@@ -1,0 +1,11 @@
+# Never send local reporter data or secrets into the Docker build context.
+journalism.db
+*.db
+*.sqlite*
+data/
+.env
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/

@@ -1,0 +1,387 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Iterable
+
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.models.domain import (
+    Investigation, Entity, Statement, Source, Evidence, ClaimEvidenceLink, Claim, Lead, LeadProfile, ReportingTask,
+    ConnectorFinding, RelationshipEdge, TimelineEvent, Document, DocumentChunk, ExtractionCandidate,
+)
+from app.services.entity_aliases import resolve_active_entity
+from app.services.post_merge_reconciliation import reconciliation_preference_map
+from app.services.relationships import serialize_relationship
+
+
+SEARCH_GROUPS = {
+    "entity": "canonical",
+    "statement": "canonical",
+    "relationship": "canonical",
+    "source": "evidence",
+    "evidence": "evidence",
+    "document": "evidence",
+    "document_chunk": "evidence",
+    "claim": "reporting",
+    "timeline_event": "reporting",
+    "lead": "workflow",
+    "reporting_task": "workflow",
+    "extraction_candidate": "review",
+    "connector_finding": "external_lead",
+}
+
+
+@dataclass
+class SearchHit:
+    type: str
+    id: str
+    investigation_id: str
+    title: str
+    snippet: str
+    score: float
+    provenance: dict
+    metadata: dict
+
+    def as_dict(self) -> dict:
+        return {
+            "type": self.type,
+            "group": SEARCH_GROUPS.get(self.type, "other"),
+            "id": self.id,
+            "investigation_id": self.investigation_id,
+            "title": self.title,
+            "snippet": self.snippet,
+            "score": round(self.score, 4),
+            "provenance": self.provenance,
+            "metadata": self.metadata,
+        }
+
+
+def _tokens(query: str) -> list[str]:
+    return [part.casefold() for part in query.split() if part.strip()]
+
+
+def _score(query: str, *values: object) -> float:
+    """Deterministic relevance scorer shared by SQLite and PostgreSQL.
+
+    The first value is treated as the record's primary human-facing field (caption, title,
+    quote, claim text, etc.). Exact/leading primary-field matches outrank incidental body
+    matches, while token coverage still allows useful partial results. This remains database
+    agnostic so local SQLite and production PostgreSQL return the same ordering.
+    """
+    q = query.strip().casefold()
+    if not q:
+        return 0.0
+    normalized = [str(v).strip().casefold() for v in values if v is not None and str(v).strip()]
+    if not normalized:
+        return 0.0
+    primary = normalized[0]
+    text = " ".join(normalized)
+    words = _tokens(query)
+
+    score = 0.0
+    if primary == q:
+        score += 12.0
+    elif primary.startswith(q):
+        score += 8.0
+    elif q in primary:
+        score += 6.0
+    elif q in text:
+        score += 4.0
+
+    if words:
+        primary_matches = sum(1 for word in words if word in primary)
+        all_matches = sum(1 for word in words if word in text)
+        score += 4.0 * (primary_matches / len(words))
+        score += 2.0 * (all_matches / len(words))
+
+    # Small deterministic specificity bonus: matching a compact primary field should beat
+    # the same phrase buried in a very large metadata blob.
+    if q in primary and len(primary) <= max(80, len(q) * 4):
+        score += 1.0
+    return score
+
+
+def _trace(record_type: str, record_id: str) -> dict:
+    return {"trace_record_type": record_type, "trace_record_id": record_id}
+
+
+def _snippet(text: str | None, query: str, limit: int = 260) -> str:
+    text = (text or "").strip().replace("\n", " ")
+    if len(text) <= limit:
+        return text
+    needle = query.strip().casefold()
+    idx = text.casefold().find(needle) if needle else -1
+    if idx < 0:
+        return text[: limit - 1] + "…"
+    start = max(0, idx - limit // 3)
+    end = min(len(text), start + limit)
+    prefix = "…" if start else ""
+    suffix = "…" if end < len(text) else ""
+    return prefix + text[start:end].strip() + suffix
+
+
+def investigation_search(db: Session, query: str, investigation_id: str | None = None, limit: int = 50, allowed_investigation_ids: set[str] | frozenset[str] | None = None, include_reconciled_duplicates: bool = False) -> dict:
+    query = query.strip()
+    if not query:
+        return {"query": query, "investigation_id": investigation_id, "total": 0, "results": [], "counts": {}}
+
+    if investigation_id and db.get(Investigation, investigation_id) is None:
+        raise ValueError("Investigation not found")
+
+    hits: list[SearchHit] = []
+
+    entities_stmt = select(Entity)
+    sources_stmt = select(Source)
+    claims_stmt = select(Claim)
+    leads_stmt = select(Lead)
+    findings_stmt = select(ConnectorFinding)
+    rels_stmt = select(RelationshipEdge)
+    timeline_stmt = select(TimelineEvent)
+    tasks_stmt = select(ReportingTask)
+    documents_stmt = select(Document)
+    if investigation_id:
+        entities_stmt = entities_stmt.where(Entity.investigation_id == investigation_id)
+        sources_stmt = sources_stmt.where(Source.investigation_id == investigation_id)
+        claims_stmt = claims_stmt.where(Claim.investigation_id == investigation_id)
+        leads_stmt = leads_stmt.where(Lead.investigation_id == investigation_id)
+        findings_stmt = findings_stmt.where(ConnectorFinding.investigation_id == investigation_id)
+        rels_stmt = rels_stmt.where(RelationshipEdge.investigation_id == investigation_id)
+        timeline_stmt = timeline_stmt.where(TimelineEvent.investigation_id == investigation_id)
+        tasks_stmt = tasks_stmt.where(ReportingTask.investigation_id == investigation_id)
+        documents_stmt = documents_stmt.where(Document.investigation_id == investigation_id)
+
+    if allowed_investigation_ids is not None:
+        allowed = tuple(sorted(allowed_investigation_ids))
+        entities_stmt = entities_stmt.where(Entity.investigation_id.in_(allowed))
+        sources_stmt = sources_stmt.where(Source.investigation_id.in_(allowed))
+        claims_stmt = claims_stmt.where(Claim.investigation_id.in_(allowed))
+        leads_stmt = leads_stmt.where(Lead.investigation_id.in_(allowed))
+        findings_stmt = findings_stmt.where(ConnectorFinding.investigation_id.in_(allowed))
+        rels_stmt = rels_stmt.where(RelationshipEdge.investigation_id.in_(allowed))
+        timeline_stmt = timeline_stmt.where(TimelineEvent.investigation_id.in_(allowed))
+        tasks_stmt = tasks_stmt.where(ReportingTask.investigation_id.in_(allowed))
+        documents_stmt = documents_stmt.where(Document.investigation_id.in_(allowed))
+
+    entities = db.scalars(entities_stmt).all()
+    entity_by_id = {e.id: e for e in entities}
+    statement_pref_cache: dict[str, dict] = {}
+    relationship_pref_cache: dict[str, dict] = {}
+    def pref_map(inv_id: str, kind: str) -> dict:
+        cache = statement_pref_cache if kind == "statement" else relationship_pref_cache
+        if inv_id not in cache:
+            cache[inv_id] = reconciliation_preference_map(db, inv_id, kind)
+        return cache[inv_id]
+    for row in entities:
+        properties_text = " ".join(
+            [prop] + [str(v) for v in (values or [])]
+            for prop, values in (row.properties or {}).items()
+        ) if False else " ".join(
+            f"{prop} {' '.join(str(v) for v in (values or []))}" for prop, values in (row.properties or {}).items()
+        )
+        score = _score(query, row.caption, row.schema, row.ftm_id, properties_text)
+        if score:
+            active, alias_chain = resolve_active_entity(db, row)
+            if active is None:
+                continue
+            is_alias = bool(alias_chain)
+            hits.append(SearchHit(
+                "entity", row.id, row.investigation_id,
+                row.caption if not is_alias else f"{row.caption} → {active.caption}",
+                _snippet(properties_text or row.caption, query), score,
+                {
+                    "kind": "merged_alias" if is_alias else "canonical",
+                    "ftm_id": row.ftm_id,
+                    "requested_entity_id": row.id,
+                    "canonical_entity_id": active.id,
+                    **_trace("entity", active.id),
+                },
+                {
+                    "schema": row.schema, "properties": row.properties or {},
+                    "merged_alias": is_alias,
+                    "active_entity_id": active.id,
+                    "active_caption": active.caption,
+                },
+            ))
+
+    # Canonical statements may contain searchable provenance not present in materialized properties.
+    if entity_by_id:
+        statements = db.scalars(select(Statement).where(Statement.entity_id.in_(entity_by_id.keys()))).all()
+        for row in statements:
+            entity = entity_by_id.get(row.entity_id)
+            if entity is None:
+                continue
+            score = _score(query, row.prop, row.value, row.dataset, row.origin, row.original_value)
+            if score:
+                reconciliation = pref_map(entity.investigation_id, "statement").get(row.id)
+                if reconciliation and reconciliation.get("suppressed_duplicate") and not include_reconciled_duplicates:
+                    continue
+                hits.append(SearchHit(
+                    "statement", row.id, entity.investigation_id,
+                    f"{entity.caption} · {row.prop}", _snippet(row.value, query), score,
+                    {"kind": "statement", "dataset": row.dataset, "origin": row.origin, "entity_id": entity.id, "reconciliation": reconciliation, **_trace("entity", entity.id)},
+                    {"prop": row.prop, "value": row.value, "schema": entity.schema, "reconciliation": reconciliation},
+                ))
+
+    sources = db.scalars(sources_stmt).all()
+    source_by_id = {s.id: s for s in sources}
+    for row in sources:
+        score = _score(query, row.title, row.url, row.source_type, row.metadata_json)
+        if score:
+            hits.append(SearchHit(
+                "source", row.id, row.investigation_id, row.title,
+                _snippet(row.url or str(row.metadata_json or ""), query), score,
+                {"kind": "source", "url": row.url, **_trace("source", row.id)},
+                {"source_type": row.source_type, "metadata": row.metadata_json or {}},
+            ))
+
+    if source_by_id:
+        evidence_rows = db.scalars(select(Evidence).where(Evidence.source_id.in_(source_by_id.keys()))).all()
+        for row in evidence_rows:
+            source = source_by_id.get(row.source_id)
+            if source is None:
+                continue
+            score = _score(query, row.quote, row.locator, row.notes, source.title, source.url)
+            if score:
+                links = db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.evidence_id == row.id)).all()
+                linked_claims = [
+                    {"claim_id": link.claim_id, "stance": link.stance, "note": link.note}
+                    for link in links
+                ]
+                hits.append(SearchHit(
+                    "evidence", row.id, source.investigation_id,
+                    source.title, _snippet(row.quote or row.notes or row.locator, query), score,
+                    {"kind": "evidence", "source_id": source.id, "source_url": source.url, "locator": row.locator, "claim_links": linked_claims, **_trace("evidence", row.id)},
+                    {"quote": row.quote, "notes": row.notes},
+                ))
+
+    for row in db.scalars(claims_stmt).all():
+        score = _score(query, row.text, row.status, row.confidence)
+        if score:
+            hits.append(SearchHit(
+                "claim", row.id, row.investigation_id, "Claim", _snippet(row.text, query), score,
+                {"kind": "reporter_claim", **_trace("claim", row.id)}, {"status": row.status, "confidence": row.confidence},
+            ))
+
+    for row in db.scalars(leads_stmt).all():
+        profile = db.scalar(select(LeadProfile).where(LeadProfile.lead_id == row.id))
+        score = _score(query, row.title, row.detail, row.provider, row.provider_record_id, row.status,
+                       profile.priority if profile else None, profile.owner if profile else None, profile.next_action if profile else None)
+        if score:
+            hits.append(SearchHit(
+                "lead", row.id, row.investigation_id, row.title, _snippet(row.detail or (profile.next_action if profile else None), query), score,
+                {"kind": "lead", "provider": row.provider, "provider_record_id": row.provider_record_id, **_trace("lead", row.id)},
+                {"status": row.status, "priority": profile.priority if profile else "normal",
+                 "owner": profile.owner if profile else None, "next_action": profile.next_action if profile else None},
+            ))
+
+    for doc in db.scalars(documents_stmt).all():
+        source = db.get(Source, doc.source_id)
+        score = _score(query, doc.filename, doc.mime_type, doc.sha256, source.title if source else None)
+        if score:
+            hits.append(SearchHit(
+                "document", doc.id, doc.investigation_id, source.title if source else doc.filename,
+                _snippet(doc.filename, query), score,
+                {"kind": "document", "source_id": doc.source_id, "sha256": doc.sha256, **_trace("document", doc.id)},
+                {"filename": doc.filename, "mime_type": doc.mime_type, "extraction_status": doc.extraction_status},
+            ))
+        chunks = db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == doc.id)).all()
+        for chunk in chunks:
+            cscore = _score(query, chunk.text, chunk.locator)
+            if cscore:
+                hits.append(SearchHit(
+                    "document_chunk", chunk.id, doc.investigation_id, source.title if source else doc.filename,
+                    _snippet(chunk.text, query), cscore,
+                    {"kind": "extracted_text", "document_id": doc.id, "source_id": doc.source_id, "locator": chunk.locator, **_trace("document", doc.id)},
+                    {"page_number": chunk.page_number, "ordinal": chunk.ordinal},
+                ))
+        candidates = db.scalars(select(ExtractionCandidate).where(ExtractionCandidate.document_id == doc.id)).all()
+        for candidate in candidates:
+            ptext = str(candidate.payload or {})
+            cscore = _score(query, ptext, candidate.candidate_type, candidate.review_status)
+            if cscore:
+                hits.append(SearchHit(
+                    "extraction_candidate", candidate.id, doc.investigation_id,
+                    f"{candidate.candidate_type.title()} candidate · {source.title if source else doc.filename}",
+                    _snippet(ptext, query), cscore,
+                    {"kind": "proposal", "document_id": doc.id, "chunk_id": candidate.chunk_id, **_trace("document", doc.id)},
+                    {"candidate_type": candidate.candidate_type, "review_status": candidate.review_status, "confidence": candidate.confidence},
+                ))
+
+    for row in db.scalars(tasks_stmt).all():
+        score = _score(query, row.title, row.detail, row.status, row.priority, row.owner, row.due_date)
+        if score:
+            hits.append(SearchHit(
+                "reporting_task", row.id, row.investigation_id, row.title, _snippet(row.detail or row.due_date, query), score,
+                {"kind": "reporting_task", "lead_id": row.lead_id, **_trace("task", row.id)},
+                {"status": row.status, "priority": row.priority, "owner": row.owner, "due_date": row.due_date},
+            ))
+
+    for row in db.scalars(findings_stmt).all():
+        props = " ".join(f"{k} {' '.join(str(v) for v in (vals or []))}" for k, vals in (row.properties or {}).items())
+        score = _score(query, row.caption, row.schema, props, row.provider, row.provider_record_id, row.source_url)
+        if score:
+            hits.append(SearchHit(
+                "connector_finding", row.id, row.investigation_id, row.caption, _snippet(props, query), score,
+                {"kind": "external_finding", "provider": row.provider, "provider_record_id": row.provider_record_id, "source_url": row.source_url},
+                {"schema": row.schema, "review_status": row.review_status},
+            ))
+
+
+    for row in db.scalars(timeline_stmt).all():
+        score = _score(query, row.title, row.description, row.date_start, row.date_end, row.verification_status, row.dataset, row.origin)
+        if score:
+            hits.append(SearchHit(
+                "timeline_event", row.id, row.investigation_id, row.title,
+                _snippet(row.description or row.date_start, query), score,
+                {"kind": "reporter_timeline_event", "origin": row.origin, "dataset": row.dataset, **(
+                    _trace("claim", row.claim_id) if row.claim_id else
+                    _trace("evidence", row.evidence_id) if row.evidence_id else
+                    _trace("source", row.source_id) if row.source_id else
+                    _trace("lead", row.lead_id) if row.lead_id else
+                    _trace("entity", row.entity_id) if row.entity_id else {}
+                )},
+                {"date_start": row.date_start, "date_end": row.date_end, "precision": row.precision,
+                 "verification_status": row.verification_status, "entity_id": row.entity_id,
+                 "relationship_entity_id": row.relationship_entity_id, "source_id": row.source_id,
+                 "evidence_id": row.evidence_id, "claim_id": row.claim_id, "lead_id": row.lead_id},
+            ))
+
+    # Relationship hits point back to the canonical interstitial FtM entity.
+    for edge in db.scalars(rels_stmt).all():
+        rel_entity = db.get(Entity, edge.relationship_entity_id)
+        source_entity = db.get(Entity, edge.source_entity_id)
+        target_entity = db.get(Entity, edge.target_entity_id)
+        if rel_entity is None:
+            continue
+        label = f"{source_entity.caption if source_entity else edge.source_entity_id} — {edge.schema} → {target_entity.caption if target_entity else edge.target_entity_id}"
+        score = _score(query, label, edge.schema, rel_entity.caption, rel_entity.properties)
+        if score:
+            reconciliation = pref_map(edge.investigation_id, "relationship").get(edge.id)
+            if reconciliation and reconciliation.get("suppressed_duplicate") and not include_reconciled_duplicates:
+                continue
+            hits.append(SearchHit(
+                "relationship", edge.id, edge.investigation_id, label,
+                _snippet(str(rel_entity.properties or {}), query), score,
+                {"kind": "ftm_relationship", "relationship_entity_id": edge.relationship_entity_id, "reconciliation": reconciliation, **_trace("relationship", edge.id)},
+                {"schema": edge.schema, "source_entity_id": edge.source_entity_id, "target_entity_id": edge.target_entity_id, "reconciliation": reconciliation, "advisory": serialize_relationship(db, edge).get("advisory")},
+            ))
+
+    hits.sort(key=lambda hit: (-hit.score, hit.type, hit.title.casefold(), hit.id))
+    total_matches = len(hits)
+    counts: dict[str, int] = {}
+    group_counts: dict[str, int] = {}
+    for hit in hits:
+        counts[hit.type] = counts.get(hit.type, 0) + 1
+        group = SEARCH_GROUPS.get(hit.type, "other")
+        group_counts[group] = group_counts.get(group, 0) + 1
+    hits = hits[: max(1, min(limit, 200))]
+    return {
+        "query": query,
+        "investigation_id": investigation_id,
+        "total": total_matches,
+        "returned": len(hits),
+        "counts": counts,
+        "group_counts": group_counts,
+        "results": [hit.as_dict() for hit in hits],
+    }

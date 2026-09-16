@@ -1,0 +1,31 @@
+# Local reporter data / credentials
+journalism.db
+*.db
+*.sqlite*
+data/
+backend/data/
+backend/.env
+.env
+.env.*
+!.env.example
+
+# Python/runtime caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Frontend dependencies/build output
+frontend/node_modules/
+frontend/.next/
+node_modules/
+.next/
+
+# Local generated snapshots / runtime artifacts
+journalism-workbench-*-source.tar.gz
+SOURCE_ARCHIVE_SHA256.txt
+SNAPSHOT_MANIFEST.json
+*.log
+.DS_Store
+Thumbs.db

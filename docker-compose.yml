@@ -1,0 +1,180 @@
+x-openaleph-environment: &openaleph-environment
+  ALEPH_DEBUG: "true"
+  ALEPH_SECRET_KEY: ${OPENALEPH_SECRET_KEY:-journalism-openaleph-dev}
+  ALEPH_SINGLE_USER: "true"
+  ALEPH_DATABASE_URI: postgresql://aleph:aleph@postgres:5432/aleph
+  OPENALEPH_DB_URI: postgresql://aleph:aleph@postgres:5432/aleph
+  FTM_STORE_URI: postgresql://aleph:aleph@postgres:5432/aleph
+  ALEPH_ELASTICSEARCH_URI: http://elasticsearch:9200
+  OPENALEPH_ELASTICSEARCH_URI: http://elasticsearch:9200
+  REDIS_URL: redis://redis:6379/0
+  ARCHIVE_TYPE: file
+  ARCHIVE_PATH: /data
+
+services:
+  workbench-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: journalism
+      POSTGRES_USER: journalism
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-journalism-local-dev}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - workbench-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U journalism -d journalism"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: aleph
+      POSTGRES_USER: aleph
+      POSTGRES_PASSWORD: aleph
+    volumes:
+      - openaleph-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aleph -d aleph"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  elasticsearch:
+    image: ghcr.io/openaleph/elasticsearch:latest
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: ${OPENALEPH_ES_JAVA_OPTS:--Xms1g -Xmx1g}
+    volumes:
+      - openaleph-elasticsearch-data:/usr/share/elasticsearch/data
+
+  redis:
+    image: redis:alpine
+    command: ["redis-server", "--save", "3600", "10"]
+    volumes:
+      - openaleph-redis-data:/data
+
+  ingest:
+    image: ghcr.io/openaleph/ingest-file:${OPENALEPH_TAG:-5.3.1}
+    platform: linux/amd64
+    command: procrastinate worker -q ingest
+    environment: *openaleph-environment
+    tmpfs:
+      - /tmp:mode=777
+    volumes:
+      - openaleph-archive:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  analyze:
+    image: ghcr.io/openaleph/ftm-analyze:${OPENALEPH_TAG:-5.3.1}
+    command: procrastinate worker -q analyze
+    environment: *openaleph-environment
+    tmpfs:
+      - /tmp:mode=777
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  worker:
+    image: ghcr.io/openaleph/openaleph:${OPENALEPH_TAG:-5.3.1}
+    command: procrastinate worker -q openaleph,openaleph-management
+    environment: *openaleph-environment
+    tmpfs:
+      - /tmp
+    volumes:
+      - openaleph-archive:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_started
+      redis:
+        condition: service_started
+      ingest:
+        condition: service_started
+
+  api:
+    image: ghcr.io/openaleph/openaleph:${OPENALEPH_TAG:-5.3.1}
+    environment: *openaleph-environment
+    ports:
+      - "127.0.0.1:8001:8000"
+    tmpfs:
+      - /tmp
+    volumes:
+      - openaleph-archive:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_started
+      redis:
+        condition: service_started
+      worker:
+        condition: service_started
+      ingest:
+        condition: service_started
+
+  ui:
+    image: ghcr.io/openaleph/aleph-ui:${OPENALEPH_TAG:-5.3.1}
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      - api
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://journalism:${POSTGRES_PASSWORD:-journalism-local-dev}@workbench-db:5432/journalism
+      OPENALEPH_ENABLED: "true"
+      OPENALEPH_BASE_URL: http://api:8000
+      OPENALEPH_UI_URL: http://localhost:8080
+      OPENALEPH_API_KEY: ${OPENALEPH_API_KEY:-}
+      OPENALEPH_AUTO_SYNC_DOCUMENTS: "true"
+      ENABLE_LOCAL_ENTITY_SUGGESTIONS: "false"
+      ALEPH_BASE_URL: https://aleph.occrp.org
+      ALEPH_API_KEY: ${ALEPH_API_KEY:-}
+      OPENSANCTIONS_BASE_URL: ${OPENSANCTIONS_BASE_URL:-https://api.opensanctions.org}
+      OPENSANCTIONS_API_KEY: ${OPENSANCTIONS_API_KEY:-}
+      OPENSANCTIONS_DATASET: ${OPENSANCTIONS_DATASET:-default}
+      OPENSANCTIONS_SEARCH_LIMIT: ${OPENSANCTIONS_SEARCH_LIMIT:-20}
+      API_AUTH_TOKEN: ${API_AUTH_TOKEN:-}
+      API_AUTH_INVESTIGATION_IDS: ${API_AUTH_INVESTIGATION_IDS:-}
+      ENABLE_AI_FEATURES: "false"
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      workbench-db:
+        condition: service_healthy
+      api:
+        condition: service_started
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build: ./frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_OPENALEPH_URL: http://localhost:8080
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  workbench-pgdata:
+  openaleph-pgdata:
+  openaleph-elasticsearch-data:
+  openaleph-redis-data:
+  openaleph-archive:
