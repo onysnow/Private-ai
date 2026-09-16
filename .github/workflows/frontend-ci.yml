@@ -12,6 +12,8 @@ on:
 
 jobs:
   frontend:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     defaults:
       run:
