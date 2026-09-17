@@ -93,3 +93,30 @@ mounted drive (a plain `npm install` there repeatedly stalled past the
 error — see dev-log.md's "practical notes" section). Pushed the fix as
 `7e5665d` to `copilot/adopt-shadcn-ui-library`. PR #27 is now
 `mergeable: true`, CI running on the new commit.
+
+---
+
+**[2026-09-17] Technical work (task #35 + issue #36), no new user prompt
+this stretch — Claude working through the backlog instruction from
+earlier:** Merged PR #27 via GitHub API (squash — this repo disables
+plain merge commits). Spent significant effort diagnosing task #35's
+backend-postgres-ci.yml push-only failure: ruled out YAML syntax,
+invalid action-tag versions, staleness, and an account-wide Actions
+outage, narrowed it to a genuine dispatch-level failure (0 jobs, 0
+check-runs, 0-duration run, non-retryable, and the run's displayed
+`name` falls back to the file path — a concrete sign GitHub isn't
+fully resolving the file even though it parses as valid YAML) but did
+not reach root cause; left a specific next-step (check the GitHub web
+UI's Actions tab banner, which surfaces human-readable parse errors
+the REST API doesn't expose) rather than a vague "still broken."
+Started issue #36 (backend LLM reasoning layer — the explicit top
+priority): built the provider-agnostic LLM client abstraction
+(Anthropic + OpenAI adapters), the new Settings fields, and the
+AIAnalysisCandidate review-gated model. While adding its Alembic
+migration, found the existing migration history had already forked
+into two heads from an earlier unreconciled merge — fixed that with a
+proper merge migration rather than just building on top of one branch
+and leaving the fork in place, and verified the whole chain applies
+and reverses cleanly against a real (throwaway) database rather than
+just eyeballing the code. Endpoints, citation validation, and tests
+are queued for the next cycle.

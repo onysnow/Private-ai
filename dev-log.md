@@ -18,27 +18,49 @@ cold.
 
 ## Current state (updated each cycle — read this first)
 
-- **Open PRs on Private-ai:** #27 (shadcn/ui adoption) — only one open.
-- **PR #27:** was `mergeable_state: dirty` against main after PR #47 and
-  the TAS PR #1 merged (both landed 2026-09-17 ~18:24 UTC, moving
-  main's tip to `17a0540`). Root cause: `frontend/package.json` /
-  `package-lock.json` conflict — PR #27's branch still had
-  `vitest ^3.2.6`, main had already moved to `vitest ^5.0.1` via a
-  separate dependency bump. Resolved by keeping PR #27's
-  `tailwindcss`/`typescript` additions and taking main's newer
-  `vitest`, then regenerating the lockfile. Pushed as commit
-  `7e5665d` to `copilot/adopt-shadcn-ui-library`. As of this entry:
-  `mergeable: true`, `mergeable_state: unstable` (checks still running
-  on the new commit) — do not merge until it reports clean/success.
-- **PR #47 (Private-ai, bump TAS submodule to v1.8.0)** — merged
-  2026-09-17 18:24 UTC.
-- **task #35 (backend-postgres-ci.yml push-trigger failure)** — not
-  yet diagnosed this cycle; main just moved twice, so a fresh push-CI
-  data point should exist shortly — check `main`'s latest workflow run
-  before assuming the old failure data point is still current.
-- **Task #54 gate (backend LLM reasoning layer, issue #36):** not
-  started yet. This is explicitly the priority per Ony's sequencing,
-  ahead of any frontend feature work (#43/#44/#45).
+- **Open PRs on Private-ai:** none. PR #27 (shadcn/ui) merged (squash,
+  commit `1852356`) after its conflict was fixed — mergeable/CI both
+  clean. PR #47 (submodule bump) was already merged before this cycle.
+- **task #35 (backend-postgres-ci.yml push-trigger failure)** —
+  diagnosed but NOT yet root-caused. Confirmed facts: the workflow's
+  YAML is valid (parses fine, schema-plausible, structurally identical
+  in shape to the working workflows); the action tags it pins
+  (`checkout@v7`, `setup-python@v7`) genuinely exist; it is not a
+  stale-check artifact (reproduced fresh via a real push with a
+  trivial content edit, still failed identically); it is not an
+  account-wide Actions outage (sibling workflows — CodeQL, docker-build,
+  frontend, Analyze — succeed on the exact same commits). The run
+  itself is created (shows up under the workflow's own run history)
+  but completes in 0 duration with 0 jobs and 0 check-runs, conclusion
+  `failure`, and GitHub refuses to let it be rerun ("This workflow run
+  cannot be retried" — a 403 GitHub reserves for dispatch-level
+  configuration failures, not job failures). The run's `name` field
+  also falls back to the file path instead of showing the declared
+  `name: Backend PostgreSQL CI` — a concrete sign GitHub's workflow
+  processor isn't fully resolving this file's top-level metadata, even
+  though generic YAML parsing succeeds. This needs a look at the
+  GitHub web UI's Actions tab directly (it surfaces a human-readable
+  "Invalid workflow file" banner in this exact failure mode that the
+  REST API does not expose) — not yet done. Do not re-diagnose from
+  scratch next cycle; start from the web UI banner.
+- **Issue #36 (backend LLM reasoning layer) — in progress, part 1/2
+  done:** provider-agnostic `LLMClient` abstraction (Anthropic +
+  OpenAI adapters), `Settings.ai_provider`/`anthropic_api_key`/
+  `openai_api_key`, `.env.example` docs, and the `AIAnalysisCandidate`
+  review-gated model + Alembic migration are done and pushed to `dev`
+  (commit `536e65e`). Verified the full migration chain applies AND
+  reverses cleanly against a throwaway sqlite db. **Next cycle:**
+  implement the two endpoints (`POST .../assistant/case-synthesis`,
+  `POST .../assistant/hypothesis-test`) per issue #36's spec — compile
+  system prompt from the TAS module file + `SOURCE_AUTHORITY_AND_
+  RETRIEVAL_POLICY.md` + the existing `reasoning_contract`, call
+  `build_question_context()` for the user-turn content, strictly
+  validate every returned evidence_id against the packet's `citations`
+  list (reject/flag anything not present), persist as
+  `AIAnalysisCandidate`, wire into the existing candidate-review flow
+  (see `review_extraction_candidate` in `routes.py` for the pattern to
+  reuse) — then the test list from the issue body. This is still the
+  explicit priority ahead of any frontend feature work (#43/#44/#45).
 - **Working-branch convention:** `dev` is the shared unprotected branch
   for day-to-day pushes (no PR needed there); `main` still requires a
   clean PR. Don't conflate the two.
@@ -61,6 +83,18 @@ cold.
   merges into main — GitHub recomputes it async. Re-fetch 2-3 times
   with a short delay before treating a conflict as real (in this case
   it was real and consistent across 3 fetches).
+- This device's system `python3` is 3.10 — too old for this codebase
+  (`app/core/time.py` uses `datetime.UTC`, needs 3.11+). `uv` is
+  installed on this device though: `uv python install 3.12 && uv venv
+  <path> --python 3.12` gets a working interpreter fast, then
+  `uv pip install --python <path>/bin/python <pkgs>` for deps. The
+  pinned `backend/requirements.txt` isn't fully installable here as of
+  this cycle (`followthemoney==4.11.0` doesn't exist on PyPI at that
+  pin) — for a quick alembic/model sanity check, installing just the
+  handful of packages the import chain actually needs (alembic,
+  sqlalchemy, pydantic-settings, psycopg, fastapi) is much faster and
+  sufficient; don't burn time on the full requirements.txt unless the
+  task actually needs to run the app/tests for real.
 
 ## Entries
 
@@ -85,3 +119,24 @@ cold.
   "Current state" section above is the fast-import summary; the
   dated entries below are the full history for anyone who needs the
   detail.
+
+### 2026-09-17 — Task #35 diagnosed (partially), Issue #36 part 1/2 shipped
+- Confirmed PR #27 fully green after the fix and merged it (squash,
+  `1852356`) via the GitHub API — repo requires squash/rebase merges,
+  plain "merge" is disabled (`allow_merge_commit: false`).
+- Spent real effort on task #35 (see "Current state" above for the
+  full finding) but did not reach root cause — narrowed it a lot
+  without needing to guess further. Flagged exactly where to pick this
+  up (the web UI Actions tab banner) rather than leaving a vague
+  "still broken" note.
+- Started issue #36 (explicitly the top engineering priority). While
+  wiring up the Alembic migration, discovered the existing migration
+  chain had silently forked into two heads (`b84e2fa90c17` /
+  `c05f9e3a1d64`) from two previously-merged PRs that were never
+  reconciled — `alembic upgrade head` would have been ambiguous for
+  anyone hitting this fresh. Added a merge migration to fix that as
+  part of landing the new table, verified the whole chain top to
+  bottom against a real sqlite db (up AND down), not just by reading
+  it. Shipped the provider-agnostic LLM client + config + model +
+  migrations to `dev` (`536e65e`); endpoints + citation validation +
+  tests are next cycle's work.
