@@ -120,3 +120,55 @@ and leaving the fork in place, and verified the whole chain applies
 and reverses cleanly against a real (throwaway) database rather than
 just eyeballing the code. Endpoints, citation validation, and tests
 are queued for the next cycle.
+
+---
+
+**[2026-09-17] Ony (mid-turn, while Claude was implementing issue #36 /
+running the structure audit):**
+> Yes keep going, also can you do a full application structure audit
+> and make sure anything from the folder structure, to components,
+> models, - and everything else. (Make a prompt for this)
+
+**Claude:** Wrote `APPLICATION_STRUCTURE_AUDIT_PROMPT.md` as a reusable,
+10-pass prompt rather than a one-off ad hoc review, deliberately reusing
+TAS's own finding-record schema and severity taxonomy (BLOCKING /
+MATERIAL / NON_MATERIAL / OPTIONAL, OPEN / CORRECTED / VERIFIED /
+ACCEPTED_RISK) instead of inventing new vocabulary. Ran the first pass
+and logged it as `STRUCTURE_AUDIT.md` (7 findings, one flagged BLOCKING
+at the time: `followthemoney==4.11.0` appearing not to exist on PyPI).
+
+---
+
+**[2026-09-17] Ony:**
+> And make sure the follow the highest standards for software
+> development. And also make sure it's structure for human development.
+
+**Claude:** Read this as a directive to go back and actually fix what
+the audit had found, not just leave it as a report, and to keep
+applying that bar going forward. Went finding-by-finding:
+- Re-checked the one BLOCKING finding (STRUCT-0001) before touching
+  anything else — a claim that severe deserved a second look, not just
+  a first impression carried forward. Found it was wrong: the
+  `followthemoney` pin is real and installable; the original failure
+  was a transient PyPI propagation delay. Corrected the audit record
+  rather than leaving a known-wrong finding on file, and explicitly
+  named this self-correction as an example of the standard being asked
+  for — "highest standards" includes being willing to reverse your own
+  prior conclusion when better evidence shows up, not just plowing
+  ahead on the original call.
+- Fixed everything else that was safe to fix mechanically: removed the
+  unused `pypdf` dependency, reconciled CI action versions across all 4
+  workflow files, closed all 5 `.env.example` gaps against `Settings`,
+  and wrote the resulting conventions into
+  `.github/copilot-instructions.md` so they're discoverable for future
+  contributors instead of only living in this session.
+- Deliberately did NOT rush the one large remaining item (the
+  `routes.py` split — 1797 lines, 117 endpoints) into this same pass.
+  Explained to Ony (via dev-log.md, and here) that doing so would
+  itself violate this project's own already-stated engineering rules
+  (PR scope discipline, full-test-suite-before-merge) — the "highest
+  standards" instruction cuts against rushing a large structural change
+  in without its own dedicated regression coverage, not for it. Ran the
+  full 216-test backend suite (not just the tests touching issue #36)
+  against a synced local copy before opening PR #50, to make sure this
+  batch of fixes didn't regress anything.
