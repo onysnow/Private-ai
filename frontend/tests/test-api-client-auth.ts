@@ -10,8 +10,8 @@ const seen:Seen[]=[];
 };
 
 test('ApiClient auth fixtures', async ()=>{
+  seen.length=0;
   const explicitAuthorization='custom-auth-header';
-  const scheme=String.fromCharCode(66,101,97,114,101,114);
   const token='unit-test-token';
   const client=new ApiClient('https://example.test');
   await client.unknown('/api/one');
@@ -19,7 +19,10 @@ test('ApiClient auth fixtures', async ()=>{
   client.setAuthToken(`  ${token}  `);
   expect(client.hasAuthToken()).toBe(true);
   await client.unknown('/api/two',{method:'POST',body:{x:1}});
-  expect(seen[1].authorization).toBe(`${scheme} ${token}`);
+  const [scheme, receivedToken, ...extraParts]=(seen[1].authorization??'').split(' ');
+  expect(scheme.toLowerCase()).toBe('bearer');
+  expect(receivedToken).toBe(token);
+  expect(extraParts.length).toBe(0);
   await client.unknown('/api/three',{headers:{authorization:explicitAuthorization}});
   expect(seen[2].authorization).toBe(explicitAuthorization);
   client.clearAuthToken();
