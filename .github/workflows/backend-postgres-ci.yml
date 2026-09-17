@@ -33,8 +33,8 @@ jobs:
         working-directory: backend
 
     env:
-      DATABASE_URL: ******127.0.0.1:5432/journalism_test
-      POSTGRES_TEST_URL: ******127.0.0.1:5432/journalism_test
+      DATABASE_URL: "postgresql+psycopg://journalism:journalism@127.0.0.1:5432/journalism_test"
+      POSTGRES_TEST_URL: "postgresql+psycopg://journalism:journalism@127.0.0.1:5432/journalism_test"
 
     steps:
       - uses: actions/checkout@v4
