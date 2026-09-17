@@ -18,11 +18,10 @@ cold.
 
 ## Current state (updated each cycle — read this first)
 
-- **Open PRs on Private-ai:** #50 (dev -> main, structure audit
-  fixes batch) — opened this cycle, not yet merged. Full backend
-  suite (216 tests) verified passing locally before opening; wait for
-  real CI (clean/success, not just "pending") before merging, per
-  this repo's own established practice.
+- **Open PRs on Private-ai:** none. PR #50 (structure audit fixes
+  batch) merged (squash, `df18cd6`) once every check reported
+  success and `mergeable_state` was `clean` — not before. `dev` merged
+  back from `main` afterward, no conflicts.
 - **task #35 (backend-postgres-ci.yml push-trigger failure)** —
   diagnosed but NOT yet root-caused. Confirmed facts: the workflow's
   YAML is valid (parses fine, schema-plausible, structurally identical
