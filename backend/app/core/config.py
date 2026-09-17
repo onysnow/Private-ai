@@ -32,6 +32,10 @@ class Settings(BaseSettings):
     enable_restore_api: bool = False
     app_environment: str = "development"
     enable_ai_features: bool = False
+    # "" disables regardless of enable_ai_features; "anthropic" / "openai" selects the adapter.
+    ai_provider: str = ""
+    anthropic_api_key: str = ""
+    openai_api_key: str = ""
     cors_allowed_origins: str = (
         "http://localhost:3000,http://127.0.0.1:3000,http://127.0.0.1:8000,http://localhost:8000"
     )
