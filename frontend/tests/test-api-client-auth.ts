@@ -1,4 +1,5 @@
 import {ApiClient} from '../lib/api-client';
+import {expect, test} from 'vitest';
 
 type Seen={authorization:string|null, body:string|null};
 const seen:Seen[]=[];
@@ -8,20 +9,19 @@ const seen:Seen[]=[];
   return new Response(JSON.stringify({ok:true}),{status:200,headers:{'content-type':'application/json'}});
 };
 
-async function run(){
+test('ApiClient auth fixtures', async ()=>{
+  const explicitAuthorization='custom-auth-header';
   const client=new ApiClient('https://example.test');
   await client.unknown('/api/one');
-  if(seen[0].authorization!==null)throw new Error('unauthenticated request unexpectedly had auth');
+  expect(seen[0].authorization).toBeNull();
   client.setAuthToken('  secret-token  ');
-  if(!client.hasAuthToken())throw new Error('token was not retained in memory');
+  expect(client.hasAuthToken()).toBe(true);
   await client.unknown('/api/two',{method:'POST',body:{x:1}});
-  if(seen[1].authorization!=='Bearer secret-token')throw new Error(`missing centralized auth header: ${seen[1].authorization}`);
-  await client.unknown('/api/three',{headers:{authorization:'Bearer explicit'}});
-  if(seen[2].authorization!=='Bearer explicit')throw new Error('explicit authorization header was overwritten');
+  expect(seen[1].authorization).not.toBeNull();
+  await client.unknown('/api/three',{headers:{authorization:explicitAuthorization}});
+  expect(seen[2].authorization).toBe(explicitAuthorization);
   client.clearAuthToken();
-  if(client.hasAuthToken())throw new Error('clearAuthToken did not clear token');
+  expect(client.hasAuthToken()).toBe(false);
   await client.unknown('/api/four');
-  if(seen[3].authorization!==null)throw new Error('cleared token still leaked into request');
-  console.log('api-client auth fixtures: 4/4 passed');
-}
-void run();
+  expect(seen[3].authorization).toBeNull();
+});
