@@ -10,7 +10,7 @@ def new_inv(name='Docs'):
 def test_text_document_ingestion_review_boundary():
     inv=new_inv('Document boundary')
     text=("Acme Holdings Inc. announced a new infrastructure program on August 12, 2026.\n\n"
-          "Jordan Rivera served as a state senator before becoming mayor.\n")
+          "Jordan Rivera joined the board of directors in 2019.\n")
     r=client.post('/api/documents/upload', data={'investigation_id':inv,'title':'Test memo'}, files={'file':('memo.txt', text.encode(), 'text/plain')})
     assert r.status_code==200, r.text
     doc=r.json(); assert doc['extraction_status']=='complete'; assert doc['chunk_count']==2
