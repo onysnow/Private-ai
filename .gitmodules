@@ -1,0 +1,3 @@
+[submodule "backend/app/ai/tas_spec"]
+	path = backend/app/ai/tas_spec
+	url = https://github.com/onysnow/topic-authority-system.git
