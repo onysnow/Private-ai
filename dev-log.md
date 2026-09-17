@@ -43,24 +43,18 @@ cold.
   "Invalid workflow file" banner in this exact failure mode that the
   REST API does not expose) — not yet done. Do not re-diagnose from
   scratch next cycle; start from the web UI banner.
-- **Issue #36 (backend LLM reasoning layer) — in progress, part 1/2
-  done:** provider-agnostic `LLMClient` abstraction (Anthropic +
-  OpenAI adapters), `Settings.ai_provider`/`anthropic_api_key`/
-  `openai_api_key`, `.env.example` docs, and the `AIAnalysisCandidate`
-  review-gated model + Alembic migration are done and pushed to `dev`
-  (commit `536e65e`). Verified the full migration chain applies AND
-  reverses cleanly against a throwaway sqlite db. **Next cycle:**
-  implement the two endpoints (`POST .../assistant/case-synthesis`,
-  `POST .../assistant/hypothesis-test`) per issue #36's spec — compile
-  system prompt from the TAS module file + `SOURCE_AUTHORITY_AND_
-  RETRIEVAL_POLICY.md` + the existing `reasoning_contract`, call
-  `build_question_context()` for the user-turn content, strictly
-  validate every returned evidence_id against the packet's `citations`
-  list (reject/flag anything not present), persist as
-  `AIAnalysisCandidate`, wire into the existing candidate-review flow
-  (see `review_extraction_candidate` in `routes.py` for the pattern to
-  reuse) — then the test list from the issue body. This is still the
-  explicit priority ahead of any frontend feature work (#43/#44/#45).
+- **Issue #36 (backend LLM reasoning layer) — DONE, merged.** Both
+  endpoints (case-synthesis, hypothesis-test), strict schema +
+  citation validation, the review endpoint, and 6 passing tests
+  landed via PR #49 (squash-merged to main @ `2cff5c6`). Issue #36
+  auto-closed. Task #54's backend-completion gate: re-confirm with Ony
+  whether this satisfies it before starting any frontend work
+  (#43/#44/#45).
+- **Structure audit v1 shipped** in the same PR — see
+  `STRUCTURE_AUDIT.md` for the 7 findings (1 BLOCKING: a
+  `followthemoney` pin that doesn't exist on PyPI). None of the
+  findings were fixed as part of this PR — audits and fixes stay
+  separate, per the audit prompt's own rule 2.
 - **Working-branch convention:** `dev` is the shared unprotected branch
   for day-to-day pushes (no PR needed there); `main` still requires a
   clean PR. Don't conflate the two.
@@ -156,3 +150,15 @@ cold.
   (MATERIAL). Full detail and 4 more findings in STRUCTURE_AUDIT.md.
   Explicitly marked LIMITED REVIEW — passes 2/6/10 weren't done this
   cycle, don't treat this report as exhaustive.
+
+### 2026-09-17 (cont'd) — PR #49 merged, issue #36 closed
+- Opened PR #49 (dev -> main) bundling issue #36's full implementation
+  with the structure audit v1 work. Waited for real CI (not a stale
+  check), confirmed `mergeable_state: clean` and every triggered check
+  (CodeQL, both Analyze jobs, both docker-build) passed, squash-merged.
+  GitHub auto-closed issue #36 on merge (the PR body used "Closes #36").
+  backend-postgres-ci.yml did not run on this PR — expected, it's the
+  workflow with the still-unresolved dispatch failure (task #35), and
+  this PR touches no backend/** files that would even change its
+  behavior once fixed.
+- Merged `origin/main` back into `dev` to keep the branches in sync.
