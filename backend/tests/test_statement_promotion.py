@@ -6,9 +6,9 @@ from app.connectors.registry import registry
 class PromotionConnector(Connector):
     async def search(self, query: str):
         return [ExternalFinding(
-            provider="promotionfake", record_id="company-p1", caption="NiSource Inc.", schema="Company",
+            provider="promotionfake", record_id="company-p1", caption="Acme Holdings Inc.", schema="Company",
             url="https://example.test/company-p1",
-            properties={"name": ["NiSource Inc."], "jurisdiction": ["us-in"], "address": ["123 Main St"]},
+            properties={"name": ["Acme Holdings Inc."], "jurisdiction": ["us-in"], "address": ["123 Main St"]},
             raw={"id": "company-p1", "dataset": "corporate_registry_test"},
         )]
 
@@ -17,10 +17,10 @@ def test_explicit_promotion_adds_only_accepted_value_with_provenance():
     client = TestClient(app)
     inv = client.post("/api/investigations", json={"name":"Promotion test"}).json()
     entity = client.post("/api/entities", json={
-        "investigation_id":inv["id"], "schema":"Company", "caption":"NiSource Inc.",
-        "properties":{"name":["NiSource Inc."]}, "dataset":"reporter"
+        "investigation_id":inv["id"], "schema":"Company", "caption":"Acme Holdings Inc.",
+        "properties":{"name":["Acme Holdings Inc."]}, "dataset":"reporter"
     }).json()
-    finding = client.post("/api/connectors/promotionfake/search", json={"investigation_id":inv["id"], "query":"NiSource"}).json()[0]
+    finding = client.post("/api/connectors/promotionfake/search", json={"investigation_id":inv["id"], "query":"Acme Holdings"}).json()[0]
     client.post(f"/api/connector-findings/{finding['id']}/resolution", json={
         "entity_id":entity["id"], "decision":"positive", "confidence":0.99, "rationale":"Same legal entity"
     })
@@ -64,10 +64,10 @@ def test_promotion_requires_accepted_assessment_and_positive_identity():
     client = TestClient(app)
     inv = client.post("/api/investigations", json={"name":"Promotion guard test"}).json()
     entity = client.post("/api/entities", json={
-        "investigation_id":inv["id"], "schema":"Company", "caption":"NiSource Inc.",
-        "properties":{"name":["NiSource Inc."]}, "dataset":"reporter"
+        "investigation_id":inv["id"], "schema":"Company", "caption":"Acme Holdings Inc.",
+        "properties":{"name":["Acme Holdings Inc."]}, "dataset":"reporter"
     }).json()
-    finding = client.post("/api/connectors/promotionfake2/search", json={"investigation_id":inv["id"], "query":"NiSource"}).json()[0]
+    finding = client.post("/api/connectors/promotionfake2/search", json={"investigation_id":inv["id"], "query":"Acme Holdings"}).json()[0]
     unresolved = client.post(f"/api/connector-findings/{finding['id']}/assessments", json={
         "entity_id":entity["id"], "prop":"jurisdiction", "value":"us-in", "status":"unresolved"
     }).json()
