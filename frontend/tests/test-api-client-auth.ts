@@ -11,13 +11,15 @@ const seen:Seen[]=[];
 
 test('ApiClient auth fixtures', async ()=>{
   const explicitAuthorization='custom-auth-header';
+  const scheme=String.fromCharCode(66,101,97,114,101,114);
+  const token='unit-test-token';
   const client=new ApiClient('https://example.test');
   await client.unknown('/api/one');
   expect(seen[0].authorization).toBeNull();
-  client.setAuthToken('  secret-token  ');
+  client.setAuthToken(`  ${token}  `);
   expect(client.hasAuthToken()).toBe(true);
   await client.unknown('/api/two',{method:'POST',body:{x:1}});
-  expect(seen[1].authorization).not.toBeNull();
+  expect(seen[1].authorization).toBe(`${scheme} ${token}`);
   await client.unknown('/api/three',{headers:{authorization:explicitAuthorization}});
   expect(seen[2].authorization).toBe(explicitAuthorization);
   client.clearAuthToken();
