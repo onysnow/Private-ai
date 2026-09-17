@@ -60,7 +60,17 @@ Double-click **Start with Docker.bat**, or run:
 docker compose up --build
 ```
 
-The Workbench Next.js UI is intended at `http://localhost:3000`, Workbench API docs at `http://localhost:8000/docs`, local OpenAleph API at `http://localhost:8001`, and the OpenAleph UI at `http://localhost:8080`. The full container stack has not yet been boot-tested in this execution environment.
+The default stack starts the Workbench database, API, and Next.js UI: use `http://localhost:3000` for the UI and `http://localhost:8000/docs` for API docs.
+
+Docker Compose wires a localhost-only development bearer token between the frontend and backend automatically so the browser UI can talk to the containerized API through the published `localhost` port. Override `API_AUTH_TOKEN` in your shell or `.env` if you want a different local token.
+
+To also boot the local OpenAleph services, opt into the profile explicitly:
+
+```bash
+COMPOSE_PROFILES=openaleph OPENALEPH_ENABLED=true OPENALEPH_AUTO_SYNC_DOCUMENTS=true ENABLE_LOCAL_ENTITY_SUGGESTIONS=false docker compose up --build
+```
+
+That profile additionally exposes the local OpenAleph API at `http://localhost:8001` and the OpenAleph UI at `http://localhost:8080`.
 
 ## Aleph access
 
