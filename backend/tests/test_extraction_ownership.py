@@ -27,7 +27,7 @@ def _ingest(tmp_path, *, local_entities: bool):
             title="Ownership note",
             filename="note.txt",
             mime_type="text/plain",
-            data=b"Eddie Melton worked with NiSource Corporation. The filing reported that the company paid a consultant.",
+            data=b"Jordan Rivera worked with Acme Holdings Corporation. The filing reported that the company paid a consultant.",
             storage_dir=tmp_path / "documents",
         )
         candidates = db.scalars(

@@ -7,12 +7,12 @@ from app.connectors.base import Connector, ExternalFinding
 class AConnector(Connector):
     async def search(self, query: str): return []
     async def enrich(self, entity: dict):
-        return [ExternalFinding(provider="a", record_id="a-1", caption="NiSource Inc", schema="Company", properties={"name":["NiSource Inc."],"leiCode":["549300ABC123"],"jurisdiction":["us-in"]}, url="https://a.example/a-1", raw={})]
+        return [ExternalFinding(provider="a", record_id="a-1", caption="Acme Holdings Inc", schema="Company", properties={"name":["Acme Holdings Inc."],"leiCode":["549300ABC123"],"jurisdiction":["us-in"]}, url="https://a.example/a-1", raw={})]
 
 class BConnector(Connector):
     async def search(self, query: str): return []
     async def enrich(self, entity: dict):
-        return [ExternalFinding(provider="b", record_id="b-1", caption="NISOURCE INC.", schema="Company", properties={"name":["NiSource Inc"],"leiCode":["549300ABC123"],"address":["801 E 86th Ave"]}, url="https://b.example/b-1", raw={})]
+        return [ExternalFinding(provider="b", record_id="b-1", caption="ACME HOLDINGS INC.", schema="Company", properties={"name":["Acme Holdings Inc"],"leiCode":["549300ABC123"],"address":["801 E 86th Ave"]}, url="https://b.example/b-1", raw={})]
 
 def setup_module():
     Base.metadata.drop_all(bind=engine)
@@ -22,7 +22,7 @@ def setup_module():
 def test_cross_provider_cluster_and_reporter_decision():
     client=TestClient(app)
     inv=client.post("/api/investigations",json={"name":"Cluster test"}).json()
-    entity=client.post("/api/entities",json={"investigation_id":inv["id"],"schema":"Company","caption":"NiSource Inc.","properties":{"name":["NiSource Inc."]}}).json()
+    entity=client.post("/api/entities",json={"investigation_id":inv["id"],"schema":"Company","caption":"Acme Holdings Inc.","properties":{"name":["Acme Holdings Inc."]}}).json()
     session=client.post(f'/api/entities/{entity["id"]}/enrich',json={"providers":["a","b"]}).json()
     clusters=client.get(f'/api/enrichment-sessions/{session["id"]}/clusters').json()
     assert len(clusters)==1

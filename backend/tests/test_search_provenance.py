@@ -15,13 +15,13 @@ def test_investigation_search_returns_typed_provenance_and_claim_evidence_links(
     other = client.post('/api/investigations', json={'name': 'Other investigation'}).json()
 
     entity = client.post('/api/entities', json={
-        'investigation_id': inv['id'], 'schema': 'Company', 'caption': 'NiSource Inc.',
-        'properties': {'name': ['NiSource Inc.'], 'jurisdiction': ['Indiana']},
+        'investigation_id': inv['id'], 'schema': 'Company', 'caption': 'Acme Holdings Inc.',
+        'properties': {'name': ['Acme Holdings Inc.'], 'jurisdiction': ['Indiana']},
         'origin': 'reporter-notebook'
     }).json()
     client.post('/api/entities', json={
-        'investigation_id': other['id'], 'schema': 'Company', 'caption': 'NiSource Other',
-        'properties': {'name': ['NiSource Other']}
+        'investigation_id': other['id'], 'schema': 'Company', 'caption': 'Acme Holdings Other',
+        'properties': {'name': ['Acme Holdings Other']}
     })
 
     source = client.post('/api/sources', json={
@@ -30,12 +30,12 @@ def test_investigation_search_returns_typed_provenance_and_claim_evidence_links(
     }).json()
     evidence = client.post('/api/evidence', json={
         'source_id': source['id'],
-        'quote': 'NiSource requested approval for the Indiana project.',
+        'quote': 'Acme Holdings requested approval for the Indiana project.',
         'locator': 'p. 42',
         'notes': 'Primary filing excerpt'
     }).json()
     claim = client.post('/api/claims', json={
-        'investigation_id': inv['id'], 'text': 'NiSource requested regulatory approval.',
+        'investigation_id': inv['id'], 'text': 'Acme Holdings requested regulatory approval.',
         'status': 'supported', 'confidence': 0.8
     }).json()
     link = client.post(f"/api/claims/{claim['id']}/evidence", json={
@@ -43,7 +43,7 @@ def test_investigation_search_returns_typed_provenance_and_claim_evidence_links(
     })
     assert link.status_code == 200, link.text
 
-    response = client.get('/api/search', params={'q': 'NiSource', 'investigation_id': inv['id']})
+    response = client.get('/api/search', params={'q': 'Acme Holdings', 'investigation_id': inv['id']})
     assert response.status_code == 200, response.text
     body = response.json()
     assert body['investigation_id'] == inv['id']
@@ -58,7 +58,7 @@ def test_investigation_search_returns_typed_provenance_and_claim_evidence_links(
     assert evidence_hit['provenance']['claim_links'][0]['claim_id'] == claim['id']
     assert evidence_hit['provenance']['claim_links'][0]['stance'] == 'supports'
 
-    global_response = client.get('/api/search', params={'q': 'NiSource'})
+    global_response = client.get('/api/search', params={'q': 'Acme Holdings'})
     assert global_response.status_code == 200
     assert {row['investigation_id'] for row in global_response.json()['results']} >= {inv['id'], other['id']}
 
