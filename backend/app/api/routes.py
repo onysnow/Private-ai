@@ -52,7 +52,7 @@ from app.core.authorization import (
     authorize_routed_resource, scope_for_request,
     require_scope_investigation, require_scope_investigation_admin, require_scope_global_admin,
 )
-from app.core.security_controls import read_security_audit, summarize_security_audit, preview_security_audit_retention, apply_security_audit_retention
+from app.core.audit_log import read_security_audit, summarize_security_audit, preview_security_audit_retention, apply_security_audit_retention
 from pathlib import Path
 import secrets
 from app.services.claims import review_claim, claim_review_workspace

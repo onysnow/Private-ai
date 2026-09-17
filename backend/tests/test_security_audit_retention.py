@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from app.core.security_controls import (
+from app.core.audit_log import (
     SecurityAuditLogger,
     apply_security_audit_retention,
     preview_security_audit_retention,

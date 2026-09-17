@@ -2,105 +2,10 @@ from __future__ import annotations
 
 import json
 import os
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from threading import Lock
-from time import monotonic
 from uuid import uuid4
-
-from fastapi import Request
-
-
-class RequestBodyTooLarge(RuntimeError):
-    pass
-
-
-@dataclass(frozen=True)
-class RequestLimitPolicy:
-    default_bytes: int
-    document_bytes: int
-    backup_bytes: int
-
-    def for_path(self, path: str) -> int:
-        if path.startswith("/api/documents/upload"):
-            return self.document_bytes
-        if path.startswith("/api/backups/"):
-            return self.backup_bytes
-        return self.default_bytes
-
-
-def validate_content_length(value: str | None, limit: int) -> tuple[bool, str]:
-    """Validate Content-Length without reading the request body."""
-    if value is None or value == "":
-        return True, ""
-    try:
-        length = int(value)
-    except (TypeError, ValueError):
-        return False, "Invalid Content-Length header."
-    if length < 0:
-        return False, "Invalid Content-Length header."
-    if length > limit:
-        return False, f"Request body exceeds the {limit}-byte limit for this endpoint."
-    return True, ""
-
-
-
-def validate_request_envelope(
-    *,
-    method: str,
-    content_length: str | None,
-    content_type: str | None,
-    transfer_encoding: str | None,
-    limit: int,
-) -> tuple[bool, int, str]:
-    """Validate body framing before FastAPI parses an unsafe API request.
-
-    Unknown-length/chunked request bodies are rejected for unsafe methods so a
-    streaming client cannot bypass the early byte ceiling. Bodyless unsafe actions
-    remain allowed when neither Content-Type nor Transfer-Encoding indicates a body.
-    """
-    method = method.upper()
-    may_have_body = method not in {"GET", "HEAD", "OPTIONS"}
-    has_body_signal = bool((content_type or "").strip() or (transfer_encoding or "").strip())
-    if may_have_body and has_body_signal and content_length is None:
-        return False, 411, "Content-Length is required for API requests with a body."
-    ok, detail = validate_content_length(content_length, limit)
-    if ok:
-        return True, 200, ""
-    status = 400 if detail.startswith("Invalid") else 413
-    return False, status, detail
-
-
-class FixedWindowRateLimiter:
-    """Small in-process limiter for repeated authentication failures.
-
-    This is intentionally best-effort for the current single-user/local-first runtime;
-    a multi-worker or multi-user deployment should use shared state at the edge.
-    """
-
-    def __init__(self, limit: int, window_seconds: int = 60):
-        self.limit = max(1, int(limit))
-        self.window_seconds = max(1, int(window_seconds))
-        self._lock = Lock()
-        self._windows: dict[str, tuple[float, int]] = {}
-
-    def hit(self, key: str, now: float | None = None) -> tuple[bool, int]:
-        current = monotonic() if now is None else float(now)
-        with self._lock:
-            start, count = self._windows.get(key, (current, 0))
-            if current - start >= self.window_seconds:
-                start, count = current, 0
-            count += 1
-            self._windows[key] = (start, count)
-            allowed = count <= self.limit
-            retry_after = max(1, int(self.window_seconds - (current - start)))
-            return allowed, retry_after
-
-    def reset(self, key: str) -> None:
-        with self._lock:
-            self._windows.pop(key, None)
-
 
 SENSITIVE_GET_PREFIXES = (
     "/api/backups/",

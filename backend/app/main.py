@@ -13,14 +13,9 @@ from app.core.authorization import (
     scope_for_request, set_current_authorization_scope,
 )
 from app.services.identity import scope_for_persisted_token
-from app.core.security_controls import (
-    FixedWindowRateLimiter,
-    RequestLimitPolicy,
-    SecurityAuditLogger,
-    new_request_id,
-    should_audit_request,
-    validate_request_envelope,
-)
+from app.core.request_limits import RequestLimitPolicy, validate_request_envelope
+from app.core.rate_limiter import FixedWindowRateLimiter
+from app.core.audit_log import SecurityAuditLogger, new_request_id, should_audit_request
 
 ensure_database_schema(engine)
 app = FastAPI(title="Journalism Workbench API", version="1.24.0")

@@ -18,10 +18,20 @@ cold.
 
 ## Current state (updated each cycle — read this first)
 
-- **Open PRs on Private-ai:** none. PR #50 (structure audit fixes
-  batch) merged (squash, `df18cd6`) once every check reported
-  success and `mergeable_state` was `clean` — not before. `dev` merged
-  back from `main` afterward, no conflicts.
+- **Open PRs on Private-ai:** none. `REMEDIATION_PROMPT.md` (fix-side
+  companion to the structure audit) is in place, pushed directly to
+  `dev` -- see its Stage A-F order for how the remaining findings
+  get worked through.
+- **Remediation Stage A done (STRUCT-0009):** `security_controls.py`
+  split into `request_limits.py` / `rate_limiter.py` / `audit_log.py`,
+  pushed directly to `dev` (pure mechanical move, no PR needed per the
+  remediation prompt's own rules). Full 216-test suite reverified
+  passing after, identical count.
+- **Remediation Stages B-F not started.** Stage B (root-causing task
+  #35 via the GitHub web UI) unblocks the rest -- until it's done,
+  `backend-postgres-ci.yml` still isn't running pytest in CI, so
+  every merge needs the same manual local-venv test run this session
+  has been doing.
 - **task #35 (backend-postgres-ci.yml push-trigger failure)** —
   diagnosed but NOT yet root-caused. Confirmed facts: the workflow's
   YAML is valid (parses fine, schema-plausible, structurally identical
@@ -232,3 +242,27 @@ cold.
 - Opened PR #50 (dev -> main) scoped to just this batch, per the
   project's own PR-scoping rule. Not yet merged — waiting for real CI
   before merging, same discipline as PR #27/#49.
+
+### 2026-09-17 (cont'd) — Remediation prompt written, Stage A executed
+- Ony asked to "create a prompt to address all of these issues" (the
+  5 new findings + STRUCT-0006's reopening from the prior cycle).
+  Wrote `REMEDIATION_PROMPT.md`, the fix-side companion to the audit
+  prompt: a dependency-ordered stage plan (A-F) rather than a flat
+  to-do list, since several findings genuinely depend on each other
+  (a test-isolation fixture needs an app factory to override cleanly;
+  a CI check needs a working CI workflow to add it to).
+- Immediately executed Stage A (STRUCT-0009) to prove the prompt
+  actually works end to end, not just as a plan: split
+  `security_controls.py`'s three unrelated concerns into
+  `request_limits.py`, `rate_limiter.py`, and `audit_log.py`, updated
+  all 4 import sites, deleted the old file, verified with
+  `py_compile` + a clean `app.main` import + the full 216-test suite
+  (identical pass count, zero behavior change). Pushed directly to
+  `dev` per the prompt's own rule that a pure mechanical move doesn't
+  need a PR.
+- Stages B (task #35 root cause -- needs the GitHub web UI, not
+  another API-only pass), C (app-factory refactor), D (conftest.py +
+  test isolation), E (the routes.py split, sliced into 8
+  smallest-to-largest PRs), and F (STRUCT-0006's actual CI check) are
+  still queued, in that order -- see `REMEDIATION_PROMPT.md` for the
+  full reasoning behind the ordering.
