@@ -59,7 +59,7 @@ I'd rather this table be accurate than impressive. The architecture and domain m
 
 ## Running it locally (Windows, no Docker required)
 
-1. Extract/clone the repo to a normal writable folder.
+1. Extract/clone the repo to a normal writable folder. This repo has one git submodule ([`topic-authority-system`](https://github.com/onysnow/topic-authority-system) at `backend/app/ai/tas_spec/`, the standalone evidence-discipline methodology behind the AI reasoning layer); run `git submodule update --init --recursive` after cloning if you're doing full development rather than just running the app (the launcher below doesn't require it).
 2. Double-click **`Start Journalism Workbench.bat`**.
 3. First run creates a private `.venv`, installs pinned dependencies, and verifies imports before marking setup complete. Requires Python 3.12 (the launcher will try to install it via `winget` if missing).
 4. The app opens at `http://127.0.0.1:8000`, backed by a local SQLite database (`backend/journalism.db`). No PostgreSQL, no Node.js, no Docker needed for this mode.

@@ -1,0 +1,74 @@
+name: Backend PostgreSQL CI
+
+on:
+  push:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-postgres-ci.yml"
+  pull_request:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-postgres-ci.yml"
+
+jobs:
+  backend-postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: journalism_test
+          POSTGRES_USER: journalism
+          POSTGRES_PASSWORD: journalism
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U journalism -d journalism_test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    defaults:
+      run:
+        working-directory: backend
+
+    env:
+      DATABASE_URL: "postgresql+psycopg://journalism:journalism@127.0.0.1:5432/journalism_test"
+      POSTGRES_TEST_URL: "postgresql+psycopg://journalism:journalism@127.0.0.1:5432/journalism_test"
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Dependabot-triggered runs never receive repository secrets (by GitHub's
+      # design, to stop a malicious dependency bump from exfiltrating them), so
+      # TAS_REPO_TOKEN is empty in that context. actions/checkout@v6+ hard-fails
+      # ("Input required and not supplied: token") if handed an explicitly-empty
+      # token, where v4 tolerated it - so the submodule is fetched as its own
+      # step here instead of via checkout's `submodules:` input, gated on the
+      # secret actually being present, so a Dependabot PR's checkout still
+      # succeeds (just without the submodule) instead of failing outright.
+      - name: Fetch TAS submodule
+        if: ${{ secrets.TAS_REPO_TOKEN != '' }}
+        working-directory: ${{ github.workspace }}
+        env:
+          TAS_REPO_TOKEN: ${{ secrets.TAS_REPO_TOKEN }}
+        run: |
+          git config submodule.backend/app/ai/tas_spec.url "https://x-access-token:${TAS_REPO_TOKEN}@github.com/onysnow/topic-authority-system.git"
+          git submodule update --init --recursive backend/app/ai/tas_spec
+        continue-on-error: true
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install OCR runtime
+        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-eng
+
+      - name: Install backend dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
+
+      - name: Apply Alembic migrations on PostgreSQL
+        run: python -m alembic upgrade head
+
+      - name: Run backend pytest suite on PostgreSQL
+        run: python run_postgres_gate.py
