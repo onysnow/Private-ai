@@ -37,12 +37,12 @@ jobs:
       POSTGRES_TEST_URL: "postgresql+psycopg://journalism:journalism@127.0.0.1:5432/journalism_test"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
           token: ${{ secrets.TAS_REPO_TOKEN }}
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
