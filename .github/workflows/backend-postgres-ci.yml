@@ -37,12 +37,27 @@ jobs:
       POSTGRES_TEST_URL: "postgresql+psycopg://journalism:journalism@127.0.0.1:5432/journalism_test"
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          token: ${{ secrets.TAS_REPO_TOKEN }}
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      # Dependabot-triggered runs never receive repository secrets (by GitHub's
+      # design, to stop a malicious dependency bump from exfiltrating them), so
+      # TAS_REPO_TOKEN is empty in that context. actions/checkout@v6+ hard-fails
+      # ("Input required and not supplied: token") if handed an explicitly-empty
+      # token, where v4 tolerated it - so the submodule is fetched as its own
+      # step here instead of via checkout's `submodules:` input, gated on the
+      # secret actually being present, so a Dependabot PR's checkout still
+      # succeeds (just without the submodule) instead of failing outright.
+      - name: Fetch TAS submodule
+        if: ${{ secrets.TAS_REPO_TOKEN != '' }}
+        working-directory: ${{ github.workspace }}
+        env:
+          TAS_REPO_TOKEN: ${{ secrets.TAS_REPO_TOKEN }}
+        run: |
+          git config submodule.backend/app/ai/tas_spec.url "https://x-access-token:${TAS_REPO_TOKEN}@github.com/onysnow/topic-authority-system.git"
+          git submodule update --init --recursive backend/app/ai/tas_spec
+        continue-on-error: true
+
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 

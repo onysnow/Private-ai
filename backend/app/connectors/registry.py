@@ -11,10 +11,16 @@ class ConnectorRegistry:
 
     def _build(self, name: str):
         if name == "aleph":
-            key = get_secret(settings.connector_credentials_file, "aleph", settings.aleph_api_key)
+            key = get_secret(
+                settings.connector_credentials_file, "aleph", settings.aleph_api_key
+            )
             return AlephConnector(api_key=key)
         if name == "opensanctions":
-            key = get_secret(settings.connector_credentials_file, "opensanctions", settings.opensanctions_api_key)
+            key = get_secret(
+                settings.connector_credentials_file,
+                "opensanctions",
+                settings.opensanctions_api_key,
+            )
             return OpenSanctionsConnector(api_key=key)
         return None
 

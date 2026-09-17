@@ -1,6 +1,7 @@
 import httpx
-from app.core.config import settings
+
 from app.connectors.base import Connector, ExternalFinding
+from app.core.config import settings
 
 
 class OpenSanctionsConnector(Connector):
@@ -29,9 +30,16 @@ class OpenSanctionsConnector(Connector):
                 "OpenSanctions offers API keys for public-interest journalism."
             )
 
-    def _parse_result(self, item: dict, *, match_meta: dict | None = None) -> ExternalFinding:
+    def _parse_result(
+        self, item: dict, *, match_meta: dict | None = None
+    ) -> ExternalFinding:
         props = item.get("properties") or {}
-        caption = item.get("caption") or (props.get("name") or [None])[0] or item.get("id") or "OpenSanctions entity"
+        caption = (
+            item.get("caption")
+            or (props.get("name") or [None])[0]
+            or item.get("id")
+            or "OpenSanctions entity"
+        )
         record_id = str(item.get("id") or caption)
         raw = dict(item)
         if match_meta:
@@ -67,7 +75,9 @@ class OpenSanctionsConnector(Connector):
         schema = entity.get("schema")
         properties = entity.get("properties") or {}
         if not schema:
-            raise RuntimeError("OpenSanctions entity matching requires a FollowTheMoney schema.")
+            raise RuntimeError(
+                "OpenSanctions entity matching requires a FollowTheMoney schema."
+            )
         query_entity = {"schema": schema, "properties": properties}
         async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
             resp = await client.post(

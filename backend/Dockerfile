@@ -3,7 +3,7 @@ FROM python:3.12-slim
 # PyMuPDF's integrated OCR requires Tesseract language data. Keep the location
 # explicit rather than relying on runtime autodiscovery.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-eng \
+    && apt-get install -y --no-install-recommends build-essential pkg-config libicu-dev tesseract-ocr tesseract-ocr-eng \
     && rm -rf /var/lib/apt/lists/*
 ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata
 
