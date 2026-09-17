@@ -1,6 +1,7 @@
 fastapi==0.115.6
 uvicorn[standard]==0.34.0
 sqlalchemy==2.0.36
+psycopg[binary]==3.2.3
 pydantic-settings==2.7.0
 httpx==0.28.1
 followthemoney==4.10.2
@@ -10,4 +11,5 @@ pypdf==5.1.0
 python-docx==1.1.2
 alembic==1.18.4
 PyMuPDF==1.26.7
+Pillow==12.3.0
 openaleph-client==1.1.3

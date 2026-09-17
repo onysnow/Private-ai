@@ -13,4 +13,5 @@ python-docx==1.1.2
 alembic==1.18.4
 
 PyMuPDF==1.26.7
+Pillow==12.3.0
 openaleph-client==1.1.3
