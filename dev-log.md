@@ -140,3 +140,19 @@ cold.
   it. Shipped the provider-agnostic LLM client + config + model +
   migrations to `dev` (`536e65e`); endpoints + citation validation +
   tests are next cycle's work.
+
+### 2026-09-17 (cont'd) — Structure audit v1 run
+- Ony asked for a full application-structure audit + a reusable prompt
+  for it. Wrote `APPLICATION_STRUCTURE_AUDIT_PROMPT.md` (10 passes,
+  reuses TAS's own audit-finding-record schema/severity taxonomy
+  instead of inventing a new one) and ran a first pass, logged as
+  `STRUCTURE_AUDIT.md`. Headline findings: `requirements.txt` pins
+  `followthemoney==4.11.0`, which doesn't exist on PyPI (BLOCKING —
+  breaks any clean install); `app/api/routes.py` is a single
+  1797-line/117-endpoint file with zero sub-modules, inconsistent
+  with the rest of the backend's per-concern file layout (MATERIAL);
+  `pypdf` is a directly-declared dependency with active Dependabot
+  security churn but zero actual references in the codebase
+  (MATERIAL). Full detail and 4 more findings in STRUCTURE_AUDIT.md.
+  Explicitly marked LIMITED REVIEW — passes 2/6/10 weren't done this
+  cycle, don't treat this report as exhaustive.
