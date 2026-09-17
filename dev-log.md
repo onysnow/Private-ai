@@ -18,9 +18,11 @@ cold.
 
 ## Current state (updated each cycle — read this first)
 
-- **Open PRs on Private-ai:** none. PR #27 (shadcn/ui) merged (squash,
-  commit `1852356`) after its conflict was fixed — mergeable/CI both
-  clean. PR #47 (submodule bump) was already merged before this cycle.
+- **Open PRs on Private-ai:** #50 (dev -> main, structure audit
+  fixes batch) — opened this cycle, not yet merged. Full backend
+  suite (216 tests) verified passing locally before opening; wait for
+  real CI (clean/success, not just "pending") before merging, per
+  this repo's own established practice.
 - **task #35 (backend-postgres-ci.yml push-trigger failure)** —
   diagnosed but NOT yet root-caused. Confirmed facts: the workflow's
   YAML is valid (parses fine, schema-plausible, structurally identical
@@ -50,14 +52,40 @@ cold.
   auto-closed. Task #54's backend-completion gate: re-confirm with Ony
   whether this satisfies it before starting any frontend work
   (#43/#44/#45).
-- **Structure audit v1 shipped** in the same PR — see
-  `STRUCTURE_AUDIT.md` for the 7 findings (1 BLOCKING: a
-  `followthemoney` pin that doesn't exist on PyPI). None of the
-  findings were fixed as part of this PR — audits and fixes stay
-  separate, per the audit prompt's own rule 2.
+- **Structure audit v1 findings — mostly resolved this cycle (PR #50,
+  pending merge).** STRUCT-0001/STRUCT-0004 self-corrected: the
+  original BLOCKING call against `followthemoney==4.11.0` was a
+  transient PyPI index-propagation delay, not a real problem (the pin
+  is genuinely installable; re-verified via the PyPI JSON API and a
+  clean dependency resolution). The real, narrower, still-unverified-
+  in-sandbox residual risk is `pyicu`'s system ICU/pkg-config build
+  requirement (this device_bash VM can't `apt-get install` as root to
+  check). STRUCT-0003 (unused `pypdf` dependency) removed. STRUCT-0005
+  (CI action version drift) fixed — all 4 workflow files now pin
+  `actions/checkout@v7` consistently. STRUCT-0007 (.env.example gaps)
+  fixed — all 5 missing `Settings` keys added, 0 remain missing.
+  STRUCT-0002 (`routes.py`, 1797 lines/117 endpoints, needs a module
+  split) is deliberately **not** fixed yet — see "Deliberate non-
+  fix" note below. Passes 2 (model/migration diff beyond this
+  cycle's table), 6 (frontend components), and 10 (full docs-hygiene
+  sweep) still haven't been run — don't treat the audit as exhaustive.
 - **Working-branch convention:** `dev` is the shared unprotected branch
   for day-to-day pushes (no PR needed there); `main` still requires a
   clean PR. Don't conflate the two.
+- **Deliberate non-fix: the `routes.py` split.** Ony asked to hold
+  everything to "the highest standards" and structure the codebase
+  "for human development." The routes.py split is real and warranted
+  (STRUCT-0002), but this repo's own `.github/copilot-instructions.md`
+  requires PRs stay scoped to one concern and requires the full test
+  suite pass before any backend-touching PR — rushing a 117-endpoint
+  file split into this same cycle, without dedicated regression
+  coverage for the reorganization itself, would violate the very
+  standard being invoked. Deferred to its own future PR. The concrete
+  ~10-module breakdown (settings, search/assistant, investigations,
+  entities, relationships, documents/extraction, evidence/claims,
+  leads/reporting, connectors/enrichment, resolution) still needs to
+  be written into STRUCTURE_AUDIT.md as a ready-to-execute plan — not
+  done yet.
 
 ### Practical notes learned this cycle (save yourself the pain)
 
@@ -162,3 +190,46 @@ cold.
   this PR touches no backend/** files that would even change its
   behavior once fixed.
 - Merged `origin/main` back into `dev` to keep the branches in sync.
+
+### 2026-09-17 (cont'd) — "Highest standards" pass: audit fixes, self-correction, PR #50
+- Ony: "And make sure the follow the highest standards for software
+  development. And also make sure it's structure for human
+  development." Took this as license to go back through
+  `STRUCTURE_AUDIT.md`'s open findings and actually fix what was safe
+  to fix mechanically, rather than just filing more findings.
+- Re-investigated STRUCT-0001 (the BLOCKING `followthemoney==4.11.0`
+  finding) before touching anything else, since a BLOCKING finding
+  deserves more than one data point. Found the original conclusion was
+  wrong: PyPI's index API and a clean `uv pip install --dry-run`
+  resolution both show the pin is real and installable; the original
+  failure was a transient propagation delay. Corrected the record
+  (STRUCT-0001 -> NON_MATERIAL/VERIFIED, STRUCT-0004 ->
+  VERIFIED/WITHDRAWN) instead of leaving a known-wrong BLOCKING
+  finding on file — treated self-correction as part of "highest
+  standards," not a discreditable admission.
+- Removed the unused `pypdf` dependency, reconciled all 4 workflow
+  files to `actions/checkout@v7` (+ `setup-node@v7` in
+  frontend-ci.yml), and added the 5 `Settings` keys missing from
+  `.env.example` (verified 0 remain missing).
+- Wrote the underlying conventions into
+  `.github/copilot-instructions.md` (new "Code organization
+  standards" section) so they're enforceable/discoverable for future
+  contributors, human or AI, not just something living in this
+  session's working memory.
+- Deliberately did NOT execute the `routes.py` split in this same
+  pass — see "Deliberate non-fix" in Current state above for why.
+- Verified nothing regressed: synced the changed backend files into
+  the `~/workbench-local` local copy (faster than the network-mounted
+  drive), put `alembic` on PATH, and ran the **full** backend test
+  suite (`pytest tests/`, not just the two files touched by issue
+  #36) — 216 tests, all passing.
+- Confirmed via `git diff --stat origin/main origin/dev` that `dev`'s
+  actual content delta over `main` is exactly this batch (PR #49's
+  squash-merge means `dev`'s older commit-by-commit history no longer
+  matches `main` commit-for-commit, but the tree content already
+  converged — checked the diff directly instead of trusting `git log`
+  range output, which would have wrongly suggested a dozen unmerged
+  commits).
+- Opened PR #50 (dev -> main) scoped to just this batch, per the
+  project's own PR-scoping rule. Not yet merged — waiting for real CI
+  before merging, same discipline as PR #27/#49.
