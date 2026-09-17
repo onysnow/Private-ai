@@ -9,6 +9,7 @@ def test_docker_build_workflow_builds_backend_and_frontend_on_push_and_pr():
 
     assert workflow["name"] == "Docker Build"
     assert sorted(workflow["on"]) == ["pull_request", "push"]
+    assert workflow["jobs"]["docker-build"]["permissions"] == {"contents": "read"}
 
     steps = workflow["jobs"]["docker-build"]["steps"]
     run_steps = [step.get("run", "") for step in steps]

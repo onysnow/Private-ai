@@ -6,6 +6,8 @@ name: Docker Build
 
 jobs:
   docker-build:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
