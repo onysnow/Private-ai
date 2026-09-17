@@ -28,7 +28,7 @@ def test_entity_dossier_assembles_canonical_evidence_relationships_and_leads():
     assert rel.status_code == 200, rel.text
 
     source = client.post('/api/sources', json={
-        'investigation_id': inv['id'], 'title': 'Commission filing', 'url': 'https://example.test/nisource'
+        'investigation_id': inv['id'], 'title': 'Commission filing', 'url': 'https://example.test/acme-holdings'
     }).json()
     evidence = client.post('/api/evidence', json={
         'source_id': source['id'], 'quote': 'Acme Holdings filed the application.', 'locator': 'p. 4'
@@ -56,7 +56,7 @@ def test_entity_dossier_assembles_canonical_evidence_relationships_and_leads():
     assert body['summary']['evidence_count'] == 1
     assert body['summary']['lead_count'] == 1
     assert body['claims'][0]['match_basis']['type'] == 'text_mention'
-    assert body['evidence'][0]['source']['url'] == 'https://example.test/nisource'
+    assert body['evidence'][0]['source']['url'] == 'https://example.test/acme-holdings'
     assert body['evidence'][0]['claim_links'][0]['stance'] == 'supports'
     assert body['relationships'][0]['direction'] == 'incoming'
     assert body['statement_history']
