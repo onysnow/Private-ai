@@ -41,7 +41,7 @@ class FakeOpenAlephClient:
 def test_openaleph_corpus_binding_and_document_sync(tmp_path, monkeypatch):
     db = SessionLocal()
     monkeypatch.setattr(settings, "openaleph_enabled", True)
-    inv = Investigation(name="Gary investigation", description="Local corpus")
+    inv = Investigation(name="Example City investigation", description="Local corpus")
     db.add(inv); db.commit(); db.refresh(inv)
     client = FakeOpenAlephClient()
 
@@ -61,7 +61,7 @@ def test_openaleph_corpus_binding_and_document_sync(tmp_path, monkeypatch):
         title="Evidence note",
         filename="evidence.txt",
         mime_type="text/plain",
-        data=b"Eddie Melton served in public office. This is a test document.",
+        data=b"Jordan Rivera served in public office. This is a test document.",
         storage_dir=tmp_path / "documents",
     )
     sync_row = sync_document_to_openaleph(db, doc.id, client_factory=lambda: client)
@@ -72,7 +72,7 @@ def test_openaleph_corpus_binding_and_document_sync(tmp_path, monkeypatch):
     assert len(client.uploads) == 1
     coll, path, metadata, sync, index = client.uploads[0]
     assert coll == binding.collection_id
-    assert path.read_bytes().startswith(b"Eddie Melton")
+    assert path.read_bytes().startswith(b"Jordan Rivera")
     assert metadata["sha256"] == doc.sha256
     assert sync is False and index is True
 
@@ -243,7 +243,7 @@ def test_openaleph_mentions_are_staged_as_entity_candidates_without_auto_resolut
         title="Investigative filing",
         filename="filing.txt",
         mime_type="text/plain",
-        data=b"NiSource and Eddie Melton are mentioned in this filing.",
+        data=b"Acme Holdings and Jordan Rivera are mentioned in this filing.",
         storage_dir=tmp_path / "documents",
     )
     sync_document_to_openaleph(db, doc.id, client_factory=lambda: client)
@@ -256,7 +256,7 @@ def test_openaleph_mentions_are_staged_as_entity_candidates_without_auto_resolut
                 "id": "oa-mention-1",
                 "schema": "Mention",
                 "properties": {
-                    "name": ["Eddie Melton"],
+                    "name": ["Jordan Rivera"],
                     "document": ["oa-document-1"],
                     "detectedSchema": ["Person"],
                     "resolved": ["oa-person-777"],
@@ -266,7 +266,7 @@ def test_openaleph_mentions_are_staged_as_entity_candidates_without_auto_resolut
                 "id": "oa-mention-2",
                 "schema": "Mention",
                 "properties": {
-                    "name": ["NiSource Inc."],
+                    "name": ["Acme Holdings Inc."],
                     "document": ["oa-document-1"],
                     "detectedSchema": ["ORG"],
                 },
@@ -290,8 +290,8 @@ def test_openaleph_mentions_are_staged_as_entity_candidates_without_auto_resolut
         if (row.payload or {}).get("provenance", {}).get("provider") == "openaleph"
     ]
     assert len(candidates) == 2
-    person = next(c for c in candidates if c.payload["caption"] == "Eddie Melton")
-    org = next(c for c in candidates if c.payload["caption"] == "NiSource Inc.")
+    person = next(c for c in candidates if c.payload["caption"] == "Jordan Rivera")
+    org = next(c for c in candidates if c.payload["caption"] == "Acme Holdings Inc.")
     assert person.payload["suggested_schema"] == "Person"
     assert org.payload["suggested_schema"] == "Organization"
     assert person.payload["provenance"]["provider_resolved_entity_id"] == "oa-person-777"

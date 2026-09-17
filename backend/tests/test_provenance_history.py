@@ -6,8 +6,8 @@ def test_statement_history_shows_support_conflict_and_promotion(tmp_path, monkey
     client = TestClient(app)
     inv = client.post('/api/investigations', json={'name':'History Test'}).json()
     entity = client.post('/api/entities', json={
-        'investigation_id': inv['id'], 'schema':'Company', 'caption':'NiSource',
-        'properties': {'name':['NiSource']}, 'dataset':'reporter'
+        'investigation_id': inv['id'], 'schema':'Company', 'caption':'Acme Holdings',
+        'properties': {'name':['Acme Holdings']}, 'dataset':'reporter'
     }).json()
 
     # Inject two connector findings directly through DB-backed models because connector transport is tested elsewhere.
@@ -15,8 +15,8 @@ def test_statement_history_shows_support_conflict_and_promotion(tmp_path, monkey
     from app.models.domain import ConnectorFinding, ResolutionDecision
     db = SessionLocal()
     try:
-        f1 = ConnectorFinding(investigation_id=inv['id'], provider='aleph', provider_record_id='a1', caption='NiSource', schema='Company', properties={'jurisdiction':['us-in']}, source_url='https://aleph.example/a1', raw={'dataset':'corp_registry'})
-        f2 = ConnectorFinding(investigation_id=inv['id'], provider='aleph', provider_record_id='a2', caption='NiSource', schema='Company', properties={'jurisdiction':['us-oh']}, source_url='https://aleph.example/a2', raw={'dataset':'old_registry'})
+        f1 = ConnectorFinding(investigation_id=inv['id'], provider='aleph', provider_record_id='a1', caption='Acme Holdings', schema='Company', properties={'jurisdiction':['us-in']}, source_url='https://aleph.example/a1', raw={'dataset':'corp_registry'})
+        f2 = ConnectorFinding(investigation_id=inv['id'], provider='aleph', provider_record_id='a2', caption='Acme Holdings', schema='Company', properties={'jurisdiction':['us-oh']}, source_url='https://aleph.example/a2', raw={'dataset':'old_registry'})
         db.add_all([f1,f2]); db.flush()
         db.add_all([
             ResolutionDecision(investigation_id=inv['id'], finding_id=f1.id, entity_id=entity['id'], decision='positive', confidence=.95),

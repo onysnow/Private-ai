@@ -13,8 +13,8 @@ def test_entity_dossier_assembles_canonical_evidence_relationships_and_leads():
     client = TestClient(app)
     inv = client.post('/api/investigations', json={'name': 'Dossier test'}).json()
     company = client.post('/api/entities', json={
-        'investigation_id': inv['id'], 'schema': 'Company', 'caption': 'NiSource Inc.',
-        'properties': {'name': ['NiSource Inc.'], 'alias': ['NiSource']}, 'origin': 'reporter'
+        'investigation_id': inv['id'], 'schema': 'Company', 'caption': 'Acme Holdings Inc.',
+        'properties': {'name': ['Acme Holdings Inc.'], 'alias': ['Acme Holdings']}, 'origin': 'reporter'
     }).json()
     person = client.post('/api/entities', json={
         'investigation_id': inv['id'], 'schema': 'Person', 'caption': 'Jane Reporter',
@@ -28,13 +28,13 @@ def test_entity_dossier_assembles_canonical_evidence_relationships_and_leads():
     assert rel.status_code == 200, rel.text
 
     source = client.post('/api/sources', json={
-        'investigation_id': inv['id'], 'title': 'Commission filing', 'url': 'https://example.test/nisource'
+        'investigation_id': inv['id'], 'title': 'Commission filing', 'url': 'https://example.test/acme-holdings'
     }).json()
     evidence = client.post('/api/evidence', json={
-        'source_id': source['id'], 'quote': 'NiSource filed the application.', 'locator': 'p. 4'
+        'source_id': source['id'], 'quote': 'Acme Holdings filed the application.', 'locator': 'p. 4'
     }).json()
     claim = client.post('/api/claims', json={
-        'investigation_id': inv['id'], 'text': 'NiSource sought commission approval.', 'status': 'supported', 'confidence': .8
+        'investigation_id': inv['id'], 'text': 'Acme Holdings sought commission approval.', 'status': 'supported', 'confidence': .8
     }).json()
     client.post(f"/api/claims/{claim['id']}/evidence", json={
         'evidence_id': evidence['id'], 'stance': 'supports'
@@ -43,7 +43,7 @@ def test_entity_dossier_assembles_canonical_evidence_relationships_and_leads():
         'investigation_id': inv['id'], 'text': 'Unrelated company claim.'
     })
     client.post('/api/leads', json={
-        'investigation_id': inv['id'], 'title': 'Check NiSource board overlap', 'detail': 'Find current directors.'
+        'investigation_id': inv['id'], 'title': 'Check Acme Holdings board overlap', 'detail': 'Find current directors.'
     })
 
     response = client.get(f"/api/entities/{company['id']}/dossier")
@@ -56,7 +56,7 @@ def test_entity_dossier_assembles_canonical_evidence_relationships_and_leads():
     assert body['summary']['evidence_count'] == 1
     assert body['summary']['lead_count'] == 1
     assert body['claims'][0]['match_basis']['type'] == 'text_mention'
-    assert body['evidence'][0]['source']['url'] == 'https://example.test/nisource'
+    assert body['evidence'][0]['source']['url'] == 'https://example.test/acme-holdings'
     assert body['evidence'][0]['claim_links'][0]['stance'] == 'supports'
     assert body['relationships'][0]['direction'] == 'incoming'
     assert body['statement_history']

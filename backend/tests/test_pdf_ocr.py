@@ -14,13 +14,13 @@ def make_scan(path: Path, text: str):
 
 def test_image_only_pdf_uses_ocr(tmp_path):
     p = tmp_path / 'scan.pdf'
-    make_scan(p, 'NiSource announced a new infrastructure program on August 12, 2026.')
+    make_scan(p, 'Acme Holdings announced a new infrastructure program on August 12, 2026.')
     result = extract_pdf_chunks(p)
     assert result.ocr_pages == 1
     assert result.native_pages == 0
     assert result.blank_pages == 0
     assert result.chunks[0]['locator'] == 'page 1 (OCR)'
-    assert 'NiSource announced a new infrastructure program' in result.chunks[0]['text']
+    assert 'Acme Holdings announced a new infrastructure program' in result.chunks[0]['text']
 
 
 def test_native_pdf_does_not_get_reclassified_as_ocr(tmp_path):

@@ -6,9 +6,9 @@ from app.connectors.registry import registry
 class FakeConnector(Connector):
     async def search(self, query: str):
         return [ExternalFinding(
-            provider="fake", record_id="company-1", caption="NiSource Inc.", schema="Company",
+            provider="fake", record_id="company-1", caption="Acme Holdings Inc.", schema="Company",
             url="https://example.test/company-1",
-            properties={"name": ["NiSource Inc."], "jurisdiction": ["us-in"], "address": ["123 Main St"]},
+            properties={"name": ["Acme Holdings Inc."], "jurisdiction": ["us-in"], "address": ["123 Main St"]},
             raw={"id": "company-1", "dataset": "fake_registry"},
         )]
 
@@ -17,11 +17,11 @@ def test_non_destructive_resolution_and_statement_assessment():
     client = TestClient(app)
     inv = client.post("/api/investigations", json={"name":"Test investigation"}).json()
     entity = client.post("/api/entities", json={
-        "investigation_id":inv["id"], "schema":"Company", "caption":"NiSource Inc.",
-        "properties":{"name":["NiSource Inc."]}, "dataset":"reporter"
+        "investigation_id":inv["id"], "schema":"Company", "caption":"Acme Holdings Inc.",
+        "properties":{"name":["Acme Holdings Inc."]}, "dataset":"reporter"
     }).json()
 
-    res = client.post("/api/connectors/fake/search", json={"investigation_id":inv["id"], "query":"NiSource"})
+    res = client.post("/api/connectors/fake/search", json={"investigation_id":inv["id"], "query":"Acme Holdings"})
     assert res.status_code == 200
     finding = res.json()[0]
     assert finding["properties"]["jurisdiction"] == ["us-in"]
