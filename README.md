@@ -1,5 +1,7 @@
 # Journalism Workbench
 
+[![CodeQL](https://github.com/onysnow/Private-ai/actions/workflows/codeql.yml/badge.svg)](https://github.com/onysnow/Private-ai/actions/workflows/codeql.yml) [![License: Proprietary](https://img.shields.io/badge/license-proprietary-lightgrey.svg)](LICENSE)
+
 **An evidence-first investigative research platform — built for humans, not for an LLM to guess with.**
 
 Journalism Workbench helps investigators build evidence-backed cases: collect sources, resolve entities, map relationships, track claims, and preserve exactly where every conclusion came from. It runs entirely without a local or cloud AI model — reasoning over your evidence graph is an optional layer on top, not the foundation underneath.
