@@ -10,7 +10,7 @@ pytest==8.3.4
 python-multipart==0.0.20
 pypdf==5.1.0
 python-docx==1.1.2
-alembic==1.18.4
+alembic==1.20.0
 
 PyMuPDF==1.28.2
 Pillow==12.3.0
