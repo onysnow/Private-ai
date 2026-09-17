@@ -1,5 +1,7 @@
 # Journalism Workbench
 
+[![CodeQL](https://github.com/onysnow/Private-ai/actions/workflows/codeql.yml/badge.svg)](https://github.com/onysnow/Private-ai/actions/workflows/codeql.yml) [![License: Proprietary](https://img.shields.io/badge/license-proprietary-lightgrey.svg)](LICENSE)
+
 **An evidence-first investigative research platform — built for humans, not for an LLM to guess with.**
 
 Journalism Workbench helps investigators build evidence-backed cases: collect sources, resolve entities, map relationships, track claims, and preserve exactly where every conclusion came from. It runs entirely without a local or cloud AI model — reasoning over your evidence graph is an optional layer on top, not the foundation underneath.
@@ -57,7 +59,7 @@ I'd rather this table be accurate than impressive. The architecture and domain m
 
 ## Running it locally (Windows, no Docker required)
 
-1. Extract/clone the repo to a normal writable folder.
+1. Extract/clone the repo to a normal writable folder. This repo has one git submodule ([`topic-authority-system`](https://github.com/onysnow/topic-authority-system) at `backend/app/ai/tas_spec/`, the standalone evidence-discipline methodology behind the AI reasoning layer); run `git submodule update --init --recursive` after cloning if you're doing full development rather than just running the app (the launcher below doesn't require it).
 2. Double-click **`Start Journalism Workbench.bat`**.
 3. First run creates a private `.venv`, installs pinned dependencies, and verifies imports before marking setup complete. Requires Python 3.12 (the launcher will try to install it via `winget` if missing).
 4. The app opens at `http://127.0.0.1:8000`, backed by a local SQLite database (`backend/journalism.db`). No PostgreSQL, no Node.js, no Docker needed for this mode.
