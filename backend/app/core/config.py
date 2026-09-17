@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
 from app.services.security import parse_csv
 
 
@@ -31,7 +32,9 @@ class Settings(BaseSettings):
     enable_restore_api: bool = False
     app_environment: str = "development"
     enable_ai_features: bool = False
-    cors_allowed_origins: str = "http://localhost:3000,http://127.0.0.1:3000,http://127.0.0.1:8000,http://localhost:8000"
+    cors_allowed_origins: str = (
+        "http://localhost:3000,http://127.0.0.1:3000,http://127.0.0.1:8000,http://localhost:8000"
+    )
     api_auth_token: str = ""
     api_auth_investigation_ids: str = ""
     max_api_request_bytes: int = 10 * 1024 * 1024
