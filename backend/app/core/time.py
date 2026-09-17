@@ -5,6 +5,7 @@ Alembic schema. Generate UTC values using the modern timezone-aware API, then
 strip tzinfo at the persistence boundary until a future migration promotes the
 columns to ``TIMESTAMP WITH TIME ZONE`` on PostgreSQL.
 """
+
 from datetime import UTC, datetime
 
 

@@ -48,9 +48,13 @@ def is_loopback_host(host: str | None) -> bool:
         return False
 
 
-def request_is_local(*, client_host: str | None, target_host: str | None = None) -> bool:
+def request_is_local(
+    *, client_host: str | None, target_host: str | None = None
+) -> bool:
     """Return True only when both the network peer and requested host are local."""
-    return is_loopback_host(client_host) and is_loopback_host(target_host or client_host)
+    return is_loopback_host(client_host) and is_loopback_host(
+        target_host or client_host
+    )
 
 
 def _forwarded_values(value: str | None, key: str) -> list[str]:
@@ -131,7 +135,13 @@ def bearer_token(authorization: str | None) -> str:
     return token.strip()
 
 
-def decide_api_access(*, client_host: str | None, target_host: str | None = None, authorization: str | None, configured_token: str) -> AccessDecision:
+def decide_api_access(
+    *,
+    client_host: str | None,
+    target_host: str | None = None,
+    authorization: str | None,
+    configured_token: str,
+) -> AccessDecision:
     """Authorize one API request under the local-first security policy."""
     if request_is_local(client_host=client_host, target_host=target_host):
         return AccessDecision(True)
@@ -168,7 +178,9 @@ def _normalize_origin(origin: str) -> str:
         parsed_port = parsed.port
     except ValueError:
         return ""
-    default_port = (parsed.scheme == "http" and parsed_port == 80) or (parsed.scheme == "https" and parsed_port == 443)
+    default_port = (parsed.scheme == "http" and parsed_port == 80) or (
+        parsed.scheme == "https" and parsed_port == 443
+    )
     host = parsed.hostname.lower()
     if ":" in host:
         host = f"[{host}]"
@@ -176,7 +188,13 @@ def _normalize_origin(origin: str) -> str:
     return f"{parsed.scheme.lower()}://{host}{port}"
 
 
-def decide_browser_write_access(*, method: str, origin: str | None, sec_fetch_site: str | None, allowed_origins: list[str]) -> AccessDecision:
+def decide_browser_write_access(
+    *,
+    method: str,
+    origin: str | None,
+    sec_fetch_site: str | None,
+    allowed_origins: list[str],
+) -> AccessDecision:
     """Block cross-site browser writes before they can reach state-changing routes.
 
     CORS controls whether JavaScript may read a response; it does not guarantee that a
@@ -239,4 +257,6 @@ async def enforce_browser_write_access(request: Request, allowed_origins: list[s
     )
     if decision.allowed:
         return None
-    return JSONResponse(status_code=decision.status_code, content={"detail": decision.detail})
+    return JSONResponse(
+        status_code=decision.status_code, content={"detail": decision.detail}
+    )

@@ -25,8 +25,16 @@ class Connector(ABC):
         """
         props = entity.get("properties") or {}
         preferred = (
-            "name", "alias", "registrationNumber", "taxNumber", "idNumber",
-            "leiCode", "isin", "jurisdiction", "country", "address",
+            "name",
+            "alias",
+            "registrationNumber",
+            "taxNumber",
+            "idNumber",
+            "leiCode",
+            "isin",
+            "jurisdiction",
+            "country",
+            "address",
         )
         terms: list[str] = []
         for prop in preferred:
