@@ -10,13 +10,14 @@ from app.models.domain import (
     ConnectorRun, ConnectorFinding, ResolutionDecision, CanonicalResolutionDecision, CanonicalEntityMergeAudit, PostMergeReconciliationDecision, PropertyConflictDecision, StatementAssessment, StatementPromotion,
     EnrichmentSession, EnrichmentSessionRun, EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document, DocumentChunk, ExtractionCandidate,
-    AppUser, InvestigationMembership,
+    AppUser, InvestigationMembership, AIAnalysisCandidate,
 )
 from app.schemas.api import (
     InvestigationCreate, EntityCreate, SourceCreate, EvidenceCreate, ClaimEvidenceLinkCreate, ClaimCreate, ClaimUpdate, ClaimReviewRequest, LeadCreate, LeadUpdate, LeadLinkCreate, LeadConvertRequest, ReportingTaskCreate, ReportingTaskUpdate, TimelineEventCreate, AlephSearchRequest,
     ConnectorSearchRequest, FindingReviewRequest, ResolutionRequest, CanonicalResolutionRequest, CanonicalMergeExecuteRequest, PostMergeReconciliationRequest, PropertyConflictDecisionRequest, StatementAssessmentRequest, StatementPromotionRequest,
     MultiEnrichmentRequest, CrossProviderDecisionRequest, RelationshipCreate, RelationshipEvidenceAttachRequest, RelationshipEvidenceReviewRequest, ExternalRelationshipReviewRequest, ExtractionCandidateReviewRequest, ExtractedRelationshipProposalCreate,
     AppUserCreate, AppUserUpdate, InvestigationMembershipPut, InvestigationQuestionContextRequest,
+    CaseSynthesisRequest, HypothesisTestRequest, AIAnalysisCandidateReviewRequest,
 )
 from app.services.ftm import make_ftm_entity
 from app.services.resolution import candidate_entities, canonical_duplicate_candidates, record_canonical_resolution
@@ -33,6 +34,7 @@ from app.connectors.registry import registry
 from app.services.external_relationships import relationship_endpoint_candidates, create_review, promote_review, is_relationship_finding
 from app.services.search import investigation_search
 from app.services.assistant_context import build_question_context
+from app.ai.reasoning import run_reasoning_module, review_ai_analysis_candidate, ReasoningInputError, CitationValidationError, SchemaValidationError
 from app.services.dossier import entity_dossier
 from app.services.timeline import investigation_timeline, validate_timeline_refs, _normalize_date
 from app.services.documents import ingest_document, serialize_document, review_candidate, preview_entity_candidate_matches, serialize_extraction_lineage, propose_relationship_from_extracted_claim
@@ -558,6 +560,55 @@ def investigation_question_context(
         raise HTTPException(404, str(exc))
 
 
+def _run_reasoning_endpoint(db: Session, *, investigation_id: str, module: str, question: str, max_results: int, include_external_leads: bool, working_theory: str | None = None):
+    if not settings.enable_ai_features or not (settings.ai_provider or "").strip():
+        raise HTTPException(400, "AI reasoning endpoints are not enabled on this deployment (enable_ai_features and ai_provider must both be set)")
+    try:
+        candidate = run_reasoning_module(
+            db, investigation_id=investigation_id, module=module, question=question,
+            working_theory=working_theory, max_results=max_results, include_external_leads=include_external_leads,
+        )
+        return {"candidate_id": candidate.id, "review_status": candidate.review_status, "payload": candidate.payload}
+    except ReasoningInputError as exc:
+        raise HTTPException(400, str(exc))
+    except CitationValidationError as exc:
+        raise HTTPException(422, {"message": "Model output rejected: referenced evidence not present in the retrieval packet.", "invalid_citations": exc.bad_refs})
+    except SchemaValidationError as exc:
+        raise HTTPException(422, {"message": "Model output rejected: did not match the required output schema.", "schema_errors": exc.errors})
+    except ValueError as exc:
+        raise HTTPException(404, str(exc))
+
+
+@router.post("/investigations/{investigation_id}/assistant/case-synthesis")
+def investigation_case_synthesis(
+    investigation_id: str, body: CaseSynthesisRequest, db: Session = Depends(get_db),
+):
+    """TAS Module 08 (Case Synthesis) as a real, citation-validated LLM call.
+
+    Never writes to canonical records — the result is persisted as a
+    review_status="proposed" AIAnalysisCandidate. See app/ai/reasoning.py.
+    """
+    return _run_reasoning_endpoint(
+        db, investigation_id=investigation_id, module="case_synthesis", question=body.question,
+        max_results=body.max_results, include_external_leads=body.include_external_leads,
+    )
+
+
+@router.post("/investigations/{investigation_id}/assistant/hypothesis-test")
+def investigation_hypothesis_test(
+    investigation_id: str, body: HypothesisTestRequest, db: Session = Depends(get_db),
+):
+    """TAS Module 06 (Hypothesis and Contradiction Testing) as a real,
+    citation-validated LLM call. Same non-canonical-write guarantee as
+    /assistant/case-synthesis above.
+    """
+    return _run_reasoning_endpoint(
+        db, investigation_id=investigation_id, module="hypothesis_test", question=body.question,
+        max_results=body.max_results, include_external_leads=body.include_external_leads,
+        working_theory=body.working_theory,
+    )
+
+
 @router.get("/investigations/{investigation_id}/timeline")
 def get_investigation_timeline(
     investigation_id: str,
@@ -995,6 +1046,17 @@ def review_extraction_candidate(candidate_id: str, body: ExtractionCandidateRevi
         raise HTTPException(404, "Extraction candidate not found")
     try:
         return review_candidate(db, row, **body.model_dump())
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+
+
+@router.post("/ai-analysis-candidates/{candidate_id}/review")
+def review_ai_analysis_candidate_endpoint(candidate_id: str, body: AIAnalysisCandidateReviewRequest, db: Session = Depends(get_db)):
+    row = db.get(AIAnalysisCandidate, candidate_id)
+    if row is None:
+        raise HTTPException(404, "AI analysis candidate not found")
+    try:
+        return review_ai_analysis_candidate(db, row, decision=body.decision, note=body.note)
     except ValueError as exc:
         raise HTTPException(400, str(exc))
 

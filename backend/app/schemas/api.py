@@ -244,6 +244,24 @@ class ExtractionCandidateReviewRequest(BaseModel):
     matched_entity_id: str | None = None
     entity_identity_decision: str | None = None
 
+
+class CaseSynthesisRequest(BaseModel):
+    question: str = Field(min_length=1, max_length=4000)
+    max_results: int = Field(default=30, ge=1, le=100)
+    include_external_leads: bool = True
+
+
+class HypothesisTestRequest(BaseModel):
+    working_theory: str = Field(min_length=1, max_length=2000)
+    question: str = Field(min_length=1, max_length=4000)
+    max_results: int = Field(default=30, ge=1, le=100)
+    include_external_leads: bool = True
+
+
+class AIAnalysisCandidateReviewRequest(BaseModel):
+    decision: str
+    note: str | None = None
+
 class AppUserCreate(BaseModel):
     display_name: str
     global_role: str = "member"
