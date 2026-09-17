@@ -85,8 +85,8 @@ def test_opensanctions_enrich_uses_match_query_by_example(monkeypatch):
         seen["auth"] = request.headers.get("Authorization")
         seen["body"] = __import__("json").loads(request.content.decode())
         return httpx.Response(200, json={"responses": {"q": {"status": 200, "results": [{
-            "id": "entity-match-1", "schema": "Company", "caption": "NiSource Inc.",
-            "score": 0.97, "properties": {"name": ["NiSource Inc."], "jurisdiction": ["us-in"]}
+            "id": "entity-match-1", "schema": "Company", "caption": "Acme Holdings Inc.",
+            "score": 0.97, "properties": {"name": ["Acme Holdings Inc."], "jurisdiction": ["us-in"]}
         }]}}})
 
     transport = httpx.MockTransport(handler)
@@ -101,8 +101,8 @@ def test_opensanctions_enrich_uses_match_query_by_example(monkeypatch):
     try:
         results = asyncio.run(c.enrich({
             "schema": "Company",
-            "caption": "NiSource Inc.",
-            "properties": {"name": ["NiSource Inc."], "jurisdiction": ["us-in"]},
+            "caption": "Acme Holdings Inc.",
+            "properties": {"name": ["Acme Holdings Inc."], "jurisdiction": ["us-in"]},
         }))
     finally:
         monkeypatch.setattr(httpx, "AsyncClient", original)

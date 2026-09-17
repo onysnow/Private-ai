@@ -14,9 +14,9 @@ class EntityAwareConnector(Connector):
     async def enrich(self, entity: dict):
         self.seen = entity
         return [ExternalFinding(
-            provider="entityfake", record_id="match-1", caption="NiSource Inc.", schema="Company",
+            provider="entityfake", record_id="match-1", caption="Acme Holdings Inc.", schema="Company",
             url="https://example.test/match-1",
-            properties={"name": ["NiSource Inc."], "jurisdiction": ["us-in"]},
+            properties={"name": ["Acme Holdings Inc."], "jurisdiction": ["us-in"]},
             raw={"score": 0.99, "mode": "entity-match"},
         )]
 
@@ -27,8 +27,8 @@ def test_entity_driven_enrichment_persists_findings_and_run():
     client = TestClient(app)
     inv = client.post("/api/investigations", json={"name": "Entity enrichment"}).json()
     entity = client.post("/api/entities", json={
-        "investigation_id": inv["id"], "schema": "Company", "caption": "NiSource Inc.",
-        "properties": {"name": ["NiSource Inc."], "jurisdiction": ["us-in"]}, "dataset": "reporter",
+        "investigation_id": inv["id"], "schema": "Company", "caption": "Acme Holdings Inc.",
+        "properties": {"name": ["Acme Holdings Inc."], "jurisdiction": ["us-in"]}, "dataset": "reporter",
     }).json()
 
     response = client.post(f"/api/entities/{entity['id']}/enrich/entityfake")

@@ -32,8 +32,8 @@ def test_multi_provider_enrichment_session_tracks_partial_failure():
     client = TestClient(app)
     inv = client.post("/api/investigations", json={"name": "Multi enrich"}).json()
     entity = client.post("/api/entities", json={
-        "investigation_id": inv["id"], "schema": "Company", "caption": "NiSource Inc.",
-        "properties": {"name": ["NiSource Inc."]},
+        "investigation_id": inv["id"], "schema": "Company", "caption": "Acme Holdings Inc.",
+        "properties": {"name": ["Acme Holdings Inc."]},
     }).json()
 
     response = client.post(f'/api/entities/{entity["id"]}/enrich', json={"providers": ["good", "bad"]})

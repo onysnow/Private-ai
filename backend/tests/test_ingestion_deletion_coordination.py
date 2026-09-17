@@ -89,7 +89,7 @@ def test_failed_document_commit_removes_new_file_and_rows(monkeypatch, tmp_path)
             title='Atomic memo',
             filename='memo.txt',
             mime_type='text/plain',
-            data=b'NiSource Inc. announced a documented infrastructure program.',
+            data=b'Acme Holdings Inc. announced a documented infrastructure program.',
             storage_dir=tmp_path,
         )
 
