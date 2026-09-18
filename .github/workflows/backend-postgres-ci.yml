@@ -1,4 +1,4 @@
-name: Backend PostgreSQL CI  # touched 20260917T190615Z to test task #35 (phantom 0-job failure)
+name: Backend PostgreSQL CI
 
 on:
   push:
@@ -35,6 +35,14 @@ jobs:
     env:
       DATABASE_URL: "postgresql+psycopg://journalism:journalism@127.0.0.1:5432/journalism_test"
       POSTGRES_TEST_URL: "postgresql+psycopg://journalism:journalism@127.0.0.1:5432/journalism_test"
+      # Job-level (not step-level) so the "Fetch TAS submodule" step's `if:`
+      # below can read it via `env.TAS_REPO_TOKEN` -- the `secrets` context is
+      # not a valid named-value inside an `if:` condition at all (a documented
+      # Actions runner limitation, https://github.com/actions/runner/issues/520;
+      # confirmed as this workflow's actual root cause for task #35's
+      # "Invalid workflow file" dispatch failure, "Unrecognized named-value:
+      # 'secrets'"). `env:` blocks (unlike `if:`) can read `secrets` directly.
+      TAS_REPO_TOKEN: ${{ secrets.TAS_REPO_TOKEN }}
 
     steps:
       - uses: actions/checkout@v7
@@ -48,7 +56,7 @@ jobs:
       # secret actually being present, so a Dependabot PR's checkout still
       # succeeds (just without the submodule) instead of failing outright.
       - name: Fetch TAS submodule
-        if: ${{ secrets.TAS_REPO_TOKEN != '' }}
+        if: ${{ env.TAS_REPO_TOKEN != '' }}
         working-directory: ${{ github.workspace }}
         env:
           TAS_REPO_TOKEN: ${{ secrets.TAS_REPO_TOKEN }}
