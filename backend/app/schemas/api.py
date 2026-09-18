@@ -6,7 +6,11 @@ class InvestigationCreate(BaseModel):
 
 class EntityCreate(BaseModel):
     investigation_id: str
-    schema: str
+    # Intentionally shadows pydantic.BaseModel's deprecated v1 .schema()
+    # classmethod, matching FollowTheMoney's own "schema" property naming used
+    # throughout this codebase -- harmless at runtime (confirmed: only a
+    # UserWarning), narrow ignore for mypy (STRUCT-0013).
+    schema: str  # type: ignore[assignment]
     caption: str
     properties: dict[str, list[str]] = Field(default_factory=dict)
     dataset: str = "reporter"
@@ -199,7 +203,7 @@ class CrossProviderDecisionRequest(BaseModel):
 
 class RelationshipCreate(BaseModel):
     investigation_id: str
-    schema: str
+    schema: str  # type: ignore[assignment]  # see EntityCreate.schema above
     source_entity_id: str
     target_entity_id: str
     properties: dict[str, list[str]] = Field(default_factory=dict)
@@ -219,7 +223,7 @@ class RelationshipEvidenceReviewRequest(BaseModel):
 
 
 class ExtractedRelationshipProposalCreate(BaseModel):
-    schema: str
+    schema: str  # type: ignore[assignment]  # see EntityCreate.schema above
     source_entity_id: str
     target_entity_id: str
     properties: dict[str, list[str]] = Field(default_factory=dict)

@@ -34,7 +34,11 @@ class AuthorizationScope:
     def allows(self, investigation_id: str | None) -> bool:
         if not investigation_id:
             return False
-        return self.unrestricted or investigation_id in self.investigation_ids
+        # Written as `is None` (not `self.unrestricted`) so mypy can narrow
+        # investigation_ids to frozenset[str] on the right side of `or` --
+        # the two are equivalent by construction (STRUCT-0013), but going
+        # through the property loses that narrowing for the type checker.
+        return self.investigation_ids is None or investigation_id in self.investigation_ids
 
     def role_for(self, investigation_id: str) -> str:
         if self.unrestricted:

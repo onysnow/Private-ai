@@ -1,0 +1,38 @@
+name: Backend Lint
+
+on:
+  push:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-lint-ci.yml"
+  pull_request:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-lint-ci.yml"
+
+jobs:
+  backend-lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install backend + lint/type-check dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-local.txt
+
+      - name: Run mypy
+        # STRUCT-0013: mypy was configured in pyproject.toml but never actually
+        # invoked in CI, so even its narrow covered scope (app/connectors,
+        # app/core/access.py, app/core/config.py, app/core/time.py) went
+        # unchecked. This closes that gap for the current [tool.mypy] `files`
+        # scope; widen the workflow only after pyproject.toml's own scope grows.
+        run: python -m mypy

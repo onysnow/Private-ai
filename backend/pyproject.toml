@@ -23,7 +23,7 @@ known-first-party = ["app"]
 
 [tool.mypy]
 python_version = "3.12"
-files = ["app/connectors", "app/core/access.py", "app/core/config.py", "app/core/time.py"]
+files = ["app/connectors", "app/core/access.py", "app/core/config.py", "app/core/time.py", "app/models", "app/schemas"]
 warn_return_any = true
 warn_unused_configs = true
 warn_redundant_casts = true
@@ -36,8 +36,19 @@ ignore_missing_imports = true
 pretty = true
 show_error_codes = true
 
-# Deferred until the remaining backend packages are ready for broader type-checking.
+# Deferred until the remaining backend packages are ready for broader type-checking
+# (STRUCT-0013): app/services (289 errors across 20 files, ~105 of them in
+# app/services/search.py alone -- see STRUCT-0036) and app/ai (134 errors,
+# mostly the same search.py errors surfacing transitively plus a couple of
+# genuine issues in reasoning.py) are the next widening targets, app/api last.
 disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+# app/models and app/schemas are newly covered (STRUCT-0013) and clean under
+# the stricter check -- hold them to it per-module rather than waiting for
+# every package to reach this bar before enabling it anywhere.
+module = ["app.models.*", "app.schemas.*"]
+disallow_untyped_defs = true
 
 [tool.pytest.ini_options]
 addopts = "-q --cov=app --cov-report=term-missing"

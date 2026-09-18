@@ -1081,3 +1081,47 @@ automatically, and a credential-store roundtrip for the new provider
 name.
 
 Full backend suite: 220 passed, 0 failed (214 previous + 6 new).
+
+## STRUCT-0013 progress: mypy widened + CI enforcement added; STRUCT-0006 corrected
+
+Started working the STRUCT-00XX backlog. First up, STRUCT-0013
+(BLOCKING): mypy was configured but only covered 4 files and was never
+actually run in CI.
+
+- Widened mypy's `files` scope to include app/models and app/schemas.
+  Both were already clean except 3 known BaseModel.schema-shadowing
+  warnings (fixed with narrow, explained `# type: ignore[assignment]`s
+  rather than renaming the `schema` field, which is load-bearing FtM
+  terminology used throughout) and one real type-narrowing gap in
+  app/core/authorization.py's AuthorizationScope.allows() (rewrote the
+  `self.unrestricted or ...` check as an explicit `self.investigation_ids
+  is None or ...` so mypy -- and a human reader -- can verify the guard
+  directly instead of trusting the `unrestricted` property indirection;
+  behaviorally identical, since `unrestricted` is defined as exactly that
+  None-check).
+- Added `[[tool.mypy.overrides]]` flipping `disallow_untyped_defs = true`
+  for app.models.*/app.schemas.* specifically, per the finding's own
+  suggestion to enable it per-module as each package is brought under
+  coverage rather than waiting for the whole backend.
+- Added .github/workflows/backend-lint-ci.yml running `python -m mypy`
+  on every push/PR touching backend/** -- this was the more severe half
+  of the original finding: even the narrow 4-file scope was never
+  actually checked in CI.
+- Did NOT attempt app/services (289 errors, 20 files, ~105 in
+  search.py alone) or app/ai (134 errors, mostly the same search.py
+  errors surfacing transitively) this pass -- real, multi-file
+  type-safety work that deserves its own focused pass rather than being
+  rushed alongside everything else in this cycle. Logged as a precise
+  progress note on STRUCT-0013 itself; status moved OPEN -> IN_PROGRESS
+  (still BLOCKING).
+
+While in STRUCTURE_AUDIT.md, re-verified STRUCT-0006 (the Alembic
+migration-fork CI guard) and found it's actually already done: the
+"Verify Alembic migration chain has a single head" step in
+backend-postgres-ci.yml (which explicitly cites STRUCT-0006 in its own
+comment) was added and merged in a prior cycle, and STRUCT-0012's
+blocker (the workflow not running at all) is independently confirmed
+CORRECTED. Marked STRUCT-0006 CORRECTED -- it had simply never been
+updated to reflect work already done.
+
+Full backend suite: 220 passed, 0 failed.
