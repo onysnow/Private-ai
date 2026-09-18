@@ -69,6 +69,9 @@ def test_local_owner_can_create_user_and_membership_and_token_is_only_returned_o
     from fastapi import FastAPI
     from app.api.routes import router
     from app.api.routes_system import router as system_router
+    from app.api.routes_provenance import router as provenance_router
+    from app.api.routes_sources import router as sources_router
+    from app.api.routes_reporting_tasks import router as reporting_tasks_router
 
     factory = _factory()
     with factory() as db:
@@ -85,6 +88,9 @@ def test_local_owner_can_create_user_and_membership_and_token_is_only_returned_o
     app.dependency_overrides[get_db] = db_override
     app.include_router(router)
     app.include_router(system_router)
+    app.include_router(provenance_router)
+    app.include_router(sources_router)
+    app.include_router(reporting_tasks_router)
 
     with TestClient(app) as client:
         created = client.post("/api/settings/security/users", json={"display_name": "Reporter One"})
@@ -140,6 +146,9 @@ def test_local_owner_can_disable_rotate_and_revoke_user_token():
     from fastapi import FastAPI
     from app.api.routes import router
     from app.api.routes_system import router as system_router
+    from app.api.routes_provenance import router as provenance_router
+    from app.api.routes_sources import router as sources_router
+    from app.api.routes_reporting_tasks import router as reporting_tasks_router
 
     factory = _factory()
     app = FastAPI()
@@ -152,6 +161,9 @@ def test_local_owner_can_disable_rotate_and_revoke_user_token():
     app.dependency_overrides[get_db] = db_override
     app.include_router(router)
     app.include_router(system_router)
+    app.include_router(provenance_router)
+    app.include_router(sources_router)
+    app.include_router(reporting_tasks_router)
 
     with TestClient(app) as client:
         created = client.post("/api/settings/security/users", json={"display_name": "Reporter Lifecycle"})
@@ -203,6 +215,9 @@ def test_rotating_revoked_token_reactivates_credential_but_not_disabled_user():
     from fastapi import FastAPI
     from app.api.routes import router
     from app.api.routes_system import router as system_router
+    from app.api.routes_provenance import router as provenance_router
+    from app.api.routes_sources import router as sources_router
+    from app.api.routes_reporting_tasks import router as reporting_tasks_router
 
     factory = _factory()
     app = FastAPI()
@@ -215,6 +230,9 @@ def test_rotating_revoked_token_reactivates_credential_but_not_disabled_user():
     app.dependency_overrides[get_db] = db_override
     app.include_router(router)
     app.include_router(system_router)
+    app.include_router(provenance_router)
+    app.include_router(sources_router)
+    app.include_router(reporting_tasks_router)
 
     with TestClient(app) as client:
         created = client.post("/api/settings/security/users", json={"display_name": "Reporter Revoked"})

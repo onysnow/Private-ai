@@ -9,6 +9,9 @@ from sqlalchemy.pool import StaticPool
 
 from app.api.routes import router
 from app.api.routes_system import router as system_router
+from app.api.routes_provenance import router as provenance_router
+from app.api.routes_sources import router as sources_router
+from app.api.routes_reporting_tasks import router as reporting_tasks_router
 from app.core.authorization import (
     AuthorizationScope,
     InvestigationAuthorizationError,
@@ -79,6 +82,9 @@ def _scoped_app(factory) -> FastAPI:
 
     app.include_router(router)
     app.include_router(system_router)
+    app.include_router(provenance_router)
+    app.include_router(sources_router)
+    app.include_router(reporting_tasks_router)
     return app
 
 

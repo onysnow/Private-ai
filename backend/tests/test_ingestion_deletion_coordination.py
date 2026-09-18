@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
 
 from app.api import routes
+from app.api import routes_sources
 from app.db.session import Base
 from app.models.domain import Document, Investigation, Source
 from app.services import documents
@@ -58,13 +59,13 @@ def test_source_create_locks_before_rechecking_investigation(monkeypatch):
             return None
 
     monkeypatch.setattr(
-        routes,
+        routes_sources,
         'lock_investigation_transaction',
         lambda db, investigation_id: order.append(f'lock:{investigation_id}'),
     )
 
     with pytest.raises(HTTPException) as exc:
-        routes.create_source(SimpleNamespace(investigation_id='deleted-id'), _MissingInvestigationDb())
+        routes_sources.create_source_endpoint(SimpleNamespace(investigation_id='deleted-id'), _MissingInvestigationDb())
 
     assert exc.value.status_code == 404
     assert order == ['lock:deleted-id', 'get:deleted-id']

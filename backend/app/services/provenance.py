@@ -1,4 +1,3 @@
-from collections import defaultdict
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.models.domain import (
@@ -466,3 +465,32 @@ def record_provenance_trace(db: Session, record_type: str, record_id: str) -> di
         "lead_links": lead_links,
         "reconciliation": reconciliation,
     }
+
+
+def find_extraction_lineage(db: Session, record_type: str, record_id: str) -> dict:
+    """Return the most recently accepted extraction candidate's lineage for a
+    canonical record, if any exists, as a simple `{found, lineage}` payload.
+
+    This is a direct-match lookup only (record_type/record_id must match an
+    accepted ExtractionCandidate exactly) -- unlike `_record_extraction_lineage`
+    above, it does not fall back to a claim's lineage for evidence created
+    alongside it. That richer fallback is intentionally not applied here to
+    preserve this endpoint's existing behavior exactly.
+    """
+    from app.models.domain import ExtractionCandidate
+    from app.services.documents import serialize_extraction_lineage
+
+    allowed = {"entity", "claim", "evidence"}
+    if record_type not in allowed:
+        raise ValueError("record_type must be entity, claim, or evidence")
+
+    row = db.scalar(
+        select(ExtractionCandidate)
+        .where(
+            ExtractionCandidate.accepted_record_type == record_type,
+            ExtractionCandidate.accepted_record_id == record_id,
+            ExtractionCandidate.review_status == "accepted",
+        )
+        .order_by(ExtractionCandidate.reviewed_at.desc(), ExtractionCandidate.created_at.desc())
+    )
+    return {"found": row is not None, "lineage": serialize_extraction_lineage(db, row) if row else None}

@@ -3,7 +3,6 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.core.time import utcnow_naive
 from app.db.session import get_db
-from app.db.locking import lock_investigation_transaction
 from app.models.domain import (
     Investigation, Entity, Statement, Source, Evidence, ClaimEvidenceLink, Claim, Lead, LeadProfile, LeadLink, LeadWorkflowEvent, ReportingTask, ConnectorRun, ConnectorFinding, ResolutionDecision, CanonicalEntityMergeAudit, PropertyConflictDecision, StatementAssessment, StatementPromotion,
     EnrichmentSession, EnrichmentSessionRun, EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
@@ -11,7 +10,7 @@ from app.models.domain import (
     AppUser, InvestigationMembership,
 )
 from app.schemas.api import (
-    InvestigationCreate, EntityCreate, SourceCreate, ClaimEvidenceLinkCreate, ClaimCreate, ClaimUpdate, ClaimReviewRequest, LeadCreate, LeadUpdate, LeadLinkCreate, LeadConvertRequest, ReportingTaskCreate, ReportingTaskUpdate, AlephSearchRequest,
+    InvestigationCreate, EntityCreate, ClaimEvidenceLinkCreate, ClaimCreate, ClaimUpdate, ClaimReviewRequest, LeadCreate, LeadUpdate, LeadLinkCreate, LeadConvertRequest, AlephSearchRequest,
     ConnectorSearchRequest, FindingReviewRequest, ResolutionRequest, CanonicalResolutionRequest, CanonicalMergeExecuteRequest, PostMergeReconciliationRequest, PropertyConflictDecisionRequest, StatementAssessmentRequest, MultiEnrichmentRequest, CrossProviderDecisionRequest, RelationshipCreate, RelationshipEvidenceAttachRequest, RelationshipEvidenceReviewRequest, ExternalRelationshipReviewRequest, ExtractionCandidateReviewRequest, ExtractedRelationshipProposalCreate,
     AppUserCreate, AppUserUpdate, InvestigationMembershipPut, InvestigationQuestionContextRequest,
     CaseSynthesisRequest, HypothesisTestRequest,
@@ -20,7 +19,7 @@ from app.services.ftm import make_ftm_entity
 from app.services.resolution import candidate_entities, canonical_duplicate_candidates, record_canonical_resolution
 from app.services.entity_merge import preview_entity_merge, execute_entity_merge
 from app.services.post_merge_reconciliation import detect_post_merge_reconciliation, record_post_merge_reconciliation
-from app.services.provenance import entity_statement_history, record_provenance_trace
+from app.services.provenance import entity_statement_history
 from app.services.consolidation import session_findings, consolidate_findings, cluster_key
 from app.services.relationships import (
     RELATIONSHIP_SCHEMAS, create_relationship, investigation_relationships,
@@ -44,13 +43,13 @@ from app.core.config import settings
 from app.core.access import request_is_local_request
 from app.core.authorization import (
     scope_for_request,
-    require_scope_investigation, require_scope_investigation_admin, require_scope_global_admin,
+    require_scope_investigation_admin, require_scope_global_admin,
 )
 from app.core.audit_log import read_security_audit, summarize_security_audit, preview_security_audit_retention, apply_security_audit_retention
 import secrets
 from app.services.claims import review_claim, claim_review_workspace
 from app.services.leads import (
-    LEAD_STATUSES, PRIORITIES, TASK_STATUSES, get_profile, serialize_lead, serialize_link, serialize_task, make_task_workflow_event, validate_link_target, create_relationship_context_lead,
+    LEAD_STATUSES, PRIORITIES, get_profile, serialize_lead, serialize_link, serialize_task, make_task_workflow_event, validate_link_target, create_relationship_context_lead,
 )
 
 from app.api.dependencies import authorize_request_resource
@@ -907,34 +906,6 @@ def get_extraction_candidate_lineage(candidate_id: str, db: Session = Depends(ge
     return serialize_extraction_lineage(db, row)
 
 
-@router.get("/provenance/trace")
-def get_record_provenance_trace(record_type: str, record_id: str, request: Request, db: Session = Depends(get_db)):
-    try:
-        trace = record_provenance_trace(db, record_type, record_id)
-        require_scope_investigation(scope_for_request(request), trace["investigation_id"])
-        return trace
-    except LookupError as exc:
-        raise HTTPException(404, str(exc))
-    except ValueError as exc:
-        raise HTTPException(400, str(exc))
-
-
-@router.get("/provenance/extraction-lineage")
-def find_extraction_lineage(record_type: str, record_id: str, db: Session = Depends(get_db)):
-    if record_type not in {"entity", "claim", "evidence"}:
-        raise HTTPException(400, "record_type must be entity, claim, or evidence")
-    row = db.scalar(
-        select(ExtractionCandidate)
-        .where(
-            ExtractionCandidate.accepted_record_type == record_type,
-            ExtractionCandidate.accepted_record_id == record_id,
-            ExtractionCandidate.review_status == "accepted",
-        )
-        .order_by(ExtractionCandidate.reviewed_at.desc(), ExtractionCandidate.created_at.desc())
-    )
-    return {"found": row is not None, "lineage": serialize_extraction_lineage(db, row) if row else None}
-
-
 @router.post("/extraction-candidates/{candidate_id}/review")
 def review_extraction_candidate(candidate_id: str, body: ExtractionCandidateReviewRequest, db: Session = Depends(get_db)):
     row = db.get(ExtractionCandidate, candidate_id)
@@ -944,32 +915,6 @@ def review_extraction_candidate(candidate_id: str, body: ExtractionCandidateRevi
         return review_candidate(db, row, **body.model_dump())
     except ValueError as exc:
         raise HTTPException(400, str(exc))
-
-
-@router.post("/sources")
-def create_source(body: SourceCreate, db: Session = Depends(get_db)):
-    # Source creation participates in the same investigation-scoped PostgreSQL lock
-    # as document ingest/delete/restore so a source cannot commit after deletion.
-    lock_investigation_transaction(db, body.investigation_id)
-    if db.get(Investigation, body.investigation_id) is None:
-        raise HTTPException(404, "Investigation not found")
-    title = body.title.strip()
-    if not title:
-        raise HTTPException(400, "Source title is required")
-    payload = body.model_dump()
-    payload["title"] = title
-    if payload.get("url") is not None:
-        payload["url"] = payload["url"].strip() or None
-    row = Source(**payload)
-    db.add(row); db.commit(); db.refresh(row)
-    return row
-
-
-@router.get("/sources/{source_id}/evidence")
-def list_source_evidence(source_id: str, db: Session = Depends(get_db)):
-    if db.get(Source, source_id) is None:
-        raise HTTPException(404, "Source not found")
-    return db.scalars(select(Evidence).where(Evidence.source_id == source_id)).all()
 
 
 @router.get("/investigations/{investigation_id}/evidence")
@@ -1250,23 +1195,6 @@ def convert_lead(lead_id: str, body: LeadConvertRequest, db: Session = Depends(g
     raise HTTPException(400, "Conversion kind must be claim or task")
 
 
-@router.post("/reporting-tasks")
-def create_reporting_task(body: ReportingTaskCreate, db: Session = Depends(get_db)):
-    if db.get(Investigation, body.investigation_id) is None:
-        raise HTTPException(404, "Investigation not found")
-    if body.status not in TASK_STATUSES or body.priority not in PRIORITIES:
-        raise HTTPException(400, "Invalid task status or priority")
-    if body.lead_id:
-        lead = db.get(Lead, body.lead_id)
-        if lead is None or lead.investigation_id != body.investigation_id:
-            raise HTTPException(400, "Lead must belong to the same investigation")
-    row = ReportingTask(**body.model_dump())
-    db.add(row); db.flush()
-    db.add(make_task_workflow_event(db, row, from_status=None, to_status=row.status, note="Reporting task created"))
-    db.commit(); db.refresh(row)
-    return serialize_task(db, row)
-
-
 @router.get("/investigations/{investigation_id}/reporting-tasks")
 def list_reporting_tasks(investigation_id: str, db: Session = Depends(get_db)):
     if db.get(Investigation, investigation_id) is None:
@@ -1274,25 +1202,6 @@ def list_reporting_tasks(investigation_id: str, db: Session = Depends(get_db)):
     rows = db.scalars(select(ReportingTask).where(ReportingTask.investigation_id == investigation_id).order_by(ReportingTask.created_at.desc())).all()
     return [serialize_task(db, row) for row in rows]
 
-
-@router.patch("/reporting-tasks/{task_id}")
-def update_reporting_task(task_id: str, body: ReportingTaskUpdate, db: Session = Depends(get_db)):
-    row = db.get(ReportingTask, task_id)
-    if row is None:
-        raise HTTPException(404, "Reporting task not found")
-    data = body.model_dump(exclude_unset=True)
-    workflow_note = data.pop("workflow_note", None)
-    if data.get("status") is not None and data["status"] not in TASK_STATUSES:
-        raise HTTPException(400, "Invalid task status")
-    if data.get("priority") is not None and data["priority"] not in PRIORITIES:
-        raise HTTPException(400, "Invalid task priority")
-    old_status = row.status
-    for field, value in data.items():
-        setattr(row, field, value)
-    if row.status != old_status:
-        db.add(make_task_workflow_event(db, row, from_status=old_status, to_status=row.status, note=workflow_note))
-    db.commit(); db.refresh(row)
-    return serialize_task(db, row)
 
 @router.get("/connectors")
 def connectors():

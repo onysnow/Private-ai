@@ -310,3 +310,47 @@ def create_relationship_context_lead(db: Session, edge: RelationshipEdge, *, tit
 
     db.flush()
     return lead
+
+
+def create_reporting_task(db: Session, body) -> ReportingTask:
+    """Validate and persist a new ReportingTask from a request body.
+
+    Raises ValueError for a bad status/priority enum or a lead_id that
+    doesn't belong to the same investigation. The caller is responsible
+    for confirming body.investigation_id exists (a 404 concern, not a
+    validation one).
+    """
+    if body.status not in TASK_STATUSES or body.priority not in PRIORITIES:
+        raise ValueError("Invalid task status or priority")
+    if body.lead_id:
+        lead = db.get(Lead, body.lead_id)
+        if lead is None or lead.investigation_id != body.investigation_id:
+            raise ValueError("Lead must belong to the same investigation")
+    row = ReportingTask(**body.model_dump())
+    db.add(row)
+    db.flush()
+    db.add(make_task_workflow_event(db, row, from_status=None, to_status=row.status, note="Reporting task created"))
+    db.commit()
+    db.refresh(row)
+    return row
+
+
+def update_reporting_task(db: Session, row: ReportingTask, body) -> ReportingTask:
+    """Apply a partial update to a ReportingTask, recording a workflow event
+    when status changes. Raises ValueError for a bad status/priority enum.
+    The caller is responsible for confirming the task exists (a 404
+    concern, not a validation one)."""
+    data = body.model_dump(exclude_unset=True)
+    workflow_note = data.pop("workflow_note", None)
+    if data.get("status") is not None and data["status"] not in TASK_STATUSES:
+        raise ValueError("Invalid task status")
+    if data.get("priority") is not None and data["priority"] not in PRIORITIES:
+        raise ValueError("Invalid task priority")
+    old_status = row.status
+    for field, value in data.items():
+        setattr(row, field, value)
+    if row.status != old_status:
+        db.add(make_task_workflow_event(db, row, from_status=old_status, to_status=row.status, note=workflow_note))
+    db.commit()
+    db.refresh(row)
+    return row

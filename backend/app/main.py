@@ -7,6 +7,9 @@ from app.db.session import engine, SessionLocal
 from app.db.migrations import ensure_database_schema
 from app.api.routes import router
 from app.api.routes_system import router as system_router
+from app.api.routes_provenance import router as provenance_router
+from app.api.routes_sources import router as sources_router
+from app.api.routes_reporting_tasks import router as reporting_tasks_router
 from app.core.config import settings
 from app.core.access import bearer_token, enforce_api_access, enforce_browser_write_access, request_is_local_request
 from app.core.authorization import (
@@ -35,6 +38,9 @@ app.add_middleware(
 )
 app.include_router(router)
 app.include_router(system_router)
+app.include_router(provenance_router)
+app.include_router(sources_router)
+app.include_router(reporting_tasks_router)
 
 _request_limits = RequestLimitPolicy(
     default_bytes=settings.max_api_request_bytes,
