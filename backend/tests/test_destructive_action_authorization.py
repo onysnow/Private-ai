@@ -18,6 +18,7 @@ from app.api.routes_claims import router as claims_router
 from app.api.routes_leads import router as leads_router
 from app.api.routes_documents import router as documents_router
 from app.api.routes_connector_findings import router as connector_findings_router
+from app.api.routes_settings import router as settings_router
 from app.core.authorization import (
     AuthorizationScope,
     reset_current_authorization_scope,
@@ -68,6 +69,7 @@ def _app(factory, scope: AuthorizationScope) -> FastAPI:
     app.include_router(leads_router)
     app.include_router(documents_router)
     app.include_router(connector_findings_router)
+    app.include_router(settings_router)
     return app
 
 
