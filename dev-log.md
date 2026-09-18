@@ -965,3 +965,48 @@ Docs-only change (STRUCTURE_AUDIT.md + this entry) -- no code
 touched, full suite not re-run for this commit.
 
 Next: testing-strategy, then Firecrawl.
+
+## Testing-strategy audit: 1 finding logged (STRUCT-0039)
+
+Ninth dimension. STRUCT-0015 (frontend test thinness) and STRUCT-0016
+(no --cov-fail-under gate) already covered the obvious gaps from an
+earlier cycle, so this pass looked for something new: test
+*organization*, not just coverage numbers.
+
+- **STRUCT-0039 (MATERIAL, testing-strategy):** the identical 16-line
+  app.include_router(...) block is hand-duplicated across 4 separate
+  FastAPI app constructions in 3 test files (test_destructive_action_
+  authorization.py, test_investigation_authorization.py, and twice in
+  test_persisted_identity_roles.py), with no shared fixture. This is
+  precisely the pattern that made every one of the 8 Stage E split
+  groups require manually touching 4 files in lockstep this session --
+  a missed copy would silently drop a router from that test app's
+  coverage with nothing failing to say so.
+
+## Engineering-skills audit: all 10 dimensions complete
+
+Full run across code-review, architecture, debug, deploy-checklist,
+documentation, incident-response, standup, system-design, tech-debt,
+and testing-strategy is done. Final tally: 39 findings in
+STRUCTURE_AUDIT.md, 30 OPEN (3 BLOCKING, 21 MATERIAL, 6 OPTIONAL, 9
+NON_MATERIAL was updated to 9 as of this entry), 7 CORRECTED, 2
+VERIFIED. Two BLOCKING items (STRUCT-0013 mypy scope, STRUCT-0015
+frontend test thinness) predate this session's audit and remain the
+top of the backlog. Nothing found across all 10 dimensions rose above
+BLOCKING -- consistent with this being a genuinely well-built,
+carefully-reasoned-about codebase (advisory-locked concurrency
+control, strict provenance/non-auto-promotion invariants, a real
+security audit trail) whose gaps are mostly "fine for a single
+trusted operator today, worth a line of documentation or a small
+refactor before that assumption changes."
+
+Full backend test suite (214 tests) was not re-run during this audit
+pass since no code was touched -- every commit this cycle was
+docs-only (STRUCTURE_AUDIT.md + dev-log.md).
+
+Next: per Ony's original sequencing ("finish the split first, then
+run the full audit"), the audit is now finished. Moving on to
+Firecrawl -- research for TAS/dev use, then the connector-registry
+generalization (resolves STRUCT-0022) and Firecrawl connector
+implementation, verified against the full suite, with an ADR for
+sign-off before calling it done.
