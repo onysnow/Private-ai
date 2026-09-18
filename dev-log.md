@@ -700,3 +700,57 @@ cold.
   testing-strategy) across the whole Private-ai project, then explore
   Firecrawl for TAS/dev research and consider a Firecrawl integration
   into Private-ai itself.
+
+## Code review pass (post-split): 1 critical + 4 suggestions logged
+
+Ran `/engineering:code-review` against the whole backend (plus a
+light frontend pass) now that the routes.py split is complete and
+every domain lives in its own route/service module pair. Reviewed
+with targeted greps and full-file reads rather than a blanket re-read
+of all 71 files:
+
+- **Critical (STRUCT-0017, N+1 query cascade):**
+  `app/services/leads.py` (`serialize_link` line 35, `_lead_triage`
+  line 55, `serialize_lead` line 124, `serialize_task` line 206) and
+  `app/services/investigations.py`'s `list_investigation_leads` /
+  `lead_queue` re-serialize every lead's links/triage with fresh
+  per-row queries instead of a batched load. Confirmed via direct code
+  read, not speculation.
+- **Suggestion (STRUCT-0018, pagination):** none of the
+  `app/api/routes_*.py` list endpoints paginate; every investigation-
+  scoped list (documents, evidence, leads, connector-findings, etc.)
+  returns its full result set. Fine at current data volumes, will not
+  be once investigations accumulate real history.
+- **Suggestion (STRUCT-0019, test coverage):**
+  `app/services/settings.py:207-229` (`save_connector_credential`,
+  `delete_connector_credential`) has zero coverage under `--cov`.
+  `tests/test_connector_credentials.py` only exercises
+  `app/services/credentials.py` directly, never the service-layer
+  wrappers added in group 6's split.
+- **Suggestion (STRUCT-0020, 404 vs. empty-list inconsistency):**
+  some investigation-scoped list endpoints in
+  `routes_investigations.py` 404 when the parent investigation is
+  missing (`db.get(Investigation, ...) is None` check), others
+  (`/sources`, `/claims`, `/connector-runs`, `/connector-findings`)
+  silently return `[]` for a nonexistent investigation_id. Traced to
+  `app/core/authorization.py:200-226`'s `authorize_routed_resource`
+  doing scope-checking but not existence-checking in unrestricted
+  mode -- the inconsistency predates this split, the split just made
+  it visible side-by-side in one file.
+- **Suggestion (STRUCT-0021, test coverage):**
+  `app/api/routes_documents.py:30-95`'s OpenAleph endpoints are
+  thinly covered.
+
+Ony approved filing all five as tracked findings in
+STRUCTURE_AUDIT.md (STRUCT-0017 through STRUCT-0021, status OPEN)
+rather than GitHub issues, matching the STRUCT-00xx convention used
+throughout the split. Docs-only change (STRUCTURE_AUDIT.md +
+this dev-log entry) -- no code touched, full suite not re-run for
+this commit.
+
+Next per Ony's standing instruction: continue the engineering-skills
+audit (architecture, debug, deploy-checklist, documentation,
+incident-response, standup, system-design, tech-debt,
+testing-strategy) one skill at a time as Ony invokes them, then
+Firecrawl for TAS/dev research and a Firecrawl-integration
+architecture consideration.
