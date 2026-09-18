@@ -430,3 +430,36 @@ cold.
   committed to) integrating Firecrawl directly into Private-ai
   itself as a research feature. Explicitly sequenced: finish the
   routes.py split first, per user decision, before either of those.
+
+## Cycle: routes.py split group 3 (extraction-candidates, enrichment-sessions, connectors, backups)
+
+- Extracted 12 endpoints into 4 new route modules. The interesting
+  part of this group was a cross-group dependency: /connectors and
+  /entities/{id}/enrich* share three private helpers
+  (_persist_connector_findings, _run_connector, _enrich_entity) that
+  actually run a connector and persist its findings. Moved all three
+  to a new app/services/connectors.py now (rather than waiting for
+  group 7's entities extraction to hit the same code), and had
+  routes.py re-import them under their old private names so the
+  /entities endpoints still in routes.py don't need to change until
+  group 7 actually moves them.
+- Also surfaced a second cross-group shared helper the same way:
+  _read_upload_limited (upload-size limiting) is used by both
+  /backups/* (this group) and the document-ingest endpoint (still in
+  routes.py, pending group 5). Moved it to
+  app.api.dependencies.read_upload_limited alongside
+  authorize_request_resource, same re-import-under-old-name pattern.
+- Proactively added the four new routers to all three hand-built
+  test apps before running the suite, rather than waiting for a
+  failure -- paid off: full suite passed clean on the first attempt,
+  no follow-up fixes needed this group (groups 1 and 2 each needed
+  1-2 follow-up fixes after the first full-suite run).
+- Full backend suite: 214 passed, 0 failed. Committed and pushed to
+  `dev` (`d01b02f`). STRUCT-0002/0008 updated with group 3 progress.
+- Pattern worth remembering for groups 4-8: before writing new route
+  modules, grep the target endpoints' bodies for any private
+  `_helper` functions they call, and check whether those helpers are
+  *also* called by endpoints outside the current group. If so,
+  promote the helper to a services/ module now and re-import it under
+  its old name in routes.py, rather than duplicating logic or leaving
+  a route module importing a private symbol from routes.py.
