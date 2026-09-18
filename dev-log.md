@@ -24,14 +24,31 @@ cold.
   get worked through.
 - **Remediation Stage A done (STRUCT-0009):** `security_controls.py`
   split into `request_limits.py` / `rate_limiter.py` / `audit_log.py`,
-  pushed directly to `dev` (pure mechanical move, no PR needed per the
-  remediation prompt's own rules). Full 216-test suite reverified
-  passing after, identical count.
-- **Remediation Stages B-F not started.** Stage B (root-causing task
-  #35 via the GitHub web UI) unblocks the rest -- until it's done,
-  `backend-postgres-ci.yml` still isn't running pytest in CI, so
-  every merge needs the same manual local-venv test run this session
-  has been doing.
+  pushed directly to `dev`. Full 216-test suite reverified passing
+  after, identical count.
+- **Remediation Stage B done -- task #35 finally fixed.** Root cause
+  (via the GitHub web UI, exactly as flagged): line 51's
+  `if: ${{ secrets.TAS_REPO_TOKEN != '' }}` -- `secrets` is not a
+  valid named-value inside an `if:` at all (actions/runner#520).
+  This workflow had never successfully dispatched, on any commit,
+  ever. Fixed by moving the token into the job-level `env:` block and
+  reading `env.TAS_REPO_TOKEN` in the `if:` instead. Run #94 (commit
+  `3b734ed`) is this workflow's first-ever green run -- backend
+  pytest suite passed against real PostgreSQL, not sqlite.
+- **Remediation Stage F done -- STRUCT-0006's actual fix finally
+  landed.** Added a "Verify Alembic migration chain has a single
+  head" step to backend-postgres-ci.yml (now that Stage B gives it
+  somewhere to run). Verified green on run #95 (commit `bcdf640`).
+  **`backend-postgres-ci.yml` is now a real, working CI gate for the
+  first time this session** -- "CI is green" finally means the
+  backend test suite actually ran, on this repo, in CI.
+- **Remediation Stages C, D, E not started** (app-factory refactor,
+  conftest.py + test isolation, and the routes.py split respectively)
+  -- queued in that order per REMEDIATION_PROMPT.md.
+- **Open question for Ony, not decided unilaterally:** whether to add
+  `backend-postgres-ci.yml` as a required status check in GitHub's
+  branch protection settings, now that it actually works -- a repo-
+  settings change, not something done from code.
 - **task #35 (backend-postgres-ci.yml push-trigger failure)** —
   diagnosed but NOT yet root-caused. Confirmed facts: the workflow's
   YAML is valid (parses fine, schema-plausible, structurally identical
@@ -266,3 +283,36 @@ cold.
   smallest-to-largest PRs), and F (STRUCT-0006's actual CI check) are
   still queued, in that order -- see `REMEDIATION_PROMPT.md` for the
   full reasoning behind the ordering.
+
+### 2026-09-17 (cont'd) — Stages B and F: task #35 actually fixed
+- Ony: "Okay go ahead and continue" -- the go-ahead to use the GitHub
+  web UI (flagged as needed since API-only diagnosis had stalled on
+  task #35 for the whole session).
+- Opened `backend-postgres-ci.yml`'s run history in the browser and
+  clicked into the latest failing run. The Annotations panel showed
+  exactly what the REST API never surfaces: "Invalid workflow file
+  ... (Line: 51, Col: 13): Unrecognized named-value: 'secrets'.
+  Located at position 1 within expression:
+  secrets.TAS_REPO_TOKEN != ''". Confirmed against
+  actions/runner#520 (web search) that this is a real, documented
+  Actions limitation -- `secrets` cannot be referenced inside an
+  `if:` condition, full stop, regardless of job/step level.
+- This resolves a genuine mystery that spanned this entire session:
+  every "0 jobs, 0 duration, non-retryable failure" data point
+  collected across many prior cycles was this exact static
+  validation error. The workflow had literally never run
+  successfully since the line was written -- not a flaky/transient
+  issue, not an account-wide outage, not something that would have
+  resolved itself.
+- Fixed it (job-level env + `env.TAS_REPO_TOKEN` in the `if:`),
+  pushed, and watched run #94 dispatch, execute all 12 real steps,
+  and pass -- including the actual backend pytest suite against real
+  PostgreSQL, for the first time.
+- With a working workflow to add it to, immediately did Stage F too:
+  added the single-Alembic-head CI check STRUCT-0006 always needed.
+  Verified green on run #95.
+- Net effect: `backend-postgres-ci.yml` is a real, functioning CI
+  gate as of this cycle. Every PR/push going forward should show a
+  real pytest result here rather than "0 jobs" -- if that ever
+  regresses, don't re-diagnose from scratch; start from this entry
+  and the actions/runner#520 restriction.
