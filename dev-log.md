@@ -901,3 +901,36 @@ touched, full suite not re-run for this commit.
 
 Next: standup, system-design, tech-debt, testing-strategy, then
 Firecrawl.
+
+## System-design audit: 2 findings logged (STRUCT-0036-0037)
+
+Seventh dimension. Went past the architecture pass into concurrency
+and data-growth specifics: read app/db/locking.py and
+app/db/mutation_guard.py in full (PostgreSQL advisory locks,
+transaction-scoped, correctly no-op on SQLite with a clear comment
+explaining why; a before_flush SQLAlchemy event resolves
+investigation_id even for leaf-only records like Statement/Evidence).
+This is genuinely well-built -- confirmed all investigation_id
+foreign keys carry index=True (168 index=True occurrences checked).
+
+One real scaling gap found in the search/retrieval path:
+
+- **STRUCT-0036 (MATERIAL, system-design):** investigation_search()
+  (backing both /search and every AI-assistant question via
+  build_question_context) fetches every row of every searchable model
+  type for an investigation into Python with no SQL-level text
+  filtering, then scores every row with _score() before truncating to
+  `limit` -- confirmed by reading the fetch code directly. A
+  deliberate trade-off for cross-dialect score-ordering consistency,
+  not an oversight, but cost scales with total record count, not
+  match count -- worth addressing as investigations grow into the
+  volumes this tool is built for.
+- **STRUCT-0037 (OPTIONAL, system-design):** the SQLite-vs-PostgreSQL
+  concurrency asymmetry (advisory locks only apply to PostgreSQL) is
+  correct in code but undocumented -- nothing states that a
+  SQLite-backed deployment must stay single-process.
+
+Docs-only change (STRUCTURE_AUDIT.md + this entry) -- no code
+touched, full suite not re-run for this commit.
+
+Next: tech-debt, testing-strategy, then Firecrawl.
