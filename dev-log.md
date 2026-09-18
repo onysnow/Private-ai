@@ -316,3 +316,64 @@ cold.
   real pytest result here rather than "0 jobs" -- if that ever
   regresses, don't re-diagnose from scratch; start from this entry
   and the actions/runner#520 restriction.
+
+## Cycle: backend-postgres-ci required check + routes.py split (group 1)
+
+- Made `backend-postgres` a required status check on `main`'s branch
+  protection ruleset (GitHub rulesets API, ruleset id 23571038) --
+  the recommendation STRUCT-0012 left open last cycle. A PR into
+  `main` can no longer merge without this workflow passing.
+- Split `backend/app/api/routes.py` (STRUCT-0002/0008), Stage E group
+  1 of 8 (the smallest/lowest-risk group per REMEDIATION_PROMPT.md):
+  extracted 9 single-endpoint routes (health, capabilities, OpenAleph
+  status probe, search, timeline-event creation, relationship
+  schemas, AI-analysis-candidate review, evidence creation,
+  statement-assessment promotion) into a new `app/api/routes_system.py`,
+  with inline validation logic moved into `app/services/evidence.py`
+  and `app/services/timeline.py` (both raising `ValueError`, mapped
+  to 400/409 by the route, matching the existing
+  `create_canonical_relationship` convention). Added
+  `app/api/dependencies.py` so both route modules share the same
+  `authorize_request_resource` dependency without importing from each
+  other. `routes.py`: 1859 -> ~1700 lines, 120 -> 111 endpoints.
+- Hit and fixed a real assertion failure mid-split: the script
+  removing the 9 function bodies assumed a uniform "2 blank lines"
+  separator between top-level functions, but the file isn't
+  consistent (some pairs have 1, some have 2). Rewrote the removal to
+  match each function body without baking in trailing blank lines,
+  then normalized any 3+ blank-line run left behind by a removal down
+  to 2 blank lines with a single regex pass at the end -- more robust
+  than trying to special-case each block's exact spacing.
+- `ruff --select F401 --fix` on the trimmed routes.py removed 19
+  now-dead imports (some pre-existing, most freed up by this
+  extraction) -- used instead of manually reasoning about every name,
+  per the plan.
+- Full local-venv test run caught 2 real regressions before they
+  could reach CI: three tests build their own minimal FastAPI app by
+  hand (`from app.api.routes import router; app.include_router(router)`)
+  instead of importing `app.main` -- they needed
+  `routes_system.router` added too, since one of them (`/api/search`)
+  hit a moved endpoint. And `test_openaleph_integration.py`
+  monkeypatches `probe_openaleph` at the module level it's imported
+  into, which had to move from `app.api.routes` to
+  `app.api.routes_system`. Fixed both; this same pattern (hand-built
+  test apps missing the new router) will need to be watched for in
+  groups 2-8.
+- Full backend suite: 214 passed, 0 failed, 0 regressions (rsynced to
+  `$HOME/workbench-local/backend`, run via `$HOME/tmpvenv`). Committed
+  and pushed to `dev` (`5f8de76`). Updated STRUCT-0002/0008 in
+  `STRUCTURE_AUDIT.md` from OPEN to IN_PROGRESS with a note on what's
+  done vs. remaining (groups 2-8: provenance/sources/reporting-tasks;
+  extraction-candidates/enrichment/connectors/backups; relationships/
+  leads/claims; connector-findings/documents; settings; entities;
+  investigations).
+- Logged 4 new structure-audit findings answering the "is there
+  real type-safety/test coverage" question (STRUCT-0013 through
+  STRUCT-0016): mypy is scoped to 4 files and not run in CI at all;
+  frontend ESLint doesn't enforce explicit function return types or
+  ban `any`; frontend has exactly one 32-line test file; backend
+  coverage is a real 86% but has no `--cov-fail-under` floor. These
+  are informational for now -- not yet acted on, since the user's
+  explicit instruction this cycle was to finish the routes.py split
+  first. Next cycle should check whether to tackle these or continue
+  groups 2-8 of the split.
