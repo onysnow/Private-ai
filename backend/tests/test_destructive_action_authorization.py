@@ -9,6 +9,10 @@ from app.api.routes_system import router as system_router
 from app.api.routes_provenance import router as provenance_router
 from app.api.routes_sources import router as sources_router
 from app.api.routes_reporting_tasks import router as reporting_tasks_router
+from app.api.routes_connectors import router as connectors_router
+from app.api.routes_extraction_candidates import router as extraction_candidates_router
+from app.api.routes_enrichment_sessions import router as enrichment_sessions_router
+from app.api.routes_backups import router as backups_router
 from app.core.authorization import (
     AuthorizationScope,
     reset_current_authorization_scope,
@@ -50,6 +54,10 @@ def _app(factory, scope: AuthorizationScope) -> FastAPI:
     app.include_router(provenance_router)
     app.include_router(sources_router)
     app.include_router(reporting_tasks_router)
+    app.include_router(connectors_router)
+    app.include_router(extraction_candidates_router)
+    app.include_router(enrichment_sessions_router)
+    app.include_router(backups_router)
     return app
 
 

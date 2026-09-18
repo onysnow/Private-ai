@@ -3,7 +3,7 @@ import re
 from itertools import combinations
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from app.models.domain import ConnectorFinding, EnrichmentSessionFinding
+from app.models.domain import ConnectorFinding, CrossProviderDecision, EnrichmentSession, EnrichmentSessionFinding, EnrichmentSessionRun
 
 STRONG_IDS = {"registrationNumber", "taxNumber", "leiCode", "isin", "idNumber", "imoNumber", "vatCode"}
 NAME_PROPS = {"name", "alias", "weakAlias", "previousName"}
@@ -81,3 +81,75 @@ def consolidate_findings(findings: list[ConnectorFinding], threshold: float=0.60
         findings_payload=[{"id":by_id[i].id,"provider":by_id[i].provider,"provider_record_id":by_id[i].provider_record_id,"caption":by_id[i].caption,"schema":by_id[i].schema,"properties":by_id[i].properties,"source_url":by_id[i].source_url} for i in ids]
         out.append({"cluster_key":cluster_key(ids),"score":round(max(scores) if scores else 0.0,4),"providers":sorted(providers),"finding_ids":sorted(ids),"findings":findings_payload,"pairs":sorted(pairs,key=lambda x:x["score"],reverse=True)})
     return sorted(out,key=lambda x:x["score"],reverse=True)
+
+
+def get_enrichment_session_detail(db: Session, session_id: str) -> dict:
+    """Return an enrichment session with its per-provider runs. Raises
+    LookupError if the session doesn't exist (the caller maps that to 404)."""
+    session = db.get(EnrichmentSession, session_id)
+    if session is None:
+        raise LookupError("Enrichment session not found")
+    runs = db.scalars(
+        select(EnrichmentSessionRun).where(EnrichmentSessionRun.session_id == session_id).order_by(EnrichmentSessionRun.provider)
+    ).all()
+    return {
+        "id": session.id, "entity_id": session.entity_id, "investigation_id": session.investigation_id,
+        "status": session.status, "providers": session.providers, "total_results": session.total_results,
+        "started_at": session.started_at, "finished_at": session.finished_at, "runs": runs,
+    }
+
+
+def get_enrichment_session_clusters(db: Session, session_id: str) -> list[dict]:
+    """Return this session's consolidated cross-provider clusters, each
+    annotated with its latest recorded decision (if any). Raises
+    LookupError if the session doesn't exist."""
+    session = db.get(EnrichmentSession, session_id)
+    if session is None:
+        raise LookupError("Enrichment session not found")
+    clusters = consolidate_findings(session_findings(db, session_id))
+    decisions = db.scalars(
+        select(CrossProviderDecision).where(CrossProviderDecision.session_id == session_id).order_by(CrossProviderDecision.created_at.desc())
+    ).all()
+    latest = {}
+    for decision in decisions:
+        latest.setdefault(decision.cluster_key, decision)
+    for cluster in clusters:
+        decision = latest.get(cluster["cluster_key"])
+        cluster["decision"] = None if decision is None else {
+            "id": decision.id, "decision": decision.decision, "confidence": decision.confidence,
+            "rationale": decision.rationale, "created_at": decision.created_at,
+        }
+    return clusters
+
+
+def create_cross_provider_decision(db: Session, session_id: str, body) -> CrossProviderDecision:
+    """Validate and persist a cross-provider consolidation decision.
+
+    Raises ValueError for any validation failure (bad decision enum, fewer
+    than 2 findings, a finding outside this session, or findings that don't
+    actually span 2+ providers) and LookupError if the session doesn't
+    exist. The caller maps LookupError to 404 and ValueError to 400.
+    """
+    if body.decision not in {"positive", "negative", "unsure"}:
+        raise ValueError("Decision must be positive, negative, or unsure")
+    session = db.get(EnrichmentSession, session_id)
+    if session is None:
+        raise LookupError("Enrichment session not found")
+    available = {f.id for f in session_findings(db, session_id)}
+    finding_ids = sorted(set(body.finding_ids))
+    if len(finding_ids) < 2:
+        raise ValueError("A cross-provider decision requires at least two findings")
+    if any(fid not in available for fid in finding_ids):
+        raise ValueError("All findings must belong to this enrichment session")
+    rows = [db.get(ConnectorFinding, fid) for fid in finding_ids]
+    if len({row.provider for row in rows if row}) < 2:
+        raise ValueError("Cross-provider decisions require findings from at least two providers")
+    row = CrossProviderDecision(
+        investigation_id=session.investigation_id, entity_id=session.entity_id, session_id=session.id,
+        cluster_key=cluster_key(finding_ids), finding_ids=finding_ids, decision=body.decision,
+        confidence=body.confidence, rationale=body.rationale,
+    )
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return row

@@ -10,8 +10,7 @@ from app.models.domain import (
     AppUser, InvestigationMembership,
 )
 from app.schemas.api import (
-    InvestigationCreate, EntityCreate, ClaimEvidenceLinkCreate, ClaimCreate, ClaimUpdate, ClaimReviewRequest, LeadCreate, LeadUpdate, LeadLinkCreate, LeadConvertRequest, AlephSearchRequest,
-    ConnectorSearchRequest, FindingReviewRequest, ResolutionRequest, CanonicalResolutionRequest, CanonicalMergeExecuteRequest, PostMergeReconciliationRequest, PropertyConflictDecisionRequest, StatementAssessmentRequest, MultiEnrichmentRequest, CrossProviderDecisionRequest, RelationshipCreate, RelationshipEvidenceAttachRequest, RelationshipEvidenceReviewRequest, ExternalRelationshipReviewRequest, ExtractionCandidateReviewRequest, ExtractedRelationshipProposalCreate,
+    InvestigationCreate, EntityCreate, ClaimEvidenceLinkCreate, ClaimCreate, ClaimUpdate, ClaimReviewRequest, LeadCreate, LeadUpdate, LeadLinkCreate, LeadConvertRequest, FindingReviewRequest, ResolutionRequest, CanonicalResolutionRequest, CanonicalMergeExecuteRequest, PostMergeReconciliationRequest, PropertyConflictDecisionRequest, StatementAssessmentRequest, MultiEnrichmentRequest, RelationshipCreate, RelationshipEvidenceAttachRequest, RelationshipEvidenceReviewRequest, ExternalRelationshipReviewRequest, ExtractedRelationshipProposalCreate,
     AppUserCreate, AppUserUpdate, InvestigationMembershipPut, InvestigationQuestionContextRequest,
     CaseSynthesisRequest, HypothesisTestRequest,
 )
@@ -20,7 +19,6 @@ from app.services.resolution import candidate_entities, canonical_duplicate_cand
 from app.services.entity_merge import preview_entity_merge, execute_entity_merge
 from app.services.post_merge_reconciliation import detect_post_merge_reconciliation, record_post_merge_reconciliation
 from app.services.provenance import entity_statement_history
-from app.services.consolidation import session_findings, consolidate_findings, cluster_key
 from app.services.relationships import (
     RELATIONSHIP_SCHEMAS, create_relationship, investigation_relationships,
     entity_relationships, investigation_graph, serialize_relationship, review_relationship_evidence, relationship_evidence_review_history, attach_relationship_evidence,
@@ -31,8 +29,8 @@ from app.services.assistant_context import build_question_context
 from app.ai.reasoning import run_reasoning_module, ReasoningInputError, CitationValidationError, SchemaValidationError
 from app.services.dossier import entity_dossier
 from app.services.timeline import investigation_timeline, _normalize_date
-from app.services.documents import ingest_document, serialize_document, review_candidate, preview_entity_candidate_matches, serialize_extraction_lineage, propose_relationship_from_extracted_claim
-from app.services.exports import build_investigation_export, inspect_export, preview_investigation_restore, restore_investigation_export
+from app.services.documents import ingest_document, serialize_document, propose_relationship_from_extracted_claim
+from app.services.exports import build_investigation_export
 from app.services.security import redact_database_url, resolve_storage_root
 from app.services.credentials import credential_status, set_secret, remove_secret
 from app.services.lifecycle import preview_investigation_deletion, delete_investigation
@@ -43,7 +41,7 @@ from app.core.config import settings
 from app.core.access import request_is_local_request
 from app.core.authorization import (
     scope_for_request,
-    require_scope_investigation_admin, require_scope_global_admin,
+    require_scope_investigation_admin,
 )
 from app.core.audit_log import read_security_audit, summarize_security_audit, preview_security_audit_retention, apply_security_audit_retention
 import secrets
@@ -52,7 +50,11 @@ from app.services.leads import (
     LEAD_STATUSES, PRIORITIES, get_profile, serialize_lead, serialize_link, serialize_task, make_task_workflow_event, validate_link_target, create_relationship_context_lead,
 )
 
-from app.api.dependencies import authorize_request_resource
+from app.api.dependencies import authorize_request_resource, read_upload_limited as _read_upload_limited
+from app.services.connectors import (
+    persist_connector_findings as _persist_connector_findings,
+    enrich_entity as _enrich_entity,
+)
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
@@ -149,20 +151,6 @@ def import_openaleph_document_entities(document_id: str, db: Session = Depends(g
         raise HTTPException(409, str(exc))
     except Exception as exc:
         raise HTTPException(502, f"OpenAleph entity import failed: {exc.__class__.__name__}: {exc}")
-
-
-async def _read_upload_limited(file: UploadFile, limit: int) -> bytes:
-    chunks = []
-    total = 0
-    while True:
-        chunk = await file.read(min(1024 * 1024, limit - total + 1))
-        if not chunk:
-            break
-        total += len(chunk)
-        if total > limit:
-            raise HTTPException(413, f"Upload exceeds {limit} byte limit")
-        chunks.append(chunk)
-    return b"".join(chunks)
 
 
 def _require_local_request(request: Request) -> None:
@@ -575,37 +563,6 @@ def export_investigation(
     )
 
 
-@router.post("/backups/inspect")
-async def inspect_backup(file: UploadFile = File(...)):
-    data = await _read_upload_limited(file, settings.max_backup_bytes)
-    try:
-        manifest, records = inspect_export(data)
-    except ValueError as exc:
-        raise HTTPException(400, str(exc))
-    return {"manifest": manifest, "record_counts": {k: len(v) for k, v in records.items()}}
-
-
-@router.post("/backups/preview")
-async def preview_backup_restore(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    data = await _read_upload_limited(file, settings.max_backup_bytes)
-    try:
-        return preview_investigation_restore(db, data, resolve_storage_root(settings.document_storage_dir))
-    except ValueError as exc:
-        raise HTTPException(400, str(exc))
-
-
-@router.post("/backups/restore")
-async def restore_backup(request: Request, file: UploadFile = File(...), db: Session = Depends(get_db)):
-    if not settings.enable_restore_api:
-        raise HTTPException(403, "Backup restore API is disabled; set ENABLE_RESTORE_API=true to enable it")
-    require_scope_global_admin(scope_for_request(request))
-    data = await _read_upload_limited(file, settings.max_backup_bytes)
-    try:
-        return restore_investigation_export(db, data, resolve_storage_root(settings.document_storage_dir))
-    except ValueError as exc:
-        raise HTTPException(400, str(exc))
-
-
 @router.post("/investigations")
 def create_investigation(body: InvestigationCreate, db: Session = Depends(get_db)):
     row = Investigation(name=body.name, description=body.description)
@@ -885,36 +842,6 @@ def create_extracted_relationship_proposal(claim_id: str, body: ExtractedRelatio
         'chunk_id': row.chunk_id, 'candidate_type': row.candidate_type, 'payload': row.payload,
         'confidence': row.confidence, 'review_status': row.review_status,
     }
-
-
-@router.get("/extraction-candidates/{candidate_id}/entity-matches")
-def get_extraction_entity_matches(candidate_id: str, db: Session = Depends(get_db)):
-    row = db.get(ExtractionCandidate, candidate_id)
-    if row is None:
-        raise HTTPException(404, "Extraction candidate not found")
-    try:
-        return preview_entity_candidate_matches(db, row)
-    except ValueError as exc:
-        raise HTTPException(400, str(exc))
-
-
-@router.get("/extraction-candidates/{candidate_id}/lineage")
-def get_extraction_candidate_lineage(candidate_id: str, db: Session = Depends(get_db)):
-    row = db.get(ExtractionCandidate, candidate_id)
-    if row is None:
-        raise HTTPException(404, "Extraction candidate not found")
-    return serialize_extraction_lineage(db, row)
-
-
-@router.post("/extraction-candidates/{candidate_id}/review")
-def review_extraction_candidate(candidate_id: str, body: ExtractionCandidateReviewRequest, db: Session = Depends(get_db)):
-    row = db.get(ExtractionCandidate, candidate_id)
-    if row is None:
-        raise HTTPException(404, "Extraction candidate not found")
-    try:
-        return review_candidate(db, row, **body.model_dump())
-    except ValueError as exc:
-        raise HTTPException(400, str(exc))
 
 
 @router.get("/investigations/{investigation_id}/evidence")
@@ -1203,91 +1130,6 @@ def list_reporting_tasks(investigation_id: str, db: Session = Depends(get_db)):
     return [serialize_task(db, row) for row in rows]
 
 
-@router.get("/connectors")
-def connectors():
-    return {
-        "providers": registry.names(),
-        "status": {
-            name: {"configured": bool(getattr(registry.get(name), "configured", True))}
-            for name in registry.names()
-        },
-    }
-
-def _persist_connector_findings(db: Session, run: ConnectorRun, investigation_id: str, provider: str, findings):
-    rows = []
-    for finding in findings:
-        existing = db.scalar(select(ConnectorFinding).where(
-            ConnectorFinding.investigation_id == investigation_id,
-            ConnectorFinding.provider == provider,
-            ConnectorFinding.provider_record_id == finding.record_id,
-        ))
-        if existing:
-            rows.append(existing)
-            continue
-        row = ConnectorFinding(
-            investigation_id=investigation_id, run_id=run.id, provider=provider,
-            provider_record_id=finding.record_id, caption=finding.caption, schema=finding.schema,
-            properties=finding.properties or {}, source_url=finding.url, raw=finding.raw or {},
-        )
-        db.add(row); rows.append(row)
-        lead = Lead(
-            investigation_id=investigation_id, title=finding.caption, detail=finding.url,
-            provider=provider, provider_record_id=finding.record_id,
-        )
-        db.add(lead); db.flush()
-        db.add(LeadProfile(lead_id=lead.id, priority="normal"))
-        db.add(LeadWorkflowEvent(lead_id=lead.id, from_status=None, to_status=lead.status, note=f"Created from {provider} connector finding"))
-    run.status = "completed"
-    run.result_count = len(rows)
-    run.finished_at = utcnow_naive()
-    db.commit()
-    for row in rows:
-        db.refresh(row)
-    return rows
-
-
-async def _run_connector(provider: str, body: ConnectorSearchRequest, db: Session):
-    if db.get(Investigation, body.investigation_id) is None:
-        raise HTTPException(404, "Investigation not found")
-    connector = registry.get(provider)
-    if connector is None:
-        raise HTTPException(404, "Connector not found")
-    run = ConnectorRun(investigation_id=body.investigation_id, provider=provider, query=body.query)
-    db.add(run); db.commit(); db.refresh(run)
-    try:
-        findings = await connector.search(body.query)
-        return _persist_connector_findings(db, run, body.investigation_id, provider, findings)
-    except Exception as exc:
-        run.status = "failed"; run.error = str(exc); run.finished_at = utcnow_naive(); db.commit()
-        raise HTTPException(502, f"{provider} connector failed: {exc}") from exc
-
-
-async def _enrich_entity(provider: str, entity: Entity, db: Session):
-    connector = registry.get(provider)
-    if connector is None:
-        raise HTTPException(404, "Connector not found")
-    query_label = f"entity:{entity.ftm_id or entity.id}"
-    run = ConnectorRun(
-        investigation_id=entity.investigation_id, provider=provider, query=query_label,
-    )
-    db.add(run); db.commit(); db.refresh(run)
-    try:
-        findings = await connector.enrich({
-            "id": entity.ftm_id,
-            "schema": entity.schema,
-            "caption": entity.caption,
-            "properties": entity.properties or {},
-        })
-        return _persist_connector_findings(db, run, entity.investigation_id, provider, findings)
-    except Exception as exc:
-        run.status = "failed"; run.error = str(exc); run.finished_at = utcnow_naive(); db.commit()
-        raise HTTPException(502, f"{provider} enrichment failed: {exc}") from exc
-
-
-@router.post("/connectors/{provider}/search")
-async def connector_search(provider: str, body: ConnectorSearchRequest, db: Session = Depends(get_db)):
-    return await _run_connector(provider, body, db)
-
 @router.post("/entities/{entity_id}/enrich/{provider}")
 async def enrich_entity(entity_id: str, provider: str, db: Session = Depends(get_db)):
     entity = db.get(Entity, entity_id)
@@ -1364,68 +1206,11 @@ async def enrich_entity_multi(entity_id: str, body: MultiEnrichmentRequest, db: 
     }
 
 
-@router.get("/enrichment-sessions/{session_id}")
-def enrichment_session_detail(session_id: str, db: Session = Depends(get_db)):
-    session = db.get(EnrichmentSession, session_id)
-    if session is None:
-        raise HTTPException(404, "Enrichment session not found")
-    runs = db.scalars(select(EnrichmentSessionRun).where(EnrichmentSessionRun.session_id == session_id).order_by(EnrichmentSessionRun.provider)).all()
-    return {
-        "id": session.id, "entity_id": session.entity_id, "investigation_id": session.investigation_id,
-        "status": session.status, "providers": session.providers, "total_results": session.total_results,
-        "started_at": session.started_at, "finished_at": session.finished_at, "runs": runs,
-    }
-
-
 @router.get("/entities/{entity_id}/enrichment-sessions")
 def list_entity_enrichment_sessions(entity_id: str, db: Session = Depends(get_db)):
     if db.get(Entity, entity_id) is None:
         raise HTTPException(404, "Entity not found")
     return db.scalars(select(EnrichmentSession).where(EnrichmentSession.entity_id == entity_id).order_by(EnrichmentSession.started_at.desc())).all()
-
-
-@router.get("/enrichment-sessions/{session_id}/clusters")
-def enrichment_session_clusters(session_id: str, db: Session = Depends(get_db)):
-    session = db.get(EnrichmentSession, session_id)
-    if session is None:
-        raise HTTPException(404, "Enrichment session not found")
-    clusters = consolidate_findings(session_findings(db, session_id))
-    decisions = db.scalars(select(CrossProviderDecision).where(CrossProviderDecision.session_id == session_id).order_by(CrossProviderDecision.created_at.desc())).all()
-    latest = {}
-    for decision in decisions:
-        latest.setdefault(decision.cluster_key, decision)
-    for cluster in clusters:
-        decision = latest.get(cluster["cluster_key"])
-        cluster["decision"] = None if decision is None else {
-            "id": decision.id, "decision": decision.decision, "confidence": decision.confidence,
-            "rationale": decision.rationale, "created_at": decision.created_at,
-        }
-    return clusters
-
-
-@router.post("/enrichment-sessions/{session_id}/clusters/decision")
-def decide_cross_provider_cluster(session_id: str, body: CrossProviderDecisionRequest, db: Session = Depends(get_db)):
-    if body.decision not in {"positive", "negative", "unsure"}:
-        raise HTTPException(400, "Decision must be positive, negative, or unsure")
-    session = db.get(EnrichmentSession, session_id)
-    if session is None:
-        raise HTTPException(404, "Enrichment session not found")
-    available = {f.id for f in session_findings(db, session_id)}
-    finding_ids = sorted(set(body.finding_ids))
-    if len(finding_ids) < 2:
-        raise HTTPException(400, "A cross-provider decision requires at least two findings")
-    if any(fid not in available for fid in finding_ids):
-        raise HTTPException(400, "All findings must belong to this enrichment session")
-    rows = [db.get(ConnectorFinding, fid) for fid in finding_ids]
-    if len({row.provider for row in rows if row}) < 2:
-        raise HTTPException(400, "Cross-provider decisions require findings from at least two providers")
-    row = CrossProviderDecision(
-        investigation_id=session.investigation_id, entity_id=session.entity_id, session_id=session.id,
-        cluster_key=cluster_key(finding_ids), finding_ids=finding_ids, decision=body.decision,
-        confidence=body.confidence, rationale=body.rationale,
-    )
-    db.add(row); db.commit(); db.refresh(row)
-    return row
 
 
 @router.get("/entities/{entity_id}/cross-provider-decisions")
@@ -1434,9 +1219,6 @@ def list_cross_provider_decisions(entity_id: str, db: Session = Depends(get_db))
         raise HTTPException(404, "Entity not found")
     return db.scalars(select(CrossProviderDecision).where(CrossProviderDecision.entity_id == entity_id).order_by(CrossProviderDecision.created_at.desc())).all()
 
-@router.post("/connectors/aleph/search")
-async def aleph_search(body: AlephSearchRequest, db: Session = Depends(get_db)):
-    return await _run_connector("aleph", ConnectorSearchRequest(**body.model_dump()), db)
 
 @router.get("/investigations/{investigation_id}/connector-runs")
 def list_connector_runs(investigation_id: str, db: Session = Depends(get_db)):
