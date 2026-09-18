@@ -463,3 +463,34 @@ cold.
   promote the helper to a services/ module now and re-import it under
   its old name in routes.py, rather than duplicating logic or leaving
   a route module importing a private symbol from routes.py.
+
+## Cycle: routes.py split group 4 (relationships, leads, claims)
+
+- Extracted 18 endpoints -- the biggest group yet -- into
+  routes_relationships.py, routes_claims.py, routes_leads.py.
+  Relationships were already thin adapters (no new service code
+  needed); claims and leads each needed real extraction into
+  app/services/claims.py and app/services/leads.py respectively,
+  including converting the private, HTTPException-raising
+  _validate_claim_fields into a public, ValueError-based
+  validate_claim_fields to match the rest of the codebase's
+  convention (group 3's connector helpers were the deliberate,
+  narrow exception to that convention; this wasn't one of those
+  cases).
+- Caught a real bug in review before running the suite:
+  create_lead_link's first draft returned the raw LeadLink ORM row
+  instead of serialize_link(db, row), which would have silently
+  changed the /leads/{id}/links response shape. Fixed by re-reading
+  the new route file against the original code line by line before
+  testing, not just trusting that "it compiles."
+- Full backend suite: 214 passed, 0 failed -- clean run, no
+  follow-up fixes needed (same as group 3). Committed and pushed to
+  `dev` (`6e1f01c`). STRUCT-0002/0008 updated with group 4 progress.
+- Worth carrying into groups 5-8: this group's size (18 endpoints)
+  made a full manual diff-against-original review worthwhile before
+  testing, not just after a test failure surfaces a problem. Groups
+  5 (17), 7 (20), and 8 (23) are all this size or bigger --
+  budget time for that review pass rather than treating "tests pass"
+  as the only correctness signal, since a bug that happens to return
+  the same HTTP status code with a different body shape won't always
+  be caught by existing tests.
