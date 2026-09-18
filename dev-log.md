@@ -934,3 +934,34 @@ Docs-only change (STRUCTURE_AUDIT.md + this entry) -- no code
 touched, full suite not re-run for this commit.
 
 Next: tech-debt, testing-strategy, then Firecrawl.
+
+## Tech-debt audit: 1 finding logged (STRUCT-0038) + backlog inventory
+
+Eighth dimension. Checked for hidden debt outside the tracked system
+first: zero TODO/FIXME/XXX/HACK markers anywhere in backend or
+frontend source, only 3 `# noqa` suppressions (all legitimate,
+self-documented registration imports already read during the debug
+pass), zero `# type: ignore`. Debt in this codebase is tracked
+externally in STRUCTURE_AUDIT.md, not hidden in code comments -- good
+discipline, nothing to surface there.
+
+- **STRUCT-0038 (MATERIAL, tech-debt):** .github/dependabot.yml
+  ignores ALL semver-major updates for both npm and pip. A CVE fix
+  that only ships in a new major version (like the Next.js CVE
+  README's own status table names under issue #20) will never
+  surface as an automatic PR -- catching it depends on someone
+  noticing manually. Reasonable as a policy, but undocumented as a
+  security blind spot.
+
+Prioritized backlog snapshot (38 total findings, 28 OPEN): 2 BLOCKING
+still open (STRUCT-0013 mypy scoped to 4 files; STRUCT-0015 frontend
+tests are a single 32-line file despite CI showing green), 19
+MATERIAL, 6 OPTIONAL, 9 NON_MATERIAL. Nothing found this session rises
+above what was already tracked as BLOCKING before this audit started
+-- the two existing BLOCKING items remain the top of the backlog by
+severity.
+
+Docs-only change (STRUCTURE_AUDIT.md + this entry) -- no code
+touched, full suite not re-run for this commit.
+
+Next: testing-strategy, then Firecrawl.
