@@ -795,3 +795,34 @@ documentation, incident-response, standup, system-design, tech-debt,
 testing-strategy) as Ony invokes each one, then Firecrawl for TAS/dev
 research and the Firecrawl-integration architecture work itself --
 which should now also resolve STRUCT-0022 along the way.
+
+## Debug audit: 2 findings logged (STRUCT-0027-0028)
+
+Third dimension of the engineering-skills audit. Traced exception
+handling across the backend: every bare `except Exception:` (no
+`as exc` binding) turned out to be a deliberate cleanup-then-`raise`
+pattern (documents.py, entity_merge.py, exports.py, lifecycle.py) or
+an intentional safe-fallback (security.py's redact_database_url) --
+none of them silently swallow anything. No leftover `print()` debug
+statements anywhere in app code either. Good baseline.
+
+Two real gaps found in the OpenAleph/connector error paths:
+
+- **STRUCT-0027 (MATERIAL, debug):** the 4 OpenAleph pipeline
+  endpoints that catch `except Exception` have no server-side record
+  of a failure once it happens -- unlike `run_connector`/
+  `enrich_entity` (app/services/connectors.py), which persist
+  `run.error` onto the ConnectorRun row first. When an OpenAleph
+  sync/import fails, there is no way to look up why afterward.
+- **STRUCT-0028 (OPTIONAL, debug):** those same endpoints plus
+  connectors.py's two 502 handlers put raw exception text (sometimes
+  the exception class name too) directly into the client-facing
+  error response. Contained today under single-user/trusted-caller
+  mode, but worth cleaning up given STRUCT-0023's noted direction
+  toward per-user remote access.
+
+Docs-only change (STRUCTURE_AUDIT.md + this entry) -- no code
+touched, full suite not re-run for this commit.
+
+Next: deploy-checklist, documentation, incident-response, standup,
+system-design, tech-debt, testing-strategy, then Firecrawl.
