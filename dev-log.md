@@ -754,3 +754,44 @@ incident-response, standup, system-design, tech-debt,
 testing-strategy) one skill at a time as Ony invokes them, then
 Firecrawl for TAS/dev research and a Firecrawl-integration
 architecture consideration.
+
+## Architecture evaluation: 5 findings logged (STRUCT-0022-0026)
+
+Ran `/engineering:architecture evaluate` against the whole project
+(second dimension of the engineering-skills audit, after
+code-review). Reviewed the request-handling middleware, the auth
+model, the connector registry, the data model shape, the TAS
+submodule integration, and the CI/deployment topology.
+
+- **STRUCT-0022 (MATERIAL, architecture):** `ConnectorRegistry._build()`
+  hardcodes exactly two providers via an if/elif chain; `register()`
+  is dead code. Flagged now specifically because Firecrawl is next on
+  Ony's list -- recommended generalizing to a config-driven provider
+  table as part of, or just before, that work, rather than adding a
+  third hardcoded branch.
+- **STRUCT-0023 (OPTIONAL, architecture):** two coexisting auth paths
+  in `main.py`'s middleware (shared static bearer token vs. newer
+  per-user persisted tokens with real roles) -- confirmed via the
+  code's own docstrings that this is a deliberate in-progress
+  migration, not an oversight, but nothing documents the intended
+  end state or a retirement plan for the shared-token path.
+- **STRUCT-0024 (NON_MATERIAL, architecture):** `app/models/domain.py`
+  is 537 lines / 39 models in one file -- same shape `routes.py` had
+  before Stage E. No action needed now; marker to split it by domain
+  before it grows the way routes.py did.
+- **STRUCT-0025 (NON_MATERIAL, architecture):** TAS spec vendored as a
+  git submodule pinned at v1.8.0, only 2 of its modules wired to real
+  endpoints so far, no automated drift/path check against the pinned
+  commit.
+- **STRUCT-0026 (NON_MATERIAL, dependencies):** `pytest`/`pytest-cov`
+  ship in `backend/requirements.txt`, the same file the Docker image
+  installs from.
+
+Docs-only change (STRUCTURE_AUDIT.md + this entry) -- no code
+touched, full suite not re-run for this commit.
+
+Next: continue the engineering-skills audit (debug, deploy-checklist,
+documentation, incident-response, standup, system-design, tech-debt,
+testing-strategy) as Ony invokes each one, then Firecrawl for TAS/dev
+research and the Firecrawl-integration architecture work itself --
+which should now also resolve STRUCT-0022 along the way.
