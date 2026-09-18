@@ -75,6 +75,22 @@ jobs:
       - name: Install backend dependencies
         run: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
 
+      - name: Verify Alembic migration chain has a single head
+        # STRUCT-0006: the chain forked into two heads once already this
+        # session (two independently-merged PRs, neither aware of the
+        # other's migration) and went unnoticed until someone ran alembic
+        # locally. Fail fast in CI instead.
+        run: |
+          heads="$(python -m alembic heads)"
+          count="$(echo "$heads" | grep -c .)"
+          if [ "$count" -ne 1 ]; then
+            echo "::error::Alembic migration chain has $count heads, expected exactly 1:"
+            echo "$heads"
+            exit 1
+          fi
+          echo "Single migration head confirmed:"
+          echo "$heads"
+
       - name: Apply Alembic migrations on PostgreSQL
         run: python -m alembic upgrade head
 
