@@ -5,7 +5,7 @@ import secrets
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.connectors.registry import registry
+from app.connectors.registry import CONNECTOR_SPECS, registry
 from app.core.config import settings
 from app.core.time import utcnow_naive
 from app.models.domain import AppUser, Investigation, InvestigationMembership
@@ -15,13 +15,14 @@ from app.services.identity import token_digest
 from app.services.pdf_ocr import ocr_runtime_status
 from app.services.security import redact_database_url, resolve_storage_root
 
-CONNECTOR_PROVIDERS = {"aleph", "opensanctions"}
+CONNECTOR_PROVIDERS = set(CONNECTOR_SPECS)  # derives from the registry's own table (STRUCT-0022)
 GLOBAL_ROLES = {"member", "admin"}
 MEMBERSHIP_ROLES = {"viewer", "reporter", "admin"}
 
 
 def connector_credential_status(provider: str) -> dict:
-    fallback = settings.aleph_api_key if provider == "aleph" else settings.opensanctions_api_key
+    spec = CONNECTOR_SPECS.get(provider)
+    fallback = getattr(settings, spec.default_setting) if spec else ""
     return credential_status(settings.connector_credentials_file, provider, fallback)
 
 
