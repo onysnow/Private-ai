@@ -67,7 +67,7 @@ def test_global_admin_token_is_unrestricted_and_write_capable():
 
 def test_local_owner_can_create_user_and_membership_and_token_is_only_returned_once():
     from fastapi import FastAPI
-    from app.api.routes import router
+    from app.api.routes_investigations import router as investigations_router
     from app.api.routes_system import router as system_router
     from app.api.routes_provenance import router as provenance_router
     from app.api.routes_sources import router as sources_router
@@ -97,7 +97,7 @@ def test_local_owner_can_create_user_and_membership_and_token_is_only_returned_o
         finally:
             db.close()
     app.dependency_overrides[get_db] = db_override
-    app.include_router(router)
+    app.include_router(investigations_router)
     app.include_router(system_router)
     app.include_router(provenance_router)
     app.include_router(sources_router)
@@ -166,7 +166,7 @@ def test_token_usage_revocation_and_disable_lifecycle():
 
 def test_local_owner_can_disable_rotate_and_revoke_user_token():
     from fastapi import FastAPI
-    from app.api.routes import router
+    from app.api.routes_investigations import router as investigations_router
     from app.api.routes_system import router as system_router
     from app.api.routes_provenance import router as provenance_router
     from app.api.routes_sources import router as sources_router
@@ -192,7 +192,7 @@ def test_local_owner_can_disable_rotate_and_revoke_user_token():
         finally:
             db.close()
     app.dependency_overrides[get_db] = db_override
-    app.include_router(router)
+    app.include_router(investigations_router)
     app.include_router(system_router)
     app.include_router(provenance_router)
     app.include_router(sources_router)
@@ -257,7 +257,7 @@ def test_local_owner_can_disable_rotate_and_revoke_user_token():
 
 def test_rotating_revoked_token_reactivates_credential_but_not_disabled_user():
     from fastapi import FastAPI
-    from app.api.routes import router
+    from app.api.routes_investigations import router as investigations_router
     from app.api.routes_system import router as system_router
     from app.api.routes_provenance import router as provenance_router
     from app.api.routes_sources import router as sources_router
@@ -283,7 +283,7 @@ def test_rotating_revoked_token_reactivates_credential_but_not_disabled_user():
         finally:
             db.close()
     app.dependency_overrides[get_db] = db_override
-    app.include_router(router)
+    app.include_router(investigations_router)
     app.include_router(system_router)
     app.include_router(provenance_router)
     app.include_router(sources_router)

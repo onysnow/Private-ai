@@ -1,35 +1,58 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, Request
-from sqlalchemy import select
+"""Investigation endpoints: /investigations/*.
+
+Group 8 (final group) of the Stage E routes.py split. Covers
+investigation CRUD (create/list/deletion-preview/delete), OpenAleph
+corpus binding, AI assistant context/case-synthesis/hypothesis-test,
+timeline, backup export, relationships/graph, and investigation-scoped
+listing of documents, evidence, sources, claims, leads (+ queue),
+reporting-tasks, connector-runs, and connector-findings.
+
+This is the last of the 8 groups in REMEDIATION_PROMPT.md's Stage E
+plan (STRUCT-0002/0008); once this landed, app/api/routes.py itself
+was deleted and main.py no longer imports it.
+"""
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from sqlalchemy.orm import Session
+
+from app.ai.reasoning import (
+    CitationValidationError,
+    ReasoningInputError,
+    SchemaValidationError,
+    run_reasoning_module,
+)
+from app.api.dependencies import authorize_request_resource
+from app.core.authorization import require_scope_investigation_admin, scope_for_request
+from app.core.config import settings
 from app.db.session import get_db
-from app.models.domain import (
-    Investigation, Source, Evidence, Claim, Lead, ReportingTask, ConnectorRun, ConnectorFinding, Document,
-)
+from app.models.domain import Investigation
 from app.schemas.api import (
-    InvestigationCreate, InvestigationQuestionContextRequest,
-    CaseSynthesisRequest, HypothesisTestRequest,
-)
-from app.services.relationships import (
-    RELATIONSHIP_SCHEMAS, investigation_relationships,
-    investigation_graph,
+    CaseSynthesisRequest, HypothesisTestRequest, InvestigationCreate,
+    InvestigationQuestionContextRequest,
 )
 from app.services.assistant_context import build_question_context
-from app.ai.reasoning import run_reasoning_module, ReasoningInputError, CitationValidationError, SchemaValidationError
-from app.services.timeline import investigation_timeline
-from app.services.documents import serialize_document
 from app.services.exports import build_investigation_export
-from app.services.lifecycle import preview_investigation_deletion, delete_investigation
+from app.services.investigations import (
+    create_investigation as _create_investigation,
+    lead_queue as _lead_queue,
+    list_investigation_claims as _list_investigation_claims,
+    list_investigation_connector_findings as _list_investigation_connector_findings,
+    list_investigation_connector_runs as _list_investigation_connector_runs,
+    list_investigation_documents as _list_investigation_documents,
+    list_investigation_evidence as _list_investigation_evidence,
+    list_investigation_leads as _list_investigation_leads,
+    list_investigation_reporting_tasks as _list_investigation_reporting_tasks,
+    list_investigation_sources as _list_investigation_sources,
+    list_investigations as _list_investigations,
+)
+from app.services.lifecycle import delete_investigation, preview_investigation_deletion
 from app.services.openaleph_corpus import ensure_openaleph_collection, get_binding, serialize_binding
-from app.core.config import settings
-from app.core.authorization import (
-    scope_for_request,
-    require_scope_investigation_admin,
+from app.services.relationships import (
+    RELATIONSHIP_SCHEMAS,
+    investigation_graph,
+    investigation_relationships,
 )
-from app.services.leads import (
-    LEAD_STATUSES, serialize_lead, serialize_task,
-)
-
-from app.api.dependencies import authorize_request_resource
+from app.services.timeline import investigation_timeline
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
@@ -160,17 +183,14 @@ def export_investigation(
 
 @router.post("/investigations")
 def create_investigation(body: InvestigationCreate, db: Session = Depends(get_db)):
-    row = Investigation(name=body.name, description=body.description)
-    db.add(row); db.commit(); db.refresh(row)
-    return row
+    return _create_investigation(db, body)
+
 
 @router.get("/investigations")
 def list_investigations(request: Request, db: Session = Depends(get_db)):
-    rows = db.scalars(select(Investigation).order_by(Investigation.created_at.desc())).all()
     scope = scope_for_request(request)
-    if scope.unrestricted:
-        return rows
-    return [row for row in rows if scope.allows(row.id)]
+    return _list_investigations(db, scope)
+
 
 @router.get("/investigations/{investigation_id}/deletion-preview")
 def investigation_deletion_preview(investigation_id: str, db: Session = Depends(get_db)):
@@ -219,41 +239,31 @@ def get_investigation_graph(
 def list_documents(investigation_id: str, db: Session = Depends(get_db)):
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
-    rows = db.scalars(select(Document).where(Document.investigation_id == investigation_id).order_by(Document.created_at.desc())).all()
-    return [serialize_document(db, row) for row in rows]
+    return _list_investigation_documents(db, investigation_id)
 
 
 @router.get("/investigations/{investigation_id}/evidence")
 def list_investigation_evidence(investigation_id: str, db: Session = Depends(get_db)):
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
-    sources = db.scalars(select(Source).where(Source.investigation_id == investigation_id)).all()
-    source_by_id = {source.id: source for source in sources}
-    if not source_by_id:
-        return []
-    evidence_rows = db.scalars(
-        select(Evidence)
-        .where(Evidence.source_id.in_(source_by_id.keys()))
-        .order_by(Evidence.id)
-    ).all()
-    return [{"evidence": evidence, "source": source_by_id[evidence.source_id]} for evidence in evidence_rows]
+    return _list_investigation_evidence(db, investigation_id)
 
 
 @router.get("/investigations/{investigation_id}/sources")
 def list_sources(investigation_id: str, db: Session = Depends(get_db)):
-    return db.scalars(select(Source).where(Source.investigation_id == investigation_id).order_by(Source.created_at.desc())).all()
+    return _list_investigation_sources(db, investigation_id)
+
 
 @router.get("/investigations/{investigation_id}/claims")
 def list_claims(investigation_id: str, db: Session = Depends(get_db)):
-    return db.scalars(select(Claim).where(Claim.investigation_id == investigation_id).order_by(Claim.created_at.desc())).all()
+    return _list_investigation_claims(db, investigation_id)
 
 
 @router.get("/investigations/{investigation_id}/leads")
 def list_leads(investigation_id: str, db: Session = Depends(get_db)):
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
-    rows = db.scalars(select(Lead).where(Lead.investigation_id == investigation_id).order_by(Lead.created_at.desc())).all()
-    return [serialize_lead(db, row) for row in rows]
+    return _list_investigation_leads(db, investigation_id)
 
 
 @router.get("/investigations/{investigation_id}/leads/queue")
@@ -267,44 +277,23 @@ def lead_queue(
 ):
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
-    rows = db.scalars(select(Lead).where(Lead.investigation_id == investigation_id).order_by(Lead.created_at.desc())).all()
-    items = [serialize_lead(db, row) for row in rows]
-    requested_status = set(status or [])
-    requested_priority = set(priority or [])
-    if unresolved_only and not requested_status:
-        requested_status = {"unreviewed", "active", "blocked"}
-    if requested_status:
-        items = [item for item in items if item["status"] in requested_status]
-    if requested_priority:
-        items = [item for item in items if item["priority"] in requested_priority]
-    if owner is not None:
-        items = [item for item in items if (item["owner"] or "") == owner]
-    priority_rank = {"urgent": 0, "high": 1, "normal": 2, "low": 3}
-    # Reporter-set priority remains authoritative. Within the same priority bucket,
-    # surface leads with explicit contradiction/dispute pressure first.
-    items.sort(key=lambda item: (
-        priority_rank.get(item["priority"], 9),
-        -item.get("triage", {}).get("attention_score", 0),
-        item["created_at"],
-    ))
-    counts = {key: sum(1 for item in items if item["status"] == key) for key in sorted(LEAD_STATUSES)}
-    return {"investigation_id": investigation_id, "total": len(items), "counts": counts, "items": items}
+    return _lead_queue(
+        db, investigation_id, status=status, priority=priority, owner=owner, unresolved_only=unresolved_only,
+    )
 
 
 @router.get("/investigations/{investigation_id}/reporting-tasks")
 def list_reporting_tasks(investigation_id: str, db: Session = Depends(get_db)):
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
-    rows = db.scalars(select(ReportingTask).where(ReportingTask.investigation_id == investigation_id).order_by(ReportingTask.created_at.desc())).all()
-    return [serialize_task(db, row) for row in rows]
+    return _list_investigation_reporting_tasks(db, investigation_id)
 
 
 @router.get("/investigations/{investigation_id}/connector-runs")
 def list_connector_runs(investigation_id: str, db: Session = Depends(get_db)):
-    return db.scalars(select(ConnectorRun).where(ConnectorRun.investigation_id == investigation_id).order_by(ConnectorRun.started_at.desc())).all()
+    return _list_investigation_connector_runs(db, investigation_id)
+
 
 @router.get("/investigations/{investigation_id}/connector-findings")
 def list_connector_findings(investigation_id: str, db: Session = Depends(get_db)):
-    return db.scalars(select(ConnectorFinding).where(ConnectorFinding.investigation_id == investigation_id).order_by(ConnectorFinding.created_at.desc())).all()
-
-
+    return _list_investigation_connector_findings(db, investigation_id)

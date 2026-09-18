@@ -5,7 +5,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from app.db.session import engine, SessionLocal
 from app.db.migrations import ensure_database_schema
-from app.api.routes import router
+from app.api.routes_investigations import router as investigations_router
 from app.api.routes_system import router as system_router
 from app.api.routes_provenance import router as provenance_router
 from app.api.routes_sources import router as sources_router
@@ -47,7 +47,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],
 )
-app.include_router(router)
+app.include_router(investigations_router)
 app.include_router(system_router)
 app.include_router(provenance_router)
 app.include_router(sources_router)

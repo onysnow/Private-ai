@@ -8,7 +8,6 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
 
-from app.api import routes
 from app.api import routes_sources
 from app.db.session import Base
 from app.models.domain import Document, Investigation, Source
