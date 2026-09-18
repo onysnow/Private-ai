@@ -851,3 +851,28 @@ touched, full suite not re-run for this commit.
 
 Next: documentation, incident-response, standup, system-design,
 tech-debt, testing-strategy, then Firecrawl.
+
+## Documentation audit: 2 findings logged (STRUCT-0032-0033)
+
+Fifth dimension. Cross-checked README.md's own claims against git
+history rather than just reading it in isolation.
+
+- **STRUCT-0032 (MATERIAL, documentation):** README's "Current status"
+  table still lists Postgres CI (PR #5), Docker build/boot (PR #6),
+  and frontend production build (PR #4) as "In progress," but all
+  three merged long ago (with post-merge stabilization commits after
+  each) -- confirmed via git log, not assumption. The table's last
+  edit was literally the PR #6 merge commit itself, which never
+  updated the row it was closing out.
+- **STRUCT-0033 (MATERIAL, documentation):** README points readers to
+  CHANGELOG.md as "a detailed dev log," but CHANGELOG.md's last entry
+  is from 2026-09-16 (PR #22, the same PR that introduced that
+  pointer) -- every subsequent unit of work, including the entire
+  Stage E routes.py split and this whole engineering-skills audit,
+  lives only in dev-log.md, which README never mentions.
+
+Docs-only change (STRUCTURE_AUDIT.md + this entry) -- no code
+touched, full suite not re-run for this commit.
+
+Next: incident-response, standup, system-design, tech-debt,
+testing-strategy, then Firecrawl.
