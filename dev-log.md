@@ -521,3 +521,52 @@ cold.
   cross-group shared helpers -- _run_connector/_enrich_entity --
   that entities endpoints depend on, and investigations is described
   as "the biggest and most depended-on," saved for last on purpose).
+
+## Cycle: routes.py split group 6 (settings)
+
+- Extracted all 14 /settings/* endpoints: the /settings/status
+  snapshot, persisted app-user identity CRUD plus token
+  rotate/revoke, investigation membership grants (PUT/DELETE),
+  connector credential storage (PUT/DELETE), and security audit log
+  access/retention (list, summary, retention-preview, prune).
+- Two private helpers preceding the block (_require_local_request,
+  _connector_credential_status) were grepped against the *entire*
+  routes.py file before touching anything -- both came back used
+  only within this group's own endpoints (lines 78-381 of the
+  pre-split file), so they moved cleanly with no cross-group
+  re-export shim needed, unlike group 3's _run_connector/
+  _enrich_entity which are still re-imported under their old private
+  names because entities (group 7) hasn't landed yet.
+  _require_local_request stayed in the route module rather than
+  services/settings.py: it takes the raw Request object and raises
+  HTTPException directly, which is a route-layer HTTP concern, not
+  business logic -- the same judgment already applied to
+  app/services/connectors.py's three HTTPException-raising
+  functions.
+- The connector-credential save/delete endpoints have three distinct
+  error outcomes (bad provider -> 404, blank secret -> 400, store
+  failure -> 500) that don't fit the usual ValueError=400/
+  LookupError=404 convention alone. Extended it with RuntimeError=500
+  for the store-failure case; behavior is unchanged; only where each
+  check lives moved.
+- New app/services/settings.py holds all of it (get_settings_status,
+  app-user CRUD/token functions, investigation membership put/
+  delete, connector credential save/delete). No existing services/
+  file was a natural fit, so unlike groups 2 and 5 this is a
+  from-scratch module like group 3's connectors.py.
+- All 3 hand-built test app builders updated proactively (3
+  function-scoped copies in test_persisted_identity_roles.py handled
+  with a replace_all assert-count-3 script rather than one at a
+  time). Grepped for monkeypatch/direct routes.* calls against every
+  moved settings symbol first -- none found, so no retargeting was
+  needed this cycle (a clean run, same as groups 3-5).
+- Full backend suite: 214 passed, 0 failed. Committed and pushed to
+  `dev` (`27134e9`). STRUCT-0002/0008 updated with group 6 progress.
+- routes.py: 916 -> 603 lines. 2 of 8 groups remain: entities (20),
+  investigations (23) -- 43 endpoints. Both are exactly the groups
+  flagged from the start as needing the most care: entities depends
+  on the _run_connector/_enrich_entity helpers relocated to
+  app/services/connectors.py back in group 3 (those re-import shims
+  in routes.py need to be resolved when entities lands), and
+  investigations is the biggest and most depended-on group, saved
+  for last on purpose.
