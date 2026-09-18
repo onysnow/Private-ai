@@ -494,3 +494,30 @@ cold.
   as the only correctness signal, since a bug that happens to return
   the same HTTP status code with a different body shape won't always
   be caught by existing tests.
+
+## Cycle: routes.py split group 5 (connector-findings, documents)
+
+- Extracted 17 endpoints plus one domain judgment call: POST
+  /external-relationship-reviews/{review_id}/promote has a different
+  URL prefix than /connector-findings, and REMEDIATION_PROMPT.md's
+  Stage E plan doesn't actually assign it to any of the 8 listed
+  groups (an oversight in the original plan, not something this
+  cycle can fix retroactively without renumbering everything).
+  Grouped it into routes_connector_findings.py anyway since it
+  promotes the exact ExternalRelationshipReview workflow that
+  module's other endpoints create and review -- domain fit mattered
+  more here than literal prefix matching.
+- New app/services/connector_findings.py holds review-status/
+  resolution-decision/statement-assessment logic that had no natural
+  existing home (unlike most groups so far, where an existing
+  services/ file already owned the relevant domain).
+- Full backend suite: 214 passed, 0 failed -- clean run, no
+  follow-up fixes needed. Committed and pushed to `dev` (`a6c083a`).
+  STRUCT-0002/0008 updated with group 5 progress.
+- 3 of 8 groups now remain: settings (14), entities (20),
+  investigations (23) -- 57 endpoints. These are exactly the groups
+  REMEDIATION_PROMPT.md flagged as needing the most care (entities
+  and investigations especially, since group 3 already found
+  cross-group shared helpers -- _run_connector/_enrich_entity --
+  that entities endpoints depend on, and investigations is described
+  as "the biggest and most depended-on," saved for last on purpose).
