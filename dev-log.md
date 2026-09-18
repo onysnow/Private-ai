@@ -1030,3 +1030,54 @@ class of issue as this session's earlier `which ruff` gotcha -- not a
 regression; `python -m alembic` and `PATH`-fixed runs both green).
 
 Next: implement the Firecrawl connector itself against this table.
+
+## Firecrawl connector implemented
+
+Added `firecrawl` as a third connector provider, on top of the
+CONNECTOR_SPECS table from the STRUCT-0022 fix:
+
+- app/core/config.py: firecrawl_base_url (defaults to
+  https://api.firecrawl.dev, overridable for self-hosted Firecrawl
+  per its own FIRECRAWL_API_URL convention), firecrawl_api_key,
+  firecrawl_search_limit.
+- app/connectors/firecrawl.py: FirecrawlConnector, modeled on
+  OpenSanctionsConnector's structure (configured property, _parse_result,
+  async search()) but deliberately without a _require_key() guard --
+  Firecrawl's own docs confirm POST /v2/search works keyless at a
+  lower rate limit, so this connector attaches `Authorization: Bearer`
+  only when a key is configured rather than hard-requiring one. Relies
+  on the Connector base class's default enrich() (builds a query from
+  entity properties, calls search()) rather than overriding it.
+- app/connectors/registry.py: registered "firecrawl" in CONNECTOR_SPECS.
+
+Found a THIRD hardcoded-provider-list spot while wiring this up, not
+caught during the STRUCT-0022 fix itself: app/services/credentials.py
+had its own `SUPPORTED_CONNECTORS = {"aleph", "opensanctions"}`
+constant gating get_secret/set_secret/credential_status. Since
+registry.py's _build() calls get_secret() for every provider in
+CONNECTOR_SPECS, this would have made the registry raise
+`ValueError: Unsupported connector credential` for "firecrawl" at
+import time -- not a cosmetic gap, an immediate app-startup break.
+Fixed by deriving credentials.py's provider check from
+app.connectors.registry.CONNECTOR_SPECS too, via a deferred import
+inside the module (registry.py already imports get_secret from
+credentials.py, so importing back at module load time would be
+circular; the import is deferred into the function body instead,
+which resolves fine since both modules are fully loaded by call time).
+
+Logged the frontend's own hardcoded `'aleph'|'opensanctions'` provider
+list (api-types.ts, api-validate.ts, page.tsx's settings panel) as a
+new finding, STRUCT-0040, rather than silently expanding this task
+into a frontend change -- the backend's provider list now auto-derives
+end to end (registry -> settings -> credentials), but the frontend
+still has no way to select/configure Firecrawl without its own,
+separately-scoped change.
+
+Added tests/test_firecrawl_connector.py (6 tests): result-shape
+mapping, keyless operation confirmed at both the header level and
+against a live-shaped mock, bearer-token attachment when a key is
+configured, the /api/connectors status endpoint picking Firecrawl up
+automatically, and a credential-store roundtrip for the new provider
+name.
+
+Full backend suite: 220 passed, 0 failed (214 previous + 6 new).

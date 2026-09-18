@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     opensanctions_api_key: str = ""
     opensanctions_dataset: str = "default"
     opensanctions_search_limit: int = 20
+    firecrawl_base_url: str = "https://api.firecrawl.dev"
+    firecrawl_api_key: str = ""
+    firecrawl_search_limit: int = 20
     document_storage_dir: str = "./data/documents"
     connector_credentials_file: str = "./data/secrets/connectors.json"
     max_document_bytes: int = 50 * 1024 * 1024

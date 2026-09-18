@@ -19,6 +19,7 @@ from typing import Callable
 
 from app.connectors.aleph import AlephConnector
 from app.connectors.base import Connector
+from app.connectors.firecrawl import FirecrawlConnector
 from app.connectors.opensanctions import OpenSanctionsConnector
 from app.core.config import settings
 from app.services.credentials import get_secret
@@ -40,6 +41,10 @@ CONNECTOR_SPECS: dict[str, ConnectorSpec] = {
     "opensanctions": ConnectorSpec(
         factory=lambda key: OpenSanctionsConnector(api_key=key),
         default_setting="opensanctions_api_key",
+    ),
+    "firecrawl": ConnectorSpec(
+        factory=lambda key: FirecrawlConnector(api_key=key),
+        default_setting="firecrawl_api_key",
     ),
 }
 
