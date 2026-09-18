@@ -1010,3 +1010,23 @@ Firecrawl -- research for TAS/dev use, then the connector-registry
 generalization (resolves STRUCT-0022) and Firecrawl connector
 implementation, verified against the full suite, with an ADR for
 sign-off before calling it done.
+
+## STRUCT-0022 corrected: connector registry generalized
+
+Fixed ahead of the Firecrawl connector work (commit 228eec1). Found
+two more hardcoded-provider-list spots while implementing the fix
+beyond the ones STRUCT-0022 named: app/services/settings.py's
+CONNECTOR_PROVIDERS was an independent hardcoded set, and
+connector_credential_status()'s fallback-key lookup was a raw
+`"aleph"` ternary that would have silently used opensanctions_api_key
+as the fallback for any third provider -- a real latent bug that
+would have bitten a naive Firecrawl connector add. All three now
+derive from one CONNECTOR_SPECS table in app/connectors/registry.py.
+
+Full backend suite: 214 passed, 0 failed (confirmed the 2 apparent
+failures on the first run were an environment PATH artifact --
+alembic's CLI binary not on tmpvenv's PATH in a fresh shell, same
+class of issue as this session's earlier `which ruff` gotcha -- not a
+regression; `python -m alembic` and `PATH`-fixed runs both green).
+
+Next: implement the Firecrawl connector itself against this table.
