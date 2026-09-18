@@ -1,9 +1,8 @@
 """Connector execution and finding-persistence logic shared by the
 /connectors routes (STRUCT-0002/0008 Stage E group 3) and the
-/entities/{id}/enrich* routes (still in routes.py pending group 7's
-extraction) -- both call into a real external connector and persist
-its findings the same way, so this lives here rather than in either
-route module.
+/entities/{id}/enrich* routes (app/api/routes_entities.py, group 7)
+-- both call into a real external connector and persist its findings
+the same way, so this lives here rather than in either route module.
 
 These functions raise HTTPException directly rather than
 ValueError/LookupError, unlike most other service functions in this

@@ -82,6 +82,7 @@ def test_local_owner_can_create_user_and_membership_and_token_is_only_returned_o
     from app.api.routes_documents import router as documents_router
     from app.api.routes_connector_findings import router as connector_findings_router
     from app.api.routes_settings import router as settings_router
+    from app.api.routes_entities import router as entities_router
 
     factory = _factory()
     with factory() as db:
@@ -111,6 +112,7 @@ def test_local_owner_can_create_user_and_membership_and_token_is_only_returned_o
     app.include_router(documents_router)
     app.include_router(connector_findings_router)
     app.include_router(settings_router)
+    app.include_router(entities_router)
 
     with TestClient(app) as client:
         created = client.post("/api/settings/security/users", json={"display_name": "Reporter One"})
@@ -179,6 +181,7 @@ def test_local_owner_can_disable_rotate_and_revoke_user_token():
     from app.api.routes_documents import router as documents_router
     from app.api.routes_connector_findings import router as connector_findings_router
     from app.api.routes_settings import router as settings_router
+    from app.api.routes_entities import router as entities_router
 
     factory = _factory()
     app = FastAPI()
@@ -204,6 +207,7 @@ def test_local_owner_can_disable_rotate_and_revoke_user_token():
     app.include_router(documents_router)
     app.include_router(connector_findings_router)
     app.include_router(settings_router)
+    app.include_router(entities_router)
 
     with TestClient(app) as client:
         created = client.post("/api/settings/security/users", json={"display_name": "Reporter Lifecycle"})
@@ -268,6 +272,7 @@ def test_rotating_revoked_token_reactivates_credential_but_not_disabled_user():
     from app.api.routes_documents import router as documents_router
     from app.api.routes_connector_findings import router as connector_findings_router
     from app.api.routes_settings import router as settings_router
+    from app.api.routes_entities import router as entities_router
 
     factory = _factory()
     app = FastAPI()
@@ -293,6 +298,7 @@ def test_rotating_revoked_token_reactivates_credential_but_not_disabled_user():
     app.include_router(documents_router)
     app.include_router(connector_findings_router)
     app.include_router(settings_router)
+    app.include_router(entities_router)
 
     with TestClient(app) as client:
         created = client.post("/api/settings/security/users", json={"display_name": "Reporter Revoked"})
