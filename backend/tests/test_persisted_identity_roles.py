@@ -68,6 +68,7 @@ def test_global_admin_token_is_unrestricted_and_write_capable():
 def test_local_owner_can_create_user_and_membership_and_token_is_only_returned_once():
     from fastapi import FastAPI
     from app.api.routes import router
+    from app.api.routes_system import router as system_router
 
     factory = _factory()
     with factory() as db:
@@ -83,6 +84,7 @@ def test_local_owner_can_create_user_and_membership_and_token_is_only_returned_o
             db.close()
     app.dependency_overrides[get_db] = db_override
     app.include_router(router)
+    app.include_router(system_router)
 
     with TestClient(app) as client:
         created = client.post("/api/settings/security/users", json={"display_name": "Reporter One"})
@@ -137,6 +139,7 @@ def test_token_usage_revocation_and_disable_lifecycle():
 def test_local_owner_can_disable_rotate_and_revoke_user_token():
     from fastapi import FastAPI
     from app.api.routes import router
+    from app.api.routes_system import router as system_router
 
     factory = _factory()
     app = FastAPI()
@@ -148,6 +151,7 @@ def test_local_owner_can_disable_rotate_and_revoke_user_token():
             db.close()
     app.dependency_overrides[get_db] = db_override
     app.include_router(router)
+    app.include_router(system_router)
 
     with TestClient(app) as client:
         created = client.post("/api/settings/security/users", json={"display_name": "Reporter Lifecycle"})
@@ -198,6 +202,7 @@ def test_local_owner_can_disable_rotate_and_revoke_user_token():
 def test_rotating_revoked_token_reactivates_credential_but_not_disabled_user():
     from fastapi import FastAPI
     from app.api.routes import router
+    from app.api.routes_system import router as system_router
 
     factory = _factory()
     app = FastAPI()
@@ -209,6 +214,7 @@ def test_rotating_revoked_token_reactivates_credential_but_not_disabled_user():
             db.close()
     app.dependency_overrides[get_db] = db_override
     app.include_router(router)
+    app.include_router(system_router)
 
     with TestClient(app) as client:
         created = client.post("/api/settings/security/users", json={"display_name": "Reporter Revoked"})

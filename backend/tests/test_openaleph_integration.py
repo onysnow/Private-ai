@@ -29,7 +29,7 @@ def test_openaleph_status_endpoint_reports_real_probe_result(monkeypatch):
                 }
         return Status()
 
-    monkeypatch.setattr("app.api.routes.probe_openaleph", fake_probe)
+    monkeypatch.setattr("app.api.routes_system.probe_openaleph", fake_probe)
     client = TestClient(app)
     response = client.get("/api/integrations/openaleph/status")
     assert response.status_code == 200

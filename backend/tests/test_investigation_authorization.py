@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.api.routes import router
+from app.api.routes_system import router as system_router
 from app.core.authorization import (
     AuthorizationScope,
     InvestigationAuthorizationError,
@@ -77,6 +78,7 @@ def _scoped_app(factory) -> FastAPI:
             reset_current_authorization_scope(token)
 
     app.include_router(router)
+    app.include_router(system_router)
     return app
 
 

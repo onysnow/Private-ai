@@ -1,4 +1,3 @@
-from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form, Response, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -6,24 +5,21 @@ from app.core.time import utcnow_naive
 from app.db.session import get_db
 from app.db.locking import lock_investigation_transaction
 from app.models.domain import (
-    Investigation, Entity, Statement, Source, Evidence, ClaimEvidenceLink, Claim, ClaimReviewEvent, Lead, LeadProfile, LeadLink, LeadWorkflowEvent, ReportingTask, ReportingTaskWorkflowEvent, TimelineEvent,
-    ConnectorRun, ConnectorFinding, ResolutionDecision, CanonicalResolutionDecision, CanonicalEntityMergeAudit, PostMergeReconciliationDecision, PropertyConflictDecision, StatementAssessment, StatementPromotion,
+    Investigation, Entity, Statement, Source, Evidence, ClaimEvidenceLink, Claim, Lead, LeadProfile, LeadLink, LeadWorkflowEvent, ReportingTask, ConnectorRun, ConnectorFinding, ResolutionDecision, CanonicalEntityMergeAudit, PropertyConflictDecision, StatementAssessment, StatementPromotion,
     EnrichmentSession, EnrichmentSessionRun, EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document, DocumentChunk, ExtractionCandidate,
-    AppUser, InvestigationMembership, AIAnalysisCandidate,
+    AppUser, InvestigationMembership,
 )
 from app.schemas.api import (
-    InvestigationCreate, EntityCreate, SourceCreate, EvidenceCreate, ClaimEvidenceLinkCreate, ClaimCreate, ClaimUpdate, ClaimReviewRequest, LeadCreate, LeadUpdate, LeadLinkCreate, LeadConvertRequest, ReportingTaskCreate, ReportingTaskUpdate, TimelineEventCreate, AlephSearchRequest,
-    ConnectorSearchRequest, FindingReviewRequest, ResolutionRequest, CanonicalResolutionRequest, CanonicalMergeExecuteRequest, PostMergeReconciliationRequest, PropertyConflictDecisionRequest, StatementAssessmentRequest, StatementPromotionRequest,
-    MultiEnrichmentRequest, CrossProviderDecisionRequest, RelationshipCreate, RelationshipEvidenceAttachRequest, RelationshipEvidenceReviewRequest, ExternalRelationshipReviewRequest, ExtractionCandidateReviewRequest, ExtractedRelationshipProposalCreate,
+    InvestigationCreate, EntityCreate, SourceCreate, ClaimEvidenceLinkCreate, ClaimCreate, ClaimUpdate, ClaimReviewRequest, LeadCreate, LeadUpdate, LeadLinkCreate, LeadConvertRequest, ReportingTaskCreate, ReportingTaskUpdate, AlephSearchRequest,
+    ConnectorSearchRequest, FindingReviewRequest, ResolutionRequest, CanonicalResolutionRequest, CanonicalMergeExecuteRequest, PostMergeReconciliationRequest, PropertyConflictDecisionRequest, StatementAssessmentRequest, MultiEnrichmentRequest, CrossProviderDecisionRequest, RelationshipCreate, RelationshipEvidenceAttachRequest, RelationshipEvidenceReviewRequest, ExternalRelationshipReviewRequest, ExtractionCandidateReviewRequest, ExtractedRelationshipProposalCreate,
     AppUserCreate, AppUserUpdate, InvestigationMembershipPut, InvestigationQuestionContextRequest,
-    CaseSynthesisRequest, HypothesisTestRequest, AIAnalysisCandidateReviewRequest,
+    CaseSynthesisRequest, HypothesisTestRequest,
 )
 from app.services.ftm import make_ftm_entity
 from app.services.resolution import candidate_entities, canonical_duplicate_candidates, record_canonical_resolution
 from app.services.entity_merge import preview_entity_merge, execute_entity_merge
 from app.services.post_merge_reconciliation import detect_post_merge_reconciliation, record_post_merge_reconciliation
-from app.services.promotion import promote_assessment
 from app.services.provenance import entity_statement_history, record_provenance_trace
 from app.services.consolidation import session_findings, consolidate_findings, cluster_key
 from app.services.relationships import (
@@ -31,12 +27,11 @@ from app.services.relationships import (
     entity_relationships, investigation_graph, serialize_relationship, review_relationship_evidence, relationship_evidence_review_history, attach_relationship_evidence,
 )
 from app.connectors.registry import registry
-from app.services.external_relationships import relationship_endpoint_candidates, create_review, promote_review, is_relationship_finding
-from app.services.search import investigation_search
+from app.services.external_relationships import relationship_endpoint_candidates, create_review, promote_review
 from app.services.assistant_context import build_question_context
-from app.ai.reasoning import run_reasoning_module, review_ai_analysis_candidate, ReasoningInputError, CitationValidationError, SchemaValidationError
+from app.ai.reasoning import run_reasoning_module, ReasoningInputError, CitationValidationError, SchemaValidationError
 from app.services.dossier import entity_dossier
-from app.services.timeline import investigation_timeline, validate_timeline_refs, _normalize_date
+from app.services.timeline import investigation_timeline, _normalize_date
 from app.services.documents import ingest_document, serialize_document, review_candidate, preview_entity_candidate_matches, serialize_extraction_lineage, propose_relationship_from_extracted_claim
 from app.services.exports import build_investigation_export, inspect_export, preview_investigation_restore, restore_investigation_export
 from app.services.security import redact_database_url, resolve_storage_root
@@ -44,27 +39,23 @@ from app.services.credentials import credential_status, set_secret, remove_secre
 from app.services.lifecycle import preview_investigation_deletion, delete_investigation
 from app.services.identity import token_digest
 from app.services.pdf_ocr import ocr_runtime_status
-from app.services.openaleph import probe_openaleph
 from app.services.openaleph_corpus import ensure_openaleph_collection, get_binding, get_document_sync, serialize_binding, serialize_sync, sync_document_to_openaleph, import_openaleph_evidence_candidates, import_openaleph_entity_candidates, get_openaleph_review_status, refresh_openaleph_review_candidates
 from app.core.config import settings
 from app.core.access import request_is_local_request
 from app.core.authorization import (
-    authorize_routed_resource, scope_for_request,
+    scope_for_request,
     require_scope_investigation, require_scope_investigation_admin, require_scope_global_admin,
 )
 from app.core.audit_log import read_security_audit, summarize_security_audit, preview_security_audit_retention, apply_security_audit_retention
-from pathlib import Path
 import secrets
 from app.services.claims import review_claim, claim_review_workspace
 from app.services.leads import (
     LEAD_STATUSES, PRIORITIES, TASK_STATUSES, get_profile, serialize_lead, serialize_link, serialize_task, make_task_workflow_event, validate_link_target, create_relationship_context_lead,
 )
 
-def _authorize_request_resource(request: Request, db: Session = Depends(get_db)):
-    return authorize_routed_resource(request, db)
+from app.api.dependencies import authorize_request_resource
 
-
-router = APIRouter(prefix="/api", dependencies=[Depends(_authorize_request_resource)])
+router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 CLAIM_STATUSES = {"lead", "unverified", "supported", "confirmed", "disputed", "rejected"}
 
@@ -73,49 +64,6 @@ def _validate_claim_fields(*, status: str | None, confidence: float | None) -> N
         raise HTTPException(400, f"Invalid claim status. Allowed: {', '.join(sorted(CLAIM_STATUSES))}")
     if confidence is not None and not 0.0 <= confidence <= 1.0:
         raise HTTPException(400, "Claim confidence must be between 0 and 1")
-
-
-@router.get("/health")
-def health():
-    return {"status": "ok"}
-
-
-@router.get("/capabilities")
-def capabilities():
-    """Describe the runnable core preview without making AI a startup dependency."""
-    return {
-        "product": "Journalism Workbench",
-        "mode": "integrated_preview" if settings.openaleph_enabled else "core_preview",
-        "ai_features_enabled": settings.enable_ai_features,
-        "core": {
-            "investigations": True,
-            "documents": True,
-            "sources": True,
-            "evidence": True,
-            "claims": True,
-            "relationships": True,
-            "search": True,
-            "dossiers": True,
-            "timeline": True,
-            "leads_and_tasks": True,
-            "provenance": True,
-            "connectors": True,
-            "backup_restore": True,
-        },
-        "platforms": {
-            "openaleph": {
-                "enabled": settings.openaleph_enabled,
-                "role": "local_corpus_search_ingestion_platform",
-            },
-        },
-        "note": "AI is optional and is not required for the core investigative application to run.",
-    }
-
-
-@router.get("/integrations/openaleph/status")
-async def openaleph_integration_status():
-    """Report whether the local OpenAleph corpus platform is actually reachable."""
-    return (await probe_openaleph()).to_dict()
 
 
 @router.get("/investigations/{investigation_id}/corpus/openaleph")
@@ -277,8 +225,6 @@ def settings_status(db: Session = Depends(get_db)):
             "opensanctions": _connector_credential_status("opensanctions"),
         },
     }
-
-
 
 
 @router.get("/settings/security/users")
@@ -525,25 +471,6 @@ def delete_connector_credential(provider: str, request: Request):
         raise HTTPException(500, "Could not remove connector credential") from exc
     return {"provider": provider, "removed": removed, **_connector_credential_status(provider)}
 
-@router.get("/search")
-def search_workbench(
-    request: Request,
-    q: str = Query(..., min_length=1),
-    investigation_id: str | None = None,
-    limit: int = Query(50, ge=1, le=200),
-    include_reconciled_duplicates: bool = False,
-    db: Session = Depends(get_db),
-):
-    """Search canonical and evidentiary records without conflating external findings with facts."""
-    scope = scope_for_request(request)
-    allowed_ids = None if scope.unrestricted else scope.investigation_ids
-    try:
-        return investigation_search(
-            db, q, investigation_id=investigation_id, limit=limit,
-            allowed_investigation_ids=allowed_ids, include_reconciled_duplicates=include_reconciled_duplicates,
-        )
-    except ValueError as exc:
-        raise HTTPException(404, str(exc))
 
 @router.post("/investigations/{investigation_id}/assistant/context")
 def investigation_question_context(
@@ -625,29 +552,6 @@ def get_investigation_timeline(
         )
     except ValueError as exc:
         raise HTTPException(404, str(exc))
-
-
-@router.post("/timeline-events")
-def create_timeline_event(body: TimelineEventCreate, db: Session = Depends(get_db)):
-    if db.get(Investigation, body.investigation_id) is None:
-        raise HTTPException(404, "Investigation not found")
-    allowed_precision = {"day", "month", "year", "range", "unknown"}
-    allowed_status = {"asserted", "verified", "approximate", "disputed", "unresolved"}
-    if body.precision not in allowed_precision:
-        raise HTTPException(400, f"Precision must be one of: {', '.join(sorted(allowed_precision))}")
-    if body.verification_status not in allowed_status:
-        raise HTTPException(400, f"Verification status must be one of: {', '.join(sorted(allowed_status))}")
-    if _normalize_date(body.date_start) is None:
-        raise HTTPException(400, "date_start must be ISO year, month, or date (YYYY, YYYY-MM, YYYY-MM-DD)")
-    if body.date_end and _normalize_date(body.date_end) is None:
-        raise HTTPException(400, "date_end must be ISO year, month, or date")
-    row = TimelineEvent(**body.model_dump())
-    try:
-        validate_timeline_refs(db, row)
-    except ValueError as exc:
-        raise HTTPException(400, str(exc))
-    db.add(row); db.commit(); db.refresh(row)
-    return row
 
 
 @router.get("/investigations/{investigation_id}/export")
@@ -830,12 +734,6 @@ def list_entity_statement_history(entity_id: str, db: Session = Depends(get_db))
         raise HTTPException(404, str(exc))
 
 
-
-@router.get("/relationship-schemas")
-def relationship_schemas():
-    return {"schemas": RELATIONSHIP_SCHEMAS}
-
-
 @router.post("/relationships")
 def create_canonical_relationship(body: RelationshipCreate, db: Session = Depends(get_db)):
     if db.get(Investigation, body.investigation_id) is None:
@@ -914,8 +812,6 @@ def list_entity_relationships(entity_id: str, db: Session = Depends(get_db)):
     if db.get(Entity, entity_id) is None:
         raise HTTPException(404, "Entity not found")
     return entity_relationships(db, entity_id)
-
-
 
 
 @router.post("/documents/upload")
@@ -1050,17 +946,6 @@ def review_extraction_candidate(candidate_id: str, body: ExtractionCandidateRevi
         raise HTTPException(400, str(exc))
 
 
-@router.post("/ai-analysis-candidates/{candidate_id}/review")
-def review_ai_analysis_candidate_endpoint(candidate_id: str, body: AIAnalysisCandidateReviewRequest, db: Session = Depends(get_db)):
-    row = db.get(AIAnalysisCandidate, candidate_id)
-    if row is None:
-        raise HTTPException(404, "AI analysis candidate not found")
-    try:
-        return review_ai_analysis_candidate(db, row, decision=body.decision, note=body.note)
-    except ValueError as exc:
-        raise HTTPException(400, str(exc))
-
-
 @router.post("/sources")
 def create_source(body: SourceCreate, db: Session = Depends(get_db)):
     # Source creation participates in the same investigation-scoped PostgreSQL lock
@@ -1076,21 +961,6 @@ def create_source(body: SourceCreate, db: Session = Depends(get_db)):
     if payload.get("url") is not None:
         payload["url"] = payload["url"].strip() or None
     row = Source(**payload)
-    db.add(row); db.commit(); db.refresh(row)
-    return row
-
-@router.post("/evidence")
-def create_evidence(body: EvidenceCreate, db: Session = Depends(get_db)):
-    source = db.get(Source, body.source_id)
-    if source is None:
-        raise HTTPException(404, "Source not found")
-    payload = body.model_dump()
-    for field in ("quote", "locator", "notes"):
-        if payload.get(field) is not None:
-            payload[field] = payload[field].strip() or None
-    if not any(payload.get(field) for field in ("quote", "locator", "notes")):
-        raise HTTPException(400, "Evidence requires a quote, locator, or note")
-    row = Evidence(**payload)
     db.add(row); db.commit(); db.refresh(row)
     return row
 
@@ -1517,7 +1387,6 @@ async def enrich_entity(entity_id: str, provider: str, db: Session = Depends(get
     return await _enrich_entity(provider, entity, db)
 
 
-
 @router.post("/entities/{entity_id}/enrich")
 async def enrich_entity_multi(entity_id: str, body: MultiEnrichmentRequest, db: Session = Depends(get_db)):
     entity = db.get(Entity, entity_id)
@@ -1606,7 +1475,6 @@ def list_entity_enrichment_sessions(entity_id: str, db: Session = Depends(get_db
     return db.scalars(select(EnrichmentSession).where(EnrichmentSession.entity_id == entity_id).order_by(EnrichmentSession.started_at.desc())).all()
 
 
-
 @router.get("/enrichment-sessions/{session_id}/clusters")
 def enrichment_session_clusters(session_id: str, db: Session = Depends(get_db)):
     session = db.get(EnrichmentSession, session_id)
@@ -1668,7 +1536,6 @@ def list_connector_runs(investigation_id: str, db: Session = Depends(get_db)):
 @router.get("/investigations/{investigation_id}/connector-findings")
 def list_connector_findings(investigation_id: str, db: Session = Depends(get_db)):
     return db.scalars(select(ConnectorFinding).where(ConnectorFinding.investigation_id == investigation_id).order_by(ConnectorFinding.created_at.desc())).all()
-
 
 
 @router.get("/connector-findings/{finding_id}/relationship-candidates")
@@ -1841,16 +1708,6 @@ def assess_statement(finding_id: str, body: StatementAssessmentRequest, db: Sess
     db.add(row); db.commit(); db.refresh(row)
     return row
 
-
-@router.post("/statement-assessments/{assessment_id}/promote")
-def promote_statement_assessment(assessment_id: str, body: StatementPromotionRequest, db: Session = Depends(get_db)):
-    assessment = db.get(StatementAssessment, assessment_id)
-    if assessment is None:
-        raise HTTPException(404, "Statement assessment not found")
-    try:
-        return promote_assessment(db, assessment, body.note)
-    except ValueError as exc:
-        raise HTTPException(409, str(exc))
 
 @router.get("/entities/{entity_id}/promotions")
 def list_entity_promotions(entity_id: str, db: Session = Depends(get_db)):

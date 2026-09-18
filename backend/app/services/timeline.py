@@ -11,6 +11,7 @@ from app.models.domain import (
     Claim, ClaimEvidenceLink, Entity, Evidence, Investigation, Lead, PropertyConflictDecision, RelationshipEdge, Source, Statement, TimelineEvent,
 )
 from app.services.relationships import serialize_relationship
+from app.schemas.api import TimelineEventCreate
 
 DATE_PROP_HINTS = {
     "date", "startdate", "enddate", "birthdate", "deathdate", "incorporationdate",
@@ -312,3 +313,32 @@ def validate_timeline_refs(db: Session, row: TimelineEvent) -> None:
         edge = db.scalar(select(RelationshipEdge).where(RelationshipEdge.relationship_entity_id == row.relationship_entity_id))
         if edge is None:
             raise ValueError("relationship_entity_id must reference a canonical relationship entity")
+
+
+TIMELINE_EVENT_PRECISIONS = {"day", "month", "year", "range", "unknown"}
+TIMELINE_EVENT_VERIFICATION_STATUSES = {"asserted", "verified", "approximate", "disputed", "unresolved"}
+
+
+def create_timeline_event(db: Session, body: TimelineEventCreate) -> TimelineEvent:
+    """Validate and persist a new TimelineEvent from a request body.
+
+    Raises ValueError for any validation failure (bad precision/status
+    enum, unparseable date, or a dangling reference caught by
+    validate_timeline_refs) -- the caller maps that to a 400. The
+    caller is responsible for confirming body.investigation_id exists
+    (a 404 concern, not a validation one).
+    """
+    if body.precision not in TIMELINE_EVENT_PRECISIONS:
+        raise ValueError(f"Precision must be one of: {', '.join(sorted(TIMELINE_EVENT_PRECISIONS))}")
+    if body.verification_status not in TIMELINE_EVENT_VERIFICATION_STATUSES:
+        raise ValueError(f"Verification status must be one of: {', '.join(sorted(TIMELINE_EVENT_VERIFICATION_STATUSES))}")
+    if _normalize_date(body.date_start) is None:
+        raise ValueError("date_start must be ISO year, month, or date (YYYY, YYYY-MM, YYYY-MM-DD)")
+    if body.date_end and _normalize_date(body.date_end) is None:
+        raise ValueError("date_end must be ISO year, month, or date")
+    row = TimelineEvent(**body.model_dump())
+    validate_timeline_refs(db, row)
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return row
