@@ -1,20 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form, Response, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.core.time import utcnow_naive
 from app.db.session import get_db
 from app.models.domain import (
-    Investigation, Entity, Statement, Source, Evidence, Claim, Lead, ReportingTask, ConnectorRun, ConnectorFinding, ResolutionDecision, CanonicalEntityMergeAudit, PropertyConflictDecision, StatementAssessment, StatementPromotion,
+    Investigation, Entity, Statement, Source, Evidence, Claim, Lead, ReportingTask, ConnectorRun, ConnectorFinding, CanonicalEntityMergeAudit, PropertyConflictDecision, StatementPromotion,
     EnrichmentSession, EnrichmentSessionRun, EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
-    ExternalRelationshipReview, ExternalRelationshipPromotion, Document, DocumentChunk, ExtractionCandidate,
-    AppUser, InvestigationMembership,
+    ExternalRelationshipPromotion, Document, AppUser, InvestigationMembership,
 )
 from app.schemas.api import (
-    InvestigationCreate, EntityCreate, FindingReviewRequest, ResolutionRequest, CanonicalResolutionRequest, CanonicalMergeExecuteRequest, PostMergeReconciliationRequest, PropertyConflictDecisionRequest, StatementAssessmentRequest, MultiEnrichmentRequest, ExternalRelationshipReviewRequest, AppUserCreate, AppUserUpdate, InvestigationMembershipPut, InvestigationQuestionContextRequest,
+    InvestigationCreate, EntityCreate, CanonicalResolutionRequest, CanonicalMergeExecuteRequest, PostMergeReconciliationRequest, PropertyConflictDecisionRequest, MultiEnrichmentRequest, AppUserCreate, AppUserUpdate, InvestigationMembershipPut, InvestigationQuestionContextRequest,
     CaseSynthesisRequest, HypothesisTestRequest,
 )
 from app.services.ftm import make_ftm_entity
-from app.services.resolution import candidate_entities, canonical_duplicate_candidates, record_canonical_resolution
+from app.services.resolution import canonical_duplicate_candidates, record_canonical_resolution
 from app.services.entity_merge import preview_entity_merge, execute_entity_merge
 from app.services.post_merge_reconciliation import detect_post_merge_reconciliation, record_post_merge_reconciliation
 from app.services.provenance import entity_statement_history
@@ -23,19 +22,18 @@ from app.services.relationships import (
     entity_relationships, investigation_graph,
 )
 from app.connectors.registry import registry
-from app.services.external_relationships import relationship_endpoint_candidates, create_review, promote_review
 from app.services.assistant_context import build_question_context
 from app.ai.reasoning import run_reasoning_module, ReasoningInputError, CitationValidationError, SchemaValidationError
 from app.services.dossier import entity_dossier
 from app.services.timeline import investigation_timeline, _normalize_date
-from app.services.documents import ingest_document, serialize_document
+from app.services.documents import serialize_document
 from app.services.exports import build_investigation_export
 from app.services.security import redact_database_url, resolve_storage_root
 from app.services.credentials import credential_status, set_secret, remove_secret
 from app.services.lifecycle import preview_investigation_deletion, delete_investigation
 from app.services.identity import token_digest
 from app.services.pdf_ocr import ocr_runtime_status
-from app.services.openaleph_corpus import ensure_openaleph_collection, get_binding, get_document_sync, serialize_binding, serialize_sync, sync_document_to_openaleph, import_openaleph_evidence_candidates, import_openaleph_entity_candidates, get_openaleph_review_status, refresh_openaleph_review_candidates
+from app.services.openaleph_corpus import ensure_openaleph_collection, get_binding, serialize_binding
 from app.core.config import settings
 from app.core.access import request_is_local_request
 from app.core.authorization import (
@@ -48,7 +46,7 @@ from app.services.leads import (
     LEAD_STATUSES, serialize_lead, serialize_task,
 )
 
-from app.api.dependencies import authorize_request_resource, read_upload_limited as _read_upload_limited
+from app.api.dependencies import authorize_request_resource
 from app.services.connectors import (
     persist_connector_findings as _persist_connector_findings,
     enrich_entity as _enrich_entity,
@@ -75,72 +73,6 @@ def ensure_openaleph_corpus_binding(investigation_id: str, db: Session = Depends
     except Exception as exc:
         raise HTTPException(502, f"OpenAleph collection setup failed: {exc.__class__.__name__}: {exc}")
     return {"binding": serialize_binding(binding)}
-
-
-@router.get("/documents/{document_id}/corpus/openaleph")
-def get_openaleph_document_sync(document_id: str, db: Session = Depends(get_db)):
-    if db.get(Document, document_id) is None:
-        raise HTTPException(404, "Document not found")
-    return {"sync": serialize_sync(get_document_sync(db, document_id))}
-
-
-@router.get("/documents/{document_id}/corpus/openaleph/review-status")
-def get_openaleph_document_review_status(document_id: str, db: Session = Depends(get_db)):
-    """Report provider sync plus human-review queue progress for one document."""
-    try:
-        return get_openaleph_review_status(db, document_id)
-    except ValueError as exc:
-        raise HTTPException(404, str(exc))
-
-
-@router.post("/documents/{document_id}/corpus/openaleph/sync")
-def sync_openaleph_document(document_id: str, db: Session = Depends(get_db)):
-    try:
-        row = sync_document_to_openaleph(db, document_id)
-    except ValueError as exc:
-        raise HTTPException(404, str(exc))
-    except RuntimeError as exc:
-        raise HTTPException(503, str(exc))
-    return {"sync": serialize_sync(row)}
-
-
-@router.post("/documents/{document_id}/corpus/openaleph/refresh-review")
-def refresh_openaleph_document_review(document_id: str, db: Session = Depends(get_db)):
-    """Refresh OpenAleph Page + Mention candidates without auto-accepting either."""
-    try:
-        return refresh_openaleph_review_candidates(db, document_id)
-    except ValueError as exc:
-        raise HTTPException(404, str(exc))
-    except RuntimeError as exc:
-        raise HTTPException(409, str(exc))
-    except Exception as exc:
-        raise HTTPException(502, f"OpenAleph review refresh failed: {exc.__class__.__name__}: {exc}")
-
-
-@router.post("/documents/{document_id}/corpus/openaleph/import-evidence")
-def import_openaleph_document_evidence(document_id: str, db: Session = Depends(get_db)):
-    """Stage OpenAleph page text as review-required evidence candidates."""
-    try:
-        return import_openaleph_evidence_candidates(db, document_id)
-    except ValueError as exc:
-        raise HTTPException(404, str(exc))
-    except RuntimeError as exc:
-        raise HTTPException(409, str(exc))
-    except Exception as exc:
-        raise HTTPException(502, f"OpenAleph extraction import failed: {exc.__class__.__name__}: {exc}")
-
-
-@router.post("/documents/{document_id}/corpus/openaleph/import-entities")
-def import_openaleph_document_entities(document_id: str, db: Session = Depends(get_db)):
-    """Stage OpenAleph/ftm-analyze Mention entities for explicit reporter review."""
-    try:
-        return import_openaleph_entity_candidates(db, document_id)
-    except ValueError as exc:
-        raise HTTPException(404, str(exc))
-    except RuntimeError as exc:
-        raise HTTPException(409, str(exc))
-    except Exception as exc:
-        raise HTTPException(502, f"OpenAleph entity import failed: {exc.__class__.__name__}: {exc}")
 
 
 def _require_local_request(request: Request) -> None:
@@ -713,65 +645,12 @@ def list_entity_relationships(entity_id: str, db: Session = Depends(get_db)):
     return entity_relationships(db, entity_id)
 
 
-@router.post("/documents/upload")
-async def upload_document(
-    investigation_id: str = Form(...),
-    title: str = Form(""),
-    file: UploadFile = File(...),
-    db: Session = Depends(get_db),
-):
-    if db.get(Investigation, investigation_id) is None:
-        raise HTTPException(404, "Investigation not found")
-    data = await _read_upload_limited(file, settings.max_document_bytes)
-    if not data:
-        raise HTTPException(400, "Document is empty")
-    try:
-        doc = ingest_document(
-            db, investigation_id=investigation_id, title=title or file.filename or "Document",
-            filename=file.filename or "document", mime_type=file.content_type, data=data,
-            storage_dir=resolve_storage_root(settings.document_storage_dir),
-        )
-    except ValueError as exc:
-        if str(exc) == "Investigation not found":
-            raise HTTPException(404, str(exc))
-        raise
-    if doc.extraction_status == "failed":
-        raise HTTPException(422, {"message": "Document saved but extraction failed", "document": serialize_document(db, doc), "error": doc.extraction_error})
-    result = serialize_document(db, doc)
-    if settings.openaleph_enabled and settings.openaleph_auto_sync_documents:
-        sync_row = sync_document_to_openaleph(db, doc.id)
-        result["openaleph_sync"] = serialize_sync(sync_row)
-    else:
-        result["openaleph_sync"] = serialize_sync(get_document_sync(db, doc.id))
-    return result
-
-
 @router.get("/investigations/{investigation_id}/documents")
 def list_documents(investigation_id: str, db: Session = Depends(get_db)):
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     rows = db.scalars(select(Document).where(Document.investigation_id == investigation_id).order_by(Document.created_at.desc())).all()
     return [serialize_document(db, row) for row in rows]
-
-
-@router.get("/documents/{document_id}")
-def get_document(document_id: str, db: Session = Depends(get_db)):
-    row = db.get(Document, document_id)
-    if row is None:
-        raise HTTPException(404, "Document not found")
-    result = serialize_document(db, row)
-    result["chunks"] = db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == row.id).order_by(DocumentChunk.ordinal)).all()
-    return result
-
-
-@router.get("/documents/{document_id}/candidates")
-def list_document_candidates(document_id: str, status: str | None = None, candidate_type: str | None = None, db: Session = Depends(get_db)):
-    if db.get(Document, document_id) is None:
-        raise HTTPException(404, "Document not found")
-    stmt = select(ExtractionCandidate).where(ExtractionCandidate.document_id == document_id)
-    if status: stmt = stmt.where(ExtractionCandidate.review_status == status)
-    if candidate_type: stmt = stmt.where(ExtractionCandidate.candidate_type == candidate_type)
-    return db.scalars(stmt.order_by(ExtractionCandidate.created_at)).all()
 
 
 @router.get("/investigations/{investigation_id}/evidence")
@@ -949,46 +828,6 @@ def list_connector_findings(investigation_id: str, db: Session = Depends(get_db)
     return db.scalars(select(ConnectorFinding).where(ConnectorFinding.investigation_id == investigation_id).order_by(ConnectorFinding.created_at.desc())).all()
 
 
-@router.get("/connector-findings/{finding_id}/relationship-candidates")
-def external_relationship_candidates(finding_id: str, db: Session = Depends(get_db)):
-    finding = db.get(ConnectorFinding, finding_id)
-    if finding is None:
-        raise HTTPException(404, "Finding not found")
-    try:
-        return relationship_endpoint_candidates(db, finding)
-    except ValueError as exc:
-        raise HTTPException(400, str(exc))
-
-
-@router.get("/connector-findings/{finding_id}/relationship-reviews")
-def list_external_relationship_reviews(finding_id: str, db: Session = Depends(get_db)):
-    if db.get(ConnectorFinding, finding_id) is None:
-        raise HTTPException(404, "Finding not found")
-    return db.scalars(select(ExternalRelationshipReview).where(ExternalRelationshipReview.finding_id == finding_id).order_by(ExternalRelationshipReview.created_at.desc())).all()
-
-
-@router.post("/connector-findings/{finding_id}/relationship-reviews")
-def review_external_relationship(finding_id: str, body: ExternalRelationshipReviewRequest, db: Session = Depends(get_db)):
-    finding = db.get(ConnectorFinding, finding_id)
-    if finding is None:
-        raise HTTPException(404, "Finding not found")
-    try:
-        return create_review(db, finding, body.source_entity_id, body.target_entity_id, body.decision, body.note)
-    except ValueError as exc:
-        raise HTTPException(400, str(exc))
-
-
-@router.post("/external-relationship-reviews/{review_id}/promote")
-def promote_external_relationship(review_id: str, db: Session = Depends(get_db)):
-    review = db.get(ExternalRelationshipReview, review_id)
-    if review is None:
-        raise HTTPException(404, "Relationship review not found")
-    try:
-        return promote_review(db, review)
-    except ValueError as exc:
-        raise HTTPException(409, str(exc))
-
-
 @router.get("/entities/{entity_id}/external-relationship-promotions")
 def list_external_relationship_promotions(entity_id: str, db: Session = Depends(get_db)):
     entity = db.get(Entity, entity_id)
@@ -999,14 +838,6 @@ def list_external_relationship_promotions(entity_id: str, db: Session = Depends(
         ((ExternalRelationshipPromotion.relationship_entity_id == entity_id))
     ).order_by(ExternalRelationshipPromotion.promoted_at.desc())).all()
 
-@router.patch("/connector-findings/{finding_id}/review")
-def review_finding(finding_id: str, body: FindingReviewRequest, db: Session = Depends(get_db)):
-    if body.status not in {"unreviewed", "accepted", "needs_followup", "rejected"}:
-        raise HTTPException(400, "Invalid review status")
-    row = db.get(ConnectorFinding, finding_id)
-    if row is None: raise HTTPException(404, "Finding not found")
-    row.review_status = body.status; db.commit(); db.refresh(row)
-    return row
 
 @router.get("/entities/{entity_id}/duplicate-candidates")
 def entity_duplicate_candidates(entity_id: str, db: Session = Depends(get_db)):
@@ -1076,48 +907,6 @@ def decide_entity_post_merge_reconciliation(entity_id: str, body: PostMergeRecon
         )
     except ValueError as exc:
         raise HTTPException(409, str(exc))
-
-@router.get("/connector-findings/{finding_id}/candidates")
-def finding_candidates(finding_id: str, db: Session = Depends(get_db)):
-    row = db.get(ConnectorFinding, finding_id)
-    if row is None: raise HTTPException(404, "Finding not found")
-    return candidate_entities(db, row.investigation_id, row.caption, row.schema)
-
-@router.post("/connector-findings/{finding_id}/resolution")
-def resolve_finding(finding_id: str, body: ResolutionRequest, db: Session = Depends(get_db)):
-    if body.decision not in {"positive", "negative", "unsure"}:
-        raise HTTPException(400, "Decision must be positive, negative, or unsure")
-    finding = db.get(ConnectorFinding, finding_id)
-    if finding is None: raise HTTPException(404, "Finding not found")
-    if body.entity_id and db.get(Entity, body.entity_id) is None:
-        raise HTTPException(404, "Entity not found")
-    row = ResolutionDecision(
-        investigation_id=finding.investigation_id, finding_id=finding.id, entity_id=body.entity_id,
-        decision=body.decision, confidence=body.confidence, rationale=body.rationale,
-    )
-    finding.review_status = "accepted" if body.decision == "positive" else ("rejected" if body.decision == "negative" else "needs_followup")
-    db.add(row); db.commit(); db.refresh(row)
-    return row
-
-@router.get("/connector-findings/{finding_id}/assessments")
-def list_assessments(finding_id: str, db: Session = Depends(get_db)):
-    return db.scalars(select(StatementAssessment).where(StatementAssessment.finding_id == finding_id).order_by(StatementAssessment.created_at.desc())).all()
-
-@router.post("/connector-findings/{finding_id}/assessments")
-def assess_statement(finding_id: str, body: StatementAssessmentRequest, db: Session = Depends(get_db)):
-    allowed = {"accepted", "conflicting", "outdated", "superseded", "unresolved"}
-    if body.status not in allowed:
-        raise HTTPException(400, f"Status must be one of: {', '.join(sorted(allowed))}")
-    finding = db.get(ConnectorFinding, finding_id)
-    if finding is None: raise HTTPException(404, "Finding not found")
-    if body.entity_id and db.get(Entity, body.entity_id) is None:
-        raise HTTPException(404, "Entity not found")
-    row = StatementAssessment(
-        investigation_id=finding.investigation_id, finding_id=finding.id, entity_id=body.entity_id,
-        prop=body.prop, value=body.value, status=body.status, note=body.note,
-    )
-    db.add(row); db.commit(); db.refresh(row)
-    return row
 
 
 @router.get("/entities/{entity_id}/promotions")

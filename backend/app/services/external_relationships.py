@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.models.domain import (
     ConnectorFinding, Entity, ExternalRelationshipReview, ExternalRelationshipPromotion,
 )
-from app.services.relationships import RELATIONSHIP_SCHEMAS, create_relationship, serialize_relationship
+from app.services.relationships import RELATIONSHIP_SCHEMAS, create_relationship
 from app.services.resolution import candidate_entities
 from app.services.promotion import _dataset_name
 
@@ -108,3 +108,9 @@ def promote_review(db: Session, review: ExternalRelationshipReview) -> ExternalR
     )
     db.add(row); db.commit(); db.refresh(row)
     return row
+
+
+def list_relationship_reviews(db: Session, finding_id: str) -> list[ExternalRelationshipReview]:
+    return db.scalars(
+        select(ExternalRelationshipReview).where(ExternalRelationshipReview.finding_id == finding_id).order_by(ExternalRelationshipReview.created_at.desc())
+    ).all()

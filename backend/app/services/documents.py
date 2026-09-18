@@ -277,7 +277,6 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
         raise ValueError('Candidate has already been reviewed')
     if decision not in {'accept','reject'}: raise ValueError('Decision must be accept or reject')
     candidate.reviewer_note = note
-    from datetime import datetime
     candidate.reviewed_at = utcnow_naive()
     if decision == 'reject':
         candidate.review_status='rejected'; db.commit(); db.refresh(candidate); return {'candidate': {'id': candidate.id, 'review_status': candidate.review_status, 'reviewer_note': candidate.reviewer_note, 'reviewed_at': candidate.reviewed_at}, 'record': None}
@@ -405,3 +404,19 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
     else:
         record_out = {'id': record.id, 'source_id': record.source_id, 'quote': record.quote, 'locator': record.locator, 'notes': record.notes}
     return {'candidate':candidate,'record':record_out}
+
+
+def get_document_detail(db: Session, row: Document) -> dict:
+    """Serialize a Document with its chunks attached."""
+    result = serialize_document(db, row)
+    result["chunks"] = db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == row.id).order_by(DocumentChunk.ordinal)).all()
+    return result
+
+
+def list_document_candidates(db: Session, document_id: str, status: str | None = None, candidate_type: str | None = None) -> list[ExtractionCandidate]:
+    stmt = select(ExtractionCandidate).where(ExtractionCandidate.document_id == document_id)
+    if status:
+        stmt = stmt.where(ExtractionCandidate.review_status == status)
+    if candidate_type:
+        stmt = stmt.where(ExtractionCandidate.candidate_type == candidate_type)
+    return db.scalars(stmt.order_by(ExtractionCandidate.created_at)).all()
