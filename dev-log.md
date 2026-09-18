@@ -876,3 +876,28 @@ touched, full suite not re-run for this commit.
 
 Next: incident-response, standup, system-design, tech-debt,
 testing-strategy, then Firecrawl.
+
+## Incident-response audit: 2 findings logged (STRUCT-0034-0035)
+
+Sixth dimension. Reviewed SECURITY.md, the security audit logger's
+read/summarize/retention machinery, and the auth-failure rate
+limiter.
+
+- **STRUCT-0034 (MATERIAL, incident-response):** SECURITY.md only
+  covers how an outside contributor reports a vulnerability -- there's
+  no operator-facing runbook for what Ony should actually do if the
+  audit log looks suspicious or a connector credential leaks, even
+  though every tool needed for that (audit log read/summarize,
+  backup export/restore, credential rotation) already exists.
+- **STRUCT-0035 (OPTIONAL, incident-response):** the audit log and
+  rate limiter are both purely passive -- nothing surfaces a spike in
+  denied/rate-limited requests proactively. FixedWindowRateLimiter's
+  own docstring already self-documents its in-memory,
+  best-effort-for-single-user nature; noted as worth revisiting if
+  remote/shared access (STRUCT-0023) becomes real.
+
+Docs-only change (STRUCTURE_AUDIT.md + this entry) -- no code
+touched, full suite not re-run for this commit.
+
+Next: standup, system-design, tech-debt, testing-strategy, then
+Firecrawl.
