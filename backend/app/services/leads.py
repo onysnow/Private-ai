@@ -354,3 +354,107 @@ def update_reporting_task(db: Session, row: ReportingTask, body) -> ReportingTas
     db.commit()
     db.refresh(row)
     return row
+
+
+def create_lead(db: Session, body) -> Lead:
+    """Validate and persist a new Lead, optionally linking it to a
+    relationship. Raises ValueError for a bad status or a relationship
+    link target that fails validate_link_target. The caller is
+    responsible for confirming body.investigation_id exists (a 404
+    concern)."""
+    if body.status not in LEAD_STATUSES:
+        raise ValueError("Invalid lead status")
+    data = body.model_dump(exclude={"relationship_id"})
+    row = Lead(**data)
+    db.add(row)
+    db.flush()
+    if body.relationship_id:
+        try:
+            validate_link_target(db, row, relationship_id=body.relationship_id)
+        except ValueError:
+            db.rollback()
+            raise
+        db.add(LeadLink(lead_id=row.id, relationship_id=body.relationship_id, note="Created from relationship"))
+    db.add(LeadProfile(lead_id=row.id))
+    db.add(LeadWorkflowEvent(lead_id=row.id, from_status=None, to_status=row.status, note="Lead created"))
+    db.commit()
+    db.refresh(row)
+    return row
+
+
+def update_lead(db: Session, row: Lead, data: dict) -> Lead:
+    """Apply a partial update to a Lead (and its profile). Raises
+    ValueError for a bad status or priority."""
+    if data.get("status") is not None and data["status"] not in LEAD_STATUSES:
+        raise ValueError("Invalid lead status")
+    if data.get("priority") is not None and data["priority"] not in PRIORITIES:
+        raise ValueError("Invalid lead priority")
+    profile = get_profile(db, row.id, create=True)
+    old_status = row.status
+    for field in ("title", "detail", "status"):
+        if field in data and data[field] is not None:
+            setattr(row, field, data[field])
+    for field in ("priority", "owner", "next_action"):
+        if field in data:
+            setattr(profile, field, data[field])
+    if row.status != old_status:
+        db.add(LeadWorkflowEvent(lead_id=row.id, from_status=old_status, to_status=row.status, note=data.get("note")))
+    db.commit()
+    db.refresh(row)
+    return row
+
+
+def create_lead_link(db: Session, lead: Lead, body) -> LeadLink:
+    """Validate and persist a LeadLink. Raises ValueError if
+    validate_link_target rejects the target (the caller confirms the
+    lead exists -- a 404 concern)."""
+    validate_link_target(db, lead, **body.model_dump(exclude={"note"}))
+    row = LeadLink(lead_id=lead.id, **body.model_dump())
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return row
+
+
+def list_lead_links(db: Session, lead_id: str) -> list[dict]:
+    rows = db.scalars(select(LeadLink).where(LeadLink.lead_id == lead_id).order_by(LeadLink.created_at)).all()
+    return [serialize_link(db, row) for row in rows]
+
+
+def convert_lead(db: Session, lead: Lead, body) -> dict:
+    """Convert a Lead into a Claim or a ReportingTask. Raises ValueError
+    for an unknown conversion kind or (for a task conversion) a bad
+    priority."""
+    if body.kind == "claim":
+        text = (body.text or body.title or lead.title).strip()
+        claim = Claim(investigation_id=lead.investigation_id, text=text, status="lead", confidence=0.0)
+        db.add(claim)
+        db.flush()
+        link = LeadLink(lead_id=lead.id, claim_id=claim.id, note="Converted from lead")
+        db.add(link)
+        if lead.status == "unreviewed":
+            old = lead.status
+            lead.status = "active"
+            db.add(LeadWorkflowEvent(lead_id=lead.id, from_status=old, to_status="active", note="Converted to claim"))
+        db.commit()
+        db.refresh(claim)
+        return {"kind": "claim", "record": claim, "lead": serialize_lead(db, lead)}
+    if body.kind == "task":
+        priority = body.priority or (get_profile(db, lead.id, create=True).priority)
+        if priority not in PRIORITIES:
+            raise ValueError("Invalid task priority")
+        task = ReportingTask(
+            investigation_id=lead.investigation_id, lead_id=lead.id, title=body.title or lead.title,
+            detail=body.detail or lead.detail, priority=priority, owner=body.owner, due_date=body.due_date,
+        )
+        db.add(task)
+        db.flush()
+        db.add(make_task_workflow_event(db, task, from_status=None, to_status=task.status, note="Created from reporting lead"))
+        if lead.status == "unreviewed":
+            old = lead.status
+            lead.status = "active"
+            db.add(LeadWorkflowEvent(lead_id=lead.id, from_status=old, to_status="active", note="Converted to reporting task"))
+        db.commit()
+        db.refresh(task)
+        return {"kind": "task", "record": serialize_task(db, task), "lead": serialize_lead(db, lead)}
+    raise ValueError("Conversion kind must be claim or task")

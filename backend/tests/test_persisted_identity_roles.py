@@ -76,6 +76,9 @@ def test_local_owner_can_create_user_and_membership_and_token_is_only_returned_o
     from app.api.routes_extraction_candidates import router as extraction_candidates_router
     from app.api.routes_enrichment_sessions import router as enrichment_sessions_router
     from app.api.routes_backups import router as backups_router
+    from app.api.routes_relationships import router as relationships_router
+    from app.api.routes_claims import router as claims_router
+    from app.api.routes_leads import router as leads_router
 
     factory = _factory()
     with factory() as db:
@@ -99,6 +102,9 @@ def test_local_owner_can_create_user_and_membership_and_token_is_only_returned_o
     app.include_router(extraction_candidates_router)
     app.include_router(enrichment_sessions_router)
     app.include_router(backups_router)
+    app.include_router(relationships_router)
+    app.include_router(claims_router)
+    app.include_router(leads_router)
 
     with TestClient(app) as client:
         created = client.post("/api/settings/security/users", json={"display_name": "Reporter One"})
@@ -161,6 +167,9 @@ def test_local_owner_can_disable_rotate_and_revoke_user_token():
     from app.api.routes_extraction_candidates import router as extraction_candidates_router
     from app.api.routes_enrichment_sessions import router as enrichment_sessions_router
     from app.api.routes_backups import router as backups_router
+    from app.api.routes_relationships import router as relationships_router
+    from app.api.routes_claims import router as claims_router
+    from app.api.routes_leads import router as leads_router
 
     factory = _factory()
     app = FastAPI()
@@ -180,6 +189,9 @@ def test_local_owner_can_disable_rotate_and_revoke_user_token():
     app.include_router(extraction_candidates_router)
     app.include_router(enrichment_sessions_router)
     app.include_router(backups_router)
+    app.include_router(relationships_router)
+    app.include_router(claims_router)
+    app.include_router(leads_router)
 
     with TestClient(app) as client:
         created = client.post("/api/settings/security/users", json={"display_name": "Reporter Lifecycle"})
@@ -238,6 +250,9 @@ def test_rotating_revoked_token_reactivates_credential_but_not_disabled_user():
     from app.api.routes_extraction_candidates import router as extraction_candidates_router
     from app.api.routes_enrichment_sessions import router as enrichment_sessions_router
     from app.api.routes_backups import router as backups_router
+    from app.api.routes_relationships import router as relationships_router
+    from app.api.routes_claims import router as claims_router
+    from app.api.routes_leads import router as leads_router
 
     factory = _factory()
     app = FastAPI()
@@ -257,6 +272,9 @@ def test_rotating_revoked_token_reactivates_credential_but_not_disabled_user():
     app.include_router(extraction_candidates_router)
     app.include_router(enrichment_sessions_router)
     app.include_router(backups_router)
+    app.include_router(relationships_router)
+    app.include_router(claims_router)
+    app.include_router(leads_router)
 
     with TestClient(app) as client:
         created = client.post("/api/settings/security/users", json={"display_name": "Reporter Revoked"})

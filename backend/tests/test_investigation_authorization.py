@@ -16,6 +16,9 @@ from app.api.routes_connectors import router as connectors_router
 from app.api.routes_extraction_candidates import router as extraction_candidates_router
 from app.api.routes_enrichment_sessions import router as enrichment_sessions_router
 from app.api.routes_backups import router as backups_router
+from app.api.routes_relationships import router as relationships_router
+from app.api.routes_claims import router as claims_router
+from app.api.routes_leads import router as leads_router
 from app.core.authorization import (
     AuthorizationScope,
     InvestigationAuthorizationError,
@@ -93,6 +96,9 @@ def _scoped_app(factory) -> FastAPI:
     app.include_router(extraction_candidates_router)
     app.include_router(enrichment_sessions_router)
     app.include_router(backups_router)
+    app.include_router(relationships_router)
+    app.include_router(claims_router)
+    app.include_router(leads_router)
     return app
 
 

@@ -4,14 +4,13 @@ from sqlalchemy.orm import Session
 from app.core.time import utcnow_naive
 from app.db.session import get_db
 from app.models.domain import (
-    Investigation, Entity, Statement, Source, Evidence, ClaimEvidenceLink, Claim, Lead, LeadProfile, LeadLink, LeadWorkflowEvent, ReportingTask, ConnectorRun, ConnectorFinding, ResolutionDecision, CanonicalEntityMergeAudit, PropertyConflictDecision, StatementAssessment, StatementPromotion,
+    Investigation, Entity, Statement, Source, Evidence, Claim, Lead, ReportingTask, ConnectorRun, ConnectorFinding, ResolutionDecision, CanonicalEntityMergeAudit, PropertyConflictDecision, StatementAssessment, StatementPromotion,
     EnrichmentSession, EnrichmentSessionRun, EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document, DocumentChunk, ExtractionCandidate,
     AppUser, InvestigationMembership,
 )
 from app.schemas.api import (
-    InvestigationCreate, EntityCreate, ClaimEvidenceLinkCreate, ClaimCreate, ClaimUpdate, ClaimReviewRequest, LeadCreate, LeadUpdate, LeadLinkCreate, LeadConvertRequest, FindingReviewRequest, ResolutionRequest, CanonicalResolutionRequest, CanonicalMergeExecuteRequest, PostMergeReconciliationRequest, PropertyConflictDecisionRequest, StatementAssessmentRequest, MultiEnrichmentRequest, RelationshipCreate, RelationshipEvidenceAttachRequest, RelationshipEvidenceReviewRequest, ExternalRelationshipReviewRequest, ExtractedRelationshipProposalCreate,
-    AppUserCreate, AppUserUpdate, InvestigationMembershipPut, InvestigationQuestionContextRequest,
+    InvestigationCreate, EntityCreate, FindingReviewRequest, ResolutionRequest, CanonicalResolutionRequest, CanonicalMergeExecuteRequest, PostMergeReconciliationRequest, PropertyConflictDecisionRequest, StatementAssessmentRequest, MultiEnrichmentRequest, ExternalRelationshipReviewRequest, AppUserCreate, AppUserUpdate, InvestigationMembershipPut, InvestigationQuestionContextRequest,
     CaseSynthesisRequest, HypothesisTestRequest,
 )
 from app.services.ftm import make_ftm_entity
@@ -20,8 +19,8 @@ from app.services.entity_merge import preview_entity_merge, execute_entity_merge
 from app.services.post_merge_reconciliation import detect_post_merge_reconciliation, record_post_merge_reconciliation
 from app.services.provenance import entity_statement_history
 from app.services.relationships import (
-    RELATIONSHIP_SCHEMAS, create_relationship, investigation_relationships,
-    entity_relationships, investigation_graph, serialize_relationship, review_relationship_evidence, relationship_evidence_review_history, attach_relationship_evidence,
+    RELATIONSHIP_SCHEMAS, investigation_relationships,
+    entity_relationships, investigation_graph,
 )
 from app.connectors.registry import registry
 from app.services.external_relationships import relationship_endpoint_candidates, create_review, promote_review
@@ -29,7 +28,7 @@ from app.services.assistant_context import build_question_context
 from app.ai.reasoning import run_reasoning_module, ReasoningInputError, CitationValidationError, SchemaValidationError
 from app.services.dossier import entity_dossier
 from app.services.timeline import investigation_timeline, _normalize_date
-from app.services.documents import ingest_document, serialize_document, propose_relationship_from_extracted_claim
+from app.services.documents import ingest_document, serialize_document
 from app.services.exports import build_investigation_export
 from app.services.security import redact_database_url, resolve_storage_root
 from app.services.credentials import credential_status, set_secret, remove_secret
@@ -45,9 +44,8 @@ from app.core.authorization import (
 )
 from app.core.audit_log import read_security_audit, summarize_security_audit, preview_security_audit_retention, apply_security_audit_retention
 import secrets
-from app.services.claims import review_claim, claim_review_workspace
 from app.services.leads import (
-    LEAD_STATUSES, PRIORITIES, get_profile, serialize_lead, serialize_link, serialize_task, make_task_workflow_event, validate_link_target, create_relationship_context_lead,
+    LEAD_STATUSES, serialize_lead, serialize_task,
 )
 
 from app.api.dependencies import authorize_request_resource, read_upload_limited as _read_upload_limited
@@ -57,14 +55,6 @@ from app.services.connectors import (
 )
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
-
-CLAIM_STATUSES = {"lead", "unverified", "supported", "confirmed", "disputed", "rejected"}
-
-def _validate_claim_fields(*, status: str | None, confidence: float | None) -> None:
-    if status is not None and status not in CLAIM_STATUSES:
-        raise HTTPException(400, f"Invalid claim status. Allowed: {', '.join(sorted(CLAIM_STATUSES))}")
-    if confidence is not None and not 0.0 <= confidence <= 1.0:
-        raise HTTPException(400, "Claim confidence must be between 0 and 1")
 
 
 @router.get("/investigations/{investigation_id}/corpus/openaleph")
@@ -690,53 +680,6 @@ def list_entity_statement_history(entity_id: str, db: Session = Depends(get_db))
         raise HTTPException(404, str(exc))
 
 
-@router.post("/relationships")
-def create_canonical_relationship(body: RelationshipCreate, db: Session = Depends(get_db)):
-    if db.get(Investigation, body.investigation_id) is None:
-        raise HTTPException(404, "Investigation not found")
-    try:
-        edge = create_relationship(
-            db, investigation_id=body.investigation_id, schema=body.schema,
-            source_entity_id=body.source_entity_id, target_entity_id=body.target_entity_id,
-            properties=body.properties, dataset=body.dataset, origin=body.origin, evidence_id=body.evidence_id,
-        )
-    except ValueError as exc:
-        raise HTTPException(400, str(exc))
-    return serialize_relationship(db, edge)
-
-
-@router.post("/relationships/{relationship_id}/evidence")
-def attach_relationship_evidence_endpoint(relationship_id: str, body: RelationshipEvidenceAttachRequest, db: Session = Depends(get_db)):
-    edge = db.get(RelationshipEdge, relationship_id)
-    if edge is None:
-        raise HTTPException(404, "Relationship not found")
-    try:
-        attach_relationship_evidence(db, edge, evidence_id=body.evidence_id, note=body.note)
-    except ValueError as exc:
-        raise HTTPException(400, str(exc))
-    return serialize_relationship(db, edge)
-
-
-@router.get("/relationships/{relationship_id}/evidence-reviews")
-def list_relationship_evidence_reviews(relationship_id: str, db: Session = Depends(get_db)):
-    edge = db.get(RelationshipEdge, relationship_id)
-    if edge is None:
-        raise HTTPException(404, "Relationship not found")
-    return {"relationship_id": edge.id, "reviews": relationship_evidence_review_history(db, edge)}
-
-
-@router.post("/relationships/{relationship_id}/evidence/{evidence_id}/reviews")
-def review_relationship_evidence_endpoint(relationship_id: str, evidence_id: str, body: RelationshipEvidenceReviewRequest, db: Session = Depends(get_db)):
-    edge = db.get(RelationshipEdge, relationship_id)
-    if edge is None:
-        raise HTTPException(404, "Relationship not found")
-    try:
-        review_relationship_evidence(db, edge, evidence_id=evidence_id, **body.model_dump())
-    except ValueError as exc:
-        raise HTTPException(400, str(exc))
-    return serialize_relationship(db, edge)
-
-
 @router.get("/investigations/{investigation_id}/relationships")
 def list_investigation_relationships(investigation_id: str, db: Session = Depends(get_db)):
     if db.get(Investigation, investigation_id) is None:
@@ -831,19 +774,6 @@ def list_document_candidates(document_id: str, status: str | None = None, candid
     return db.scalars(stmt.order_by(ExtractionCandidate.created_at)).all()
 
 
-@router.post("/claims/{claim_id}/relationship-proposals")
-def create_extracted_relationship_proposal(claim_id: str, body: ExtractedRelationshipProposalCreate, db: Session = Depends(get_db)):
-    try:
-        row = propose_relationship_from_extracted_claim(db, claim_id=claim_id, **body.model_dump())
-    except ValueError as exc:
-        raise HTTPException(400, str(exc))
-    return {
-        'id': row.id, 'investigation_id': row.investigation_id, 'document_id': row.document_id,
-        'chunk_id': row.chunk_id, 'candidate_type': row.candidate_type, 'payload': row.payload,
-        'confidence': row.confidence, 'review_status': row.review_status,
-    }
-
-
 @router.get("/investigations/{investigation_id}/evidence")
 def list_investigation_evidence(investigation_id: str, db: Session = Depends(get_db)):
     if db.get(Investigation, investigation_id) is None:
@@ -860,96 +790,6 @@ def list_investigation_evidence(investigation_id: str, db: Session = Depends(get
     return [{"evidence": evidence, "source": source_by_id[evidence.source_id]} for evidence in evidence_rows]
 
 
-@router.post("/claims/{claim_id}/evidence")
-def link_claim_evidence(claim_id: str, body: ClaimEvidenceLinkCreate, db: Session = Depends(get_db)):
-    claim = db.get(Claim, claim_id)
-    evidence = db.get(Evidence, body.evidence_id)
-    if claim is None:
-        raise HTTPException(404, "Claim not found")
-    if evidence is None:
-        raise HTTPException(404, "Evidence not found")
-    source = db.get(Source, evidence.source_id)
-    if source is None or source.investigation_id != claim.investigation_id:
-        raise HTTPException(400, "Claim and evidence must belong to the same investigation")
-    if body.stance not in {"supports", "contradicts", "context"}:
-        raise HTTPException(400, "Stance must be supports, contradicts, or context")
-    existing = db.scalar(select(ClaimEvidenceLink).where(
-        ClaimEvidenceLink.claim_id == claim_id,
-        ClaimEvidenceLink.evidence_id == body.evidence_id,
-        ClaimEvidenceLink.stance == body.stance,
-    ))
-    if existing is not None:
-        return existing
-    row = ClaimEvidenceLink(claim_id=claim_id, evidence_id=body.evidence_id, stance=body.stance, note=body.note)
-    db.add(row); db.commit(); db.refresh(row)
-    return row
-
-
-@router.get("/claims/{claim_id}/evidence")
-def list_claim_evidence(claim_id: str, db: Session = Depends(get_db)):
-    claim = db.get(Claim, claim_id)
-    if claim is None:
-        raise HTTPException(404, "Claim not found")
-    links = db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.claim_id == claim_id).order_by(ClaimEvidenceLink.created_at)).all()
-    rows = []
-    for link in links:
-        evidence = db.get(Evidence, link.evidence_id)
-        source = db.get(Source, evidence.source_id) if evidence else None
-        rows.append({
-            "id": link.id, "stance": link.stance, "note": link.note, "created_at": link.created_at,
-            "evidence": evidence, "source": source,
-        })
-    return rows
-
-
-@router.post("/claims")
-def create_claim(body: ClaimCreate, db: Session = Depends(get_db)):
-    if db.get(Investigation, body.investigation_id) is None:
-        raise HTTPException(404, "Investigation not found")
-    _validate_claim_fields(status=body.status, confidence=body.confidence)
-    if not body.text.strip():
-        raise HTTPException(400, "Claim text is required")
-    row = Claim(**body.model_dump())
-    db.add(row); db.commit(); db.refresh(row)
-    return row
-
-@router.get("/claims/{claim_id}/review-workspace")
-def get_claim_review_workspace(claim_id: str, db: Session = Depends(get_db)):
-    row = db.get(Claim, claim_id)
-    if row is None:
-        raise HTTPException(404, "Claim not found")
-    return claim_review_workspace(db, row)
-
-@router.post("/claims/{claim_id}/reviews")
-def create_claim_review(claim_id: str, body: ClaimReviewRequest, db: Session = Depends(get_db)):
-    row = db.get(Claim, claim_id)
-    if row is None:
-        raise HTTPException(404, "Claim not found")
-    _validate_claim_fields(status=body.status, confidence=body.confidence)
-    try:
-        claim, event = review_claim(db, row, **body.model_dump())
-    except ValueError as exc:
-        raise HTTPException(400, str(exc)) from exc
-    return {"claim": claim, "review": event, "workspace": claim_review_workspace(db, claim)}
-
-@router.patch("/claims/{claim_id}")
-def update_claim(claim_id: str, body: ClaimUpdate, db: Session = Depends(get_db)):
-    row = db.get(Claim, claim_id)
-    if row is None:
-        raise HTTPException(404, "Claim not found")
-    changes = body.model_dump(exclude_unset=True)
-    _validate_claim_fields(status=changes.get("status"), confidence=changes.get("confidence"))
-    if "text" in changes:
-        if changes["text"] is None or not changes["text"].strip():
-            raise HTTPException(400, "Claim text is required")
-        row.text = changes["text"].strip()
-    if "status" in changes and changes["status"] is not None:
-        row.status = changes["status"]
-    if "confidence" in changes and changes["confidence"] is not None:
-        row.confidence = changes["confidence"]
-    db.commit(); db.refresh(row)
-    return row
-
 @router.get("/investigations/{investigation_id}/sources")
 def list_sources(investigation_id: str, db: Session = Depends(get_db)):
     return db.scalars(select(Source).where(Source.investigation_id == investigation_id).order_by(Source.created_at.desc())).all()
@@ -957,37 +797,6 @@ def list_sources(investigation_id: str, db: Session = Depends(get_db)):
 @router.get("/investigations/{investigation_id}/claims")
 def list_claims(investigation_id: str, db: Session = Depends(get_db)):
     return db.scalars(select(Claim).where(Claim.investigation_id == investigation_id).order_by(Claim.created_at.desc())).all()
-
-@router.post("/leads")
-def create_lead(body: LeadCreate, db: Session = Depends(get_db)):
-    if db.get(Investigation, body.investigation_id) is None:
-        raise HTTPException(404, "Investigation not found")
-    if body.status not in LEAD_STATUSES:
-        raise HTTPException(400, "Invalid lead status")
-    data = body.model_dump(exclude={"relationship_id"})
-    row = Lead(**data)
-    db.add(row); db.flush()
-    if body.relationship_id:
-        try:
-            validate_link_target(db, row, relationship_id=body.relationship_id)
-        except ValueError as exc:
-            db.rollback()
-            raise HTTPException(400, str(exc))
-        db.add(LeadLink(lead_id=row.id, relationship_id=body.relationship_id, note="Created from relationship"))
-    db.add(LeadProfile(lead_id=row.id))
-    db.add(LeadWorkflowEvent(lead_id=row.id, from_status=None, to_status=row.status, note="Lead created"))
-    db.commit(); db.refresh(row)
-    return serialize_lead(db, row)
-
-
-@router.post("/relationships/{relationship_id}/lead-from-context")
-def create_lead_from_relationship_context(relationship_id: str, db: Session = Depends(get_db)):
-    edge = db.get(RelationshipEdge, relationship_id)
-    if edge is None:
-        raise HTTPException(404, "Relationship not found")
-    row = create_relationship_context_lead(db, edge)
-    db.commit(); db.refresh(row)
-    return serialize_lead(db, row)
 
 
 @router.get("/investigations/{investigation_id}/leads")
@@ -1031,95 +840,6 @@ def lead_queue(
     ))
     counts = {key: sum(1 for item in items if item["status"] == key) for key in sorted(LEAD_STATUSES)}
     return {"investigation_id": investigation_id, "total": len(items), "counts": counts, "items": items}
-
-
-@router.get("/leads/{lead_id}")
-def get_lead(lead_id: str, db: Session = Depends(get_db)):
-    row = db.get(Lead, lead_id)
-    if row is None:
-        raise HTTPException(404, "Lead not found")
-    return serialize_lead(db, row)
-
-
-@router.patch("/leads/{lead_id}")
-def update_lead(lead_id: str, body: LeadUpdate, db: Session = Depends(get_db)):
-    row = db.get(Lead, lead_id)
-    if row is None:
-        raise HTTPException(404, "Lead not found")
-    data = body.model_dump(exclude_unset=True)
-    if data.get("status") is not None and data["status"] not in LEAD_STATUSES:
-        raise HTTPException(400, "Invalid lead status")
-    if data.get("priority") is not None and data["priority"] not in PRIORITIES:
-        raise HTTPException(400, "Invalid lead priority")
-    profile = get_profile(db, row.id, create=True)
-    old_status = row.status
-    for field in ("title", "detail", "status"):
-        if field in data and data[field] is not None:
-            setattr(row, field, data[field])
-    for field in ("priority", "owner", "next_action"):
-        if field in data:
-            setattr(profile, field, data[field])
-    if row.status != old_status:
-        db.add(LeadWorkflowEvent(lead_id=row.id, from_status=old_status, to_status=row.status, note=data.get("note")))
-    db.commit(); db.refresh(row)
-    return serialize_lead(db, row)
-
-
-@router.post("/leads/{lead_id}/links")
-def link_lead(lead_id: str, body: LeadLinkCreate, db: Session = Depends(get_db)):
-    lead = db.get(Lead, lead_id)
-    if lead is None:
-        raise HTTPException(404, "Lead not found")
-    try:
-        validate_link_target(db, lead, **body.model_dump(exclude={"note"}))
-    except ValueError as exc:
-        raise HTTPException(400, str(exc))
-    row = LeadLink(lead_id=lead_id, **body.model_dump())
-    db.add(row); db.commit(); db.refresh(row)
-    return serialize_link(db, row)
-
-
-@router.get("/leads/{lead_id}/links")
-def list_lead_links(lead_id: str, db: Session = Depends(get_db)):
-    if db.get(Lead, lead_id) is None:
-        raise HTTPException(404, "Lead not found")
-    rows = db.scalars(select(LeadLink).where(LeadLink.lead_id == lead_id).order_by(LeadLink.created_at)).all()
-    return [serialize_link(db, row) for row in rows]
-
-
-@router.post("/leads/{lead_id}/convert")
-def convert_lead(lead_id: str, body: LeadConvertRequest, db: Session = Depends(get_db)):
-    lead = db.get(Lead, lead_id)
-    if lead is None:
-        raise HTTPException(404, "Lead not found")
-    if body.kind == "claim":
-        text = (body.text or body.title or lead.title).strip()
-        claim = Claim(investigation_id=lead.investigation_id, text=text, status="lead", confidence=0.0)
-        db.add(claim); db.flush()
-        link = LeadLink(lead_id=lead.id, claim_id=claim.id, note="Converted from lead")
-        db.add(link)
-        if lead.status == "unreviewed":
-            old = lead.status; lead.status = "active"
-            db.add(LeadWorkflowEvent(lead_id=lead.id, from_status=old, to_status="active", note="Converted to claim"))
-        db.commit(); db.refresh(claim)
-        return {"kind": "claim", "record": claim, "lead": serialize_lead(db, lead)}
-    if body.kind == "task":
-        priority = body.priority or (get_profile(db, lead.id, create=True).priority)
-        if priority not in PRIORITIES:
-            raise HTTPException(400, "Invalid task priority")
-        task = ReportingTask(
-            investigation_id=lead.investigation_id, lead_id=lead.id, title=body.title or lead.title,
-            detail=body.detail or lead.detail, priority=priority, owner=body.owner, due_date=body.due_date,
-        )
-        db.add(task)
-        db.flush()
-        db.add(make_task_workflow_event(db, task, from_status=None, to_status=task.status, note="Created from reporting lead"))
-        if lead.status == "unreviewed":
-            old = lead.status; lead.status = "active"
-            db.add(LeadWorkflowEvent(lead_id=lead.id, from_status=old, to_status="active", note="Converted to reporting task"))
-        db.commit(); db.refresh(task)
-        return {"kind": "task", "record": serialize_task(db, task), "lead": serialize_lead(db, lead)}
-    raise HTTPException(400, "Conversion kind must be claim or task")
 
 
 @router.get("/investigations/{investigation_id}/reporting-tasks")
