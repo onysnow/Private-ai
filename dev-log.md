@@ -377,3 +377,56 @@ cold.
   explicit instruction this cycle was to finish the routes.py split
   first. Next cycle should check whether to tackle these or continue
   groups 2-8 of the split.
+
+## Cycle: routes.py split group 2 (provenance, sources, reporting-tasks)
+
+- Extracted the 6 endpoints under /provenance, /sources, and
+  /reporting-tasks into three new route modules
+  (routes_provenance.py, routes_sources.py,
+  routes_reporting_tasks.py), each domain getting its own file rather
+  than one shared "group 2" module -- provenance, sources, and
+  reporting-tasks are genuinely separate domains, unlike group 1's
+  disparate one-off endpoints. Added a new app/services/sources.py;
+  reporting-task logic went into the existing app/services/leads.py
+  since it already owns TASK_STATUSES/PRIORITIES/serialize_task/
+  make_task_workflow_event.
+- Caught a subtlety before it became a silent behavior change: the
+  existing provenance.py already had a private
+  _record_extraction_lineage() helper with a richer evidence-to-claim
+  fallback than the /provenance/extraction-lineage endpoint's inline
+  query ever had. Wrote a separate, narrower
+  find_extraction_lineage() rather than reusing the richer helper --
+  reusing it would have quietly made the endpoint smarter, which
+  isn't what "pure refactor" means.
+- Two more monkeypatch-target/hand-built-app fixes, same failure mode
+  as group 1's: test_ingestion_deletion_coordination.py calls
+  routes.create_source(...) directly (bypassing HTTP) and patches
+  app.api.routes.lock_investigation_transaction -- both had to follow
+  the endpoint to app.api.routes_sources. This time, instead of
+  patching just the tests that broke, added all four route modules
+  that exist so far to every hand-built test app, since three
+  separate test files build their own minimal FastAPI app by hand
+  and this exact failure mode will otherwise recur every single
+  group through group 8.
+- Hit a real git problem worth logging: .git/index.lock (and a
+  submodule's index.lock under backend/app/ai/tas_spec) couldn't be
+  unlinked by git after normal use -- delete wasn't yet enabled for
+  this session's connected folder, so stale lock files were piling
+  up and would eventually have blocked commits outright. Requested
+  and got delete permission, cleared the stale locks. If future
+  cycles see "unable to unlink .git/index.lock" warnings again after
+  this, it means delete permission didn't carry over to a new
+  session -- request it again rather than treating it as some
+  git corruption to diagnose.
+- Full backend suite: 214 passed, 0 failed. Committed and pushed to
+  `dev` (`cc71e90`). STRUCT-0002/0008 updated with group 2 progress.
+- User has since asked for two things once the full split (groups
+  2-8, this cycle onward) is complete: (1) run the entire
+  `engineering:*` skill suite (architecture, code-review, debug,
+  deploy-checklist, documentation, incident-response, standup,
+  system-design, tech-debt, testing-strategy) across the whole
+  project as a follow-on audit pass, and (2) use Firecrawl for TAS
+  and development research going forward, plus consider (not yet
+  committed to) integrating Firecrawl directly into Private-ai
+  itself as a research feature. Explicitly sequenced: finish the
+  routes.py split first, per user decision, before either of those.
