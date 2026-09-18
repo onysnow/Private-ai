@@ -570,3 +570,72 @@ cold.
   in routes.py need to be resolved when entities lands), and
   investigations is the biggest and most depended-on group, saved
   for last on purpose.
+
+## Cycle: routes.py split group 7 (entities)
+
+- Extracted all 21 /entities/* endpoints plus the entity-listing
+  endpoint under /investigations/{id}/entities. This group's file
+  reads (before writing anything) turned up the file's actual
+  domain layout: entities and investigations endpoints are
+  interleaved throughout routes.py by history, not grouped
+  contiguously -- e.g. create_entity sat right after
+  remove_investigation, and enrich_entity_multi sat right before
+  list_connector_runs/list_connector_findings (which are
+  investigation-prefixed and stayed for group 8). Block removal by
+  exact-text match (not line ranges) made this a non-issue, same as
+  every prior group, but it meant reading the whole 916-line
+  pre-split file carefully rather than assuming a contiguous block
+  to lift.
+- New app/services/entities.py holds the endpoints with real inline
+  logic: create_entity, list_entities, decide_property_conflict
+  (the biggest single validation routine in the group -- decision
+  enum, ledger-value membership, preferred/temporal-interval
+  cross-checks), and run_multi_enrichment (the full per-provider
+  connector-orchestration loop: session/session-run/connector-run
+  bookkeeping, try/except-per-provider failure isolation, status
+  rollup). Several one-query list endpoints moved too, for
+  consistency with every prior group's convention rather than a
+  fresh judgment call.
+- Endpoints that already fully delegated to an existing service
+  (entity_dossier, entity_statement_history, entity_relationships,
+  canonical_duplicate_candidates, record_canonical_resolution,
+  preview_entity_merge/execute_entity_merge,
+  detect_post_merge_reconciliation/record_post_merge_reconciliation)
+  moved verbatim into routes_entities.py with no new service
+  extraction -- same "already thin" judgment as routes_relationships.py
+  in group 4.
+- This group also cleared a piece of standing debt: the
+  _persist_connector_findings/_enrich_entity re-export shims that
+  have sat in routes.py's import block since group 3 (aliased under
+  their old private names so remaining call sites wouldn't need
+  changes before their own group's turn). Grepped both names against
+  the whole file first -- both were used only inside
+  enrich_entity/enrich_entity_multi, i.e. entirely within this
+  group -- so routes_entities.py now imports enrich_entity directly
+  from app.services.connectors, and run_multi_enrichment (the
+  service-layer version of enrich_entity_multi) calls
+  persist_connector_findings directly. Updated connectors.py's
+  module docstring, which had explicitly said "still in routes.py
+  pending group 7's extraction" since group 3 -- now says where the
+  call sites actually live.
+- All 3 hand-built test app builders updated proactively. Grepped
+  for monkeypatch/direct routes.* calls against every moved entities
+  symbol first -- none found, clean run.
+- Full backend suite: 214 passed, 0 failed -- though this cycle
+  surfaced a local tooling wrinkle worth logging: pytest.ini's
+  addopts bakes in `-q --cov=...`, and passing `-q` again on the
+  command line alongside `--no-cov` was silently swallowing the
+  final "214 passed in Xs" summary line (dots reached 100%, exit
+  code 0, but no summary text) -- looked exactly like a device_bash
+  timeout truncation at first and cost real time chasing that theory
+  (backgrounding across device_bash calls doesn't work either --
+  each call is its own PID namespace, so a backgrounded process dies
+  with the shell that spawned it). Dropping the redundant `-q` fixed
+  it immediately. Future cycles: don't pass `-q` when addopts already
+  has it, and don't try to background a long-running command across
+  separate device_bash calls -- it won't survive.
+- Committed and pushed to `dev` (`0c20093`). STRUCT-0002/0008 updated
+  with group 7 progress.
+- routes.py: 603 -> 310 lines, 22 endpoints remain. Group 8
+  (investigations) is the last one -- once it lands, routes.py is
+  deleted entirely per REMEDIATION_PROMPT.md, and Stage E is done.
