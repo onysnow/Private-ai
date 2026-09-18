@@ -639,3 +639,64 @@ cold.
 - routes.py: 603 -> 310 lines, 22 endpoints remain. Group 8
   (investigations) is the last one -- once it lands, routes.py is
   deleted entirely per REMEDIATION_PROMPT.md, and Stage E is done.
+
+## Cycle: routes.py split group 8 (investigations) -- Stage E complete
+
+- Extracted the last 22 endpoints -- everything still living directly
+  under /investigations/*: OpenAleph corpus binding, the AI assistant
+  endpoints (context/case-synthesis/hypothesis-test, via the
+  route-layer _run_reasoning_endpoint helper that stayed in the route
+  module since it's pure HTTP-exception-mapping over
+  app/ai/reasoning.py's already-real service function), timeline,
+  backup export, investigation CRUD, relationships/graph, and the
+  investigation-scoped listing endpoints for documents, evidence,
+  sources, claims, leads (+ the lead-queue filter/sort/count logic),
+  reporting-tasks, connector-runs, and connector-findings.
+- Since this was the last of the 8 groups, app/api/routes.py -- the
+  file this entire 8-cycle effort has been shrinking since it opened
+  at 1859 lines / 120 endpoints -- is deleted outright rather than
+  emptied further. New app/services/investigations.py picked up the
+  endpoints with real inline logic (create/list with scope filtering,
+  the four investigation-scoped collection queries, the lead-queue
+  logic); everything that already fully delegated to an existing
+  service module moved verbatim, same judgment applied in every prior
+  group.
+- main.py and all 3 hand-built test app builders (destructive-action,
+  investigation-authorization, persisted-identity-roles -- the last
+  with 3 function-scoped copies) now import `router` from
+  routes_investigations instead of the now-deleted routes.py. Also
+  cleaned up a dead `from app.api import routes` import left in
+  test_ingestion_deletion_coordination.py since group 2, when its
+  actual call sites were retargeted to routes_sources but the
+  now-unused top-level import was never removed -- grepping the
+  whole tests/ tree for any remaining `app.api.routes` (not
+  `routes_*`) reference caught it before it could break the deleted
+  import.
+- Full backend suite: 214 passed, 0 failed. Committed and pushed to
+  `dev` (`332fe98`).
+- STRUCT-0002 and STRUCT-0008 flipped from IN_PROGRESS to CORRECTED
+  in STRUCTURE_AUDIT.md -- the split REMEDIATION_PROMPT.md's Stage E
+  called for is done. All 120 original routes.py endpoints now live
+  across 16 per-domain route modules (routes_system, routes_provenance,
+  routes_sources, routes_reporting_tasks, routes_connectors,
+  routes_extraction_candidates, routes_enrichment_sessions,
+  routes_backups, routes_relationships, routes_claims, routes_leads,
+  routes_documents, routes_connector_findings, routes_settings,
+  routes_entities, routes_investigations), each backed by a matching
+  app/services/ module.
+- What's still open from this effort, logged as STRUCT-0013 through
+  STRUCT-0016 in earlier cycles and explicitly deferred behind
+  finishing this split (per Ony's "finish the split first" sequencing
+  decision, now satisfied): mypy coverage is scoped to only 4 files
+  and not enforced in CI; no CI step runs ruff/mypy at all; no
+  --cov-fail-under threshold. These are natural next targets now that
+  every route module is small enough to bring under strict checking
+  without a wall of pre-existing errors -- exactly the condition
+  STRUCT-0013's required_correction named as the trigger to widen
+  mypy's `files` list.
+- Next per Ony's standing instruction: run the full engineering-skills
+  audit suite (architecture, code-review, debug, deploy-checklist,
+  documentation, incident-response, standup, system-design, tech-debt,
+  testing-strategy) across the whole Private-ai project, then explore
+  Firecrawl for TAS/dev research and consider a Firecrawl integration
+  into Private-ai itself.
