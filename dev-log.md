@@ -826,3 +826,28 @@ touched, full suite not re-run for this commit.
 
 Next: deploy-checklist, documentation, incident-response, standup,
 system-design, tech-debt, testing-strategy, then Firecrawl.
+
+## Deploy-checklist audit: 3 findings logged (STRUCT-0029-0031)
+
+Fourth dimension. Reviewed both Dockerfiles, docker-compose.yml, the
+Alembic migration chain, and the CI docker-build workflow.
+
+- **STRUCT-0029 (MATERIAL, deploy-checklist):** neither Dockerfile
+  declares a HEALTHCHECK and docker-compose.yml gives backend/frontend
+  no healthcheck either, despite GET /health already existing --
+  unlike workbench-db's real pg_isready healthcheck. A hung backend
+  is invisible to Docker and to frontend's depends_on.
+- **STRUCT-0030 (NON_MATERIAL, deploy-checklist):** frontend/Dockerfile
+  runs `npm install` while CI runs `npm ci` -- the built image isn't
+  guaranteed to match what CI tested.
+- **STRUCT-0031 (OPTIONAL, deploy-checklist):** docker-compose.yml is
+  the only deployment artifact in the repo and it's dev-only (bind-mounts
+  source over the built image, 127.0.0.1-only ports, a literal default
+  dev token). Fine under the local-first assumption; flagged so it
+  isn't mistaken for deploy-ready if shared/hosted use is ever wanted.
+
+Docs-only change (STRUCTURE_AUDIT.md + this entry) -- no code
+touched, full suite not re-run for this commit.
+
+Next: documentation, incident-response, standup, system-design,
+tech-debt, testing-strategy, then Firecrawl.
