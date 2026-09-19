@@ -1717,3 +1717,31 @@ Added the matching check to all 4, plus
 tests/test_investigation_list_404_consistency.py covering both directions
 (404 for a missing investigation, still 200 [] for a real one with no
 rows). Full backend suite (240 tests) verified passing.
+
+
+## STRUCT-0021 corrected: OpenAleph document routes now 99% covered, one real bug found
+
+routes_documents.py was the lowest-covered route module after the Stage E
+split (49%) -- its OpenAleph corpus sync/review/import endpoints only had
+their underlying service functions tested directly
+(test_openaleph_corpus_bridge.py), never the actual HTTP route layer, so
+each route's own try/except/response-shaping code went unexercised.
+
+Added tests/test_openaleph_document_routes_coverage.py (17 tests) covering
+the 6 named endpoints plus get_document/list_document_candidates_endpoint/
+upload_document: 404/409/503/success paths, monkeypatching each service
+function at the route-module import site (the pattern
+test_openaleph_operation_failures.py already established) so each test
+isolates the route's own logic rather than re-testing the service layer.
+Coverage rose from 72% (already improved by earlier STRUCT-0027/0028 work
+from the finding's original 49%) to 99%.
+
+Writing the extraction-failure test surfaced a real, previously-hidden bug:
+upload_document's 422 detail embeds serialize_document()'s raw `created_at`
+datetime, which FastAPI's default HTTPException handler cannot JSON-encode
+(unlike a normal 200 response, it never runs jsonable_encoder) -- a real
+extraction failure in production would have crashed with an unhandled 500
+instead of the intended 422. Fixed by wrapping that HTTPException's detail
+in fastapi.encoders.jsonable_encoder(...).
+
+Verified via the full backend suite (257 tests, all passing, exit 0).

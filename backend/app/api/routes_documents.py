@@ -8,6 +8,7 @@ GET /investigations/{investigation_id}/documents stays in routes.py:
 its URL prefix is /investigations, so it belongs with group 8.
 """
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource, read_upload_limited
@@ -137,7 +138,11 @@ async def upload_document(
             raise HTTPException(404, str(exc))
         raise
     if doc.extraction_status == "failed":
-        raise HTTPException(422, {"message": "Document saved but extraction failed", "document": serialize_document(db, doc), "error": doc.extraction_error})
+        raise HTTPException(422, jsonable_encoder({
+                "message": "Document saved but extraction failed",
+                "document": serialize_document(db, doc),
+                "error": doc.extraction_error,
+            }))
     result = serialize_document(db, doc)
     if settings.openaleph_enabled and settings.openaleph_auto_sync_documents:
         sync_row = sync_document_to_openaleph(db, doc.id)
