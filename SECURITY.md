@@ -17,3 +17,13 @@ this repository, or contact the maintainer directly.
 
 Please do not include real investigation data, source-identifying
 information, or credentials in any report.
+
+## Operator incident response
+
+This policy covers *reporting* a vulnerability to the maintainer. If
+you are the operator and something has already gone wrong -- a spike
+of denied/rate-limited requests, a suspected leaked connector
+credential, or data that looks tampered with -- see
+[`INCIDENT_RESPONSE.md`](INCIDENT_RESPONSE.md) for the operational
+runbook (evidence preservation, reading the security audit log,
+credential rotation).

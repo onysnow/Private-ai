@@ -1467,3 +1467,41 @@ historical artifact now, not a maintained file. Corrected the header's
 cross-reference.
 
 Docs-only change; no backend tests affected.
+
+
+## STRUCT-0034 corrected: operator-facing incident-response runbook added
+
+SECURITY.md only covered how an outside contributor reports a
+vulnerability privately -- it said nothing about what Ony (the actual
+operator) should do if the security audit log shows an unexpected
+spike of access_denied/auth_rate_limited events, a connector
+credential is suspected leaked, or investigation data looks tampered
+with. All the individual pieces already existed and were well built
+(SecurityAuditLogger's read/summarize/retention-preview functions in
+app/core/audit_log.py, per-investigation backup export in
+app/services/exports.py, connector-credential rotation in
+app/services/settings.py) but nothing tied them into an actual
+"if you see X, do Y, in this order" procedure.
+
+Added a new INCIDENT_RESPONSE.md with four steps in order: (1)
+preserve evidence first via a fresh per-investigation export before
+touching anything else; (2) pull and read the audit log for the
+window in question, starting with the aggregate summary endpoint then
+filtering by the real event names (access_denied, auth_rate_limited,
+request_rejected, browser_write_denied); (3) rotate a suspected-leaked
+connector credential via the existing PUT/DELETE credential endpoints;
+(4) honest manual guidance for suspected tampering, since no dedicated
+diff tool exists today -- documented as a real limitation rather than
+invented functionality to paper over it. The "after the incident"
+section on pruning the audit log states the exact literal confirmation
+string apply_security_audit_retention requires ("PRUNE SECURITY
+AUDIT"), verified directly against app/core/audit_log.py rather than
+left as a vague "see the request body."
+
+Left SECURITY.md's existing contributor-facing disclosure content
+untouched and added one short "Operator incident response" section
+pointing to the new file, since the two audiences (external security
+researchers vs. the one trusted operator) are genuinely distinct
+readers with different needs.
+
+Docs-only change; no backend tests affected.
