@@ -2047,3 +2047,23 @@ downstream check doesn't show the expected effect.
 
 STRUCT-0015 stays IN_PROGRESS -- most of app/page.tsx (dossier, relationships, documents, claims,
 leads, backups, security audit) remains untested, as expected for a component this size.
+
+## 2026-09-19: STRUCT-0018 cycle 3 -- lead-queue pagination (post-filter slice, not SQL offset/limit)
+
+Paginated GET /investigations/{id}/leads/queue, the one endpoint from the remainder list flagged
+as needing a genuinely different mechanism: its ordering depends on a computed triage
+attention_score and status/priority/owner filters that only exist after every lead is fetched and
+serialized, so there's no SQL column to slice on. limit/offset are now applied as a Python list
+slice after the existing filter+sort pipeline, documented clearly in lead_queue()'s docstring as
+NOT reducing the fetch-and-serialize cost (only bounding response size) so it isn't mistaken for
+the same fix as the 8 SQL-level endpoints from cycles 1-2. `total` still reports the full filtered
+count so a caller can compute page count even though `items` is sliced.
+
+New test proves the slice happens after filtering (a status filter narrows both `total` and the
+page, not just the page). Full suite green (267 tests, up from 266), mypy unaffected and clean.
+Frontend's existing loadLeads() call passes no limit, so behavior there is unchanged.
+
+Remaining unpaginated (evidence, relationships, graph, timeline) each still need their own design
+pass -- multi-table joins or serialization that doesn't reduce to either pagination pattern used
+so far. Default-page-size product decision still deferred pending frontend paging UI. STRUCT-0018
+stays IN_PROGRESS.

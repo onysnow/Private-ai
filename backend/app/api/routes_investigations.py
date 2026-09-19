@@ -321,12 +321,15 @@ def lead_queue(
     priority: list[str] | None = Query(default=None),
     owner: str | None = None,
     unresolved_only: bool = True,
+    limit: int | None = Query(default=None, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
     db: Session = Depends(get_db),
 ):
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     return _lead_queue(
         db, investigation_id, status=status, priority=priority, owner=owner, unresolved_only=unresolved_only,
+        limit=limit, offset=offset,
     )
 
 

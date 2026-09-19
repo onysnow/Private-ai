@@ -120,7 +120,26 @@ def list_investigation_leads(
 def lead_queue(
     db: Session, investigation_id: str, *,
     status: list[str] | None, priority: list[str] | None, owner: str | None, unresolved_only: bool,
+    limit: int | None = None, offset: int = 0,
 ) -> dict:
+    """Build the triage-sorted lead queue for an investigation.
+
+    STRUCT-0018: unlike the plain /leads list (list_investigation_leads),
+    this endpoint's ordering depends on values (triage.attention_score, the
+    status/priority/owner filters) that only exist after every lead has
+    already been fetched and serialized -- there's no SQL column to ORDER BY
+    or WHERE on for them. So limit/offset are applied here as a plain list
+    slice AFTER the full filter+sort pipeline runs, not as a SQL-level
+    offset/limit the way the simpler list endpoints do it. This still
+    doesn't reduce the underlying fetch-and-serialize cost for a very large
+    investigation (every lead is still loaded and scored to compute the
+    queue order) -- it only bounds the response payload size, which is the
+    part of this finding that's actually reachable without redesigning the
+    triage scoring to be SQL-expressible. `total` reflects the full
+    filtered-but-unsliced count, so a caller can still compute how many
+    pages exist. Both default to "no limit" to preserve existing callers'
+    behavior unchanged.
+    """
     rows = db.scalars(select(Lead).where(Lead.investigation_id == investigation_id).order_by(Lead.created_at.desc())).all()
     items = list_leads_serialized(db, rows)
     requested_status = set(status or [])
@@ -142,7 +161,12 @@ def lead_queue(
         item["created_at"],
     ))
     counts = {key: sum(1 for item in items if item["status"] == key) for key in sorted(LEAD_STATUSES)}
-    return {"investigation_id": investigation_id, "total": len(items), "counts": counts, "items": items}
+    total = len(items)
+    if offset:
+        items = items[offset:]
+    if limit is not None:
+        items = items[:limit]
+    return {"investigation_id": investigation_id, "total": total, "counts": counts, "items": items}
 
 
 def list_investigation_reporting_tasks(
