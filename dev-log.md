@@ -1199,3 +1199,35 @@ create_app() directly yet; that's the actual payoff and belongs with
 STRUCT-0011's fixture work rather than a mechanical sweep here.
 
 Full backend suite: 220 passed, 0 failed. mypy: clean.
+
+## STRUCT-0011 investigated, design documented (not implemented this pass)
+
+Looked into the isolated-DB-fixture work STRUCT-0010's factory was
+meant to unblock. Found the test suite actually has two different
+patterns, not one: some files (test_investigation_authorization.py,
+test_persisted_identity_roles.py) already build their own isolated
+in-memory engine per file -- fine, just duplicated (STRUCT-0039). The
+real problem is ~12+ other files that import app.main.app directly and
+rely on setup_module() wiping the shared global engine's tables.
+
+The nonobvious part: several of those files also call SessionLocal()
+directly (not through the get_db dependency) to seed data outside the
+request cycle -- e.g. test_assistant_context.py inserting a
+ConnectorFinding row directly. A conftest fixture that only overrides
+app.dependency_overrides[get_db] would miss those calls entirely,
+since `from app.db.session import SessionLocal` binds the name at
+import time, immune to a later monkeypatch of the module attribute.
+
+Correct fix: keep the same SessionLocal object identity and
+reconfigure it in place per test (`SessionLocal.configure(bind=fresh_engine)`)
+rather than replacing the name, in an autouse conftest.py fixture that
+builds a fresh StaticPool sqlite:// engine, creates the schema, yields,
+then tears it down. Documented this precisely in STRUCTURE_AUDIT.md so
+whoever picks this up next (me or Ony) has a concrete, correct plan
+rather than starting from scratch -- but did not execute the 12+-file
+migration itself this pass. Migrating every affected file and deleting
+their now-redundant setup_module functions is real, higher-risk
+surgery across the whole suite; better done as its own focused pass
+with room to catch anything subtle, not as one more item in an
+unattended sweep. No code changed; full suite unaffected (220/220,
+unchanged from before).
