@@ -5,8 +5,6 @@ psycopg[binary]==3.3.5
 pydantic-settings==2.15.0
 httpx==0.28.1
 followthemoney==4.11.0
-pytest==9.0.3
-pytest-cov==5.0.0
 
 python-multipart==0.0.32
 python-docx==1.2.0

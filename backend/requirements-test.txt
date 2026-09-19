@@ -1,0 +1,10 @@
+# STRUCT-0026: test tooling (pytest/pytest-cov) split out of requirements.txt
+# so the production Docker image (backend/Dockerfile installs from
+# requirements.txt directly) doesn't ship tooling it never runs. This file is
+# what .github/workflows/backend-postgres-ci.yml installs to actually run the
+# test suite -- it layers on top of requirements.txt rather than duplicating
+# its pins, so there is exactly one place each runtime dependency's version is
+# pinned.
+-r requirements.txt
+pytest==9.0.3
+pytest-cov==5.0.0

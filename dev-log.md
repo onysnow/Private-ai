@@ -1784,3 +1784,21 @@ bump or new-module wiring naturally leads to running this test.
 
 No new CI workflow step was needed -- the existing pytest job already runs
 the full suite (now 258 tests) whenever the submodule fetch step succeeds.
+
+## 2026-09-19: STRUCT-0026 fixed -- test tooling out of the production requirements file
+
+`backend/requirements.txt` -- the same file `backend/Dockerfile` installs from for the runtime
+image -- listed `pytest`/`pytest-cov` directly, so the production container shipped test tooling
+it never runs.
+
+Split into three layered files instead of duplicating pins across separate lists:
+`requirements.txt` (runtime only, what Dockerfile installs), `requirements-test.txt`
+(`-r requirements.txt` + pytest/pytest-cov, now what
+`.github/workflows/backend-postgres-ci.yml` installs to run the suite), and the already-existing
+`requirements-local.txt` (`-r requirements-test.txt` + mypy/ruff/black/pypdf, for
+`Start Journalism Workbench.bat` and `backend-lint-ci.yml`). That also fixes a latent version-drift
+risk: `requirements-local.txt` previously duplicated every runtime pin by hand rather than
+including from `requirements.txt`, so the two could have silently diverged. Updated
+`CONTRIBUTING.md`'s description of the dependency files to match. `backend/Dockerfile` needed no
+change -- it already only ever installed `requirements.txt`, so trimming that file was the whole
+fix.
