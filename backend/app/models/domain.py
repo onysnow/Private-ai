@@ -442,6 +442,27 @@ class DocumentCorpusSync(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, onupdate=utcnow_naive)
 
 
+class OpenAlephOperationFailure(Base):
+    """Server-side trace of a failed OpenAleph pipeline operation (STRUCT-0027).
+
+    Distinct from DocumentCorpusSync.error (which tracks the document-sync
+    operation's own current state) because this covers operations that have
+    no single row to attach an error to -- collection setup can fail before
+    any InvestigationCorpusBinding exists, and review-refresh/evidence-import/
+    entity-import are one-shot actions, not a persistent per-document state
+    machine. Rows here are purely diagnostic: nothing reads them to drive
+    behavior, so recording a failure is always safe to add without changing
+    any existing control flow.
+    """
+    __tablename__ = "openaleph_operation_failures"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=uid)
+    investigation_id: Mapped[str] = mapped_column(ForeignKey("investigations.id"), index=True)
+    document_id: Mapped[str | None] = mapped_column(ForeignKey("documents.id"), nullable=True, index=True)
+    operation: Mapped[str] = mapped_column(String(64), index=True)
+    error: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, index=True)
+
+
 class DocumentChunk(Base):
     __tablename__ = "document_chunks"
     __table_args__ = (UniqueConstraint("document_id", "locator", name="uq_document_chunk_locator"),)

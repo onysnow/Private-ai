@@ -1355,3 +1355,36 @@ touches the real ./data/secrets/connectors.json.
 
 Verified: full 231-test suite green (224 existing + 7 new), 80% coverage
 floor held at 87.36% (app/services/settings.py: 70% -> 85%).
+
+
+## STRUCT-0027 corrected: OpenAleph failures now leave a server-side trace
+
+Added an OpenAlephOperationFailure table (investigation_id, document_id
+nullable, operation, error, created_at -- migration
+48d964619dd5_add_openaleph_operation_failures.py, verified via alembic
+upgrade/downgrade/check) plus record/list/serialize helpers in
+app/services/openaleph_corpus.py. The 4 endpoints that previously caught
+`except Exception` and left no trace beyond the one HTTP response
+(refresh_openaleph_document_review, import_openaleph_document_evidence,
+import_openaleph_document_entities, ensure_openaleph_corpus_binding) now
+roll back the session and record a failure row before re-raising the 502
+-- the same treatment run_connector/enrich_entity already give connector
+failures via ConnectorRun.error. Added GET
+/investigations/{id}/corpus/openaleph/failures so these are actually
+queryable rather than sitting in a table with no way to reach them.
+
+sync_document_to_openaleph was deliberately left untouched -- it already
+records failures onto its own DocumentCorpusSync.error field, which is
+why the original finding's precise_locations correctly excluded it.
+
+Added tests/test_openaleph_operation_failures.py (6 tests): each
+endpoint's failure path is forced by monkeypatching the service call at
+the route module's import site (these are looked-up-by-name module
+globals at call time, not bound default arguments, so patching there is
+what actually reaches the except block), then verifies the recorded
+row's fields and that the new endpoint surfaces it, plus per-investigation
+scoping and a 404 on an unknown investigation.
+
+Verified: full 237-test suite green (231 + 6 new), 80% coverage floor
+held at 87.77%, alembic upgrade/downgrade/check all clean on the new
+migration.

@@ -46,7 +46,13 @@ from app.services.investigations import (
     list_investigations as _list_investigations,
 )
 from app.services.lifecycle import delete_investigation, preview_investigation_deletion
-from app.services.openaleph_corpus import ensure_openaleph_collection, get_binding, serialize_binding
+from app.services.openaleph_corpus import (
+    ensure_openaleph_collection,
+    get_binding,
+    list_openaleph_operation_failures,
+    record_openaleph_operation_failure,
+    serialize_binding,
+)
 from app.services.relationships import (
     RELATIONSHIP_SCHEMAS,
     investigation_graph,
@@ -64,6 +70,19 @@ def get_openaleph_corpus_binding(investigation_id: str, db: Session = Depends(ge
     return {"binding": serialize_binding(get_binding(db, investigation_id))}
 
 
+@router.get("/investigations/{investigation_id}/corpus/openaleph/failures")
+def list_openaleph_corpus_failures(investigation_id: str, db: Session = Depends(get_db)):
+    """Server-side trace of failed OpenAleph pipeline operations (STRUCT-0027).
+
+    Covers collection setup, review refresh, and evidence/entity import --
+    the operations that previously left no record of *why* a 502 happened
+    beyond whatever the caller saw in that one HTTP response.
+    """
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
+    return list_openaleph_operation_failures(db, investigation_id)
+
+
 @router.post("/investigations/{investigation_id}/corpus/openaleph/ensure")
 def ensure_openaleph_corpus_binding(investigation_id: str, db: Session = Depends(get_db)):
     try:
@@ -73,6 +92,11 @@ def ensure_openaleph_corpus_binding(investigation_id: str, db: Session = Depends
     except RuntimeError as exc:
         raise HTTPException(503, str(exc))
     except Exception as exc:
+        db.rollback()
+        record_openaleph_operation_failure(
+            db, investigation_id=investigation_id, document_id=None,
+            operation="ensure_collection", error=f"{exc.__class__.__name__}: {exc}",
+        )
         raise HTTPException(502, f"OpenAleph collection setup failed: {exc.__class__.__name__}: {exc}")
     return {"binding": serialize_binding(binding)}
 

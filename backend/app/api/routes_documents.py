@@ -19,8 +19,8 @@ from app.services.documents import (
 )
 from app.services.openaleph_corpus import (
     get_document_sync, get_openaleph_review_status, import_openaleph_entity_candidates,
-    import_openaleph_evidence_candidates, refresh_openaleph_review_candidates, serialize_sync,
-    sync_document_to_openaleph,
+    import_openaleph_evidence_candidates, record_openaleph_operation_failure,
+    refresh_openaleph_review_candidates, serialize_sync, sync_document_to_openaleph,
 )
 from app.services.security import resolve_storage_root
 
@@ -64,6 +64,13 @@ def refresh_openaleph_document_review(document_id: str, db: Session = Depends(ge
     except RuntimeError as exc:
         raise HTTPException(409, str(exc))
     except Exception as exc:
+        db.rollback()
+        doc = db.get(Document, document_id)
+        if doc is not None:
+            record_openaleph_operation_failure(
+                db, investigation_id=doc.investigation_id, document_id=document_id,
+                operation="refresh_review", error=f"{exc.__class__.__name__}: {exc}",
+            )
         raise HTTPException(502, f"OpenAleph review refresh failed: {exc.__class__.__name__}: {exc}")
 
 
@@ -77,6 +84,13 @@ def import_openaleph_document_evidence(document_id: str, db: Session = Depends(g
     except RuntimeError as exc:
         raise HTTPException(409, str(exc))
     except Exception as exc:
+        db.rollback()
+        doc = db.get(Document, document_id)
+        if doc is not None:
+            record_openaleph_operation_failure(
+                db, investigation_id=doc.investigation_id, document_id=document_id,
+                operation="import_evidence", error=f"{exc.__class__.__name__}: {exc}",
+            )
         raise HTTPException(502, f"OpenAleph extraction import failed: {exc.__class__.__name__}: {exc}")
 
 
@@ -90,6 +104,13 @@ def import_openaleph_document_entities(document_id: str, db: Session = Depends(g
     except RuntimeError as exc:
         raise HTTPException(409, str(exc))
     except Exception as exc:
+        db.rollback()
+        doc = db.get(Document, document_id)
+        if doc is not None:
+            record_openaleph_operation_failure(
+                db, investigation_id=doc.investigation_id, document_id=document_id,
+                operation="import_entities", error=f"{exc.__class__.__name__}: {exc}",
+            )
         raise HTTPException(502, f"OpenAleph entity import failed: {exc.__class__.__name__}: {exc}")
 
 

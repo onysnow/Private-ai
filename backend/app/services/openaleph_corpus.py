@@ -15,6 +15,7 @@ from app.models.domain import (
     DocumentCorpusSync,
     Investigation,
     InvestigationCorpusBinding,
+    OpenAlephOperationFailure,
 )
 
 PROVIDER = "openaleph"
@@ -65,6 +66,45 @@ def serialize_sync(row: DocumentCorpusSync | None) -> dict | None:
         "created_at": row.created_at,
         "updated_at": row.updated_at,
     }
+
+
+def serialize_operation_failure(row: OpenAlephOperationFailure) -> dict:
+    return {
+        "id": row.id,
+        "investigation_id": row.investigation_id,
+        "document_id": row.document_id,
+        "operation": row.operation,
+        "error": row.error,
+        "created_at": row.created_at,
+    }
+
+
+def record_openaleph_operation_failure(
+    db: Session, *, investigation_id: str, document_id: str | None, operation: str, error: str,
+) -> OpenAlephOperationFailure:
+    """Persist a server-side trace of a failed OpenAleph pipeline operation (STRUCT-0027).
+
+    Callers rolls back the session first if the failed operation may have left
+    uncommitted writes pending, so this insert always starts from a clean
+    transaction. Failures here are diagnostic only -- if this write itself
+    fails, callers should not let that mask the original error.
+    """
+    row = OpenAlephOperationFailure(
+        investigation_id=investigation_id, document_id=document_id, operation=operation, error=error,
+    )
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return row
+
+
+def list_openaleph_operation_failures(db: Session, investigation_id: str) -> list[dict]:
+    rows = db.scalars(
+        select(OpenAlephOperationFailure)
+        .where(OpenAlephOperationFailure.investigation_id == investigation_id)
+        .order_by(OpenAlephOperationFailure.created_at.desc())
+    ).all()
+    return [serialize_operation_failure(row) for row in rows]
 
 
 def get_binding(db: Session, investigation_id: str) -> InvestigationCorpusBinding | None:
