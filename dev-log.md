@@ -1969,3 +1969,41 @@ not previously documented. Left it unfiltered with an explanatory comment. STRUC
 IN_PROGRESS: the entities/sources/documents split-query design (described in cycle 1's note) is still
 the real remaining work, plus leads/relationships prefiltering deferred as lower-priority per the
 task's own allowance.
+
+## 2026-09-19: STRUCT-0011 cycle 2 -- StaticPool widened for all SQLite backends; centralized fixture reattempted and reverted again
+
+Landed one independently-valuable piece of cycle 1's narrowed plan: app/db/session.py now forces
+StaticPool (a single persistent connection) for ANY sqlite:// URL, not just the two in-memory
+spellings it used to special-case. The file-based sqlite:///./journalism.db backend (the repo's
+actual default) was previously using a normal multi-connection QueuePool, which is what let a
+per-test exclusive DDL lock collide with a connection an earlier request cycle left open. Verified
+standalone, with nothing else touched: full suite green, 266 tests, exit 0, no hang. This also makes
+local dev's file-based engine behave the way the in-memory test URLs already did, independent of
+whatever happens with test isolation.
+
+Then reattempted cycle 1's actual goal on top of it: re-added the single autouse
+tests/conftest.py fixture (Base.metadata.drop_all/create_all around every test, unchanged design
+from cycle 1) to see whether closing the lock-contention hazard was sufficient by itself. It was
+not -- the full suite hung again, reproducibly, this time partway through
+tests/test_entity_dossier.py (the 53rd collected test via the same --collect-only cumulative-count
+localization technique from cycle 1). That file makes no direct SessionLocal/engine calls of its
+own, only HTTP requests through TestClient, so the hang is coming from how an earlier test's
+session/connection lifecycle interacts with the fixture's own engine.connect() calls for the DDL,
+not from anything in that file.
+
+This rules out "lock contention alone was the whole problem" and points at something
+StaticPool-specific: with only one physical connection in the whole pool, any session anywhere in
+the process that isn't cleanly closed and returned before another connection checkout is attempted
+(the autouse fixture's own drop_all/create_all calls are exactly such a checkout) turns what used to
+be a soft, timeout-prone lock wait into a hard, unconditional block on pool checkout -- there's
+nothing left in the pool to hand out, so SQLite's own file-lock timeout never even gets a chance to
+fire.
+
+Reverted the conftest.py addition cleanly (rm), kept the StaticPool change, and reverified the full
+suite green again afterward (266 tests, exit 0). Updated STRUCTURE_AUDIT.md's STRUCT-0011
+progress_note with the full cycle-2 account and a narrowed recommendation for cycle 3: skip another
+attempt at option (a)-style fixes and go straight to option (b), a SAVEPOINT/nested-transaction
+rollback pattern per test, since it never calls connect() a second time for DDL and so can't collide
+with StaticPool's single-slot pool the way drop_all/create_all does. Before attempting it, audit
+every test file for a session held open across an HTTP call in the same test -- StaticPool has made
+that a sharper hazard than it was before this cycle's change. Status stays OPEN.
