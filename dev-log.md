@@ -1815,3 +1815,33 @@ Changed the Dockerfile to `COPY package.json package-lock.json ./` + `RUN npm ci
 exactly. Verified by running `npm ci` against the current lockfile in a scratch directory outside
 the repo: 509 packages installed cleanly, 0 vulnerabilities -- confirming the lockfile is in sync
 today and this change won't break the next build.
+
+## 2026-09-19: STRUCT-0040 fixed -- frontend (and, it turns out, backend) connector list hardcoding
+
+The frontend hardcoded the connector provider list independently of the backend's CONNECTOR_SPECS
+single source of truth: `api-types.ts` typed `SettingsStatus.connectors` and
+`ConnectorCredentialMutation.provider` as a literal `aleph`/`opensanctions` union, `api-validate.ts`
+only validated those two keys, and `page.tsx`'s settings panel rendered a `<select>` with exactly
+those two hardcoded `<option>` values. Adding the firecrawl connector to the backend registry
+earlier this session made it selectable for search/enrichment (that part already read from
+`GET /api/connectors`'s dynamic provider list), but there was no way to save or view a firecrawl
+credential from the UI.
+
+Investigating turned up a second bug one layer further back: `app/services/settings.py`'s
+`get_settings_status()` *also* still hardcoded `"connectors": {"aleph": ..., "opensanctions": ...}`
+in its response, never actually deriving from `CONNECTOR_PROVIDERS` the way STRUCT-0022 intended.
+So even a fully generic frontend would never have seen firecrawl's credential status -- fixing only
+the frontend would have left the bug half-fixed.
+
+Fixed both. Backend: the connectors dict is now built from `CONNECTOR_PROVIDERS` directly. Added a
+test asserting the response's connector keys equal `CONNECTOR_PROVIDERS` itself (not a hardcoded
+set), so this can't drift out of sync again. Frontend: `SettingsStatus.connectors` and
+`ConnectorCredentialMutation.provider` are now generic (`Record<string,...>` / `string`), their
+validators check the object's actual keys, and the settings-panel credential `<select>` renders from
+the same `providers` array the external-connectors search panel already used -- plus a small
+`providerLabel()` helper replaces the old aleph/opensanctions display-name ternary.
+
+Verified: full backend suite (259 tests, exit 0); frontend typecheck, vitest (32 tests), and
+`next build` all clean, run against a fast local scratch copy of the frontend source after the
+in-place `npm ci` in the mounted repo path proved too slow for this sandbox's tool timeouts (a
+sandbox quirk, not a change in the dependency tree).

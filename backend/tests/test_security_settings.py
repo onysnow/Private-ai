@@ -4,6 +4,7 @@ from app.main import app
 from app.core.config import settings
 from app.services.exports import inspect_export
 from app.services.security import contained_path, redact_database_url
+from app.services.settings import CONNECTOR_PROVIDERS
 
 client = TestClient(app)
 
@@ -18,6 +19,22 @@ def test_settings_status_redacts_secrets(monkeypatch):
     body = r.json()
     assert body['connectors']['aleph']['configured'] is True
     assert body['database'] == 'postgresql://db.example:5432/news'
+
+
+def test_settings_status_connectors_covers_every_registered_provider():
+    """STRUCT-0040: the settings-status connectors dict used to hardcode just
+    aleph/opensanctions, so a registered connector added later (firecrawl)
+    silently never appeared here even though it was already selectable via
+    the credential save/delete endpoints. Derive the expected provider set
+    from CONNECTOR_PROVIDERS itself rather than hardcoding names, so this
+    test can't go stale the same way the code it's checking did."""
+    r = client.get('/api/settings/status')
+    assert r.status_code == 200
+    connectors = r.json()['connectors']
+    assert set(connectors.keys()) == CONNECTOR_PROVIDERS
+    assert 'firecrawl' in connectors
+    for status in connectors.values():
+        assert isinstance(status.get('configured'), bool)
 
 def test_restore_api_disabled_by_default():
     if settings.enable_restore_api:

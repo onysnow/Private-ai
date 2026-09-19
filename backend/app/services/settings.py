@@ -69,9 +69,13 @@ def get_settings_status(db: Session) -> dict:
             "investigation_scope_configured": bool(settings.api_auth_investigation_ids.strip()),
         },
         "cors_allowed_origins": settings.cors_origins,
+        # STRUCT-0040: derive from CONNECTOR_PROVIDERS (itself derived from the
+        # registry, STRUCT-0022) rather than a hardcoded pair, so a new
+        # connector (firecrawl, or any future one) surfaces its credential
+        # status here automatically instead of silently staying invisible.
         "connectors": {
-            "aleph": connector_credential_status("aleph"),
-            "opensanctions": connector_credential_status("opensanctions"),
+            provider: connector_credential_status(provider)
+            for provider in sorted(CONNECTOR_PROVIDERS)
         },
     }
 
