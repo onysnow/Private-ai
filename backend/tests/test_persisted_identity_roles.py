@@ -67,22 +67,7 @@ def test_global_admin_token_is_unrestricted_and_write_capable():
 
 def test_local_owner_can_create_user_and_membership_and_token_is_only_returned_once():
     from fastapi import FastAPI
-    from app.api.routes_investigations import router as investigations_router
-    from app.api.routes_system import router as system_router
-    from app.api.routes_provenance import router as provenance_router
-    from app.api.routes_sources import router as sources_router
-    from app.api.routes_reporting_tasks import router as reporting_tasks_router
-    from app.api.routes_connectors import router as connectors_router
-    from app.api.routes_extraction_candidates import router as extraction_candidates_router
-    from app.api.routes_enrichment_sessions import router as enrichment_sessions_router
-    from app.api.routes_backups import router as backups_router
-    from app.api.routes_relationships import router as relationships_router
-    from app.api.routes_claims import router as claims_router
-    from app.api.routes_leads import router as leads_router
-    from app.api.routes_documents import router as documents_router
-    from app.api.routes_connector_findings import router as connector_findings_router
-    from app.api.routes_settings import router as settings_router
-    from app.api.routes_entities import router as entities_router
+    from app.main import register_domain_routers
 
     factory = _factory()
     with factory() as db:
@@ -97,22 +82,7 @@ def test_local_owner_can_create_user_and_membership_and_token_is_only_returned_o
         finally:
             db.close()
     app.dependency_overrides[get_db] = db_override
-    app.include_router(investigations_router)
-    app.include_router(system_router)
-    app.include_router(provenance_router)
-    app.include_router(sources_router)
-    app.include_router(reporting_tasks_router)
-    app.include_router(connectors_router)
-    app.include_router(extraction_candidates_router)
-    app.include_router(enrichment_sessions_router)
-    app.include_router(backups_router)
-    app.include_router(relationships_router)
-    app.include_router(claims_router)
-    app.include_router(leads_router)
-    app.include_router(documents_router)
-    app.include_router(connector_findings_router)
-    app.include_router(settings_router)
-    app.include_router(entities_router)
+    register_domain_routers(app)
 
     with TestClient(app) as client:
         created = client.post("/api/settings/security/users", json={"display_name": "Reporter One"})
@@ -166,22 +136,7 @@ def test_token_usage_revocation_and_disable_lifecycle():
 
 def test_local_owner_can_disable_rotate_and_revoke_user_token():
     from fastapi import FastAPI
-    from app.api.routes_investigations import router as investigations_router
-    from app.api.routes_system import router as system_router
-    from app.api.routes_provenance import router as provenance_router
-    from app.api.routes_sources import router as sources_router
-    from app.api.routes_reporting_tasks import router as reporting_tasks_router
-    from app.api.routes_connectors import router as connectors_router
-    from app.api.routes_extraction_candidates import router as extraction_candidates_router
-    from app.api.routes_enrichment_sessions import router as enrichment_sessions_router
-    from app.api.routes_backups import router as backups_router
-    from app.api.routes_relationships import router as relationships_router
-    from app.api.routes_claims import router as claims_router
-    from app.api.routes_leads import router as leads_router
-    from app.api.routes_documents import router as documents_router
-    from app.api.routes_connector_findings import router as connector_findings_router
-    from app.api.routes_settings import router as settings_router
-    from app.api.routes_entities import router as entities_router
+    from app.main import register_domain_routers
 
     factory = _factory()
     app = FastAPI()
@@ -192,22 +147,7 @@ def test_local_owner_can_disable_rotate_and_revoke_user_token():
         finally:
             db.close()
     app.dependency_overrides[get_db] = db_override
-    app.include_router(investigations_router)
-    app.include_router(system_router)
-    app.include_router(provenance_router)
-    app.include_router(sources_router)
-    app.include_router(reporting_tasks_router)
-    app.include_router(connectors_router)
-    app.include_router(extraction_candidates_router)
-    app.include_router(enrichment_sessions_router)
-    app.include_router(backups_router)
-    app.include_router(relationships_router)
-    app.include_router(claims_router)
-    app.include_router(leads_router)
-    app.include_router(documents_router)
-    app.include_router(connector_findings_router)
-    app.include_router(settings_router)
-    app.include_router(entities_router)
+    register_domain_routers(app)
 
     with TestClient(app) as client:
         created = client.post("/api/settings/security/users", json={"display_name": "Reporter Lifecycle"})
@@ -257,22 +197,7 @@ def test_local_owner_can_disable_rotate_and_revoke_user_token():
 
 def test_rotating_revoked_token_reactivates_credential_but_not_disabled_user():
     from fastapi import FastAPI
-    from app.api.routes_investigations import router as investigations_router
-    from app.api.routes_system import router as system_router
-    from app.api.routes_provenance import router as provenance_router
-    from app.api.routes_sources import router as sources_router
-    from app.api.routes_reporting_tasks import router as reporting_tasks_router
-    from app.api.routes_connectors import router as connectors_router
-    from app.api.routes_extraction_candidates import router as extraction_candidates_router
-    from app.api.routes_enrichment_sessions import router as enrichment_sessions_router
-    from app.api.routes_backups import router as backups_router
-    from app.api.routes_relationships import router as relationships_router
-    from app.api.routes_claims import router as claims_router
-    from app.api.routes_leads import router as leads_router
-    from app.api.routes_documents import router as documents_router
-    from app.api.routes_connector_findings import router as connector_findings_router
-    from app.api.routes_settings import router as settings_router
-    from app.api.routes_entities import router as entities_router
+    from app.main import register_domain_routers
 
     factory = _factory()
     app = FastAPI()
@@ -283,22 +208,7 @@ def test_rotating_revoked_token_reactivates_credential_but_not_disabled_user():
         finally:
             db.close()
     app.dependency_overrides[get_db] = db_override
-    app.include_router(investigations_router)
-    app.include_router(system_router)
-    app.include_router(provenance_router)
-    app.include_router(sources_router)
-    app.include_router(reporting_tasks_router)
-    app.include_router(connectors_router)
-    app.include_router(extraction_candidates_router)
-    app.include_router(enrichment_sessions_router)
-    app.include_router(backups_router)
-    app.include_router(relationships_router)
-    app.include_router(claims_router)
-    app.include_router(leads_router)
-    app.include_router(documents_router)
-    app.include_router(connector_findings_router)
-    app.include_router(settings_router)
-    app.include_router(entities_router)
+    register_domain_routers(app)
 
     with TestClient(app) as client:
         created = client.post("/api/settings/security/users", json={"display_name": "Reporter Revoked"})

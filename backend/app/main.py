@@ -33,6 +33,35 @@ from app.core.rate_limiter import FixedWindowRateLimiter
 from app.core.audit_log import SecurityAuditLogger, new_request_id, should_audit_request
 
 
+def register_domain_routers(app: FastAPI) -> None:
+    """Wire every domain route module onto `app` (STRUCT-0039).
+
+    This is the single source of truth for "which routers make up this API" --
+    both the real `create_app()` below and every test file that needs a
+    FastAPI app wired the same way as production import and call this,
+    instead of each hand-copying the same 16-line include_router block (which
+    happened 5 times across 3 test files before this fix, with nothing
+    keeping the copies in sync as routers were added/removed during the
+    routes.py Stage E split).
+    """
+    app.include_router(investigations_router)
+    app.include_router(system_router)
+    app.include_router(provenance_router)
+    app.include_router(sources_router)
+    app.include_router(reporting_tasks_router)
+    app.include_router(connectors_router)
+    app.include_router(extraction_candidates_router)
+    app.include_router(enrichment_sessions_router)
+    app.include_router(backups_router)
+    app.include_router(relationships_router)
+    app.include_router(claims_router)
+    app.include_router(leads_router)
+    app.include_router(documents_router)
+    app.include_router(connector_findings_router)
+    app.include_router(settings_router)
+    app.include_router(entities_router)
+
+
 def create_app(app_settings=None) -> FastAPI:
     """Build a FastAPI app instance (STRUCT-0010).
 
@@ -67,22 +96,7 @@ def create_app(app_settings=None) -> FastAPI:
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allow_headers=["Authorization", "Content-Type"],
     )
-    app.include_router(investigations_router)
-    app.include_router(system_router)
-    app.include_router(provenance_router)
-    app.include_router(sources_router)
-    app.include_router(reporting_tasks_router)
-    app.include_router(connectors_router)
-    app.include_router(extraction_candidates_router)
-    app.include_router(enrichment_sessions_router)
-    app.include_router(backups_router)
-    app.include_router(relationships_router)
-    app.include_router(claims_router)
-    app.include_router(leads_router)
-    app.include_router(documents_router)
-    app.include_router(connector_findings_router)
-    app.include_router(settings_router)
-    app.include_router(entities_router)
+    register_domain_routers(app)
 
     request_limits = RequestLimitPolicy(
         default_bytes=app_settings.max_api_request_bytes,

@@ -7,22 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.api.routes_investigations import router as investigations_router
-from app.api.routes_system import router as system_router
-from app.api.routes_provenance import router as provenance_router
-from app.api.routes_sources import router as sources_router
-from app.api.routes_reporting_tasks import router as reporting_tasks_router
-from app.api.routes_connectors import router as connectors_router
-from app.api.routes_extraction_candidates import router as extraction_candidates_router
-from app.api.routes_enrichment_sessions import router as enrichment_sessions_router
-from app.api.routes_backups import router as backups_router
-from app.api.routes_relationships import router as relationships_router
-from app.api.routes_claims import router as claims_router
-from app.api.routes_leads import router as leads_router
-from app.api.routes_documents import router as documents_router
-from app.api.routes_connector_findings import router as connector_findings_router
-from app.api.routes_settings import router as settings_router
-from app.api.routes_entities import router as entities_router
+from app.main import register_domain_routers
 from app.core.authorization import (
     AuthorizationScope,
     InvestigationAuthorizationError,
@@ -91,22 +76,7 @@ def _scoped_app(factory) -> FastAPI:
         finally:
             reset_current_authorization_scope(token)
 
-    app.include_router(investigations_router)
-    app.include_router(system_router)
-    app.include_router(provenance_router)
-    app.include_router(sources_router)
-    app.include_router(reporting_tasks_router)
-    app.include_router(connectors_router)
-    app.include_router(extraction_candidates_router)
-    app.include_router(enrichment_sessions_router)
-    app.include_router(backups_router)
-    app.include_router(relationships_router)
-    app.include_router(claims_router)
-    app.include_router(leads_router)
-    app.include_router(documents_router)
-    app.include_router(connector_findings_router)
-    app.include_router(settings_router)
-    app.include_router(entities_router)
+    register_domain_routers(app)
     return app
 
 

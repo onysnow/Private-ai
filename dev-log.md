@@ -1574,3 +1574,28 @@ verify the setting is actually on.
 
 Docs-only change; dependabot.yml re-validated with yaml.safe_load(); no
 backend tests affected.
+
+
+## STRUCT-0039 corrected: one register_domain_routers() helper instead of 5 hand-copied blocks
+
+The identical 16-line app.include_router(...) block was hand-duplicated
+across what turned out to be 5 places (not 4 -- the finding's
+precise_locations missed a 3rd occurrence in
+test_persisted_identity_roles.py), each a verbatim copy with no shared
+fixture. This is exactly the pattern this session had to work around by
+hand during the Stage E routes.py split, and nothing kept the copies in
+sync.
+
+Rather than adding a 6th hardcoded list in a new tests/conftest.py (the
+finding's literal suggestion), extracted register_domain_routers(app) into
+backend/app/main.py itself, right beside create_app(), and had create_app()
+call it too. This makes main.py -- the real production wiring -- the
+single source of truth: a test app now can never silently drift from what
+production actually registers, which a separate test-only conftest.py copy
+could still do. All 5 duplicated copies (2 module-level in
+test_destructive_action_authorization.py / test_investigation_authorization.py,
+3 inline/function-local in test_persisted_identity_roles.py) were replaced
+with a one-line import + one-line call.
+
+Verified via the full backend suite (238 tests per --collect-only, all
+passing unchanged, exit 0) run against the synced workbench venv.
