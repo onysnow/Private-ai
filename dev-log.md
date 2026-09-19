@@ -1542,3 +1542,35 @@ unfiltered) from "which entities/sources themselves match" (prefiltered,
 for entity/source-type hits only) -- a more invasive change that deserves
 its own careful pass rather than being rushed here. Left STRUCT-0036 as
 IN_PROGRESS with the remainder captured for a dedicated follow-up.
+
+
+## STRUCT-0038 corrected: documented Dependabot's ignore-vs-security-update behavior
+
+.github/dependabot.yml ignores all semver-major version updates for both
+npm and pip ecosystems, and the finding worried this meant a CVE that only
+ships in a new major version (like the one README's status table names
+under issue #20) would never surface automatically.
+
+Checked GitHub's current documentation before writing anything down, and
+that premise needed a correction: `update-types`-scoped ignore rules (which
+is the exact shape this file already uses) only affect the routine
+version-update path. GitHub's own docs state it plainly -- "update-types
+only affects version updates, not security updates. Security updates will
+always be created regardless of the update-types setting." So this
+repo was never silently skipping CVE-driven major bumps via this
+mechanism, as long as Dependabot *security* updates (a separate repo
+setting under Settings > Advanced Security, not controlled by
+dependabot.yml at all) is turned on.
+
+That caveat -- "as long as" -- is the actual gap: nothing in the repo
+states the assumption or asks anyone to confirm it, and this sandbox can't
+check the live GitHub repo setting (same access limitation already noted
+for STRUCT-0032's issue #20 row: no gh CLI, no GitHub API access for this
+repo from here). Added a file-level comment to dependabot.yml plus a short
+note on each ignore block explaining precisely what it does and doesn't
+suppress, and updated SECURITY.md's "Dependency vulnerabilities" scope
+line to say the same and ask whoever administers the GitHub repo to
+verify the setting is actually on.
+
+Docs-only change; dependabot.yml re-validated with yaml.safe_load(); no
+backend tests affected.

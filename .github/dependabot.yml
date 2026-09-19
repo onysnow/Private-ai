@@ -1,3 +1,16 @@
+# NOTE on the `ignore` blocks below (STRUCT-0038): each one scopes itself to
+# `update-types: ["version-update:semver-major"]`, which -- per GitHub's own
+# documented behavior -- only suppresses *routine* major-version bumps on the
+# regular version-update path. It does NOT suppress Dependabot *security*
+# updates: those are a separate mechanism (triggered by GitHub's advisory
+# database, not this schedule/ignore config) and are proposed regardless of
+# any update-types-scoped ignore rule, even for a major-version-only fix.
+#
+# That safety net depends on a setting this file does not control: repo
+# Settings -> Advanced Security -> "Dependabot security updates" must be
+# turned on. Verify it's enabled (or ask whoever administers the GitHub repo
+# to confirm) rather than assuming this file alone guarantees a CVE that
+# only ships in a new major version will get proposed automatically.
 version: 2
 updates:
   - package-ecosystem: "npm"
@@ -13,6 +26,8 @@ updates:
           - "minor"
           - "patch"
     ignore:
+      # Deliberate: keep unreviewed breaking major bumps off dev. Does not
+      # suppress Dependabot security updates -- see the file-level note above.
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
 
@@ -29,6 +44,8 @@ updates:
           - "minor"
           - "patch"
     ignore:
+      # Deliberate: keep unreviewed breaking major bumps off dev. Does not
+      # suppress Dependabot security updates -- see the file-level note above.
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
 

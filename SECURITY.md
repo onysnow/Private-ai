@@ -13,7 +13,11 @@ this repository, or contact the maintainer directly.
 
 - Backend (FastAPI) authorization/authentication boundaries
 - Data handling for uploaded documents/evidence
-- Dependency vulnerabilities (also tracked via Dependabot)
+- Dependency vulnerabilities -- routine updates are tracked via Dependabot version
+  updates (`.github/dependabot.yml`, monthly, minor/patch only); a CVE that only
+  ships in a new major version relies on the separate Dependabot *security*
+  updates repo setting (Settings -> Advanced Security), not on that file, so
+  confirm it's enabled rather than assuming dependabot.yml alone covers it
 
 Please do not include real investigation data, source-identifying
 information, or credentials in any report.
