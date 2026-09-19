@@ -152,8 +152,13 @@ def investigation_timeline(
                 continue
             evidence = db.get(Evidence, interval.get("evidence_id")) if interval.get("evidence_id") else None
             source = db.get(Source, evidence.source_id) if evidence else None
-            date_start = start[0] if start else end[0]
-            precision = interval.get("precision") or (start or end)[1]
+            # The `if not start and not end: continue` above guarantees at least one of
+            # them is set, but mypy can't see that across the two independent locals --
+            # resolve to a single non-None tuple once and assert it for the narrowing.
+            resolved = start or end
+            assert resolved is not None
+            date_start = resolved[0]
+            precision = interval.get("precision") or resolved[1]
             events.append({
                 "id": f"property-review:{review.id}:{index}", "kind": "property_temporal_interval",
                 "investigation_id": investigation_id,

@@ -1877,3 +1877,31 @@ design to two concrete options: force `StaticPool` for any SQLite backend during
 the two in-memory URL spellings), or switch to a SAVEPOINT/nested-transaction-per-test rollback
 pattern instead of schema-DDL churn. Either way, the naive "reset the literal configured engine
 before every test" recipe should not be retried without first resolving this locking hazard.
+
+## 2026-09-19: STRUCT-0013 cycle 2 -- widened mypy to 8 app/services files, caught and fixed a self-introduced regression
+
+Scoped this cycle to the smallest safely-completable app/services slice, per the lesson from the
+STRUCT-0011 revert earlier this session about not rushing large risky changes. Re-measured the
+actual error count first (316 errors in 20 files, up from the finding's documented 289) and picked
+the 6 files with only 1-2 errors each. Discovered mypy's `follow_imports=normal` default still
+analyzes and reports errors from unlisted files transitively imported by a listed one -- widening
+the real slice to 8 files (adding relationships.py and post_merge_reconciliation.py) once that was
+accounted for. All 34 errors in the 8-file slice were confirmed safe mechanical fixes (Sequence-vs-
+list wraps, missing annotations, a shared-base-class attribute gap, a SQLAlchemy stub gap, an
+Optional-tuple indexing gap, and three cases of a variable name reused across two non-overlapping
+loops/branches in one function) -- none were genuine bugs.
+
+One rename (relationships.py's `state` -> `row_state` inside `_apply_reconciliation_view`) missed a
+second, non-contiguous use of the same bare name later in the same loop iteration. The full pytest
+run caught it immediately: 15 tests failed with `UnboundLocalError: cannot access local variable
+'state'`. Fixed with a second, narrower patch renaming that remaining use, then reverified both
+`python -m mypy` (still 0 errors, matching CI's exact invocation) and the full suite (259 passed,
+exit 0, unchanged count) before calling the fix done. Widened `pyproject.toml`'s mypy `files` list
+to cover all 8 files. Left `disallow_untyped_defs` at its relaxed default for these 8 (6 more errors
+surface under the strict flag, mostly untyped route-payload `body` params) rather than rushing those
+annotations too.
+
+Remaining app/services scope re-measured at 282 errors across 12 files, dominated by search.py
+(106, overlapping STRUCT-0036's own scope), documents.py (41), leads.py (38), provenance.py (35).
+app/ai (134 errors) and app/api remain untouched. STRUCT-0013 stays `IN_PROGRESS` with a detailed
+progress_note recording the exact remaining per-file counts for the next cycle.

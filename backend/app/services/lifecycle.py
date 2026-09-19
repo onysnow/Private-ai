@@ -173,7 +173,10 @@ def delete_investigation(db: Session, investigation_id: str, storage_root: str |
             if len(pk_cols) != 1:
                 continue
             result = db.execute(table.delete().where(pk_cols[0].in_(ids)))
-            deleted_counts[table.name] = int(result.rowcount or 0)
+            # db.execute() on a Delete statement returns a CursorResult at runtime, which
+            # does have .rowcount, but the stub's declared return type (Result[Any]) doesn't
+            # expose it -- a known SQLAlchemy stub gap, not a real type mismatch.
+            deleted_counts[table.name] = int(result.rowcount or 0)  # type: ignore[attr-defined]
         db.commit()
     except Exception:
         db.rollback()

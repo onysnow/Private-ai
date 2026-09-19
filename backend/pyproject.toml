@@ -23,7 +23,16 @@ known-first-party = ["app"]
 
 [tool.mypy]
 python_version = "3.12"
-files = ["app/connectors", "app/core/access.py", "app/core/config.py", "app/core/time.py", "app/models", "app/schemas"]
+files = [
+    "app/connectors", "app/core/access.py", "app/core/config.py", "app/core/time.py",
+    "app/models", "app/schemas",
+    # STRUCT-0013 widening, cycle 2: the smallest safely-completable app/services slice
+    # (6 files with 1-2 mypy errors each, plus their 2 transitively-imported dependencies
+    # that mypy analyzes regardless of whether they are listed here).
+    "app/services/sources.py", "app/services/lifecycle.py", "app/services/entity_merge.py",
+    "app/services/connector_findings.py", "app/services/claims.py", "app/services/timeline.py",
+    "app/services/relationships.py", "app/services/post_merge_reconciliation.py",
+]
 warn_return_any = true
 warn_unused_configs = true
 warn_redundant_casts = true
@@ -37,10 +46,18 @@ pretty = true
 show_error_codes = true
 
 # Deferred until the remaining backend packages are ready for broader type-checking
-# (STRUCT-0013): app/services (289 errors across 20 files, ~105 of them in
-# app/services/search.py alone -- see STRUCT-0036) and app/ai (134 errors,
-# mostly the same search.py errors surfacing transitively plus a couple of
-# genuine issues in reasoning.py) are the next widening targets, app/api last.
+# (STRUCT-0013, cycle 2 update): 8 app/services files brought under coverage above.
+# The rest of app/services now stands at ~282 errors across 12 files (re-measured
+# this cycle; was 289/20 files before this widening) -- dominated by search.py alone
+# (106 errors), then documents.py (41), leads.py (38), provenance.py (35), dossier.py
+# (17), investigations.py/exports.py/entities.py/consolidation.py (8 each),
+# resolution.py/external_relationships.py (5 each), openaleph_corpus.py (3). app/ai
+# (134 errors, not yet investigated) and app/api remain untouched widening targets.
+# The 8 files just added are NOT yet clean under disallow_untyped_defs=true (6 errors:
+# missing return-type/arg annotations, mostly on route-payload `body` params whose
+# concrete Pydantic schema type needs to be threaded through) -- left under the relaxed
+# default rather than rushing those annotations in this cycle; a future cycle can flip
+# them to the strict override alongside app.models.*/app.schemas.* once annotated.
 disallow_untyped_defs = false
 
 [[tool.mypy.overrides]]

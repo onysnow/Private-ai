@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
@@ -56,7 +58,8 @@ def relationship_schema_info(schema: str) -> dict:
 
 def relationship_caption(schema: str, source: Entity, target: Entity, properties: dict[str, list[str]]) -> str:
     info = relationship_schema_info(schema)
-    role = (properties.get("role") or [None])[0]
+    role_values = properties.get("role") or []
+    role = role_values[0] if role_values else None
     middle = role or info["label"]
     return f"{source.caption} — {middle} → {target.caption}"
 
@@ -193,7 +196,7 @@ def serialize_relationship(db: Session, edge: RelationshipEdge) -> dict:
                 "original_value": stmt.original_value, "first_seen": stmt.first_seen, "last_seen": stmt.last_seen,
             })
     attachments = relationship_evidence_attachments(db, edge)
-    attached_evidence = []
+    attached_evidence: list[dict[str, Any]] = []
     for attachment in attachments:
         ev = db.get(Evidence, attachment.evidence_id)
         src = db.get(Source, ev.source_id) if ev else None
@@ -325,10 +328,10 @@ def _apply_reconciliation_view(
     visible: list[dict] = []
     suppressed_count = 0
     for row in rows:
-        state = states.get(row["id"])
+        row_state = states.get(row["id"])
         reconciliation = None
-        if state:
-            reconciliation = {**state}
+        if row_state:
+            reconciliation = {**row_state}
             reconciliation["suppressed_duplicate_ids"] = sorted(suppressed_by_preferred.get(row["id"], []))
             reconciliation["suppressed_duplicate_count"] = len(reconciliation["suppressed_duplicate_ids"])
             row["reconciliation"] = reconciliation
@@ -378,7 +381,7 @@ def _apply_reconciliation_view(
                     "claim_dependencies": deps,
                     "presentation_aggregate": True,
                 }
-        if state and state.get("suppressed_duplicate") and not include_reconciled_duplicates:
+        if row_state and row_state.get("suppressed_duplicate") and not include_reconciled_duplicates:
             suppressed_count += 1
             continue
         visible.append(row)

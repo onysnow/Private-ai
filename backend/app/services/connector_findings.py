@@ -40,9 +40,10 @@ def create_resolution_decision(db: Session, finding: ConnectorFinding, body) -> 
 
 
 def list_statement_assessments(db: Session, finding_id: str) -> list[StatementAssessment]:
-    return db.scalars(
+    # db.scalars(...).all() is typed Sequence[StatementAssessment]; wrap for the declared list return type.
+    return list(db.scalars(
         select(StatementAssessment).where(StatementAssessment.finding_id == finding_id).order_by(StatementAssessment.created_at.desc())
-    ).all()
+    ).all())
 
 
 def create_statement_assessment(db: Session, finding: ConnectorFinding, body) -> StatementAssessment:

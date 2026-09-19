@@ -58,7 +58,10 @@ def preview_entity_merge(db: Session, source: Entity, target: Entity) -> dict:
     for name, model, field_name in REFERENCE_SPECS:
         field = getattr(model, field_name)
         rows = list(db.scalars(select(model).where(field == source.id)).all())
-        ids = sorted(row.id for row in rows)
+        # REFERENCE_SPECS mixes several unrelated model classes in one tuple, so mypy
+        # widens `model` (and thus `rows`) to the shared declarative Base, which has no
+        # `id` attribute of its own -- every concrete model here does declare one.
+        ids = sorted(row.id for row in rows)  # type: ignore[attr-defined]
         refs[name] = {"count": len(ids), "record_ids": ids[:100]}
         digest_rows.append((name, ids))
 

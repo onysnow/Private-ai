@@ -32,7 +32,8 @@ def claim_review_workspace(db: Session, claim: Claim) -> dict:
         attachments = list(db.scalars(select(RelationshipEvidenceAttachment).where(RelationshipEvidenceAttachment.evidence_id.in_(evidence_ids))).all())
         edge_ids = {a.relationship_edge_id for a in attachments}
         edges = list(db.scalars(select(RelationshipEdge).where(RelationshipEdge.id.in_(edge_ids))).all()) if edge_ids else []
-        attached_by_edge = {}
+        # Explicit annotation: edge id -> list of attached evidence ids.
+        attached_by_edge: dict[str, list[str]] = {}
         for attachment in attachments:
             attached_by_edge.setdefault(attachment.relationship_edge_id, []).append(attachment.evidence_id)
         for edge in edges:
