@@ -1414,3 +1414,24 @@ error; watching that run after push is this fix's real verification step.
 
 Verified: full 238-test suite green (237 + 1 new), 80% coverage floor
 held at 87.79%.
+
+
+## STRUCT-0032 corrected: README status table updated to reflect merged work
+
+Confirmed via `git merge-base --is-ancestor` that the three PRs the
+"Current status" table listed as "In progress" (Postgres CI #5, Docker
+build/boot #6, frontend production build/typecheck #4) are all ancestors
+of the current HEAD, and that the CI workflows they added
+(backend-postgres-ci.yml, docker-build.yml) still exist and run. Updated
+all three rows to "Validated -- running in CI", matching the table's
+first row, and updated the closing sentence accordingly.
+
+Left the "Dependency security posture" (issue #20) row unchanged --
+this sandbox has no way to check GitHub's live issue state (no gh CLI,
+no GitHub API access for this repo), and the finding itself only asked
+to update that row if the issue is confirmed still open. Current
+dependency versions (next 15.5.25, python-multipart 0.0.32, pypdf
+6.16.1) suggest the named CVEs may already be patched, but that's a
+different question from whether the tracking issue is closed.
+
+Docs-only change; no backend tests affected.

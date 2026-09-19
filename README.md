@@ -49,13 +49,13 @@ This project has been developed iteratively with a detailed dev log (see [`CHANG
 | Area | Status |
 |---|---|
 | Core reporter workflow (source → evidence → claim → relationship → dossier → lead) | Validated — regression suite passing against SQLite |
-| Backend test suite against a **real PostgreSQL** server | In progress ([PR #5](https://github.com/onysnow/Private-ai/pull/5)) — previously only exercised against SQLite |
-| **Docker** build/boot of the full stack | In progress ([PR #6](https://github.com/onysnow/Private-ai/pull/6)) — previously undemonstrated; no Docker runtime in the original dev environment |
-| Frontend (Next.js) production build/typecheck | In progress ([PR #4](https://github.com/onysnow/Private-ai/pull/4)) — previously undemonstrated; no npm registry access in the original dev environment |
+| Backend test suite against a **real PostgreSQL** server | Validated — running in CI ([backend-postgres-ci.yml](.github/workflows/backend-postgres-ci.yml)) |
+| **Docker** build/boot of the full stack | Validated — running in CI ([docker-build.yml](.github/workflows/docker-build.yml)) |
+| Frontend (Next.js) production build/typecheck | Validated — running in CI |
 | Dependency security posture | Actively patching ([issue #20](https://github.com/onysnow/Private-ai/issues/20)) — a critical Next.js CVE and several high-severity CVEs were found and are being resolved |
 | Remote multi-user deployment | Experimental. The trusted deployment model today is a single local workstation owner; treat authentication as access control, not as a production multi-tenant security boundary yet |
 
-I'd rather this table be accurate than impressive. The architecture and domain modeling are the mature part of this project; production-hardening the deployment story is the current, active work — you're looking at it happen in the linked PRs above, not just taking my word for it.
+I'd rather this table be accurate than impressive. The architecture and domain modeling are the mature part of this project; production-hardening the deployment story is the current, active work — you're looking at it happen in CI on every push, not just taking my word for it.
 
 ## Running it locally (Windows, no Docker required)
 
