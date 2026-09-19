@@ -1658,3 +1658,29 @@ and stays available to expose via an API later.
 
 Verified via the full backend suite (238 tests, all passing unchanged,
 exit 0); confirmed no test asserted on the removed raw-exception text.
+
+
+## STRUCT-0031 / STRUCT-0035 reviewed: watch items still correctly deferred
+
+Both findings' own required_correction says no action is needed yet
+(STRUCT-0031: while this stays local-first single-user; STRUCT-0035: while
+remote/shared access remains experimental) -- these are the two OPTIONAL
+"Watch" backlog items, not fixes to rush.
+
+Reviewed both against current state rather than skipping them silently.
+STRUCT-0031: re-checked docker-compose.yml directly -- the ./backend:/app
+bind mount, 127.0.0.1-only ports, and the docker-compose-local-dev-token
+default are all still exactly as described; no production compose file
+exists. STRUCT-0035: re-checked against this session's new STRUCT-0023 ADR
+(docs/adr/0002-authorization-two-tier-end-state.md) -- persisted per-user
+tokens are a complete, independent path today, but there's still no stated
+move toward actual multi-person shared/remote deployment as the norm, so
+the audit-log/rate-limiter passivity remains an accepted trade-off, not an
+active gap.
+
+Left both OPEN (not CORRECTED -- nothing was actually changed) with a
+progress_note recording this review, so future-me/Ony can see these were
+consciously re-examined rather than forgotten, and re-check the trigger
+condition on each next.
+
+Docs-only change; no backend tests affected.
