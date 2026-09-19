@@ -1175,3 +1175,27 @@ that file is a single, extremely dense 139-line component (thousands
 of packed characters per line) that would benefit from at least
 partial decomposition before it's practically testable. Status moved
 OPEN -> IN_PROGRESS.
+
+## STRUCT-0010 progress: app-factory function added
+
+app/main.py conflated FastAPI app construction with import-time side
+effects and module-level singletons (_request_limits, _audit,
+_auth_failures all built directly from `settings` at import), so
+nothing importing app.main.app could substitute test doubles.
+
+Wrapped the construction (exception handler, CORS/middleware, all 16
+router mounts, static-file route) in `create_app(app_settings=None)`,
+defaulting to the real settings singleton so `app = create_app()` is
+behaviorally identical to what was there before -- verified via a
+full, unmodified 220-test run (zero test changes needed).
+
+Deliberately did NOT touch app/db/session.py's `engine`/`SessionLocal`
+singletons, which are built from settings.database_url at their own
+module's import time, independent of main.py. Making those injectable
+too is a bigger, separate piece of work -- exactly what STRUCT-0011's
+planned conftest.py fixture needs, and that finding already says it
+depends on this factory existing first. No test file migrated to call
+create_app() directly yet; that's the actual payoff and belongs with
+STRUCT-0011's fixture work rather than a mechanical sweep here.
+
+Full backend suite: 220 passed, 0 failed. mypy: clean.
