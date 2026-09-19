@@ -1929,3 +1929,20 @@ slow for the tool timeout): full vitest suite green (35 tests, up from 32), `tsc
 `eslint` clean on the new file. Frontend test count: 3 files/32 tests -> 4 files/35 tests. STRUCT-0015
 stays IN_PROGRESS -- the component's other dozens of interactions (search, dossier, relationships,
 documents, claims, leads, backups, security audit) are still untested.
+
+## 2026-09-19: STRUCT-0018 cycle 2 -- pagination extended to sources/claims/leads/reporting-tasks/connector-runs
+
+Extended the SQL-level limit/offset pattern from cycle 1 (documents, entities, connector-findings) to
+the five endpoints cycle 1's note flagged as next-most-likely to grow large: GET
+/investigations/{id}/sources, /claims, /leads, /reporting-tasks, /connector-runs. Same shape as
+before: `limit: int | None = None, offset: int = 0` on each service function, `Query(ge=1, le=500)` /
+`Query(ge=0)` on the route handlers, both defaulting to unpaginated/unbounded so no existing caller
+changes behavior. For leads and reporting-tasks specifically, pagination applies to the underlying
+Lead/ReportingTask select before the rows reach list_leads_serialized/serialize_tasks_batch, so
+per-row serialization is untouched and the same order is preserved.
+
+tests/test_investigation_list_pagination.py grew from 4 to 10 tests. Full suite re-verified green
+(265 tests, up from 259) and `python -m mypy` stays clean. 8 of 18 investigation-scoped list
+endpoints now paginated. Still deferred: the default-page-size product decision (needs frontend
+paging controls first), and leads/queue, evidence, relationships, graph, timeline -- each needs its
+own design pass since none reduces to a plain SQL offset/limit as directly as the 8 done so far.

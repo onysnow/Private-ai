@@ -1,15 +1,20 @@
 """Covers STRUCT-0018: limit/offset on investigation-scoped list endpoints.
 
-Exercises the three endpoints prioritized in the finding (documents,
-entities, connector-findings): unpaginated behavior must stay identical
-(everything, in existing order) and limit/offset must slice that same
-order at the SQL level.
+Exercises the endpoints prioritized in the finding: documents, entities,
+connector-findings (cycle 1), then sources, claims, leads, reporting-tasks,
+connector-runs (cycle 2, the "most likely to grow large" group named in the
+remainder task). Unpaginated behavior must stay identical (everything, in
+existing order) and limit/offset must slice that same order at the SQL
+level. Still not paginated (tracked separately -- their list functions do
+post-fetch filtering/sorting or multi-table assembly that doesn't reduce to
+a plain SQL offset/limit as directly): leads/queue, evidence, relationships,
+graph, timeline.
 """
 from fastapi.testclient import TestClient
 
 from app.db.session import Base, SessionLocal, engine
 from app.main import app
-from app.models.domain import ConnectorFinding
+from app.models.domain import ConnectorFinding, ConnectorRun
 
 
 def setup_module():
@@ -101,3 +106,116 @@ def test_limit_out_of_range_is_rejected():
     assert client.get(f'/api/investigations/{inv}/documents', params={'limit': 0}).status_code == 422
     assert client.get(f'/api/investigations/{inv}/documents', params={'limit': 501}).status_code == 422
     assert client.get(f'/api/investigations/{inv}/documents', params={'offset': -1}).status_code == 422
+
+
+def test_sources_list_limit_offset():
+    client = TestClient(app)
+    inv = _new_investigation(client, 'Source pagination')
+    created = []
+    for i in range(5):
+        r = client.post('/api/sources', json={'investigation_id': inv, 'title': f'Source {i}', 'url': f'https://example.com/{i}'})
+        assert r.status_code == 200, r.text
+        created.append(r.json()['id'])
+
+    full = client.get(f'/api/investigations/{inv}/sources').json()
+    assert len(full) == 5
+    full_ids = [item['id'] for item in full]
+
+    page1 = client.get(f'/api/investigations/{inv}/sources', params={'limit': 2}).json()
+    assert [item['id'] for item in page1] == full_ids[:2]
+
+    page2 = client.get(f'/api/investigations/{inv}/sources', params={'limit': 2, 'offset': 2}).json()
+    assert [item['id'] for item in page2] == full_ids[2:4]
+
+    remainder = client.get(f'/api/investigations/{inv}/sources', params={'offset': 4}).json()
+    assert [item['id'] for item in remainder] == full_ids[4:]
+
+
+def test_claims_list_limit_offset():
+    client = TestClient(app)
+    inv = _new_investigation(client, 'Claim pagination')
+    created = []
+    for i in range(4):
+        r = client.post('/api/claims', json={'investigation_id': inv, 'text': f'Claim {i}'})
+        assert r.status_code == 200, r.text
+        created.append(r.json()['id'])
+
+    full = client.get(f'/api/investigations/{inv}/claims').json()
+    assert len(full) == 4
+    full_ids = [item['id'] for item in full]
+
+    page1 = client.get(f'/api/investigations/{inv}/claims', params={'limit': 2}).json()
+    assert [item['id'] for item in page1] == full_ids[:2]
+
+    page2 = client.get(f'/api/investigations/{inv}/claims', params={'limit': 2, 'offset': 2}).json()
+    assert [item['id'] for item in page2] == full_ids[2:4]
+
+
+def test_leads_list_limit_offset():
+    client = TestClient(app)
+    inv = _new_investigation(client, 'Lead pagination')
+    created = []
+    for i in range(4):
+        r = client.post('/api/leads', json={'investigation_id': inv, 'title': f'Lead {i}'})
+        assert r.status_code == 200, r.text
+        created.append(r.json()['id'])
+
+    full = client.get(f'/api/investigations/{inv}/leads').json()
+    assert len(full) == 4
+    full_ids = [item['id'] for item in full]
+
+    page1 = client.get(f'/api/investigations/{inv}/leads', params={'limit': 2}).json()
+    assert [item['id'] for item in page1] == full_ids[:2]
+
+    page2 = client.get(f'/api/investigations/{inv}/leads', params={'limit': 2, 'offset': 2}).json()
+    assert [item['id'] for item in page2] == full_ids[2:4]
+
+
+def test_reporting_tasks_list_limit_offset():
+    client = TestClient(app)
+    inv = _new_investigation(client, 'Reporting task pagination')
+    created = []
+    for i in range(4):
+        r = client.post('/api/reporting-tasks', json={'investigation_id': inv, 'title': f'Task {i}'})
+        assert r.status_code == 200, r.text
+        created.append(r.json()['id'])
+
+    full = client.get(f'/api/investigations/{inv}/reporting-tasks').json()
+    assert len(full) == 4
+    full_ids = [item['id'] for item in full]
+
+    page1 = client.get(f'/api/investigations/{inv}/reporting-tasks', params={'limit': 2}).json()
+    assert [item['id'] for item in page1] == full_ids[:2]
+
+    page2 = client.get(f'/api/investigations/{inv}/reporting-tasks', params={'limit': 2, 'offset': 2}).json()
+    assert [item['id'] for item in page2] == full_ids[2:4]
+
+
+def test_connector_runs_list_limit_offset():
+    client = TestClient(app)
+    inv = _new_investigation(client, 'Connector run pagination')
+    with SessionLocal() as db:
+        for i in range(4):
+            db.add(ConnectorRun(
+                investigation_id=inv, provider='aleph', query=f'query-{i}', status='completed', result_count=i,
+            ))
+        db.commit()
+
+    full = client.get(f'/api/investigations/{inv}/connector-runs').json()
+    assert len(full) == 4
+    full_ids = [item['id'] for item in full]
+
+    page1 = client.get(f'/api/investigations/{inv}/connector-runs', params={'limit': 2}).json()
+    assert [item['id'] for item in page1] == full_ids[:2]
+
+    page2 = client.get(f'/api/investigations/{inv}/connector-runs', params={'limit': 2, 'offset': 2}).json()
+    assert [item['id'] for item in page2] == full_ids[2:4]
+
+
+def test_second_batch_out_of_range_params_rejected():
+    client = TestClient(app)
+    inv = _new_investigation(client, 'Bad pagination params 2')
+    for path in ('sources', 'claims', 'leads', 'reporting-tasks', 'connector-runs'):
+        assert client.get(f'/api/investigations/{inv}/{path}', params={'limit': 0}).status_code == 422
+        assert client.get(f'/api/investigations/{inv}/{path}', params={'limit': 501}).status_code == 422
+        assert client.get(f'/api/investigations/{inv}/{path}', params={'offset': -1}).status_code == 422

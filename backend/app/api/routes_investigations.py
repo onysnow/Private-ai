@@ -279,24 +279,39 @@ def list_investigation_evidence(investigation_id: str, db: Session = Depends(get
 
 
 @router.get("/investigations/{investigation_id}/sources")
-def list_sources(investigation_id: str, db: Session = Depends(get_db)):
+def list_sources(
+    investigation_id: str,
+    limit: int | None = Query(default=None, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+):
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
-    return _list_investigation_sources(db, investigation_id)
+    return _list_investigation_sources(db, investigation_id, limit=limit, offset=offset)
 
 
 @router.get("/investigations/{investigation_id}/claims")
-def list_claims(investigation_id: str, db: Session = Depends(get_db)):
+def list_claims(
+    investigation_id: str,
+    limit: int | None = Query(default=None, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+):
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
-    return _list_investigation_claims(db, investigation_id)
+    return _list_investigation_claims(db, investigation_id, limit=limit, offset=offset)
 
 
 @router.get("/investigations/{investigation_id}/leads")
-def list_leads(investigation_id: str, db: Session = Depends(get_db)):
+def list_leads(
+    investigation_id: str,
+    limit: int | None = Query(default=None, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+):
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
-    return _list_investigation_leads(db, investigation_id)
+    return _list_investigation_leads(db, investigation_id, limit=limit, offset=offset)
 
 
 @router.get("/investigations/{investigation_id}/leads/queue")
@@ -316,17 +331,27 @@ def lead_queue(
 
 
 @router.get("/investigations/{investigation_id}/reporting-tasks")
-def list_reporting_tasks(investigation_id: str, db: Session = Depends(get_db)):
+def list_reporting_tasks(
+    investigation_id: str,
+    limit: int | None = Query(default=None, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+):
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
-    return _list_investigation_reporting_tasks(db, investigation_id)
+    return _list_investigation_reporting_tasks(db, investigation_id, limit=limit, offset=offset)
 
 
 @router.get("/investigations/{investigation_id}/connector-runs")
-def list_connector_runs(investigation_id: str, db: Session = Depends(get_db)):
+def list_connector_runs(
+    investigation_id: str,
+    limit: int | None = Query(default=None, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+):
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
-    return _list_investigation_connector_runs(db, investigation_id)
+    return _list_investigation_connector_runs(db, investigation_id, limit=limit, offset=offset)
 
 
 @router.get("/investigations/{investigation_id}/connector-findings")

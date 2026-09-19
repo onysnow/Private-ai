@@ -59,16 +59,61 @@ def list_investigation_evidence(db: Session, investigation_id: str) -> list[dict
     return [{"evidence": evidence, "source": source_by_id[evidence.source_id]} for evidence in evidence_rows]
 
 
-def list_investigation_sources(db: Session, investigation_id: str) -> list[Source]:
-    return db.scalars(select(Source).where(Source.investigation_id == investigation_id).order_by(Source.created_at.desc())).all()
+def list_investigation_sources(
+    db: Session, investigation_id: str, *, limit: int | None = None, offset: int = 0,
+) -> list[Source]:
+    """List an investigation's sources, newest first.
+
+    limit/offset apply at the SQL level (STRUCT-0018) so a large investigation
+    doesn't force a full-table scan-and-serialize on every list call. Both
+    default to "no limit" to preserve existing callers' behavior unchanged;
+    wiring a default page size plus frontend pagination controls is tracked
+    separately since it changes what an unpaginated caller sees.
+    """
+    stmt = select(Source).where(Source.investigation_id == investigation_id).order_by(Source.created_at.desc())
+    if offset:
+        stmt = stmt.offset(offset)
+    if limit is not None:
+        stmt = stmt.limit(limit)
+    return db.scalars(stmt).all()
 
 
-def list_investigation_claims(db: Session, investigation_id: str) -> list[Claim]:
-    return db.scalars(select(Claim).where(Claim.investigation_id == investigation_id).order_by(Claim.created_at.desc())).all()
+def list_investigation_claims(
+    db: Session, investigation_id: str, *, limit: int | None = None, offset: int = 0,
+) -> list[Claim]:
+    """List an investigation's claims, newest first.
+
+    limit/offset apply at the SQL level (STRUCT-0018) so a large investigation
+    doesn't force a full-table scan-and-serialize on every list call. Both
+    default to "no limit" to preserve existing callers' behavior unchanged;
+    wiring a default page size plus frontend pagination controls is tracked
+    separately since it changes what an unpaginated caller sees.
+    """
+    stmt = select(Claim).where(Claim.investigation_id == investigation_id).order_by(Claim.created_at.desc())
+    if offset:
+        stmt = stmt.offset(offset)
+    if limit is not None:
+        stmt = stmt.limit(limit)
+    return db.scalars(stmt).all()
 
 
-def list_investigation_leads(db: Session, investigation_id: str) -> list[dict]:
-    rows = db.scalars(select(Lead).where(Lead.investigation_id == investigation_id).order_by(Lead.created_at.desc())).all()
+def list_investigation_leads(
+    db: Session, investigation_id: str, *, limit: int | None = None, offset: int = 0,
+) -> list[dict]:
+    """List an investigation's leads, newest first.
+
+    limit/offset apply at the SQL level (STRUCT-0018) so a large investigation
+    doesn't force a full-table scan-and-serialize on every list call. Both
+    default to "no limit" to preserve existing callers' behavior unchanged;
+    wiring a default page size plus frontend pagination controls is tracked
+    separately since it changes what an unpaginated caller sees.
+    """
+    stmt = select(Lead).where(Lead.investigation_id == investigation_id).order_by(Lead.created_at.desc())
+    if offset:
+        stmt = stmt.offset(offset)
+    if limit is not None:
+        stmt = stmt.limit(limit)
+    rows = db.scalars(stmt).all()
     return list_leads_serialized(db, rows)
 
 
@@ -100,14 +145,44 @@ def lead_queue(
     return {"investigation_id": investigation_id, "total": len(items), "counts": counts, "items": items}
 
 
-def list_investigation_reporting_tasks(db: Session, investigation_id: str) -> list[dict]:
-    rows = db.scalars(select(ReportingTask).where(ReportingTask.investigation_id == investigation_id).order_by(ReportingTask.created_at.desc())).all()
+def list_investigation_reporting_tasks(
+    db: Session, investigation_id: str, *, limit: int | None = None, offset: int = 0,
+) -> list[dict]:
+    """List an investigation's reporting tasks, newest first.
+
+    limit/offset apply at the SQL level (STRUCT-0018) so a large investigation
+    doesn't force a full-table scan-and-serialize on every list call. Both
+    default to "no limit" to preserve existing callers' behavior unchanged;
+    wiring a default page size plus frontend pagination controls is tracked
+    separately since it changes what an unpaginated caller sees.
+    """
+    stmt = select(ReportingTask).where(ReportingTask.investigation_id == investigation_id).order_by(ReportingTask.created_at.desc())
+    if offset:
+        stmt = stmt.offset(offset)
+    if limit is not None:
+        stmt = stmt.limit(limit)
+    rows = db.scalars(stmt).all()
     serialized = serialize_tasks_batch(db, rows)
     return [serialized[row.id] for row in rows]
 
 
-def list_investigation_connector_runs(db: Session, investigation_id: str) -> list[ConnectorRun]:
-    return db.scalars(select(ConnectorRun).where(ConnectorRun.investigation_id == investigation_id).order_by(ConnectorRun.started_at.desc())).all()
+def list_investigation_connector_runs(
+    db: Session, investigation_id: str, *, limit: int | None = None, offset: int = 0,
+) -> list[ConnectorRun]:
+    """List an investigation's connector runs, newest first.
+
+    limit/offset apply at the SQL level (STRUCT-0018) so a large investigation
+    doesn't force a full-table scan-and-serialize on every list call. Both
+    default to "no limit" to preserve existing callers' behavior unchanged;
+    wiring a default page size plus frontend pagination controls is tracked
+    separately since it changes what an unpaginated caller sees.
+    """
+    stmt = select(ConnectorRun).where(ConnectorRun.investigation_id == investigation_id).order_by(ConnectorRun.started_at.desc())
+    if offset:
+        stmt = stmt.offset(offset)
+    if limit is not None:
+        stmt = stmt.limit(limit)
+    return db.scalars(stmt).all()
 
 
 def list_investigation_connector_findings(db: Session, investigation_id: str, *, limit: int | None = None, offset: int = 0) -> list[ConnectorFinding]:
