@@ -236,10 +236,15 @@ def get_investigation_graph(
 
 
 @router.get("/investigations/{investigation_id}/documents")
-def list_documents(investigation_id: str, db: Session = Depends(get_db)):
+def list_documents(
+    investigation_id: str,
+    limit: int | None = Query(default=None, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+):
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
-    return _list_investigation_documents(db, investigation_id)
+    return _list_investigation_documents(db, investigation_id, limit=limit, offset=offset)
 
 
 @router.get("/investigations/{investigation_id}/evidence")
@@ -295,5 +300,10 @@ def list_connector_runs(investigation_id: str, db: Session = Depends(get_db)):
 
 
 @router.get("/investigations/{investigation_id}/connector-findings")
-def list_connector_findings(investigation_id: str, db: Session = Depends(get_db)):
-    return _list_investigation_connector_findings(db, investigation_id)
+def list_connector_findings(
+    investigation_id: str,
+    limit: int | None = Query(default=None, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+):
+    return _list_investigation_connector_findings(db, investigation_id, limit=limit, offset=offset)

@@ -57,8 +57,14 @@ def create_entity(body: EntityCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/investigations/{investigation_id}/entities")
-def list_entities(investigation_id: str, include_relationships: bool = False, db: Session = Depends(get_db)):
-    return _list_entities(db, investigation_id, include_relationships)
+def list_entities(
+    investigation_id: str,
+    include_relationships: bool = False,
+    limit: int | None = Query(default=None, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+):
+    return _list_entities(db, investigation_id, include_relationships, limit=limit, offset=offset)
 
 
 @router.get("/entities/{entity_id}/dossier")

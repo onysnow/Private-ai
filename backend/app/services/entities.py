@@ -38,12 +38,27 @@ def create_entity(db: Session, body: EntityCreate) -> Entity:
     return row
 
 
-def list_entities(db: Session, investigation_id: str, include_relationships: bool) -> list[Entity]:
+def list_entities(
+    db: Session, investigation_id: str, include_relationships: bool, *, limit: int | None = None, offset: int = 0,
+) -> list[Entity]:
+    """List an investigation's canonical entities.
+
+    limit/offset apply at the SQL level (STRUCT-0018) so a large investigation
+    doesn't force a full-table scan-and-serialize on every list call. Both
+    default to "no limit" to preserve existing callers' behavior unchanged;
+    wiring a default page size plus frontend pagination controls is tracked
+    separately since it changes what an unpaginated caller sees.
+    """
     stmt = select(Entity).where(Entity.investigation_id == investigation_id, Entity.merged_into_entity_id.is_(None))
     if not include_relationships:
         relationship_ids = select(RelationshipEdge.relationship_entity_id).where(RelationshipEdge.investigation_id == investigation_id)
         stmt = stmt.where(~Entity.id.in_(relationship_ids))
-    return db.scalars(stmt.order_by(Entity.caption)).all()
+    stmt = stmt.order_by(Entity.caption)
+    if offset:
+        stmt = stmt.offset(offset)
+    if limit is not None:
+        stmt = stmt.limit(limit)
+    return db.scalars(stmt).all()
 
 
 def decide_property_conflict(db: Session, entity: Entity, prop: str, body: PropertyConflictDecisionRequest) -> PropertyConflictDecision:

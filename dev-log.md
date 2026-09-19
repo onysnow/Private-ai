@@ -1301,3 +1301,36 @@ Verified: full 220-test suite green (tests/test_lead_workflow.py and
 tests/test_relationship_evidence_review.py exercise this serialization
 path directly), 80% coverage floor held at 86.77%. No response-shape
 change on any endpoint -- this is a pure query-count optimization.
+
+
+## STRUCT-0018 partially corrected: pagination on the three highest-priority list endpoints
+
+Added optional limit/offset query params, applied as real SQL LIMIT/OFFSET
+(not fetch-then-slice), to the endpoints the finding called out as most
+likely to grow large in practice: GET /investigations/{id}/documents,
+GET /investigations/{id}/entities, and GET /investigations/{id}/connector-
+findings. The underlying service functions (list_investigation_documents,
+list_investigation_connector_findings in app/services/investigations.py,
+list_entities in app/services/entities.py) take limit: int | None = None,
+offset: int = 0; route handlers validate them via Query(ge=1, le=500) /
+Query(ge=0). Both default to "no limit" -- unpaginated behavior is
+byte-for-byte unchanged, so no existing caller (frontend or test) is
+affected until it opts in.
+
+Added tests/test_investigation_list_pagination.py (4 tests) covering all
+three endpoints: unpaginated output matches the pre-existing shape,
+limit/offset slice that same order correctly, and out-of-range params
+return 422.
+
+Deliberately not done in this pass, tracked as follow-up: a default page
+size when the client sends no limit (the finding asks for one, but the
+frontend has no pagination UI yet -- capping every existing list silently
+would look like data loss, not a fix, so it needs to land with frontend
+paging support, not alone); and the other 13 investigation-scoped list
+endpoints (leads, leads/queue, sources, claims, reporting-tasks,
+connector-runs, evidence, relationships, graph, timeline) still have no
+limit/offset -- leads/sources/claims/reporting-tasks/connector-runs are
+the natural next slice.
+
+Verified: full 224-test suite green (220 existing + 4 new), 80% coverage
+floor held at 86.86%.
