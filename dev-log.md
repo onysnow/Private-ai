@@ -1125,3 +1125,53 @@ CORRECTED. Marked STRUCT-0006 CORRECTED -- it had simply never been
 updated to reflect work already done.
 
 Full backend suite: 220 passed, 0 failed.
+
+## STRUCT-0015 progress: frontend test tooling + first real coverage
+
+Second BLOCKING item. frontend/tests/ had exactly one file (32 lines,
+no component coverage at all, no jsdom/RTL tooling installed).
+
+- Added jsdom, @testing-library/react, @testing-library/jest-dom,
+  @testing-library/user-event, @vitejs/plugin-react as devDependencies.
+- vitest.config.ts: added the React plugin, a `@` path alias resolver
+  (matching tsconfig's `@/*` -> `./*`, needed for component imports like
+  `@/lib/utils`), and a setupFile; kept the default environment as
+  'node' with per-file `// @vitest-environment jsdom` opt-in so the
+  existing test keeps its faster default instead of paying jsdom
+  startup cost project-wide.
+- Added tests/test-api-validate.ts (26 tests): exercises the exact
+  code this finding named -- lib/api-validate.ts's type guards and
+  jsonObject/jsonArray/parse* helpers -- with malformed and
+  missing-field payloads, confirming they reject bad shapes instead of
+  silently trusting them.
+- Added tests/test-button.test.tsx (5 tests): first real RTL component
+  test in this codebase, on components/ui/button.tsx (small,
+  self-contained) rather than app/page.tsx directly. Needed an explicit
+  `afterEach(cleanup)` -- @testing-library/react's auto-cleanup only
+  self-registers when it detects a global `afterEach`, which isn't
+  present under vitest without `test.globals: true`.
+- Frontend: 1 file/1 test -> 3 files/32 tests, all green.
+
+Environment note worth recording: npm install repeatedly failed with
+ENOTEMPTY on this device's mounted frontend/ folder (backed by a
+Windows path via the remote-devices bridge -- rename() semantics
+through that translation layer aren't reliable under npm's
+install/dedupe churn, confirmed by a `x-deny-reason: host_not_allowed`
+wall blocking npm entirely from the cloud sandbox side, so this had to
+be worked around rather than routed to the cloud container). Fixed by
+building node_modules in a scratch directory on the device's own local
+disk (not under the mounted folder), verifying all tests pass there,
+then copying only the small set of actually-changed source files
+(package.json, package-lock.json, vitest.config.ts, the new test
+files) back into the real frontend/ directory -- never node_modules
+itself, which CI regenerates from package-lock.json independently.
+Ony will need to run `npm install` locally to pick up the new
+devDependencies for local `npm test`/`npm run dev` -- not a code
+issue, just this sandbox's mount quirk.
+
+Did not attempt app/page.tsx interaction tests this pass, per this
+finding's own explicit instruction not to treat it as a one-PR fix --
+that file is a single, extremely dense 139-line component (thousands
+of packed characters per line) that would benefit from at least
+partial decomposition before it's practically testable. Status moved
+OPEN -> IN_PROGRESS.
