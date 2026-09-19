@@ -2090,3 +2090,30 @@ No new test needed -- coverage was already there. mypy unaffected.
 
 STRUCT-0036 stays IN_PROGRESS: documents_stmt and leads/relationships prefiltering remain
 deliberately deferred, not oversights.
+
+## 2026-09-19: STRUCT-0011 cycle 3 -- disproved the pool-exhaustion theory, audit found no test hazard
+
+Before reattempting the SAVEPOINT-per-test design, did the audit cycle 2 called for (every test file
+for a session held open across an HTTP call) and ran a standalone experiment to check cycle 2's own
+pool-exhaustion theory. The audit came back clean: none of the 11 test files that call SessionLocal()
+directly hold a session open across a client.* HTTP call. Found one legitimate nested-SessionLocal
+pattern outside tests, in app/main.py's api_access_guard middleware, but it's currently safe (closes
+before call_next runs).
+
+The experiment disproves cycle 2's theory: StaticPool does not block a second engine.connect() while
+a first connection's transaction is still open and uncommitted -- confirmed with a SIGALRM timeout
+that never fired, and the second connection's write succeeded immediately since both checkouts share
+the literal same underlying DBAPI connection object. So the test_entity_dossier.py hang from cycle 2
+was NOT a connection-pool-checkout deadlock. Corrected STRUCTURE_AUDIT.md's STRUCT-0011 note rather
+than let a wrong theory stand.
+
+New leading hypothesis for whoever picks this up next: get_db() is a plain sync generator, which
+FastAPI runs in a worker thread pool for async routes; combined with check_same_thread=False (needed
+for StaticPool across requests), the single shared SQLite connection can be touched from more than
+one OS thread, and Python's sqlite3 module doesn't make that safe just because the guard rail is
+disabled. No BackgroundTasks usage exists to explain an obvious async-lifetime mismatch, so a future
+cycle should instrument with thread-id/timestamp logging and reproduce the hang directly rather than
+reasoning further in the abstract. Deliberately did not re-add the conftest.py fixture blind a third
+time -- two prior reproducible hangs already cost real cycles to diagnose and revert.
+
+No code changed this cycle (the diagnostic script was scratch-only). STRUCT-0011 stays OPEN.
