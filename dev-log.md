@@ -1845,3 +1845,35 @@ Verified: full backend suite (259 tests, exit 0); frontend typecheck, vitest (32
 `next build` all clean, run against a fast local scratch copy of the frontend source after the
 in-place `npm ci` in the mounted repo path proved too slow for this sandbox's tool timeouts (a
 sandbox quirk, not a change in the dependency tree).
+
+## 2026-09-19: STRUCT-0011 attempted, reverted -- SQLite file-lock hazard discovered
+
+Attempted the documented design: a single autouse, function-scoped `tests/conftest.py` fixture
+resetting the shared `engine`/`SessionLocal`'s schema before every test, replacing the ad hoc
+`setup_module()`/`setup_function()` (or per-file autouse fixture) duplicated across 19 files
+(more than the ~12+ originally estimated). Deliberately reused the SAME engine object rather than
+building a fresh hardcoded SQLite engine, both because some files call `Session(engine)` /
+`SessionLocal()` directly on already-imported name bindings (a rebind wouldn't reach them) and
+because `settings.database_url` is real PostgreSQL under `backend-postgres-ci.yml` -- forcing
+SQLite there would have silently defeated that job's whole purpose.
+
+The full suite run then hung, reproducibly, partway through -- inside `test_export_backup.py`
+(a file that turned out to ALSO silently depend on some earlier file's schema reset, despite never
+doing one itself: a 20th, previously uncatalogued instance of this exact finding). Root cause is
+almost certainly SQLite file-lock contention: this repo's actual default test backend is
+`sqlite:///./journalism.db`, a real file, not the two in-memory URL forms `app/db/session.py`
+already special-cases with `StaticPool` -- so it uses a normal multi-connection pool, and an
+exclusive per-test schema-DDL lock can collide with a connection some earlier request cycle left
+open. A single reset cycle benchmarks at ~0.3ms in isolation, ruling out plain slowness.
+
+Reverted cleanly: all 19 file edits `git checkout`'d, the new `conftest.py` removed, stale
+`journalism.db`/`-journal` files from the killed run deleted. Re-verified the full suite passes
+clean on the reverted code (259 tests, exit 0) -- the codebase is exactly as it was before this
+attempt.
+
+Left STRUCT-0011 `OPEN` (not `CORRECTED` -- nothing was actually shipped) with a detailed
+progress_note in `STRUCTURE_AUDIT.md` recording this evidence and narrowing the next attempt's
+design to two concrete options: force `StaticPool` for any SQLite backend during tests (not just
+the two in-memory URL spellings), or switch to a SAVEPOINT/nested-transaction-per-test rollback
+pattern instead of schema-DDL churn. Either way, the naive "reset the literal configured engine
+before every test" recipe should not be retried without first resolving this locking hazard.
