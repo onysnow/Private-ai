@@ -1905,3 +1905,27 @@ Remaining app/services scope re-measured at 282 errors across 12 files, dominate
 (106, overlapping STRUCT-0036's own scope), documents.py (41), leads.py (38), provenance.py (35).
 app/ai (134 errors) and app/api remain untouched. STRUCT-0013 stays `IN_PROGRESS` with a detailed
 progress_note recording the exact remaining per-file counts for the next cycle.
+
+## 2026-09-19: STRUCT-0015 cycle 2 -- first component test against app/page.tsx (API-access gate)
+
+app/page.tsx is a single ~140-line but extremely dense component (60+ useState hooks, dozens of
+async handlers packed into one function) -- too large to decompose or fully cover in one pass, per
+this finding's own note not to treat it as a one-PR fix. Rather than rush a partial refactor, found
+the one flow that's genuinely self-contained regardless of the rest of the component: the API-access
+bootstrap gate that runs on mount and its bearer-token recovery path -- the very first thing a
+reporter interacts with.
+
+Added tests/test-page-api-access.test.tsx (3 tests, jsdom + RTL): a successful local-only bootstrap
+with no token gate shown; the token gate appearing on a 401, entering a token, clicking Connect, and
+a successful re-bootstrap with that token attached as an Authorization header (confirmed absent on
+the pre-auth request); and Clear session token dropping the token and re-running unauthenticated.
+Each test dynamically re-imports app/page.tsx after vi.resetModules() so the module-level `api`
+ApiClient singleton starts fresh every test -- page.tsx constructs it once at module import time
+(`const api = new ApiClient(API)`), so without this a bearer token set in one test would leak into
+the next.
+
+Verified via the same fast-scratch-directory workaround from STRUCT-0040 (mounted-repo npm ci is too
+slow for the tool timeout): full vitest suite green (35 tests, up from 32), `tsc --noEmit` clean,
+`eslint` clean on the new file. Frontend test count: 3 files/32 tests -> 4 files/35 tests. STRUCT-0015
+stays IN_PROGRESS -- the component's other dozens of interactions (search, dossier, relationships,
+documents, claims, leads, backups, security audit) are still untested.
