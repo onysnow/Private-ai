@@ -1231,3 +1231,30 @@ surgery across the whole suite; better done as its own focused pass
 with room to catch anything subtle, not as one more item in an
 unattended sweep. No code changed; full suite unaffected (220/220,
 unchanged from before).
+
+## STRUCT-0014 corrected: stricter ESLint typing rules
+
+Added @typescript-eslint/explicit-module-boundary-types and
+@typescript-eslint/no-explicit-any to .eslintrc.json as errors. Small
+enough surface to fix outright rather than phase in like mypy: 13
+missing-return-type spots (app/page.tsx's default export,
+app/layout.tsx, and small exported components in components/ui/ and
+lib/utils.ts/api-validate.ts), 0 existing `any` usage anywhere.
+
+Notable gotcha: React 19's @types/react removed the global `JSX`
+namespace in favor of React.JSX/ReactElement -- `: JSX.Element`
+doesn't compile under this project's installed types. Used
+`React.ReactElement` in files with `import * as React`, and a
+`ReactElement` named type import in files that only import specific
+react exports (app/page.tsx, components/ui/sonner.tsx).
+
+Also added an argsIgnorePattern/varsIgnorePattern of ^_ to the
+existing no-unused-vars rule, needed for the intentionally-discarded
+destructured fields in tests/test-api-validate.ts (STRUCT-0015) --
+standard ESLint convention, not scope creep.
+
+Verified via the same local-disk-mirror workaround as STRUCT-0015
+(npm install is unreliable on the mounted frontend/ folder): 0 eslint
+errors (9 pre-existing, unrelated warnings left as out of scope --
+dead imports and one exhaustive-deps hook warning in app/page.tsx),
+0 tsc --noEmit errors, full vitest suite 32/32 passing.
