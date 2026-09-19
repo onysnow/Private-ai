@@ -51,4 +51,4 @@ module = ["app.models.*", "app.schemas.*"]
 disallow_untyped_defs = true
 
 [tool.pytest.ini_options]
-addopts = "-q --cov=app --cov-report=term-missing"
+addopts = "-q --cov=app --cov-report=term-missing --cov-fail-under=80"

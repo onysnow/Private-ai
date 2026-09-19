@@ -1258,3 +1258,13 @@ Verified via the same local-disk-mirror workaround as STRUCT-0015
 errors (9 pre-existing, unrelated warnings left as out of scope --
 dead imports and one exhaustive-deps hook warning in app/page.tsx),
 0 tsc --noEmit errors, full vitest suite 32/32 passing.
+
+## STRUCT-0016 corrected: coverage floor added
+
+Added --cov-fail-under=80 to pytest's addopts in pyproject.toml.
+Coverage was measured and reported but nothing gated on it. Current
+coverage re-verified at 86.57% -- comfortably above the new floor.
+Applies automatically in CI: run_postgres_gate.py calls `python -m
+pytest -q` with no cov flags of its own, relying entirely on addopts,
+so backend-postgres-ci.yml enforces this with no workflow change.
+Verified: "Required test coverage of 80% reached", 220/220 passing.
