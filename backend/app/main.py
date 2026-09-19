@@ -110,6 +110,9 @@ def create_app(app_settings=None) -> FastAPI:
     @app.middleware("http")
     async def api_access_guard(request, call_next):
         request_id = new_request_id()
+        # Exposed so route handlers can reference the same id in a generic
+        # error detail (STRUCT-0028) instead of embedding raw exception text.
+        request.state.request_id = request_id
         should_audit = should_audit_request(request.method, request.url.path)
         local_request = request_is_local_request(request)
         client_host = request.client.host if request.client else None

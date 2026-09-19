@@ -1628,3 +1628,33 @@ so a future reader lands on the stated intent instead of re-deriving it.
 Marked Proposed, pending Ony's review, matching ADR-0001's convention.
 
 Docs-only change; no backend logic touched beyond the docstring addition.
+
+
+## STRUCT-0028 corrected: 6 sites stopped echoing raw exception text to clients
+
+6 call sites (routes_documents.py x3, routes_investigations.py x1,
+services/connectors.py x2) built their 502 detail as an f-string embedding
+the raw exception message and class name, putting internal/external-service
+failure text directly into the API response body.
+
+Fixed all 6. The 4 route-handler sites already log the full exception
+server-side via STRUCT-0027's record_openaleph_operation_failure; changed
+their 502 detail to a generic message plus a cross-reference id. Rather
+than inventing a new id, exposed the request_id main.py's api_access_guard
+already computes (previously used only inside the middleware closure, for
+the X-Request-ID header and audit log) onto request.state.request_id, so
+route handlers can point at the exact same id that's already on the
+response header and in the audit trail.
+
+The 2 services/connectors.py sites (run_connector, enrich_entity) are
+plain service functions with no Request object -- they already persist the
+full exception on the ConnectorRun row (run.error) before this fix. Used
+the run's own id as the cross-reference token instead of threading a
+request_id through routes_connectors.py/routes_entities.py into these
+service functions, which would have been a much wider change for an
+OPTIONAL finding; no endpoint exists yet to look up a run by id, but the
+id still ties the response to a specific persisted, queryable row today
+and stays available to expose via an API later.
+
+Verified via the full backend suite (238 tests, all passing unchanged,
+exit 0); confirmed no test asserted on the removed raw-exception text.

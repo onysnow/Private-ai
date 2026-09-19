@@ -7,7 +7,7 @@ list_document_candidates) alongside ingest_document/serialize_document.
 GET /investigations/{investigation_id}/documents stays in routes.py:
 its URL prefix is /investigations, so it belongs with group 8.
 """
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource, read_upload_limited
@@ -55,7 +55,7 @@ def sync_openaleph_document(document_id: str, db: Session = Depends(get_db)):
 
 
 @router.post("/documents/{document_id}/corpus/openaleph/refresh-review")
-def refresh_openaleph_document_review(document_id: str, db: Session = Depends(get_db)):
+def refresh_openaleph_document_review(document_id: str, request: Request, db: Session = Depends(get_db)):
     """Refresh OpenAleph Page + Mention candidates without auto-accepting either."""
     try:
         return refresh_openaleph_review_candidates(db, document_id)
@@ -71,11 +71,11 @@ def refresh_openaleph_document_review(document_id: str, db: Session = Depends(ge
                 db, investigation_id=doc.investigation_id, document_id=document_id,
                 operation="refresh_review", error=f"{exc.__class__.__name__}: {exc}",
             )
-        raise HTTPException(502, f"OpenAleph review refresh failed: {exc.__class__.__name__}: {exc}")
+        raise HTTPException(502, f"OpenAleph review refresh failed. Details were logged server-side (request {request.state.request_id}).")
 
 
 @router.post("/documents/{document_id}/corpus/openaleph/import-evidence")
-def import_openaleph_document_evidence(document_id: str, db: Session = Depends(get_db)):
+def import_openaleph_document_evidence(document_id: str, request: Request, db: Session = Depends(get_db)):
     """Stage OpenAleph page text as review-required evidence candidates."""
     try:
         return import_openaleph_evidence_candidates(db, document_id)
@@ -91,11 +91,11 @@ def import_openaleph_document_evidence(document_id: str, db: Session = Depends(g
                 db, investigation_id=doc.investigation_id, document_id=document_id,
                 operation="import_evidence", error=f"{exc.__class__.__name__}: {exc}",
             )
-        raise HTTPException(502, f"OpenAleph extraction import failed: {exc.__class__.__name__}: {exc}")
+        raise HTTPException(502, f"OpenAleph extraction import failed. Details were logged server-side (request {request.state.request_id}).")
 
 
 @router.post("/documents/{document_id}/corpus/openaleph/import-entities")
-def import_openaleph_document_entities(document_id: str, db: Session = Depends(get_db)):
+def import_openaleph_document_entities(document_id: str, request: Request, db: Session = Depends(get_db)):
     """Stage OpenAleph/ftm-analyze Mention entities for explicit reporter review."""
     try:
         return import_openaleph_entity_candidates(db, document_id)
@@ -111,7 +111,7 @@ def import_openaleph_document_entities(document_id: str, db: Session = Depends(g
                 db, investigation_id=doc.investigation_id, document_id=document_id,
                 operation="import_entities", error=f"{exc.__class__.__name__}: {exc}",
             )
-        raise HTTPException(502, f"OpenAleph entity import failed: {exc.__class__.__name__}: {exc}")
+        raise HTTPException(502, f"OpenAleph entity import failed. Details were logged server-side (request {request.state.request_id}).")
 
 
 @router.post("/documents/upload")

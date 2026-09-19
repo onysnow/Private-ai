@@ -84,7 +84,7 @@ def list_openaleph_corpus_failures(investigation_id: str, db: Session = Depends(
 
 
 @router.post("/investigations/{investigation_id}/corpus/openaleph/ensure")
-def ensure_openaleph_corpus_binding(investigation_id: str, db: Session = Depends(get_db)):
+def ensure_openaleph_corpus_binding(investigation_id: str, request: Request, db: Session = Depends(get_db)):
     try:
         binding = ensure_openaleph_collection(db, investigation_id)
     except ValueError as exc:
@@ -97,7 +97,7 @@ def ensure_openaleph_corpus_binding(investigation_id: str, db: Session = Depends
             db, investigation_id=investigation_id, document_id=None,
             operation="ensure_collection", error=f"{exc.__class__.__name__}: {exc}",
         )
-        raise HTTPException(502, f"OpenAleph collection setup failed: {exc.__class__.__name__}: {exc}")
+        raise HTTPException(502, f"OpenAleph collection setup failed. Details were logged server-side (request {request.state.request_id}).")
     return {"binding": serialize_binding(binding)}
 
 

@@ -73,7 +73,11 @@ async def run_connector(provider: str, body: ConnectorSearchRequest, db: Session
         return persist_connector_findings(db, run, body.investigation_id, provider, findings)
     except Exception as exc:
         run.status = "failed"; run.error = str(exc); run.finished_at = utcnow_naive(); db.commit()
-        raise HTTPException(502, f"{provider} connector failed: {exc}") from exc
+        # Full exception text/class is persisted on the ConnectorRun row (run.error) rather than
+        # echoed into the client-facing response (STRUCT-0028).
+        raise HTTPException(
+            502, f"{provider} connector failed. Details were logged server-side (connector run {run.id})."
+        ) from exc
 
 
 async def enrich_entity(provider: str, entity: Entity, db: Session):
@@ -95,4 +99,8 @@ async def enrich_entity(provider: str, entity: Entity, db: Session):
         return persist_connector_findings(db, run, entity.investigation_id, provider, findings)
     except Exception as exc:
         run.status = "failed"; run.error = str(exc); run.finished_at = utcnow_naive(); db.commit()
-        raise HTTPException(502, f"{provider} enrichment failed: {exc}") from exc
+        # Full exception text/class is persisted on the ConnectorRun row (run.error) rather than
+        # echoed into the client-facing response (STRUCT-0028).
+        raise HTTPException(
+            502, f"{provider} enrichment failed. Details were logged server-side (connector run {run.id})."
+        ) from exc
