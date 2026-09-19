@@ -1599,3 +1599,32 @@ with a one-line import + one-line call.
 
 Verified via the full backend suite (238 tests per --collect-only, all
 passing unchanged, exit 0) run against the synced workbench venv.
+
+
+## STRUCT-0023 corrected: ADR states the two-tier auth end-state
+
+api_access_guard resolves remote requests one of two ways -- persisted
+per-user tokens (AppUser/InvestigationMembership, real per-investigation
+roles) tried first, falling back to the single shared JW_API_AUTH_TOKEN --
+and nothing stated whether this was a migration in progress or a deliberate
+permanent design.
+
+Traced the actual middleware code before deciding anything: local requests
+bypass both paths entirely (neither matters for ordinary single-workstation
+use), and the two remote paths are already fully independent -- a valid
+persisted token grants access even with api_auth_token unset (which fails
+closed for the shared-token path alone by default). That independence is
+what settled the decision: there's no technical reason forcing eventual
+removal of either path, so docs/adr/0002-authorization-two-tier-end-state.md
+proposes treating them as permanently coexisting tiers instead of inventing
+a migration deadline. Persisted per-user tokens are the recommended path
+for any multi-person or role-differentiated remote access and the only
+path future remote-auth features should build on; the shared token stays
+as a deliberately minimal, feature-frozen convenience for a solo operator
+or script.
+
+Added a one-line pointer to the ADR in AuthorizationScope's own docstring
+so a future reader lands on the stated intent instead of re-deriving it.
+Marked Proposed, pending Ony's review, matching ADR-0001's convention.
+
+Docs-only change; no backend logic touched beyond the docstring addition.

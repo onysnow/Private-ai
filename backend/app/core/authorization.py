@@ -20,6 +20,13 @@ class AuthorizationScope:
     ``investigation_ids=None`` means unrestricted. A concrete frozenset is a
     fail-closed allowlist. The local single-user workstation remains unrestricted;
     remote shared-bearer access can be narrowed with JW_API_AUTH_INVESTIGATION_IDS.
+
+    Two independent remote-auth paths feed this scope -- persisted per-user
+    tokens (app/services/identity.py) and the shared JW_API_AUTH_TOKEN
+    fallback -- and both are meant to coexist permanently as different
+    tiers rather than one migrating away. See
+    docs/adr/0002-authorization-two-tier-end-state.md (STRUCT-0023) before
+    changing either path.
     """
 
     actor_id: str
