@@ -1,15 +1,19 @@
 # Dev Log — Private-ai (Claude session/ops log)
 
-This file is separate from `BUILD_STATE.md`. `BUILD_STATE.md` is the
-product/feature changelog (what the Journalism Workbench app can do).
-This file is the **operations log for Claude's own autonomous work** on
-this repo across sessions/wakeups: PR triage, CI diagnosis, merges,
-branch hygiene, and the reasoning behind decisions. It exists so that a
-Claude session picking this backlog back up — after a context
-compaction, a new session, or a scheduled wakeup — can reconstruct
-current state without depending on conversation memory, which is lossy
-(see claude-log.md for the raw prompts/responses that led to these
-entries).
+This file is separate from `CHANGELOG.md` (formerly `BUILD_STATE.md`,
+which PR #22 superseded on 2026-09-16 -- that file is now a frozen
+historical artifact, not a maintained log). `CHANGELOG.md` is the
+product-facing changelog: what the Journalism Workbench app can do, one
+compact entry per milestone, meant for README.md's readers. This file is
+the **operations log for Claude's own autonomous work** on this repo
+across sessions/wakeups: PR triage, CI diagnosis, merges, branch
+hygiene, individual STRUCT-00xx remediation, and the reasoning behind
+decisions -- one entry per unit of work, much finer-grained than
+CHANGELOG.md's milestones. It exists so that a Claude session picking
+this backlog back up — after a context compaction, a new session, or a
+scheduled wakeup — can reconstruct current state without depending on
+conversation memory, which is lossy (see claude-log.md for the raw
+prompts/responses that led to these entries).
 
 Convention: append new entries at the bottom, newest last, each dated
 and tagged with what changed. Keep the "Current state" section below
@@ -1433,5 +1437,33 @@ to update that row if the issue is confirmed still open. Current
 dependency versions (next 15.5.25, python-multipart 0.0.32, pypdf
 6.16.1) suggest the named CVEs may already be patched, but that's a
 different question from whether the tracking issue is closed.
+
+Docs-only change; no backend tests affected.
+
+
+## STRUCT-0033 corrected: CHANGELOG.md resumed, its split from dev-log.md made explicit
+
+README.md pointed readers at CHANGELOG.md as "a detailed dev log", but
+CHANGELOG.md's last entry (DEV 0.93) was from 2026-09-16 (PR #22) and
+hadn't been touched since -- the entire routes.py Stage E split (120
+endpoints, 16 modules) and this session's full engineering audit (40
+STRUCT-00xx findings, ongoing remediation) were recorded only here in
+dev-log.md, which README never mentioned. A reader following README's
+own pointer would see a project that looked stalled since 2026-09-16.
+
+Added one CHANGELOG.md entry ("Engineering hardening pass (post-DEV
+1.24)") summarizing that work at a product level and explicitly pointing
+to dev-log.md for full session-by-session detail -- deliberately not
+one CHANGELOG entry per STRUCT-00xx fix, since that granularity is what
+this file is for. Updated both of README.md's CHANGELOG.md references
+to also name dev-log.md and describe what each file covers, so the
+split is explicit rather than implicit.
+
+Also fixed a related staleness bug found while researching this:
+dev-log.md's own header still called BUILD_STATE.md the product
+changelog, but BUILD_STATE.md was superseded by CHANGELOG.md in PR #22
+and hasn't been touched since (confirmed via git log) -- it's a frozen
+historical artifact now, not a maintained file. Corrected the header's
+cross-reference.
 
 Docs-only change; no backend tests affected.

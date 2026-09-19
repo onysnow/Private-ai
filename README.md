@@ -44,7 +44,7 @@ _Coming shortly — the local UI is being captured live._
 
 ## Current status — read this before judging "done"
 
-This project has been developed iteratively with a detailed dev log (see [`CHANGELOG.md`](CHANGELOG.md)) and a consistently honest practice of naming what's *not* yet proven, not just what's built. As of this writing:
+This project has been developed iteratively -- product-facing milestones live in [`CHANGELOG.md`](CHANGELOG.md), and the underlying session-by-session engineering log (PR triage, CI diagnosis, individual audit-finding remediation) lives in [`dev-log.md`](dev-log.md) -- and with a consistently honest practice of naming what's *not* yet proven, not just what's built. As of this writing:
 
 | Area | Status |
 |---|---|
@@ -90,4 +90,4 @@ See [`SECURITY.md`](SECURITY.md) for the vulnerability reporting process. Short 
 
 ## Development history
 
-The full DEV 0.7 → DEV 1.24 iteration log — including every architectural decision, ownership boundary, and validation gate along the way — lives in [`CHANGELOG.md`](CHANGELOG.md).
+The full DEV 0.7 → DEV 1.24 iteration log — including every architectural decision, ownership boundary, and validation gate along the way — lives in [`CHANGELOG.md`](CHANGELOG.md). For the engineering work since DEV 1.24 (the `routes.py` module split, the ongoing structural audit tracked in [`STRUCTURE_AUDIT.md`](STRUCTURE_AUDIT.md), and everything else at session granularity), see [`dev-log.md`](dev-log.md).
