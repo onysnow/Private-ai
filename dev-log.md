@@ -1745,3 +1745,19 @@ instead of the intended 422. Fixed by wrapping that HTTPException's detail
 in fastapi.encoders.jsonable_encoder(...).
 
 Verified via the full backend suite (257 tests, all passing, exit 0).
+
+## 2026-09-19: STRUCT-0024 reviewed (Watch item, no split needed yet)
+
+`backend/app/models/domain.py` (39 models, 537 lines when the finding was written) was flagged as
+a "watch this before it becomes another 1859-line routes.py" item, not something needing action
+today. Checked the current state: 42 classes, 558 lines -- about 4% growth (mostly the
+`OpenAlephOperationFailure` model added during STRUCT-0027 work). Not "meaningfully past" 537
+lines, so no split was performed. Left STRUCT-0024 `OPEN` with a progress_note recording the
+current count, matching how STRUCT-0031/STRUCT-0035 were handled earlier this session: a Watch
+item that's still correctly in its "no action" state gets a documented review, not an invented
+change just to close it out.
+
+When this does cross a real threshold, the plan is already written into the finding: split by the
+same domain boundaries as `app/api/routes_*.py` / `app/services/*.py` (investigations, entities,
+leads, documents, connectors, settings, etc.), each domain's models in their own module, all still
+declared against the shared `Base` from `app/db/session.py`.
