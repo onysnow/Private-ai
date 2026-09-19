@@ -1802,3 +1802,16 @@ including from `requirements.txt`, so the two could have silently diverged. Upda
 `CONTRIBUTING.md`'s description of the dependency files to match. `backend/Dockerfile` needed no
 change -- it already only ever installed `requirements.txt`, so trimming that file was the whole
 fix.
+
+## 2026-09-19: STRUCT-0030 fixed -- frontend Docker build now matches CI's install
+
+`frontend/Dockerfile` ran `npm install` (and only ever copied `package.json` into the build
+context, not the lockfile), while `.github/workflows/frontend-ci.yml` runs `npm ci` -- a
+deterministic install strictly from `package-lock.json`. The two commands can resolve different
+dependency versions once the lockfile and `package.json` drift even slightly, so the image that
+actually gets built and run wasn't guaranteed to match what CI tested against.
+
+Changed the Dockerfile to `COPY package.json package-lock.json ./` + `RUN npm ci`, matching CI
+exactly. Verified by running `npm ci` against the current lockfile in a scratch directory outside
+the repo: 509 packages installed cleanly, 0 vulnerabilities -- confirming the lockfile is in sync
+today and this change won't break the next build.
