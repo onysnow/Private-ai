@@ -1701,3 +1701,19 @@ multi-worker-capable PostgreSQL example, so a future --workers throughput
 tweak doesn't quietly break SQLite installs.
 
 Docs-only change; no backend tests affected.
+
+
+## STRUCT-0020 corrected: 4 list endpoints now 404 consistently
+
+list_sources, list_claims, list_connector_runs, and list_connector_findings
+(routes_investigations.py) were missing the `db.get(Investigation, ...) is
+None` check their sibling list endpoints in the same module already had --
+in unrestricted (single-user default) mode they silently returned 200 []
+for a nonexistent investigation_id instead of 404. No security impact
+(unrestricted mode already grants full access), just an inconsistency the
+finding correctly flagged.
+
+Added the matching check to all 4, plus
+tests/test_investigation_list_404_consistency.py covering both directions
+(404 for a missing investigation, still 200 [] for a real one with no
+rows). Full backend suite (240 tests) verified passing.

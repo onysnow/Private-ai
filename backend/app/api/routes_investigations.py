@@ -280,11 +280,15 @@ def list_investigation_evidence(investigation_id: str, db: Session = Depends(get
 
 @router.get("/investigations/{investigation_id}/sources")
 def list_sources(investigation_id: str, db: Session = Depends(get_db)):
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
     return _list_investigation_sources(db, investigation_id)
 
 
 @router.get("/investigations/{investigation_id}/claims")
 def list_claims(investigation_id: str, db: Session = Depends(get_db)):
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
     return _list_investigation_claims(db, investigation_id)
 
 
@@ -320,6 +324,8 @@ def list_reporting_tasks(investigation_id: str, db: Session = Depends(get_db)):
 
 @router.get("/investigations/{investigation_id}/connector-runs")
 def list_connector_runs(investigation_id: str, db: Session = Depends(get_db)):
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
     return _list_investigation_connector_runs(db, investigation_id)
 
 
@@ -330,4 +336,6 @@ def list_connector_findings(
     offset: int = Query(default=0, ge=0),
     db: Session = Depends(get_db),
 ):
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
     return _list_investigation_connector_findings(db, investigation_id, limit=limit, offset=offset)
