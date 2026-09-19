@@ -1,7 +1,8 @@
 from fastapi.testclient import TestClient
 
-from app.db.session import Base, engine
+from app.db.session import Base, SessionLocal, engine
 from app.main import app
+from app.models.domain import ConnectorFinding, DocumentChunk, ExtractionCandidate, Statement, TimelineEvent
 
 
 def setup_module():
@@ -168,3 +169,77 @@ def test_search_ranking_and_groups_keep_external_findings_separate():
     external = next(row for row in full['results'] if row['type'] == 'connector_finding')
     assert external['group'] == 'external_lead'
     assert 'trace_record_type' not in external['provenance']
+
+
+def test_prefiltered_record_types_still_match_via_own_fields_not_a_parents(): # noqa: E501
+    """STRUCT-0036: the SQL-level prefilters added to statement/evidence/claim/
+    reporting_task/timeline_event/connector_finding/extraction_candidate/
+    document_chunk queries must never drop a hit whose OWN text matches the
+    query, even when a related "parent" record's independently-scored fields
+    (entity caption, document filename, etc.) never mention it. Mirrors the
+    existing "Regional Holdings" entity-properties test but for every other
+    record type this cycle's prefilter touched, including two that only match
+    via a cast-to-text JSON column (connector_finding.properties,
+    extraction_candidate.payload).
+    """
+    client = TestClient(app)
+    inv = client.post('/api/investigations', json={'name': 'Prefilter safety'}).json()['id']
+    token = 'Kestrelwood'
+
+    # Statement matches via its own value even though the parent entity's
+    # caption/schema/properties never mention the token.
+    entity = client.post('/api/entities', json={
+        'investigation_id': inv, 'schema': 'Company', 'caption': 'Ordinary Holdings', 'properties': {},
+    }).json()
+    with SessionLocal() as db:
+        db.add(Statement(entity_id=entity['id'], prop='alias', value=f'{token} Trust', dataset='reporter'))
+        db.commit()
+
+    # Evidence matches only via its JOINED source's title, not its own quote/locator/notes.
+    source = client.post('/api/sources', json={
+        'investigation_id': inv, 'title': f'{token} Holdings disclosure', 'source_type': 'filing',
+    }).json()
+    client.post('/api/evidence', json={
+        'source_id': source['id'], 'quote': 'Standard filing text with no distinguishing name.',
+    })
+
+    # Claim and reporting task: self-contained, match via their own text.
+    client.post('/api/claims', json={'investigation_id': inv, 'text': f'{token} entity confirmed as owner.'})
+    client.post('/api/reporting-tasks', json={'investigation_id': inv, 'title': f'Verify {token} filing'})
+
+    with SessionLocal() as db:
+        db.add(TimelineEvent(investigation_id=inv, title=f'{token} incorporated', date_start='2020-01-01'))
+        # Connector finding matches only via its JSON properties field, not its caption.
+        db.add(ConnectorFinding(
+            investigation_id=inv, provider='aleph', provider_record_id='rec-prefilter-1',
+            caption='Unrelated caption', schema='Company',
+            properties={'notes': [f'{token} appears only in a background note']},
+            raw={}, review_status='unreviewed',
+        ))
+        db.commit()
+
+    upload = client.post(
+        '/api/documents/upload',
+        data={'investigation_id': inv, 'title': 'Doc'},
+        files={'file': ('doc.txt', b'placeholder body', 'text/plain')},
+    )
+    assert upload.status_code == 200, upload.text
+    document_id = upload.json()['id']
+    with SessionLocal() as db:
+        # DocumentChunk matches only via its own extracted text, not the document's filename.
+        db.add(DocumentChunk(document_id=document_id, locator='p.1', ordinal=0, text=f'{token} was named as the registered agent.'))
+        # ExtractionCandidate matches only via its JSON payload field.
+        db.add(ExtractionCandidate(
+            investigation_id=inv, document_id=document_id, candidate_type='entity',
+            payload={'caption': f'{token} Ventures', 'schema': 'Company'}, review_status='proposed',
+        ))
+        db.commit()
+
+    response = client.get('/api/search', params={'q': token, 'investigation_id': inv})
+    assert response.status_code == 200, response.text
+    body = response.json()
+    by_type = {row['type'] for row in body['results']}
+    assert {
+        'statement', 'evidence', 'claim', 'reporting_task', 'timeline_event',
+        'connector_finding', 'extraction_candidate', 'document_chunk',
+    }.issubset(by_type), f"missing types: {({'statement', 'evidence', 'claim', 'reporting_task', 'timeline_event', 'connector_finding', 'extraction_candidate', 'document_chunk'} - by_type)}, got {by_type}"

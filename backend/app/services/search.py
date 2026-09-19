@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterable
 
-from sqlalchemy import select
+from sqlalchemy import String, cast, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.models.domain import (
@@ -59,6 +59,37 @@ class SearchHit:
 
 def _tokens(query: str) -> list[str]:
     return [part.casefold() for part in query.split() if part.strip()]
+
+
+def _prefilter(tokens: list[str], *columns):
+    """SQL-level, portable (SQLite/PostgreSQL) "any token is a substring of any of
+    these columns, case-insensitively" predicate (STRUCT-0036).
+
+    This narrows a SELECT to rows _score() could possibly give a nonzero score to,
+    so the DB does the elimination instead of fetching and scoring every row in the
+    investigation in Python. It is only ever safe to add to a query whose full
+    fetched set isn't ALSO relied on elsewhere as a lookup table (e.g. entities and
+    sources are deliberately NOT prefiltered this way -- see the comment above
+    entities_stmt/sources_stmt below) -- adding this to one of those would silently
+    drop, say, a statement hit whose own text matches but whose parent entity's
+    caption doesn't.
+
+    Correctness argument: _score(query, *values) only returns a nonzero score when
+    either the full stripped query, or one of _tokens(query)'s words, is found as a
+    substring of `primary` (values[0]) or of `text` (all values joined). Since
+    `primary` is always itself a substring of `text`, and every token is by
+    construction a substring of the full query, ANY nonzero-score condition implies
+    at least one token is a literal substring of `text` -- so "does any token appear
+    in any of the same columns _score() was given" is a safe superset, never a
+    stricter, condition than _score()'s own check. JSON columns are cast to text so
+    their keys/values stay substring-searchable, mirroring the str(...)-based text
+    _score() builds from them in Python.
+    """
+    exprs = []
+    for column in columns:
+        text_col = func.lower(cast(column, String))
+        exprs.extend(text_col.contains(token) for token in tokens)
+    return or_(*exprs)
 
 
 def _score(query: str, *values: object) -> float:
@@ -129,16 +160,46 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
     if investigation_id and db.get(Investigation, investigation_id) is None:
         raise ValueError("Investigation not found")
 
+    # Computed once and reused by every _prefilter() call below (STRUCT-0036).
+    tokens = _tokens(query)
     hits: list[SearchHit] = []
 
+    # STRUCT-0036: entities_stmt, sources_stmt, and documents_stmt (below) are
+    # deliberately NOT given a _prefilter() -- each one's full unfiltered result is
+    # also relied on as a lookup table by other record types in this function
+    # (entity_by_id backs statement/relationship hits; source_by_id backs
+    # evidence hits; `documents`/document_ids drive the document_chunk and
+    # extraction_candidate queries below). Prefiltering any of these three would
+    # silently drop a hit whose OWN text matches but whose parent entity/source/
+    # document's own fields don't -- exactly the failure mode this finding's
+    # tests guard against. Splitting each of these into a cheap unfiltered
+    # id-only lookup query plus a separately prefiltered scoring query is real,
+    # still-open follow-up work (tracked in STRUCTURE_AUDIT.md/STRUCT-0036).
     entities_stmt = select(Entity)
     sources_stmt = select(Source)
-    claims_stmt = select(Claim)
+    # STRUCT-0036: claims are self-contained -- nothing downstream needs the full
+    # unfiltered set, so a SQL prefilter here can't drop a hit like the
+    # entities/sources shared-lookup case can (see _prefilter's docstring).
+    claims_stmt = select(Claim).where(_prefilter(tokens, Claim.text, Claim.status))
     leads_stmt = select(Lead)
-    findings_stmt = select(ConnectorFinding)
+    findings_stmt = select(ConnectorFinding).where(_prefilter(
+        tokens, ConnectorFinding.caption, ConnectorFinding.schema, ConnectorFinding.properties,
+        ConnectorFinding.provider, ConnectorFinding.provider_record_id, ConnectorFinding.source_url,
+    ))
     rels_stmt = select(RelationshipEdge)
-    timeline_stmt = select(TimelineEvent)
-    tasks_stmt = select(ReportingTask)
+    timeline_stmt = select(TimelineEvent).where(_prefilter(
+        tokens, TimelineEvent.title, TimelineEvent.description, TimelineEvent.date_start,
+        TimelineEvent.date_end, TimelineEvent.verification_status, TimelineEvent.dataset, TimelineEvent.origin,
+    ))
+    tasks_stmt = select(ReportingTask).where(_prefilter(
+        tokens, ReportingTask.title, ReportingTask.detail, ReportingTask.status,
+        ReportingTask.priority, ReportingTask.owner, ReportingTask.due_date,
+    ))
+    # STRUCT-0036: documents_stmt is deliberately unfiltered beyond investigation
+    # scope, same reasoning as entities_stmt/sources_stmt above -- `documents`
+    # (fetched from it) drives document_ids, which the document_chunk and
+    # extraction_candidate queries above depend on regardless of whether the
+    # parent document's own fields match.
     documents_stmt = select(Document)
     if investigation_id:
         entities_stmt = entities_stmt.where(Entity.investigation_id == investigation_id)
@@ -206,7 +267,14 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
 
     # Canonical statements may contain searchable provenance not present in materialized properties.
     if entity_by_id:
-        statements = db.scalars(select(Statement).where(Statement.entity_id.in_(entity_by_id.keys()))).all()
+        # STRUCT-0036: statements are self-contained for prefiltering purposes --
+        # nothing downstream needs the full unfiltered statement set for a given
+        # entity, only the ones whose own text could actually score.
+        statements = db.scalars(
+            select(Statement)
+            .where(Statement.entity_id.in_(entity_by_id.keys()))
+            .where(_prefilter(tokens, Statement.prop, Statement.value, Statement.dataset, Statement.origin, Statement.original_value))
+        ).all()
         for row in statements:
             entity = entity_by_id.get(row.entity_id)
             if entity is None:
@@ -236,7 +304,15 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
             ))
 
     if source_by_id:
-        evidence_rows = db.scalars(select(Evidence).where(Evidence.source_id.in_(source_by_id.keys()))).all()
+        # STRUCT-0036: evidence's own unfiltered set isn't relied on as a lookup
+        # elsewhere, but its score also depends on the joined source's title/url
+        # (see below), so the prefilter must cover those same joined columns too.
+        evidence_rows = db.scalars(
+            select(Evidence)
+            .join(Source, Evidence.source_id == Source.id)
+            .where(Evidence.source_id.in_(source_by_id.keys()))
+            .where(_prefilter(tokens, Evidence.quote, Evidence.locator, Evidence.notes, Source.title, Source.url))
+        ).all()
         for row in evidence_rows:
             source = source_by_id.get(row.source_id)
             if source is None:
@@ -291,9 +367,19 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
     chunks_by_document_id: dict[str, list[DocumentChunk]] = {}
     candidates_by_document_id: dict[str, list[ExtractionCandidate]] = {}
     if document_ids:
-        for chunk in db.scalars(select(DocumentChunk).where(DocumentChunk.document_id.in_(document_ids))).all():
+        # STRUCT-0036: chunks/candidates are self-contained for prefiltering
+        # purposes -- nothing downstream needs the full unfiltered set for either.
+        for chunk in db.scalars(
+            select(DocumentChunk)
+            .where(DocumentChunk.document_id.in_(document_ids))
+            .where(_prefilter(tokens, DocumentChunk.text, DocumentChunk.locator))
+        ).all():
             chunks_by_document_id.setdefault(chunk.document_id, []).append(chunk)
-        for candidate in db.scalars(select(ExtractionCandidate).where(ExtractionCandidate.document_id.in_(document_ids))).all():
+        for candidate in db.scalars(
+            select(ExtractionCandidate)
+            .where(ExtractionCandidate.document_id.in_(document_ids))
+            .where(_prefilter(tokens, ExtractionCandidate.payload, ExtractionCandidate.candidate_type, ExtractionCandidate.review_status))
+        ).all():
             candidates_by_document_id.setdefault(candidate.document_id, []).append(candidate)
     for doc in documents:
         source = db.get(Source, doc.source_id)

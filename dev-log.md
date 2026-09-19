@@ -1946,3 +1946,26 @@ tests/test_investigation_list_pagination.py grew from 4 to 10 tests. Full suite 
 endpoints now paginated. Still deferred: the default-page-size product decision (needs frontend
 paging controls first), and leads/queue, evidence, relationships, graph, timeline -- each needs its
 own design pass since none reduces to a plain SQL offset/limit as directly as the 8 done so far.
+
+## 2026-09-19: STRUCT-0036 cycle 2 -- SQL-level search prefilter for 8 safe record types
+
+Added the SQL-level prefilter cycle 1 deferred after finding a correctness hazard in
+entities_stmt/sources_stmt. This cycle applied a new `_prefilter(tokens, *columns)` helper -- a
+portable, case-insensitive "any query token is a substring of any of these columns" WHERE predicate
+with a written correctness argument for why it's a safe superset of `_score()`'s own conditions -- to
+the 7 record types with no shared-lookup hazard: claim, reporting_task, connector_finding,
+timeline_event, statement, document_chunk, extraction_candidate. Also fixed evidence with a JOIN
+against Source (its score depends on the joined source's title/url, so a plain-column prefilter would
+have silently dropped matches).
+
+New test (test_prefiltered_record_types_still_match_via_own_fields_not_a_parents) proves all 8 types
+still surface a hit that matches ONLY via that record's own field, including two JSON-column cases
+(connector_finding.properties, extraction_candidate.payload cast to text). Full suite green (266
+tests, up from 265), mypy clean.
+
+Also discovered while auditing: documents_stmt has the exact same shared-lookup hazard as
+entities_stmt/sources_stmt (drives document_ids for the now-prefiltered chunk/candidate queries) --
+not previously documented. Left it unfiltered with an explanatory comment. STRUCT-0036 stays
+IN_PROGRESS: the entities/sources/documents split-query design (described in cycle 1's note) is still
+the real remaining work, plus leads/relationships prefiltering deferred as lower-priority per the
+task's own allowance.
