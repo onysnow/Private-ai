@@ -1334,3 +1334,24 @@ the natural next slice.
 
 Verified: full 224-test suite green (220 existing + 4 new), 80% coverage
 floor held at 86.86%.
+
+
+## STRUCT-0019 corrected: connector-credential save/delete now covered
+
+Added tests/test_connector_credential_endpoints.py (7 tests) exercising
+PUT/DELETE /api/settings/connectors/{provider}/credential through the
+FastAPI TestClient end to end -- the prior test_connector_credentials.py
+only called the lower-level app/services/credentials.py store directly
+and never touched save_connector_credential/delete_connector_credential
+or the routes that wrap them.
+
+Covers the three branches those wrapper functions were specifically
+written to distinguish (unknown provider -> 404, blank/missing credential
+-> 400, forced set_secret/remove_secret failure via monkeypatch -> 500),
+plus the success round trip and confirming the secret value never leaks
+into a response body. Each test monkeypatches
+settings.connector_credentials_file to a pytest tmp_path so nothing
+touches the real ./data/secrets/connectors.json.
+
+Verified: full 231-test suite green (224 existing + 7 new), 80% coverage
+floor held at 87.36% (app/services/settings.py: 70% -> 85%).
