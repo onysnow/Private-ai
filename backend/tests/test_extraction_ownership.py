@@ -7,13 +7,6 @@ from app.models.domain import ExtractionCandidate, Investigation
 from app.services.documents import ingest_document
 
 
-@pytest.fixture(autouse=True)
-def _clean_database():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-    yield
-
-
 def _ingest(tmp_path, *, local_entities: bool):
     old = settings.enable_local_entity_suggestions
     settings.enable_local_entity_suggestions = local_entities

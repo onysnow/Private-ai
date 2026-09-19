@@ -10,11 +10,6 @@ from app.db.session import Base, engine
 from app.main import app
 
 
-def setup_module():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
-
 def test_list_endpoints_404_for_nonexistent_investigation():
     client = TestClient(app)
     missing = "no-such-investigation"

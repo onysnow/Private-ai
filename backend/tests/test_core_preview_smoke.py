@@ -4,11 +4,6 @@ from app.db.session import Base, engine
 from app.main import app
 
 
-def setup_module():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
-
 def test_core_preview_capabilities_do_not_require_ai():
     client = TestClient(app)
     response = client.get('/api/capabilities')

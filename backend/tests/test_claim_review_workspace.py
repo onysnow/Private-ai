@@ -2,9 +2,6 @@ from fastapi.testclient import TestClient
 from app.db.session import Base, engine
 from app.main import app
 
-def setup_module():
-    Base.metadata.drop_all(bind=engine); Base.metadata.create_all(bind=engine)
-
 def test_claim_review_requires_rationale_preserves_history_and_shows_relationship_dependencies():
     client=TestClient(app)
     inv=client.post('/api/investigations',json={'name':'Claim review'}).json()

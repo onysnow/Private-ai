@@ -4,11 +4,6 @@ from app.main import app
 from app.models.domain import ConnectorFinding
 
 
-def setup_module():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
-
 def test_question_context_separates_external_leads_from_factual_citations():
     client = TestClient(app)
     inv = client.post('/api/investigations', json={'name': 'AI context'}).json()

@@ -13,12 +13,6 @@ from app.services.exports import collect_investigation_records
 
 
 
-@pytest.fixture(autouse=True)
-def _clean_database():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-    yield
-
 class FakeOpenAlephClient:
     def __init__(self):
         self.collections = {}

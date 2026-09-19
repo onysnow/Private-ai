@@ -16,11 +16,6 @@ from app.core.config import settings
 import app.ai.reasoning as reasoning_module
 
 
-def setup_module():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
-
 class _FakeLLMClient:
     def __init__(self, response_text: str):
         self._response_text = response_text

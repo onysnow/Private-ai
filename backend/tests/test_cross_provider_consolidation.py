@@ -15,8 +15,6 @@ class BConnector(Connector):
         return [ExternalFinding(provider="b", record_id="b-1", caption="ACME HOLDINGS INC.", schema="Company", properties={"name":["Acme Holdings Inc"],"leiCode":["549300ABC123"],"address":["801 E 86th Ave"]}, url="https://b.example/b-1", raw={})]
 
 def setup_module():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
     registry.register("a", AConnector()); registry.register("b", BConnector())
 
 def test_cross_provider_cluster_and_reporter_decision():

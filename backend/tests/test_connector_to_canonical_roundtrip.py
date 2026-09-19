@@ -11,9 +11,6 @@ from app.services.exports import build_investigation_export, restore_investigati
 from app.services.promotion import promote_assessment
 from app.services.relationships import investigation_graph
 
-def setup_function():
-    Base.metadata.drop_all(bind=engine); Base.metadata.create_all(bind=engine)
-
 def add_finding(db, inv, run, rid, caption, schema, props, url):
     row=ConnectorFinding(investigation_id=inv,run_id=run,provider='aleph',provider_record_id=rid,caption=caption,schema=schema,properties=props,source_url=url,raw={'dataset':'aleph-fixture'})
     db.add(row); db.flush(); return row

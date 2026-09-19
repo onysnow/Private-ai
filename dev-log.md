@@ -2117,3 +2117,36 @@ reasoning further in the abstract. Deliberately did not re-add the conftest.py f
 time -- two prior reproducible hangs already cost real cycles to diagnose and revert.
 
 No code changed this cycle (the diagnostic script was scratch-only). STRUCT-0011 stays OPEN.
+
+## 2026-09-19: STRUCT-0011 cycle 4 -- root cause found and fixed (live /engineering:debug session)
+
+Root cause was never a hang: Base.metadata.drop_all()+create_all() against the app's real 42-table
+schema costs ~2.3-2.8s PER CALL (confirmed with faulthandler.dump_traceback_later(12, repeat=True) --
+every periodic thread-stack dump landed in the same create_all() DDL frame, never a deeper or growing
+stack). Cycle 1's own "0.3ms" benchmark was a measurement bug: it imported only app.db.session, never
+app.main/app.models, so Base.metadata.tables was empty and it never measured the real schema at all.
+Across 259+ tests, resetting the schema via DDL before every test is ~700-750s of pure churn --
+comfortably past any timeout either of cycles 1-2 tested with, which is exactly what got misreported
+as a hang both times. Cycle 2's StaticPool connection-pool-exhaustion theory (already disproven in
+cycle 3) and cycle 3's own get_db()-threadpool/SQLite-thread-safety hypothesis were both red herrings.
+
+Fix shipped: backend/tests/conftest.py now has one autouse fixture that creates the schema ONCE
+(create_all(checkfirst=True) -- a no-op after app.main's ensure_database_schema(engine) already ran
+it at import time) and resets row DATA between tests with plain DELETEs in reverse dependency order
+(reversed(Base.metadata.sorted_tables)) inside one engine.begin() transaction. Benchmarked at ~19ms
+vs ~2.7s for the DDL approach -- about 145x faster.
+
+Migrated all 19 files cycle 2 catalogued off their ad hoc setup_module()/setup_function()/
+_clean_database DB-reset boilerplate: 17 had it as pure scaffolding and lost the whole function;
+test_cross_provider_consolidation.py and test_multi_enrichment.py kept setup_module() (it also
+registers fixture connectors into the global registry) with only the DB-reset lines stripped;
+test_connector_to_canonical_roundtrip.py kept its own mid-test manual drop_all()/create_all() call
+untouched, since that one simulates "restore into a genuinely blank database" as real test semantics,
+not incidental setup. The fixture binds against the same engine/Base objects app.db.session already
+constructs (not a fresh engine), since several files call SessionLocal()/Session(engine) directly on
+an already-imported name binding.
+
+Verified: full backend suite, rsynced into a disposable scratch copy (never run against the live
+checkout directly), 259+ tests, exit 0, zero failures, 88.39% coverage (80% floor), 1m20s wall time
+including coverage instrumentation -- down from a run that never finished within any timeout tested
+before this fix. STRUCT-0011 is CORRECTED.

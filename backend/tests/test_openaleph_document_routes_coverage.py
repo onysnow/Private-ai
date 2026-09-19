@@ -24,11 +24,6 @@ from app.models.domain import Document, DocumentCorpusSync, Source
 client = TestClient(app)
 
 
-def setup_module():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
-
 def _new_investigation(name: str) -> str:
     r = client.post('/api/investigations', json={'name': name})
     assert r.status_code == 200, r.text

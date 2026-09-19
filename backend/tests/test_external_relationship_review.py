@@ -6,11 +6,6 @@ from app.main import app
 from app.models.domain import ConnectorFinding, ConnectorRun
 
 
-def setup_module():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
-
 def entity(client, inv, schema, caption):
     return client.post('/api/entities', json={
         'investigation_id': inv, 'schema': schema, 'caption': caption,

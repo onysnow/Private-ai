@@ -5,11 +5,6 @@ from app.main import app
 from app.models.domain import ConnectorFinding, DocumentChunk, ExtractionCandidate, Statement, TimelineEvent
 
 
-def setup_module():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
-
 def test_investigation_search_returns_typed_provenance_and_claim_evidence_links():
     client = TestClient(app)
     inv = client.post('/api/investigations', json={'name': 'Search provenance'}).json()

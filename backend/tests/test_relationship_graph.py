@@ -4,11 +4,6 @@ from app.db.session import Base, engine
 from app.main import app
 
 
-def setup_module():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
-
 def make_entity(client, inv_id, schema, caption):
     return client.post("/api/entities", json={
         "investigation_id": inv_id,

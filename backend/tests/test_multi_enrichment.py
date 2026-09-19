@@ -22,8 +22,6 @@ class BadConnector(Connector):
 
 
 def setup_module():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
     registry.register("good", GoodConnector())
     registry.register("bad", BadConnector())
 
