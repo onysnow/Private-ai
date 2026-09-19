@@ -1388,3 +1388,29 @@ scoping and a 404 on an unknown investigation.
 Verified: full 237-test suite green (231 + 6 new), 80% coverage floor
 held at 87.77%, alembic upgrade/downgrade/check all clean on the new
 migration.
+
+
+## STRUCT-0029 corrected: Docker HEALTHCHECKs added
+
+Added HEALTHCHECK to backend/Dockerfile (python's urllib against
+GET /api/health -- auth-exempt for loopback callers, so no token needed)
+and frontend/Dockerfile (node's http module against the root page, since
+no dedicated frontend health route exists). Neither adds a new package --
+both use the runtime already in their base image instead of installing
+curl/wget. docker-compose.yml's frontend.depends_on.backend now uses
+condition: service_healthy instead of the bare list form, which only
+waited for container start, not readiness -- matching the pattern
+workbench-db/postgres already use.
+
+Added tests/test_health_endpoint.py (1 test) confirming GET /api/health
+returns 200 for an unauthenticated local-style request, which is exactly
+how the in-container healthcheck calls it and which nothing previously
+verified.
+
+Not locally build-verified -- no docker binary in this sandbox --
+.github/workflows/docker-build.yml already runs `docker compose build
+backend frontend` on every push and will catch any Dockerfile syntax
+error; watching that run after push is this fix's real verification step.
+
+Verified: full 238-test suite green (237 + 1 new), 80% coverage floor
+held at 87.79%.

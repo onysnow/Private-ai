@@ -12,4 +12,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt \
     && python -c "import fitz, pathlib; p=pathlib.Path(fitz.get_tessdata()); assert (p/'eng.traineddata').is_file(), f'English tessdata missing: {p}'"
 COPY . .
+
+# GET /api/health is auth-exempt for local/loopback callers (see
+# app.core.access.request_is_local_request), so this needs no token.
+HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=5 \
+    CMD python -c "import sys, urllib.request; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/api/health', timeout=3).status == 200 else 1)" || exit 1
+
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
