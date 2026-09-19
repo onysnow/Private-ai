@@ -1505,3 +1505,40 @@ researchers vs. the one trusted operator) are genuinely distinct
 readers with different needs.
 
 Docs-only change; no backend tests affected.
+
+
+## STRUCT-0036 partial fix: eliminated 3 N+1s in search, full scan-and-score deferred
+
+investigation_search() (backend/app/services/search.py) fetches every row of
+every searchable model type for an investigation and scores each one in
+Python -- a deliberate, documented trade-off for cross-dialect ordering
+consistency, but one whose cost scales with total record count rather than
+match count. On top of that base cost, three genuine N+1s were compounding
+it further, each firing regardless of whether the parent record matched:
+LeadProfile was queried once per lead, and DocumentChunk/ExtractionCandidate
+were each queried once per document. Batched all three into single IN()
+queries keyed by lead id / document id, mirroring the batching pattern
+Statement already used for entity_id in this same function. Verified via
+the full backend suite (268 tests, all passing unchanged) including
+test_search_provenance.py's ranking and provenance-trace assertions.
+
+Also checked whether resolve_active_entity()'s per-row db.get() calls, and
+the inline db.get(Entity, ...) calls in the relationship-hit loop, were a
+real N+1 -- they are not: entities_stmt loads every Entity for the
+investigation into the session up front, so SQLAlchemy's identity map
+answers those get()s without a second query. No fix needed there.
+
+Deliberately did not attempt the finding's core ask -- a SQL-level
+prefilter (LIKE/ILIKE or FTS) ahead of _score() so unmatched rows are never
+fetched -- this pass. Investigating it surfaced a real correctness hazard:
+entities_stmt/sources_stmt's full, unfiltered results are reused as
+entity_by_id/source_by_id lookup tables so that statements/evidence/
+documents can be scored and displayed even when their OWN text matches but
+their parent entity/source's fields do not. Prefiltering entities_stmt/
+sources_stmt directly would silently drop those matches from search
+results entirely -- a worse bug than the slow scan it would fix. A correct
+fix needs to separate "which entities/sources are in scope" (cheap, ID-only,
+unfiltered) from "which entities/sources themselves match" (prefiltered,
+for entity/source-type hits only) -- a more invasive change that deserves
+its own careful pass rather than being rushed here. Left STRUCT-0036 as
+IN_PROGRESS with the remainder captured for a dedicated follow-up.

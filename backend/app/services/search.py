@@ -263,8 +263,15 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
                 {"kind": "reporter_claim", **_trace("claim", row.id)}, {"status": row.status, "confidence": row.confidence},
             ))
 
-    for row in db.scalars(leads_stmt).all():
-        profile = db.scalar(select(LeadProfile).where(LeadProfile.lead_id == row.id))
+    # Batch-load lead profiles instead of one query per lead (previous N+1: a query
+    # per lead regardless of whether that lead's own fields even matched the query).
+    leads = db.scalars(leads_stmt).all()
+    lead_profile_by_lead_id: dict[str, LeadProfile] = {}
+    if leads:
+        for profile in db.scalars(select(LeadProfile).where(LeadProfile.lead_id.in_([row.id for row in leads]))).all():
+            lead_profile_by_lead_id[profile.lead_id] = profile
+    for row in leads:
+        profile = lead_profile_by_lead_id.get(row.id)
         score = _score(query, row.title, row.detail, row.provider, row.provider_record_id, row.status,
                        profile.priority if profile else None, profile.owner if profile else None, profile.next_action if profile else None)
         if score:
@@ -275,7 +282,20 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
                  "owner": profile.owner if profile else None, "next_action": profile.next_action if profile else None},
             ))
 
-    for doc in db.scalars(documents_stmt).all():
+    # Batch-load chunks/candidates for every matched document instead of issuing one
+    # query per document (previous N+1: every document in the investigation, matched
+    # or not, triggered two additional queries just to see if its chunks/candidates
+    # matched).
+    documents = db.scalars(documents_stmt).all()
+    document_ids = [doc.id for doc in documents]
+    chunks_by_document_id: dict[str, list[DocumentChunk]] = {}
+    candidates_by_document_id: dict[str, list[ExtractionCandidate]] = {}
+    if document_ids:
+        for chunk in db.scalars(select(DocumentChunk).where(DocumentChunk.document_id.in_(document_ids))).all():
+            chunks_by_document_id.setdefault(chunk.document_id, []).append(chunk)
+        for candidate in db.scalars(select(ExtractionCandidate).where(ExtractionCandidate.document_id.in_(document_ids))).all():
+            candidates_by_document_id.setdefault(candidate.document_id, []).append(candidate)
+    for doc in documents:
         source = db.get(Source, doc.source_id)
         score = _score(query, doc.filename, doc.mime_type, doc.sha256, source.title if source else None)
         if score:
@@ -285,8 +305,7 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
                 {"kind": "document", "source_id": doc.source_id, "sha256": doc.sha256, **_trace("document", doc.id)},
                 {"filename": doc.filename, "mime_type": doc.mime_type, "extraction_status": doc.extraction_status},
             ))
-        chunks = db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == doc.id)).all()
-        for chunk in chunks:
+        for chunk in chunks_by_document_id.get(doc.id, []):
             cscore = _score(query, chunk.text, chunk.locator)
             if cscore:
                 hits.append(SearchHit(
@@ -295,8 +314,7 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
                     {"kind": "extracted_text", "document_id": doc.id, "source_id": doc.source_id, "locator": chunk.locator, **_trace("document", doc.id)},
                     {"page_number": chunk.page_number, "ordinal": chunk.ordinal},
                 ))
-        candidates = db.scalars(select(ExtractionCandidate).where(ExtractionCandidate.document_id == doc.id)).all()
-        for candidate in candidates:
+        for candidate in candidates_by_document_id.get(doc.id, []):
             ptext = str(candidate.payload or {})
             cscore = _score(query, ptext, candidate.candidate_type, candidate.review_status)
             if cscore:
