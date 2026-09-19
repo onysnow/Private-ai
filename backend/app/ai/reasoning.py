@@ -30,6 +30,11 @@ from app.services.assistant_context import build_question_context
 
 TAS_SPEC_ROOT = Path(__file__).resolve().parent / "tas_spec"
 
+# STRUCT-0025: tests/test_tas_submodule_drift.py verifies every path below
+# still resolves inside the pinned tas_spec submodule commit. If you bump the
+# submodule pin (or wire up a new TAS module here), run that test locally
+# first -- an upstream rename/restructure should fail there, not silently at
+# request time with a FileNotFoundError.
 MODULE_FILES = {
     "case_synthesis": TAS_SPEC_ROOT / "PROMPT_MODULES" / "08_CASE_SYNTHESIS.md",
     "hypothesis_test": TAS_SPEC_ROOT / "PROMPT_MODULES" / "06_HYPOTHESIS_AND_CONTRADICTION_TESTING.md",

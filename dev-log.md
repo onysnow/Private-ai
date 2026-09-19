@@ -1761,3 +1761,26 @@ When this does cross a real threshold, the plan is already written into the find
 same domain boundaries as `app/api/routes_*.py` / `app/services/*.py` (investigations, entities,
 leads, documents, connectors, settings, etc.), each domain's models in their own module, all still
 declared against the shared `Base` from `app/db/session.py`.
+
+## 2026-09-19: STRUCT-0025 fixed -- TAS submodule drift check
+
+`backend/app/ai/reasoning.py` looks up its two wired TAS prompt modules
+(case_synthesis, hypothesis_test) by hardcoded file paths inside the
+`backend/app/ai/tas_spec` git submodule. Nothing verified those paths still
+existed after bumping the submodule's pin, so an upstream rename or
+restructure in onysnow/topic-authority-system would have failed silently at
+request time with a `FileNotFoundError`, not at CI or review time.
+
+Added `backend/tests/test_tas_submodule_drift.py`: walks
+`reasoning.MODULE_FILES` and asserts every path resolves to a real,
+non-empty file under `TAS_SPEC_ROOT`. It skips (doesn't fail) when
+`tas_spec` isn't checked out at all, matching
+`.github/workflows/backend-postgres-ci.yml`'s existing tolerance of a
+missing submodule on Dependabot PRs -- so this only adds a new failure mode
+for the case that actually matters (submodule present but restructured),
+not a new spurious failure for the already-tolerated case. Added a one-line
+pointer comment above `MODULE_FILES` in `reasoning.py` so a future submodule
+bump or new-module wiring naturally leads to running this test.
+
+No new CI workflow step was needed -- the existing pytest job already runs
+the full suite (now 258 tests) whenever the submodule fetch step succeeds.
