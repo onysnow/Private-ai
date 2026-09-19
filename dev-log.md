@@ -2024,3 +2024,26 @@ green, 266 tests, exit 0, unchanged (these were all type-level fixes, no behavio
 mypy `files` list now covers 11 app/services files. Remaining scope re-measured at 270 errors across 9 files,
 still dominated by search.py (106, overlaps STRUCT-0036); app/ai (134 errors) and app/api remain untouched.
 STRUCT-0013 stays IN_PROGRESS.
+
+## 2026-09-19: STRUCT-0015 cycle 3 -- app/page.tsx investigation-search flow tested
+
+Added tests/test-page-search.test.tsx covering the "Investigation search" box (internalSearch(),
+GET /api/search) and its grouped results rendering -- the second genuinely self-contained flow
+found on app/page.tsx after cycle 2's API-access bootstrap gate. internalSearch() only needs
+`internalQ`, never `inv`, so it's reachable without driving selectInvestigation()'s 9-way fetch
+cascade, keeping the investigations list empty exactly like cycle 2's tests.
+
+3 new tests: grouped rendering (canonical hit gets a Trace-provenance action, external_lead hit
+gets the fixed caution copy instead) plus URL assertions for q/limit and the absence of
+investigation_id/include_reconciled_duplicates when neither applies; the include_reconciled_duplicates
+checkbox actually reaching the request URL; and the empty-query early-return sending no request at
+all. Full vitest suite green (38 tests, up from 35), tsc clean, eslint clean.
+
+Also hit, and want on record for future cycles: a device_commit_files call can return no `rejected`
+entries yet leave the device file's old content in place (a transient failure already documented
+elsewhere this session for STRUCT-0036's test file) -- an identical retry with force:true picked it
+up. A commit call succeeding is not proof the device file changed; verify by reading it back when a
+downstream check doesn't show the expected effect.
+
+STRUCT-0015 stays IN_PROGRESS -- most of app/page.tsx (dossier, relationships, documents, claims,
+leads, backups, security audit) remains untested, as expected for a component this size.
