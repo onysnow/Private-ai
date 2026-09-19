@@ -1,4 +1,6 @@
 import re
+from typing import Any
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.models.domain import Entity, RelationshipEdge, CanonicalResolutionDecision
@@ -11,7 +13,7 @@ def candidate_entities(db: Session, investigation_id: str, caption: str, schema:
     needle = set(_norm(caption).split())
     relationship_ids = select(RelationshipEdge.relationship_entity_id).where(RelationshipEdge.investigation_id == investigation_id)
     rows = db.scalars(select(Entity).where(Entity.investigation_id == investigation_id, Entity.merged_into_entity_id.is_(None), ~Entity.id.in_(relationship_ids))).all()
-    scored = []
+    scored: list[dict[str, Any]] = []
     for row in rows:
         hay = set(_norm(row.caption).split())
         overlap = len(needle & hay) / max(1, len(needle | hay))
@@ -24,21 +26,21 @@ def candidate_entities(db: Session, investigation_id: str, caption: str, schema:
 
 
 def canonical_duplicate_candidates(db: Session, entity: Entity) -> list[dict]:
-    entity, _ = resolve_active_entity(db, entity)
-    if entity is None:
+    resolved_entity, _ = resolve_active_entity(db, entity)
+    if resolved_entity is None:
         return []
-    candidates = candidate_entities(db, entity.investigation_id, entity.caption, entity.schema)
-    latest = {}
+    candidates = candidate_entities(db, resolved_entity.investigation_id, resolved_entity.caption, resolved_entity.schema)
+    latest: dict[str, CanonicalResolutionDecision] = {}
     rows = db.scalars(select(CanonicalResolutionDecision).where(
-        CanonicalResolutionDecision.investigation_id == entity.investigation_id,
-        ((CanonicalResolutionDecision.entity_a_id == entity.id) | (CanonicalResolutionDecision.entity_b_id == entity.id)),
+        CanonicalResolutionDecision.investigation_id == resolved_entity.investigation_id,
+        ((CanonicalResolutionDecision.entity_a_id == resolved_entity.id) | (CanonicalResolutionDecision.entity_b_id == resolved_entity.id)),
     ).order_by(CanonicalResolutionDecision.created_at.desc())).all()
     for row in rows:
-        other = row.entity_b_id if row.entity_a_id == entity.id else row.entity_a_id
+        other = row.entity_b_id if row.entity_a_id == resolved_entity.id else row.entity_a_id
         latest.setdefault(other, row)
     out = []
     for candidate in candidates:
-        if candidate["entity_id"] == entity.id:
+        if candidate["entity_id"] == resolved_entity.id:
             continue
         decision = latest.get(candidate["entity_id"])
         out.append({**candidate, "latest_decision": None if decision is None else {

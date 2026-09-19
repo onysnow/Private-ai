@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -37,10 +39,10 @@ def _endpoint_finding(db: Session, finding: ConnectorFinding, record_id: str) ->
 
 def relationship_endpoint_candidates(db: Session, finding: ConnectorFinding) -> dict:
     source_ref, target_ref = _external_refs(finding)
-    result = {
+    result: dict[str, Any] = {
         "schema": finding.schema,
-        "source_prop": RELATIONSHIP_SCHEMAS[finding.schema]["source_prop"],
-        "target_prop": RELATIONSHIP_SCHEMAS[finding.schema]["target_prop"],
+        "source_prop": RELATIONSHIP_SCHEMAS[finding.schema or ""]["source_prop"],
+        "target_prop": RELATIONSHIP_SCHEMAS[finding.schema or ""]["target_prop"],
         "source_external_id": source_ref,
         "target_external_id": target_ref,
         "source_candidates": [],
@@ -111,6 +113,6 @@ def promote_review(db: Session, review: ExternalRelationshipReview) -> ExternalR
 
 
 def list_relationship_reviews(db: Session, finding_id: str) -> list[ExternalRelationshipReview]:
-    return db.scalars(
+    return list(db.scalars(
         select(ExternalRelationshipReview).where(ExternalRelationshipReview.finding_id == finding_id).order_by(ExternalRelationshipReview.created_at.desc())
-    ).all()
+    ).all())

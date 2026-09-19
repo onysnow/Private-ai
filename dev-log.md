@@ -2007,3 +2007,20 @@ rollback pattern per test, since it never calls connect() a second time for DDL 
 with StaticPool's single-slot pool the way drop_all/create_all does. Before attempting it, audit
 every test file for a session held open across an HTTP call in the same test -- StaticPool has made
 that a sharper hazard than it was before this cycle's change. Status stays OPEN.
+
+## 2026-09-19: STRUCT-0013 cycle 3 -- mypy widened to 3 more app/services files (resolution, external_relationships, openaleph_corpus)
+
+Picked up the next-smallest slice cycle 2's note identified: resolution.py, external_relationships.py,
+and openaleph_corpus.py (13 mypy errors total, all confirmed safe mechanical fixes). Notable fix: a
+reused-variable-different-type bug pattern seen in earlier cycles recurred here -- canonical_duplicate_candidates()
+reassigned its own `entity: Entity` parameter to `resolve_active_entity()`'s `Entity | None` return, which
+made mypy treat the subsequent `if entity is None: return []` guard as unreachable (a real, previously-masked
+gap, not just a lint nag). Renamed to `resolved_entity` to restore it as live code. Also fixed a ternary in
+openaleph_corpus.py that called `.get()` twice instead of naming the intermediate value, which is what was
+defeating mypy's isinstance narrowing.
+
+Verified: `python -m mypy` (exact CI invocation) clean across all 21 covered source files; full backend suite
+green, 266 tests, exit 0, unchanged (these were all type-level fixes, no behavior change). pyproject.toml's
+mypy `files` list now covers 11 app/services files. Remaining scope re-measured at 270 errors across 9 files,
+still dominated by search.py (106, overlaps STRUCT-0036); app/ai (134 errors) and app/api remain untouched.
+STRUCT-0013 stays IN_PROGRESS.

@@ -32,6 +32,9 @@ files = [
     "app/services/sources.py", "app/services/lifecycle.py", "app/services/entity_merge.py",
     "app/services/connector_findings.py", "app/services/claims.py", "app/services/timeline.py",
     "app/services/relationships.py", "app/services/post_merge_reconciliation.py",
+    # STRUCT-0013 widening, cycle 3: the next-smallest slice (13 errors across 3 files).
+    "app/services/resolution.py", "app/services/external_relationships.py",
+    "app/services/openaleph_corpus.py",
 ]
 warn_return_any = true
 warn_unused_configs = true
@@ -46,15 +49,14 @@ pretty = true
 show_error_codes = true
 
 # Deferred until the remaining backend packages are ready for broader type-checking
-# (STRUCT-0013, cycle 2 update): 8 app/services files brought under coverage above.
-# The rest of app/services now stands at ~282 errors across 12 files (re-measured
-# this cycle; was 289/20 files before this widening) -- dominated by search.py alone
+# (STRUCT-0013, cycle 3 update): 11 app/services files brought under coverage above.
+# The rest of app/services now stands at 270 errors across 9 files (re-measured
+# this cycle; was 282/12 files before this widening) -- dominated by search.py alone
 # (106 errors), then documents.py (41), leads.py (38), provenance.py (35), dossier.py
-# (17), investigations.py/exports.py/entities.py/consolidation.py (8 each),
-# resolution.py/external_relationships.py (5 each), openaleph_corpus.py (3). app/ai
+# (17), investigations.py/exports.py/entities.py/consolidation.py (8 each). app/ai
 # (134 errors, not yet investigated) and app/api remain untouched widening targets.
-# The 8 files just added are NOT yet clean under disallow_untyped_defs=true (6 errors:
-# missing return-type/arg annotations, mostly on route-payload `body` params whose
+# The 11 files added across cycles 2-3 are NOT yet clean under disallow_untyped_defs=true
+# (missing return-type/arg annotations, mostly on route-payload `body` params whose
 # concrete Pydantic schema type needs to be threaded through) -- left under the relaxed
 # default rather than rushing those annotations in this cycle; a future cycle can flip
 # them to the strict override alongside app.models.*/app.schemas.* once annotated.

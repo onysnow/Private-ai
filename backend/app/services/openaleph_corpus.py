@@ -267,7 +267,8 @@ def get_openaleph_review_status(db: Session, document_id: str) -> dict:
     provider_candidates = []
     for candidate in candidates:
         payload = candidate.payload if isinstance(candidate.payload, dict) else {}
-        provenance = payload.get("provenance") if isinstance(payload.get("provenance"), dict) else {}
+        raw_provenance = payload.get("provenance")
+        provenance = raw_provenance if isinstance(raw_provenance, dict) else {}
         if provenance.get("provider") == PROVIDER:
             provider_candidates.append(candidate)
 
@@ -338,7 +339,7 @@ def _openaleph_search(
     headers = {"User-Agent": "JournalismWorkbench/0.93"}
     if settings.openaleph_api_key:
         headers["Authorization"] = f"ApiKey {settings.openaleph_api_key}"
-    params = {
+    params: dict[str, str | int] = {
         "q": "*",
         "filter:collection_id": collection_id,
         "filter:schema": "Page",
@@ -485,7 +486,7 @@ def _openaleph_mention_search(
     headers = {"User-Agent": "JournalismWorkbench/0.93"}
     if settings.openaleph_api_key:
         headers["Authorization"] = f"ApiKey {settings.openaleph_api_key}"
-    params = {
+    params: dict[str, str | int] = {
         "q": "*",
         "filter:collection_id": collection_id,
         "filter:schema": "Mention",
