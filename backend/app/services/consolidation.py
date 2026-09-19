@@ -1,6 +1,7 @@
 import hashlib
 import re
 from itertools import combinations
+from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.models.domain import ConnectorFinding, CrossProviderDecision, EnrichmentSession, EnrichmentSessionFinding, EnrichmentSessionRun
@@ -53,7 +54,7 @@ def cluster_key(finding_ids: list[str]) -> str:
 def session_findings(db: Session, session_id: str) -> list[ConnectorFinding]:
     finding_ids=[r.finding_id for r in db.scalars(select(EnrichmentSessionFinding).where(EnrichmentSessionFinding.session_id==session_id)).all()]
     if not finding_ids: return []
-    return db.scalars(select(ConnectorFinding).where(ConnectorFinding.id.in_(finding_ids))).all()
+    return list(db.scalars(select(ConnectorFinding).where(ConnectorFinding.id.in_(finding_ids))).all())
 
 def consolidate_findings(findings: list[ConnectorFinding], threshold: float=0.60) -> list[dict]:
     by_id={f.id:f for f in findings}; parent={f.id:f.id for f in findings}
@@ -68,16 +69,25 @@ def consolidate_findings(findings: list[ConnectorFinding], threshold: float=0.60
     for a,b in combinations(findings,2):
         score,reasons=pair_score(a,b); pair_meta[tuple(sorted((a.id,b.id)))]=(score,reasons)
         if score>=threshold: union(a.id,b.id)
-    groups={}
+    groups: dict[str, list[str]] = {}
     for fid in by_id: groups.setdefault(find(fid),[]).append(fid)
     out=[]
     for ids in groups.values():
         providers={by_id[i].provider for i in ids}
         if len(ids)<2 or len(providers)<2: continue
-        pairs=[]; scores=[]
-        for a,b in combinations(ids,2):
-            score,reasons=pair_meta.get(tuple(sorted((a,b))),(0.0,[]))
-            if score>0: pairs.append({"finding_ids":[a,b],"score":score,"reasons":reasons}); scores.append(score)
+        # Renamed from the outer loop's `a, b` (ConnectorFinding objects, above) to
+        # fid_a/fid_b (their ids, str) -- reusing `a, b` here made mypy keep treating
+        # them as ConnectorFinding from the first loop's binding, flagging this loop's
+        # genuinely different str usage as a type error (the same reused-variable-
+        # different-type pattern fixed in other app/services files in earlier
+        # STRUCT-0013 cycles). `pairs` is explicitly typed since its dict literal's
+        # values are heterogeneous (list[str]/float/list[dict]), which mypy otherwise
+        # infers as dict[str, object] -- not sortable by score below.
+        pairs: list[dict[str, Any]] = []
+        scores=[]
+        for fid_a, fid_b in combinations(ids,2):
+            score,reasons=pair_meta.get(tuple(sorted((fid_a,fid_b))),(0.0,[]))
+            if score>0: pairs.append({"finding_ids":[fid_a,fid_b],"score":score,"reasons":reasons}); scores.append(score)
         findings_payload=[{"id":by_id[i].id,"provider":by_id[i].provider,"provider_record_id":by_id[i].provider_record_id,"caption":by_id[i].caption,"schema":by_id[i].schema,"properties":by_id[i].properties,"source_url":by_id[i].source_url} for i in ids]
         out.append({"cluster_key":cluster_key(ids),"score":round(max(scores) if scores else 0.0,4),"providers":sorted(providers),"finding_ids":sorted(ids),"findings":findings_payload,"pairs":sorted(pairs,key=lambda x:x["score"],reverse=True)})
     return sorted(out,key=lambda x:x["score"],reverse=True)
@@ -110,14 +120,18 @@ def get_enrichment_session_clusters(db: Session, session_id: str) -> list[dict]:
     decisions = db.scalars(
         select(CrossProviderDecision).where(CrossProviderDecision.session_id == session_id).order_by(CrossProviderDecision.created_at.desc())
     ).all()
-    latest = {}
+    latest: dict[str, CrossProviderDecision] = {}
     for decision in decisions:
         latest.setdefault(decision.cluster_key, decision)
     for cluster in clusters:
-        decision = latest.get(cluster["cluster_key"])
-        cluster["decision"] = None if decision is None else {
-            "id": decision.id, "decision": decision.decision, "confidence": decision.confidence,
-            "rationale": decision.rationale, "created_at": decision.created_at,
+        # Renamed from `decision` (reused below as CrossProviderDecision | None from
+        # latest.get(), colliding with the loop variable above's non-Optional
+        # CrossProviderDecision type) -- the same reused-variable-different-type
+        # pattern fixed elsewhere in this file and in earlier STRUCT-0013 cycles.
+        resolved_decision = latest.get(cluster["cluster_key"])
+        cluster["decision"] = None if resolved_decision is None else {
+            "id": resolved_decision.id, "decision": resolved_decision.decision, "confidence": resolved_decision.confidence,
+            "rationale": resolved_decision.rationale, "created_at": resolved_decision.created_at,
         }
     return clusters
 

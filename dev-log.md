@@ -2150,3 +2150,77 @@ Verified: full backend suite, rsynced into a disposable scratch copy (never run 
 checkout directly), 259+ tests, exit 0, zero failures, 88.39% coverage (80% floor), 1m20s wall time
 including coverage instrumentation -- down from a run that never finished within any timeout tested
 before this fix. STRUCT-0011 is CORRECTED.
+
+## 2026-09-19: STRUCT-0013 cycle 4 -- mypy widened to ftm.py and consolidation.py (scheduled autonomous cycle)
+
+Picked STRUCT-0013 for this cycle since it, STRUCT-0015, STRUCT-0018, and STRUCT-0036 were all
+still IN_PROGRESS per STRUCTURE_AUDIT.md (STRUCT-0011 was already CORRECTED as of cycle 4's
+prior "live /engineering:debug session with Ony" entry, so it's out of scope for this cycle
+per the usual pick-the-lowest-numbered-remaining-task rule). This session also had to rebuild
+its device-local Python toolchain from scratch (a fresh device connection, no `$HOME/tmpvenv`
+from any prior cycle): the system Python here is only 3.10, and `followthemoney==4.11.0`
+requires >=3.11 and pulls in `pyicu` (via `normality`), which has no prebuilt wheel and needs
+ICU dev headers + pkg-config to build from source -- neither installable without root. Worked
+around it with `uv python install 3.12` for the interpreter and a `micromamba`-provisioned
+conda-forge environment (`$HOME/mmenv`) just for a prebuilt `pyicu`, then `pip install`ed the
+rest of requirements.txt/-test.txt/-local.txt plus `alembic` into that same env normally. This
+is exactly the gap STRUCT-0001 already documents (BUILD_STATE.md/CI presumably have real ICU
+dev packages available; this sandbox doesn't and has no root to add them) -- not a new finding,
+so left STRUCT-0001 untouched.
+
+Baseline full-suite run surfaced 3 failures unrelated to any code here:
+test_docker_build_workflow.py and two tests in test_integrated_stack_config.py resolve
+`Path(__file__).resolve().parents[2]` to expect repo-root files (`.github/workflows/docker-build.yml`,
+`docker-compose.yml`) two directories above `backend/tests/` -- which don't exist when only
+`backend/` is rsynced into the disposable `$HOME/workbench-local` scratch copy per this chain's
+own verification instructions. Symlinked just those two files into
+`$HOME/workbench-local/{docker-compose.yml,.github/workflows/docker-build.yml}` (pointing at the
+real repo) as part of the verification harness setup, not a repo change -- all 3 pass with that
+in place. Full baseline afterward: 302 tests, 0 failed, 88.37% coverage.
+
+Cycle work: `python -m mypy` on the untouched baseline surfaced 3 real errors in
+app/services/ftm.py, which isn't in pyproject.toml's mypy `files` list but is transitively
+checked anyway (it's imported by relationships.py, in scope since cycle 2) -- apparently never
+actually surfaced in a verification run with followthemoney's real types present until now.
+Its `try: from followthemoney import model as ftm_model / except ImportError: ftm_model = None`
+fallback let mypy infer `ftm_model: Model` (non-Optional) from the try branch alone, which flagged
+the except branch's reassignment as an incompatible-types error and, worse, made every
+`if ftm_model is not None:` guard in _schema_exists/_supports_name look permanently true --
+their None-fallback return lines got flagged as unreachable. Fixed by declaring `ftm_model: Any
+= None` before the try block so the module keeps Any as its declared type regardless of which
+branch runs, and dropped the now-redundant `ftm_model = None` from except.
+
+Then widened the `files` list itself with app/services/consolidation.py (8 errors, all mechanical:
+a Sequence-vs-list return, two missing dict annotations, an unsortable-by-object-key dict-literal
+list needing an explicit `list[dict[str, Any]]` annotation, and two more instances of the
+reused-variable-different-type pattern seen in several earlier cycles' files -- `a, b` reused
+across two different loops with different actual types, and `decision` reused as both a loop
+variable and a `.get()`-returned Optional). Picked over exports.py/entities.py/investigations.py
+(cycle 3's note estimated ~8 errors each too, but measuring each standalone this cycle found they
+each pull in 3 more transitively-checked files once analyzed alone -- 122 errors combined per file,
+not 8 -- so none were attempted, to avoid a much larger unattended slice than intended) because
+consolidation.py's only app.* import is app.models.domain, already covered, so it carries no
+transitive-blowup risk.
+
+Verified: `python -m mypy` (exact CI invocation) passes clean, 23 source files, 0 errors (up from
+21); full backend suite green, 302 tests, exit 0, 88.38% coverage, unchanged from before this cycle
+(pure type-level fixes, no behavior change, no new test needed). Updated STRUCTURE_AUDIT.md's
+STRUCT-0013 progress_note; format re-validated (40 unique finding_id lines, all valid JSON --
+noted in passing that STRUCT-0001 already has a non-OPEN/IN_PROGRESS/CORRECTED status
+("VERIFIED"), pre-existing and outside this cycle's scope, so left as-is). Remaining app/services
+scope: search.py (106), documents.py (41), leads.py (38), provenance.py (35), dossier.py (17),
+investigations.py/exports.py/entities.py (8 each in isolation, 122 combined once their transitive
+files are counted). app/ai (134, not yet investigated) and app/api remain untouched. STRUCT-0013
+stays IN_PROGRESS.
+
+LIVE VERIFICATION NOTE (added while shipping this cycle's uncommitted work in a live session with
+Ony): re-ran `python -m mypy` before committing and it did NOT actually come back clean -- the
+ftm.py fix's inline `# noqa: F811  # type: ignore[no-redef]` comment ordering silently failed to
+suppress the no-redef error in this environment (mypy 1.11.2): a `# type: ignore` marker is only
+recognized when it's the leading comment on the line, so a `# noqa: ...` placed before it makes
+mypy treat the whole thing as ordinary text and never register the suppression -- confirmed by
+isolating it in a scratch file against this repo's own pyproject.toml mypy settings (which has
+warn_unused_ignores=true, yet didn't flag it as unused either -- it was simply never parsed as an
+ignore comment). Reordered to `# type: ignore[no-redef]  # noqa: F811`; re-ran mypy (23 source
+files, 0 errors, confirmed clean this time) and the full backend suite (302 tests, exit 0, 88.39%
+coverage) before pushing. No functional code changed, comment-ordering fix only.
