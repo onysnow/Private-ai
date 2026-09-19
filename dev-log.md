@@ -1684,3 +1684,20 @@ consciously re-examined rather than forgotten, and re-check the trigger
 condition on each next.
 
 Docs-only change; no backend tests affected.
+
+
+## STRUCT-0037 corrected: documented the SQLite single-process constraint
+
+app/db/locking.py's advisory-lock concurrency design correctly gates
+itself to PostgreSQL and no-ops on SQLite, but nothing wrote down the
+consequence: a SQLite-backed deployment must stay single-process/
+single-replica, since concurrent writers would race against SQLite's own
+locking model instead of the app's coordination.
+
+Added the note directly above DATABASE_URL in .env.example -- the file
+every deployment starts from -- stating this plainly and pointing to
+docker-compose.yml's backend/workbench-db services as a working
+multi-worker-capable PostgreSQL example, so a future --workers throughput
+tweak doesn't quietly break SQLite installs.
+
+Docs-only change; no backend tests affected.
