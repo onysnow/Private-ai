@@ -10,7 +10,7 @@ from app.models.domain import (
 )
 from app.schemas.api import InvestigationCreate
 from app.services.documents import serialize_document
-from app.services.leads import LEAD_STATUSES, serialize_lead, serialize_task
+from app.services.leads import LEAD_STATUSES, list_leads_serialized, serialize_tasks_batch
 
 
 def create_investigation(db: Session, body: InvestigationCreate) -> Investigation:
@@ -56,7 +56,7 @@ def list_investigation_claims(db: Session, investigation_id: str) -> list[Claim]
 
 def list_investigation_leads(db: Session, investigation_id: str) -> list[dict]:
     rows = db.scalars(select(Lead).where(Lead.investigation_id == investigation_id).order_by(Lead.created_at.desc())).all()
-    return [serialize_lead(db, row) for row in rows]
+    return list_leads_serialized(db, rows)
 
 
 def lead_queue(
@@ -64,7 +64,7 @@ def lead_queue(
     status: list[str] | None, priority: list[str] | None, owner: str | None, unresolved_only: bool,
 ) -> dict:
     rows = db.scalars(select(Lead).where(Lead.investigation_id == investigation_id).order_by(Lead.created_at.desc())).all()
-    items = [serialize_lead(db, row) for row in rows]
+    items = list_leads_serialized(db, rows)
     requested_status = set(status or [])
     requested_priority = set(priority or [])
     if unresolved_only and not requested_status:
@@ -89,7 +89,8 @@ def lead_queue(
 
 def list_investigation_reporting_tasks(db: Session, investigation_id: str) -> list[dict]:
     rows = db.scalars(select(ReportingTask).where(ReportingTask.investigation_id == investigation_id).order_by(ReportingTask.created_at.desc())).all()
-    return [serialize_task(db, row) for row in rows]
+    serialized = serialize_tasks_batch(db, rows)
+    return [serialized[row.id] for row in rows]
 
 
 def list_investigation_connector_runs(db: Session, investigation_id: str) -> list[ConnectorRun]:

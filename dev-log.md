@@ -1268,3 +1268,36 @@ Applies automatically in CI: run_postgres_gate.py calls `python -m
 pytest -q` with no cov flags of its own, relying entirely on addopts,
 so backend-postgres-ci.yml enforces this with no workflow change.
 Verified: "Required test coverage of 80% reached", 220/220 passing.
+
+
+## STRUCT-0017 corrected: N+1 query cascade in lead serialization
+
+Added batch equivalents in app/services/leads.py: list_leads_serialized()
+(replaces per-lead serialize_lead() calls), _lead_triage_batch(),
+_resolve_link_labels()/_serialize_links_batch(), and
+serialize_tasks_batch() (backed by a shared _build_task_dict() helper
+that serialize_task() now also delegates to, so the two stay in
+lockstep). app/services/investigations.py's list_investigation_leads,
+lead_queue, and list_investigation_reporting_tasks now call these once
+per investigation-sized batch instead of once per lead/task in a
+Python-level loop.
+
+Each batch function fetches every table it needs (LeadProfile, LeadLink,
+ReportingTask, LeadWorkflowEvent, the five link-target tables, plus
+RelationshipEvidenceAttachment/RelationshipEvidenceReviewEvent/
+ClaimEvidenceLink for triage, and ReportingTaskWorkflowEvent for task
+history) with a small constant number of `.in_()` queries regardless of
+how many leads are in the investigation, then reassembles each lead's
+dict from in-memory dicts keyed by id -- eliminating the scaling
+behavior where a leads-list page load ran roughly 6-10 queries per lead.
+
+serialize_lead/serialize_link/serialize_task/_lead_triage are left
+unchanged for their existing single-record call sites (routes_leads.py,
+routes_reporting_tasks.py, dossier.py, provenance.py, convert_lead,
+lead_provenance_snapshot) -- those only ever serialize one record per
+request, so batching them would add complexity with no benefit.
+
+Verified: full 220-test suite green (tests/test_lead_workflow.py and
+tests/test_relationship_evidence_review.py exercise this serialization
+path directly), 80% coverage floor held at 86.77%. No response-shape
+change on any endpoint -- this is a pure query-count optimization.

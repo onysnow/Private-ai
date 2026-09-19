@@ -52,6 +52,78 @@ def serialize_link(db: Session, link: LeadLink) -> dict:
     return {"id": link.id, "lead_id": link.lead_id, "type": kind, "target_id": target_id, "label": target, "note": link.note, "created_at": link.created_at}
 
 
+def _resolve_link_labels(db: Session, links: list[LeadLink]) -> dict[str, str | None]:
+    """Batch-resolve the `label` field serialize_link computes per link.
+
+    Fetches each referenced table once for the whole `links` set instead of
+    issuing 1-2 `db.get()` calls per link (STRUCT-0017). Must stay in exact
+    lockstep with serialize_link's per-kind lookup logic above.
+    """
+    entity_ids: set[str] = set()
+    source_ids: set[str] = set()
+    claim_ids: set[str] = set()
+    evidence_ids: set[str] = set()
+    relationship_ids: set[str] = set()
+    kind_by_link: dict[str, tuple[str, str] | tuple[None, None]] = {}
+    for link in links:
+        kind, target_id = _target_label(link)
+        kind_by_link[link.id] = (kind, target_id)
+        if kind == "entity":
+            entity_ids.add(target_id)
+        elif kind == "source":
+            source_ids.add(target_id)
+        elif kind == "claim":
+            claim_ids.add(target_id)
+        elif kind == "evidence":
+            evidence_ids.add(target_id)
+        elif kind == "relationship":
+            relationship_ids.add(target_id)
+
+    entities = {row.id: row for row in db.scalars(select(Entity).where(Entity.id.in_(entity_ids))).all()} if entity_ids else {}
+    sources = {row.id: row for row in db.scalars(select(Source).where(Source.id.in_(source_ids))).all()} if source_ids else {}
+    claims = {row.id: row for row in db.scalars(select(Claim).where(Claim.id.in_(claim_ids))).all()} if claim_ids else {}
+    evidence = {row.id: row for row in db.scalars(select(Evidence).where(Evidence.id.in_(evidence_ids))).all()} if evidence_ids else {}
+    edges = {row.id: row for row in db.scalars(select(RelationshipEdge).where(RelationshipEdge.id.in_(relationship_ids))).all()} if relationship_ids else {}
+
+    # A relationship's endpoint entities may not already be in `entities` --
+    # a lead can link a relationship without separately linking its endpoints.
+    endpoint_ids = {eid for edge in edges.values() for eid in (edge.source_entity_id, edge.target_entity_id)}
+    missing_endpoint_ids = endpoint_ids - entities.keys()
+    if missing_endpoint_ids:
+        entities.update({row.id: row for row in db.scalars(select(Entity).where(Entity.id.in_(missing_endpoint_ids))).all()})
+
+    labels: dict[str, str | None] = {}
+    for link in links:
+        kind, target_id = kind_by_link[link.id]
+        label = None
+        if kind == "entity":
+            row = entities.get(target_id); label = row.caption if row else None
+        elif kind == "source":
+            row = sources.get(target_id); label = row.title if row else None
+        elif kind == "claim":
+            row = claims.get(target_id); label = row.text if row else None
+        elif kind == "evidence":
+            row = evidence.get(target_id); label = (row.quote or row.locator or row.notes) if row else None
+        elif kind == "relationship":
+            edge = edges.get(target_id)
+            if edge:
+                source = entities.get(edge.source_entity_id)
+                target_entity = entities.get(edge.target_entity_id)
+                label = f"{source.caption if source else edge.source_entity_id} — {edge.schema} → {target_entity.caption if target_entity else edge.target_entity_id}"
+        labels[link.id] = label
+    return labels
+
+
+def _serialize_links_batch(db: Session, links: list[LeadLink]) -> dict[str, dict]:
+    """Batch equivalent of {link.id: serialize_link(db, link) for link in links}."""
+    labels = _resolve_link_labels(db, links)
+    out: dict[str, dict] = {}
+    for link in links:
+        kind, target_id = _target_label(link)
+        out[link.id] = {"id": link.id, "lead_id": link.lead_id, "type": kind, "target_id": target_id, "label": labels[link.id], "note": link.note, "created_at": link.created_at}
+    return out
+
+
 def _lead_triage(db: Session, links: list[LeadLink]) -> dict:
     """Summarize evidence tension around records explicitly linked to a lead.
 
@@ -121,6 +193,132 @@ def _lead_triage(db: Session, links: list[LeadLink]) -> dict:
     }
 
 
+def _lead_triage_batch(db: Session, links_by_lead: dict[str, list[LeadLink]]) -> dict[str, dict]:
+    """Batch equivalent of {lead_id: _lead_triage(db, links) for lead_id, links in links_by_lead.items()}.
+
+    _lead_triage issues up to ~6 queries per lead (2 of them -- the per-relationship
+    attachment lookup and the per-attachment "latest review event" lookup -- run
+    once per relationship_id/attachment, not once per lead). This computes the
+    same per-lead result set but fetches every referenced table once for the
+    whole `links_by_lead` batch, so the query count no longer scales with the
+    number of leads (STRUCT-0017). Every intermediate value mirrors a step in
+    _lead_triage exactly; keep the two in lockstep if either changes.
+    """
+    all_links = [link for links in links_by_lead.values() for link in links]
+
+    all_relationship_ids = {link.relationship_id for link in all_links if link.relationship_id}
+    attachments_by_rel: dict[str, list[RelationshipEvidenceAttachment]] = {}
+    if all_relationship_ids:
+        for attachment in db.scalars(select(RelationshipEvidenceAttachment).where(RelationshipEvidenceAttachment.relationship_edge_id.in_(all_relationship_ids))).all():
+            attachments_by_rel.setdefault(attachment.relationship_edge_id, []).append(attachment)
+
+    # Latest RelationshipEvidenceReviewEvent per (relationship_id, evidence_id) pair,
+    # computed once for every relationship any lead in the batch links to. Rows are
+    # fetched newest-first, so the first row seen for a key is the latest one.
+    latest_review: dict[tuple[str, str], RelationshipEvidenceReviewEvent] = {}
+    if all_relationship_ids:
+        events = db.scalars(
+            select(RelationshipEvidenceReviewEvent)
+            .where(RelationshipEvidenceReviewEvent.relationship_edge_id.in_(all_relationship_ids))
+            .order_by(RelationshipEvidenceReviewEvent.created_at.desc(), RelationshipEvidenceReviewEvent.id.desc())
+        ).all()
+        for event in events:
+            key = (event.relationship_edge_id, event.evidence_id)
+            if key not in latest_review:
+                latest_review[key] = event
+
+    per_lead_claim_ids: dict[str, set[str]] = {}
+    per_lead_evidence_ids: dict[str, set[str]] = {}
+    per_lead_relationship_ids: dict[str, set[str]] = {}
+    all_claim_ids: set[str] = set()
+    all_evidence_ids: set[str] = set()
+    for lead_id, links in links_by_lead.items():
+        claim_ids = {link.claim_id for link in links if link.claim_id}
+        evidence_ids = {link.evidence_id for link in links if link.evidence_id}
+        relationship_ids = {link.relationship_id for link in links if link.relationship_id}
+        for relationship_id in relationship_ids:
+            for attachment in attachments_by_rel.get(relationship_id, []):
+                evidence_ids.add(attachment.evidence_id)
+        per_lead_claim_ids[lead_id] = claim_ids
+        per_lead_evidence_ids[lead_id] = evidence_ids
+        per_lead_relationship_ids[lead_id] = relationship_ids
+        all_claim_ids.update(claim_ids)
+        all_evidence_ids.update(evidence_ids)
+
+    evidence_links_by_claim: dict[str, list[ClaimEvidenceLink]] = {}
+    evidence_links_by_evidence: dict[str, list[ClaimEvidenceLink]] = {}
+    if all_claim_ids:
+        for row in db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.claim_id.in_(all_claim_ids))).all():
+            evidence_links_by_claim.setdefault(row.claim_id, []).append(row)
+    if all_evidence_ids:
+        for row in db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.evidence_id.in_(all_evidence_ids))).all():
+            evidence_links_by_evidence.setdefault(row.evidence_id, []).append(row)
+
+    per_lead_evidence_links: dict[str, list[ClaimEvidenceLink]] = {}
+    per_lead_expanded_claim_ids: dict[str, set[str]] = {}
+    all_expanded_claim_ids: set[str] = set()
+    for lead_id in links_by_lead:
+        evidence_links: list[ClaimEvidenceLink] = []
+        for claim_id in per_lead_claim_ids[lead_id]:
+            evidence_links.extend(evidence_links_by_claim.get(claim_id, []))
+        for evidence_id in per_lead_evidence_ids[lead_id]:
+            evidence_links.extend(evidence_links_by_evidence.get(evidence_id, []))
+        # De-duplicate links reached through both a directly-linked claim and evidence item.
+        evidence_links = list({row.id: row for row in evidence_links}.values())
+        per_lead_evidence_links[lead_id] = evidence_links
+        claim_ids = set(per_lead_claim_ids[lead_id])
+        claim_ids.update(row.claim_id for row in evidence_links)
+        per_lead_expanded_claim_ids[lead_id] = claim_ids
+        all_expanded_claim_ids.update(claim_ids)
+
+    claims_by_id: dict[str, Claim] = {}
+    if all_expanded_claim_ids:
+        claims_by_id = {row.id: row for row in db.scalars(select(Claim).where(Claim.id.in_(all_expanded_claim_ids))).all()}
+
+    results: dict[str, dict] = {}
+    for lead_id in links_by_lead:
+        evidence_links = per_lead_evidence_links[lead_id]
+        claims = [claims_by_id[cid] for cid in per_lead_expanded_claim_ids[lead_id] if cid in claims_by_id]
+
+        stance_counts = {"supports": 0, "contradicts": 0, "context": 0}
+        for row in evidence_links:
+            if row.stance in stance_counts:
+                stance_counts[row.stance] += 1
+        disputed_claim_count = sum(1 for claim in claims if claim.status == "disputed")
+        contradiction_count = stance_counts["contradicts"]
+
+        relationship_review_counts = {"supports": 0, "contradicts": 0, "context": 0, "superseded": 0, "unresolved": 0, "unreviewed": 0}
+        relationship_ids = per_lead_relationship_ids[lead_id]
+        if relationship_ids:
+            for relationship_id in relationship_ids:
+                for attachment in attachments_by_rel.get(relationship_id, []):
+                    latest = latest_review.get((relationship_id, attachment.evidence_id))
+                    relationship_review_counts[latest.stance if latest else "unreviewed"] += 1
+        relationship_attention = relationship_review_counts["contradicts"] * 3 + relationship_review_counts["unresolved"] * 2 + relationship_review_counts["unreviewed"]
+        attention_score = contradiction_count * 3 + disputed_claim_count * 2 + relationship_attention
+        reasons = []
+        if contradiction_count:
+            reasons.append(f"{contradiction_count} contradicting evidence link(s)")
+        if disputed_claim_count:
+            reasons.append(f"{disputed_claim_count} disputed claim(s)")
+        if relationship_review_counts["contradicts"]:
+            reasons.append(f"{relationship_review_counts['contradicts']} relationship evidence assessment(s) contradict the relationship")
+        if relationship_review_counts["unresolved"]:
+            reasons.append(f"{relationship_review_counts['unresolved']} unresolved relationship evidence assessment(s)")
+        if relationship_review_counts["unreviewed"]:
+            reasons.append(f"{relationship_review_counts['unreviewed']} unreviewed relationship evidence attachment(s)")
+        results[lead_id] = {
+            "needs_attention": attention_score > 0,
+            "attention_score": attention_score,
+            "stance_counts": stance_counts,
+            "linked_claim_count": len(claims),
+            "disputed_claim_count": disputed_claim_count,
+            "relationship_evidence_review_counts": relationship_review_counts,
+            "reasons": reasons,
+        }
+    return results
+
+
 def serialize_lead(db: Session, lead: Lead) -> dict:
     profile = get_profile(db, lead.id, create=False)
     links = db.scalars(select(LeadLink).where(LeadLink.lead_id == lead.id).order_by(LeadLink.created_at)).all()
@@ -144,6 +342,66 @@ def serialize_lead(db: Session, lead: Lead) -> dict:
         "history": history,
         "triage": _lead_triage(db, links),
     }
+
+
+def list_leads_serialized(db: Session, leads: list[Lead]) -> list[dict]:
+    """Batch equivalent of [serialize_lead(db, lead) for lead in leads].
+
+    serialize_lead issues ~4 queries directly plus whatever serialize_link/
+    serialize_task/_lead_triage add per lead -- for an investigation with N
+    leads and their links, that cascades into dozens of round trips (STRUCT-0017).
+    This fetches every referenced table once for the whole `leads` list, then
+    assembles each lead's dict from the pre-fetched, in-memory data. Single-lead
+    call sites keep using serialize_lead unchanged; this is additive, not a
+    replacement.
+    """
+    if not leads:
+        return []
+    lead_ids = [lead.id for lead in leads]
+
+    profiles_by_lead = {row.lead_id: row for row in db.scalars(select(LeadProfile).where(LeadProfile.lead_id.in_(lead_ids))).all()}
+
+    links_by_lead: dict[str, list[LeadLink]] = {lead_id: [] for lead_id in lead_ids}
+    all_links = db.scalars(select(LeadLink).where(LeadLink.lead_id.in_(lead_ids)).order_by(LeadLink.created_at)).all()
+    for link in all_links:
+        links_by_lead.setdefault(link.lead_id, []).append(link)
+    serialized_links = _serialize_links_batch(db, all_links)
+
+    tasks_by_lead: dict[str, list[ReportingTask]] = {lead_id: [] for lead_id in lead_ids}
+    all_tasks = db.scalars(select(ReportingTask).where(ReportingTask.lead_id.in_(lead_ids)).order_by(ReportingTask.created_at.desc())).all()
+    for task in all_tasks:
+        tasks_by_lead.setdefault(task.lead_id, []).append(task)
+    serialized_tasks = serialize_tasks_batch(db, all_tasks)
+
+    history_by_lead: dict[str, list[LeadWorkflowEvent]] = {lead_id: [] for lead_id in lead_ids}
+    all_history = db.scalars(select(LeadWorkflowEvent).where(LeadWorkflowEvent.lead_id.in_(lead_ids)).order_by(LeadWorkflowEvent.created_at.desc())).all()
+    for event in all_history:
+        history_by_lead.setdefault(event.lead_id, []).append(event)
+
+    triage_by_lead = _lead_triage_batch(db, links_by_lead)
+
+    results = []
+    for lead in leads:
+        profile = profiles_by_lead.get(lead.id)
+        results.append({
+            "id": lead.id,
+            "investigation_id": lead.investigation_id,
+            "title": lead.title,
+            "detail": lead.detail,
+            "provider": lead.provider,
+            "provider_record_id": lead.provider_record_id,
+            "kind": "connector" if lead.provider else "question",
+            "status": lead.status,
+            "priority": profile.priority if profile else "normal",
+            "owner": profile.owner if profile else None,
+            "next_action": profile.next_action if profile else None,
+            "created_at": lead.created_at,
+            "links": [serialized_links[link.id] for link in links_by_lead.get(lead.id, [])],
+            "tasks": [serialized_tasks[task.id] for task in tasks_by_lead.get(lead.id, [])],
+            "history": history_by_lead.get(lead.id, []),
+            "triage": triage_by_lead[lead.id],
+        })
+    return results
 
 
 def lead_provenance_snapshot(db: Session, lead: Lead | None) -> dict | None:
@@ -203,12 +461,12 @@ def lead_provenance_snapshot(db: Session, lead: Lead | None) -> dict | None:
     }
 
 
-def serialize_task(db: Session, task: ReportingTask) -> dict:
-    events = db.scalars(
-        select(ReportingTaskWorkflowEvent)
-        .where(ReportingTaskWorkflowEvent.task_id == task.id)
-        .order_by(ReportingTaskWorkflowEvent.created_at.desc())
-    ).all()
+def _build_task_dict(task: ReportingTask, events: list[ReportingTaskWorkflowEvent]) -> dict:
+    """Shared assembly logic for serialize_task and its batch equivalent.
+
+    Pure function -- no db access -- so a batch caller can pre-fetch `events`
+    for many tasks at once and reuse the exact same dict-shaping code.
+    """
     history = []
     for event in events:
         snapshot = None
@@ -230,6 +488,31 @@ def serialize_task(db: Session, task: ReportingTask) -> dict:
         # immutable audit trail; this is simply the newest frozen lead snapshot.
         "task_context": next((item["lead_provenance"] for item in history if item.get("lead_provenance")), None),
     }
+
+
+def serialize_task(db: Session, task: ReportingTask) -> dict:
+    events = db.scalars(
+        select(ReportingTaskWorkflowEvent)
+        .where(ReportingTaskWorkflowEvent.task_id == task.id)
+        .order_by(ReportingTaskWorkflowEvent.created_at.desc())
+    ).all()
+    return _build_task_dict(task, events)
+
+
+def serialize_tasks_batch(db: Session, tasks: list[ReportingTask]) -> dict[str, dict]:
+    """Batch equivalent of {task.id: serialize_task(db, task) for task in tasks}."""
+    if not tasks:
+        return {}
+    task_ids = [task.id for task in tasks]
+    events_by_task: dict[str, list[ReportingTaskWorkflowEvent]] = {}
+    all_events = db.scalars(
+        select(ReportingTaskWorkflowEvent)
+        .where(ReportingTaskWorkflowEvent.task_id.in_(task_ids))
+        .order_by(ReportingTaskWorkflowEvent.created_at.desc())
+    ).all()
+    for event in all_events:
+        events_by_task.setdefault(event.task_id, []).append(event)
+    return {task.id: _build_task_dict(task, events_by_task.get(task.id, [])) for task in tasks}
 
 
 def make_task_workflow_event(db: Session, task: ReportingTask, *, from_status: str | None, to_status: str, note: str | None) -> ReportingTaskWorkflowEvent:
