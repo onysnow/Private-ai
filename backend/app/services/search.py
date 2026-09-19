@@ -164,19 +164,30 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
     tokens = _tokens(query)
     hits: list[SearchHit] = []
 
-    # STRUCT-0036: entities_stmt, sources_stmt, and documents_stmt (below) are
-    # deliberately NOT given a _prefilter() -- each one's full unfiltered result is
-    # also relied on as a lookup table by other record types in this function
-    # (entity_by_id backs statement/relationship hits; source_by_id backs
-    # evidence hits; `documents`/document_ids drive the document_chunk and
-    # extraction_candidate queries below). Prefiltering any of these three would
-    # silently drop a hit whose OWN text matches but whose parent entity/source/
-    # document's own fields don't -- exactly the failure mode this finding's
-    # tests guard against. Splitting each of these into a cheap unfiltered
-    # id-only lookup query plus a separately prefiltered scoring query is real,
-    # still-open follow-up work (tracked in STRUCTURE_AUDIT.md/STRUCT-0036).
-    entities_stmt = select(Entity)
-    sources_stmt = select(Source)
+    # STRUCT-0036 cycle 4: entities/sources are split into a lightweight, ALWAYS-
+    # unfiltered lookup query (feeding entity_by_id/source_by_id, used only to
+    # resolve a statement's/evidence's PARENT record for hit construction) and a
+    # separately prefiltered scoring query (used only to decide which entities/
+    # sources become entity-type/source-type hits in their own right). This is
+    # safe -- unlike prefiltering entities_stmt/sources_stmt as a single query
+    # would be -- because every entity_by_id.get(...)/source_by_id.get(...) call
+    # site in this function (read in full before making this change) only ever
+    # touches investigation_id/caption/schema (entities) or
+    # investigation_id/title/url (sources): the lookup dicts never need the
+    # heavier properties/metadata_json JSON columns that only the entity's/
+    # source's OWN hit-scoring reads. The scoring queries can be prefiltered
+    # because they score each row on its OWN fields only (never a merged-alias
+    # target's fields), which is exactly the same self-contained shape as
+    # claims_stmt below -- the shared-lookup hazard was specific to the lookup
+    # dicts, not to entity/source scoring itself.
+    entity_lookup_stmt = select(Entity.id, Entity.investigation_id, Entity.caption, Entity.schema)
+    entity_scoring_stmt = select(Entity).where(_prefilter(
+        tokens, Entity.caption, Entity.schema, Entity.ftm_id, Entity.properties,
+    ))
+    source_lookup_stmt = select(Source.id, Source.investigation_id, Source.title, Source.url)
+    source_scoring_stmt = select(Source).where(_prefilter(
+        tokens, Source.title, Source.url, Source.source_type, Source.metadata_json,
+    ))
     # STRUCT-0036: claims are self-contained -- nothing downstream needs the full
     # unfiltered set, so a SQL prefilter here can't drop a hit like the
     # entities/sources shared-lookup case can (see _prefilter's docstring).
@@ -195,15 +206,20 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
         tokens, ReportingTask.title, ReportingTask.detail, ReportingTask.status,
         ReportingTask.priority, ReportingTask.owner, ReportingTask.due_date,
     ))
-    # STRUCT-0036: documents_stmt is deliberately unfiltered beyond investigation
-    # scope, same reasoning as entities_stmt/sources_stmt above -- `documents`
-    # (fetched from it) drives document_ids, which the document_chunk and
-    # extraction_candidate queries above depend on regardless of whether the
-    # parent document's own fields match.
+    # STRUCT-0036: documents_stmt is still deliberately unfiltered beyond
+    # investigation scope, and DOESN'T get the same lookup/scoring split as
+    # entities/sources above -- a document_chunk/extraction_candidate hit's own
+    # title is built from its PARENT document's filename/source title
+    # regardless of whether that document's own fields match the query, so the
+    # full Document object (not just a few lookup columns) is needed for every
+    # document in scope either way. `documents`/document_ids (fetched from it)
+    # drive the document_chunk and extraction_candidate queries below.
     documents_stmt = select(Document)
     if investigation_id:
-        entities_stmt = entities_stmt.where(Entity.investigation_id == investigation_id)
-        sources_stmt = sources_stmt.where(Source.investigation_id == investigation_id)
+        entity_lookup_stmt = entity_lookup_stmt.where(Entity.investigation_id == investigation_id)
+        entity_scoring_stmt = entity_scoring_stmt.where(Entity.investigation_id == investigation_id)
+        source_lookup_stmt = source_lookup_stmt.where(Source.investigation_id == investigation_id)
+        source_scoring_stmt = source_scoring_stmt.where(Source.investigation_id == investigation_id)
         claims_stmt = claims_stmt.where(Claim.investigation_id == investigation_id)
         leads_stmt = leads_stmt.where(Lead.investigation_id == investigation_id)
         findings_stmt = findings_stmt.where(ConnectorFinding.investigation_id == investigation_id)
@@ -214,8 +230,10 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
 
     if allowed_investigation_ids is not None:
         allowed = tuple(sorted(allowed_investigation_ids))
-        entities_stmt = entities_stmt.where(Entity.investigation_id.in_(allowed))
-        sources_stmt = sources_stmt.where(Source.investigation_id.in_(allowed))
+        entity_lookup_stmt = entity_lookup_stmt.where(Entity.investigation_id.in_(allowed))
+        entity_scoring_stmt = entity_scoring_stmt.where(Entity.investigation_id.in_(allowed))
+        source_lookup_stmt = source_lookup_stmt.where(Source.investigation_id.in_(allowed))
+        source_scoring_stmt = source_scoring_stmt.where(Source.investigation_id.in_(allowed))
         claims_stmt = claims_stmt.where(Claim.investigation_id.in_(allowed))
         leads_stmt = leads_stmt.where(Lead.investigation_id.in_(allowed))
         findings_stmt = findings_stmt.where(ConnectorFinding.investigation_id.in_(allowed))
@@ -224,8 +242,7 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
         tasks_stmt = tasks_stmt.where(ReportingTask.investigation_id.in_(allowed))
         documents_stmt = documents_stmt.where(Document.investigation_id.in_(allowed))
 
-    entities = db.scalars(entities_stmt).all()
-    entity_by_id = {e.id: e for e in entities}
+    entity_by_id = {row.id: row for row in db.execute(entity_lookup_stmt).all()}
     statement_pref_cache: dict[str, dict] = {}
     relationship_pref_cache: dict[str, dict] = {}
     def pref_map(inv_id: str, kind: str) -> dict:
@@ -233,6 +250,7 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
         if inv_id not in cache:
             cache[inv_id] = reconciliation_preference_map(db, inv_id, kind)
         return cache[inv_id]
+    entities = db.scalars(entity_scoring_stmt).all()
     for row in entities:
         properties_text = " ".join(
             [prop] + [str(v) for v in (values or [])]
@@ -291,8 +309,8 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
                     {"prop": row.prop, "value": row.value, "schema": entity.schema, "reconciliation": reconciliation},
                 ))
 
-    sources = db.scalars(sources_stmt).all()
-    source_by_id = {s.id: s for s in sources}
+    source_by_id = {row.id: row for row in db.execute(source_lookup_stmt).all()}
+    sources = db.scalars(source_scoring_stmt).all()
     for row in sources:
         score = _score(query, row.title, row.url, row.source_type, row.metadata_json)
         if score:

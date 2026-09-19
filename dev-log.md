@@ -2067,3 +2067,26 @@ Remaining unpaginated (evidence, relationships, graph, timeline) each still need
 pass -- multi-table joins or serialization that doesn't reduce to either pagination pattern used
 so far. Default-page-size product decision still deferred pending frontend paging UI. STRUCT-0018
 stays IN_PROGRESS.
+
+## 2026-09-19: STRUCT-0036 cycle 4 -- entities/sources split-query design implemented
+
+Implemented the entities/sources split cycles 1-3 kept deferring as too invasive: split each of
+entities_stmt/sources_stmt into a lightweight, always-unfiltered lookup query (feeding
+entity_by_id/source_by_id, which -- verified by reading every call site -- only ever need
+investigation_id/caption/schema or investigation_id/title/url, never the heavier
+properties/metadata_json JSON blobs) and a separately prefiltered scoring query used only to decide
+entity-type/source-type hits. This is safe because entity/source scoring only reads a row's OWN
+fields, never a merged-alias target's -- the same self-contained shape as claims_stmt, once separated
+from the lookup dicts' column needs.
+
+documents_stmt is explicitly NOT given the same treatment: a document_chunk/extraction_candidate
+hit's title comes from its parent document's filename regardless of whether the document's own
+fields match, so no comparably clean split exists there.
+
+Full suite green (267 tests, unchanged -- a pure query-shape change), including the existing tests
+that already exercise every risk surface this touches (entity match via caption and via JSON
+properties, entity not matching but still needed as a statement's parent, source/evidence lookup).
+No new test needed -- coverage was already there. mypy unaffected.
+
+STRUCT-0036 stays IN_PROGRESS: documents_stmt and leads/relationships prefiltering remain
+deliberately deferred, not oversights.
