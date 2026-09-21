@@ -8,21 +8,19 @@ from typing import Any
 # `if ftm_model is not None:` guard below look permanently true, flagging the None-fallback branches
 # in _schema_exists/_supports_name as unreachable dead code -- a real (if currently harmless, since
 # mypy doesn't gate runtime) mistracking of this module's own documented bootstrap/test fallback.
-# The explicit `Any` annotation itself then makes mypy flag the try block's `from ... import ...
-# as ftm_model` as a redefinition (no-redef) of an already-annotated name -- a real mypy rule for
-# import-vs-assignment rebindings, independent of whether followthemoney actually resolves -- so
-# that one line carries its own targeted `# type: ignore[no-redef]`, rather than looping back to
-# an unannotated declaration (which would just reintroduce the original bug this fixes). The ignore
-# comment must come BEFORE the pre-existing `# noqa: F811` on that line, not after: mypy only
-# recognizes a `# type: ignore` marker as the leading comment on a line, so `# noqa: ...  # type:
-# ignore[...]` silently fails to suppress anything (confirmed directly against this project's
-# actual pyproject.toml mypy config, which has warn_unused_ignores=true but did not flag it as
-# unused either -- it was simply never parsed as an ignore comment at all).
+# Importing straight into the annotated name is a trap: mypy reports no-redef only when
+# followthemoney is NOT installed (the import resolves to Any under ignore_missing_imports
+# and rebinding an annotated name is flagged), and with warn_unused_ignores=true a
+# `# type: ignore[no-redef]` on that line then fails lint wherever followthemoney IS
+# installed (Backend Lint CI installs requirements-local -> requirements.txt). Importing under
+# a private alias and assigning in `else:` is clean in both environments (checked both ways).
 ftm_model: Any = None
 try:
-    from followthemoney import model as ftm_model  # type: ignore[no-redef]  # noqa: F811
+    from followthemoney import model as _imported_ftm_model
 except ImportError:  # Local bootstrap/test compatibility; production requirements still install FollowTheMoney.
     pass
+else:
+    ftm_model = _imported_ftm_model
 
 _FALLBACK_SCHEMAS = {
     "Person", "Company", "Organization", "PublicBody", "LegalEntity", "Asset",

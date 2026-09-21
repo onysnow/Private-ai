@@ -2321,3 +2321,22 @@ candidate in Adminer (`ai_analysis_candidates`); decide whether to bump `tas_spe
 v1.9 (docs-only + `CORE/CONTROL_SURFACE.md`; drift test must pass) and whether any of its flags
 belong as request parameters -- §2 there says flags may change scope/verbosity but never weaken
 evidence rules, so `severity_floor` / `source_tier_floor` are the only plausible ones.
+
+## 2026-09-21 (later): CI on dev was already red -- both failures fixed
+
+After the push above, `gh run list` showed Backend Lint and backend-postgres failing -- and the
+three previous dev runs failing the same way, so neither was introduced by this work, but both sit
+on the TAS integration seam:
+- **Backend Lint (mypy):** `app/services/ftm.py:23` "unused type: ignore". Reproduced locally:
+  the `no-redef` only fires when followthemoney is *not* installed (import resolves to Any under
+  `ignore_missing_imports`), and CI installs it, so `warn_unused_ignores` then fails. Fix: import
+  under a private alias and assign in `else:` -- mypy clean with and without the package
+  (checked both). The long comment claiming the ignore was required is replaced.
+- **backend-postgres:** no `TAS_REPO_TOKEN` on this repo, so the submodule fetch is skipped and
+  every reasoning test that builds a prompt died with `FileNotFoundError` -- a 500 from the
+  endpoint too. Fix: `_read()` in `app/ai/reasoning.py` turns a missing spec file into
+  `ReasoningInputError` (-> 400 naming the file and `git submodule update --init`); the four
+  spec-reading tests carry `@requires_tas_spec` (skip, mirroring the drift test); a new test
+  asserts the clean 400 and that nothing is persisted. Verified by hiding `tas_spec` in the
+  working copy: 5 passed / 5 skipped; with it present: 11 passed. `python -m mypy` and
+  `ruff check app tests` clean.

@@ -168,7 +168,18 @@ def validate_output_shape(module: str, payload: dict) -> list[str]:
 
 
 def _read(path: Path) -> str:
-    return path.read_text(encoding="utf-8")
+    """Read one vendored TAS file. A missing file means the tas_spec submodule
+    is not checked out (or was restructured upstream -- STRUCT-0025 drift
+    test); surface that as a 400-class input error with the path named,
+    not a 500 from deep inside the request."""
+    try:
+        return path.read_text(encoding="utf-8")
+    except FileNotFoundError as exc:
+        rel = path.relative_to(TAS_SPEC_ROOT) if path.is_relative_to(TAS_SPEC_ROOT) else path
+        raise ReasoningInputError(
+            f"vendored TAS spec file {str(rel)!r} is missing -- the backend/app/ai/tas_spec submodule is not checked out "
+            "(git submodule update --init) or no longer matches app/ai/reasoning.py MODULE_FILES"
+        ) from exc
 
 
 def build_system_prompt(module: str, reasoning_contract: dict) -> str:

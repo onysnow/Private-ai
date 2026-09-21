@@ -16,6 +16,14 @@ from app.core.config import settings
 import app.ai.reasoning as reasoning_module
 
 
+# The vendored TAS spec is a private submodule; CI without TAS_REPO_TOKEN runs
+# without it (see .github/workflows/backend-postgres-ci.yml). Tests that actually
+# build a prompt from it skip there, mirroring tests/test_tas_submodule_drift.py;
+# gating/queue/settings tests that never read a spec file still run.
+_TAS_SPEC_PRESENT = (reasoning_module.TAS_SPEC_ROOT / "PROMPT_MODULES").exists()
+requires_tas_spec = pytest.mark.skipif(not _TAS_SPEC_PRESENT, reason="tas_spec submodule not checked out")
+
+
 class _FakeLLMClient:
     def __init__(self, response_text: str):
         self._response_text = response_text
@@ -76,6 +84,7 @@ def test_case_synthesis_no_provider_configured_returns_4xx_with_no_llm_call(monk
     assert called["n"] == 0
 
 
+@requires_tas_spec
 def test_case_synthesis_rejects_invented_citation(monkeypatch):
     settings.enable_ai_features = True
     settings.ai_provider = "anthropic"
@@ -109,6 +118,7 @@ def test_case_synthesis_rejects_invented_citation(monkeypatch):
         assert rows[0].review_status == "rejected", "an invented citation must never be persisted as proposed/accepted"
 
 
+@requires_tas_spec
 def test_case_synthesis_rejects_malformed_schema(monkeypatch):
     settings.enable_ai_features = True
     settings.ai_provider = "anthropic"
@@ -126,6 +136,7 @@ def test_case_synthesis_rejects_malformed_schema(monkeypatch):
     assert "schema" in r.text.lower()
 
 
+@requires_tas_spec
 def test_case_synthesis_valid_response_is_proposed_and_reviewable(monkeypatch):
     settings.enable_ai_features = True
     settings.ai_provider = "anthropic"
@@ -201,6 +212,7 @@ def _valid_case_synthesis(evidence_id: str) -> str:
     })
 
 
+@requires_tas_spec
 def test_candidate_queue_list_get_and_filters(monkeypatch):
     """The reviewer-facing surface: list per investigation (newest first,
     payload omitted), filter by review_status/module, fetch one by id with
@@ -275,3 +287,24 @@ def test_settings_status_reports_ai_reasoning_state_without_secrets():
             assert ai["tas_spec"]["version"], "vendored TAS version should be read from the submodule CHANGELOG"
     finally:
         settings.anthropic_api_key = original_key
+
+
+def test_missing_tas_spec_file_is_a_clean_400_not_a_500(monkeypatch):
+    """Runs everywhere (no submodule needed): point the module table at a path
+    that does not exist and make sure the endpoint answers with a message a
+    reporter can act on rather than an unhandled FileNotFoundError."""
+    settings.enable_ai_features = True
+    settings.ai_provider = "anthropic"
+    client = TestClient(app)
+    seeded = _seeded_investigation(client)
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _FakeLLMClient("{}"))
+    monkeypatch.setitem(reasoning_module.MODULE_FILES, "case_synthesis", reasoning_module.TAS_SPEC_ROOT / "PROMPT_MODULES" / "99_DOES_NOT_EXIST.md")
+    r = client.post(
+        f"/api/investigations/{seeded['investigation']['id']}/assistant/case-synthesis",
+        json={"question": "What did Ada North sign?"},
+    )
+    assert r.status_code == 400, r.text
+    assert "99_DOES_NOT_EXIST.md" in r.text and "submodule" in r.text
+    with SessionLocal() as db:
+        from app.models.domain import AIAnalysisCandidate
+        assert db.query(AIAnalysisCandidate).filter_by(investigation_id=seeded["investigation"]["id"]).count() == 0, "nothing is persisted when the prompt cannot even be built"
