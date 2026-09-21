@@ -185,3 +185,93 @@ def test_hypothesis_test_requires_working_theory(monkeypatch):
         json={"working_theory": "", "question": "Did Ada North act alone?"},
     )
     assert r.status_code == 422, r.text  # pydantic min_length=1 rejects before reaching the service layer
+
+
+def _valid_case_synthesis(evidence_id: str) -> str:
+    return json.dumps({
+        "executive_summary": "Ada North signed an agreement, per one directly cited filing.",
+        "claims": [{
+            "claim_id": "CLM-0001", "claim": "Ada North signed the agreement.",
+            "classification": "CORROBORATED_FACT",
+            "supporting_evidence": [{"record_type": "evidence", "record_id": evidence_id}],
+            "contradicting_evidence": [], "warrant": "The filing directly quotes Ada North's signature on the agreement.",
+            "confidence": "HIGH", "confidence_basis": "single direct primary source", "limitations": [],
+        }],
+        "investigative_gaps": [],
+    })
+
+
+def test_candidate_queue_list_get_and_filters(monkeypatch):
+    """The reviewer-facing surface: list per investigation (newest first,
+    payload omitted), filter by review_status/module, fetch one by id with
+    the full payload and the request that produced it."""
+    settings.enable_ai_features = True
+    settings.ai_provider = "anthropic"
+    client = TestClient(app)
+    seeded = _seeded_investigation(client)
+    inv_id = seeded["investigation"]["id"]
+    evidence_id = seeded["evidence"]["id"]
+
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _FakeLLMClient(_valid_case_synthesis(evidence_id)))
+    first = client.post(f"/api/investigations/{inv_id}/assistant/case-synthesis", json={"question": "What did Ada North sign?"})
+    assert first.status_code == 200, first.text
+    # An auto-rejected one (invented citation) must also show up in the queue, as rejected.
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _FakeLLMClient(_valid_case_synthesis("NOT-A-REAL-ID")))
+    second = client.post(f"/api/investigations/{inv_id}/assistant/case-synthesis", json={"question": "Who else signed with Ada North?"})
+    assert second.status_code == 422, second.text
+
+    listed = client.get(f"/api/investigations/{inv_id}/ai-analysis-candidates")
+    assert listed.status_code == 200, listed.text
+    rows = listed.json()["candidates"]
+    assert [r["review_status"] for r in rows] == ["rejected", "proposed"], "newest first"
+    assert all("payload" not in r for r in rows), "list omits payloads"
+    assert rows[1]["request"]["question"] == "What did Ada North sign?"
+    assert rows[1]["checked_citation_count"] >= 1
+
+    proposed_only = client.get(f"/api/investigations/{inv_id}/ai-analysis-candidates", params={"review_status": "proposed"}).json()["candidates"]
+    assert [r["id"] for r in proposed_only] == [first.json()["candidate_id"]]
+    assert client.get(f"/api/investigations/{inv_id}/ai-analysis-candidates", params={"module": "hypothesis_test"}).json()["candidates"] == []
+    assert client.get(f"/api/investigations/{inv_id}/ai-analysis-candidates", params={"review_status": "bogus"}).status_code == 400
+    assert client.get(f"/api/investigations/{inv_id}/ai-analysis-candidates", params={"module": "bogus"}).status_code == 400
+    assert client.get("/api/investigations/does-not-exist/ai-analysis-candidates").status_code == 404
+
+    one = client.get(f"/api/ai-analysis-candidates/{first.json()['candidate_id']}")
+    assert one.status_code == 200, one.text
+    body = one.json()
+    assert body["module"] == "case_synthesis"
+    assert body["payload"]["claims"][0]["claim_id"] == "CLM-0001"
+    assert {"record_type": "evidence", "record_id": evidence_id} in body["checked_citation_ids"]
+    assert body["request"] == {"question": "What did Ada North sign?", "working_theory": None, "max_results": 30, "include_external_leads": True}
+    assert client.get("/api/ai-analysis-candidates/does-not-exist").status_code == 404
+
+    # Review through the existing endpoint is reflected in both list and get.
+    client.post(f"/api/ai-analysis-candidates/{body['id']}/review", json={"decision": "reject", "note": "Needs a second source."})
+    assert client.get(f"/api/ai-analysis-candidates/{body['id']}").json()["reviewer_note"] == "Needs a second source."
+    assert client.get(f"/api/investigations/{inv_id}/ai-analysis-candidates", params={"review_status": "proposed"}).json()["candidates"] == []
+
+
+def test_settings_status_reports_ai_reasoning_state_without_secrets():
+    settings.enable_ai_features = False
+    settings.ai_provider = ""
+    client = TestClient(app)
+    ai = client.get("/api/settings/status").json()["ai"]
+    assert ai["enabled"] is False
+    assert ai["provider"] is None
+    assert ai["endpoints_callable"] is False
+    assert set(ai["tas_spec"]["modules"]) == {"case_synthesis", "hypothesis_test"}
+    assert "spec_file" in ai["tas_spec"]["modules"]["case_synthesis"]
+
+    settings.enable_ai_features = True
+    settings.ai_provider = "anthropic"
+    original_key = settings.anthropic_api_key
+    try:
+        settings.anthropic_api_key = "sk-ant-should-never-appear"
+        r = client.get("/api/settings/status")
+        ai = r.json()["ai"]
+        assert ai["enabled"] is True and ai["provider"] == "anthropic" and ai["provider_key_configured"] is True
+        assert "sk-ant" not in r.text, "settings status must never leak key material"
+        if ai["tas_spec"]["present"]:
+            assert ai["endpoints_callable"] is True
+            assert ai["tas_spec"]["version"], "vendored TAS version should be read from the submodule CHANGELOG"
+    finally:
+        settings.anthropic_api_key = original_key

@@ -27,7 +27,7 @@ from app.schemas.api import (
     StatementPromotionRequest,
     TimelineEventCreate,
 )
-from app.ai.reasoning import review_ai_analysis_candidate
+from app.ai.reasoning import review_ai_analysis_candidate, serialize_ai_analysis_candidate
 from app.services.evidence import create_evidence
 from app.services.openaleph import probe_openaleph
 from app.services.promotion import promote_assessment
@@ -115,6 +115,14 @@ def create_timeline_event_endpoint(body: TimelineEventCreate, db: Session = Depe
 @router.get("/relationship-schemas")
 def relationship_schemas():
     return {"schemas": RELATIONSHIP_SCHEMAS}
+
+
+@router.get("/ai-analysis-candidates/{candidate_id}")
+def get_ai_analysis_candidate_endpoint(candidate_id: str, db: Session = Depends(get_db)):
+    row = db.get(AIAnalysisCandidate, candidate_id)
+    if row is None:
+        raise HTTPException(404, "AI analysis candidate not found")
+    return serialize_ai_analysis_candidate(row)
 
 
 @router.post("/ai-analysis-candidates/{candidate_id}/review")

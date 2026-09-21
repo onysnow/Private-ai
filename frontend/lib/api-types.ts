@@ -75,7 +75,18 @@ export type BackupRestoreResult={investigation_id:string,restored_counts:Record<
 export type ConnectorCredentialStatus={configured:boolean,source?:'local_store'|'environment'|'none',local_store_present?:boolean,permissions_restricted?:boolean};
 export type ApiAccessStatus={remote_api_enabled:boolean,mode:'local_only'|'shared_bearer',token_configured:boolean};
 export type DocumentExtractionStatus={pdf_ocr_enabled:boolean,pdf_ocr_language:string,pdf_ocr_dpi:number,pdf_ocr_min_native_chars:number,local_entity_suggestions_enabled:boolean,entity_extraction_owner:'workbench_local'|'openaleph_ftm_analyze',ocr_runtime:{available:boolean,tessdata:string|null,requested_languages:string[],missing_languages:string[],detail:string}};
-export type SettingsStatus={environment:string,database:string,document_storage_dir:string,limits:Record<string,number>,restore_api_enabled:boolean,document_extraction:DocumentExtractionStatus,access:ApiAccessStatus,cors_allowed_origins:string[],connectors:Record<string,ConnectorCredentialStatus>};
+// TAS reasoning layer (issue #36). `ai` is optional on SettingsStatus so a frontend built from this
+// commit still validates an older backend's settings payload; the panel treats absence as "unknown".
+export type AiModuleName='case_synthesis'|'hypothesis_test';
+export type AiReviewStatus='proposed'|'accepted'|'rejected';
+export type AiReasoningStatus={enabled:boolean,provider:string|null,provider_key_configured:boolean,endpoints_callable:boolean,tas_spec:{present:boolean,version:string|null,modules:Record<string,{spec_file:string,available:boolean}>}};
+export type AiAnalysisRequest={question?:string|null,working_theory?:string|null,max_results?:number,include_external_leads?:boolean};
+export type AiCitationRef={record_type:string,record_id:string};
+export type AiAnalysisCandidateSummary={id:string,investigation_id:string,module:AiModuleName|string,request:AiAnalysisRequest,review_status:AiReviewStatus|string,confidence:number,reviewer_note:string|null,accepted_record_type:string|null,accepted_record_id:string|null,created_at:string,reviewed_at:string|null,checked_citation_count:number};
+export type AiAnalysisCandidate=AiAnalysisCandidateSummary&{payload:JsonObject,checked_citation_ids:AiCitationRef[]};
+export type AiReasoningRunResult={candidate_id:string,review_status:AiReviewStatus|string,payload:JsonObject};
+export type AiAnalysisCandidateReview={id:string,module:string,review_status:AiReviewStatus|string,reviewer_note:string|null,reviewed_at:string|null};
+export type SettingsStatus={environment:string,database:string,document_storage_dir:string,limits:Record<string,number>,restore_api_enabled:boolean,document_extraction:DocumentExtractionStatus,access:ApiAccessStatus,cors_allowed_origins:string[],connectors:Record<string,ConnectorCredentialStatus>,ai?:AiReasoningStatus};
 export type ConnectorCredentialMutation={provider:string,configured:boolean,source?:'local_store'|'environment'|'none',local_store_present?:boolean,permissions_restricted?:boolean,removed?:boolean};
 export type DeletionFilePreview={document_id:string,relative_path:string,exists:boolean,shared_with_other_investigation:boolean,action:'delete'|'preserve_shared'|'already_missing'};
 export type InvestigationDeletionPreview={investigation_id:string,investigation_name:string,record_counts:Record<string,number>,record_total:number,document_files:DeletionFilePreview[],document_file_summary:{delete:number,preserve_shared:number,already_missing:number,unsafe:number},unsafe_paths:{document_id:string,storage_path:string,error:string}[],can_delete:boolean,requires_confirmation:string};

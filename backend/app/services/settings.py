@@ -5,6 +5,7 @@ import secrets
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.ai.reasoning import ai_reasoning_status
 from app.connectors.registry import CONNECTOR_SPECS, registry
 from app.core.config import settings
 from app.core.time import utcnow_naive
@@ -69,6 +70,9 @@ def get_settings_status(db: Session) -> dict:
             "investigation_scope_configured": bool(settings.api_auth_investigation_ids.strip()),
         },
         "cors_allowed_origins": settings.cors_origins,
+        # Issue #36 follow-up: the reviewer-facing panel needs to know whether the
+        # TAS reasoning endpoints are callable before offering to run them.
+        "ai": ai_reasoning_status(settings),
         # STRUCT-0040: derive from CONNECTOR_PROVIDERS (itself derived from the
         # registry, STRUCT-0022) rather than a hardcoded pair, so a new
         # connector (firecrawl, or any future one) surfaces its credential

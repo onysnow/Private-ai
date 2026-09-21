@@ -507,6 +507,10 @@ class AIAnalysisCandidate(Base):
     id: Mapped[str] = mapped_column(String, primary_key=True, default=uid)
     investigation_id: Mapped[str] = mapped_column(ForeignKey("investigations.id"), index=True)
     module: Mapped[str] = mapped_column(String(32), index=True)  # case_synthesis/hypothesis_test
+    # What the reporter asked (question, working_theory, retrieval options). A reviewer
+    # can't judge a synthesis without the question it answers, and payload is model
+    # output only, so the request is kept beside it. Nullable: rows predate this column.
+    request: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     payload: Mapped[dict] = mapped_column(JSON, default=dict)
     # The exact citation IDs (from build_question_context()'s citations list) the payload
     # was checked against, preserved so a later reviewer can re-verify without re-running

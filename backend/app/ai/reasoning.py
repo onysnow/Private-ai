@@ -325,6 +325,12 @@ def run_reasoning_module(
     candidate = AIAnalysisCandidate(
         investigation_id=investigation_id,
         module=module,
+        request={
+            "question": question,
+            "working_theory": working_theory,
+            "max_results": max_results,
+            "include_external_leads": include_external_leads,
+        },
         payload=payload,
         checked_citation_ids=[{"record_type": c["record_type"], "record_id": c["record_id"]} for c in packet["citations"]],
         confidence=0.0,
@@ -369,4 +375,97 @@ def review_ai_analysis_candidate(db: Session, candidate: AIAnalysisCandidate, *,
         "review_status": candidate.review_status,
         "reviewer_note": candidate.reviewer_note,
         "reviewed_at": candidate.reviewed_at,
+    }
+
+
+def serialize_ai_analysis_candidate(candidate: AIAnalysisCandidate, *, include_payload: bool = True) -> dict:
+    """One JSON shape for the list/get endpoints and the frontend review panel.
+
+    include_payload=False keeps the list endpoint light (a case-synthesis
+    payload can run to many KB); the reviewer fetches the full row by id.
+    """
+    row = {
+        "id": candidate.id,
+        "investigation_id": candidate.investigation_id,
+        "module": candidate.module,
+        "request": candidate.request or {},
+        "review_status": candidate.review_status,
+        "confidence": candidate.confidence,
+        "reviewer_note": candidate.reviewer_note,
+        "accepted_record_type": candidate.accepted_record_type,
+        "accepted_record_id": candidate.accepted_record_id,
+        "created_at": candidate.created_at,
+        "reviewed_at": candidate.reviewed_at,
+        "checked_citation_count": len(candidate.checked_citation_ids or []),
+    }
+    if include_payload:
+        row["payload"] = candidate.payload
+        row["checked_citation_ids"] = candidate.checked_citation_ids or []
+    return row
+
+
+REVIEW_STATUSES = ("proposed", "accepted", "rejected")
+
+
+def list_ai_analysis_candidates(
+    db: Session,
+    *,
+    investigation_id: str,
+    review_status: str | None = None,
+    module: str | None = None,
+    limit: int = 100,
+) -> list[dict]:
+    """Newest first. Filters are validated here (not in the route) so the
+    same rules hold for any future caller -- STRUCT-0002 keeps routes thin.
+    """
+    if review_status is not None and review_status not in REVIEW_STATUSES:
+        raise ValueError(f"review_status must be one of {', '.join(REVIEW_STATUSES)}")
+    if module is not None and module not in MODULE_FILES:
+        raise ValueError(f"module must be one of {', '.join(sorted(MODULE_FILES))}")
+    query = db.query(AIAnalysisCandidate).filter_by(investigation_id=investigation_id)
+    if review_status is not None:
+        query = query.filter_by(review_status=review_status)
+    if module is not None:
+        query = query.filter_by(module=module)
+    rows = query.order_by(AIAnalysisCandidate.created_at.desc(), AIAnalysisCandidate.id.desc()).limit(limit).all()
+    return [serialize_ai_analysis_candidate(row, include_payload=False) for row in rows]
+
+
+def _vendored_tas_version() -> str | None:
+    """The first '## <version>' heading in the vendored CHANGELOG, e.g. '1.8'.
+    None when the submodule is not checked out (CI without TAS_REPO_TOKEN)."""
+    changelog = TAS_SPEC_ROOT / "CHANGELOG.md"
+    if not changelog.exists():
+        return None
+    for line in changelog.read_text(encoding="utf-8").splitlines():
+        if line.startswith("## "):
+            return line[3:].split("\u2014")[0].split("-")[0].strip() or None
+    return None
+
+
+def ai_reasoning_status(settings: Settings = default_settings) -> dict:
+    """What the settings panel shows about the AI layer: whether the
+    endpoints are callable, which provider adapter is selected, and whether
+    the vendored TAS spec the prompts are built from is actually present.
+    Never reveals key material -- only whether a key is configured.
+    """
+    provider = (settings.ai_provider or "").strip()
+    key_configured = {
+        "anthropic": bool(settings.anthropic_api_key.strip()),
+        "openai": bool(settings.openai_api_key.strip()),
+    }.get(provider, False)
+    modules = {
+        name: {"spec_file": str(path.relative_to(TAS_SPEC_ROOT)), "available": path.exists()}
+        for name, path in MODULE_FILES.items()
+    }
+    return {
+        "enabled": bool(settings.enable_ai_features),
+        "provider": provider or None,
+        "provider_key_configured": key_configured,
+        "endpoints_callable": bool(settings.enable_ai_features) and bool(provider) and key_configured and all(m["available"] for m in modules.values()),
+        "tas_spec": {
+            "present": TAS_SPEC_ROOT.exists() and (TAS_SPEC_ROOT / "PROMPT_MODULES").exists(),
+            "version": _vendored_tas_version(),
+            "modules": modules,
+        },
     }

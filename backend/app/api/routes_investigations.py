@@ -19,6 +19,7 @@ from app.ai.reasoning import (
     CitationValidationError,
     ReasoningInputError,
     SchemaValidationError,
+    list_ai_analysis_candidates,
     run_reasoning_module,
 )
 from app.api.dependencies import authorize_request_resource
@@ -163,6 +164,27 @@ def investigation_hypothesis_test(
         max_results=body.max_results, include_external_leads=body.include_external_leads,
         working_theory=body.working_theory,
     )
+
+
+@router.get("/investigations/{investigation_id}/ai-analysis-candidates")
+def list_investigation_ai_analysis_candidates(
+    investigation_id: str,
+    review_status: str | None = None,
+    module: str | None = None,
+    limit: int = Query(default=100, ge=1, le=500),
+    db: Session = Depends(get_db),
+):
+    """The review queue for TAS reasoning output, newest first. Payloads are
+    omitted here; GET /ai-analysis-candidates/{id} returns the full row.
+    """
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
+    try:
+        return {"candidates": list_ai_analysis_candidates(
+            db, investigation_id=investigation_id, review_status=review_status, module=module, limit=limit,
+        )}
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
 
 
 @router.get("/investigations/{investigation_id}/timeline")

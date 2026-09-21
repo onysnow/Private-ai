@@ -2265,3 +2265,59 @@ up --build` on the Windows host is the real test -- if the login form does not p
 PostgreSQL, pick it manually; `ADMINER_DEFAULT_SERVER` only sets the server field. Ony's
 standing ask, recorded here so it survives the session: **once the backend is done, test it
 thoroughly**, with Adminer as the visual check on what the tests actually wrote.
+
+## 2026-09-21: TAS integration -- reviewer surface for the AI reasoning layer (live session with Ony)
+
+Ony's direction: work on the app's *integration* of the Topic Authority System, not on TAS itself.
+Survey of what existed (issue #36 landed the backend core): two TAS modules wired in
+`backend/app/ai/reasoning.py` (08 Case Synthesis, 06 Hypothesis & Contradiction Testing) with
+schema + citation gates, output parked as `AIAnalysisCandidate` (`proposed`), one review endpoint,
+the STRUCT-0025 submodule drift test. Gaps: no way to *list or read* candidates over the API, no
+record of the question a candidate answers, nothing in the frontend at all, and the settings panel
+could not say whether the reasoning endpoints were callable. This entry closes those; TAS doctrine
+and the submodule pin (4220ecb, v1.8) are untouched.
+
+Backend:
+- `ai_analysis_candidates.request` (JSON, nullable; migration `a7c3e9d1f2b4` on head
+  `48d964619dd5`, `batch_alter_table` so SQLite works). `run_reasoning_module` stores
+  question / working_theory / max_results / include_external_leads beside the payload -- a
+  reviewer cannot judge a synthesis without the question it answers.
+- `GET /api/investigations/{id}/ai-analysis-candidates?review_status=&module=&limit=` -- newest
+  first, payload omitted, 400 on an unknown filter value, 404 on an unknown investigation.
+- `GET /api/ai-analysis-candidates/{id}` -- full row: payload, `checked_citation_ids`, request.
+- `GET /api/settings/status` gains `ai`: enabled, provider, `provider_key_configured` (boolean
+  only -- the test asserts the key never appears in the response), `endpoints_callable`, and
+  `tas_spec` {present, version read from the vendored CHANGELOG, per-module spec file + present}.
+  Logic lives in `app/ai/reasoning.py` (`list_ai_analysis_candidates`,
+  `serialize_ai_analysis_candidate`, `ai_reasoning_status`); routes stay thin (STRUCT-0002).
+- Tests: `test_reasoning_endpoints.py` +2 (queue list/get/filter/review round-trip incl. an
+  auto-rejected row; settings `ai` block with no secret leak).
+
+Frontend:
+- `components/ai-reasoning-panel.tsx` (new, kept out of the 115 KB `page.tsx` so it can be
+  tested alone): status line from `settings.ai` with a plain-language reason when runs are not
+  possible; run Case Synthesis / Hypothesis Test (theory required, max results, include leads);
+  review queue with status filter; candidate detail rendering claims / hypothesis matrix /
+  contradiction log / gaps with the `record_type:record_id` refs each claim cites, the raw
+  payload behind `<details>`; accept ("trusted analysis") / reject with a note. Mounted in
+  `page.tsx` after "Questions & reporting leads".
+- `lib/api-types.ts` / `lib/api-validate.ts`: `AiReasoningStatus`, `AiAnalysisCandidate(Summary)`,
+  guards, `parseAiAnalysisCandidateList`; `SettingsStatus.ai` optional so an older backend still
+  validates.
+- Tests: `tests/test-ai-reasoning-panel.test.tsx` (6): status wording, disabled deployment still
+  lists the queue, no-investigation guard, run -> open -> accept round-trip with request bodies
+  asserted, 422 citation rejection surfaced, hypothesis-test theory requirement + body.
+
+Verification (device VM, Python 3.12 venv, tests run from a copy because the mounted folder
+refuses coverage temp-file deletes): full backend suite **269 passed** (was 267; run in five
+chunks under the 180 s shell limit -- a background run does not survive the call, which is why
+the earlier "17 dots" log was empty). Frontend: `tsc --noEmit` clean, eslint clean on the new
+files (9 pre-existing warnings in page.tsx untouched), vitest **44 passed** (was 38).
+
+NOT VERIFIED: no real provider key was used -- the run path is exercised with the fake LLM client
+only; `next build` was not run (tsc + vitest only); Adminer/Docker still not started from this
+shell. Follow-ups, in order: try one real run against a configured provider and read the
+candidate in Adminer (`ai_analysis_candidates`); decide whether to bump `tas_spec` to upstream
+v1.9 (docs-only + `CORE/CONTROL_SURFACE.md`; drift test must pass) and whether any of its flags
+belong as request parameters -- §2 there says flags may change scope/verbosity but never weaken
+evidence rules, so `severity_floor` / `source_tier_floor` are the only plausible ones.
