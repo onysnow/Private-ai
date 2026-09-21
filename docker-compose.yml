@@ -177,6 +177,19 @@ services:
       backend:
         condition: service_healthy
 
+  # Database inspector for local development: browse and edit workbench-db tables, run SQL.
+  # Chosen over pgweb/CloudBeaver/sqladmin on 2026-09-21 (see dev-log.md). Bound to localhost only;
+  # log in with System=PostgreSQL, Server=workbench-db, Username=journalism, Database=journalism.
+  adminer:
+    image: adminer:6
+    environment:
+      ADMINER_DEFAULT_SERVER: workbench-db
+    ports:
+      - "127.0.0.1:8081:8080"
+    depends_on:
+      workbench-db:
+        condition: service_healthy
+
 volumes:
   workbench-pgdata:
   openaleph-pgdata:

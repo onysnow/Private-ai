@@ -2224,3 +2224,44 @@ warn_unused_ignores=true, yet didn't flag it as unused either -- it was simply n
 ignore comment). Reordered to `# type: ignore[no-redef]  # noqa: F811`; re-ran mypy (23 source
 files, 0 errors, confirmed clean this time) and the full backend suite (302 tests, exit 0, 88.39%
 coverage) before pushing. No functional code changed, comment-ordering fix only.
+
+## 2026-09-21: Adminer added as a local database inspector (live session with Ony)
+
+Ony asked for "a visual way to see what's going on ... like a built in database UI manager" for the
+backend, then asked for research on which one fits. Stack was read from this repo, not assumed:
+FastAPI 0.141 + SQLAlchemy 2.0.52 + Alembic + psycopg3 on Postgres 16 (`workbench-db`,
+127.0.0.1:5432), Next.js frontend, .bat launchers on Windows, optional `openaleph` profile
+(Postgres 17 + Elasticsearch + Redis). Criteria stated before searching: one more compose service
+against the existing `workbench-db`; browse/edit rows and run SQL for one local user; maintained
+2025-26 with a permissive licence; light beside Postgres (+ES/Redis); secondary, sees the OpenAleph
+stores when that profile is on.
+
+Candidates and outcome (full record with every query, yield and GitHub API primary record was
+delivered to Ony as `private-ai-db-ui-research.md` on 2026-09-21; summary here):
+- **Adminer — chosen.** Docker Official Image (`adminer`, port 8080, `ADMINER_DEFAULT_SERVER`),
+  single PHP file, native PostgreSQL, Elasticsearch via plugin, row editing + SQL; repo pushed
+  2026-09-19, v6.1.0 released 2026-09-14. Disconfirming pass: CVE-2026-25892 / GHSA-q4f2-39gr-45jh,
+  high, unauthenticated persistent DoS, vulnerable >= 4.6.2 < 5.4.2 -- current major is outside
+  that range and the service is bound to 127.0.0.1. Does not do Redis.
+- pgweb -- lighter Postgres-only Go binary (MIT); slower cadence (last release 2025-11-22) and the
+  README does not state row editing. Kept as the fallback if Adminer's PHP footprint is disliked.
+- sqladmin (`smithyhq/sqladmin`, BSD-3, 0.32.0 on 2026-09-20) -- the "literally inside FastAPI"
+  option, one `ModelView` per SQLAlchemy model, mounted at `/admin`. Not chosen for *testing*
+  visibility because it shows only registered models; Alembic's tables, junctions and anything a
+  model does not cover stay invisible. Revisit if a reporter-facing admin panel is ever wanted.
+- CloudBeaver -- Java server, heavier than the job; CE README does not name ES/Redis support.
+- NocoDB / Directus -- ruled out: they write their own tables into (or need) the target database,
+  the wrong shape for a provenance-sensitive workbench DB (Directus discussion #17859, NocoDB NC_DB).
+
+Change: `docker-compose.yml` gains an `adminer` service (`adminer:6`, `127.0.0.1:8081:8080` --
+8080 is already the OpenAleph UI under the profile -- `ADMINER_DEFAULT_SERVER=workbench-db`,
+`depends_on: workbench-db: service_healthy`, no volumes, no profile so it is part of the default
+stack). README's run section names the URL and the login (System PostgreSQL / Server workbench-db
+/ Username journalism / Password POSTGRES_PASSWORD / Database journalism).
+
+NOT VERIFIED: this session's shell has no Docker, so `docker compose up` was not run; the YAML
+was parsed (`yaml.safe_load`) and the service block read back, nothing more. First `docker compose
+up --build` on the Windows host is the real test -- if the login form does not preselect
+PostgreSQL, pick it manually; `ADMINER_DEFAULT_SERVER` only sets the server field. Ony's
+standing ask, recorded here so it survives the session: **once the backend is done, test it
+thoroughly**, with Adminer as the visual check on what the tests actually wrote.

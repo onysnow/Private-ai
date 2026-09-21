@@ -72,7 +72,7 @@ If setup fails, check `journalism-workbench-setup.log` and run **`Repair Journal
 docker compose up --build
 ```
 
-The default stack starts the Workbench database, API, and Next.js UI: use `http://localhost:3000` for the UI and `http://localhost:8000/docs` for API docs.
+The default stack starts the Workbench database, API, and Next.js UI: use `http://localhost:3000` for the UI and `http://localhost:8000/docs` for API docs. A database inspector (Adminer) is at `http://localhost:8081` — System `PostgreSQL`, Server `workbench-db`, Username `journalism`, Password `POSTGRES_PASSWORD` (default `journalism-local-dev`), Database `journalism`.
 
 Docker Compose wires a localhost-only development bearer token between the frontend and backend automatically so the browser UI can talk to the containerized API through the published `localhost` port. Override `API_AUTH_TOKEN` in your shell or `.env` if you want a different local token.
 
