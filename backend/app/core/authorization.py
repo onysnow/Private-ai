@@ -160,6 +160,7 @@ def filter_visible_investigation_ids(scope: AuthorizationScope, ids: Iterable[st
 def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
     # Lazy import keeps authorization infrastructure independent from ORM import order.
     from app.models.domain import (
+        AIAnalysisCandidate,
         Claim,
         ConnectorFinding,
         Document,
@@ -199,11 +200,16 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         return source.investigation_id if source is not None else None
 
     if key == "candidate_id":
+        # Two candidate tables share this path-parameter name:
+        # /extraction-candidates/{candidate_id}/... and /ai-analysis-candidates/{candidate_id}[/review].
+        # Both are UUID-keyed, so try each; an id found in neither resolves to None and the
+        # route's own 404 applies.
         row = db.get(ExtractionCandidate, value)
-        if row is None:
-            return None
-        document = db.get(Document, row.document_id)
-        return document.investigation_id if document is not None else None
+        if row is not None:
+            document = db.get(Document, row.document_id)
+            return document.investigation_id if document is not None else None
+        ai_row = db.get(AIAnalysisCandidate, value)
+        return ai_row.investigation_id if ai_row is not None else None
 
     return None
 

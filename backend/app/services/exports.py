@@ -26,6 +26,7 @@ from app.models.domain import (
     EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
+    AIAnalysisCandidate,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -40,6 +41,7 @@ MODEL_BY_TABLE = {
         EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
+        AIAnalysisCandidate,
     ]
 }
 
@@ -52,6 +54,10 @@ RESTORE_ORDER = [
     "enrichment_session_findings", "cross_provider_decisions", "relationship_edges", "relationship_evidence_attachments", "relationship_evidence_review_events",
     "external_relationship_reviews", "external_relationship_promotions",
     "document_chunks", "extraction_candidates",
+    # The TAS reasoning review queue travels with the investigation: a restored
+    # backup keeps every proposed/accepted/rejected analysis and its reviewer note,
+    # exactly as extraction_candidates keeps the document review trail.
+    "ai_analysis_candidates",
 ]
 
 
@@ -117,7 +123,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
     direct_models = [
         ReportingTask, ReportingTaskWorkflowEvent, TimelineEvent, ResolutionDecision, CanonicalResolutionDecision, CanonicalEntityMergeAudit, PostMergeReconciliationDecision, PropertyConflictDecision, StatementAssessment,
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
-        ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate,
+        ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
     ]
     direct = {
         m.__tablename__: list(db.scalars(select(m).where(m.investigation_id == investigation_id)).all())
@@ -148,6 +154,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "external_relationship_promotions": direct["external_relationship_promotions"],
         "documents": documents, "investigation_corpus_bindings": corpus_bindings, "document_corpus_syncs": document_syncs, "document_chunks": chunks,
         "extraction_candidates": direct["extraction_candidates"],
+        "ai_analysis_candidates": direct["ai_analysis_candidates"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 

@@ -28,9 +28,11 @@ class _FakeLLMClient:
     def __init__(self, response_text: str):
         self._response_text = response_text
         self.calls = 0
+        self.system_prompts: list[str] = []
 
     def generate(self, system_prompt: str, user_prompt: str, *, max_tokens: int = 4096) -> str:
         self.calls += 1
+        self.system_prompts.append(system_prompt)
         return self._response_text
 
 
@@ -253,7 +255,10 @@ def test_candidate_queue_list_get_and_filters(monkeypatch):
     assert body["module"] == "case_synthesis"
     assert body["payload"]["claims"][0]["claim_id"] == "CLM-0001"
     assert {"record_type": "evidence", "record_id": evidence_id} in body["checked_citation_ids"]
-    assert body["request"] == {"question": "What did Ada North sign?", "working_theory": None, "max_results": 30, "include_external_leads": True}
+    assert body["request"] == {
+        "question": "What did Ada North sign?", "working_theory": None, "max_results": 30, "include_external_leads": True,
+        "control_flags": {"severity_floor": "ALL", "source_tier_floor": "C"},  # TAS CONTROL_SURFACE defaults when omitted
+    }
     assert client.get("/api/ai-analysis-candidates/does-not-exist").status_code == 404
 
     # Review through the existing endpoint is reflected in both list and get.
@@ -308,3 +313,72 @@ def test_missing_tas_spec_file_is_a_clean_400_not_a_500(monkeypatch):
     with SessionLocal() as db:
         from app.models.domain import AIAnalysisCandidate
         assert db.query(AIAnalysisCandidate).filter_by(investigation_id=seeded["investigation"]["id"]).count() == 0, "nothing is persisted when the prompt cannot even be built"
+
+
+def test_control_surface_flags_are_validated_before_any_llm_call(monkeypatch):
+    """TAS v1.9 CONTROL_SURFACE §4: unknown values are a 400, not silently
+    defaulted, and the LLM client is never even constructed for them."""
+    settings.enable_ai_features = True
+    settings.ai_provider = "anthropic"
+    called = {"n": 0}
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: called.__setitem__("n", called["n"] + 1))
+    client = TestClient(app)
+    seeded = _seeded_investigation(client)
+    url = f"/api/investigations/{seeded['investigation']['id']}/assistant/case-synthesis"
+
+    bad_tier = client.post(url, json={"question": "What did Ada North sign?", "source_tier_floor": "Z"})
+    assert bad_tier.status_code == 400, bad_tier.text
+    assert "source_tier_floor" in bad_tier.text
+    bad_severity = client.post(url, json={"question": "What did Ada North sign?", "severity_floor": "NONE"})
+    assert bad_severity.status_code == 400, bad_severity.text
+    assert "severity_floor" in bad_severity.text
+    assert called["n"] == 0
+
+    # The service layer rejects flags outside the table too (routes are thin; this is the real gate).
+    with pytest.raises(reasoning_module.ReasoningInputError):
+        reasoning_module.normalize_control_flags({"auto_run_adversarial_gate": True})
+    assert reasoning_module.normalize_control_flags(None) == {"severity_floor": "ALL", "source_tier_floor": "C"}
+    assert reasoning_module.normalize_control_flags({"source_tier_floor": "b", "severity_floor": None}) == {"severity_floor": "ALL", "source_tier_floor": "B"}
+
+
+@requires_tas_spec
+def test_control_surface_flags_reach_the_prompt_and_the_stored_request_without_touching_validation(monkeypatch):
+    settings.enable_ai_features = True
+    settings.ai_provider = "anthropic"
+    client = TestClient(app)
+    seeded = _seeded_investigation(client)
+    evidence_id = seeded["evidence"]["id"]
+    fake = _FakeLLMClient(_valid_case_synthesis(evidence_id))
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: fake)
+
+    r = client.post(
+        f"/api/investigations/{seeded['investigation']['id']}/assistant/case-synthesis",
+        json={"question": "What did Ada North sign?", "severity_floor": "blocking", "source_tier_floor": "B"},
+    )
+    assert r.status_code == 200, r.text
+    prompt = fake.system_prompts[-1]
+    assert "severity_floor = BLOCKING" in prompt and "source_tier_floor = B" in prompt
+    assert "never weaken, skip, or make optional" in prompt, "the §2 boundary must be stated to the model"
+    # The evidence-authority rules and output contract are unchanged by flags.
+    assert "Never invent, alter, or guess a record_type/record_id" in prompt and "OUTPUT CONTRACT:" in prompt
+
+    stored = client.get(f"/api/ai-analysis-candidates/{r.json()['candidate_id']}").json()
+    assert stored["request"]["control_flags"] == {"severity_floor": "BLOCKING", "source_tier_floor": "B"}
+
+    # Same flags, invented citation: still auto-rejected -- flags cannot relax the citation gate.
+    fake_bad = _FakeLLMClient(_valid_case_synthesis("NOT-A-REAL-ID"))
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: fake_bad)
+    r2 = client.post(
+        f"/api/investigations/{seeded['investigation']['id']}/assistant/case-synthesis",
+        json={"question": "What did Ada North sign?", "severity_floor": "BLOCKING", "source_tier_floor": "F"},
+    )
+    assert r2.status_code == 422, r2.text
+
+
+def test_settings_status_lists_the_supported_control_surface():
+    settings.enable_ai_features = False
+    settings.ai_provider = ""
+    cs = TestClient(app).get("/api/settings/status").json()["ai"]["tas_spec"]["control_surface"]
+    assert cs["spec_file"] == "CORE/CONTROL_SURFACE.md"
+    assert cs["flags"]["severity_floor"] == {"default": "ALL", "allowed": ["ALL", "MATERIAL", "BLOCKING"]}
+    assert cs["flags"]["source_tier_floor"]["default"] == "C" and cs["flags"]["source_tier_floor"]["allowed"] == list("ABCDEF")

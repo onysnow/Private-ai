@@ -2340,3 +2340,46 @@ on the TAS integration seam:
   asserts the clean 400 and that nothing is persisted. Verified by hiding `tas_spec` in the
   working copy: 5 passed / 5 skipped; with it present: 11 passed. `python -m mypy` and
   `ruff check app tests` clean.
+
+## 2026-09-21 (later still): backend TAS integration finished -- lifecycle seams, submodule v1.9, control-surface flags
+
+Ony: "keep going, only stopping when the backend is finished." Three backend passes, all on the
+integration seam (no TAS doctrine touched):
+
+1. **Lifecycle seams for `ai_analysis_candidates`** (`tests/test_ai_candidate_lifecycle_seams.py`, 4 tests):
+   - *Authorization gap, real:* `/ai-analysis-candidates/{candidate_id}` shares its path-parameter
+     name with `/extraction-candidates/{candidate_id}`, and `_resource_investigation_id` only knew
+     the extraction table -- so a remote token scoped to one investigation could `GET` any other
+     investigation's model output by id (reproduced: 200 before the fix, 404 after). The resolver
+     now falls through to `AIAnalysisCandidate`. Writes were already blocked by the flush-time
+     mutation guard (the row carries `investigation_id`); the test proves both.
+   - *Backup/restore:* the table was absent from `MODEL_BY_TABLE` / `RESTORE_ORDER`, so every
+     portable export silently dropped the AI review queue. Added, plus a metadata-walk test that
+     fails if any future investigation-owned table is left out of `RESTORE_ORDER` (only
+     `investigation_memberships` and `openaleph_operation_failures` are deliberately non-portable).
+   - *Deletion:* already covered by lifecycle's FK walk; now asserted (preview count, delete count,
+     sibling investigation untouched).
+   - *Audit log:* POSTs (runs, reviews) are already recorded by the generic middleware; no change.
+2. **`tas_spec` submodule 4220ecb (v1.8) -> 2484bae (v1.9).** Docs-only upstream delta
+   (`CORE/CONTROL_SURFACE.md`, AGENTS.md, logs). Drift test passes; `settings.ai.tas_spec.version`
+   now reads `1.9`. Note for the mounted checkout: `git checkout` could create the new files but
+   not replace `CHANGELOG.md`/`README.md` (no delete permission on the mount), so those two were
+   rewritten in place from `git cat-file`; the empty `*.tmp2` scratch files that left behind are
+   parked in `_to_delete/tas_spec_tmp/` for Ony to remove.
+3. **CONTROL_SURFACE §4 flags as request options.** `severity_floor` (ALL|MATERIAL|BLOCKING) and
+   `source_tier_floor` (A-F) on both reasoning requests; validated in `normalize_control_flags`
+   *before* an LLM client is built (400 on unknown values, never silently defaulted); rendered as
+   a "SESSION FLAGS" block in the system prompt that restates the §2 boundary to the model;
+   stored in `candidate.request.control_flags`; listed under `settings.ai.tas_spec.control_surface`.
+   Deliberately NOT exposed, with the reason in code: `show_reasoning_chain` (warrant /
+   confidence_basis are required output-schema fields -- hiding the chain would mean relaxing
+   validation, a §2 violation), `auto_run_adversarial_gate` (no in-app adversarial runner),
+   `visual_release_mode` (no visual output). A second drift test pins the two flags' names and
+   defaults to the vendored CONTROL_SURFACE.md text so an upstream rename fails at test time.
+
+Verification (device VM, tests run from a copy): **278 passed** (was 270), coverage 89% (gate 80%),
+`python -m mypy` clean, `ruff check app tests` clean. Frontend untouched this pass (the panel does
+not yet offer the two flags -- optional request fields, so nothing breaks; the `ai` status guard
+ignores the new `control_surface` key).
+
+NOT VERIFIED: still no real provider run; still no Docker/Adminer from this shell.

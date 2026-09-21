@@ -53,3 +53,22 @@ def test_tas_spec_submodule_drift_or_absence():
     assert not empty, (
         f"MODULE_FILES paths resolved but are empty files: {empty}"
     )
+
+
+def test_tas_control_surface_still_defines_the_flags_this_app_exposes():
+    """The two CONTROL_SURFACE §4 flags exposed as request options
+    (app/ai/reasoning.py CONTROL_SURFACE_FLAGS) must still exist by name in
+    the vendored spec, with the same value tables. If upstream renames or
+    re-scopes a flag, this fails at test time instead of the app quietly
+    steering the model with a flag TAS no longer defines."""
+    path = reasoning_module.CONTROL_SURFACE_FILE
+    if not reasoning_module.TAS_SPEC_ROOT.exists() or not any(reasoning_module.TAS_SPEC_ROOT.iterdir()):
+        import pytest
+        pytest.skip("tas_spec submodule not checked out in this environment -- nothing to verify.")
+    assert path.is_file(), f"vendored TAS no longer ships {path.relative_to(reasoning_module.TAS_SPEC_ROOT)} (bumped below v1.9?)"
+    text = path.read_text(encoding="utf-8")
+    assert "## 2. Non-negotiable boundary" in text
+    for name, spec in reasoning_module.CONTROL_SURFACE_FLAGS.items():
+        assert f"`{name}`" in text, f"flag {name} is no longer defined in CONTROL_SURFACE.md"
+        assert f"| `{name}` | `{spec['default']}`" in text, f"flag {name}'s default changed upstream from {spec['default']!r}"
+    assert "BLOCKING is always enforced regardless of this flag's value" in text

@@ -253,6 +253,8 @@ class CaseSynthesisRequest(BaseModel):
     question: str = Field(min_length=1, max_length=4000)
     max_results: int = Field(default=30, ge=1, le=100)
     include_external_leads: bool = True
+    severity_floor: str | None = Field(default=None, max_length=16)
+    source_tier_floor: str | None = Field(default=None, max_length=1)
 
 
 class HypothesisTestRequest(BaseModel):
@@ -260,6 +262,10 @@ class HypothesisTestRequest(BaseModel):
     question: str = Field(min_length=1, max_length=4000)
     max_results: int = Field(default=30, ge=1, le=100)
     include_external_leads: bool = True
+    # TAS CONTROL_SURFACE §4 session flags; validated against the table in
+    # app/ai/reasoning.py (ALL|MATERIAL|BLOCKING; A-F). None = TAS default.
+    severity_floor: str | None = Field(default=None, max_length=16)
+    source_tier_floor: str | None = Field(default=None, max_length=1)
 
 
 class AIAnalysisCandidateReviewRequest(BaseModel):

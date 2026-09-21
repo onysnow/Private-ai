@@ -117,13 +117,14 @@ def investigation_question_context(
         raise HTTPException(404, str(exc))
 
 
-def _run_reasoning_endpoint(db: Session, *, investigation_id: str, module: str, question: str, max_results: int, include_external_leads: bool, working_theory: str | None = None):
+def _run_reasoning_endpoint(db: Session, *, investigation_id: str, module: str, question: str, max_results: int, include_external_leads: bool, working_theory: str | None = None, control_flags: dict | None = None):
     if not settings.enable_ai_features or not (settings.ai_provider or "").strip():
         raise HTTPException(400, "AI reasoning endpoints are not enabled on this deployment (enable_ai_features and ai_provider must both be set)")
     try:
         candidate = run_reasoning_module(
             db, investigation_id=investigation_id, module=module, question=question,
             working_theory=working_theory, max_results=max_results, include_external_leads=include_external_leads,
+            control_flags=control_flags,
         )
         return {"candidate_id": candidate.id, "review_status": candidate.review_status, "payload": candidate.payload}
     except ReasoningInputError as exc:
@@ -148,6 +149,7 @@ def investigation_case_synthesis(
     return _run_reasoning_endpoint(
         db, investigation_id=investigation_id, module="case_synthesis", question=body.question,
         max_results=body.max_results, include_external_leads=body.include_external_leads,
+        control_flags={"severity_floor": body.severity_floor, "source_tier_floor": body.source_tier_floor},
     )
 
 
@@ -163,6 +165,7 @@ def investigation_hypothesis_test(
         db, investigation_id=investigation_id, module="hypothesis_test", question=body.question,
         max_results=body.max_results, include_external_leads=body.include_external_leads,
         working_theory=body.working_theory,
+        control_flags={"severity_floor": body.severity_floor, "source_tier_floor": body.source_tier_floor},
     )
 
 
