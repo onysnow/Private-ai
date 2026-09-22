@@ -182,6 +182,8 @@ def canonical_entity_resolution(entity_id: str, body: CanonicalResolutionRequest
 def entity_merge_preview(entity_id: str, target_entity_id: str = Query(...), db: Session = Depends(get_db)):
     source = db.get(Entity, entity_id)
     target = db.get(Entity, target_entity_id)
+    if source is None or target is None:
+        raise HTTPException(404, "Entity not found")
     try:
         return preview_entity_merge(db, source, target)
     except ValueError as exc:
@@ -192,6 +194,8 @@ def entity_merge_preview(entity_id: str, target_entity_id: str = Query(...), db:
 def entity_merge_execute(entity_id: str, body: CanonicalMergeExecuteRequest, db: Session = Depends(get_db)):
     source = db.get(Entity, entity_id)
     target = db.get(Entity, body.target_entity_id)
+    if source is None or target is None:
+        raise HTTPException(404, "Entity not found")
     try:
         audit = execute_entity_merge(db, source, target, preview_digest=body.preview_digest, rationale=body.rationale)
         return {"audit": audit, "source_entity_id": entity_id, "target_entity_id": body.target_entity_id}

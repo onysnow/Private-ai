@@ -58,7 +58,7 @@ def list_entities(
         stmt = stmt.offset(offset)
     if limit is not None:
         stmt = stmt.limit(limit)
-    return db.scalars(stmt).all()
+    return list(db.scalars(stmt).all())
 
 
 def decide_property_conflict(db: Session, entity: Entity, prop: str, body: PropertyConflictDecisionRequest) -> PropertyConflictDecision:
@@ -102,13 +102,13 @@ def decide_property_conflict(db: Session, entity: Entity, prop: str, body: Prope
 
 
 def list_property_conflict_decisions(db: Session, entity_id: str, prop: str) -> list[PropertyConflictDecision]:
-    return db.scalars(select(PropertyConflictDecision).where(
+    return list(db.scalars(select(PropertyConflictDecision).where(
         PropertyConflictDecision.entity_id == entity_id, PropertyConflictDecision.prop == prop
-    ).order_by(PropertyConflictDecision.created_at.desc())).all()
+    ).order_by(PropertyConflictDecision.created_at.desc())).all())
 
 
 def list_entity_statements(db: Session, entity_id: str) -> list[Statement]:
-    return db.scalars(select(Statement).where(Statement.entity_id == entity_id)).all()
+    return list(db.scalars(select(Statement).where(Statement.entity_id == entity_id)).all())
 
 
 async def run_multi_enrichment(db: Session, entity: Entity, providers: list[str] | None) -> dict:
@@ -183,26 +183,26 @@ async def run_multi_enrichment(db: Session, entity: Entity, providers: list[str]
 
 
 def list_entity_enrichment_sessions(db: Session, entity_id: str) -> list[EnrichmentSession]:
-    return db.scalars(select(EnrichmentSession).where(EnrichmentSession.entity_id == entity_id).order_by(EnrichmentSession.started_at.desc())).all()
+    return list(db.scalars(select(EnrichmentSession).where(EnrichmentSession.entity_id == entity_id).order_by(EnrichmentSession.started_at.desc())).all())
 
 
 def list_cross_provider_decisions(db: Session, entity_id: str) -> list[CrossProviderDecision]:
-    return db.scalars(select(CrossProviderDecision).where(CrossProviderDecision.entity_id == entity_id).order_by(CrossProviderDecision.created_at.desc())).all()
+    return list(db.scalars(select(CrossProviderDecision).where(CrossProviderDecision.entity_id == entity_id).order_by(CrossProviderDecision.created_at.desc())).all())
 
 
 def list_external_relationship_promotions(db: Session, entity: Entity) -> list[ExternalRelationshipPromotion]:
-    return db.scalars(select(ExternalRelationshipPromotion).where(
+    return list(db.scalars(select(ExternalRelationshipPromotion).where(
         (ExternalRelationshipPromotion.investigation_id == entity.investigation_id),
         ((ExternalRelationshipPromotion.relationship_entity_id == entity.id))
-    ).order_by(ExternalRelationshipPromotion.promoted_at.desc())).all()
+    ).order_by(ExternalRelationshipPromotion.promoted_at.desc())).all())
 
 
 def entity_merge_history(db: Session, entity: Entity) -> list[CanonicalEntityMergeAudit]:
-    return db.scalars(select(CanonicalEntityMergeAudit).where(
+    return list(db.scalars(select(CanonicalEntityMergeAudit).where(
         CanonicalEntityMergeAudit.investigation_id == entity.investigation_id,
         ((CanonicalEntityMergeAudit.source_entity_id == entity.id) | (CanonicalEntityMergeAudit.target_entity_id == entity.id))
-    ).order_by(CanonicalEntityMergeAudit.created_at.desc())).all()
+    ).order_by(CanonicalEntityMergeAudit.created_at.desc())).all())
 
 
 def list_entity_promotions(db: Session, entity_id: str) -> list[StatementPromotion]:
-    return db.scalars(select(StatementPromotion).where(StatementPromotion.entity_id == entity_id).order_by(StatementPromotion.promoted_at.desc())).all()
+    return list(db.scalars(select(StatementPromotion).where(StatementPromotion.entity_id == entity_id).order_by(StatementPromotion.promoted_at.desc())).all())

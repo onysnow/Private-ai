@@ -36,13 +36,13 @@ def serialize_link(db: Session, link: LeadLink) -> dict:
     kind, target_id = _target_label(link)
     target = None
     if kind == "entity":
-        row = db.get(Entity, target_id); target = row.caption if row else None
+        ent = db.get(Entity, target_id); target = ent.caption if ent else None
     elif kind == "source":
-        row = db.get(Source, target_id); target = row.title if row else None
+        src = db.get(Source, target_id); target = src.title if src else None
     elif kind == "claim":
-        row = db.get(Claim, target_id); target = row.text if row else None
+        clm = db.get(Claim, target_id); target = clm.text if clm else None
     elif kind == "evidence":
-        row = db.get(Evidence, target_id); target = (row.quote or row.locator or row.notes) if row else None
+        evd = db.get(Evidence, target_id); target = (evd.quote or evd.locator or evd.notes) if evd else None
     elif kind == "relationship":
         edge = db.get(RelationshipEdge, target_id)
         if edge:
@@ -64,10 +64,12 @@ def _resolve_link_labels(db: Session, links: list[LeadLink]) -> dict[str, str | 
     claim_ids: set[str] = set()
     evidence_ids: set[str] = set()
     relationship_ids: set[str] = set()
-    kind_by_link: dict[str, tuple[str, str] | tuple[None, None]] = {}
+    kind_by_link: dict[str, tuple[str | None, str | None]] = {}
     for link in links:
         kind, target_id = _target_label(link)
         kind_by_link[link.id] = (kind, target_id)
+        if target_id is None:
+            continue
         if kind == "entity":
             entity_ids.add(target_id)
         elif kind == "source":
@@ -96,16 +98,18 @@ def _resolve_link_labels(db: Session, links: list[LeadLink]) -> dict[str, str | 
     for link in links:
         kind, target_id = kind_by_link[link.id]
         label = None
+        if target_id is None:
+            kind = None
         if kind == "entity":
-            row = entities.get(target_id); label = row.caption if row else None
+            ent = entities.get(target_id or ""); label = ent.caption if ent else None
         elif kind == "source":
-            row = sources.get(target_id); label = row.title if row else None
+            src = sources.get(target_id or ""); label = src.title if src else None
         elif kind == "claim":
-            row = claims.get(target_id); label = row.text if row else None
+            clm = claims.get(target_id or ""); label = clm.text if clm else None
         elif kind == "evidence":
-            row = evidence.get(target_id); label = (row.quote or row.locator or row.notes) if row else None
+            evd = evidence.get(target_id or ""); label = (evd.quote or evd.locator or evd.notes) if evd else None
         elif kind == "relationship":
-            edge = edges.get(target_id)
+            edge = edges.get(target_id or "")
             if edge:
                 source = entities.get(edge.source_entity_id)
                 target_entity = entities.get(edge.target_entity_id)
@@ -137,7 +141,7 @@ def _lead_triage(db: Session, links: list[LeadLink]) -> dict:
         attachments = db.scalars(select(RelationshipEvidenceAttachment).where(RelationshipEvidenceAttachment.relationship_edge_id.in_(relationship_ids))).all()
         evidence_ids.update(attachment.evidence_id for attachment in attachments)
 
-    evidence_links = []
+    evidence_links: list[ClaimEvidenceLink] = []
     if claim_ids:
         evidence_links.extend(db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.claim_id.in_(claim_ids))).all())
     if evidence_ids:
@@ -340,7 +344,7 @@ def serialize_lead(db: Session, lead: Lead) -> dict:
         "links": [serialize_link(db, link) for link in links],
         "tasks": [serialize_task(db, task) for task in tasks],
         "history": history,
-        "triage": _lead_triage(db, links),
+        "triage": _lead_triage(db, list(links)),
     }
 
 
@@ -362,15 +366,16 @@ def list_leads_serialized(db: Session, leads: list[Lead]) -> list[dict]:
     profiles_by_lead = {row.lead_id: row for row in db.scalars(select(LeadProfile).where(LeadProfile.lead_id.in_(lead_ids))).all()}
 
     links_by_lead: dict[str, list[LeadLink]] = {lead_id: [] for lead_id in lead_ids}
-    all_links = db.scalars(select(LeadLink).where(LeadLink.lead_id.in_(lead_ids)).order_by(LeadLink.created_at)).all()
+    all_links = list(db.scalars(select(LeadLink).where(LeadLink.lead_id.in_(lead_ids)).order_by(LeadLink.created_at)).all())
     for link in all_links:
         links_by_lead.setdefault(link.lead_id, []).append(link)
     serialized_links = _serialize_links_batch(db, all_links)
 
     tasks_by_lead: dict[str, list[ReportingTask]] = {lead_id: [] for lead_id in lead_ids}
-    all_tasks = db.scalars(select(ReportingTask).where(ReportingTask.lead_id.in_(lead_ids)).order_by(ReportingTask.created_at.desc())).all()
+    all_tasks = list(db.scalars(select(ReportingTask).where(ReportingTask.lead_id.in_(lead_ids)).order_by(ReportingTask.created_at.desc())).all())
     for task in all_tasks:
-        tasks_by_lead.setdefault(task.lead_id, []).append(task)
+        if task.lead_id:
+            tasks_by_lead.setdefault(task.lead_id, []).append(task)
     serialized_tasks = serialize_tasks_batch(db, all_tasks)
 
     history_by_lead: dict[str, list[LeadWorkflowEvent]] = {lead_id: [] for lead_id in lead_ids}
@@ -416,7 +421,7 @@ def lead_provenance_snapshot(db: Session, lead: Lead | None) -> dict | None:
     profile = get_profile(db, lead.id, create=False)
     links = db.scalars(select(LeadLink).where(LeadLink.lead_id == lead.id).order_by(LeadLink.created_at)).all()
     claims, evidence_items, relationships, sources = [], [], [], []
-    seen = {"claim": set(), "evidence": set(), "relationship": set(), "source": set()}
+    seen: dict[str, set[str]] = {"claim": set(), "evidence": set(), "relationship": set(), "source": set()}
 
     def add_source(source: Source | None) -> None:
         if source is None or source.id in seen["source"]: return
@@ -457,7 +462,7 @@ def lead_provenance_snapshot(db: Session, lead: Lead | None) -> dict | None:
                  "next_action": profile.next_action if profile else None},
         "links": [serialize_link(db, link) for link in links],
         "context": {"relationships": relationships, "claims": claims, "evidence": evidence_items, "sources": sources},
-        "triage": _lead_triage(db, links),
+        "triage": _lead_triage(db, list(links)),
     }
 
 
@@ -496,7 +501,7 @@ def serialize_task(db: Session, task: ReportingTask) -> dict:
         .where(ReportingTaskWorkflowEvent.task_id == task.id)
         .order_by(ReportingTaskWorkflowEvent.created_at.desc())
     ).all()
-    return _build_task_dict(task, events)
+    return _build_task_dict(task, list(events))
 
 
 def serialize_tasks_batch(db: Session, tasks: list[ReportingTask]) -> dict[str, dict]:
@@ -530,16 +535,16 @@ def validate_link_target(db: Session, lead: Lead, *, entity_id=None, source_id=N
     if len(targets) != 1:
         raise ValueError("A lead link must reference exactly one entity, source, claim, evidence item, or relationship")
     if entity_id:
-        row = db.get(Entity, entity_id)
-        if row is None or row.investigation_id != lead.investigation_id:
+        ent = db.get(Entity, entity_id)
+        if ent is None or ent.investigation_id != lead.investigation_id:
             raise ValueError("Entity must belong to the same investigation")
     if source_id:
-        row = db.get(Source, source_id)
-        if row is None or row.investigation_id != lead.investigation_id:
+        src = db.get(Source, source_id)
+        if src is None or src.investigation_id != lead.investigation_id:
             raise ValueError("Source must belong to the same investigation")
     if claim_id:
-        row = db.get(Claim, claim_id)
-        if row is None or row.investigation_id != lead.investigation_id:
+        clm = db.get(Claim, claim_id)
+        if clm is None or clm.investigation_id != lead.investigation_id:
             raise ValueError("Claim must belong to the same investigation")
     if evidence_id:
         evidence = db.get(Evidence, evidence_id)
@@ -723,7 +728,8 @@ def convert_lead(db: Session, lead: Lead, body) -> dict:
         db.refresh(claim)
         return {"kind": "claim", "record": claim, "lead": serialize_lead(db, lead)}
     if body.kind == "task":
-        priority = body.priority or (get_profile(db, lead.id, create=True).priority)
+        profile = get_profile(db, lead.id, create=True)
+        priority = body.priority or (profile.priority if profile else "normal")
         if priority not in PRIORITIES:
             raise ValueError("Invalid task priority")
         task = ReportingTask(

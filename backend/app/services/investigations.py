@@ -22,7 +22,7 @@ def create_investigation(db: Session, body: InvestigationCreate) -> Investigatio
 
 
 def list_investigations(db: Session, scope: AuthorizationScope) -> list[Investigation]:
-    rows = db.scalars(select(Investigation).order_by(Investigation.created_at.desc())).all()
+    rows = list(db.scalars(select(Investigation).order_by(Investigation.created_at.desc())).all())
     if scope.unrestricted:
         return rows
     return [row for row in rows if scope.allows(row.id)]
@@ -90,7 +90,7 @@ def list_investigation_sources(
         stmt = stmt.offset(offset)
     if limit is not None:
         stmt = stmt.limit(limit)
-    return db.scalars(stmt).all()
+    return list(db.scalars(stmt).all())
 
 
 def list_investigation_claims(
@@ -109,7 +109,7 @@ def list_investigation_claims(
         stmt = stmt.offset(offset)
     if limit is not None:
         stmt = stmt.limit(limit)
-    return db.scalars(stmt).all()
+    return list(db.scalars(stmt).all())
 
 
 def list_investigation_leads(
@@ -128,7 +128,7 @@ def list_investigation_leads(
         stmt = stmt.offset(offset)
     if limit is not None:
         stmt = stmt.limit(limit)
-    rows = db.scalars(stmt).all()
+    rows = list(db.scalars(stmt).all())
     return list_leads_serialized(db, rows)
 
 
@@ -155,7 +155,7 @@ def lead_queue(
     pages exist. Both default to "no limit" to preserve existing callers'
     behavior unchanged.
     """
-    rows = db.scalars(select(Lead).where(Lead.investigation_id == investigation_id).order_by(Lead.created_at.desc())).all()
+    rows = list(db.scalars(select(Lead).where(Lead.investigation_id == investigation_id).order_by(Lead.created_at.desc())).all())
     items = list_leads_serialized(db, rows)
     requested_status = set(status or [])
     requested_priority = set(priority or [])
@@ -200,7 +200,7 @@ def list_investigation_reporting_tasks(
         stmt = stmt.offset(offset)
     if limit is not None:
         stmt = stmt.limit(limit)
-    rows = db.scalars(stmt).all()
+    rows = list(db.scalars(stmt).all())
     serialized = serialize_tasks_batch(db, rows)
     return [serialized[row.id] for row in rows]
 
@@ -221,7 +221,7 @@ def list_investigation_connector_runs(
         stmt = stmt.offset(offset)
     if limit is not None:
         stmt = stmt.limit(limit)
-    return db.scalars(stmt).all()
+    return list(db.scalars(stmt).all())
 
 
 def list_investigation_connector_findings(db: Session, investigation_id: str, *, limit: int | None = None, offset: int = 0) -> list[ConnectorFinding]:
@@ -235,4 +235,4 @@ def list_investigation_connector_findings(db: Session, investigation_id: str, *,
         stmt = stmt.offset(offset)
     if limit is not None:
         stmt = stmt.limit(limit)
-    return db.scalars(stmt).all()
+    return list(db.scalars(stmt).all())

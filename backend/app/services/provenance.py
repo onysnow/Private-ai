@@ -150,7 +150,7 @@ def record_provenance_trace(db: Session, record_type: str, record_id: str) -> di
     lead references. This makes provenance inspectable without promoting or changing records.
     """
     from app.models.domain import (
-        Claim, Evidence, Source, ClaimEvidenceLink, RelationshipEdge, Entity, LeadLink, Lead, ReportingTask,
+        Claim, Evidence, Source, ClaimEvidenceLink, RelationshipEdge, Entity, LeadLink, Lead, ReportingTask, Document,
     )
     from app.services.relationships import serialize_relationship
     from app.services.entity_aliases import resolve_active_entity, entity_alias_payload
@@ -163,14 +163,19 @@ def record_provenance_trace(db: Session, record_type: str, record_id: str) -> di
     root: dict
     investigation_id: str | None = None
     lineage = None
+    # These names are reused across the record_type branches below, each time
+    # loaded via db.get() and narrowed by an explicit None check; declaring them
+    # Optional once keeps every branch honest about the lookup possibly missing.
+    evidence: Evidence | None
+    source: Source | None
+    document: Document | None
+    edge: RelationshipEdge | None
     evidence_rows: list[dict] = []
     claim_rows: list[dict] = []
     relationship_rows: list[dict] = []
     reconciliation = None
 
     if record_type in {"source", "document"}:
-        from app.models.domain import Document
-
         document = None
         if record_type == "source":
             source = db.get(Source, record_id)
@@ -196,6 +201,7 @@ def record_provenance_trace(db: Session, record_type: str, record_id: str) -> di
                     "extraction_error": document.extraction_error,
                 }
         else:
+            assert document is not None  # the document branch above raised if it was missing
             root = {
                 "id": document.id, "type": "document", "source": source_payload,
                 "document": {
@@ -206,7 +212,7 @@ def record_provenance_trace(db: Session, record_type: str, record_id: str) -> di
             }
 
         evidence_objects = db.scalars(select(Evidence).where(Evidence.source_id == source.id)).all()
-        seen_claim_links = set()
+        seen_claim_links: set[str] = set()
         for evidence in evidence_objects:
             evidence_rows.append({
                 "link_id": None, "stance": "source_evidence", "note": None,
@@ -290,8 +296,8 @@ def record_provenance_trace(db: Session, record_type: str, record_id: str) -> di
         for candidate_id, candidate_state in states.items():
             if candidate_state.get("decision") == "duplicate" and candidate_state.get("preferred_record_id") == preferred_id:
                 underlying_ids.add(candidate_id)
-        underlying_edges = [db.get(RelationshipEdge, rid) for rid in sorted(underlying_ids)]
-        underlying_edges = [item for item in underlying_edges if item is not None]
+        maybe_edges = [db.get(RelationshipEdge, rid) for rid in sorted(underlying_ids)]
+        underlying_edges = [item for item in maybe_edges if item is not None]
         relationship_rows = [serialize_relationship(db, item) for item in underlying_edges]
         root["reviewed_duplicate_scope"] = {
             "presentation_only": True,
@@ -300,7 +306,7 @@ def record_provenance_trace(db: Session, record_type: str, record_id: str) -> di
             "underlying_relationship_count": len(underlying_edges),
         }
         seen_evidence: set[str] = set()
-        seen_claim_links: set[str] = set()
+        seen_claim_links = set()
         for underlying in underlying_edges:
             attachments = db.scalars(select(RelationshipEvidenceAttachment).where(RelationshipEvidenceAttachment.relationship_edge_id == underlying.id).order_by(RelationshipEvidenceAttachment.created_at)).all()
             for attachment in attachments:
@@ -335,26 +341,26 @@ def record_provenance_trace(db: Session, record_type: str, record_id: str) -> di
         investigation_id = lead.investigation_id
         lead_payload = serialize_lead(db, lead)
         root = {"id": lead.id, "type": "lead", "lead": lead_payload}
-        for link in db.scalars(select(LeadLink).where(LeadLink.lead_id == lead.id).order_by(LeadLink.created_at)).all():
-            if link.claim_id:
-                claim = db.get(Claim, link.claim_id)
+        for lead_link in db.scalars(select(LeadLink).where(LeadLink.lead_id == lead.id).order_by(LeadLink.created_at)).all():
+            if lead_link.claim_id:
+                claim = db.get(Claim, lead_link.claim_id)
                 if claim:
-                    claim_rows.append({"link_id": link.id, "stance": "lead_context", "note": link.note, "claim": {"id": claim.id, "text": claim.text, "status": claim.status, "confidence": claim.confidence}})
-            if link.evidence_id:
-                evidence = db.get(Evidence, link.evidence_id)
+                    claim_rows.append({"link_id": lead_link.id, "stance": "lead_context", "note": lead_link.note, "claim": {"id": claim.id, "text": claim.text, "status": claim.status, "confidence": claim.confidence}})
+            if lead_link.evidence_id:
+                evidence = db.get(Evidence, lead_link.evidence_id)
                 source = db.get(Source, evidence.source_id) if evidence else None
-                evidence_rows.append({"link_id": link.id, "stance": "lead_context", "note": link.note, "evidence": None if evidence is None else {"id": evidence.id, "quote": evidence.quote, "locator": evidence.locator, "notes": evidence.notes}, "source": None if source is None else {"id": source.id, "title": source.title, "url": source.url, "source_type": source.source_type}, "extraction_lineage": _record_extraction_lineage(db, "evidence", evidence.id) if evidence else None})
-            if link.source_id:
-                source = db.get(Source, link.source_id)
+                evidence_rows.append({"link_id": lead_link.id, "stance": "lead_context", "note": lead_link.note, "evidence": None if evidence is None else {"id": evidence.id, "quote": evidence.quote, "locator": evidence.locator, "notes": evidence.notes}, "source": None if source is None else {"id": source.id, "title": source.title, "url": source.url, "source_type": source.source_type}, "extraction_lineage": _record_extraction_lineage(db, "evidence", evidence.id) if evidence else None})
+            if lead_link.source_id:
+                source = db.get(Source, lead_link.source_id)
                 if source:
                     for evidence in db.scalars(select(Evidence).where(Evidence.source_id == source.id)).all():
-                        evidence_rows.append({"link_id": link.id, "stance": "lead_source_context", "note": link.note, "evidence": {"id": evidence.id, "quote": evidence.quote, "locator": evidence.locator, "notes": evidence.notes}, "source": {"id": source.id, "title": source.title, "url": source.url, "source_type": source.source_type}, "extraction_lineage": _record_extraction_lineage(db, "evidence", evidence.id)})
-            if link.relationship_id:
-                edge = db.get(RelationshipEdge, link.relationship_id)
+                        evidence_rows.append({"link_id": lead_link.id, "stance": "lead_source_context", "note": lead_link.note, "evidence": {"id": evidence.id, "quote": evidence.quote, "locator": evidence.locator, "notes": evidence.notes}, "source": {"id": source.id, "title": source.title, "url": source.url, "source_type": source.source_type}, "extraction_lineage": _record_extraction_lineage(db, "evidence", evidence.id)})
+            if lead_link.relationship_id:
+                edge = db.get(RelationshipEdge, lead_link.relationship_id)
                 if edge:
                     relationship_rows.append(serialize_relationship(db, edge))
-            if link.entity_id:
-                for edge in db.scalars(select(RelationshipEdge).where((RelationshipEdge.source_entity_id == link.entity_id) | (RelationshipEdge.target_entity_id == link.entity_id))).all():
+            if lead_link.entity_id:
+                for edge in db.scalars(select(RelationshipEdge).where((RelationshipEdge.source_entity_id == lead_link.entity_id) | (RelationshipEdge.target_entity_id == lead_link.entity_id))).all():
                     relationship_rows.append(serialize_relationship(db, edge))
 
     elif record_type == "task":
@@ -368,18 +374,18 @@ def record_provenance_trace(db: Session, record_type: str, record_id: str) -> di
         if task.lead_id:
             lead = db.get(Lead, task.lead_id)
             if lead:
-                links = db.scalars(select(LeadLink).where(LeadLink.lead_id == lead.id).order_by(LeadLink.created_at)).all()
-                for link in links:
-                    if link.claim_id:
-                        claim = db.get(Claim, link.claim_id)
+                task_lead_links = db.scalars(select(LeadLink).where(LeadLink.lead_id == lead.id).order_by(LeadLink.created_at)).all()
+                for lead_link in task_lead_links:
+                    if lead_link.claim_id:
+                        claim = db.get(Claim, lead_link.claim_id)
                         if claim:
-                            claim_rows.append({"link_id": link.id, "stance": "lead_context", "note": link.note, "claim": {"id": claim.id, "text": claim.text, "status": claim.status, "confidence": claim.confidence}})
-                    if link.evidence_id:
-                        evidence = db.get(Evidence, link.evidence_id)
+                            claim_rows.append({"link_id": lead_link.id, "stance": "lead_context", "note": lead_link.note, "claim": {"id": claim.id, "text": claim.text, "status": claim.status, "confidence": claim.confidence}})
+                    if lead_link.evidence_id:
+                        evidence = db.get(Evidence, lead_link.evidence_id)
                         source = db.get(Source, evidence.source_id) if evidence else None
-                        evidence_rows.append({"link_id": link.id, "stance": "lead_context", "note": link.note, "evidence": None if evidence is None else {"id": evidence.id, "quote": evidence.quote, "locator": evidence.locator, "notes": evidence.notes}, "source": None if source is None else {"id": source.id, "title": source.title, "url": source.url, "source_type": source.source_type}, "extraction_lineage": _record_extraction_lineage(db, "evidence", evidence.id) if evidence else None})
-                    if link.relationship_id:
-                        edge = db.get(RelationshipEdge, link.relationship_id)
+                        evidence_rows.append({"link_id": lead_link.id, "stance": "lead_context", "note": lead_link.note, "evidence": None if evidence is None else {"id": evidence.id, "quote": evidence.quote, "locator": evidence.locator, "notes": evidence.notes}, "source": None if source is None else {"id": source.id, "title": source.title, "url": source.url, "source_type": source.source_type}, "extraction_lineage": _record_extraction_lineage(db, "evidence", evidence.id) if evidence else None})
+                    if lead_link.relationship_id:
+                        edge = db.get(RelationshipEdge, lead_link.relationship_id)
                         if edge:
                             relationship_rows.append(serialize_relationship(db, edge))
 
@@ -407,7 +413,7 @@ def record_provenance_trace(db: Session, record_type: str, record_id: str) -> di
         record_id = entity.id
         reconciliation = detect_post_merge_reconciliation(db, entity)
 
-    lead_links = []
+    lead_links: list[dict] = []
     conditions = []
     if record_type == "entity": conditions.append(LeadLink.entity_id == record_id)
     if record_type == "claim": conditions.append(LeadLink.claim_id == record_id)
@@ -435,11 +441,11 @@ def record_provenance_trace(db: Session, record_type: str, record_id: str) -> di
     if conditions:
         from sqlalchemy import or_
         stmt = select(LeadLink).where(conditions[0] if len(conditions) == 1 else or_(*conditions))
-        for link in db.scalars(stmt.order_by(LeadLink.created_at)).all():
-            lead = db.get(Lead, link.lead_id)
+        for lead_link in db.scalars(stmt.order_by(LeadLink.created_at)).all():
+            lead = db.get(Lead, lead_link.lead_id)
             if lead and (investigation_id is None or lead.investigation_id == investigation_id):
                 lead_links.append({
-                    "link_id": link.id, "note": link.note,
+                    "link_id": lead_link.id, "note": lead_link.note,
                     "lead": {"id": lead.id, "title": lead.title, "detail": lead.detail, "status": lead.status, "provider": lead.provider},
                 })
 

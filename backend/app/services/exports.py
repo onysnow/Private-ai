@@ -125,8 +125,8 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
     ]
-    direct = {
-        m.__tablename__: list(db.scalars(select(m).where(m.investigation_id == investigation_id)).all())
+    direct: dict[str, list[Any]] = {
+        m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
         for m in direct_models
     }
 
@@ -200,10 +200,10 @@ def _lineage_integrity(records: dict[str, list[dict[str, Any]]]) -> dict[str, An
         if document_id not in documents:
             errors.append(f"candidate {candidate_id} references missing document {document_id}")
         if chunk_id is not None:
-            chunk = chunks.get(chunk_id)
-            if chunk is None:
+            parent_chunk = chunks.get(chunk_id)
+            if parent_chunk is None:
                 errors.append(f"candidate {candidate_id} references missing chunk {chunk_id}")
-            elif chunk.get("document_id") != document_id:
+            elif parent_chunk.get("document_id") != document_id:
                 errors.append(f"candidate {candidate_id} chunk {chunk_id} belongs to a different document")
 
         record_type = candidate.get("accepted_record_type")
@@ -278,16 +278,16 @@ def _build_investigation_export_snapshot(db: Session, investigation_id: str, inc
     document_entries = []
     if include_documents:
         for doc in records["documents"]:
-            path = Path(doc.get("storage_path") or "")
-            if path.is_file():
-                raw = path.read_bytes()
+            raw_path = Path(doc.get("storage_path") or "")
+            if raw_path.is_file():
+                raw = raw_path.read_bytes()
                 ext_name = f"documents/raw/{doc['id']}/{_safe_name(doc['filename'])}"
                 file_payloads[ext_name] = raw
                 document_entries.append({"document_id": doc["id"], "archive_path": ext_name, "sha256": hashlib.sha256(raw).hexdigest()})
             else:
                 missing_documents.append({"document_id": doc["id"], "storage_path": doc.get("storage_path")})
 
-    manifest = {
+    manifest: dict[str, Any] = {
         "format": EXPORT_FORMAT,
         "version": EXPORT_VERSION,
         "generated_at": generated_at,

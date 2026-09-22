@@ -5,6 +5,7 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 from threading import Lock
+from typing import Any
 from uuid import uuid4
 
 SENSITIVE_GET_PREFIXES = (
@@ -191,18 +192,15 @@ def read_security_audit(
 def summarize_security_audit(path: str | Path) -> dict:
     """Return metadata-only aggregate counts for the complete local audit file."""
     audit_path = Path(path)
-    summary = {
-        "total_records": 0,
-        "malformed_lines": 0,
-        "local_records": 0,
-        "remote_records": 0,
-        "by_event": {},
-        "by_method": {},
-        "by_status": {},
-        "file_bytes": 0,
-    }
+    counters: dict[str, int] = {"total_records": 0, "malformed_lines": 0, "local_records": 0, "remote_records": 0, "file_bytes": 0}
+    buckets: dict[str, dict[str, int]] = {"by_event": {}, "by_method": {}, "by_status": {}}
+    extra: dict[str, Any] = {}
+
+    def summary() -> dict[str, Any]:
+        return {**counters, **buckets, **extra}
+
     if not audit_path.exists():
-        return summary
+        return summary()
     try:
         with audit_path.open("r", encoding="utf-8", errors="replace") as handle:
             for line in handle:
@@ -212,26 +210,26 @@ def summarize_security_audit(path: str | Path) -> dict:
                 try:
                     parsed = json.loads(raw)
                 except json.JSONDecodeError:
-                    summary["malformed_lines"] += 1
+                    counters["malformed_lines"] += 1
                     continue
                 record = _safe_audit_record(parsed)
                 if record is None:
-                    summary["malformed_lines"] += 1
+                    counters["malformed_lines"] += 1
                     continue
-                summary["total_records"] += 1
+                counters["total_records"] += 1
                 locality = "local_records" if record["local_request"] else "remote_records"
-                summary[locality] += 1
+                counters[locality] += 1
                 for key, value in (("by_event", record["event"]), ("by_method", record["method"]), ("by_status", str(record["status_code"]))):
-                    bucket = summary[key]
+                    bucket = buckets[key]
                     bucket[value] = bucket.get(value, 0) + 1
     except OSError:
-        summary["read_error"] = True
-        return summary
+        extra["read_error"] = True
+        return summary()
     try:
-        summary["file_bytes"] = audit_path.stat().st_size
+        counters["file_bytes"] = audit_path.stat().st_size
     except OSError:
         pass
-    return summary
+    return summary()
 
 
 def _parse_audit_timestamp(value: object) -> datetime | None:

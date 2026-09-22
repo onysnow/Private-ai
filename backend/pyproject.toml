@@ -23,29 +23,18 @@ known-first-party = ["app"]
 
 [tool.mypy]
 python_version = "3.12"
-files = [
-    "app/connectors", "app/core/access.py", "app/core/config.py", "app/core/time.py",
-    "app/models", "app/schemas",
-    # STRUCT-0013 widening, cycle 2: the smallest safely-completable app/services slice
-    # (6 files with 1-2 mypy errors each, plus their 2 transitively-imported dependencies
-    # that mypy analyzes regardless of whether they are listed here).
-    "app/services/sources.py", "app/services/lifecycle.py", "app/services/entity_merge.py",
-    "app/services/connector_findings.py", "app/services/claims.py", "app/services/timeline.py",
-    "app/services/relationships.py", "app/services/post_merge_reconciliation.py",
-    # STRUCT-0013 widening, cycle 3: the next-smallest slice (13 errors across 3 files).
-    "app/services/resolution.py", "app/services/external_relationships.py",
-    "app/services/openaleph_corpus.py",
-    # STRUCT-0013 widening, cycle 4: app/services/ftm.py (a transitively-checked
-    # dependency of relationships.py, already implicitly analyzed -- listing it
-    # explicitly locks in its now-clean status) and app/services/consolidation.py
-    # (8 errors, self-contained: its only app.* import is app.models.domain, already
-    # covered). exports.py/entities.py/investigations.py were tried this cycle too but
-    # each pulls in 3 more transitively-checked files once analyzed on their own (122
-    # errors combined per file, not the ~8 estimated in cycle 3's note, which only
-    # counted each target file's own errors) -- deferred rather than risk a much bigger
-    # unattended slice than intended.
-    "app/services/ftm.py", "app/services/consolidation.py",
-]
+# STRUCT-0013, cycle 5 (2026-09-22): the whole backend package is checked. Cycles
+# 2-4 widened this list one app/services slice at a time; cycle 5 cleared the
+# remaining 275 errors across 12 files (search.py 106, documents.py 41, leads.py 38,
+# provenance.py 35, dossier.py 17, investigations/exports/entities.py 8 each,
+# audit_log.py 6, routes_entities.py 4, migrations.py 2, ai/reasoning.py 2) -- almost
+# all one of three shapes: a loop/branch variable reused for a different ORM type
+# (renamed per type), Sequence-vs-list from db.scalars(...).all() (wrapped in
+# list()), or a missing dict/list annotation. Two were real bugs: routes_entities'
+# merge endpoints passed a possibly-None Entity into the service (now 404), and
+# dossier.py's evidence loop was one rename away from reporting a stale claim
+# basis. `files` is the package, so a new module is checked the day it lands.
+files = ["app"]
 warn_return_any = true
 warn_unused_configs = true
 warn_redundant_casts = true
@@ -58,23 +47,9 @@ ignore_missing_imports = true
 pretty = true
 show_error_codes = true
 
-# Deferred until the remaining backend packages are ready for broader type-checking
-# (STRUCT-0013, cycle 4 update): 13 app/services files brought under coverage above
-# (cycle 4 added ftm.py -- fixed 3 real errors from an ImportError-fallback module
-# variable mypy was mistracking as non-Optional -- and consolidation.py -- fixed 8
-# errors, all either reused-variable-different-type bugs or missing dict/return
-# annotations, the same patterns fixed in prior cycles' files). The rest of
-# app/services now stands at 262 errors across 8 files -- dominated by search.py alone
-# (106 errors), then documents.py (41), leads.py (38), provenance.py (35), dossier.py
-# (17), investigations.py/exports.py/entities.py (8 each; measured standalone this
-# cycle, each of these three actually pulls in 3 more transitively-checked files once
-# analyzed on its own -- 122 errors combined, not ~8 -- so none were attempted this
-# cycle). app/ai (134 errors, not yet investigated) and app/api remain untouched
-# widening targets. The 13 files added across cycles 2-4 are NOT yet clean under disallow_untyped_defs=true
-# (missing return-type/arg annotations, mostly on route-payload `body` params whose
-# concrete Pydantic schema type needs to be threaded through) -- left under the relaxed
-# default rather than rushing those annotations in this cycle; a future cycle can flip
-# them to the strict override alongside app.models.*/app.schemas.* once annotated.
+# Still relaxed package-wide: flipping this is the next STRUCT-0013 step and is
+# mostly annotation typing on route handlers and service helpers, not bug-finding.
+# app.models.* / app.schemas.* already hold the strict bar (override below).
 disallow_untyped_defs = false
 
 [[tool.mypy.overrides]]

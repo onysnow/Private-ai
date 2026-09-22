@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from typing import Any
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
@@ -115,7 +116,7 @@ def entity_dossier(db: Session, entity_id: str) -> dict:
     finding_ids = {link.finding_id for link in enrichment_links}
     finding_ids.update(d.finding_id for d in decisions)
     finding_ids.update(a.finding_id for a in assessments)
-    findings = db.scalars(select(ConnectorFinding).where(ConnectorFinding.id.in_(finding_ids))).all() if finding_ids else []
+    findings: list[ConnectorFinding] = list(db.scalars(select(ConnectorFinding).where(ConnectorFinding.id.in_(finding_ids))).all()) if finding_ids else []
     finding_by_id = {f.id: f for f in findings}
 
     # Build dossier relevance from explicit graph/evidence links first. Text mentions are
@@ -135,45 +136,46 @@ def entity_dossier(db: Session, entity_id: str) -> dict:
     all_claim_links = db.scalars(
         select(ClaimEvidenceLink).where(ClaimEvidenceLink.evidence_id.in_(evidence_by_id.keys()))
     ).all() if evidence_by_id else []
-    links_by_evidence = {}
-    links_by_claim = {}
-    for link in all_claim_links:
-        links_by_evidence.setdefault(link.evidence_id, []).append(link)
-        links_by_claim.setdefault(link.claim_id, []).append(link)
+    links_by_evidence: dict[str, list[ClaimEvidenceLink]] = {}
+    links_by_claim: dict[str, list[ClaimEvidenceLink]] = {}
+    for claim_link in all_claim_links:
+        links_by_evidence.setdefault(claim_link.evidence_id, []).append(claim_link)
+        links_by_claim.setdefault(claim_link.claim_id, []).append(claim_link)
 
     relationship_claim_ids = {
-        link.claim_id for evidence_id in relationship_evidence_ids
-        for link in links_by_evidence.get(evidence_id, [])
+        claim_link.claim_id for evidence_id in relationship_evidence_ids
+        for claim_link in links_by_evidence.get(evidence_id, [])
     }
     explicit_lead_links = db.scalars(
         select(LeadLink).join(Lead, Lead.id == LeadLink.lead_id).where(Lead.investigation_id == entity.investigation_id)
     ).all()
-    direct_lead_ids = {link.lead_id for link in explicit_lead_links if link.entity_id == entity.id}
-    for link in explicit_lead_links:
-        if link.relationship_id in relationship_edge_ids:
-            direct_lead_ids.add(link.lead_id)
-        if link.evidence_id in relationship_evidence_ids:
-            direct_lead_ids.add(link.lead_id)
-        if link.claim_id in relationship_claim_ids:
-            direct_lead_ids.add(link.lead_id)
+    direct_lead_ids = {lead_link.lead_id for lead_link in explicit_lead_links if lead_link.entity_id == entity.id}
+    for lead_link in explicit_lead_links:
+        if lead_link.relationship_id in relationship_edge_ids:
+            direct_lead_ids.add(lead_link.lead_id)
+        if lead_link.evidence_id in relationship_evidence_ids:
+            direct_lead_ids.add(lead_link.lead_id)
+        if lead_link.claim_id in relationship_claim_ids:
+            direct_lead_ids.add(lead_link.lead_id)
 
     explicit_claim_ids = set(relationship_claim_ids)
     explicit_evidence_ids = set(relationship_evidence_ids)
-    for link in explicit_lead_links:
-        if link.lead_id not in direct_lead_ids:
+    for lead_link in explicit_lead_links:
+        if lead_link.lead_id not in direct_lead_ids:
             continue
-        if link.claim_id:
-            explicit_claim_ids.add(link.claim_id)
-        if link.evidence_id:
-            explicit_evidence_ids.add(link.evidence_id)
-        if link.source_id and link.source_id in source_by_id:
-            explicit_evidence_ids.update(e.id for e in all_evidence if e.source_id == link.source_id)
+        if lead_link.claim_id:
+            explicit_claim_ids.add(lead_link.claim_id)
+        if lead_link.evidence_id:
+            explicit_evidence_ids.add(lead_link.evidence_id)
+        if lead_link.source_id and lead_link.source_id in source_by_id:
+            explicit_evidence_ids.update(e.id for e in all_evidence if e.source_id == lead_link.source_id)
 
-    claims = []
+    claims: list[dict[str, Any]] = []
     all_claims = db.scalars(select(Claim).where(Claim.investigation_id == entity.investigation_id).order_by(Claim.created_at.desc())).all()
     claim_by_id = {claim.id: claim for claim in all_claims}
     for claim in all_claims:
         matched = _mention(claim.text, terms)
+        basis: dict[str, Any]
         if claim.id in explicit_claim_ids:
             basis = {"type": "explicit_graph_context"}
         elif matched:
@@ -183,25 +185,26 @@ def entity_dossier(db: Session, entity_id: str) -> dict:
         claims.append({"claim": claim, "match_basis": basis})
         explicit_evidence_ids.update(link.evidence_id for link in links_by_claim.get(claim.id, []))
 
-    evidence_rows = []
+    evidence_rows: list[dict[str, Any]] = []
     for evidence in all_evidence:
         matched = _mention(" ".join(filter(None, [evidence.quote, evidence.notes, evidence.locator])), terms)
         related_links = links_by_evidence.get(evidence.id, [])
         related_dossier_links = [link for link in related_links if link.claim_id in {item["claim"].id for item in claims}]
+        evidence_basis: dict[str, Any]
         if evidence.id in relationship_evidence_ids:
-            basis = {"type": "relationship_evidence"}
+            evidence_basis = {"type": "relationship_evidence"}
         elif evidence.id in explicit_evidence_ids:
-            basis = {"type": "explicit_context"}
+            evidence_basis = {"type": "explicit_context"}
         elif related_dossier_links:
-            basis = {"type": "linked_claim"}
+            evidence_basis = {"type": "linked_claim"}
         elif matched:
-            basis = {"type": "text_mention", "terms": matched}
+            evidence_basis = {"type": "text_mention", "terms": matched}
         else:
             continue
         evidence_rows.append({
             "evidence": evidence,
             "source": source_by_id.get(evidence.source_id),
-            "match_basis": basis,
+            "match_basis": evidence_basis,
             "claim_links": [
                 {"claim_id": link.claim_id, "stance": link.stance, "note": link.note}
                 for link in related_links if link.claim_id in claim_by_id
@@ -237,13 +240,13 @@ def entity_dossier(db: Session, entity_id: str) -> dict:
     # Multiple values are never collapsed or "resolved" by the dossier. A reporter preference
     # must come from an explicit review primitive; until then the conflict stays unresolved.
     statement_history = entity_statement_history(db, entity.id)
-    property_groups = {}
+    property_groups: dict[str, list[dict[str, Any]]] = {}
     for row in statement_history:
         property_groups.setdefault(row["prop"], []).append(row)
     conflict_decisions = db.scalars(select(PropertyConflictDecision).where(
         PropertyConflictDecision.entity_id == entity.id
     ).order_by(PropertyConflictDecision.created_at.desc())).all()
-    decisions_by_prop = {}
+    decisions_by_prop: dict[str, list[PropertyConflictDecision]] = {}
     for decision in conflict_decisions:
         decisions_by_prop.setdefault(decision.prop, []).append(decision)
     property_conflicts = []

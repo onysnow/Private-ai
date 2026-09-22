@@ -5,7 +5,7 @@ from typing import Iterable
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.core.time import utcnow_naive
-from app.models.domain import Document, DocumentChunk, ExtractionCandidate, Source, Evidence, Claim, ClaimEvidenceLink, Entity, Statement, Investigation
+from app.models.domain import Document, DocumentChunk, ExtractionCandidate, Source, Evidence, Claim, ClaimEvidenceLink, Entity, Statement, Investigation, RelationshipEdge
 from app.services.ftm import make_ftm_entity
 from app.services.security import contained_path, resolve_storage_root
 from app.services.resolution import candidate_entities
@@ -160,7 +160,7 @@ def ingest_document(db: Session, *, investigation_id: str, title: str, filename:
 def serialize_document(db: Session, doc: Document) -> dict:
     chunks = db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == doc.id).order_by(DocumentChunk.ordinal)).all()
     candidates = db.scalars(select(ExtractionCandidate).where(ExtractionCandidate.document_id == doc.id).order_by(ExtractionCandidate.created_at)).all()
-    counts = {}
+    counts: dict[str, int] = {}
     for c in candidates: counts[c.candidate_type] = counts.get(c.candidate_type,0)+1
     return {'id':doc.id,'investigation_id':doc.investigation_id,'source_id':doc.source_id,'filename':doc.filename,'mime_type':doc.mime_type,'sha256':doc.sha256,'extraction_status':doc.extraction_status,'extraction_error':doc.extraction_error,'created_at':doc.created_at,'chunk_count':len(chunks),'candidate_counts':counts}
 
@@ -259,7 +259,8 @@ def preview_entity_candidate_matches(db: Session, candidate: ExtractionCandidate
     caption = str(payload.get('caption') or '').strip()
     schema = str(payload.get('suggested_schema') or 'Thing')
     matches = candidate_entities(db, doc.investigation_id, caption, schema)
-    provenance = payload.get('provenance') if isinstance(payload.get('provenance'), dict) else {}
+    raw_provenance = payload.get('provenance')
+    provenance: dict = raw_provenance if isinstance(raw_provenance, dict) else {}
     return {
         'candidate_id': candidate.id, 'caption': caption, 'schema': schema,
         'matches': matches,
@@ -287,7 +288,14 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
     if isinstance(span, dict) and isinstance(span.get('start_char'), int) and isinstance(span.get('end_char'), int):
         span_suffix = f"@chars:{span['start_char']}-{span['end_char']}"
     origin=f'document:{doc.id}#{chunk.locator if chunk else "document"}{span_suffix}'
-    record=None
+    # One typed slot per accepted-record kind: the branches below produce different
+    # ORM types, and the serialized `record_out` is built after the commit so it
+    # reflects persisted state (ids, defaults) exactly as before.
+    evidence_record: Evidence | None = None
+    claim_record: Claim | None = None
+    entity_record: Entity | None = None
+    edge_record: RelationshipEdge | None = None
+    accepted_id: str
     if candidate.candidate_type=='evidence':
         evidence_quote = candidate.payload.get('quote')
         evidence_locator = candidate.payload.get('locator') or (chunk.locator if chunk else None)
@@ -302,12 +310,12 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
                 raise ValueError('Extraction candidate character span is outside the source chunk')
             if chunk.text[start:end] != evidence_quote:
                 raise ValueError('Extraction candidate evidence quote does not match its exact source span')
-        record=Evidence(source_id=source.id, quote=evidence_quote, locator=evidence_locator, notes=note)
-        db.add(record); db.flush(); rtype='evidence'
+        evidence_record=Evidence(source_id=source.id, quote=evidence_quote, locator=evidence_locator, notes=note)
+        db.add(evidence_record); db.flush(); rtype='evidence'; accepted_id=evidence_record.id
     elif candidate.candidate_type=='claim':
         claim_text = candidate.payload.get('text','')
-        record=Claim(investigation_id=doc.investigation_id, text=claim_text, status=claim_status, confidence=confidence if confidence is not None else 0.0)
-        db.add(record); db.flush()
+        claim_record=Claim(investigation_id=doc.investigation_id, text=claim_text, status=claim_status, confidence=confidence if confidence is not None else 0.0)
+        db.add(claim_record); db.flush(); accepted_id=claim_record.id
         # Accepting an extracted claim must not sever it from the exact document text
         # the reporter reviewed. Materialize that precise span as Evidence and record
         # an explicit SUPPORTS link. This is provenance, not automatic verification:
@@ -323,7 +331,7 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
         )
         db.add(extracted_evidence); db.flush()
         db.add(ClaimEvidenceLink(
-            claim_id=record.id,
+            claim_id=claim_record.id,
             evidence_id=extracted_evidence.id,
             stance='supports',
             note=f'Exact reviewed document span from extraction candidate {candidate.id}',
@@ -350,11 +358,13 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
             if isinstance(values, list)
         }
         if entity_identity_decision == 'same':
-            record = matched
+            assert matched is not None  # guaranteed by the matched_entity_id checks above
+            entity_record = matched
         else:
             ftm=make_ftm_entity(schema, cap, normalized_properties)
-            record=Entity(investigation_id=doc.investigation_id, ftm_id=ftm['id'], schema=ftm['schema'], caption=cap, properties=ftm['properties'])
-            db.add(record); db.flush()
+            entity_record=Entity(investigation_id=doc.investigation_id, ftm_id=ftm['id'], schema=ftm['schema'], caption=cap, properties=ftm['properties'])
+            db.add(entity_record); db.flush()
+        accepted_id=entity_record.id
         provenance = candidate.payload.get('provenance') if isinstance(candidate.payload, dict) else None
         if isinstance(provenance, dict) and provenance.get('provider'):
             provider = str(provenance.get('provider'))
@@ -369,11 +379,11 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
         # extra properties. Reporter acceptance is the point at which this
         # proposal becomes a Workbench entity; provider resolution metadata is
         # not treated as a canonical identity decision.
-        db.add(Statement(entity_id=record.id, prop='name', value=cap, dataset=dataset, origin=statement_origin, original_value=cap))
+        db.add(Statement(entity_id=entity_record.id, prop='name', value=cap, dataset=dataset, origin=statement_origin, original_value=cap))
         if entity_identity_decision == 'different' and matched is not None:
             from app.services.resolution import record_canonical_resolution
             # Record the reporter's explicit negative identity decision without auto-merging.
-            record_canonical_resolution(db, record, matched, decision='different', confidence=confidence if confidence is not None else 1.0, rationale=note, commit=False)
+            record_canonical_resolution(db, entity_record, matched, decision='different', confidence=confidence if confidence is not None else 1.0, rationale=note, commit=False)
         rtype='entity'
     elif candidate.candidate_type=='relationship':
         from app.services.relationships import create_relationship
@@ -384,25 +394,27 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
             raise ValueError('Relationship proposal claim is missing or outside this investigation')
         # create_relationship performs endpoint/evidence scope validation. The relationship
         # statement origin points back to this exact reviewed extraction candidate.
-        edge = create_relationship(
-            db, investigation_id=doc.investigation_id, schema=payload.get('schema'),
-            source_entity_id=payload.get('source_entity_id'), target_entity_id=payload.get('target_entity_id'),
+        edge_record = create_relationship(
+            db, investigation_id=doc.investigation_id, schema=str(payload.get('schema') or ''),
+            source_entity_id=str(payload.get('source_entity_id') or ''), target_entity_id=str(payload.get('target_entity_id') or ''),
             properties=payload.get('properties') or {}, dataset=f'document:{doc.id}',
             origin=f'extraction-candidate:{candidate.id}', evidence_id=evidence_id, commit=False,
         )
-        record=edge; rtype='relationship'
+        rtype='relationship'; accepted_id=edge_record.id
     else: raise ValueError('Unsupported candidate type')
-    candidate.review_status='accepted'; candidate.accepted_record_type=rtype; candidate.accepted_record_id=record.id
+    candidate.review_status='accepted'; candidate.accepted_record_type=rtype; candidate.accepted_record_id=accepted_id
     db.commit(); db.refresh(candidate)
-    if rtype == 'entity':
-        record_out = {'id': record.id, 'investigation_id': record.investigation_id, 'ftm_id': record.ftm_id, 'schema': record.schema, 'caption': record.caption, 'properties': record.properties}
-    elif rtype == 'claim':
-        record_out = {'id': record.id, 'investigation_id': record.investigation_id, 'text': record.text, 'status': record.status, 'confidence': record.confidence}
-    elif rtype == 'relationship':
+    record_out: dict
+    if entity_record is not None:
+        record_out = {'id': entity_record.id, 'investigation_id': entity_record.investigation_id, 'ftm_id': entity_record.ftm_id, 'schema': entity_record.schema, 'caption': entity_record.caption, 'properties': entity_record.properties}
+    elif claim_record is not None:
+        record_out = {'id': claim_record.id, 'investigation_id': claim_record.investigation_id, 'text': claim_record.text, 'status': claim_record.status, 'confidence': claim_record.confidence}
+    elif edge_record is not None:
         from app.services.relationships import serialize_relationship
-        record_out = serialize_relationship(db, record)
+        record_out = serialize_relationship(db, edge_record)
     else:
-        record_out = {'id': record.id, 'source_id': record.source_id, 'quote': record.quote, 'locator': record.locator, 'notes': record.notes}
+        assert evidence_record is not None
+        record_out = {'id': evidence_record.id, 'source_id': evidence_record.source_id, 'quote': evidence_record.quote, 'locator': evidence_record.locator, 'notes': evidence_record.notes}
     return {'candidate':candidate,'record':record_out}
 
 
@@ -419,4 +431,4 @@ def list_document_candidates(db: Session, document_id: str, status: str | None =
         stmt = stmt.where(ExtractionCandidate.review_status == status)
     if candidate_type:
         stmt = stmt.where(ExtractionCandidate.candidate_type == candidate_type)
-    return db.scalars(stmt.order_by(ExtractionCandidate.created_at)).all()
+    return list(db.scalars(stmt.order_by(ExtractionCandidate.created_at)).all())

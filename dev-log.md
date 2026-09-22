@@ -2443,3 +2443,20 @@ Both findings were already IN_PROGRESS from earlier cycles; this closes the rema
 
 STRUCTURE_AUDIT.md rows updated to CORRECTED. **295 passed** (was 290), mypy + ruff clean.
 Next per Ony: STRUCT-0013 (widen mypy), then STRUCT-0010 (app factory / settings injection).
+
+## 2026-09-22 (cont.): STRUCT-0013 -- whole backend under mypy
+
+`files = ["app"]`: 73 modules, zero errors, CI-enforced. The 275 errors cleared this cycle were
+almost all three shapes -- a loop/branch variable reused for a different ORM type (renamed per
+type: `row` -> `entity_row`/`claim_row`/..., `link` -> `claim_link`/`lead_link`, `record` ->
+`evidence_record`/`claim_record`/...), `Sequence` from `db.scalars().all()` where a `list` was
+promised (wrapped), and missing dict/list annotations. Two real bugs surfaced: the entity
+merge-preview/merge endpoints passed a possibly-None Entity into the service (now a clean 404),
+and dossier.py's evidence loop reused the claim loop's `basis` name -- correct today only because
+it was reassigned on every path; one edit away from reporting a stale claim basis (now
+`evidence_basis`). migrations.py now type-checks UniqueConstraint with isinstance instead of a
+class-name string; audit_log's summary is built from typed counters/buckets.
+
+Not flipped: `disallow_untyped_defs` stays false package-wide (models/schemas already strict).
+That is the remaining STRUCT-0013 step, annotation work rather than bug-finding.
+295 passed, ruff clean. STRUCT-0013 marked CORRECTED with the remaining step stated in the row.

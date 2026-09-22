@@ -217,7 +217,7 @@ REJECTION_REASONS = {
 # Required top-level shape per module. Intentionally lighter than a full JSON
 # Schema validator (jsonschema isn't a dependency here) but real: every entry
 # actually gets type-checked, not just presence-checked.
-_REQUIRED_SHAPE = {
+_REQUIRED_SHAPE: dict[str, dict[str, type | tuple[type, dict[str, type]]]] = {
     "case_synthesis": {
         "executive_summary": str,
         "claims": (list, {"claim_id": str, "claim": str, "classification": str, "confidence": str}),
@@ -244,6 +244,7 @@ def validate_output_shape(module: str, payload: dict) -> list[str]:
             if not isinstance(value, list_type):
                 errors.append(f"field {key!r} must be a list")
                 continue
+            assert isinstance(value, list)  # narrowed above via list_type; restated for the type checker
             for i, item in enumerate(value):
                 if not isinstance(item, dict):
                     errors.append(f"{key}[{i}] must be an object")
