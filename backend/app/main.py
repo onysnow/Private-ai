@@ -1,13 +1,15 @@
-from typing import Any
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import AsyncIterator, Awaitable, Callable
+from typing import Any, AsyncIterator, Awaitable, Callable, Iterator
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from app.db.session import engine, SessionLocal
+from sqlalchemy import Engine
+from sqlalchemy.orm import Session
+
+from app.db.session import SessionLocal, build_engine, build_session_factory, engine as default_engine, get_db
 from app.db.migrations import ensure_database_schema
 from app.api.routes_investigations import router as investigations_router
 from app.api.routes_system import router as system_router
@@ -73,6 +75,8 @@ def create_app(
     audit: SecurityAuditLogger | None = None,
     request_limits: RequestLimitPolicy | None = None,
     auth_failures: FixedWindowRateLimiter | None = None,
+    database_url: str | None = None,
+    engine: Engine | None = None,
 ) -> FastAPI:
     """Build a FastAPI app instance (STRUCT-0010).
 
@@ -90,20 +94,36 @@ def create_app(
     state or the real audit file. Omitted, each is built from `app_settings`
     exactly as before.
 
-    Deliberately NOT parameterized here: `engine`/`SessionLocal` (from
-    app.db.session), which are themselves built from `settings.database_url`
-    at THEIR module's import time, independent of this factory. Injecting a
-    different database per app instance is a bigger, separate refactor.
+    `database_url` (or a ready `engine`) gives this instance its own database:
+    its own Engine and session factory, its own `get_db` dependency override,
+    and its own schema bootstrap -- none of it touching app.db.session's
+    module-level `engine`/`SessionLocal`, which stay the default for
+    `create_app()` with no database argument (and for code that imports them
+    directly, which is why they are not removed).
     """
     app_settings = app_settings or default_settings
+    if engine is not None and database_url is not None:
+        raise ValueError("pass database_url or engine, not both")
+    app_engine: Engine = engine if engine is not None else (build_engine(database_url) if database_url else default_engine)
+    session_factory = build_session_factory(app_engine) if app_engine is not default_engine else SessionLocal
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
         if bootstrap_schema:
-            ensure_database_schema(engine)
+            ensure_database_schema(app_engine)
         yield
 
     app = FastAPI(title="Journalism Workbench API", version="1.24.0", lifespan=lifespan)
+    app.state.engine = app_engine
+    app.state.session_factory = session_factory
+    if app_engine is not default_engine:
+        def _app_get_db() -> Iterator[Session]:
+            db = session_factory()
+            try:
+                yield db
+            finally:
+                db.close()
+        app.dependency_overrides[get_db] = _app_get_db
 
     @app.exception_handler(InvestigationAuthorizationError)
     async def investigation_authorization_denied(_request: Request, _exc: Exception) -> JSONResponse:
@@ -167,7 +187,7 @@ def create_app(
         if not local_request:
             supplied_token = bearer_token(request.headers.get("authorization"))
             if supplied_token:
-                with SessionLocal() as identity_db:
+                with session_factory() as identity_db:
                     persisted_scope = scope_for_persisted_token(identity_db, supplied_token, mark_used=True)
                 if persisted_scope is not None:
                     request.state.authorization_scope = persisted_scope

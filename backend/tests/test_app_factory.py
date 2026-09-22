@@ -81,3 +81,26 @@ def test_two_app_instances_do_not_share_settings():
     assert TestClient(open_app, **remote).get("/api/investigations", headers={"authorization": "Bearer t0k3n"}).status_code == 403, "no token configured means no remote access on this instance, whatever token is sent"
     assert TestClient(locked_app, **remote).get("/api/investigations").status_code == 401
     assert TestClient(locked_app, **remote).get("/api/investigations", headers={"authorization": "Bearer t0k3n"}).status_code == 200
+
+
+def test_each_app_instance_can_own_its_database(tmp_path):
+    """create_app(database_url=...) gives the instance its own engine, session
+    factory and get_db override -- the module-level engine/SessionLocal that the
+    default app and direct importers use are untouched."""
+    from app.db.session import engine as module_engine
+    a = main_module.create_app(Settings(), database_url=f"sqlite:///{tmp_path / 'a.db'}", audit=_MemoryAudit())  # type: ignore[arg-type]
+    b = main_module.create_app(Settings(), database_url=f"sqlite:///{tmp_path / 'b.db'}", audit=_MemoryAudit())  # type: ignore[arg-type]
+    assert a.state.engine is not b.state.engine and a.state.engine is not module_engine
+    assert main_module.create_app(Settings(), bootstrap_schema=False).state.engine is module_engine
+
+    with TestClient(a) as client_a, TestClient(b) as client_b:  # lifespan bootstraps each schema
+        created = client_a.post("/api/investigations", json={"name": "Only in A"})
+        assert created.status_code == 200, created.text
+        assert [row["name"] for row in client_a.get("/api/investigations").json()] == ["Only in A"]
+        assert client_b.get("/api/investigations").json() == []
+        assert client_b.get(f"/api/investigations/{created.json()['id']}/documents").status_code == 404
+    assert (tmp_path / "a.db").exists() and (tmp_path / "b.db").exists()
+
+    import pytest
+    with pytest.raises(ValueError):
+        main_module.create_app(Settings(), database_url="sqlite://", engine=module_engine)

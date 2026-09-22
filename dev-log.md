@@ -2490,3 +2490,14 @@ handler that returns an ORM object routed the response through pydantic and fail
 annotated route decorator (121), which reproduces the previous "no annotation" behaviour exactly;
 the two handlers that return `Response` objects are annotated as such instead.
 298 passed, mypy 1.11.2 + ruff clean.
+
+## 2026-09-22 (cont.): per-instance database for create_app (STRUCT-0010 follow-up)
+
+`create_app(database_url=...)` / `create_app(engine=...)`: the instance gets its own Engine via
+the new `app/db/session.py` `build_engine()` (the same function that builds the module-level
+engine, so the StaticPool-for-SQLite rule lives in one place), its own session factory (also used
+for the persisted-token lookup in the access guard), a `get_db` dependency override, and its own
+lifespan schema bootstrap; `app.state.engine` / `app.state.session_factory` expose them. The
+module-level `engine`/`SessionLocal` are the default and are what `app.main.app`, conftest and
+direct importers still use. Test: two instances on two SQLite files, an investigation created in
+A is absent from B; passing both arguments is a ValueError. 299 passed, mypy + ruff clean.
