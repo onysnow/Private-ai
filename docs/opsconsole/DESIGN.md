@@ -581,11 +581,14 @@ What the host supplies (all in `app/console_adapters.py`, ~200 lines):
 - `log_sources = [JsonlLogSource(settings.app_log_file, id="app"),
   JsonlLogSource(settings.audit_log_file, id="security")]`.
 - `users = WorkbenchUsers()` over `app.models.identity`: `app_users`
-  (`global_role` member/admin) and `investigation_memberships` (`role`
-  viewer/reporter/admin). The workbench has one shared bearer token
-  (`API_AUTH_TOKEN`), not per-user tokens, so `revoke_token`/`issue_token`
-  are not implemented and the Tokens column is absent from its Users view;
-  the "revoke" action instead points at the security tile's token status.
+  (`global_role` member/admin, `disabled`, one persisted bearer token per
+  user as `token_digest` with created/last-used/rotated/revoked timestamps)
+  and `investigation_memberships` (`role` viewer/reporter/admin). So the
+  adapter implements `list()` (roles = global role + per-investigation
+  memberships), `set_roles`, `set_disabled`, `revoke_token` (sets
+  `token_revoked_at`) and `issue_token` as a rotation (new digest, returns
+  the plaintext once). The process-wide shared `API_AUTH_TOKEN` (ADR-0002's
+  first tier) is not a user; it is shown on the security tile only.
 - `backups = WorkbenchBackups()` over `app/services/exports.py`
   (`inspect_export`, `preview_investigation_restore`,
   `restore_investigation_export`, which today back `/backups/*`). Those are
@@ -595,10 +598,12 @@ What the host supplies (all in `app/console_adapters.py`, ~200 lines):
   `restore_plan()` is `preview_investigation_restore`. A whole-database
   `PgDumpBackups`/`SqliteFileBackups` provider can be added alongside as a
   second `BackupProvider` (the section supports several, labelled by kind).
-- `table_policy`: hide nothing; read-only `alembic_version`. Connector
-  credentials are file-based (`app/services/credentials.py`), not rows, so
-  nothing in the schema needs masking today; the Config section masks
-  `API_AUTH_TOKEN` and every `*_KEY`/`*_SECRET`/`*_TOKEN` setting.
+- `table_policy`: hide nothing; read-only `alembic_version`; mask
+  `app_users.token_digest` (a SHA-256 digest, but still not something to
+  export or search). Connector credentials are file-based
+  (`app/services/credentials.py`), not rows, so nothing else needs masking
+  today; the Config section masks `API_AUTH_TOKEN` and every
+  `*_KEY`/`*_SECRET`/`*_TOKEN` setting.
 - `domain_of_table` from the models package split
   (investigations/entities/sources/claims/leads/connectors/relationships/documents/ai/identity);
   `table_docs` from each model class docstring.
