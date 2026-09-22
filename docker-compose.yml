@@ -30,7 +30,6 @@ services:
 
   postgres:
     image: postgres:17-alpine
-    profiles: ["openaleph"]
     environment:
       POSTGRES_DB: aleph
       POSTGRES_USER: aleph
@@ -45,7 +44,6 @@ services:
 
   elasticsearch:
     image: ghcr.io/openaleph/elasticsearch:latest
-    profiles: ["openaleph"]
     environment:
       discovery.type: single-node
       xpack.security.enabled: "false"
@@ -55,14 +53,12 @@ services:
 
   redis:
     image: redis:alpine
-    profiles: ["openaleph"]
     command: ["redis-server", "--save", "3600", "10"]
     volumes:
       - openaleph-redis-data:/data
 
   ingest:
     image: ghcr.io/openaleph/ingest-file:${OPENALEPH_TAG:-5.3.1}
-    profiles: ["openaleph"]
     platform: linux/amd64
     command: procrastinate worker -q ingest
     environment: *openaleph-environment
@@ -78,7 +74,6 @@ services:
 
   analyze:
     image: ghcr.io/openaleph/ftm-analyze:${OPENALEPH_TAG:-5.3.1}
-    profiles: ["openaleph"]
     command: procrastinate worker -q analyze
     environment: *openaleph-environment
     tmpfs:
@@ -91,7 +86,6 @@ services:
 
   worker:
     image: ghcr.io/openaleph/openaleph:${OPENALEPH_TAG:-5.3.1}
-    profiles: ["openaleph"]
     command: procrastinate worker -q openaleph,openaleph-management
     environment: *openaleph-environment
     tmpfs:
@@ -110,7 +104,6 @@ services:
 
   api:
     image: ghcr.io/openaleph/openaleph:${OPENALEPH_TAG:-5.3.1}
-    profiles: ["openaleph"]
     environment: *openaleph-environment
     ports:
       - "127.0.0.1:8001:8000"
@@ -132,7 +125,6 @@ services:
 
   ui:
     image: ghcr.io/openaleph/aleph-ui:${OPENALEPH_TAG:-5.3.1}
-    profiles: ["openaleph"]
     ports:
       - "127.0.0.1:8080:8080"
     depends_on:
@@ -142,7 +134,7 @@ services:
     build: ./backend
     environment:
       DATABASE_URL: postgresql+psycopg://journalism:${POSTGRES_PASSWORD:-journalism-local-dev}@workbench-db:5432/journalism
-      OPENALEPH_ENABLED: ${OPENALEPH_ENABLED:-false}
+      OPENALEPH_ENABLED: ${OPENALEPH_ENABLED:-true}
       OPENALEPH_BASE_URL: http://api:8000
       OPENALEPH_UI_URL: http://localhost:8080
       OPENALEPH_API_KEY: ${OPENALEPH_API_KEY:-}
@@ -162,6 +154,8 @@ services:
     depends_on:
       workbench-db:
         condition: service_healthy
+      api:
+        condition: service_started
     volumes:
       - ./backend:/app
 

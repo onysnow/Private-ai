@@ -11,6 +11,7 @@ from app.core.config import settings
 from app.core.time import utcnow_naive
 from app.models.domain import AppUser, Investigation, InvestigationMembership
 from app.schemas.api import AppUserCreate, AppUserUpdate
+from app.core.audit_log import recent_security_denials
 from app.services.credentials import credential_status, remove_secret, set_secret
 from app.services.identity import token_digest
 from app.services.pdf_ocr import ocr_runtime_status
@@ -70,6 +71,9 @@ def get_settings_status(db: Session) -> dict:
             "investigation_scope_configured": bool(settings.api_auth_investigation_ids.strip()),
         },
         "cors_allowed_origins": settings.cors_origins,
+        # STRUCT-0035: a passive alert surface -- the operator sees denial counts
+        # without querying the audit log. Full detail: GET /settings/security/alerts.
+        "security": security_alerts(window_hours=24.0, max_examples=0),
         # Issue #36 follow-up: the reviewer-facing panel needs to know whether the
         # TAS reasoning endpoints are callable before offering to run them.
         "ai": ai_reasoning_status(settings),
@@ -82,6 +86,13 @@ def get_settings_status(db: Session) -> dict:
             for provider in sorted(CONNECTOR_PROVIDERS)
         },
     }
+
+
+def security_alerts(*, window_hours: float = 24.0, max_examples: int = 10) -> dict:
+    return recent_security_denials(
+        settings.audit_log_file, window_hours=window_hours,
+        attention_threshold=settings.security_alert_denials_per_day, max_examples=max_examples,
+    )
 
 
 def list_app_users(db: Session) -> list[dict]:

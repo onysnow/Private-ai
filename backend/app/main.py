@@ -148,7 +148,10 @@ def create_app(
         backup_bytes=app_settings.max_backup_bytes + (1024 * 1024),
     )
     audit_logger = audit or SecurityAuditLogger(app_settings.audit_log_file)
-    failure_limiter = auth_failures or FixedWindowRateLimiter(app_settings.api_auth_failure_limit_per_minute, 60)
+    failure_limiter = auth_failures or FixedWindowRateLimiter(
+        app_settings.api_auth_failure_limit_per_minute, 60,
+        state_file=app_settings.api_auth_failure_state_file or None,
+    )
     app.state.audit_logger = audit_logger  # reachable from routes/tests without re-plumbing
 
     @app.middleware("http")

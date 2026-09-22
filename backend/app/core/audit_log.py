@@ -232,6 +232,78 @@ def summarize_security_audit(path: str | Path) -> dict:
     return summary()
 
 
+DENIAL_EVENTS = ("access_denied", "auth_rate_limited", "browser_write_denied", "request_rejected")
+
+
+def recent_security_denials(
+    path: str | Path,
+    *,
+    window_hours: float = 24.0,
+    attention_threshold: int = 20,
+    max_examples: int = 10,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Operator-facing view of the audit log's denial events in a recent window
+    (STRUCT-0035): counts per denial event, the busiest remote hosts, the most
+    recent examples, and one boolean an operator can glance at. Reads the whole
+    file (it is capped by the retention endpoint) and never returns bodies or
+    credentials -- only the public audit fields.
+    """
+    reference = now or datetime.now(timezone.utc)
+    since = reference.timestamp() - max(0.0, window_hours) * 3600.0
+    counts: dict[str, int] = {event: 0 for event in DENIAL_EVENTS}
+    hosts: dict[str, int] = {}
+    examples: list[dict[str, Any]] = []
+    scanned = 0
+    malformed = 0
+    read_error = False
+    audit_path = Path(path)
+    if audit_path.exists():
+        try:
+            with audit_path.open("r", encoding="utf-8", errors="replace") as handle:
+                for line in handle:
+                    raw = line.strip()
+                    if not raw:
+                        continue
+                    try:
+                        parsed = json.loads(raw)
+                    except json.JSONDecodeError:
+                        malformed += 1
+                        continue
+                    record = _safe_audit_record(parsed)
+                    if record is None:
+                        malformed += 1
+                        continue
+                    scanned += 1
+                    if record["event"] not in counts:
+                        continue
+                    stamp = _parse_audit_timestamp(record["timestamp"])
+                    if stamp is None or stamp.timestamp() < since:
+                        continue
+                    counts[record["event"]] += 1
+                    host = record.get("client_host") or ""
+                    if host and not record["local_request"]:
+                        hosts[host] = hosts.get(host, 0) + 1
+                    examples.append(record)
+        except OSError:
+            read_error = True
+    total = sum(counts.values())
+    examples.sort(key=lambda r: r["timestamp"], reverse=True)
+    return {
+        "window_hours": window_hours,
+        "since": datetime.fromtimestamp(since, tz=timezone.utc).isoformat(),
+        "total_denials": total,
+        "by_event": counts,
+        "remote_hosts": [{"client_host": h, "count": c} for h, c in sorted(hosts.items(), key=lambda kv: (-kv[1], kv[0]))[:max_examples]],
+        "recent": examples[:max_examples],
+        "attention_threshold": attention_threshold,
+        "needs_attention": total >= attention_threshold or counts["auth_rate_limited"] > 0,
+        "records_scanned": scanned,
+        "malformed_lines": malformed,
+        "read_error": read_error,
+    }
+
+
 def _parse_audit_timestamp(value: object) -> datetime | None:
     if not isinstance(value, str):
         return None

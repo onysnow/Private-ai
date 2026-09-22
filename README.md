@@ -53,7 +53,7 @@ This project has been developed iteratively -- product-facing milestones live in
 | **Docker** build/boot of the full stack | Validated — running in CI ([docker-build.yml](.github/workflows/docker-build.yml)) |
 | Frontend (Next.js) production build/typecheck | Validated — running in CI |
 | Dependency security posture | Actively patching ([issue #20](https://github.com/onysnow/Private-ai/issues/20)) — a critical Next.js CVE and several high-severity CVEs were found and are being resolved |
-| Remote multi-user deployment | Experimental. The trusted deployment model today is a single local workstation owner; treat authentication as access control, not as a production multi-tenant security boundary yet |
+| Remote multi-user deployment | Experimental. The trusted deployment model today is a single local workstation owner; treat authentication as access control, not as a production multi-tenant security boundary yet A separate production compose file and runbook now exist — [`docker-compose.prod.yml`](docker-compose.prod.yml) and [`DEPLOYMENT.md`](DEPLOYMENT.md) (secrets required, no source bind-mount, loopback-only behind your TLS proxy, rollback via `alembic downgrade` and the portable backup feature) — validated by the config test suite, not yet by a live deployment. |
 
 I'd rather this table be accurate than impressive. The architecture and domain modeling are the mature part of this project; production-hardening the deployment story is the current, active work — you're looking at it happen in CI on every push, not just taking my word for it.
 
@@ -76,13 +76,13 @@ The default stack starts the Workbench database, API, and Next.js UI: use `http:
 
 Docker Compose wires a localhost-only development bearer token between the frontend and backend automatically so the browser UI can talk to the containerized API through the published `localhost` port. Override `API_AUTH_TOKEN` in your shell or `.env` if you want a different local token.
 
-To also boot the local OpenAleph services, opt into the profile explicitly:
+OpenAleph is part of the stack, not an add-on: `docker compose up --build` boots the workbench **and** the local OpenAleph services (Postgres 17, Elasticsearch, Redis, ingest/analyze workers, API and UI), with the backend wired to it (`OPENALEPH_ENABLED=true` by default). The OpenAleph API is at `http://localhost:8001` and its UI at `http://localhost:8080`. Elasticsearch wants about 1 GB of heap (`OPENALEPH_ES_JAVA_OPTS`); on a small machine you can still run the workbench alone with `OPENALEPH_ENABLED=false docker compose up workbench-db backend frontend adminer`, but that is a reduced mode, not the product.
+
+To have uploads flow into the OpenAleph corpus automatically and let OpenAleph's `ftm-analyze` own entity extraction:
 
 ```bash
-COMPOSE_PROFILES=openaleph OPENALEPH_ENABLED=true OPENALEPH_AUTO_SYNC_DOCUMENTS=true ENABLE_LOCAL_ENTITY_SUGGESTIONS=false docker compose up --build
+OPENALEPH_AUTO_SYNC_DOCUMENTS=true ENABLE_LOCAL_ENTITY_SUGGESTIONS=false docker compose up --build
 ```
-
-That profile additionally exposes the local OpenAleph API at `http://localhost:8001` and the OpenAleph UI at `http://localhost:8080`.
 
 ## Security
 

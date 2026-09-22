@@ -27,6 +27,7 @@ from app.services.settings import (
     delete_connector_credential as _delete_connector_credential,
     delete_investigation_membership as _delete_investigation_membership,
     get_settings_status,
+    security_alerts,
     list_app_users as _list_app_users,
     put_investigation_membership as _put_investigation_membership,
     revoke_app_user_token as _revoke_app_user_token,
@@ -133,6 +134,16 @@ def get_security_audit(
 @router.get("/settings/security/audit/summary", response_model=None)
 def get_security_audit_summary() -> Any:
     return summarize_security_audit(settings.audit_log_file)
+
+
+@router.get("/settings/security/alerts", response_model=None)
+def get_security_alerts(
+    window_hours: float = Query(24.0, gt=0, le=24 * 30),
+    max_examples: int = Query(10, ge=0, le=100),
+) -> Any:
+    """Recent denial events (access_denied / auth_rate_limited / browser_write_denied /
+    request_rejected) as counts, busiest remote hosts and latest examples -- STRUCT-0035."""
+    return security_alerts(window_hours=window_hours, max_examples=max_examples)
 
 
 @router.get("/settings/security/audit/retention-preview", response_model=None)

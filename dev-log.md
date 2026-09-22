@@ -2501,3 +2501,30 @@ lifespan schema bootstrap; `app.state.engine` / `app.state.session_factory` expo
 module-level `engine`/`SessionLocal` are the default and are what `app.main.app`, conftest and
 direct importers still use. Test: two instances on two SQLite files, an investigation created in
 A is absent from B; passing both arguments is a ValueError. 299 passed, mypy + ruff clean.
+
+## 2026-09-22 (cont.): the three OPTIONAL audit findings closed; OpenAleph made core
+
+Ony: "DO the optional ones." Then, mid-way: "Open aleph is not optional." The repo had framed it
+as optional everywhere (compose profile, OPENALEPH_ENABLED default false, README "opt into the
+profile", `core_preview` vs `integrated_preview`, a test asserting the profile gate); I had read
+that framing as intent. Corrected in the same pass.
+
+- **STRUCT-0035** -- `security` block on /settings/status + /settings/security/alerts (denials per
+  event in a window, busiest remote hosts, latest examples, `needs_attention`), a line in the
+  frontend API-access panel, and FixedWindowRateLimiter persistence (`state_file`, wall-clock
+  windows, expired dropped on load, corrupt ignored) so a lockout survives a restart.
+- **STRUCT-0031** -- `docker-compose.prod.yml` + `DEPLOYMENT.md`. Required secrets, no bind-mount,
+  loopback-only behind a TLS proxy, both databases internal, data on named volumes, no token in the
+  public bundle (`frontend/Dockerfile` gained an `ARG NEXT_PUBLIC_API_URL` because Next inlines
+  public vars at build time). Runbook covers first start, upgrade, code-vs-schema rollback (downgrade
+  from the NEW image first), pg_dump + portable backups, monitoring.
+- **OpenAleph is core**: dev compose profile gate removed (8 services boot with `docker compose
+  up`, `OPENALEPH_ENABLED` defaults true, backend depends_on api); prod compose includes the full
+  OpenAleph stack with its own required secrets (`OPENALEPH_SECRET_KEY`, `OPENALEPH_DB_PASSWORD`),
+  only the UI published on loopback. README and tests updated. Left as-is: the app-level
+  `openaleph_enabled=False` default, which the Windows no-Docker launcher relies on -- flagged to
+  Ony as a one-line flip if the .bat path should be the reduced mode instead.
+- **STRUCT-0024** -- `app/models/domain.py` split into ten domain modules + `base.py`; domain.py is
+  the re-export facade so nothing else changed. `tests/test_models_split.py`.
+
+**305 passed** (five chunks), mypy 1.11.2 + ruff clean; frontend 45 vitest passed, tsc clean.

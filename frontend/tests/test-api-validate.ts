@@ -163,3 +163,19 @@ describe('parseSearchBody', () => {
     expect(() => parseSearchBody({results: 'nope', counts: {}, group_counts: {}}, endpoint)).toThrow(ApiPayloadError);
   });
 });
+
+describe('isSettingsStatus with the optional security block (STRUCT-0035)', () => {
+  it('accepts a payload without it, with a valid one, and rejects a malformed one', async () => {
+    const {isSettingsStatus, isSecurityAlerts} = await import('../lib/api-validate');
+    const base = {
+      environment: 'test', database: 'sqlite', document_storage_dir: '/d', limits: {}, restore_api_enabled: false,
+      document_extraction: {pdf_ocr_enabled: false, pdf_ocr_language: 'eng', pdf_ocr_dpi: 200, pdf_ocr_min_native_chars: 20, local_entity_suggestions_enabled: true, entity_extraction_owner: 'workbench_local', ocr_runtime: {available: false, requested_languages: [], missing_languages: [], detail: 'off'}},
+      access: {remote_api_enabled: false, mode: 'local_only', token_configured: false}, cors_allowed_origins: [], connectors: {},
+    };
+    expect(isSettingsStatus(base)).toBe(true);
+    const security = {window_hours: 24, since: '2026-09-22T00:00:00+00:00', total_denials: 2, by_event: {access_denied: 2}, remote_hosts: [{client_host: '203.0.113.9', count: 2}], recent: [], attention_threshold: 20, needs_attention: false, records_scanned: 9, malformed_lines: 0, read_error: false};
+    expect(isSecurityAlerts(security)).toBe(true);
+    expect(isSettingsStatus({...base, security})).toBe(true);
+    expect(isSettingsStatus({...base, security: {...security, needs_attention: 'no'}})).toBe(false);
+  });
+});

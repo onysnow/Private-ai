@@ -58,6 +58,11 @@ class Settings(BaseSettings):
     max_api_request_bytes: int = 10 * 1024 * 1024
     audit_log_file: str = "./data/audit/security.jsonl"
     api_auth_failure_limit_per_minute: int = 30
+    # STRUCT-0035: persist the auth-failure limiter so a restart does not reset a
+    # lockout ("" keeps it in-memory only), and the denial count over the last 24h
+    # at which settings/status flags security.needs_attention.
+    api_auth_failure_state_file: str = "./data/audit/auth-failures.json"
+    security_alert_denials_per_day: int = 20
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @property

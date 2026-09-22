@@ -1,0 +1,222 @@
+# Production / shared-server compose for Journalism Workbench (STRUCT-0031).
+#
+# This is a SEPARATE file from docker-compose.yml on purpose. The dev file
+# bind-mounts ./backend over the image, binds every port to 127.0.0.1, ships a
+# literal default API token, and adds Adminer. None of that belongs on a shared
+# host. This file:
+#   - runs the image that was built (no source bind-mount; a deploy is a rebuild);
+#   - refuses to start without real secrets (${VAR:?...} -- no defaults);
+#   - keeps the backend/frontend bound to the loopback of the host by default
+#     (BIND_ADDRESS) so a TLS reverse proxy (Caddy, nginx, Traefik) in front is
+#     the only thing reachable from the network; the database has no host port;
+#   - persists backend data (documents, audit log, connector secrets, limiter
+#     state) in a named volume so the audit trail survives a redeploy;
+#   - does not bake a bearer token into the public frontend bundle. Reporters
+#     enter their own token (or persisted-user token) in the app's "API access"
+#     panel; the dev file's public token variable is deliberately absent.
+#
+#   - runs OpenAleph as part of the stack (it is not optional in this product):
+#     its own Postgres 17, Elasticsearch, Redis, ingest/analyze/openaleph workers,
+#     API and UI, all on the internal network; only the OpenAleph UI gets a
+#     loopback port so the proxy can publish it beside the workbench.
+#
+# Usage:  docker compose -f docker-compose.prod.yml up -d --build
+# Runbook (upgrade, rollback, restore): DEPLOYMENT.md
+x-openaleph-environment: &openaleph-environment
+  ALEPH_DEBUG: "false"
+  ALEPH_SECRET_KEY: ${OPENALEPH_SECRET_KEY:?set OPENALEPH_SECRET_KEY (openssl rand -hex 32)}
+  ALEPH_SINGLE_USER: "true"
+  ALEPH_DATABASE_URI: postgresql://aleph:${OPENALEPH_DB_PASSWORD:?set OPENALEPH_DB_PASSWORD}@postgres:5432/aleph
+  OPENALEPH_DB_URI: postgresql://aleph:${OPENALEPH_DB_PASSWORD:?set OPENALEPH_DB_PASSWORD}@postgres:5432/aleph
+  FTM_STORE_URI: postgresql://aleph:${OPENALEPH_DB_PASSWORD:?set OPENALEPH_DB_PASSWORD}@postgres:5432/aleph
+  ALEPH_ELASTICSEARCH_URI: http://elasticsearch:9200
+  OPENALEPH_ELASTICSEARCH_URI: http://elasticsearch:9200
+  REDIS_URL: redis://redis:6379/0
+  ARCHIVE_TYPE: file
+  ARCHIVE_PATH: /data
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aleph
+      POSTGRES_USER: aleph
+      POSTGRES_PASSWORD: ${OPENALEPH_DB_PASSWORD:?set OPENALEPH_DB_PASSWORD}
+    volumes:
+      - openaleph-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aleph -d aleph"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  elasticsearch:
+    image: ghcr.io/openaleph/elasticsearch:latest
+    restart: unless-stopped
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: ${OPENALEPH_ES_JAVA_OPTS:--Xms1g -Xmx1g}
+    volumes:
+      - openaleph-elasticsearch-data:/usr/share/elasticsearch/data
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "3600", "10"]
+    volumes:
+      - openaleph-redis-data:/data
+
+  ingest:
+    image: ghcr.io/openaleph/ingest-file:${OPENALEPH_TAG:-5.3.1}
+    restart: unless-stopped
+    platform: linux/amd64
+    command: procrastinate worker -q ingest
+    environment: *openaleph-environment
+    tmpfs:
+      - /tmp:mode=777
+    volumes:
+      - openaleph-archive:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  analyze:
+    image: ghcr.io/openaleph/ftm-analyze:${OPENALEPH_TAG:-5.3.1}
+    restart: unless-stopped
+    command: procrastinate worker -q analyze
+    environment: *openaleph-environment
+    tmpfs:
+      - /tmp:mode=777
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  worker:
+    image: ghcr.io/openaleph/openaleph:${OPENALEPH_TAG:-5.3.1}
+    restart: unless-stopped
+    command: procrastinate worker -q openaleph,openaleph-management
+    environment: *openaleph-environment
+    tmpfs:
+      - /tmp
+    volumes:
+      - openaleph-archive:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_started
+      redis:
+        condition: service_started
+      ingest:
+        condition: service_started
+
+  api:
+    image: ghcr.io/openaleph/openaleph:${OPENALEPH_TAG:-5.3.1}
+    restart: unless-stopped
+    environment: *openaleph-environment
+    tmpfs:
+      - /tmp
+    volumes:
+      - openaleph-archive:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_started
+      redis:
+        condition: service_started
+      worker:
+        condition: service_started
+      ingest:
+        condition: service_started
+
+  ui:
+    image: ghcr.io/openaleph/aleph-ui:${OPENALEPH_TAG:-5.3.1}
+    restart: unless-stopped
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:8080:8080"
+    depends_on:
+      - api
+
+  workbench-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: journalism
+      POSTGRES_USER: journalism
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in the environment or .env}
+    volumes:
+      - workbench-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U journalism -d journalism"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    image: journalism-workbench-backend:${WORKBENCH_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      APP_ENVIRONMENT: production
+      DATABASE_URL: postgresql+psycopg://journalism:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@workbench-db:5432/journalism
+      API_AUTH_TOKEN: ${API_AUTH_TOKEN:?set API_AUTH_TOKEN to a long random secret (openssl rand -hex 32)}
+      API_AUTH_INVESTIGATION_IDS: ${API_AUTH_INVESTIGATION_IDS:-}
+      CORS_ALLOWED_ORIGINS: ${PUBLIC_ORIGIN:?set PUBLIC_ORIGIN to the https origin the reverse proxy serves, e.g. https://workbench.example.org}
+      DOCUMENT_STORAGE_DIR: /app/data/documents
+      AUDIT_LOG_FILE: /app/data/audit/security.jsonl
+      API_AUTH_FAILURE_STATE_FILE: /app/data/audit/auth-failures.json
+      CONNECTOR_CREDENTIALS_FILE: /app/data/secrets/connectors.json
+      ENABLE_RESTORE_API: ${ENABLE_RESTORE_API:-false}
+      ENABLE_AI_FEATURES: ${ENABLE_AI_FEATURES:-false}
+      AI_PROVIDER: ${AI_PROVIDER:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ALEPH_API_KEY: ${ALEPH_API_KEY:-}
+      OPENSANCTIONS_API_KEY: ${OPENSANCTIONS_API_KEY:-}
+      FIRECRAWL_API_KEY: ${FIRECRAWL_API_KEY:-}
+      OPENALEPH_ENABLED: "true"
+      OPENALEPH_BASE_URL: http://api:8000
+      OPENALEPH_UI_URL: ${PUBLIC_OPENALEPH_URL:?set PUBLIC_OPENALEPH_URL to the https URL the proxy serves the OpenAleph UI at}
+      OPENALEPH_API_KEY: ${OPENALEPH_API_KEY:-}
+      OPENALEPH_AUTO_SYNC_DOCUMENTS: ${OPENALEPH_AUTO_SYNC_DOCUMENTS:-true}
+      ENABLE_LOCAL_ENTITY_SUGGESTIONS: ${ENABLE_LOCAL_ENTITY_SUGGESTIONS:-false}
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:8000:8000"
+    volumes:
+      - workbench-data:/app/data
+    depends_on:
+      workbench-db:
+        condition: service_healthy
+      api:
+        condition: service_started
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:?set PUBLIC_API_URL to the https URL the browser reaches the API at, e.g. https://workbench.example.org/api-root}
+    image: journalism-workbench-frontend:${WORKBENCH_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:?set PUBLIC_API_URL}
+      NEXT_PUBLIC_OPENALEPH_URL: ${PUBLIC_OPENALEPH_URL:?set PUBLIC_OPENALEPH_URL}
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  workbench-pgdata:
+  workbench-data:
+  openaleph-pgdata:
+  openaleph-elasticsearch-data:
+  openaleph-redis-data:
+  openaleph-archive:

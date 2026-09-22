@@ -3,6 +3,12 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
+# NEXT_PUBLIC_* values are inlined into the client bundle at build time, so a
+# deployment that is not on localhost must pass the public API URL as a build
+# argument (docker-compose.prod.yml does). Empty keeps the source fallback
+# (http://localhost:8000), which is what docker-compose.yml relies on.
+ARG NEXT_PUBLIC_API_URL=
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 RUN npm run build
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=5 \
