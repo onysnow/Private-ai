@@ -295,9 +295,6 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
     entities = db.scalars(entity_scoring_stmt).all()
     for entity_row in entities:
         properties_text = " ".join(
-            [prop] + [str(v) for v in (values or [])]
-            for prop, values in (entity_row.properties or {}).items()
-        ) if False else " ".join(
             f"{prop} {' '.join(str(v) for v in (values or []))}" for prop, values in (entity_row.properties or {}).items()
         )
         score = _score(query, entity_row.caption, entity_row.schema, entity_row.ftm_id, properties_text)
