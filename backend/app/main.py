@@ -29,7 +29,6 @@ from app.api.routes_documents import router as documents_router
 from app.api.routes_connector_findings import router as connector_findings_router
 from app.api.routes_settings import router as settings_router
 from app.api.routes_entities import router as entities_router
-from app.api.routes_console import router as console_router
 from app.core.config import Settings, settings as default_settings
 from app.core.access import bearer_token, enforce_api_access, enforce_browser_write_access, request_is_local_request
 from app.core.authorization import (
@@ -41,6 +40,8 @@ from app.core.request_limits import RequestLimitPolicy, validate_request_envelop
 from app.core.rate_limiter import FixedWindowRateLimiter
 from app.core.audit_log import SecurityAuditLogger, new_request_id, should_audit_request
 from app.core.app_log import configure_app_logging, current_request_id
+from app.console_adapters import build_console_config
+from opsconsole import mount as mount_console
 
 
 def register_domain_routers(app: FastAPI) -> None:
@@ -70,7 +71,6 @@ def register_domain_routers(app: FastAPI) -> None:
     app.include_router(connector_findings_router)
     app.include_router(settings_router)
     app.include_router(entities_router)
-    app.include_router(console_router)
 
 
 def create_app(
@@ -117,6 +117,9 @@ def create_app(
         if bootstrap_schema:
             ensure_database_schema(app_engine)
         yield
+        console = getattr(_app.state, "opsconsole", None)
+        if console is not None:
+            console.shutdown()
 
     app = FastAPI(title="Journalism Workbench API", version="1.24.0", lifespan=lifespan)
     if app_settings.app_log_file:
@@ -289,12 +292,12 @@ def create_app(
     def home() -> FileResponse:
         return FileResponse(static_dir / "index.html")
 
-    @app.get("/console", include_in_schema=False)
-    def console_page() -> FileResponse:
-        """The backend-served operator console (the Next.js app has the same page at
-        /console). The API behind it refuses non-loopback callers, so serving the
-        HTML to anyone is harmless."""
-        return FileResponse(static_dir / "console.html")
+    if app_settings.console_enabled:
+        # The operator console (ADR-0003): a host-agnostic package mounted with the
+        # app's adapters. /api/console/* answers loopback callers only (see
+        # app/console_adapters.py); the UI is served at /console and the Next.js
+        # /console page embeds it.
+        mount_console(app, build_console_config(app_settings, app_engine, session_factory, app_version=app.version))
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:

@@ -84,6 +84,9 @@ if not exist "backend\.env" (
   echo OPENSANCTIONS_API_KEY=>> backend\.env
   echo OPENSANCTIONS_DATASET=default>> backend\.env
   echo OPENSANCTIONS_SEARCH_LIMIT=20>> backend\.env
+  rem Operator console (ADR-0003): local desktop use is a trusted single operator,
+  rem so allow reviewed changeset writes from the backend console out of the box.
+  echo CONSOLE_WRITES=changesets>> backend\.env
 )
 
 rem Use the Docker Postgres database when the workbench-db container is running, so

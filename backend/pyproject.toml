@@ -13,13 +13,15 @@ include = [
     "app/core/access.py",
     "app/core/config.py",
     "app/core/time.py",
+    "app/console_adapters.py",
+    "opsconsole/**/*.py",
 ]
 
 [tool.ruff.lint]
 select = ["I"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["app"]
+known-first-party = ["app", "opsconsole"]
 
 [tool.mypy]
 python_version = "3.12"
@@ -34,7 +36,10 @@ python_version = "3.12"
 # merge endpoints passed a possibly-None Entity into the service (now 404), and
 # dossier.py's evidence loop was one rename away from reporting a stale claim
 # basis. `files` is the package, so a new module is checked the day it lands.
-files = ["app"]
+# ADR-0003 (2026-09-22): opsconsole/ (the standalone operator console package)
+# and its host wiring in app/console_adapters.py hold to the same bar and are
+# clean under it -- added to `files` so a regression here fails CI too.
+files = ["app", "opsconsole"]
 warn_return_any = true
 warn_unused_configs = true
 warn_redundant_casts = true

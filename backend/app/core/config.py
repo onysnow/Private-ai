@@ -69,6 +69,9 @@ class Settings(BaseSettings):
     console_enabled: bool = True
     app_log_file: str = "./data/logs/app.jsonl"
     console_dir: str = "./data/console"   # test-run logs and the isolated test database
+    # What the console may change: disabled | changesets | changesets_and_sql (ADR-0003).
+    # Production defaults to read-only; the Windows launcher sets changesets.
+    console_writes: str = "disabled"
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @property
