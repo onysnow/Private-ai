@@ -2460,3 +2460,19 @@ class-name string; audit_log's summary is built from typed counters/buckets.
 Not flipped: `disallow_untyped_defs` stays false package-wide (models/schemas already strict).
 That is the remaining STRUCT-0013 step, annotation work rather than bug-finding.
 295 passed, ruff clean. STRUCT-0013 marked CORRECTED with the remaining step stated in the row.
+
+## 2026-09-22 (cont.): STRUCT-0010 closed -- app factory without import-time side effects
+
+`import app.main` no longer runs `ensure_database_schema()`: it moved into the FastAPI lifespan,
+so it runs when uvicorn starts (Docker CMD and the .bat launcher both go through uvicorn) or when a
+test enters `with TestClient(app):`; `create_app(..., bootstrap_schema=False)` skips it. The
+factory also takes `audit=`, `request_limits=`, `auth_failures=` so a test can inject an in-memory
+audit logger or a one-hit limiter instead of monkeypatching module globals; omitted, each is built
+from the injected Settings exactly as before. `tests/test_app_factory.py` (3): import runs no schema
+check and the lifespan runs it once; the injected double receives `access_denied` /
+`auth_rate_limited` / `request_rejected` events while the settings-built file logger is never
+created; two instances keep separate auth settings. conftest's docstring updated (it is now the
+sole guarantee that tables exist for a bare TestClient). Out of scope, as the row says:
+engine/SessionLocal are still module-level in app.db.session.
+
+**298 passed**, mypy + ruff clean. STRUCT-0010 marked CORRECTED.

@@ -13,9 +13,11 @@ of schema-rebuild churn, which is exactly what two earlier attempts at
 this fixture hit and misread as a hang under a shorter timeout -- it was
 never a deadlock or a connection-pool/threading hazard.
 
-This fixture instead creates the schema ONCE (a no-op if
-ensure_database_schema() already ran it via app.main's module-level
-create_app() -- checkfirst=True skips any table that already exists) and
+This fixture instead creates the schema ONCE (checkfirst=True skips any
+table that already exists; since STRUCT-0010 importing app.main no longer
+runs ensure_database_schema() -- that moved to the app lifespan, which a
+bare TestClient(app) never enters -- this fixture is what guarantees the
+tables exist for every test) and
 then clears row DATA between tests with plain DELETEs in reverse
 dependency order, which benchmarks at ~19ms for the same schema -- about
 145x faster, and non-blocking for anything else touching the same

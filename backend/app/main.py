@@ -1,4 +1,7 @@
+from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import AsyncIterator
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
@@ -62,27 +65,44 @@ def register_domain_routers(app: FastAPI) -> None:
     app.include_router(entities_router)
 
 
-def create_app(app_settings=None) -> FastAPI:
+def create_app(
+    app_settings=None,
+    *,
+    bootstrap_schema: bool = True,
+    audit: SecurityAuditLogger | None = None,
+    request_limits: RequestLimitPolicy | None = None,
+    auth_failures: FixedWindowRateLimiter | None = None,
+) -> FastAPI:
     """Build a FastAPI app instance (STRUCT-0010).
 
-    `app_settings` lets a caller (a future test fixture, in particular)
-    inject a different CORS/rate-limit/audit-log/auth-token configuration
-    than the process-wide `app.core.config.settings` singleton, without
-    monkeypatching module attributes. Defaults to that singleton so
-    `app = create_app()` below is behaviorally identical to the previous
-    module-level construction -- this is additive, not a behavior change.
+    Importing this module has no side effects: `app = create_app()` at the
+    bottom only constructs the ASGI app. The database schema check
+    (`ensure_database_schema`) runs in the app's lifespan -- i.e. when
+    uvicorn starts serving, or when a test enters `with TestClient(app):` --
+    and can be skipped per instance with `bootstrap_schema=False`.
+
+    `app_settings` injects a different CORS / rate-limit / audit-log /
+    auth-token configuration than the process-wide `app.core.config.settings`
+    singleton; `audit`, `request_limits` and `auth_failures` inject the
+    objects the access-guard middleware uses, so a test can hand in an
+    in-memory audit logger or a tiny rate limit without touching module
+    state or the real audit file. Omitted, each is built from `app_settings`
+    exactly as before.
 
     Deliberately NOT parameterized here: `engine`/`SessionLocal` (from
     app.db.session), which are themselves built from `settings.database_url`
     at THEIR module's import time, independent of this factory. Injecting a
-    different database per app instance is a bigger, separate refactor
-    (tracked as STRUCT-0011, which depends on this factory existing first)
-    -- doing both at once would be a much larger, riskier change than this
-    pass's other fixes.
+    different database per app instance is a bigger, separate refactor.
     """
     app_settings = app_settings or default_settings
-    ensure_database_schema(engine)
-    app = FastAPI(title="Journalism Workbench API", version="1.24.0")
+
+    @asynccontextmanager
+    async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+        if bootstrap_schema:
+            ensure_database_schema(engine)
+        yield
+
+    app = FastAPI(title="Journalism Workbench API", version="1.24.0", lifespan=lifespan)
 
     @app.exception_handler(InvestigationAuthorizationError)
     async def investigation_authorization_denied(_request, _exc):
@@ -98,14 +118,17 @@ def create_app(app_settings=None) -> FastAPI:
     )
     register_domain_routers(app)
 
-    request_limits = RequestLimitPolicy(
+    # Bound to non-Optional names here so the middleware closure below sees the
+    # resolved objects (mypy does not narrow Optional parameters inside nested defs).
+    limits_policy = request_limits or RequestLimitPolicy(
         default_bytes=app_settings.max_api_request_bytes,
         # Allow multipart framing overhead while preserving the stricter route-level file limit.
         document_bytes=app_settings.max_document_bytes + (1024 * 1024),
         backup_bytes=app_settings.max_backup_bytes + (1024 * 1024),
     )
-    audit = SecurityAuditLogger(app_settings.audit_log_file)
-    auth_failures = FixedWindowRateLimiter(app_settings.api_auth_failure_limit_per_minute, 60)
+    audit_logger = audit or SecurityAuditLogger(app_settings.audit_log_file)
+    failure_limiter = auth_failures or FixedWindowRateLimiter(app_settings.api_auth_failure_limit_per_minute, 60)
+    app.state.audit_logger = audit_logger  # reachable from routes/tests without re-plumbing
 
     @app.middleware("http")
     async def api_access_guard(request, call_next):
@@ -117,7 +140,7 @@ def create_app(app_settings=None) -> FastAPI:
         local_request = request_is_local_request(request)
         client_host = request.client.host if request.client else None
 
-        limit = request_limits.for_path(request.url.path)
+        limit = limits_policy.for_path(request.url.path)
         valid_envelope, status, length_detail = validate_request_envelope(
             method=request.method,
             content_length=request.headers.get("content-length"),
@@ -129,7 +152,7 @@ def create_app(app_settings=None) -> FastAPI:
             response = JSONResponse(status_code=status, content={"detail": length_detail})
             response.headers["X-Request-ID"] = request_id
             if should_audit:
-                audit.write(
+                audit_logger.write(
                     request_id=request_id,
                     method=request.method,
                     path=request.url.path,
@@ -152,7 +175,7 @@ def create_app(app_settings=None) -> FastAPI:
         if denial is not None:
             if denial.status_code == 401:
                 rate_key = f"{client_host or ''}|{request.url.hostname or ''}"
-                allowed_failure, retry_after = auth_failures.hit(rate_key)
+                allowed_failure, retry_after = failure_limiter.hit(rate_key)
                 if not allowed_failure:
                     denial = JSONResponse(
                         status_code=429,
@@ -161,7 +184,7 @@ def create_app(app_settings=None) -> FastAPI:
                     )
             denial.headers["X-Request-ID"] = request_id
             if should_audit:
-                audit.write(
+                audit_logger.write(
                     request_id=request_id,
                     method=request.method,
                     path=request.url.path,
@@ -172,12 +195,12 @@ def create_app(app_settings=None) -> FastAPI:
                 )
             return denial
         if not local_request:
-            auth_failures.reset(f"{client_host or ''}|{request.url.hostname or ''}")
+            failure_limiter.reset(f"{client_host or ''}|{request.url.hostname or ''}")
         browser_denial = await enforce_browser_write_access(request, app_settings.cors_origins)
         if browser_denial is not None:
             browser_denial.headers["X-Request-ID"] = request_id
             if should_audit:
-                audit.write(
+                audit_logger.write(
                     request_id=request_id,
                     method=request.method,
                     path=request.url.path,
@@ -196,7 +219,7 @@ def create_app(app_settings=None) -> FastAPI:
 
         response.headers["X-Request-ID"] = request_id
         if should_audit:
-            audit.write(
+            audit_logger.write(
                 request_id=request_id,
                 method=request.method,
                 path=request.url.path,
