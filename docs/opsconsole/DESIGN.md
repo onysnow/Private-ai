@@ -1,6 +1,6 @@
 # opsconsole — a reusable operator console for web backends
 
-Status: design, v1.0 (2026-09-22). Supersedes the v1 console that shipped in
+Status: design, v1.1 (2026-09-22; Part II deep dive added). Supersedes the v1 console that shipped in
 fa79215 (`app/services/console.py`, `/api/console/*`, `static/console.html`,
 `frontend/app/console/page.tsx`).
 
@@ -679,3 +679,242 @@ backend/opsconsole/
 - Live Queries in the back4app sense (subscribe to row changes) would need
   DB-level change capture (Postgres `LISTEN/NOTIFY` triggers); the current
   "live mode" is poll-based by design.
+
+---
+
+# Part II — Deep dive
+
+Part I fixed the shape. Part II fixes the details an implementer needs on
+day one: the store's DDL, the change-set state machine, what is cached and
+for how long, how each failure is handled and retried, the load the design
+is sized for, and how the console watches itself.
+
+## 16. Store DDL
+
+SQLite by default (`console_dir/opsconsole.db`, WAL mode, `busy_timeout=5000`);
+identical models under `store="host"` with the `opsconsole_` prefix. All ids
+are ULIDs (sortable, no coordination). JSON columns are `TEXT` with a
+`json_valid` check on SQLite and `JSONB` on Postgres.
+
+```sql
+CREATE TABLE activity_log (
+  id              TEXT PRIMARY KEY,              -- ULID
+  at              TEXT NOT NULL,                 -- ISO-8601 UTC
+  principal_id    TEXT NOT NULL,
+  principal_label TEXT NOT NULL,
+  request_id      TEXT,
+  section         TEXT NOT NULL,                 -- data|query|schema|users|backups|config|tests|checks|activity
+  action          TEXT NOT NULL,                 -- row.insert|row.update|row.delete|sql.write|migration.upgrade|...
+  target_table    TEXT,
+  target_pk       TEXT,                          -- json: {"id": "..."} (composite keys supported)
+  before          TEXT,                          -- json row or null
+  after           TEXT,                          -- json row or null
+  changeset_id    TEXT,
+  run_id          TEXT,
+  note            TEXT,
+  undone_by       TEXT REFERENCES activity_log(id),
+  state           TEXT NOT NULL DEFAULT 'committed'  -- pending|committed|failed (two-phase audit, §19)
+);
+CREATE INDEX ix_activity_at ON activity_log(at DESC);
+CREATE INDEX ix_activity_target ON activity_log(target_table, target_pk);
+CREATE INDEX ix_activity_principal ON activity_log(principal_id, at DESC);
+
+CREATE TABLE change_sets (
+  id            TEXT PRIMARY KEY,
+  created_at    TEXT NOT NULL,
+  principal_id  TEXT NOT NULL,
+  status        TEXT NOT NULL CHECK (status IN ('pending','applying','applied','rejected','discarded','expired')),
+  target_table  TEXT NOT NULL,
+  ops           TEXT NOT NULL,                   -- json [{op, pk, set, before, after, warnings}]
+  origin        TEXT NOT NULL,                   -- inline|bulk|undo|import
+  applied_at    TEXT,
+  error         TEXT,
+  expires_at    TEXT NOT NULL                    -- pending sets expire (default 30 min)
+);
+CREATE INDEX ix_changesets_status ON change_sets(status, created_at DESC);
+
+CREATE TABLE saved_queries (
+  id TEXT PRIMARY KEY, name TEXT NOT NULL UNIQUE, sql TEXT NOT NULL,
+  params TEXT NOT NULL DEFAULT '[]',             -- json [{name, type, default}]
+  created_by TEXT NOT NULL, updated_at TEXT NOT NULL, pinned INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE query_history (
+  id TEXT PRIMARY KEY, at TEXT NOT NULL, principal_id TEXT NOT NULL,
+  sql TEXT NOT NULL, mode TEXT NOT NULL, rows INTEGER, ms INTEGER, error TEXT
+);
+CREATE INDEX ix_query_history_at ON query_history(at DESC);
+
+CREATE TABLE runs (
+  id TEXT PRIMARY KEY, kind TEXT NOT NULL,       -- tests|checks|backup|restore|migration|probes
+  selection TEXT, principal_id TEXT NOT NULL,
+  started_at TEXT NOT NULL, finished_at TEXT,
+  status TEXT NOT NULL CHECK (status IN ('queued','running','passed','failed','error','cancelled')),
+  summary TEXT,                                  -- json, kind-specific
+  log_path TEXT NOT NULL, exit_code INTEGER
+);
+CREATE INDEX ix_runs_kind ON runs(kind, started_at DESC);
+
+CREATE TABLE check_results (
+  run_id TEXT NOT NULL REFERENCES runs(id) ON DELETE CASCADE,
+  check_id TEXT NOT NULL, status TEXT NOT NULL,  -- pass|info|warn|fail|error
+  count INTEGER, samples TEXT, hint TEXT, ms INTEGER,
+  PRIMARY KEY (run_id, check_id)
+);
+
+CREATE TABLE traffic_snapshots (
+  at TEXT NOT NULL, route TEXT NOT NULL, method TEXT NOT NULL,
+  count INTEGER NOT NULL, p50_ms REAL, p95_ms REAL, max_ms REAL,
+  status_4xx INTEGER NOT NULL, status_5xx INTEGER NOT NULL,
+  PRIMARY KEY (at, route, method)
+);
+
+CREATE TABLE api_collections (
+  id TEXT PRIMARY KEY, name TEXT NOT NULL UNIQUE, requests TEXT NOT NULL, updated_at TEXT NOT NULL
+);
+
+CREATE TABLE store_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);  -- schema_version, created_at
+```
+
+The store has its own tiny versioned migration list inside the package
+(`store/migrations.py`, a list of `(version, sql)`), applied at `mount`.
+It never uses the host's Alembic.
+
+## 17. Change-set state machine
+
+```
+            create (preview)                     apply                      ok
+  ─────────────────────────────►  pending  ──────────────────►  applying  ─────────►  applied
+                                    │  ▲                            │
+                       discard      │  │ re-preview                 │ guard failed / db error
+                                    ▼  │ (refresh before-snapshots) ▼
+                                 discarded                       rejected  (error text kept; ops
+                                    ▲                                        and before/after kept
+                       30 min idle  │                                        for the operator to
+                                 expired                                     re-preview)
+```
+
+`applying` is a real state (written before the host transaction opens) so a
+crash mid-apply leaves evidence; on mount, any `applying` set older than
+`Limits.apply_timeout` is marked `rejected` with `error="interrupted"` and the
+operator is shown the rows to re-check. The optimistic guard compares the
+current row to `before` column-by-column using the coerced values (not string
+forms), ignoring columns listed in `TablePolicy.volatile_columns`
+(e.g. `updated_at` maintained by triggers).
+
+Undo creates a new change-set with `origin="undo"` whose `set` is the
+original `before` (for update/delete) or a delete (for insert), previews it
+through the same guard, and links the two activity rows via `undone_by`.
+
+## 18. Caching
+
+Everything the console caches is either immutable for the process lifetime or
+cheap to rebuild; nothing is cached across processes.
+
+| What | Where | Invalidation |
+|---|---|---|
+| Introspected model schema (MetaData → tables/columns/FKs/model indexes) | process memory, built at `mount` | never (models are code) |
+| Live DB schema (Inspector: live indexes, drift) | process memory | TTL 60 s; forced after a migration run completes |
+| Row-count estimates per table | process memory | TTL 30 s; exact counts under the threshold are not cached |
+| Route list + OpenAPI-derived param schemas | process memory, built on first request | never (routes are code); `refresh=true` rebuilds |
+| Test tree (`collect`) | process memory + `console_dir/runs/tests/collect.json` | `refresh=true`, or automatically after any test run |
+| Manifest | process memory | never; it is a function of config |
+| Effective config | none (recomputed per request — it is ~100 rows) | — |
+| Health tiles | last result per tile in memory with its `refresh_seconds` | tile-specific TTL (db 5 s, server 5 s, migrations 60 s, host tiles as declared); SSE pushes on state change only |
+| Traffic stats | ring buffer (deque) | rolling; snapshot flushed every 60 s |
+
+Browser side: the UI caches the manifest and schema map in memory for the
+page lifetime and keeps per-viewer conveniences (last table, column widths,
+theme) in `localStorage` wrapped in try/catch. No data rows are cached in the
+browser.
+
+## 19. Error handling and retry
+
+Principle: the console never takes the host down, never leaves a half-done
+write, and always tells the operator what happened with a request id.
+
+| Component | Failure | Handling | Retry |
+|---|---|---|---|
+| Request handler | any uncaught exception | error envelope `{code, message, request_id}`, 500; logged to the host logger with the request id; activity row if a write was in progress | none |
+| Host DB unreachable | `OperationalError` on any read | tile `database=fail`, sections that need the DB return 503 `db_unavailable`; UI shows a banner and keeps polling `/health` | UI polls with backoff 2 s → 30 s |
+| Console store unreachable | SQLite locked / missing dir | reads of console state return 503 `store_unavailable`; **writes to the host DB are refused** (audit must succeed first) | `busy_timeout` 5 s covers lock contention; otherwise operator action |
+| Change-set apply | guard mismatch | `rejected`, 409 `changed_underneath` with the differing columns | operator re-previews |
+| Change-set apply | DB constraint error | transaction rolled back, `rejected`, 409 with the driver message (first line, 500 chars) | operator edits |
+| Change-set apply | audit and data commit disagree | two-phase audit: activity rows are written with `state=pending` *before* the host transaction opens (if that write fails, nothing is applied); after the host commit they are flipped to `committed`, after a rollback to `failed`. Under `store="host"` both live in one transaction and the flip is trivial. A crash between commit and flip leaves `pending` rows; at mount they are reconciled by comparing the target row to `after` (match → `committed`, else → `failed`) | — |
+| Query (read) | timeout / too many rows | 400 `query_timeout` / results truncated with `truncated: true` and the cap | operator narrows |
+| Supervised run | adapter raises | run `status=error`, traceback in the run log, SSE `run.error` | operator re-runs; single-flight lock released in `finally` |
+| Supervised run | cancel | cooperative flag; subprocess gets SIGTERM then SIGKILL after 5 s; `status=cancelled` | — |
+| Supervised run | process restart mid-run | on mount, runs with `status=running` and no live thread are marked `error="interrupted"` | operator re-runs |
+| Subprocess (pytest, pg_dump, alembic) | non-zero exit | `status=failed` with exit code and parsed summary where the adapter can parse | — |
+| Log source | file missing / rotated | source reports `available=false` with reason; tail returns `[]`; follow re-opens on inode change | automatic |
+| API playground `send` | host route errors | shown as the response (that is the point); 5xx from the host is not a console error | none |
+| API playground `send` | connection refused (host not reachable on its own base_url, e.g. behind a proxy) | 502 `self_unreachable` with the URL tried | none; config hint shown |
+| SSE | client disconnect | subscriber queue removed | UI reconnects with backoff, then falls back to polling after 3 failures |
+| SSE | slow consumer | oldest events dropped, `gap` event sent | UI re-syncs the affected section by polling |
+| Health tile / check | provider raises | that tile/check is `error` with the message; others unaffected | next refresh |
+| Alembic upgrade | fails mid-way | `status=failed`; migration state re-read and shown (Alembic leaves the DB at the last completed revision, or inside a transaction on Postgres which is rolled back); schema cache invalidated | operator |
+| Restore | fails | provider-specific; the automatic pre-restore backup id is in the run summary | operator |
+
+Idempotency: every write endpoint is keyed by the target id in `confirm`, so a
+retried apply of an already-applied change-set returns 409 `already_applied`
+rather than re-applying; a retried `POST /tests/run` while running returns
+409 with the current run id.
+
+## 20. Load estimate and sizing
+
+The console is a one-operator tool sitting next to a small backend; it is
+sized for that, and the limits exist so that it stays harmless when it is
+pointed at a bigger one.
+
+| Dimension | Design point | Headroom |
+|---|---|---|
+| Concurrent operators | 1–3 | SQLite store WAL handles ~10 writers/s; `store="host"` beyond that |
+| Host request rate the traffic hook must absorb | ≤ 200 req/s | hook cost is one `perf_counter` pair + deque append (< 20 µs); no I/O on the request path |
+| Ring buffer memory | 2,000 entries × ~200 B | < 1 MB |
+| SSE subscribers | ≤ 10 | bounded queues of 500 events each |
+| Largest table browsed | 10M rows | estimated counts, keyset paging; offset paging refused past `offset_max` (50k) |
+| Query result | 500 rows / 5 MB / 30 s | caps from `Limits`; export streams up to `export_rows` (100k) |
+| Log tail | 2,000 lines per request from a file read backwards in 64 KB blocks | independent of file size |
+| Test run | tens of minutes | output ring buffer 2,000 lines + full log on disk |
+| Activity log growth | ~1 row per operator write; bulk of 10k rows = 10k rows | 90-day sweep; a `bulk` op stores one activity row per affected row on purpose (undo granularity) but with `before`/`after` limited to the changed columns for updates |
+
+Vertical only: the console runs in the host's process, one instance per
+host process. With several host workers (gunicorn/uvicorn workers) each has
+its own ring buffer and supervisor; the UI talks to whichever worker answers.
+Consequence and mitigation: traffic stats are per-worker (the snapshot table
+merges them, tagged by pid); supervised runs are single-flight per worker,
+so the store's `runs` table is the cross-worker lock (`INSERT ... WHERE NOT
+EXISTS running` in one statement). Documented as a known limitation for
+multi-worker hosts; single-worker is the common case for the apps this
+targets.
+
+## 21. The console watching itself
+
+A built-in `console` tile reports: store reachable and writable, store size,
+pending change-sets, last sweep time, SSE subscribers, ring buffer fill,
+supervisor threads alive, interrupted runs found at mount. Built-in checks
+`console_store_writable` and `console_runs_interrupted` surface the same in
+the Checks section so an operator looking at the nav badge sees console
+faults exactly like application faults. The console's own actions and
+errors go through the host's logger under the `opsconsole` logger name, so
+they appear in the Logs section's `app` source with request ids like
+everything else — there is no separate console log to forget about.
+
+## 22. Assumptions
+
+Stated so they can be checked rather than inherited:
+
+1. One process serves both the API and the console UI, on the same origin,
+   so `send` can call `request.base_url` and cookies/loopback rules hold.
+2. The host's models are declared on one SQLAlchemy `MetaData`; tables that
+   exist in the DB but not in the models are shown (as "live only") but are
+   read-only in the Data section because their types are not known to the
+   coercion layer.
+3. Every table the operator will edit has a primary key. Tables without one
+   are browse-only.
+4. The host's `AuthPolicy` is the security boundary; the console adds
+   `confirm` and audit but does not authenticate anyone itself.
+5. Alembic, if present, is configured by an ini file the host can point to
+   and the host's `env.py` can be imported from the console's process.
+6. pytest, if present, runs against a database the host's `TestRunner` env
+   points at; the console never runs tests against the live database.
