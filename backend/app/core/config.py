@@ -39,6 +39,17 @@ class Settings(BaseSettings):
     ai_provider: str = ""
     anthropic_api_key: str = ""
     openai_api_key: str = ""
+    # Model ids are configuration, not code: a provider deprecation must not need a release.
+    anthropic_model: str = "claude-sonnet-4-5"
+    openai_model: str = "gpt-4.1"
+    # Guard rails on the one endpoint family that spends money and holds a worker
+    # thread (POST /investigations/{id}/assistant/*). All per-process, best-effort,
+    # like api_auth_failure_limit_per_minute; put a real limiter at the edge for
+    # multi-worker deployments.
+    ai_request_timeout_seconds: float = 120.0
+    ai_max_output_tokens: int = 8192
+    ai_runs_per_minute: int = 6          # per actor (token / persisted user / local owner)
+    ai_max_concurrent_runs: int = 2      # per process, all actors together
     cors_allowed_origins: str = (
         "http://localhost:3000,http://127.0.0.1:3000,http://127.0.0.1:8000,http://localhost:8000"
     )

@@ -14,6 +14,8 @@ from app.db.session import Base, SessionLocal, engine
 from app.main import app
 from app.core.config import settings
 import app.ai.reasoning as reasoning_module
+from app.ai.governor import governor
+from app.ai.llm_client import LLMProviderError, LLMResponse
 
 
 # The vendored TAS spec is a private submodule; CI without TAS_REPO_TOKEN runs
@@ -42,9 +44,11 @@ def _restore_ai_settings():
     and this restores the shared singleton afterward so tests can't leak
     state into each other or into unrelated test modules.
     """
-    original = (settings.enable_ai_features, settings.ai_provider)
+    original = (settings.enable_ai_features, settings.ai_provider, settings.ai_runs_per_minute, settings.ai_max_concurrent_runs)
+    governor.reset()
     yield
-    settings.enable_ai_features, settings.ai_provider = original
+    settings.enable_ai_features, settings.ai_provider, settings.ai_runs_per_minute, settings.ai_max_concurrent_runs = original
+    governor.reset()
 
 
 def _seeded_investigation(client: TestClient) -> dict:
@@ -258,6 +262,7 @@ def test_candidate_queue_list_get_and_filters(monkeypatch):
     assert body["request"] == {
         "question": "What did Ada North sign?", "working_theory": None, "max_results": 30, "include_external_leads": True,
         "control_flags": {"severity_floor": "ALL", "source_tier_floor": "C"},  # TAS CONTROL_SURFACE defaults when omitted
+        "provider": "anthropic", "model": "unknown",  # the fake client returns a bare str, so no model id is known
     }
     assert client.get("/api/ai-analysis-candidates/does-not-exist").status_code == 404
 
@@ -326,11 +331,13 @@ def test_control_surface_flags_are_validated_before_any_llm_call(monkeypatch):
     seeded = _seeded_investigation(client)
     url = f"/api/investigations/{seeded['investigation']['id']}/assistant/case-synthesis"
 
+    # Literal-typed request fields: pydantic refuses out-of-table values at 422 with the
+    # field named, before the route body runs.
     bad_tier = client.post(url, json={"question": "What did Ada North sign?", "source_tier_floor": "Z"})
-    assert bad_tier.status_code == 400, bad_tier.text
+    assert bad_tier.status_code == 422, bad_tier.text
     assert "source_tier_floor" in bad_tier.text
     bad_severity = client.post(url, json={"question": "What did Ada North sign?", "severity_floor": "NONE"})
-    assert bad_severity.status_code == 400, bad_severity.text
+    assert bad_severity.status_code == 422, bad_severity.text
     assert "severity_floor" in bad_severity.text
     assert called["n"] == 0
 
@@ -353,7 +360,7 @@ def test_control_surface_flags_reach_the_prompt_and_the_stored_request_without_t
 
     r = client.post(
         f"/api/investigations/{seeded['investigation']['id']}/assistant/case-synthesis",
-        json={"question": "What did Ada North sign?", "severity_floor": "blocking", "source_tier_floor": "B"},
+        json={"question": "What did Ada North sign?", "severity_floor": "BLOCKING", "source_tier_floor": "B"},
     )
     assert r.status_code == 200, r.text
     prompt = fake.system_prompts[-1]
@@ -382,3 +389,109 @@ def test_settings_status_lists_the_supported_control_surface():
     assert cs["spec_file"] == "CORE/CONTROL_SURFACE.md"
     assert cs["flags"]["severity_floor"] == {"default": "ALL", "allowed": ["ALL", "MATERIAL", "BLOCKING"]}
     assert cs["flags"]["source_tier_floor"]["default"] == "C" and cs["flags"]["source_tier_floor"]["allowed"] == list("ABCDEF")
+
+
+# --- Review fixes: provider-side failures, gating order, throttling ------------------------
+
+class _TruncatingClient:
+    def generate(self, system_prompt, user_prompt, *, max_tokens=4096):
+        return LLMResponse(text='{"executive_summary": "cut off mid', model="claude-test", truncated=True, stop_reason="max_tokens")
+
+
+class _FailingClient:
+    def generate(self, system_prompt, user_prompt, *, max_tokens=4096):
+        raise LLMProviderError("anthropic request failed: APIConnectionError: boom")
+
+
+@requires_tas_spec
+def test_truncated_model_output_is_a_502_and_a_rejected_candidate_not_a_400(monkeypatch):
+    settings.enable_ai_features = True
+    settings.ai_provider = "anthropic"
+    client = TestClient(app)
+    seeded = _seeded_investigation(client)
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _TruncatingClient())
+    r = client.post(f"/api/investigations/{seeded['investigation']['id']}/assistant/case-synthesis", json={"question": "What did Ada North sign?"})
+    assert r.status_code == 502, r.text
+    assert r.json()["detail"]["rejection_reason"] == "truncated"
+    rows = client.get(f"/api/investigations/{seeded['investigation']['id']}/ai-analysis-candidates").json()["candidates"]
+    assert len(rows) == 1 and rows[0]["review_status"] == "rejected" and rows[0]["rejection_reason"] == "truncated"
+    full = client.get(f"/api/ai-analysis-candidates/{rows[0]['id']}").json()
+    assert full["payload"]["raw_output"].startswith('{"executive_summary"'), "the cut-off text is kept for the audit trail"
+    assert full["request"]["model"] == "claude-test" and full["request"]["provider"] == "anthropic"
+
+
+@requires_tas_spec
+def test_prose_around_the_json_object_is_tolerated(monkeypatch):
+    settings.enable_ai_features = True
+    settings.ai_provider = "anthropic"
+    client = TestClient(app)
+    seeded = _seeded_investigation(client)
+    wrapped = "Here is the analysis you asked for:\n```json\n" + _valid_case_synthesis(seeded["evidence"]["id"]) + "\n```\nLet me know if you need more."
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _FakeLLMClient(wrapped))
+    r = client.post(f"/api/investigations/{seeded['investigation']['id']}/assistant/case-synthesis", json={"question": "What did Ada North sign?"})
+    assert r.status_code == 200, r.text
+    assert r.json()["review_status"] == "proposed"
+
+
+@requires_tas_spec
+def test_provider_failure_is_a_502_without_vendor_text(monkeypatch):
+    settings.enable_ai_features = True
+    settings.ai_provider = "anthropic"
+    client = TestClient(app)
+    seeded = _seeded_investigation(client)
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _FailingClient())
+    r = client.post(f"/api/investigations/{seeded['investigation']['id']}/assistant/case-synthesis", json={"question": "What did Ada North sign?"})
+    assert r.status_code == 502, r.text
+    assert "APIConnectionError" not in r.text and "boom" not in r.text
+    assert governor.in_flight == 0, "a failed run must release its concurrency slot"
+
+
+def test_no_json_object_at_all_is_not_json(monkeypatch):
+    with pytest.raises(reasoning_module.ModelOutputError) as exc:
+        reasoning_module._parse_model_json("I cannot answer that.")
+    assert exc.value.reason == "not_json"
+    with pytest.raises(reasoning_module.ModelOutputError):
+        reasoning_module._parse_model_json("[1, 2, 3]")
+    assert reasoning_module._parse_model_json('```json\n{"a": 1}\n``` trailing prose') == {"a": 1}
+
+
+def test_per_actor_rate_limit_refuses_before_the_provider_is_called(monkeypatch):
+    settings.enable_ai_features = True
+    settings.ai_provider = "anthropic"
+    settings.ai_runs_per_minute = 2
+    called = {"n": 0}
+
+    class _Counting:
+        def generate(self, *a, **k):
+            called["n"] += 1
+            return "{}"  # schema-invalid on purpose; we only care whether it was called
+
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _Counting())
+    client = TestClient(app)
+    seeded = _seeded_investigation(client)
+    url = f"/api/investigations/{seeded['investigation']['id']}/assistant/case-synthesis"
+    statuses = [client.post(url, json={"question": "What did Ada North sign?"}).status_code for _ in range(3)]
+    if _TAS_SPEC_PRESENT:
+        assert statuses[:2] == [422, 422], statuses  # ran, then schema-rejected
+    third = client.post(url, json={"question": "What did Ada North sign?"})
+    assert statuses[2] == 429 and third.status_code == 429, (statuses, third.text)
+    assert third.headers.get("retry-after", "").isdigit()
+    assert called["n"] == (2 if _TAS_SPEC_PRESENT else 0), "the third and fourth runs must never reach the provider"
+
+
+def test_concurrency_cap_refuses_a_second_in_flight_run():
+    settings.ai_max_concurrent_runs = 1
+    settings.ai_runs_per_minute = 100
+    from app.ai.governor import ReasoningThrottled
+    with governor.acquire("actor-a", settings):
+        assert governor.in_flight == 1
+        with pytest.raises(ReasoningThrottled) as exc:
+            with governor.acquire("actor-b", settings):
+                pass
+        assert exc.value.retry_after_seconds >= 1
+    assert governor.in_flight == 0
+    # Released on exception paths too.
+    with pytest.raises(RuntimeError):
+        with governor.acquire("actor-a", settings):
+            raise RuntimeError("provider blew up")
+    assert governor.in_flight == 0

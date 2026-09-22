@@ -15,8 +15,11 @@ was deleted and main.py no longer imports it.
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from sqlalchemy.orm import Session
 
+from app.ai.governor import ReasoningThrottled
+from app.ai.llm_client import LLMProviderError
 from app.ai.reasoning import (
     CitationValidationError,
+    ModelOutputError,
     ReasoningInputError,
     SchemaValidationError,
     list_ai_analysis_candidates,
@@ -129,6 +132,16 @@ def _run_reasoning_endpoint(db: Session, *, investigation_id: str, module: str, 
         return {"candidate_id": candidate.id, "review_status": candidate.review_status, "payload": candidate.payload}
     except ReasoningInputError as exc:
         raise HTTPException(400, str(exc))
+    except ReasoningThrottled as exc:
+        raise HTTPException(429, str(exc), headers={"Retry-After": str(exc.retry_after_seconds)})
+    except LLMProviderError as exc:
+        # STRUCT-0028: no raw vendor error text in the response; the exception message
+        # is what the server log/audit gets.
+        raise HTTPException(502, "The AI provider request failed (network, authentication, or provider error). Check the server log for details.")
+    except ModelOutputError as exc:
+        # Provider/model failure, persisted as a rejected candidate for the audit trail;
+        # 502 because nothing about the reporter's request was wrong.
+        raise HTTPException(502, {"message": f"Model output unusable: {exc}", "rejection_reason": exc.reason})
     except CitationValidationError as exc:
         raise HTTPException(422, {"message": "Model output rejected: referenced evidence not present in the retrieval packet.", "invalid_citations": exc.bad_refs})
     except SchemaValidationError as exc:

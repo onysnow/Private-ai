@@ -14,11 +14,20 @@ for a client via `get_llm_client()`, and that function itself raises
 a clear, catchable error rather than silently falling back to some
 default provider when configuration is incomplete — the caller (an
 API route) is expected to turn that into a 4xx, not a 500.
+
+Every adapter:
+- takes its model id and request timeout from Settings (a deprecation is
+  a config change, and a hung provider cannot pin a worker thread for the
+  SDK's default ten minutes);
+- returns an LLMResponse, not a bare string, so the caller can tell a
+  complete answer from one the provider cut off at max_tokens and can
+  record which model actually produced it.
 """
 
 from __future__ import annotations
 
 import abc
+from dataclasses import dataclass
 
 from app.core.config import Settings
 
@@ -33,80 +42,147 @@ class LLMConfigurationError(RuntimeError):
     """
 
 
+class LLMProviderError(RuntimeError):
+    """The provider call itself failed (network, auth, 5xx, timeout).
+
+    Wrapped here so the reasoning layer never has to import a vendor SDK's
+    exception hierarchy; the route turns this into a 502.
+    """
+
+
+@dataclass(frozen=True)
+class LLMResponse:
+    text: str
+    model: str
+    truncated: bool = False          # provider stopped at max_tokens: the text is cut off, not complete
+    stop_reason: str | None = None
+
+
 class LLMClient(abc.ABC):
     """Minimal provider-neutral interface.
 
     Deliberately small: a single `generate` call taking a system
-    prompt and a user prompt and returning the model's raw text
-    response. Anything richer (streaming, tool use, structured
-    output) is out of scope until a concrete module actually needs
-    it — TAS's own modules 06/08 only need a single non-streaming
-    completion per call.
+    prompt and a user prompt and returning the model's response. Anything
+    richer (streaming, tool use) is out of scope until a concrete module
+    actually needs it — TAS's own modules 06/08 only need a single
+    non-streaming completion per call.
     """
 
     @abc.abstractmethod
-    def generate(self, system_prompt: str, user_prompt: str, *, max_tokens: int = 4096) -> str:
-        """Return the model's raw text output for one completion."""
+    def generate(self, system_prompt: str, user_prompt: str, *, max_tokens: int = 4096) -> LLMResponse | str:
+        """Return the model's output for one completion.
+
+        Returning a bare str is tolerated (test doubles do it); callers
+        should go through `coerce_response()` rather than assuming a type.
+        """
         raise NotImplementedError
 
 
+def coerce_response(value: LLMResponse | str, *, model: str = "unknown") -> LLMResponse:
+    if isinstance(value, LLMResponse):
+        return value
+    return LLMResponse(text=str(value), model=model)
+
+
 class AnthropicLLMClient(LLMClient):
-    def __init__(self, api_key: str, model: str = "claude-sonnet-4-5") -> None:
+    def __init__(self, api_key: str, model: str, *, timeout_seconds: float = 120.0) -> None:
         if not api_key:
             raise LLMConfigurationError("anthropic_api_key is not configured")
+        if not model.strip():
+            raise LLMConfigurationError("anthropic_model is not configured")
         self._api_key = api_key
         self._model = model
+        self._timeout = timeout_seconds
         self._client = None  # lazily constructed so importing this module never requires the SDK
 
     def _get_client(self):
         if self._client is None:
             import anthropic  # imported lazily: not a hard dependency unless this adapter is used
 
-            self._client = anthropic.Anthropic(api_key=self._api_key)
+            # max_retries=1: a retry doubles the worst-case wall time a worker is held; one is enough
+            # for a transient 529/overloaded, more belongs to the caller's own retry policy.
+            self._client = anthropic.Anthropic(api_key=self._api_key, timeout=self._timeout, max_retries=1)
         return self._client
 
-    def generate(self, system_prompt: str, user_prompt: str, *, max_tokens: int = 4096) -> str:
+    def generate(self, system_prompt: str, user_prompt: str, *, max_tokens: int = 4096) -> LLMResponse:
         client = self._get_client()
-        response = client.messages.create(
-            model=self._model,
-            max_tokens=max_tokens,
-            system=system_prompt,
-            messages=[{"role": "user", "content": user_prompt}],
-        )
-        return "".join(block.text for block in response.content if getattr(block, "type", None) == "text")
+        try:
+            response = client.messages.create(
+                model=self._model,
+                max_tokens=max_tokens,
+                system=system_prompt,
+                messages=[{"role": "user", "content": user_prompt}],
+            )
+        except Exception as exc:  # the SDK's hierarchy stays here; callers see one error type
+            raise LLMProviderError(f"anthropic request failed: {exc.__class__.__name__}: {exc}") from exc
+        return parse_anthropic_response(response, fallback_model=self._model)
+
+
+def parse_anthropic_response(response, *, fallback_model: str) -> LLMResponse:
+    """Pure function over the SDK's Message object (duck-typed so tests need no SDK)."""
+    text = "".join(getattr(block, "text", "") for block in getattr(response, "content", []) if getattr(block, "type", None) == "text")
+    stop_reason = getattr(response, "stop_reason", None)
+    return LLMResponse(
+        text=text,
+        model=getattr(response, "model", None) or fallback_model,
+        truncated=(stop_reason == "max_tokens"),
+        stop_reason=stop_reason,
+    )
 
 
 class OpenAILLMClient(LLMClient):
-    def __init__(self, api_key: str, model: str = "gpt-4.1") -> None:
+    def __init__(self, api_key: str, model: str, *, timeout_seconds: float = 120.0) -> None:
         if not api_key:
             raise LLMConfigurationError("openai_api_key is not configured")
+        if not model.strip():
+            raise LLMConfigurationError("openai_model is not configured")
         self._api_key = api_key
         self._model = model
+        self._timeout = timeout_seconds
         self._client = None
 
     def _get_client(self):
         if self._client is None:
             import openai  # imported lazily: not a hard dependency unless this adapter is used
 
-            self._client = openai.OpenAI(api_key=self._api_key)
+            self._client = openai.OpenAI(api_key=self._api_key, timeout=self._timeout, max_retries=1)
         return self._client
 
-    def generate(self, system_prompt: str, user_prompt: str, *, max_tokens: int = 4096) -> str:
+    def generate(self, system_prompt: str, user_prompt: str, *, max_tokens: int = 4096) -> LLMResponse:
         client = self._get_client()
-        response = client.chat.completions.create(
-            model=self._model,
-            max_tokens=max_tokens,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-        )
-        return response.choices[0].message.content or ""
+        try:
+            response = client.chat.completions.create(
+                model=self._model,
+                max_tokens=max_tokens,
+                # The reasoning prompts always demand a single JSON object; asking the
+                # API to enforce that removes the "prose around the JSON" failure mode.
+                response_format={"type": "json_object"},
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+            )
+        except Exception as exc:
+            raise LLMProviderError(f"openai request failed: {exc.__class__.__name__}: {exc}") from exc
+        return parse_openai_response(response, fallback_model=self._model)
+
+
+def parse_openai_response(response, *, fallback_model: str) -> LLMResponse:
+    choices = getattr(response, "choices", None) or []
+    first = choices[0] if choices else None
+    message = getattr(first, "message", None)
+    finish_reason = getattr(first, "finish_reason", None) if first is not None else None
+    return LLMResponse(
+        text=(getattr(message, "content", None) or "") if message is not None else "",
+        model=getattr(response, "model", None) or fallback_model,
+        truncated=(finish_reason == "length"),
+        stop_reason=finish_reason,
+    )
 
 
 _PROVIDERS = {
-    "anthropic": lambda settings: AnthropicLLMClient(api_key=settings.anthropic_api_key),
-    "openai": lambda settings: OpenAILLMClient(api_key=settings.openai_api_key),
+    "anthropic": lambda s: AnthropicLLMClient(api_key=s.anthropic_api_key, model=s.anthropic_model, timeout_seconds=s.ai_request_timeout_seconds),
+    "openai": lambda s: OpenAILLMClient(api_key=s.openai_api_key, model=s.openai_model, timeout_seconds=s.ai_request_timeout_seconds),
 }
 
 

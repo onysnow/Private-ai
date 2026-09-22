@@ -2383,3 +2383,42 @@ not yet offer the two flags -- optional request fields, so nothing breaks; the `
 ignores the new `control_surface` key).
 
 NOT VERIFIED: still no real provider run; still no Docker/Adminer from this shell.
+
+## 2026-09-22: backend code review of the TAS seam -- all findings fixed
+
+Ony ran `/code-review` on the backend and asked for the findings fixed. Review verdict was
+"request changes" on four items; everything below is on `dev`.
+
+Blocking items:
+- **No timeout / rate limit / concurrency cap on the paid LLM call.** New `app/ai/governor.py`:
+  per-actor fixed window (`AI_RUNS_PER_MINUTE`, default 6) checked first so a throttled actor
+  never takes a slot, then a per-process concurrency cap (`AI_MAX_CONCURRENT_RUNS`, default 2)
+  released on every exit path. Route maps `ReasoningThrottled` to 429 + `Retry-After`. Both SDK
+  clients are built with `timeout=AI_REQUEST_TIMEOUT_SECONDS` (default 120) and `max_retries=1`.
+- **Viewer paid before being refused.** `run_reasoning_module` now calls
+  `ensure_scope_can_mutate_ids` before the governor, the client, and retrieval; the flush-time
+  guard still stands behind it. Test proves a viewer scope and a cross-investigation reporter
+  scope both get `InvestigationAuthorizationError` with zero `generate()` calls.
+- **Idle-in-transaction across the network call.** `db.commit()` after `build_question_context`
+  releases the read transaction; the candidate insert opens its own.
+- **Truncation reported as the reporter's fault.** Adapters return `LLMResponse(text, model,
+  truncated, stop_reason)`; `stop_reason == "max_tokens"` / `finish_reason == "length"` is
+  `ModelOutputError("truncated")` -> 502 with `rejection_reason`, and the cut-off text is
+  persisted as a rejected candidate (`payload.raw_output`) for the audit trail. Provider
+  exceptions are wrapped as `LLMProviderError` -> 502 with no vendor text in the response.
+
+Suggestions taken: `_parse_model_json` uses `raw_decode` from the first `{` (prose before/after
+the object is tolerated; no object at all is `not_json`); model ids moved to settings
+(`ANTHROPIC_MODEL`, `OPENAI_MODEL`) and the model that answered is recorded in
+`candidate.request.model` with the provider; OpenAI adapter requests `response_format=json_object`;
+`_vendored_tas_version` is `lru_cache`d; restore preview flags any row whose `investigation_id`
+is not the backup's own as a `foreign_investigation` conflict (test tampers an archive, fixes the
+checksum, and confirms the victim investigation stays untouched); `severity_floor` /
+`source_tier_floor` are `Literal` types (422 with the field named, values in OpenAPI);
+`rejection_reason` (`schema|citation|truncated|not_json|reviewer`) on every serialized candidate;
+`settings.ai` now also reports `model` and `limits`. Not taken: offset pagination on the queue
+(500-row cap stands until a real queue gets near it -- noted, not built).
+
+Tests: new `tests/test_llm_client_adapters.py` (parsers, coerce, settings-driven config) and six
+new endpoint/governor tests. **290 passed** (was 278), mypy + ruff clean. `.env.example` documents
+the six new settings.

@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 class InvestigationCreate(BaseModel):
@@ -249,12 +251,19 @@ class ExtractionCandidateReviewRequest(BaseModel):
     entity_identity_decision: str | None = None
 
 
+# TAS CONTROL_SURFACE §4 flags. Literal types put the value tables in the OpenAPI
+# schema and reject anything else at 422 before a route runs; app/ai/reasoning.py
+# normalize_control_flags() is still the service-layer gate for non-HTTP callers.
+SeverityFloor = Literal["ALL", "MATERIAL", "BLOCKING"]
+SourceTierFloor = Literal["A", "B", "C", "D", "E", "F"]
+
+
 class CaseSynthesisRequest(BaseModel):
     question: str = Field(min_length=1, max_length=4000)
     max_results: int = Field(default=30, ge=1, le=100)
     include_external_leads: bool = True
-    severity_floor: str | None = Field(default=None, max_length=16)
-    source_tier_floor: str | None = Field(default=None, max_length=1)
+    severity_floor: SeverityFloor | None = None
+    source_tier_floor: SourceTierFloor | None = None
 
 
 class HypothesisTestRequest(BaseModel):
@@ -264,8 +273,8 @@ class HypothesisTestRequest(BaseModel):
     include_external_leads: bool = True
     # TAS CONTROL_SURFACE §4 session flags; validated against the table in
     # app/ai/reasoning.py (ALL|MATERIAL|BLOCKING; A-F). None = TAS default.
-    severity_floor: str | None = Field(default=None, max_length=16)
-    source_tier_floor: str | None = Field(default=None, max_length=1)
+    severity_floor: SeverityFloor | None = None
+    source_tier_floor: SourceTierFloor | None = None
 
 
 class AIAnalysisCandidateReviewRequest(BaseModel):

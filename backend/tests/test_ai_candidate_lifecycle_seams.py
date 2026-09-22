@@ -9,6 +9,8 @@ how they are produced (that is tests/test_reasoning_endpoints.py).
 
 from pathlib import Path
 
+import pytest
+
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.testclient import TestClient
@@ -184,3 +186,87 @@ def test_remote_scope_cannot_read_list_or_review_another_investigations_ai_candi
 
     with factory() as db:
         assert db.get(AIAnalysisCandidate, "d-proposed").review_status == "proposed"
+
+
+def test_viewer_and_cross_scope_runs_are_refused_before_the_provider_is_called(monkeypatch):
+    """Review item: the flush-time guard would refuse the insert, but only after
+    the provider had been paid. The check now runs first; the counting client
+    proves generate() is never reached."""
+    from app.core.authorization import AuthorizationScope
+    import app.ai.reasoning as reasoning_module
+
+    factory = _memory_factory()
+    with factory() as db:
+        _seed_candidates(db, "inv-allowed", prefix="a")
+        _seed_candidates(db, "inv-denied", prefix="d")
+
+    called = {"n": 0}
+
+    class _Counting:
+        def generate(self, *a, **k):
+            called["n"] += 1
+            return "{}"
+
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _Counting())
+    monkeypatch.setattr(settings, "enable_ai_features", True)
+    monkeypatch.setattr(settings, "ai_provider", "anthropic")
+
+    viewer = AuthorizationScope(actor_id="viewer-token", investigation_ids=frozenset({"inv-allowed"}), role="viewer")
+    reporter_elsewhere = AuthorizationScope(actor_id="reporter-token", investigation_ids=frozenset({"inv-allowed"}), role="reporter")
+    for scope, target in ((viewer, "inv-allowed"), (reporter_elsewhere, "inv-denied")):
+        token = set_current_authorization_scope(scope)
+        try:
+            with factory() as db:
+                with pytest.raises(InvestigationAuthorizationError):
+                    reasoning_module.run_reasoning_module(db, investigation_id=target, module="case_synthesis", question="What did Ada North sign?")
+        finally:
+            reset_current_authorization_scope(token)
+    assert called["n"] == 0
+    with factory() as db:
+        assert db.query(AIAnalysisCandidate).count() == 4, "nothing new was persisted"
+
+
+def test_restore_preview_rejects_rows_that_belong_to_another_investigation(tmp_path: Path):
+    """A backup is untrusted input: a row whose investigation_id is not the
+    backup's own must be a conflict, not silently attached to whatever
+    investigation it names."""
+    import io
+    import json
+    import zipfile
+    from app.services.exports import preview_investigation_restore
+
+    factory = _memory_factory()
+    with factory() as db:
+        _seed_candidates(db, "inv-backup", prefix="b")
+        package, _manifest = build_investigation_export(db, "inv-backup", include_documents=False)
+
+    # Rewrite one candidate row inside the archive to point at a different investigation,
+    # keeping the manifest checksum valid so only the new check can catch it.
+    import hashlib
+    with zipfile.ZipFile(io.BytesIO(package)) as zf:
+        names = zf.namelist()
+        manifest = json.loads(zf.read("manifest.json"))
+        records = json.loads(zf.read("data/database.json"))
+        others = {n: zf.read(n) for n in names if n not in {"manifest.json", "data/database.json"}}
+    records["ai_analysis_candidates"][0]["investigation_id"] = "inv-victim"
+    new_records = json.dumps(records).encode("utf-8")
+    manifest["checksums"]["data/database.json"] = hashlib.sha256(new_records).hexdigest()
+    tampered = io.BytesIO()
+    with zipfile.ZipFile(tampered, "w", zipfile.ZIP_DEFLATED) as zf:
+        for n, data in others.items():
+            zf.writestr(n, data)
+        zf.writestr("data/database.json", new_records)
+        zf.writestr("manifest.json", json.dumps(manifest))
+
+    engine = create_engine(f"sqlite:///{tmp_path / 'target.db'}", connect_args={"check_same_thread": False})
+    Base.metadata.create_all(engine)
+    Fresh = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+    with Fresh() as db:
+        db.add(Investigation(id="inv-victim", name="Someone else's case")); db.commit()
+        preview = preview_investigation_restore(db, tampered.getvalue(), tmp_path / "docs")
+        kinds = {c["kind"] for c in preview["conflicts"]}
+        assert "foreign_investigation" in kinds, preview["conflicts"]
+        assert preview["can_restore"] is False
+        with pytest.raises(ValueError):
+            restore_investigation_export(db, tampered.getvalue(), tmp_path / "docs")
+        assert db.query(AIAnalysisCandidate).filter_by(investigation_id="inv-victim").count() == 0

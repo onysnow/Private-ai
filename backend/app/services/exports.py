@@ -387,8 +387,12 @@ def preview_investigation_restore(
 
     # A portable investigation is restored as an isolated graph. Any primary-key collision
     # is treated as a hard conflict rather than relying on a database IntegrityError.
+    # Every row that carries an investigation_id must carry THIS investigation's: a backup
+    # is untrusted input, and without this check a crafted archive could attach rows to a
+    # different, already-present investigation (which the restore's own lock would not cover).
     for table in RESTORE_ORDER:
         model = MODEL_BY_TABLE[table]
+        scoped = "investigation_id" in {col.key for col in inspect(model).columns}
         for row in records.get(table, []):
             row_id = row.get("id")
             if row_id and db.get(model, row_id) is not None:
@@ -397,6 +401,13 @@ def preview_investigation_restore(
                     "table": table,
                     "id": str(row_id),
                     "message": f"{table} record already exists",
+                })
+            if scoped and row.get("investigation_id") != investigation_id:
+                conflicts.append({
+                    "kind": "foreign_investigation",
+                    "table": table,
+                    "id": str(row_id or "<missing-id>"),
+                    "message": f"{table} record belongs to investigation {row.get('investigation_id')!r}, not the backup's {investigation_id!r}",
                 })
 
     storage_root = resolve_storage_root(document_storage_dir)
