@@ -106,14 +106,3 @@ export type ProvenanceTraceClaimLink={link_id:string,stance:string,note?:string|
 export type ProvenanceTraceLeadLink={link_id:string,note?:string|null,lead:{id:string,title:string,detail?:string|null,status:string,provider?:string|null}};
 export type ProvenanceTrace={record_type:'entity'|'claim'|'evidence'|'relationship'|'source'|'document'|'lead'|'task',record_id:string,investigation_id:string,root:JsonObject,extraction_lineage:ExtractionLineage|null,evidence_links:ProvenanceTraceEvidenceLink[],claim_links:ProvenanceTraceClaimLink[],relationships:Relationship[],lead_links:ProvenanceTraceLeadLink[]};
 
-// Operator console (/api/console/*, frontend /console).
-export type ConsoleOverview={database:{url:string,dialect:string,modeled_tables:number,live_tables:number,missing_tables:string[],extra_tables:string[],adminer_can_open:boolean},app_log_file:string,console_dir:string,pytest_available:boolean,python:string,links:{swagger:string,redoc:string,openapi:string,adminer:string,openaleph_ui:string|null},test_run:JsonObject};
-export type ConsoleTable={name:string,rows:number,columns:{name:string,type:string,primary_key:boolean,nullable:boolean}[],foreign_keys:string[]};
-export type ConsoleTableRows={table:string,columns:string[],rows:Record<string,JsonValue>[],returned:number,total:number,offset:number,limit:number};
-export type ConsoleSqlResult={columns:string[],rows:JsonValue[][],returned:number,truncated:boolean,duration_ms:number};
-export type ConsoleRoute={path:string,methods:string[],name:string,summary:string,path_params:string[],query_params:string[]};
-export type ConsoleProbeResult={method:string,path:string,status_code:number|null,ok:boolean,error:string|null,duration_ms:number};
-export type ConsoleProbeReport={base_url:string,checked:number,ok:number,failed:number,results:ConsoleProbeResult[],at:string};
-export type ConsoleTestStatus={status:string,pid?:number,selection?:string|null,started_at?:string|null,finished_at?:string|null,returncode?:number|null,log_file?:string,database_url?:string,tail?:string[],failed_tests?:string[],summary?:string|null};
-export type ConsoleLogRecord={ts?:JsonValue,level?:JsonValue,logger?:JsonValue,message?:JsonValue,request_id?:JsonValue,exception?:JsonValue,[key:string]:JsonValue|undefined};
-export type ConsoleLogView={records:ConsoleLogRecord[],returned:number,file_bytes:number,scanned_bytes:number,truncated:boolean};
