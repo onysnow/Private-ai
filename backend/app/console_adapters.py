@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import asyncio
 import concurrent.futures
+import json
+import zipfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Callable, List
@@ -35,6 +37,11 @@ from app.models.domain import (
     RelationshipEdge,
     Source,
 )
+from app.services.exports import (
+    build_investigation_export,
+    preview_investigation_restore,
+    restore_investigation_export,
+)
 from app.services.security import redact_database_url, resolve_storage_root
 from opsconsole import (
     Check,
@@ -43,6 +50,7 @@ from opsconsole import (
     Principal,
     Probe,
     RouteMeta,
+    RunHandle,
     TablePolicy,
     Tile,
     TileProvider,
@@ -51,7 +59,14 @@ from opsconsole import (
 from opsconsole.adapters.auth_policies import LoopbackOrRole
 from opsconsole.adapters.jsonl_log import JsonlLogSource
 from opsconsole.adapters.pytest_runner import PytestRunner
-from opsconsole.protocols import IssuedToken, RoleRecord, TokenRecord, UserRecord
+from opsconsole.protocols import (
+    BackupRecord,
+    IssuedToken,
+    RestorePlan,
+    RoleRecord,
+    TokenRecord,
+    UserRecord,
+)
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 
@@ -338,6 +353,102 @@ class WorkbenchUsers:
             return IssuedToken(token_id=user.id, plaintext=result["token"], expires_at=None)
 
 
+# --- backups ----------------------------------------------------------------------------------
+
+class WorkbenchBackups:
+    """BackupProvider over app/services/exports.py's per-investigation export/restore.
+    These are per-investigation export archives (a signed zip with a manifest.json,
+    per EXPORT_FORMAT/EXPORT_VERSION), not whole-database dumps -- see DESIGN.md §12.
+    Today's /api/backups/* endpoints are upload-only (inspect/preview/restore a file
+    the caller already has); nothing persists an export to disk. create() closes that
+    gap for the console by exporting one investigation (the run's `selection`, an
+    investigation id) to a .zip under console_dir/backups, so it can be listed and
+    re-downloaded or restored later. restore_plan()/restore() reuse the exact same
+    preview_investigation_restore/restore_investigation_export functions the REST
+    endpoints call, including the same ENABLE_RESTORE_API gate -- the console does
+    not get a more privileged restore path than the app's own API."""
+
+    kind = "investigation_export"
+
+    def __init__(self, backups_dir: Path, session_factory: Callable[[], Session], document_storage_dir: Path, settings: Settings) -> None:
+        self.backups_dir = backups_dir
+        self.session_factory = session_factory
+        self.document_storage_dir = document_storage_dir
+        self.settings = settings
+        self.backups_dir.mkdir(parents=True, exist_ok=True)
+
+    def _manifest_of(self, path: Path) -> dict[str, Any] | None:
+        try:
+            with zipfile.ZipFile(path) as zf:
+                manifest: dict[str, Any] = json.loads(zf.read("manifest.json"))
+                return manifest
+        except (OSError, KeyError, ValueError, zipfile.BadZipFile):
+            return None
+
+    def list(self) -> list[BackupRecord]:
+        out: list[BackupRecord] = []
+        for path in sorted(self.backups_dir.glob("*.zip"), reverse=True):
+            manifest = self._manifest_of(path)
+            stat = path.stat()
+            label = manifest["investigation"]["name"] if manifest else path.stem
+            created_at = manifest["generated_at"] if manifest else datetime.fromtimestamp(stat.st_mtime, timezone.utc).isoformat()
+            out.append(BackupRecord(id=path.stem, created_at=created_at, bytes=stat.st_size, kind=self.kind, label=label, verified=manifest is not None))
+        return out
+
+    def create(self, handle: RunHandle, *, selection: str | None) -> BackupRecord:
+        if not selection:
+            raise ValueError("selection must be an investigation id")
+        handle.log(f"[console] exporting investigation {selection}")
+        with self.session_factory() as db:
+            data, manifest = build_investigation_export(db, selection, include_documents=True)
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        backup_id = f"{stamp}-{selection}"
+        path = self.backups_dir / f"{backup_id}.zip"
+        path.write_bytes(data)
+        handle.log(f"[console] wrote {path.name} ({len(data)} bytes)")
+        return BackupRecord(id=backup_id, created_at=manifest["generated_at"], bytes=len(data), kind=self.kind, label=manifest["investigation"]["name"], verified=True)
+
+    def _path(self, backup_id: str) -> Path:
+        path = self.backups_dir / f"{backup_id}.zip"
+        if not path.is_file():
+            raise LookupError(f"unknown backup {backup_id!r}")
+        return path
+
+    def restore_plan(self, backup_id: str) -> RestorePlan:
+        data = self._path(backup_id).read_bytes()
+        with self.session_factory() as db:
+            preview = preview_investigation_restore(db, data, self.document_storage_dir)
+        # A restore always targets an isolated investigation graph -- any collision is a
+        # hard conflict that blocks the restore rather than replacing anything, so
+        # will_replace is always empty here; conflicts show up in warnings instead.
+        summary = f"Restores {preview['investigation']['name']!r} ({preview['investigation']['id']}): {sum(preview['record_counts'].values())} record(s) across {len(preview['record_counts'])} table(s)"
+        warnings = list(preview["warnings"])
+        if not preview["can_restore"]:
+            details = "; ".join(c["message"] for c in preview["conflicts"][:5])
+            if len(preview["conflicts"]) > 5:
+                details += f"; plus {len(preview['conflicts']) - 5} more"
+            warnings.append(f"BLOCKED by {len(preview['conflicts'])} conflict(s): {details}")
+        if not preview["restore_api_enabled"]:
+            warnings.append("Restore is disabled (set ENABLE_RESTORE_API=true to enable it)")
+        return RestorePlan(backup_id=backup_id, summary=summary, will_replace=[], warnings=warnings)
+
+    def restore(self, backup_id: str, handle: RunHandle) -> None:
+        if not self.settings.enable_restore_api:
+            raise RuntimeError("Backup restore is disabled; set ENABLE_RESTORE_API=true to enable it")
+        path = self._path(backup_id)
+        data = path.read_bytes()
+        handle.log(f"[console] restoring from {path.name}")
+        with self.session_factory() as db:
+            result = restore_investigation_export(db, data, self.document_storage_dir)
+        handle.log(f"[console] restored {sum(result['restored_counts'].values())} record(s) into investigation {result['investigation_id']}")
+
+    def path_for_download(self, backup_id: str) -> str | None:
+        try:
+            return str(self._path(backup_id))
+        except LookupError:
+            return None
+
+
 # --- routes ---------------------------------------------------------------------------------------
 
 def describe_route(route: APIRoute) -> RouteMeta:
@@ -385,6 +496,7 @@ def build_console_config(settings: Settings, engine: Engine, session_factory: Ca
         tests=runner,
         log_sources=[JsonlLogSource(settings.app_log_file, id="app", title="Application log"), JsonlLogSource(settings.audit_log_file, id="security", title="Security audit")],
         users=WorkbenchUsers(session_factory),
+        backups=[WorkbenchBackups(console_dir / "backups", session_factory, resolve_storage_root(settings.document_storage_dir), settings)],
         checks=CHECKS, tiles=tiles(settings), api_probe_suite=PROBES,
         mutable_flags=("enable_ai_features", "enable_pdf_ocr", "enable_local_entity_suggestions", "openaleph_auto_sync_documents"),
         writes=writes,
@@ -397,4 +509,4 @@ def build_console_config(settings: Settings, engine: Engine, session_factory: Ca
     )
 
 
-__all__ = ["CHECKS", "PROBES", "WorkbenchUsers", "auth_policy", "build_console_config", "describe_route", "tiles"]
+__all__ = ["CHECKS", "PROBES", "WorkbenchBackups", "WorkbenchUsers", "auth_policy", "build_console_config", "describe_route", "tiles"]
