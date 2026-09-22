@@ -1,5 +1,7 @@
+import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
+from time import monotonic
 from typing import Any, AsyncIterator, Awaitable, Callable, Iterator
 
 from fastapi import FastAPI, Request, Response
@@ -27,6 +29,7 @@ from app.api.routes_documents import router as documents_router
 from app.api.routes_connector_findings import router as connector_findings_router
 from app.api.routes_settings import router as settings_router
 from app.api.routes_entities import router as entities_router
+from app.api.routes_console import router as console_router
 from app.core.config import Settings, settings as default_settings
 from app.core.access import bearer_token, enforce_api_access, enforce_browser_write_access, request_is_local_request
 from app.core.authorization import (
@@ -37,6 +40,7 @@ from app.services.identity import scope_for_persisted_token
 from app.core.request_limits import RequestLimitPolicy, validate_request_envelope
 from app.core.rate_limiter import FixedWindowRateLimiter
 from app.core.audit_log import SecurityAuditLogger, new_request_id, should_audit_request
+from app.core.app_log import configure_app_logging, current_request_id
 
 
 def register_domain_routers(app: FastAPI) -> None:
@@ -66,6 +70,7 @@ def register_domain_routers(app: FastAPI) -> None:
     app.include_router(connector_findings_router)
     app.include_router(settings_router)
     app.include_router(entities_router)
+    app.include_router(console_router)
 
 
 def create_app(
@@ -114,6 +119,20 @@ def create_app(
         yield
 
     app = FastAPI(title="Journalism Workbench API", version="1.24.0", lifespan=lifespan)
+    if app_settings.app_log_file:
+        configure_app_logging(app_settings.app_log_file)
+    app_logger = logging.getLogger("journalism.request")
+
+    @app.exception_handler(Exception)
+    async def unhandled_exception(request: Request, exc: Exception) -> JSONResponse:
+        # Logged with the traceback under the request id the client also gets, so the
+        # console's log view can be searched by the id in the 500's body.
+        request_id = getattr(request.state, "request_id", None) or "unknown"
+        app_logger.error(
+            "unhandled exception", exc_info=(type(exc), exc, exc.__traceback__),
+            extra={"request_id": request_id, "method": request.method, "path": request.url.path, "status_code": 500},
+        )
+        return JSONResponse(status_code=500, content={"detail": f"Internal server error (request {request_id})"}, headers={"X-Request-ID": request_id})
     app.state.engine = app_engine
     app.state.session_factory = session_factory
     if app_engine is not default_engine:
@@ -160,6 +179,10 @@ def create_app(
         # Exposed so route handlers can reference the same id in a generic
         # error detail (STRUCT-0028) instead of embedding raw exception text.
         request.state.request_id = request_id
+        # Each request runs in its own task context, so this set() dies with the
+        # request; no reset needed on the early-return paths below.
+        current_request_id.set(request_id)
+        started = monotonic()
         should_audit = should_audit_request(request.method, request.url.path)
         local_request = request_is_local_request(request)
         client_host = request.client.host if request.client else None
@@ -242,6 +265,12 @@ def create_app(
             reset_current_authorization_scope(auth_token)
 
         response.headers["X-Request-ID"] = request_id
+        duration_ms = round((monotonic() - started) * 1000, 1)
+        app_logger.log(
+            logging.WARNING if response.status_code >= 500 else logging.INFO,
+            "%s %s -> %s (%.1f ms)", request.method, request.url.path, response.status_code, duration_ms,
+            extra={"request_id": request_id, "method": request.method, "path": request.url.path, "status_code": response.status_code, "duration_ms": duration_ms, "client_host": client_host or ""},
+        )
         if should_audit:
             audit_logger.write(
                 request_id=request_id,
@@ -259,6 +288,13 @@ def create_app(
     @app.get("/", include_in_schema=False)
     def home() -> FileResponse:
         return FileResponse(static_dir / "index.html")
+
+    @app.get("/console", include_in_schema=False)
+    def console_page() -> FileResponse:
+        """The backend-served operator console (the Next.js app has the same page at
+        /console). The API behind it refuses non-loopback callers, so serving the
+        HTML to anyone is harmless."""
+        return FileResponse(static_dir / "console.html")
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:

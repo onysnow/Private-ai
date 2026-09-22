@@ -371,6 +371,10 @@ def test_control_surface_flags_reach_the_prompt_and_the_stored_request_without_t
 
     stored = client.get(f"/api/ai-analysis-candidates/{r.json()['candidate_id']}").json()
     assert stored["request"]["control_flags"] == {"severity_floor": "BLOCKING", "source_tier_floor": "B"}
+    # The exact prompts are kept so a reviewer can reconstruct the run.
+    assert stored["trace"]["system_prompt"] == prompt and "RETRIEVAL PACKET" in stored["trace"]["user_prompt"]
+    assert stored["trace"]["packet_summary"]["citation_count"] >= 1 and stored["trace"]["response"]["truncated"] is False
+    assert "trace" not in client.get(f"/api/investigations/{seeded['investigation']['id']}/ai-analysis-candidates").json()["candidates"][0], "list stays light"
 
     # Same flags, invented citation: still auto-rejected -- flags cannot relax the citation gate.
     fake_bad = _FakeLLMClient(_valid_case_synthesis("NOT-A-REAL-ID"))

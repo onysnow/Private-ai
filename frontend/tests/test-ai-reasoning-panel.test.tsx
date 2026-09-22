@@ -65,6 +65,7 @@ const fullCandidate = (overrides: Record<string, unknown> = {}) => ({
     investigative_gaps: ['No independent corroborating source located yet.'],
   },
   checked_citation_ids: [{record_type: 'evidence', record_id: 'ev-1'}],
+  trace: {system_prompt: 'You are operating under the Topic Authority System', user_prompt: 'RETRIEVAL PACKET (quoted)', response: {model: 'claude-test', truncated: false}},
   ...overrides,
 });
 
@@ -132,6 +133,8 @@ describe('AiReasoningPanel', () => {
     expect(within(detail).getByText('CLM-0001')).toBeInTheDocument();
     expect(within(detail).getByText(/Supports: evidence:ev-1/)).toBeInTheDocument();
     expect(within(detail).getByText('No independent corroborating source located yet.')).toBeInTheDocument();
+    expect(within(detail).getByTestId('ai-trace')).toHaveTextContent('What the model was sent · claude-test');
+    expect(within(detail).getByText(/Topic Authority System/)).toBeInTheDocument();
 
     const runCall = fetchMock.mock.calls[1];
     expect(requestUrl(runCall)).toBe('http://api.test/api/investigations/inv-1/assistant/case-synthesis');

@@ -63,6 +63,12 @@ class Settings(BaseSettings):
     # at which settings/status flags security.needs_attention.
     api_auth_failure_state_file: str = "./data/audit/auth-failures.json"
     security_alert_denials_per_day: int = 20
+    # Operator console (/api/console/*, frontend /console): loopback-only tools to
+    # inspect tables, run read-only SQL, list/probe endpoints, run the test suite
+    # against an isolated database, and read the structured application log.
+    console_enabled: bool = True
+    app_log_file: str = "./data/logs/app.jsonl"
+    console_dir: str = "./data/console"   # test-run logs and the isolated test database
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @property

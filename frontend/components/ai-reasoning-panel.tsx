@@ -160,6 +160,10 @@ export function AiReasoningPanel({api,investigationId,status}:Props):ReactElemen
             {payload&&'conclusion' in payload&&<p><b>Conclusion:</b> {asStr(payload.conclusion)}</p>}
             {gaps.length>0&&<div><b>Investigative gaps:</b><ul>{gaps.map((g,i)=><li key={i}>{asStr(g)}</li>)}</ul></div>}
             <details><summary className="muted">Checked against {selected.checked_citation_ids.length} citation id(s) · raw payload</summary><pre style={{whiteSpace:'pre-wrap',fontSize:12}}>{JSON.stringify(payload,null,2)}</pre></details>
+            {selected.trace&&<details data-testid="ai-trace"><summary className="muted">What the model was sent · {asStr(selected.trace.response&&asObj(selected.trace.response)?.model)}{selected.trace.response&&asObj(selected.trace.response)?.truncated?' · truncated':''}</summary>
+              <div className="muted"><b>System prompt</b></div><pre style={{whiteSpace:'pre-wrap',fontSize:11,maxHeight:300,overflowY:'auto'}}>{asStr(selected.trace.system_prompt)}</pre>
+              <div className="muted"><b>User prompt (retrieval packet)</b></div><pre style={{whiteSpace:'pre-wrap',fontSize:11,maxHeight:300,overflowY:'auto'}}>{asStr(selected.trace.user_prompt)}</pre>
+            </details>}
             {selected.review_status==='proposed'?<>
               <textarea aria-label="Reviewer note" value={note} onChange={(e:ChangeEvent<HTMLTextAreaElement>)=>setNote(e.target.value)} placeholder="Reviewer note (why this is or is not trustworthy)."/>
               <div className="actions"><Button onClick={()=>void review('accept')}>Accept as trusted analysis</Button><Button variant="outline" onClick={()=>void review('reject')}>Reject</Button></div>

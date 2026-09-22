@@ -86,10 +86,28 @@ if not exist "backend\.env" (
   echo OPENSANCTIONS_SEARCH_LIMIT=20>> backend\.env
 )
 
+rem Use the Docker Postgres database when the workbench-db container is running, so
+rem what you do in the app is visible in Adminer (http://127.0.0.1:8081) and matches
+rem the Docker stack. An environment variable beats backend\.env for pydantic-settings,
+rem so the .env file is left untouched. Without Docker this falls back to SQLite; the
+rem backend console (http://127.0.0.1:8000/console) can browse that too.
+set "WORKBENCH_DB=SQLite file backend\journalism.db (Adminer cannot open it; use the backend console)"
+set "WB_DB_CID="
+where docker >nul 2>&1
+if %errorlevel%==0 (
+  for /f "usebackq delims=" %%i in (`docker compose ps -q --status running workbench-db 2^>nul`) do set "WB_DB_CID=%%i"
+)
+if not defined POSTGRES_PASSWORD set "POSTGRES_PASSWORD=journalism-local-dev"
+if defined WB_DB_CID (
+  set "DATABASE_URL=postgresql+psycopg://journalism:%POSTGRES_PASSWORD%@127.0.0.1:5432/journalism"
+  set "WORKBENCH_DB=Docker Postgres workbench-db (Adminer: http://127.0.0.1:8081)"
+)
+
 echo.
 echo Starting Journalism Workbench DEV 1.24...
-echo Local data: backend\journalism.db
+echo Database: %WORKBENCH_DB%
 echo Browser: http://127.0.0.1:8000
+echo Backend console: http://127.0.0.1:8000/console   API docs: http://127.0.0.1:8000/docs
 echo.
 cd backend
 "..\.venv\Scripts\python.exe" launch_local.py

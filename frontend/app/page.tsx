@@ -9,6 +9,7 @@ import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import Link from 'next/link';
 import {Toaster} from '@/components/ui/sonner';
 import {AiReasoningPanel} from '../components/ai-reasoning-panel';
 
@@ -121,7 +122,7 @@ export default function Home(): ReactElement {
  const toggleGraphDuplicates=async(checked:boolean)=>{setIncludeGraphDuplicates(checked);setGraphEdge(null);if(inv)await loadRelationships(inv,undefined,checked)};
  const promotionFor=(p:string,v:string)=>assessments.find(a=>a.prop===p&&a.value===v&&a.status==='accepted');
  const promote=async(a:Assessment)=>{try{await api.unknown(`/api/statement-assessments/${a.id}/promote`,{method:'POST',body:{note:a.note||null}});await loadHistory(a.entity_id)}catch(error){reportPayloadError(error)}};
- return <main className="shell"><div className="top"><strong>JOURNALISM WORKBENCH</strong><Badge variant="outline" className="badge">DEV 1.18</Badge></div>
+ return <main className="shell"><div className="top"><strong>JOURNALISM WORKBENCH</strong><span><Link className="badge" href="/console" style={{marginRight:8}}>backend console</Link><Badge variant="outline" className="badge">DEV 1.18</Badge></span></div>
  <section className="card"><h3>API access</h3><p className="muted">{apiAccessMessage}</p>{(apiAccessState==='needs_token'||apiAccessState==='error')&&<div className="searchrow"><input type="password" autoComplete="off" value={apiTokenInput} onChange={(e:ChangeEvent<HTMLInputElement>)=>setApiTokenInput(e.target.value)} onKeyDown={(e:KeyboardEvent<HTMLInputElement>)=>{if(e.key==='Enter')void authenticateApi()}} placeholder="Bearer token for this session"/><Button onClick={authenticateApi} disabled={!apiTokenInput.trim()}>Connect</Button></div>}{apiAccessState==='authenticated'&&<Button onClick={clearApiSession}>Clear session token</Button>}{apiAccessState==='remote_disabled'&&<small>For safety, the frontend cannot enable remote access itself; configure the backend locally.</small>}</section>
 
  <section className="hero"><span className="accent">FollowTheMoney-centered review</span><h1>External data stays evidence until a reporter decides what it means.</h1><p>Search Aleph or OpenSanctions, preserve raw findings and provenance, resolve identity separately, then assess individual statements. Accepted values can be explicitly promoted into the canonical graph with provider and source provenance.</p></section>

@@ -31,6 +31,10 @@ class AIAnalysisCandidate(Base):
     # can't judge a synthesis without the question it answers, and payload is model
     # output only, so the request is kept beside it. Nullable: rows predate this column.
     request: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    # Exactly what the model saw: system prompt, user prompt (the retrieval packet
+    # included) and the provider response metadata. Without it a reviewer cannot
+    # reconstruct why a synthesis said what it said. Nullable: rows predate it.
+    trace: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     payload: Mapped[dict] = mapped_column(JSON, default=dict)
     # The exact citation IDs (from build_question_context()'s citations list) the payload
     # was checked against, preserved so a later reviewer can re-verify without re-running

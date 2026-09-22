@@ -389,9 +389,9 @@ def _actor_id() -> str:
 
 
 def _persist_rejected(db: Session, *, investigation_id: str, module: str, request: dict, payload: dict,
-                      checked: list[dict], reason: str, detail: str) -> AIAnalysisCandidate:
+                      checked: list[dict], reason: str, detail: str, trace: dict | None = None) -> AIAnalysisCandidate:
     candidate = AIAnalysisCandidate(
-        investigation_id=investigation_id, module=module, request=request, payload=payload,
+        investigation_id=investigation_id, module=module, request=request, payload=payload, trace=trace,
         checked_citation_ids=checked, confidence=0.0, review_status="rejected",
         reviewer_note=f"{REJECTION_REASONS[reason]}: {detail}", created_at=utcnow_naive(),
     )
@@ -467,19 +467,30 @@ def run_reasoning_module(
         "model": response.model,
     }
     checked = [{"record_type": c["record_type"], "record_id": c["record_id"]} for c in packet["citations"]]
+    trace = {
+        "system_prompt": system_prompt,
+        "user_prompt": user_prompt,
+        "packet_summary": {
+            "retrieval": packet.get("retrieval"),
+            "citation_count": len(packet.get("citations", [])),
+            "external_lead_count": len(packet.get("external_leads", [])),
+        },
+        "response": {"model": response.model, "stop_reason": response.stop_reason, "truncated": response.truncated, "chars": len(response.text)},
+        "max_tokens": settings.ai_max_output_tokens,
+    }
 
     # Provider-side failures are persisted too (audit trail: what came back and
     # why it was unusable), then surfaced as 502 -- never as a client error.
     if response.truncated:
         detail = f"stop_reason={response.stop_reason!r} at max_tokens={settings.ai_max_output_tokens}; raise ai_max_output_tokens or narrow the question"
         _persist_rejected(db, investigation_id=investigation_id, module=module, request=request,
-                          payload={"raw_output": response.text[:50000]}, checked=checked, reason="truncated", detail=detail)
+                          payload={"raw_output": response.text[:50000]}, checked=checked, reason="truncated", detail=detail, trace=trace)
         raise ModelOutputError("truncated", f"model output was cut off ({detail})")
     try:
         payload = _parse_model_json(response.text)
     except ModelOutputError as exc:
         _persist_rejected(db, investigation_id=investigation_id, module=module, request=request,
-                          payload={"raw_output": response.text[:50000]}, checked=checked, reason=exc.reason, detail=str(exc))
+                          payload={"raw_output": response.text[:50000]}, checked=checked, reason=exc.reason, detail=str(exc), trace=trace)
         raise
 
     # Structural validation first: a malformed payload can't be citation-checked
@@ -500,6 +511,7 @@ def run_reasoning_module(
         module=module,
         request=request,
         payload=payload,
+        trace=trace,
         checked_citation_ids=checked,
         confidence=0.0,
         review_status="rejected" if (shape_errors or bad_refs) else "proposed",
@@ -583,6 +595,7 @@ def serialize_ai_analysis_candidate(candidate: AIAnalysisCandidate, *, include_p
     if include_payload:
         row["payload"] = candidate.payload
         row["checked_citation_ids"] = candidate.checked_citation_ids or []
+        row["trace"] = candidate.trace
     return row
 
 

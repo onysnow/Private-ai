@@ -2528,3 +2528,42 @@ that framing as intent. Corrected in the same pass.
   the re-export facade so nothing else changed. `tests/test_models_split.py`.
 
 **305 passed** (five chunks), mypy 1.11.2 + ruff clean; frontend 45 vitest passed, tsc clean.
+
+## 2026-09-22 (cont.): operator console -- the whole backend viewable, testable, probeable
+
+Ony: "I need to know many things are working and be able to view them on the backend in order to
+be confident of this or make any direct changes within the database, run tests, check endpoints."
+What existed: Adminer (Postgres only -- and the Windows launcher writes SQLite, so the data from the
+way Ony actually runs the app was invisible), Swagger at /docs (undocumented), settings/status,
+the audit log. No application log at all, no way to run tests or probe endpoints from the app, and
+no record of what an AI run was sent.
+
+Built:
+- `app/services/console.py` + `app/api/routes_console.py` (loopback-only, `CONSOLE_ENABLED`):
+  overview (dialect, modeled vs live tables, links), every table with live counts and paged
+  rows on any dialect, read-only SQL (SELECT/WITH/EXPLAIN only, keyword-screened, rolled back,
+  READ ONLY transaction on Postgres, 500-row cap), the complete route table (walks FastAPI
+  0.141's lazily included routers -- `app.routes` alone showed one route), a live probe of the
+  id-free GET endpoints with status + latency, a pytest runner in a subprocess against an
+  ISOLATED SQLite database under data/console (single-flight, cancellable, tail + failed-test
+  list + summary), and the structured application log.
+- `app/core/app_log.py`: JSONL log (request id from a contextvar, method/path/status/duration
+  per request, unhandled exceptions with traceback and a 500 body carrying the request id).
+  Found and fixed a production bug on the way: alembic's `fileConfig()` in the startup schema
+  bootstrap disabled every existing logger (`disable_existing_loggers` default), so the app log
+  would have gone silent after the first start -- now `disable_existing_loggers=False` plus a
+  re-enable guard. Caught only because the test ran after the app-factory test's lifespan.
+- AI trace: `ai_analysis_candidates.trace` (migration b8d4f0e2a6c1) stores the exact system
+  prompt, user prompt (retrieval packet), packet summary and response metadata; the panel shows
+  it under "What the model was sent".
+- Two console UIs, same API: `backend/app/static/console.html` served at `/console` (what the
+  Windows launcher runs) and `frontend/app/console/page.tsx` for the Next.js app; both linked
+  from their home pages.
+- Windows launcher: uses the Docker Postgres automatically when `workbench-db` is running
+  (env var beats backend/.env), prints which database it chose plus the console/docs URLs.
+- README "Inspecting the backend" table; `.env.example` gains CONSOLE_ENABLED / APP_LOG_FILE /
+  CONSOLE_DIR.
+
+**314 passed**, mypy + ruff clean; frontend 48 passed, tsc clean. Not verified from here: the
+.bat on a real Windows machine (batch edited blind -- the Docker detection uses
+`docker compose ps -q --status running workbench-db`, Compose v2).

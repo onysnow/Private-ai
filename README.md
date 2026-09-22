@@ -84,6 +84,26 @@ To have uploads flow into the OpenAleph corpus automatically and let OpenAleph's
 OPENALEPH_AUTO_SYNC_DOCUMENTS=true ENABLE_LOCAL_ENTITY_SUGGESTIONS=false docker compose up --build
 ```
 
+## Inspecting the backend
+
+Everything the backend does is viewable without leaving the machine. Start from the
+**backend console** and branch out:
+
+| Surface | Where | What it shows |
+|---|---|---|
+| Backend console | `http://127.0.0.1:8000/console` (also `/console` in the Next.js app) | Database status and every table with live row counts on **any** dialect — including the SQLite file the Windows launcher uses, which Adminer cannot open; page through rows; run read-only SQL; the complete route table with a live probe of the id-free endpoints; run the real test suite against an isolated database and watch it; the structured application log (every request with status/duration, every unhandled error with its traceback, searchable by request id); the security alert counts. Loopback-only. |
+| Swagger / ReDoc | `http://127.0.0.1:8000/docs`, `/redoc` | Every endpoint with its schema, callable in the browser. |
+| Adminer | `http://127.0.0.1:8081` (Docker: `docker compose up -d workbench-db adminer`) | Browse **and edit** rows in the Postgres database. Server `workbench-db`, user `journalism`, password `POSTGRES_PASSWORD` (`journalism-local-dev` by default). The Windows launcher now uses this Postgres automatically when the container is running, so what you do in the app is what Adminer shows. |
+| OpenAleph UI | `http://localhost:8080` | The corpus side: collections, ingested documents, extracted entities. |
+| Settings → status | `GET /api/settings/status` | Config as the running process sees it (database, storage, access mode, connectors, AI provider and limits, TAS spec version, security denials). |
+| Security audit | `GET /api/settings/security/audit`, `…/summary`, `…/alerts` | The tamper-evident JSONL of every write and every denial. |
+| AI trace | any AI analysis candidate → "What the model was sent" | The exact system prompt and retrieval packet a reasoning run used, beside its output. |
+| CI | GitHub Actions on every push | Backend suite on real PostgreSQL, mypy + ruff, Docker build, frontend build/tests. |
+
+Data changes are deliberate: the console refuses anything but `SELECT`/`WITH`/`EXPLAIN`
+and rolls back every query; edits happen in Adminer, where you can see exactly what you
+are changing.
+
 ## Security
 
 See [`SECURITY.md`](SECURITY.md) for the vulnerability reporting process. Short version: this is designed for a trusted local workstation today; don't expose it to the open internet without treating the shared-bearer/remote-identity model as experimental.
