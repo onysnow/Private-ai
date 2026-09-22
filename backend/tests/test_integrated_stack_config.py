@@ -42,7 +42,7 @@ def test_root_compose_declares_core_stack_with_openaleph_always_on():
 
     for name in {"postgres", "elasticsearch", "redis", "ingest", "analyze", "worker", "api", "ui"}:
         assert "profiles" not in services[name], f"{name} must boot with the default stack, not behind a profile"
-    assert services["backend"]["depends_on"]["api"]["condition"] == "service_started"
+    assert "api" not in services["backend"]["depends_on"], "the workbench must come up even while OpenAleph is still pulling/starting"
 
 
 def test_integrated_stack_uses_separate_postgres_ownership_boundaries():
@@ -77,7 +77,7 @@ def test_production_compose_has_no_dev_shortcuts():
     assert services["ui"]["ports"] == ["${BIND_ADDRESS:-127.0.0.1}:8080:8080"]
     assert services["backend"]["environment"]["OPENALEPH_ENABLED"] == "true"
     assert services["backend"]["environment"]["OPENALEPH_BASE_URL"] == "http://api:8000"
-    assert services["backend"]["depends_on"]["api"]["condition"] == "service_started"
+    assert "api" not in services["backend"]["depends_on"], "the workbench must come up even while OpenAleph is still pulling/starting"
 
     assert "ports" not in services["workbench-db"], "database must not be published on the host"
     for name in ("backend", "frontend"):

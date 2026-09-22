@@ -154,8 +154,10 @@ services:
     depends_on:
       workbench-db:
         condition: service_healthy
-      api:
-        condition: service_started
+    # Deliberately NOT depends_on: api -- OpenAleph is part of the stack, but its
+    # images are large and Elasticsearch is slow to come up; the workbench must be
+    # reachable while that happens. The backend probes OpenAleph on demand
+    # (/api/integrations/openaleph/status) and reports it as down until it is up.
     volumes:
       - ./backend:/app
 
