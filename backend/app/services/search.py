@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Iterable
 
 from sqlalchemy import String, cast, func, or_, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, aliased
 
 from app.models.domain import (
     Investigation, Entity, Statement, Source, Evidence, ClaimEvidenceLink, Claim, Lead, LeadProfile, ReportingTask,
@@ -192,12 +192,38 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
     # unfiltered set, so a SQL prefilter here can't drop a hit like the
     # entities/sources shared-lookup case can (see _prefilter's docstring).
     claims_stmt = select(Claim).where(_prefilter(tokens, Claim.text, Claim.status))
-    leads_stmt = select(Lead)
+    # STRUCT-0036 cycle 5: a lead's score also reads its (optional) profile's
+    # priority/owner/next_action, so the prefilter outer-joins LeadProfile and
+    # covers those columns too -- same joined-column rule as evidence/Source below.
+    leads_stmt = (
+        select(Lead)
+        .outerjoin(LeadProfile, LeadProfile.lead_id == Lead.id)
+        .where(_prefilter(
+            tokens, Lead.title, Lead.detail, Lead.provider, Lead.provider_record_id, Lead.status,
+            LeadProfile.priority, LeadProfile.owner, LeadProfile.next_action,
+        ))
+    )
     findings_stmt = select(ConnectorFinding).where(_prefilter(
         tokens, ConnectorFinding.caption, ConnectorFinding.schema, ConnectorFinding.properties,
         ConnectorFinding.provider, ConnectorFinding.provider_record_id, ConnectorFinding.source_url,
     ))
-    rels_stmt = select(RelationshipEdge)
+    # STRUCT-0036 cycle 5: a relationship's score is built from its source/target
+    # captions (or their raw ids when an entity is missing), its schema, and the
+    # interstitial relationship entity's caption/properties. Join all three under
+    # aliases so the prefilter sees exactly the columns _score() will, and so the
+    # three db.get(Entity) calls per edge (3 x N queries, matched or not) become
+    # one batched lookup for the matched edges only.
+    rel_src, rel_tgt, rel_ent = aliased(Entity), aliased(Entity), aliased(Entity)
+    rels_stmt = (
+        select(RelationshipEdge)
+        .join(rel_ent, rel_ent.id == RelationshipEdge.relationship_entity_id)  # edges without one are skipped below anyway
+        .outerjoin(rel_src, rel_src.id == RelationshipEdge.source_entity_id)
+        .outerjoin(rel_tgt, rel_tgt.id == RelationshipEdge.target_entity_id)
+        .where(_prefilter(
+            tokens, rel_src.caption, rel_tgt.caption, RelationshipEdge.source_entity_id, RelationshipEdge.target_entity_id,
+            RelationshipEdge.schema, rel_ent.caption, rel_ent.properties,
+        ))
+    )
     timeline_stmt = select(TimelineEvent).where(_prefilter(
         tokens, TimelineEvent.title, TimelineEvent.description, TimelineEvent.date_start,
         TimelineEvent.date_end, TimelineEvent.verification_status, TimelineEvent.dataset, TimelineEvent.origin,
@@ -206,15 +232,27 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
         tokens, ReportingTask.title, ReportingTask.detail, ReportingTask.status,
         ReportingTask.priority, ReportingTask.owner, ReportingTask.due_date,
     ))
-    # STRUCT-0036: documents_stmt is still deliberately unfiltered beyond
-    # investigation scope, and DOESN'T get the same lookup/scoring split as
-    # entities/sources above -- a document_chunk/extraction_candidate hit's own
-    # title is built from its PARENT document's filename/source title
-    # regardless of whether that document's own fields match the query, so the
-    # full Document object (not just a few lookup columns) is needed for every
-    # document in scope either way. `documents`/document_ids (fetched from it)
-    # drive the document_chunk and extraction_candidate queries below.
-    documents_stmt = select(Document)
+    # STRUCT-0036 cycle 5: documents no longer need a full fetch. Three prefiltered
+    # queries replace it: documents whose OWN fields (plus joined source title)
+    # match, chunks whose text/locator match, and extraction candidates whose
+    # payload matches -- the latter two scoped by a join to Document rather than by
+    # an `in_(all document ids)` list. The parent Document rows a chunk/candidate
+    # hit needs for its title are then loaded once, by id, for matched rows only.
+    documents_stmt = (
+        select(Document)
+        .outerjoin(Source, Source.id == Document.source_id)
+        .where(_prefilter(tokens, Document.filename, Document.mime_type, Document.sha256, Source.title))
+    )
+    chunks_stmt = (
+        select(DocumentChunk)
+        .join(Document, Document.id == DocumentChunk.document_id)
+        .where(_prefilter(tokens, DocumentChunk.text, DocumentChunk.locator))
+    )
+    candidates_stmt = (
+        select(ExtractionCandidate)
+        .join(Document, Document.id == ExtractionCandidate.document_id)
+        .where(_prefilter(tokens, ExtractionCandidate.payload, ExtractionCandidate.candidate_type, ExtractionCandidate.review_status))
+    )
     if investigation_id:
         entity_lookup_stmt = entity_lookup_stmt.where(Entity.investigation_id == investigation_id)
         entity_scoring_stmt = entity_scoring_stmt.where(Entity.investigation_id == investigation_id)
@@ -227,6 +265,8 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
         timeline_stmt = timeline_stmt.where(TimelineEvent.investigation_id == investigation_id)
         tasks_stmt = tasks_stmt.where(ReportingTask.investigation_id == investigation_id)
         documents_stmt = documents_stmt.where(Document.investigation_id == investigation_id)
+        chunks_stmt = chunks_stmt.where(Document.investigation_id == investigation_id)
+        candidates_stmt = candidates_stmt.where(Document.investigation_id == investigation_id)
 
     if allowed_investigation_ids is not None:
         allowed = tuple(sorted(allowed_investigation_ids))
@@ -241,6 +281,8 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
         timeline_stmt = timeline_stmt.where(TimelineEvent.investigation_id.in_(allowed))
         tasks_stmt = tasks_stmt.where(ReportingTask.investigation_id.in_(allowed))
         documents_stmt = documents_stmt.where(Document.investigation_id.in_(allowed))
+        chunks_stmt = chunks_stmt.where(Document.investigation_id.in_(allowed))
+        candidates_stmt = candidates_stmt.where(Document.investigation_id.in_(allowed))
 
     entity_by_id = {row.id: row for row in db.execute(entity_lookup_stmt).all()}
     statement_pref_cache: dict[str, dict] = {}
@@ -331,16 +373,20 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
             .where(Evidence.source_id.in_(source_by_id.keys()))
             .where(_prefilter(tokens, Evidence.quote, Evidence.locator, Evidence.notes, Source.title, Source.url))
         ).all()
+        # One query for every matched row's claim links instead of one per row.
+        links_by_evidence_id: dict[str, list[ClaimEvidenceLink]] = {}
+        if evidence_rows:
+            for link in db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.evidence_id.in_([r.id for r in evidence_rows]))).all():
+                links_by_evidence_id.setdefault(link.evidence_id, []).append(link)
         for row in evidence_rows:
             source = source_by_id.get(row.source_id)
             if source is None:
                 continue
             score = _score(query, row.quote, row.locator, row.notes, source.title, source.url)
             if score:
-                links = db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.evidence_id == row.id)).all()
                 linked_claims = [
                     {"claim_id": link.claim_id, "stance": link.stance, "note": link.note}
-                    for link in links
+                    for link in links_by_evidence_id.get(row.id, [])
                 ]
                 hits.append(SearchHit(
                     "evidence", row.id, source.investigation_id,
@@ -376,31 +422,22 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
                  "owner": profile.owner if profile else None, "next_action": profile.next_action if profile else None},
             ))
 
-    # Batch-load chunks/candidates for every matched document instead of issuing one
-    # query per document (previous N+1: every document in the investigation, matched
-    # or not, triggered two additional queries just to see if its chunks/candidates
-    # matched).
-    documents = db.scalars(documents_stmt).all()
-    document_ids = [doc.id for doc in documents]
+    # Matched chunks/candidates first; then the parent documents they need, union the
+    # documents that match on their own fields -- each loaded exactly once.
     chunks_by_document_id: dict[str, list[DocumentChunk]] = {}
     candidates_by_document_id: dict[str, list[ExtractionCandidate]] = {}
-    if document_ids:
-        # STRUCT-0036: chunks/candidates are self-contained for prefiltering
-        # purposes -- nothing downstream needs the full unfiltered set for either.
-        for chunk in db.scalars(
-            select(DocumentChunk)
-            .where(DocumentChunk.document_id.in_(document_ids))
-            .where(_prefilter(tokens, DocumentChunk.text, DocumentChunk.locator))
-        ).all():
-            chunks_by_document_id.setdefault(chunk.document_id, []).append(chunk)
-        for candidate in db.scalars(
-            select(ExtractionCandidate)
-            .where(ExtractionCandidate.document_id.in_(document_ids))
-            .where(_prefilter(tokens, ExtractionCandidate.payload, ExtractionCandidate.candidate_type, ExtractionCandidate.review_status))
-        ).all():
-            candidates_by_document_id.setdefault(candidate.document_id, []).append(candidate)
+    for chunk in db.scalars(chunks_stmt).all():
+        chunks_by_document_id.setdefault(chunk.document_id, []).append(chunk)
+    for candidate in db.scalars(candidates_stmt).all():
+        candidates_by_document_id.setdefault(candidate.document_id, []).append(candidate)
+    documents = list(db.scalars(documents_stmt).all())
+    loaded_document_ids = {doc.id for doc in documents}
+    parent_ids = (set(chunks_by_document_id) | set(candidates_by_document_id)) - loaded_document_ids
+    if parent_ids:
+        documents.extend(db.scalars(select(Document).where(Document.id.in_(parent_ids))).all())
+    documents.sort(key=lambda doc: doc.id)  # deterministic hit order before the global sort
     for doc in documents:
-        source = db.get(Source, doc.source_id)
+        source = source_by_id.get(doc.source_id)  # lookup rows carry .title, which is all this loop reads
         score = _score(query, doc.filename, doc.mime_type, doc.sha256, source.title if source else None)
         if score:
             hits.append(SearchHit(
@@ -470,10 +507,13 @@ def investigation_search(db: Session, query: str, investigation_id: str | None =
             ))
 
     # Relationship hits point back to the canonical interstitial FtM entity.
-    for edge in db.scalars(rels_stmt).all():
-        rel_entity = db.get(Entity, edge.relationship_entity_id)
-        source_entity = db.get(Entity, edge.source_entity_id)
-        target_entity = db.get(Entity, edge.target_entity_id)
+    edges = db.scalars(rels_stmt).all()
+    edge_entity_ids = {i for e in edges for i in (e.relationship_entity_id, e.source_entity_id, e.target_entity_id) if i}
+    edge_entities = {ent.id: ent for ent in db.scalars(select(Entity).where(Entity.id.in_(edge_entity_ids))).all()} if edge_entity_ids else {}
+    for edge in edges:
+        rel_entity = edge_entities.get(edge.relationship_entity_id)
+        source_entity = edge_entities.get(edge.source_entity_id)
+        target_entity = edge_entities.get(edge.target_entity_id)
         if rel_entity is None:
             continue
         label = f"{source_entity.caption if source_entity else edge.source_entity_id} — {edge.schema} → {target_entity.caption if target_entity else edge.target_entity_id}"

@@ -13,10 +13,13 @@ after every lead is fetched and serialized, so limit/offset there are a
 plain Python list slice applied after the filter+sort pipeline, not a SQL
 offset/limit -- see lead_queue()'s docstring in app/services/investigations.py.
 
-Still not paginated (tracked separately -- their list functions do
-post-fetch filtering/sorting or multi-table assembly that doesn't reduce to
-a plain SQL offset/limit or a simple post-hoc slice as directly): evidence,
-relationships, graph, timeline.
+Cycle 4 closed the remainder: evidence (SQL page through a Source join),
+relationships (SQL page when reconciled duplicates are included -- the
+default -- and a post-filter slice when they are suppressed), timeline (a
+slice of the assembled, sorted list, like leads/queue; counts/total still
+describe the whole timeline), and the AI analysis candidate queue (offset
+added to its existing limit). /graph stays unpaginated on purpose: it is a
+rendering of the whole relationship set, not a list.
 """
 from fastapi.testclient import TestClient
 
@@ -264,3 +267,80 @@ def test_second_batch_out_of_range_params_rejected():
         assert client.get(f'/api/investigations/{inv}/{path}', params={'limit': 0}).status_code == 422
         assert client.get(f'/api/investigations/{inv}/{path}', params={'limit': 501}).status_code == 422
         assert client.get(f'/api/investigations/{inv}/{path}', params={'offset': -1}).status_code == 422
+
+
+def test_evidence_list_limit_offset():
+    client = TestClient(app)
+    inv = _new_investigation(client, 'Evidence pagination')
+    src_a = client.post('/api/sources', json={'investigation_id': inv, 'title': 'Source A', 'source_type': 'filing'}).json()['id']
+    src_b = client.post('/api/sources', json={'investigation_id': inv, 'title': 'Source B', 'source_type': 'filing'}).json()['id']
+    for i in range(5):
+        r = client.post('/api/evidence', json={'source_id': src_a if i % 2 else src_b, 'quote': f'Quote {i}', 'locator': f'p{i}'})
+        assert r.status_code == 200, r.text
+
+    full = client.get(f'/api/investigations/{inv}/evidence').json()
+    assert len(full) == 5
+    full_ids = [row['evidence']['id'] for row in full]
+    assert full_ids == sorted(full_ids), 'ordered by evidence id, as before'
+    assert all(row['source']['id'] in {src_a, src_b} for row in full)
+
+    page1 = client.get(f'/api/investigations/{inv}/evidence', params={'limit': 2}).json()
+    assert [row['evidence']['id'] for row in page1] == full_ids[:2]
+    page2 = client.get(f'/api/investigations/{inv}/evidence', params={'limit': 2, 'offset': 2}).json()
+    assert [row['evidence']['id'] for row in page2] == full_ids[2:4]
+    remainder = client.get(f'/api/investigations/{inv}/evidence', params={'offset': 4}).json()
+    assert [row['evidence']['id'] for row in remainder] == full_ids[4:]
+    assert client.get(f'/api/investigations/{inv}/evidence', params={'limit': 0}).status_code == 422
+
+
+def test_relationships_list_limit_offset_both_views():
+    client = TestClient(app)
+    inv = _new_investigation(client, 'Relationship pagination')
+    people = [client.post('/api/entities', json={'investigation_id': inv, 'schema': 'Person', 'caption': f'Person {i}', 'properties': {}}).json()['id'] for i in range(4)]
+    company = client.post('/api/entities', json={'investigation_id': inv, 'schema': 'Company', 'caption': 'Holdings', 'properties': {}}).json()['id']
+    for pid in people:
+        r = client.post('/api/relationships', json={'investigation_id': inv, 'schema': 'Directorship', 'source_entity_id': pid, 'target_entity_id': company})
+        assert r.status_code == 200, r.text
+
+    full = client.get(f'/api/investigations/{inv}/relationships').json()
+    assert len(full) == 4
+    full_ids = [row['id'] for row in full]
+    page1 = client.get(f'/api/investigations/{inv}/relationships', params={'limit': 3}).json()
+    assert [row['id'] for row in page1] == full_ids[:3]
+    page2 = client.get(f'/api/investigations/{inv}/relationships', params={'limit': 3, 'offset': 3}).json()
+    assert [row['id'] for row in page2] == full_ids[3:]
+    # The suppressed-duplicates view paginates after its post-fetch filter; with no
+    # reconciliation decisions recorded it must match the SQL-paged view exactly.
+    filtered = client.get(f'/api/investigations/{inv}/relationships', params={'include_reconciled_duplicates': 'false', 'limit': 3, 'offset': 1}).json()
+    assert [row['id'] for row in filtered] == full_ids[1:4]
+
+
+def test_timeline_limit_offset_keeps_whole_timeline_counts():
+    client = TestClient(app)
+    inv = _new_investigation(client, 'Timeline pagination')
+    for i in range(5):
+        r = client.post('/api/timeline-events', json={'investigation_id': inv, 'title': f'Event {i}', 'date_start': f'2020-0{i + 1}-01'})
+        assert r.status_code == 200, r.text
+
+    full = client.get(f'/api/investigations/{inv}/timeline').json()
+    assert full['total'] == 5 and full['returned'] == 5 and len(full['events']) == 5
+    full_ids = [e['id'] for e in full['events']]
+    page = client.get(f'/api/investigations/{inv}/timeline', params={'limit': 2, 'offset': 1}).json()
+    assert [e['id'] for e in page['events']] == full_ids[1:3]
+    assert page['total'] == 5 and page['returned'] == 2 and page['offset'] == 1
+    assert page['counts'] == full['counts'], 'counts describe the whole timeline, not the page'
+
+
+def test_ai_candidate_queue_offset():
+    from app.models.domain import AIAnalysisCandidate
+    client = TestClient(app)
+    inv = _new_investigation(client, 'AI queue pagination')
+    with SessionLocal() as db:
+        for i in range(4):
+            db.add(AIAnalysisCandidate(id=f'q-{i}', investigation_id=inv, module='case_synthesis', payload={}, checked_citation_ids=[], review_status='rejected', reviewer_note='n'))
+        db.commit()
+    full = [r['id'] for r in client.get(f'/api/investigations/{inv}/ai-analysis-candidates').json()['candidates']]
+    assert len(full) == 4
+    page = [r['id'] for r in client.get(f'/api/investigations/{inv}/ai-analysis-candidates', params={'limit': 2, 'offset': 1}).json()['candidates']]
+    assert page == full[1:3]
+    assert client.get(f'/api/investigations/{inv}/ai-analysis-candidates', params={'offset': -1}).status_code == 422

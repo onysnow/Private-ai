@@ -46,16 +46,31 @@ def list_investigation_documents(db: Session, investigation_id: str, *, limit: i
     return [serialize_document(db, row) for row in rows]
 
 
-def list_investigation_evidence(db: Session, investigation_id: str) -> list[dict]:
-    sources = db.scalars(select(Source).where(Source.investigation_id == investigation_id)).all()
-    source_by_id = {source.id: source for source in sources}
-    if not source_by_id:
-        return []
-    evidence_rows = db.scalars(
+def list_investigation_evidence(db: Session, investigation_id: str, *, limit: int | None = None, offset: int = 0) -> list[dict]:
+    """Evidence across every source of the investigation, ordered by id.
+
+    STRUCT-0018 cycle 4: paginates at the SQL level through a join to Source
+    (so the page is cut before any row is fetched), and loads only the sources
+    the page actually references instead of every source in the investigation.
+    Unpaginated calls return exactly what they always did.
+    """
+    stmt = (
         select(Evidence)
-        .where(Evidence.source_id.in_(source_by_id.keys()))
+        .join(Source, Source.id == Evidence.source_id)
+        .where(Source.investigation_id == investigation_id)
         .order_by(Evidence.id)
-    ).all()
+    )
+    if offset:
+        stmt = stmt.offset(offset)
+    if limit is not None:
+        stmt = stmt.limit(limit)
+    evidence_rows = db.scalars(stmt).all()
+    if not evidence_rows:
+        return []
+    source_by_id = {
+        source.id: source
+        for source in db.scalars(select(Source).where(Source.id.in_({row.source_id for row in evidence_rows}))).all()
+    }
     return [{"evidence": evidence, "source": source_by_id[evidence.source_id]} for evidence in evidence_rows]
 
 

@@ -595,6 +595,7 @@ def list_ai_analysis_candidates(
     review_status: str | None = None,
     module: str | None = None,
     limit: int = 100,
+    offset: int = 0,
 ) -> list[dict]:
     """Newest first. Filters are validated here (not in the route) so the
     same rules hold for any future caller -- STRUCT-0002 keeps routes thin.
@@ -608,7 +609,7 @@ def list_ai_analysis_candidates(
         query = query.filter_by(review_status=review_status)
     if module is not None:
         query = query.filter_by(module=module)
-    rows = query.order_by(AIAnalysisCandidate.created_at.desc(), AIAnalysisCandidate.id.desc()).limit(limit).all()
+    rows = query.order_by(AIAnalysisCandidate.created_at.desc(), AIAnalysisCandidate.id.desc()).offset(offset).limit(limit).all()
     return [serialize_ai_analysis_candidate(row, include_payload=False) for row in rows]
 
 

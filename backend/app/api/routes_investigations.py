@@ -188,6 +188,7 @@ def list_investigation_ai_analysis_candidates(
     review_status: str | None = None,
     module: str | None = None,
     limit: int = Query(default=100, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
     db: Session = Depends(get_db),
 ):
     """The review queue for TAS reasoning output, newest first. Payloads are
@@ -197,7 +198,7 @@ def list_investigation_ai_analysis_candidates(
         raise HTTPException(404, "Investigation not found")
     try:
         return {"candidates": list_ai_analysis_candidates(
-            db, investigation_id=investigation_id, review_status=review_status, module=module, limit=limit,
+            db, investigation_id=investigation_id, review_status=review_status, module=module, limit=limit, offset=offset,
         )}
     except ValueError as exc:
         raise HTTPException(400, str(exc))
@@ -209,13 +210,15 @@ def get_investigation_timeline(
     kind: list[str] | None = Query(default=None),
     verification_status: list[str] | None = Query(default=None),
     include_record_activity: bool = False,
+    limit: int | None = Query(default=None, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
     db: Session = Depends(get_db),
 ):
     try:
         return investigation_timeline(
             db, investigation_id, kinds=set(kind or []) or None,
             verification_statuses=set(verification_status or []) or None,
-            include_record_activity=include_record_activity,
+            include_record_activity=include_record_activity, limit=limit, offset=offset,
         )
     except ValueError as exc:
         raise HTTPException(404, str(exc))
@@ -272,10 +275,18 @@ def remove_investigation(investigation_id: str, request: Request, confirmation: 
 
 
 @router.get("/investigations/{investigation_id}/relationships")
-def list_investigation_relationships(investigation_id: str, db: Session = Depends(get_db)):
+def list_investigation_relationships(
+    investigation_id: str,
+    include_reconciled_duplicates: bool = Query(default=True),
+    limit: int | None = Query(default=None, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+):
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
-    return investigation_relationships(db, investigation_id)
+    return investigation_relationships(
+        db, investigation_id, include_reconciled_duplicates=include_reconciled_duplicates, limit=limit, offset=offset,
+    )
 
 
 @router.get("/investigations/{investigation_id}/graph")
@@ -310,10 +321,15 @@ def list_documents(
 
 
 @router.get("/investigations/{investigation_id}/evidence")
-def list_investigation_evidence(investigation_id: str, db: Session = Depends(get_db)):
+def list_investigation_evidence(
+    investigation_id: str,
+    limit: int | None = Query(default=None, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+):
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
-    return _list_investigation_evidence(db, investigation_id)
+    return _list_investigation_evidence(db, investigation_id, limit=limit, offset=offset)
 
 
 @router.get("/investigations/{investigation_id}/sources")

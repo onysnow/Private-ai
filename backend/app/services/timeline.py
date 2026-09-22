@@ -124,6 +124,8 @@ def investigation_timeline(
     kinds: set[str] | None = None,
     verification_statuses: set[str] | None = None,
     include_record_activity: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
 ) -> dict:
     if db.get(Investigation, investigation_id) is None:
         raise ValueError("Investigation not found")
@@ -283,12 +285,23 @@ def investigation_timeline(
     for event in events:
         counts[event["kind"]] = counts.get(event["kind"], 0) + 1
         status_counts[event["verification_status"]] = status_counts.get(event["verification_status"], 0) + 1
+    total = len(events)
+    # STRUCT-0018 cycle 4: the timeline is assembled from several tables and
+    # sorted by a computed key, so (like leads/queue) limit/offset are a slice
+    # of the finished list, not a SQL page. counts/total describe the whole
+    # timeline; only `events` is the page.
+    if offset:
+        events = events[offset:]
+    if limit is not None:
+        events = events[:limit]
     return {
         "investigation_id": investigation_id,
         "events": events,
         "counts": counts,
         "verification_counts": status_counts,
-        "total": len(events),
+        "total": total,
+        "returned": len(events),
+        "offset": offset,
     }
 
 

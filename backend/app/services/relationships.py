@@ -400,15 +400,36 @@ def investigation_relationships(
     schemas: set[str] | None = None,
     *,
     include_reconciled_duplicates: bool = True,
+    limit: int | None = None,
+    offset: int = 0,
 ) -> list[dict]:
+    """Relationships of an investigation, newest first.
+
+    STRUCT-0018 cycle 4: when reconciled duplicates are included (the list
+    endpoint's default) nothing is dropped after the fetch, so limit/offset
+    apply at the SQL level and serialize_relationship (several queries per
+    edge) runs only for the page. When duplicates are suppressed the view is
+    a post-fetch filter, so the slice is applied after it -- the page is
+    still exact, it just costs a full fetch, same as before this change.
+    """
     stmt = select(RelationshipEdge).where(RelationshipEdge.investigation_id == investigation_id)
     if schemas:
         stmt = stmt.where(RelationshipEdge.schema.in_(schemas))
-    edges = db.scalars(stmt.order_by(RelationshipEdge.created_at.desc())).all()
+    stmt = stmt.order_by(RelationshipEdge.created_at.desc(), RelationshipEdge.id)
+    sql_paged = include_reconciled_duplicates
+    if sql_paged:
+        if offset:
+            stmt = stmt.offset(offset)
+        if limit is not None:
+            stmt = stmt.limit(limit)
+    edges = db.scalars(stmt).all()
     rows = [serialize_relationship(db, edge) for edge in edges]
     rows, _ = _apply_reconciliation_view(
         db, investigation_id, rows, include_reconciled_duplicates=include_reconciled_duplicates
     )
+    if not sql_paged:
+        rows = rows[offset:] if offset else rows
+        rows = rows[:limit] if limit is not None else rows
     return rows
 
 

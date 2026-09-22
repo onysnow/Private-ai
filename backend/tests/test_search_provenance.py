@@ -238,3 +238,70 @@ def test_prefiltered_record_types_still_match_via_own_fields_not_a_parents(): # 
         'statement', 'evidence', 'claim', 'reporting_task', 'timeline_event',
         'connector_finding', 'extraction_candidate', 'document_chunk',
     }.issubset(by_type), f"missing types: {({'statement', 'evidence', 'claim', 'reporting_task', 'timeline_event', 'connector_finding', 'extraction_candidate', 'document_chunk'} - by_type)}, got {by_type}"
+
+
+def test_leads_relationships_and_documents_are_prefiltered_without_losing_joined_field_hits(monkeypatch):
+    """STRUCT-0036 cycle 5: the last three unfiltered record types (lead,
+    relationship, document) now carry SQL prefilters that include every JOINED
+    column their score reads -- a lead's profile owner/next_action, a
+    relationship's source/target captions and interstitial entity, a document's
+    source title. Each case below matches ONLY through that joined field. And
+    `_score` is counted: non-matching rows of those types must never reach
+    Python scoring at all, which is the whole point of the finding."""
+    import app.services.search as search_module
+    from app.models.domain import Document, Lead, LeadProfile, Source
+
+    client = TestClient(app)
+    inv = client.post('/api/investigations', json={'name': 'Prefilter cycle 5'}).json()['id']
+    token = 'Marrowgate'
+
+    # Lead: matches only via its profile's next_action.
+    with SessionLocal() as db:
+        hit_lead = Lead(investigation_id=inv, title='Follow up on filing', detail='no names here')
+        miss_lead = Lead(investigation_id=inv, title='Unrelated chore', detail='nothing')
+        db.add_all([hit_lead, miss_lead]); db.flush()
+        db.add(LeadProfile(lead_id=hit_lead.id, priority='normal', next_action=f'Ask {token} counsel for the deed'))
+        db.add(LeadProfile(lead_id=miss_lead.id, priority='normal', next_action='Water the plants'))
+        db.commit()
+
+    # Relationship: matches only via the TARGET entity's caption.
+    a = client.post('/api/entities', json={'investigation_id': inv, 'schema': 'Person', 'caption': 'Plain Person', 'properties': {}}).json()
+    b = client.post('/api/entities', json={'investigation_id': inv, 'schema': 'Company', 'caption': f'{token} Ltd', 'properties': {}}).json()
+    c = client.post('/api/entities', json={'investigation_id': inv, 'schema': 'Company', 'caption': 'Nowhere Inc', 'properties': {}}).json()
+    hit_rel = client.post('/api/relationships', json={'investigation_id': inv, 'schema': 'Directorship', 'source_entity_id': a['id'], 'target_entity_id': b['id']})
+    assert hit_rel.status_code == 200, hit_rel.text
+    miss_rel = client.post('/api/relationships', json={'investigation_id': inv, 'schema': 'Directorship', 'source_entity_id': a['id'], 'target_entity_id': c['id']})
+    assert miss_rel.status_code == 200, miss_rel.text
+
+    # Document: matches only via its SOURCE's title; a second document matches nothing.
+    with SessionLocal() as db:
+        hit_source = Source(investigation_id=inv, title=f'{token} annual report', source_type='filing')
+        miss_source = Source(investigation_id=inv, title='Boring memo', source_type='filing')
+        db.add_all([hit_source, miss_source]); db.flush()
+        db.add(Document(investigation_id=inv, source_id=hit_source.id, filename='report.pdf', sha256='1' * 64, storage_path='/nonexistent/report.pdf', extraction_status='complete'))
+        db.add(Document(investigation_id=inv, source_id=miss_source.id, filename='memo.pdf', sha256='2' * 64, storage_path='/nonexistent/memo.pdf', extraction_status='complete'))
+        db.commit()
+
+    scored: list[tuple] = []
+    real_score = search_module._score
+
+    def counting_score(query, *values):
+        scored.append(values)
+        return real_score(query, *values)
+
+    monkeypatch.setattr(search_module, '_score', counting_score)
+    body = client.get('/api/search', params={'q': token, 'investigation_id': inv}).json()
+    by_type = {}
+    for row in body['results']:
+        by_type.setdefault(row['type'], []).append(row)
+    assert len(by_type.get('lead', [])) == 1 and by_type['lead'][0]['metadata']['next_action'].startswith(f'Ask {token}')
+    assert [r['id'] for r in by_type.get('relationship', [])] == [hit_rel.json()['id']]
+    assert len(by_type.get('document', [])) == 1 and by_type['document'][0]['metadata']['filename'] == 'report.pdf'
+
+    # Every scored value-tuple that came from one of these three types must contain the
+    # token -- i.e. the non-matching lead/relationship/document never reached _score().
+    def mentions(values):
+        return any(token.casefold() in str(v).casefold() for v in values if v is not None)
+    scored_rows_of_interest = [v for v in scored if ('Unrelated chore' in map(str, v) or 'Nowhere Inc' in ' '.join(map(str, v)) or 'memo.pdf' in map(str, v))]
+    assert scored_rows_of_interest == [], f"non-matching rows reached Python scoring: {scored_rows_of_interest}"
+    assert all(mentions(v) for v in scored), "the prefilter let through a row the scorer could not possibly match"

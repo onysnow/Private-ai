@@ -2422,3 +2422,24 @@ checksum, and confirms the victim investigation stays untouched); `severity_floo
 Tests: new `tests/test_llm_client_adapters.py` (parsers, coerce, settings-driven config) and six
 new endpoint/governor tests. **290 passed** (was 278), mypy + ruff clean. `.env.example` documents
 the six new settings.
+
+## 2026-09-22 (cont.): STRUCT-0036 and STRUCT-0018 closed
+
+Ony asked what remained on the whole backend and picked the search prefilter + pagination pair.
+Both findings were already IN_PROGRESS from earlier cycles; this closes the remainders.
+
+- **STRUCT-0036 (search full-scan):** leads, relationships and documents were the last record
+  types fetched whole and scored in Python because their score reads joined fields. Each now
+  has a prefilter over exactly those joined columns (LeadProfile; aliased source/target/
+  interstitial Entity; Source.title), chunk/candidate queries join Document for scope instead
+  of an `in_(every document id)` list, parents load by id for matched rows only, and three
+  N+1s (3 entity gets per edge, claim links per evidence, source get per document) are batched.
+  New test monkeypatches `_score` to count calls: non-matching rows of those types never
+  reach Python, and every scored tuple contains the query token.
+- **STRUCT-0018 (pagination):** evidence, relationships, timeline, and the AI candidate queue
+  get limit/offset (relationships paginate in SQL only when reconciled duplicates are included
+  -- the endpoint default -- and slice after the filter otherwise; timeline slices the
+  assembled list and keeps whole-timeline counts). /graph deliberately stays whole.
+
+STRUCTURE_AUDIT.md rows updated to CORRECTED. **295 passed** (was 290), mypy + ruff clean.
+Next per Ony: STRUCT-0013 (widen mypy), then STRUCT-0010 (app factory / settings injection).
