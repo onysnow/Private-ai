@@ -8,6 +8,7 @@ GET /entities/{entity_id}/enrichment-sessions and GET
 URL prefix is /entities, so they belong with group 7 per the plan's
 prefix-based grouping.
 """
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -21,24 +22,24 @@ from app.services.consolidation import (
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.get("/enrichment-sessions/{session_id}")
-def enrichment_session_detail(session_id: str, db: Session = Depends(get_db)):
+@router.get("/enrichment-sessions/{session_id}", response_model=None)
+def enrichment_session_detail(session_id: str, db: Session = Depends(get_db)) -> Any:
     try:
         return get_enrichment_session_detail(db, session_id)
     except LookupError as exc:
         raise HTTPException(404, str(exc))
 
 
-@router.get("/enrichment-sessions/{session_id}/clusters")
-def enrichment_session_clusters(session_id: str, db: Session = Depends(get_db)):
+@router.get("/enrichment-sessions/{session_id}/clusters", response_model=None)
+def enrichment_session_clusters(session_id: str, db: Session = Depends(get_db)) -> Any:
     try:
         return get_enrichment_session_clusters(db, session_id)
     except LookupError as exc:
         raise HTTPException(404, str(exc))
 
 
-@router.post("/enrichment-sessions/{session_id}/clusters/decision")
-def decide_cross_provider_cluster(session_id: str, body: CrossProviderDecisionRequest, db: Session = Depends(get_db)):
+@router.post("/enrichment-sessions/{session_id}/clusters/decision", response_model=None)
+def decide_cross_provider_cluster(session_id: str, body: CrossProviderDecisionRequest, db: Session = Depends(get_db)) -> Any:
     try:
         return create_cross_provider_decision(db, session_id, body)
     except LookupError as exc:

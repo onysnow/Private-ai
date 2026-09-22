@@ -21,7 +21,7 @@ from app.models.domain import (
 PROVIDER = "openaleph"
 
 
-def _client_factory():
+def _client_factory() -> Any:
     try:
         from openaleph_client.api import AlephAPI
     except ImportError as exc:  # pragma: no cover - deployment dependency guard

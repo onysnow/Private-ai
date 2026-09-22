@@ -1,8 +1,9 @@
+from typing import Any
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import AsyncIterator
+from typing import AsyncIterator, Awaitable, Callable
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -24,7 +25,7 @@ from app.api.routes_documents import router as documents_router
 from app.api.routes_connector_findings import router as connector_findings_router
 from app.api.routes_settings import router as settings_router
 from app.api.routes_entities import router as entities_router
-from app.core.config import settings as default_settings
+from app.core.config import Settings, settings as default_settings
 from app.core.access import bearer_token, enforce_api_access, enforce_browser_write_access, request_is_local_request
 from app.core.authorization import (
     InvestigationAuthorizationError, reset_current_authorization_scope,
@@ -66,7 +67,7 @@ def register_domain_routers(app: FastAPI) -> None:
 
 
 def create_app(
-    app_settings=None,
+    app_settings: Settings | None = None,
     *,
     bootstrap_schema: bool = True,
     audit: SecurityAuditLogger | None = None,
@@ -105,7 +106,7 @@ def create_app(
     app = FastAPI(title="Journalism Workbench API", version="1.24.0", lifespan=lifespan)
 
     @app.exception_handler(InvestigationAuthorizationError)
-    async def investigation_authorization_denied(_request, _exc):
+    async def investigation_authorization_denied(_request: Request, _exc: Exception) -> JSONResponse:
         # Fail closed without revealing whether a different investigation exists.
         return JSONResponse(status_code=404, content={"detail": "Investigation not found"})
 
@@ -131,7 +132,7 @@ def create_app(
     app.state.audit_logger = audit_logger  # reachable from routes/tests without re-plumbing
 
     @app.middleware("http")
-    async def api_access_guard(request, call_next):
+    async def api_access_guard(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         request_id = new_request_id()
         # Exposed so route handlers can reference the same id in a generic
         # error detail (STRUCT-0028) instead of embedding raw exception text.
@@ -149,7 +150,7 @@ def create_app(
             limit=limit,
         )
         if not valid_envelope:
-            response = JSONResponse(status_code=status, content={"detail": length_detail})
+            response: Response = JSONResponse(status_code=status, content={"detail": length_detail})
             response.headers["X-Request-ID"] = request_id
             if should_audit:
                 audit_logger.write(
@@ -233,11 +234,11 @@ def create_app(
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
     @app.get("/", include_in_schema=False)
-    def home():
+    def home() -> FileResponse:
         return FileResponse(static_dir / "index.html")
 
     @app.middleware("http")
-    async def security_headers(request, call_next):
+    async def security_headers(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         response = await call_next(request)
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("Referrer-Policy", "no-referrer")

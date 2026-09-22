@@ -4,6 +4,7 @@ from itertools import combinations
 from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from app.schemas.api import CrossProviderDecisionRequest
 from app.models.domain import ConnectorFinding, CrossProviderDecision, EnrichmentSession, EnrichmentSessionFinding, EnrichmentSessionRun
 
 STRONG_IDS = {"registrationNumber", "taxNumber", "leiCode", "isin", "idNumber", "imoNumber", "vatCode"}
@@ -58,11 +59,11 @@ def session_findings(db: Session, session_id: str) -> list[ConnectorFinding]:
 
 def consolidate_findings(findings: list[ConnectorFinding], threshold: float=0.60) -> list[dict]:
     by_id={f.id:f for f in findings}; parent={f.id:f.id for f in findings}
-    def find(x):
+    def find(x: str) -> str:
         while parent[x]!=x:
             parent[x]=parent[parent[x]]; x=parent[x]
         return x
-    def union(a,b):
+    def union(a: str, b: str) -> None:
         ra,rb=find(a),find(b)
         if ra!=rb: parent[rb]=ra
     pair_meta={}
@@ -136,7 +137,7 @@ def get_enrichment_session_clusters(db: Session, session_id: str) -> list[dict]:
     return clusters
 
 
-def create_cross_provider_decision(db: Session, session_id: str, body) -> CrossProviderDecision:
+def create_cross_provider_decision(db: Session, session_id: str, body: CrossProviderDecisionRequest) -> CrossProviderDecision:
     """Validate and persist a cross-provider consolidation decision.
 
     Raises ValueError for any validation failure (bad decision enum, fewer

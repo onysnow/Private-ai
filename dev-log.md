@@ -2476,3 +2476,17 @@ sole guarantee that tables exist for a bare TestClient). Out of scope, as the ro
 engine/SessionLocal are still module-level in app.db.session.
 
 **298 passed**, mypy + ruff clean. STRUCT-0010 marked CORRECTED.
+
+## 2026-09-22 (cont.): STRUCT-0013 fully closed -- disallow_untyped_defs package-wide
+
+174 untyped defs annotated. Service functions got their real request types (`body: ClaimCreate`,
+`body: LeadConvertRequest`, ...), helper signatures got concrete types, and the ~120 route
+handlers got `-> Any` / `-> dict[str, Any]` / `-> None` by an AST pass. Two things the pass got
+wrong and the checks caught before commit: (1) it inserted `from typing import Any` ahead of
+`from __future__ import annotations` in three files -- a SyntaxError that mypy did not flag but
+`compileall` did; (2) FastAPI treats a return annotation as `response_model`, so `-> Any` on a
+handler that returns an ORM object routed the response through pydantic and failed with
+"Unable to serialize unknown type" -- 42 test failures. Fix: `response_model=None` on every
+annotated route decorator (121), which reproduces the previous "no annotation" behaviour exactly;
+the two handlers that return `Response` objects are annotated as such instead.
+298 passed, mypy 1.11.2 + ruff clean.

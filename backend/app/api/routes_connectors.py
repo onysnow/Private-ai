@@ -3,6 +3,7 @@ Stage E group 3). Connector execution and finding persistence live in
 app/services/connectors.py, shared with the /entities/{id}/enrich*
 endpoints still in routes.py (group 7 will move those here later).
 """
+from typing import Any
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -15,8 +16,8 @@ from app.services.connectors import run_connector
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.get("/connectors")
-def connectors():
+@router.get("/connectors", response_model=None)
+def connectors() -> dict[str, Any]:
     return {
         "providers": registry.names(),
         "status": {
@@ -26,11 +27,11 @@ def connectors():
     }
 
 
-@router.post("/connectors/{provider}/search")
-async def connector_search(provider: str, body: ConnectorSearchRequest, db: Session = Depends(get_db)):
+@router.post("/connectors/{provider}/search", response_model=None)
+async def connector_search(provider: str, body: ConnectorSearchRequest, db: Session = Depends(get_db)) -> Any:
     return await run_connector(provider, body, db)
 
 
-@router.post("/connectors/aleph/search")
-async def aleph_search(body: AlephSearchRequest, db: Session = Depends(get_db)):
+@router.post("/connectors/aleph/search", response_model=None)
+async def aleph_search(body: AlephSearchRequest, db: Session = Depends(get_db)) -> Any:
     return await run_connector("aleph", ConnectorSearchRequest(**body.model_dump()), db)

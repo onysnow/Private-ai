@@ -6,6 +6,8 @@ the same helpers without one route module importing from another.
 """
 from __future__ import annotations
 
+from typing import Any
+
 from fastapi import Depends, HTTPException, Request, UploadFile
 from sqlalchemy.orm import Session
 
@@ -13,7 +15,7 @@ from app.core.authorization import authorize_routed_resource
 from app.db.session import get_db
 
 
-def authorize_request_resource(request: Request, db: Session = Depends(get_db)):
+def authorize_request_resource(request: Request, db: Session = Depends(get_db)) -> Any:
     return authorize_routed_resource(request, db)
 
 

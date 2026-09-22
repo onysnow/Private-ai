@@ -47,16 +47,10 @@ ignore_missing_imports = true
 pretty = true
 show_error_codes = true
 
-# Still relaxed package-wide: flipping this is the next STRUCT-0013 step and is
-# mostly annotation typing on route handlers and service helpers, not bug-finding.
-# app.models.* / app.schemas.* already hold the strict bar (override below).
-disallow_untyped_defs = false
-
-[[tool.mypy.overrides]]
-# app/models and app/schemas are newly covered (STRUCT-0013) and clean under
-# the stricter check -- hold them to it per-module rather than waiting for
-# every package to reach this bar before enabling it anywhere.
-module = ["app.models.*", "app.schemas.*"]
+# STRUCT-0013 closed (cycle 6, 2026-09-22): every def in the package is annotated.
+# Route handlers that return heterogeneous JSON are `-> Any` / `-> dict[str, Any]`;
+# service functions carry their real Pydantic request types (`body: ClaimCreate`,
+# not `body`). A new untyped def now fails Backend Lint.
 disallow_untyped_defs = true
 
 [tool.pytest.ini_options]

@@ -1,5 +1,7 @@
+from typing import Iterator
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 from app.core.config import settings
 from app.db import validation as _validation  # noqa: F401 - registers cross-dialect ORM guards
@@ -29,7 +31,7 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 class Base(DeclarativeBase):
     pass
 
-def get_db():
+def get_db() -> Iterator[Session]:
     db = SessionLocal()
     try:
         yield db

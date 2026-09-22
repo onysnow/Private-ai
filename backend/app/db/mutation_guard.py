@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
-from sqlalchemy import select
+from sqlalchemy import Select, select
 from sqlalchemy import event
 from sqlalchemy.orm import Session
 
@@ -88,7 +88,7 @@ def collect_mutation_investigation_ids(db: Session, objects: Iterable[object] | 
         if isinstance(obj, (EnrichmentSessionRun, EnrichmentSessionFinding)) and obj.session_id
     }
 
-    def add_ids(stmt) -> None:
+    def add_ids(stmt: Select[tuple[str]]) -> None:
         investigation_ids.update(value for value in db.scalars(stmt).all() if value)
 
     if entity_ids:
@@ -133,5 +133,5 @@ def lock_pending_investigation_mutations(db: Session) -> None:
 
 
 @event.listens_for(Session, "before_flush")
-def _lock_mutating_investigations_before_flush(db: Session, _flush_context, _instances) -> None:
+def _lock_mutating_investigations_before_flush(db: Session, _flush_context: object, _instances: object) -> None:
     lock_pending_investigation_mutations(db)

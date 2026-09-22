@@ -7,6 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.domain import ConnectorFinding, ResolutionDecision, StatementAssessment
+from app.schemas.api import ResolutionRequest, StatementAssessmentRequest
 
 
 def update_finding_review_status(db: Session, row: ConnectorFinding, status: str) -> ConnectorFinding:
@@ -21,7 +22,7 @@ def update_finding_review_status(db: Session, row: ConnectorFinding, status: str
     return row
 
 
-def create_resolution_decision(db: Session, finding: ConnectorFinding, body) -> ResolutionDecision:
+def create_resolution_decision(db: Session, finding: ConnectorFinding, body: ResolutionRequest) -> ResolutionDecision:
     """Record a resolution decision for a finding and update the finding's
     review_status to match. Raises ValueError for a bad decision enum.
     The caller confirms the finding (and, if given, body.entity_id) exist
@@ -46,7 +47,7 @@ def list_statement_assessments(db: Session, finding_id: str) -> list[StatementAs
     ).all())
 
 
-def create_statement_assessment(db: Session, finding: ConnectorFinding, body) -> StatementAssessment:
+def create_statement_assessment(db: Session, finding: ConnectorFinding, body: StatementAssessmentRequest) -> StatementAssessment:
     """Persist a StatementAssessment for a finding. Raises ValueError for
     an unrecognized status. The caller confirms the finding (and, if
     given, body.entity_id) exist -- a 404 concern."""

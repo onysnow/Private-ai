@@ -221,7 +221,7 @@ def decide_browser_write_access(
     return AccessDecision(True)
 
 
-async def enforce_api_access(request: Request, configured_token: str):
+async def enforce_api_access(request: Request, configured_token: str) -> JSONResponse | None:
     """Return a denial response for an unauthorized API request, otherwise None."""
     if not request.url.path.startswith("/api"):
         return None
@@ -246,7 +246,7 @@ async def enforce_api_access(request: Request, configured_token: str):
     )
 
 
-async def enforce_browser_write_access(request: Request, allowed_origins: list[str]):
+async def enforce_browser_write_access(request: Request, allowed_origins: list[str]) -> JSONResponse | None:
     if not request.url.path.startswith("/api"):
         return None
     decision = decide_browser_write_access(

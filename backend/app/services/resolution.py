@@ -50,7 +50,7 @@ def canonical_duplicate_candidates(db: Session, entity: Entity) -> list[dict]:
     return out
 
 
-def record_canonical_resolution(db: Session, entity: Entity, other: Entity, *, decision: str, confidence: float, rationale: str | None, commit: bool = True):
+def record_canonical_resolution(db: Session, entity: Entity, other: Entity, *, decision: str, confidence: float, rationale: str | None, commit: bool = True) -> Any:
     if entity.id == other.id:
         raise ValueError("An entity cannot be resolved against itself")
     if entity.investigation_id != other.investigation_id:

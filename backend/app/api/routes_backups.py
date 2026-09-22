@@ -5,6 +5,7 @@ app/services/exports.py; this module wires upload-size limiting
 ingest endpoint still in routes.py pending group 5) and HTTP status
 codes.
 """
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File
 from sqlalchemy.orm import Session
 
@@ -18,8 +19,8 @@ from app.services.security import resolve_storage_root
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.post("/backups/inspect")
-async def inspect_backup(file: UploadFile = File(...)):
+@router.post("/backups/inspect", response_model=None)
+async def inspect_backup(file: UploadFile = File(...)) -> dict[str, Any]:
     data = await read_upload_limited(file, settings.max_backup_bytes)
     try:
         manifest, records = inspect_export(data)
@@ -28,8 +29,8 @@ async def inspect_backup(file: UploadFile = File(...)):
     return {"manifest": manifest, "record_counts": {k: len(v) for k, v in records.items()}}
 
 
-@router.post("/backups/preview")
-async def preview_backup_restore(file: UploadFile = File(...), db: Session = Depends(get_db)):
+@router.post("/backups/preview", response_model=None)
+async def preview_backup_restore(file: UploadFile = File(...), db: Session = Depends(get_db)) -> Any:
     data = await read_upload_limited(file, settings.max_backup_bytes)
     try:
         return preview_investigation_restore(db, data, resolve_storage_root(settings.document_storage_dir))
@@ -37,8 +38,8 @@ async def preview_backup_restore(file: UploadFile = File(...), db: Session = Dep
         raise HTTPException(400, str(exc))
 
 
-@router.post("/backups/restore")
-async def restore_backup(request: Request, file: UploadFile = File(...), db: Session = Depends(get_db)):
+@router.post("/backups/restore", response_model=None)
+async def restore_backup(request: Request, file: UploadFile = File(...), db: Session = Depends(get_db)) -> Any:
     if not settings.enable_restore_api:
         raise HTTPException(403, "Backup restore API is disabled; set ENABLE_RESTORE_API=true to enable it")
     require_scope_global_admin(scope_for_request(request))

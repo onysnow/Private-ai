@@ -51,7 +51,7 @@ def _live_application_tables(engine: Engine) -> tuple[set[str], bool]:
     return names - {ALEMBIC_VERSION_TABLE}, ALEMBIC_VERSION_TABLE in names
 
 
-def _type_family(value) -> str:
+def _type_family(value: object) -> str:
     """Compare portable SQL type families instead of dialect-specific rendered names."""
     if isinstance(value, NullType):
         return "unknown"

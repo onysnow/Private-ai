@@ -3,6 +3,7 @@ Stage E group 3). All three already delegate fully to
 app/services/documents.py; this module just wires 404s and the
 review-validation ValueError to HTTP status codes.
 """
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -15,8 +16,8 @@ from app.services.documents import preview_entity_candidate_matches, review_cand
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.get("/extraction-candidates/{candidate_id}/entity-matches")
-def get_extraction_entity_matches(candidate_id: str, db: Session = Depends(get_db)):
+@router.get("/extraction-candidates/{candidate_id}/entity-matches", response_model=None)
+def get_extraction_entity_matches(candidate_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(ExtractionCandidate, candidate_id)
     if row is None:
         raise HTTPException(404, "Extraction candidate not found")
@@ -26,16 +27,16 @@ def get_extraction_entity_matches(candidate_id: str, db: Session = Depends(get_d
         raise HTTPException(400, str(exc))
 
 
-@router.get("/extraction-candidates/{candidate_id}/lineage")
-def get_extraction_candidate_lineage(candidate_id: str, db: Session = Depends(get_db)):
+@router.get("/extraction-candidates/{candidate_id}/lineage", response_model=None)
+def get_extraction_candidate_lineage(candidate_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(ExtractionCandidate, candidate_id)
     if row is None:
         raise HTTPException(404, "Extraction candidate not found")
     return serialize_extraction_lineage(db, row)
 
 
-@router.post("/extraction-candidates/{candidate_id}/review")
-def review_extraction_candidate(candidate_id: str, body: ExtractionCandidateReviewRequest, db: Session = Depends(get_db)):
+@router.post("/extraction-candidates/{candidate_id}/review", response_model=None)
+def review_extraction_candidate(candidate_id: str, body: ExtractionCandidateReviewRequest, db: Session = Depends(get_db)) -> Any:
     row = db.get(ExtractionCandidate, candidate_id)
     if row is None:
         raise HTTPException(404, "Extraction candidate not found")

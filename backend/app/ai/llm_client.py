@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import abc
 from dataclasses import dataclass
+from typing import Any
 
 from app.core.config import Settings
 
@@ -95,7 +96,7 @@ class AnthropicLLMClient(LLMClient):
         self._timeout = timeout_seconds
         self._client = None  # lazily constructed so importing this module never requires the SDK
 
-    def _get_client(self):
+    def _get_client(self) -> Any:
         if self._client is None:
             import anthropic  # imported lazily: not a hard dependency unless this adapter is used
 
@@ -118,7 +119,7 @@ class AnthropicLLMClient(LLMClient):
         return parse_anthropic_response(response, fallback_model=self._model)
 
 
-def parse_anthropic_response(response, *, fallback_model: str) -> LLMResponse:
+def parse_anthropic_response(response: Any, *, fallback_model: str) -> LLMResponse:
     """Pure function over the SDK's Message object (duck-typed so tests need no SDK)."""
     text = "".join(getattr(block, "text", "") for block in getattr(response, "content", []) if getattr(block, "type", None) == "text")
     stop_reason = getattr(response, "stop_reason", None)
@@ -141,7 +142,7 @@ class OpenAILLMClient(LLMClient):
         self._timeout = timeout_seconds
         self._client = None
 
-    def _get_client(self):
+    def _get_client(self) -> Any:
         if self._client is None:
             import openai  # imported lazily: not a hard dependency unless this adapter is used
 
@@ -167,7 +168,7 @@ class OpenAILLMClient(LLMClient):
         return parse_openai_response(response, fallback_model=self._model)
 
 
-def parse_openai_response(response, *, fallback_model: str) -> LLMResponse:
+def parse_openai_response(response: Any, *, fallback_model: str) -> LLMResponse:
     choices = getattr(response, "choices", None) or []
     first = choices[0] if choices else None
     message = getattr(first, "message", None)

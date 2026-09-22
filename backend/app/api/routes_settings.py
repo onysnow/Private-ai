@@ -5,6 +5,7 @@ snapshot, persisted app-user (identity) CRUD and token lifecycle,
 investigation membership grants, connector credential storage, and
 security audit log access/retention.
 """
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from sqlalchemy.orm import Session
@@ -42,19 +43,19 @@ def _require_local_request(request: Request) -> None:
         raise HTTPException(403, "Connector credential changes are restricted to the local machine")
 
 
-@router.get("/settings/status")
-def settings_status(db: Session = Depends(get_db)):
+@router.get("/settings/status", response_model=None)
+def settings_status(db: Session = Depends(get_db)) -> Any:
     return get_settings_status(db)
 
 
-@router.get("/settings/security/users")
-def list_app_users(request: Request, db: Session = Depends(get_db)):
+@router.get("/settings/security/users", response_model=None)
+def list_app_users(request: Request, db: Session = Depends(get_db)) -> Any:
     _require_local_request(request)
     return _list_app_users(db)
 
 
-@router.post("/settings/security/users")
-def create_app_user(payload: AppUserCreate, request: Request, db: Session = Depends(get_db)):
+@router.post("/settings/security/users", response_model=None)
+def create_app_user(payload: AppUserCreate, request: Request, db: Session = Depends(get_db)) -> Any:
     _require_local_request(request)
     try:
         return _create_app_user(db, payload)
@@ -62,8 +63,8 @@ def create_app_user(payload: AppUserCreate, request: Request, db: Session = Depe
         raise HTTPException(400, str(exc))
 
 
-@router.patch("/settings/security/users/{user_id}")
-def update_app_user(user_id: str, payload: AppUserUpdate, request: Request, db: Session = Depends(get_db)):
+@router.patch("/settings/security/users/{user_id}", response_model=None)
+def update_app_user(user_id: str, payload: AppUserUpdate, request: Request, db: Session = Depends(get_db)) -> Any:
     _require_local_request(request)
     user = db.get(AppUser, user_id)
     if user is None:
@@ -74,8 +75,8 @@ def update_app_user(user_id: str, payload: AppUserUpdate, request: Request, db: 
         raise HTTPException(400, str(exc))
 
 
-@router.post("/settings/security/users/{user_id}/token/rotate")
-def rotate_app_user_token(user_id: str, request: Request, db: Session = Depends(get_db)):
+@router.post("/settings/security/users/{user_id}/token/rotate", response_model=None)
+def rotate_app_user_token(user_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
     _require_local_request(request)
     user = db.get(AppUser, user_id)
     if user is None:
@@ -83,8 +84,8 @@ def rotate_app_user_token(user_id: str, request: Request, db: Session = Depends(
     return _rotate_app_user_token(db, user)
 
 
-@router.post("/settings/security/users/{user_id}/token/revoke")
-def revoke_app_user_token(user_id: str, request: Request, db: Session = Depends(get_db)):
+@router.post("/settings/security/users/{user_id}/token/revoke", response_model=None)
+def revoke_app_user_token(user_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
     _require_local_request(request)
     user = db.get(AppUser, user_id)
     if user is None:
@@ -92,8 +93,8 @@ def revoke_app_user_token(user_id: str, request: Request, db: Session = Depends(
     return _revoke_app_user_token(db, user)
 
 
-@router.put("/settings/security/users/{user_id}/investigations/{investigation_id}")
-def put_investigation_membership(user_id: str, investigation_id: str, payload: InvestigationMembershipPut, request: Request, db: Session = Depends(get_db)):
+@router.put("/settings/security/users/{user_id}/investigations/{investigation_id}", response_model=None)
+def put_investigation_membership(user_id: str, investigation_id: str, payload: InvestigationMembershipPut, request: Request, db: Session = Depends(get_db)) -> dict[str, Any]:
     _require_local_request(request)
     try:
         membership = _put_investigation_membership(db, user_id, investigation_id, payload.role)
@@ -105,20 +106,20 @@ def put_investigation_membership(user_id: str, investigation_id: str, payload: I
 
 
 @router.delete("/settings/security/users/{user_id}/investigations/{investigation_id}", status_code=204)
-def delete_investigation_membership(user_id: str, investigation_id: str, request: Request, db: Session = Depends(get_db)):
+def delete_investigation_membership(user_id: str, investigation_id: str, request: Request, db: Session = Depends(get_db)) -> Response:
     _require_local_request(request)
     _delete_investigation_membership(db, user_id, investigation_id)
     return Response(status_code=204)
 
 
-@router.get("/settings/security/audit")
+@router.get("/settings/security/audit", response_model=None)
 def get_security_audit(
     limit: int = Query(100, ge=1, le=500),
     offset: int = Query(0, ge=0, le=1_000_000),
     event: str | None = None,
     method: str | None = None,
     status_code: int | None = Query(default=None, ge=100, le=599),
-):
+) -> Any:
     return read_security_audit(
         settings.audit_log_file,
         limit=limit,
@@ -129,17 +130,17 @@ def get_security_audit(
     )
 
 
-@router.get("/settings/security/audit/summary")
-def get_security_audit_summary():
+@router.get("/settings/security/audit/summary", response_model=None)
+def get_security_audit_summary() -> Any:
     return summarize_security_audit(settings.audit_log_file)
 
 
-@router.get("/settings/security/audit/retention-preview")
+@router.get("/settings/security/audit/retention-preview", response_model=None)
 def get_security_audit_retention_preview(
     request: Request,
     keep_days: int = Query(90, ge=1, le=3650),
     max_records: int = Query(5000, ge=100, le=1_000_000),
-):
+) -> Any:
     _require_local_request(request)
     try:
         preview = preview_security_audit_retention(
@@ -152,8 +153,8 @@ def get_security_audit_retention_preview(
     return preview
 
 
-@router.post("/settings/security/audit/retention")
-def prune_security_audit(body: dict, request: Request):
+@router.post("/settings/security/audit/retention", response_model=None)
+def prune_security_audit(body: dict, request: Request) -> Any:
     _require_local_request(request)
     keep_days = body.get("keep_days", 90) if isinstance(body, dict) else 90
     max_records = body.get("max_records", 5000) if isinstance(body, dict) else 5000
@@ -175,8 +176,8 @@ def prune_security_audit(body: dict, request: Request):
         raise HTTPException(400, str(exc))
 
 
-@router.put("/settings/connectors/{provider}/credential")
-def save_connector_credential(provider: str, body: dict, request: Request):
+@router.put("/settings/connectors/{provider}/credential", response_model=None)
+def save_connector_credential(provider: str, body: dict, request: Request) -> Any:
     _require_local_request(request)
     secret = body.get("credential") if isinstance(body, dict) else None
     try:
@@ -189,8 +190,8 @@ def save_connector_credential(provider: str, body: dict, request: Request):
         raise HTTPException(500, str(exc))
 
 
-@router.delete("/settings/connectors/{provider}/credential")
-def delete_connector_credential(provider: str, request: Request):
+@router.delete("/settings/connectors/{provider}/credential", response_model=None)
+def delete_connector_credential(provider: str, request: Request) -> Any:
     _require_local_request(request)
     try:
         return _delete_connector_credential(provider)

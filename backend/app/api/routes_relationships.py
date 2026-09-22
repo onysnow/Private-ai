@@ -3,6 +3,7 @@ E group 4). All 5 already delegated fully to app/services/relationships.py
 and app/services/leads.py; this module just wires 404s and ValueErrors
 to HTTP status codes.
 """
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -21,8 +22,8 @@ from app.services.relationships import (
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.post("/relationships")
-def create_canonical_relationship(body: RelationshipCreate, db: Session = Depends(get_db)):
+@router.post("/relationships", response_model=None)
+def create_canonical_relationship(body: RelationshipCreate, db: Session = Depends(get_db)) -> Any:
     if db.get(Investigation, body.investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     try:
@@ -36,8 +37,8 @@ def create_canonical_relationship(body: RelationshipCreate, db: Session = Depend
     return serialize_relationship(db, edge)
 
 
-@router.post("/relationships/{relationship_id}/evidence")
-def attach_relationship_evidence_endpoint(relationship_id: str, body: RelationshipEvidenceAttachRequest, db: Session = Depends(get_db)):
+@router.post("/relationships/{relationship_id}/evidence", response_model=None)
+def attach_relationship_evidence_endpoint(relationship_id: str, body: RelationshipEvidenceAttachRequest, db: Session = Depends(get_db)) -> Any:
     edge = db.get(RelationshipEdge, relationship_id)
     if edge is None:
         raise HTTPException(404, "Relationship not found")
@@ -48,16 +49,16 @@ def attach_relationship_evidence_endpoint(relationship_id: str, body: Relationsh
     return serialize_relationship(db, edge)
 
 
-@router.get("/relationships/{relationship_id}/evidence-reviews")
-def list_relationship_evidence_reviews(relationship_id: str, db: Session = Depends(get_db)):
+@router.get("/relationships/{relationship_id}/evidence-reviews", response_model=None)
+def list_relationship_evidence_reviews(relationship_id: str, db: Session = Depends(get_db)) -> dict[str, Any]:
     edge = db.get(RelationshipEdge, relationship_id)
     if edge is None:
         raise HTTPException(404, "Relationship not found")
     return {"relationship_id": edge.id, "reviews": relationship_evidence_review_history(db, edge)}
 
 
-@router.post("/relationships/{relationship_id}/evidence/{evidence_id}/reviews")
-def review_relationship_evidence_endpoint(relationship_id: str, evidence_id: str, body: RelationshipEvidenceReviewRequest, db: Session = Depends(get_db)):
+@router.post("/relationships/{relationship_id}/evidence/{evidence_id}/reviews", response_model=None)
+def review_relationship_evidence_endpoint(relationship_id: str, evidence_id: str, body: RelationshipEvidenceReviewRequest, db: Session = Depends(get_db)) -> Any:
     edge = db.get(RelationshipEdge, relationship_id)
     if edge is None:
         raise HTTPException(404, "Relationship not found")
@@ -68,8 +69,8 @@ def review_relationship_evidence_endpoint(relationship_id: str, evidence_id: str
     return serialize_relationship(db, edge)
 
 
-@router.post("/relationships/{relationship_id}/lead-from-context")
-def create_lead_from_relationship_context(relationship_id: str, db: Session = Depends(get_db)):
+@router.post("/relationships/{relationship_id}/lead-from-context", response_model=None)
+def create_lead_from_relationship_context(relationship_id: str, db: Session = Depends(get_db)) -> Any:
     edge = db.get(RelationshipEdge, relationship_id)
     if edge is None:
         raise HTTPException(404, "Relationship not found")

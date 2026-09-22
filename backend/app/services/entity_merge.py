@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any
 
 import hashlib
 import json
@@ -28,7 +29,7 @@ REFERENCE_SPECS = (
 )
 
 
-def _latest_same_decision(db: Session, source: Entity, target: Entity):
+def _latest_same_decision(db: Session, source: Entity, target: Entity) -> Any:
     a, b = sorted((source.id, target.id))
     return db.scalars(select(CanonicalResolutionDecision).where(
         CanonicalResolutionDecision.investigation_id == source.investigation_id,

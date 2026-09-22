@@ -3,6 +3,7 @@
 (validate_claim_fields, create_claim, update_claim, link_claim_evidence,
 list_claim_evidence), review_claim/claim_review_workspace already did.
 """
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -22,8 +23,8 @@ from app.services.documents import propose_relationship_from_extracted_claim
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.post("/claims/{claim_id}/relationship-proposals")
-def create_extracted_relationship_proposal(claim_id: str, body: ExtractedRelationshipProposalCreate, db: Session = Depends(get_db)):
+@router.post("/claims/{claim_id}/relationship-proposals", response_model=None)
+def create_extracted_relationship_proposal(claim_id: str, body: ExtractedRelationshipProposalCreate, db: Session = Depends(get_db)) -> dict[str, Any]:
     try:
         row = propose_relationship_from_extracted_claim(db, claim_id=claim_id, **body.model_dump())
     except ValueError as exc:
@@ -35,8 +36,8 @@ def create_extracted_relationship_proposal(claim_id: str, body: ExtractedRelatio
     }
 
 
-@router.post("/claims/{claim_id}/evidence")
-def link_claim_evidence_endpoint(claim_id: str, body: ClaimEvidenceLinkCreate, db: Session = Depends(get_db)):
+@router.post("/claims/{claim_id}/evidence", response_model=None)
+def link_claim_evidence_endpoint(claim_id: str, body: ClaimEvidenceLinkCreate, db: Session = Depends(get_db)) -> Any:
     claim = db.get(Claim, claim_id)
     evidence = db.get(Evidence, body.evidence_id)
     if claim is None:
@@ -49,16 +50,16 @@ def link_claim_evidence_endpoint(claim_id: str, body: ClaimEvidenceLinkCreate, d
         raise HTTPException(400, str(exc))
 
 
-@router.get("/claims/{claim_id}/evidence")
-def list_claim_evidence_endpoint(claim_id: str, db: Session = Depends(get_db)):
+@router.get("/claims/{claim_id}/evidence", response_model=None)
+def list_claim_evidence_endpoint(claim_id: str, db: Session = Depends(get_db)) -> Any:
     claim = db.get(Claim, claim_id)
     if claim is None:
         raise HTTPException(404, "Claim not found")
     return list_claim_evidence(db, claim_id)
 
 
-@router.post("/claims")
-def create_claim_endpoint(body: ClaimCreate, db: Session = Depends(get_db)):
+@router.post("/claims", response_model=None)
+def create_claim_endpoint(body: ClaimCreate, db: Session = Depends(get_db)) -> Any:
     if db.get(Investigation, body.investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     try:
@@ -67,16 +68,16 @@ def create_claim_endpoint(body: ClaimCreate, db: Session = Depends(get_db)):
         raise HTTPException(400, str(exc))
 
 
-@router.get("/claims/{claim_id}/review-workspace")
-def get_claim_review_workspace(claim_id: str, db: Session = Depends(get_db)):
+@router.get("/claims/{claim_id}/review-workspace", response_model=None)
+def get_claim_review_workspace(claim_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(Claim, claim_id)
     if row is None:
         raise HTTPException(404, "Claim not found")
     return claim_review_workspace(db, row)
 
 
-@router.post("/claims/{claim_id}/reviews")
-def create_claim_review(claim_id: str, body: ClaimReviewRequest, db: Session = Depends(get_db)):
+@router.post("/claims/{claim_id}/reviews", response_model=None)
+def create_claim_review(claim_id: str, body: ClaimReviewRequest, db: Session = Depends(get_db)) -> dict[str, Any]:
     row = db.get(Claim, claim_id)
     if row is None:
         raise HTTPException(404, "Claim not found")
@@ -88,8 +89,8 @@ def create_claim_review(claim_id: str, body: ClaimReviewRequest, db: Session = D
     return {"claim": claim, "review": event, "workspace": claim_review_workspace(db, claim)}
 
 
-@router.patch("/claims/{claim_id}")
-def update_claim_endpoint(claim_id: str, body: ClaimUpdate, db: Session = Depends(get_db)):
+@router.patch("/claims/{claim_id}", response_model=None)
+def update_claim_endpoint(claim_id: str, body: ClaimUpdate, db: Session = Depends(get_db)) -> Any:
     row = db.get(Claim, claim_id)
     if row is None:
         raise HTTPException(404, "Claim not found")

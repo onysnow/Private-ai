@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from typing import Iterable
 
 from sqlalchemy import String, cast, func, or_, select
+from sqlalchemy.sql import ColumnElement
+from typing import Any
 from sqlalchemy.orm import Session, aliased
 
 from app.models.domain import (
@@ -61,7 +63,7 @@ def _tokens(query: str) -> list[str]:
     return [part.casefold() for part in query.split() if part.strip()]
 
 
-def _prefilter(tokens: list[str], *columns):
+def _prefilter(tokens: list[str], *columns: Any) -> ColumnElement[bool]:
     """SQL-level, portable (SQLite/PostgreSQL) "any token is a substring of any of
     these columns, case-insensitively" predicate (STRUCT-0036).
 

@@ -13,6 +13,7 @@ here, and any real validation or persistence logic lives in the
 matching app/services/ module, following the pattern app/ai/reasoning.py
 already established for issue #36.
 """
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
@@ -38,13 +39,13 @@ from app.services.timeline import create_timeline_event
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.get("/health")
-def health():
+@router.get("/health", response_model=None)
+def health() -> dict[str, Any]:
     return {"status": "ok"}
 
 
-@router.get("/capabilities")
-def capabilities():
+@router.get("/capabilities", response_model=None)
+def capabilities() -> dict[str, Any]:
     """Describe the runnable core preview without making AI a startup dependency."""
     return {
         "product": "Journalism Workbench",
@@ -75,13 +76,13 @@ def capabilities():
     }
 
 
-@router.get("/integrations/openaleph/status")
-async def openaleph_integration_status():
+@router.get("/integrations/openaleph/status", response_model=None)
+async def openaleph_integration_status() -> Any:
     """Report whether the local OpenAleph corpus platform is actually reachable."""
     return (await probe_openaleph()).to_dict()
 
 
-@router.get("/search")
+@router.get("/search", response_model=None)
 def search_workbench(
     request: Request,
     q: str = Query(..., min_length=1),
@@ -89,7 +90,7 @@ def search_workbench(
     limit: int = Query(50, ge=1, le=200),
     include_reconciled_duplicates: bool = False,
     db: Session = Depends(get_db),
-):
+) -> Any:
     """Search canonical and evidentiary records without conflating external findings with facts."""
     scope = scope_for_request(request)
     allowed_ids = None if scope.unrestricted else scope.investigation_ids
@@ -102,8 +103,8 @@ def search_workbench(
         raise HTTPException(404, str(exc))
 
 
-@router.post("/timeline-events")
-def create_timeline_event_endpoint(body: TimelineEventCreate, db: Session = Depends(get_db)):
+@router.post("/timeline-events", response_model=None)
+def create_timeline_event_endpoint(body: TimelineEventCreate, db: Session = Depends(get_db)) -> Any:
     if db.get(Investigation, body.investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     try:
@@ -112,21 +113,21 @@ def create_timeline_event_endpoint(body: TimelineEventCreate, db: Session = Depe
         raise HTTPException(400, str(exc))
 
 
-@router.get("/relationship-schemas")
-def relationship_schemas():
+@router.get("/relationship-schemas", response_model=None)
+def relationship_schemas() -> dict[str, Any]:
     return {"schemas": RELATIONSHIP_SCHEMAS}
 
 
-@router.get("/ai-analysis-candidates/{candidate_id}")
-def get_ai_analysis_candidate_endpoint(candidate_id: str, db: Session = Depends(get_db)):
+@router.get("/ai-analysis-candidates/{candidate_id}", response_model=None)
+def get_ai_analysis_candidate_endpoint(candidate_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(AIAnalysisCandidate, candidate_id)
     if row is None:
         raise HTTPException(404, "AI analysis candidate not found")
     return serialize_ai_analysis_candidate(row)
 
 
-@router.post("/ai-analysis-candidates/{candidate_id}/review")
-def review_ai_analysis_candidate_endpoint(candidate_id: str, body: AIAnalysisCandidateReviewRequest, db: Session = Depends(get_db)):
+@router.post("/ai-analysis-candidates/{candidate_id}/review", response_model=None)
+def review_ai_analysis_candidate_endpoint(candidate_id: str, body: AIAnalysisCandidateReviewRequest, db: Session = Depends(get_db)) -> Any:
     row = db.get(AIAnalysisCandidate, candidate_id)
     if row is None:
         raise HTTPException(404, "AI analysis candidate not found")
@@ -136,8 +137,8 @@ def review_ai_analysis_candidate_endpoint(candidate_id: str, body: AIAnalysisCan
         raise HTTPException(400, str(exc))
 
 
-@router.post("/evidence")
-def create_evidence_endpoint(body: EvidenceCreate, db: Session = Depends(get_db)):
+@router.post("/evidence", response_model=None)
+def create_evidence_endpoint(body: EvidenceCreate, db: Session = Depends(get_db)) -> Any:
     source = db.get(Source, body.source_id)
     if source is None:
         raise HTTPException(404, "Source not found")
@@ -147,8 +148,8 @@ def create_evidence_endpoint(body: EvidenceCreate, db: Session = Depends(get_db)
         raise HTTPException(400, str(exc))
 
 
-@router.post("/statement-assessments/{assessment_id}/promote")
-def promote_statement_assessment(assessment_id: str, body: StatementPromotionRequest, db: Session = Depends(get_db)):
+@router.post("/statement-assessments/{assessment_id}/promote", response_model=None)
+def promote_statement_assessment(assessment_id: str, body: StatementPromotionRequest, db: Session = Depends(get_db)) -> Any:
     assessment = db.get(StatementAssessment, assessment_id)
     if assessment is None:
         raise HTTPException(404, "Statement assessment not found")

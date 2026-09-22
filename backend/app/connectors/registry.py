@@ -15,7 +15,7 @@ here.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable
+from typing import Any, Callable
 
 from app.connectors.aleph import AlephConnector
 from app.connectors.base import Connector
@@ -50,11 +50,11 @@ CONNECTOR_SPECS: dict[str, ConnectorSpec] = {
 
 
 class ConnectorRegistry:
-    def __init__(self):
-        self._connectors = {}
+    def __init__(self) -> None:
+        self._connectors: dict[str, Connector] = {}
         self.refresh()
 
-    def _build(self, name: str):
+    def _build(self, name: str) -> Any:
         spec = CONNECTOR_SPECS.get(name)
         if spec is None:
             return None
@@ -72,10 +72,10 @@ class ConnectorRegistry:
     def names(self) -> list[str]:
         return sorted(self._connectors)
 
-    def get(self, name: str):
+    def get(self, name: str) -> Any:
         return self._connectors.get(name)
 
-    def register(self, name: str, connector) -> None:
+    def register(self, name: str, connector: Connector) -> None:
         self._connectors[name] = connector
 
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from contextvars import ContextVar, Token
 from dataclasses import dataclass
-from typing import Iterable
+from typing import Iterable, Iterator
 
 from fastapi import HTTPException, Request
 from sqlalchemy.orm import Session
@@ -99,7 +99,7 @@ def reset_current_authorization_scope(token: Token) -> None:
 
 
 @contextmanager
-def authorization_scope_context(scope: AuthorizationScope):
+def authorization_scope_context(scope: AuthorizationScope) -> Iterator[AuthorizationScope]:
     token = set_current_authorization_scope(scope)
     try:
         yield scope

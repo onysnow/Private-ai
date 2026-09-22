@@ -10,6 +10,7 @@ The GET /investigations/{investigation_id}/reporting-tasks list endpoint is
 not here: its URL prefix is /investigations, so it belongs with group 8
 (investigations) per REMEDIATION_PROMPT.md Stage E's prefix-based grouping.
 """
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -22,8 +23,8 @@ from app.services.leads import create_reporting_task, serialize_task, update_rep
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.post("/reporting-tasks")
-def create_reporting_task_endpoint(body: ReportingTaskCreate, db: Session = Depends(get_db)):
+@router.post("/reporting-tasks", response_model=None)
+def create_reporting_task_endpoint(body: ReportingTaskCreate, db: Session = Depends(get_db)) -> Any:
     if db.get(Investigation, body.investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     try:
@@ -32,8 +33,8 @@ def create_reporting_task_endpoint(body: ReportingTaskCreate, db: Session = Depe
         raise HTTPException(400, str(exc))
 
 
-@router.patch("/reporting-tasks/{task_id}")
-def update_reporting_task_endpoint(task_id: str, body: ReportingTaskUpdate, db: Session = Depends(get_db)):
+@router.patch("/reporting-tasks/{task_id}", response_model=None)
+def update_reporting_task_endpoint(task_id: str, body: ReportingTaskUpdate, db: Session = Depends(get_db)) -> Any:
     row = db.get(ReportingTask, task_id)
     if row is None:
         raise HTTPException(404, "Reporting task not found")

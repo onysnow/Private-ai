@@ -325,7 +325,7 @@ def _known_citation_keys(citations: list[dict]) -> set[tuple[str, str]]:
     return {(c["record_type"], c["record_id"]) for c in citations if c.get("record_type") and c.get("record_id")}
 
 
-def _find_citation_refs(node) -> list[dict]:
+def _find_citation_refs(node: object) -> list[dict]:
     """Recursively find every {"record_type": ..., "record_id": ...}-shaped
     dict anywhere in a parsed payload, regardless of which field it's under.
     Deliberately structure-agnostic: a model that nests these slightly

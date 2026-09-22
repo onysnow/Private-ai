@@ -6,6 +6,7 @@ app/services/provenance.py (record_provenance_trace,
 find_extraction_lineage). This module just wires HTTP status codes to
 the service layer's LookupError/ValueError.
 """
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
@@ -17,8 +18,8 @@ from app.services.provenance import find_extraction_lineage, record_provenance_t
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.get("/provenance/trace")
-def get_record_provenance_trace(record_type: str, record_id: str, request: Request, db: Session = Depends(get_db)):
+@router.get("/provenance/trace", response_model=None)
+def get_record_provenance_trace(record_type: str, record_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
     try:
         trace = record_provenance_trace(db, record_type, record_id)
         require_scope_investigation(scope_for_request(request), trace["investigation_id"])
@@ -29,8 +30,8 @@ def get_record_provenance_trace(record_type: str, record_id: str, request: Reque
         raise HTTPException(400, str(exc))
 
 
-@router.get("/provenance/extraction-lineage")
-def find_extraction_lineage_endpoint(record_type: str, record_id: str, db: Session = Depends(get_db)):
+@router.get("/provenance/extraction-lineage", response_model=None)
+def find_extraction_lineage_endpoint(record_type: str, record_id: str, db: Session = Depends(get_db)) -> Any:
     try:
         return find_extraction_lineage(db, record_type, record_id)
     except ValueError as exc:

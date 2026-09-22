@@ -4,6 +4,7 @@ import json
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from app.schemas.api import LeadConvertRequest, LeadCreate, LeadLinkCreate, ReportingTaskCreate, ReportingTaskUpdate
 
 from app.models.domain import (
     Claim, ClaimEvidenceLink, Entity, Evidence, Lead, LeadLink, LeadProfile, LeadWorkflowEvent,
@@ -530,7 +531,7 @@ def make_task_workflow_event(db: Session, task: ReportingTask, *, from_status: s
     )
 
 
-def validate_link_target(db: Session, lead: Lead, *, entity_id=None, source_id=None, claim_id=None, evidence_id=None, relationship_id=None) -> None:
+def validate_link_target(db: Session, lead: Lead, *, entity_id: str | None = None, source_id: str | None = None, claim_id: str | None = None, evidence_id: str | None = None, relationship_id: str | None = None) -> None:
     targets = [x for x in (entity_id, source_id, claim_id, evidence_id, relationship_id) if x]
     if len(targets) != 1:
         raise ValueError("A lead link must reference exactly one entity, source, claim, evidence item, or relationship")
@@ -600,7 +601,7 @@ def create_relationship_context_lead(db: Session, edge: RelationshipEdge, *, tit
     return lead
 
 
-def create_reporting_task(db: Session, body) -> ReportingTask:
+def create_reporting_task(db: Session, body: ReportingTaskCreate) -> ReportingTask:
     """Validate and persist a new ReportingTask from a request body.
 
     Raises ValueError for a bad status/priority enum or a lead_id that
@@ -623,7 +624,7 @@ def create_reporting_task(db: Session, body) -> ReportingTask:
     return row
 
 
-def update_reporting_task(db: Session, row: ReportingTask, body) -> ReportingTask:
+def update_reporting_task(db: Session, row: ReportingTask, body: ReportingTaskUpdate) -> ReportingTask:
     """Apply a partial update to a ReportingTask, recording a workflow event
     when status changes. Raises ValueError for a bad status/priority enum.
     The caller is responsible for confirming the task exists (a 404
@@ -644,7 +645,7 @@ def update_reporting_task(db: Session, row: ReportingTask, body) -> ReportingTas
     return row
 
 
-def create_lead(db: Session, body) -> Lead:
+def create_lead(db: Session, body: LeadCreate) -> Lead:
     """Validate and persist a new Lead, optionally linking it to a
     relationship. Raises ValueError for a bad status or a relationship
     link target that fails validate_link_target. The caller is
@@ -692,7 +693,7 @@ def update_lead(db: Session, row: Lead, data: dict) -> Lead:
     return row
 
 
-def create_lead_link(db: Session, lead: Lead, body) -> LeadLink:
+def create_lead_link(db: Session, lead: Lead, body: LeadLinkCreate) -> LeadLink:
     """Validate and persist a LeadLink. Raises ValueError if
     validate_link_target rejects the target (the caller confirms the
     lead exists -- a 404 concern)."""
@@ -709,7 +710,7 @@ def list_lead_links(db: Session, lead_id: str) -> list[dict]:
     return [serialize_link(db, row) for row in rows]
 
 
-def convert_lead(db: Session, lead: Lead, body) -> dict:
+def convert_lead(db: Session, lead: Lead, body: LeadConvertRequest) -> dict:
     """Convert a Lead into a Claim or a ReportingTask. Raises ValueError
     for an unknown conversion kind or (for a task conversion) a bad
     priority."""

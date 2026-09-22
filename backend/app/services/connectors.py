@@ -15,10 +15,15 @@ this one connector-orchestration concern.
 """
 from __future__ import annotations
 
+from typing import Any
+
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from typing import Sequence
+
+from app.connectors.base import ExternalFinding
 from app.connectors.registry import registry
 from app.core.time import utcnow_naive
 from app.models.domain import (
@@ -27,7 +32,7 @@ from app.models.domain import (
 from app.schemas.api import ConnectorSearchRequest
 
 
-def persist_connector_findings(db: Session, run: ConnectorRun, investigation_id: str, provider: str, findings):
+def persist_connector_findings(db: Session, run: ConnectorRun, investigation_id: str, provider: str, findings: Sequence[ExternalFinding]) -> list[ConnectorFinding]:
     rows = []
     for finding in findings:
         existing = db.scalar(select(ConnectorFinding).where(
@@ -60,7 +65,7 @@ def persist_connector_findings(db: Session, run: ConnectorRun, investigation_id:
     return rows
 
 
-async def run_connector(provider: str, body: ConnectorSearchRequest, db: Session):
+async def run_connector(provider: str, body: ConnectorSearchRequest, db: Session) -> Any:
     if db.get(Investigation, body.investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     connector = registry.get(provider)
@@ -80,7 +85,7 @@ async def run_connector(provider: str, body: ConnectorSearchRequest, db: Session
         ) from exc
 
 
-async def enrich_entity(provider: str, entity: Entity, db: Session):
+async def enrich_entity(provider: str, entity: Entity, db: Session) -> Any:
     connector = registry.get(provider)
     if connector is None:
         raise HTTPException(404, "Connector not found")

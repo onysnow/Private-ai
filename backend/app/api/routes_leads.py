@@ -4,6 +4,7 @@
 convert_lead), alongside the domain's existing serialize_lead/
 serialize_link/get_profile/validate_link_target.
 """
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -18,8 +19,8 @@ from app.services.leads import (
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.post("/leads")
-def create_lead_endpoint(body: LeadCreate, db: Session = Depends(get_db)):
+@router.post("/leads", response_model=None)
+def create_lead_endpoint(body: LeadCreate, db: Session = Depends(get_db)) -> Any:
     if db.get(Investigation, body.investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     try:
@@ -29,16 +30,16 @@ def create_lead_endpoint(body: LeadCreate, db: Session = Depends(get_db)):
     return serialize_lead(db, row)
 
 
-@router.get("/leads/{lead_id}")
-def get_lead(lead_id: str, db: Session = Depends(get_db)):
+@router.get("/leads/{lead_id}", response_model=None)
+def get_lead(lead_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(Lead, lead_id)
     if row is None:
         raise HTTPException(404, "Lead not found")
     return serialize_lead(db, row)
 
 
-@router.patch("/leads/{lead_id}")
-def update_lead_endpoint(lead_id: str, body: LeadUpdate, db: Session = Depends(get_db)):
+@router.patch("/leads/{lead_id}", response_model=None)
+def update_lead_endpoint(lead_id: str, body: LeadUpdate, db: Session = Depends(get_db)) -> Any:
     row = db.get(Lead, lead_id)
     if row is None:
         raise HTTPException(404, "Lead not found")
@@ -50,8 +51,8 @@ def update_lead_endpoint(lead_id: str, body: LeadUpdate, db: Session = Depends(g
     return serialize_lead(db, row)
 
 
-@router.post("/leads/{lead_id}/links")
-def link_lead(lead_id: str, body: LeadLinkCreate, db: Session = Depends(get_db)):
+@router.post("/leads/{lead_id}/links", response_model=None)
+def link_lead(lead_id: str, body: LeadLinkCreate, db: Session = Depends(get_db)) -> Any:
     lead = db.get(Lead, lead_id)
     if lead is None:
         raise HTTPException(404, "Lead not found")
@@ -62,15 +63,15 @@ def link_lead(lead_id: str, body: LeadLinkCreate, db: Session = Depends(get_db))
     return serialize_link(db, row)
 
 
-@router.get("/leads/{lead_id}/links")
-def list_lead_links_endpoint(lead_id: str, db: Session = Depends(get_db)):
+@router.get("/leads/{lead_id}/links", response_model=None)
+def list_lead_links_endpoint(lead_id: str, db: Session = Depends(get_db)) -> Any:
     if db.get(Lead, lead_id) is None:
         raise HTTPException(404, "Lead not found")
     return list_lead_links(db, lead_id)
 
 
-@router.post("/leads/{lead_id}/convert")
-def convert_lead_endpoint(lead_id: str, body: LeadConvertRequest, db: Session = Depends(get_db)):
+@router.post("/leads/{lead_id}/convert", response_model=None)
+def convert_lead_endpoint(lead_id: str, body: LeadConvertRequest, db: Session = Depends(get_db)) -> Any:
     lead = db.get(Lead, lead_id)
     if lead is None:
         raise HTTPException(404, "Lead not found")

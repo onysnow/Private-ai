@@ -1,9 +1,11 @@
+from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from app.schemas.api import ClaimCreate
 from app.models.domain import Claim, ClaimReviewEvent, ClaimEvidenceLink, Evidence, Source, RelationshipEdge, RelationshipEvidenceAttachment
 
 
-def review_claim(db: Session, claim: Claim, *, status: str, confidence: float, rationale: str):
+def review_claim(db: Session, claim: Claim, *, status: str, confidence: float, rationale: str) -> Any:
     rationale = rationale.strip()
     if not rationale:
         raise ValueError("Reporter rationale is required for a claim review")
@@ -53,7 +55,7 @@ def validate_claim_fields(*, status: str | None, confidence: float | None) -> No
         raise ValueError("Claim confidence must be between 0 and 1")
 
 
-def create_claim(db: Session, body) -> Claim:
+def create_claim(db: Session, body: ClaimCreate) -> Claim:
     """Validate and persist a new Claim. Raises ValueError for a bad
     status/confidence or empty text. The caller is responsible for
     confirming body.investigation_id exists (a 404 concern)."""
@@ -84,7 +86,7 @@ def update_claim(db: Session, row: Claim, changes: dict) -> Claim:
     return row
 
 
-def link_claim_evidence(db: Session, claim: Claim, evidence: Evidence, *, stance: str, note: str | None):
+def link_claim_evidence(db: Session, claim: Claim, evidence: Evidence, *, stance: str, note: str | None) -> Any:
     """Validate and persist a ClaimEvidenceLink (or return the existing one
     if this exact claim/evidence/stance link already exists). Raises
     ValueError if claim and evidence don't share an investigation, or the

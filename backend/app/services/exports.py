@@ -72,7 +72,7 @@ def _row_dict(row: Any) -> dict[str, Any]:
     return {attr.key: _json_value(getattr(row, attr.key)) for attr in mapper.column_attrs}
 
 
-def _rows(db: Session, model, ids: set[str] | None = None, id_col=None):
+def _rows(db: Session, model: type[Any], ids: set[str] | None = None, id_col: Any = None) -> list[Any]:
     stmt = select(model)
     if ids is not None:
         if not ids:
@@ -134,7 +134,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
     relationship_evidence_reviews = _rows(db, RelationshipEvidenceReviewEvent, relationship_edge_ids, RelationshipEvidenceReviewEvent.relationship_edge_id)
     relationship_evidence_attachments = _rows(db, RelationshipEvidenceAttachment, relationship_edge_ids, RelationshipEvidenceAttachment.relationship_edge_id)
 
-    table_rows = {
+    table_rows: dict[str, list[Any]] = {
         "investigations": [inv], "entities": entities, "statements": statements,
         "sources": sources, "evidence": evidence, "claim_evidence_links": claim_links, "claim_review_events": claim_review_events,
         "claims": claims, "leads": leads, "lead_profiles": lead_profiles,
@@ -449,7 +449,7 @@ def preview_investigation_restore(
         "restore_api_enabled": settings.enable_restore_api,
     }
 
-def _coerce_datetimes(model, row: dict[str, Any]) -> dict[str, Any]:
+def _coerce_datetimes(model: type[Any], row: dict[str, Any]) -> dict[str, Any]:
     result = dict(row)
     mapper = inspect(model)
     for col in mapper.columns:

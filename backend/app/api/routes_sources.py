@@ -6,6 +6,7 @@ routes.py, so a source can't be created after its investigation's
 deletion begins); persistence and validation live in
 app/services/sources.py.
 """
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -19,8 +20,8 @@ from app.services.sources import create_source, list_source_evidence
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.post("/sources")
-def create_source_endpoint(body: SourceCreate, db: Session = Depends(get_db)):
+@router.post("/sources", response_model=None)
+def create_source_endpoint(body: SourceCreate, db: Session = Depends(get_db)) -> Any:
     # Source creation participates in the same investigation-scoped PostgreSQL lock
     # as document ingest/delete/restore so a source cannot commit after deletion.
     lock_investigation_transaction(db, body.investigation_id)
@@ -32,8 +33,8 @@ def create_source_endpoint(body: SourceCreate, db: Session = Depends(get_db)):
         raise HTTPException(400, str(exc))
 
 
-@router.get("/sources/{source_id}/evidence")
-def list_source_evidence_endpoint(source_id: str, db: Session = Depends(get_db)):
+@router.get("/sources/{source_id}/evidence", response_model=None)
+def list_source_evidence_endpoint(source_id: str, db: Session = Depends(get_db)) -> Any:
     if db.get(Source, source_id) is None:
         raise HTTPException(404, "Source not found")
     return list_source_evidence(db, source_id)

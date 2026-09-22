@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 from sqlalchemy import String, event, inspect
+from typing import Iterator
 from sqlalchemy.orm import Session
 
 
-def _iter_string_limits(obj):
-    mapper = inspect(obj).mapper
+def _iter_string_limits(obj: object) -> Iterator[tuple[str, int]]:
+    state = inspect(obj)
+    assert state is not None
+    mapper = state.mapper
     for attr in mapper.column_attrs:
         if not attr.columns:
             continue
@@ -39,5 +42,5 @@ def validate_modeled_string_lengths(session: Session) -> None:
 
 
 @event.listens_for(Session, "before_flush")
-def _enforce_modeled_string_lengths(session: Session, flush_context, instances) -> None:
+def _enforce_modeled_string_lengths(session: Session, flush_context: object, instances: object) -> None:
     validate_modeled_string_lengths(session)
