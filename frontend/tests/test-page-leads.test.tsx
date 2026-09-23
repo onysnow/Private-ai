@@ -124,7 +124,7 @@ function leadFixture(overrides: Record<string, unknown> = {}) {
 function cascadeResponses(leads: unknown[] = []) {
   return [
     jsonResponse([]), // GET connector-findings
-    jsonResponse({entities: []}), // GET entities
+    jsonResponse([]), // GET entities (parseEntityList expects the raw array, not {entities:[]})
     jsonResponse(emptyGraph), // GET graph
     jsonResponse({events: [], verification_counts: {}}), // GET timeline
     jsonResponse({items: leads}), // GET leads/queue

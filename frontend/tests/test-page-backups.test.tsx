@@ -209,7 +209,7 @@ describe('Home portable investigation backup & restore', () => {
       ) // POST /api/backups/restore
       .mockResolvedValueOnce(jsonResponse([{id: 'inv-restored', name: 'Restored investigation'}])) // GET investigations reload
       .mockResolvedValueOnce(jsonResponse([])) // findings
-      .mockResolvedValueOnce(jsonResponse({entities: []})) // entities
+      .mockResolvedValueOnce(jsonResponse([])) // entities (parseEntityList expects the raw array)
       .mockResolvedValueOnce(
         jsonResponse({
           nodes: [],
