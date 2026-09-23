@@ -36,3 +36,12 @@ jobs:
         # unchecked. This closes that gap for the current [tool.mypy] `files`
         # scope; widen the workflow only after pyproject.toml's own scope grows.
         run: python -m mypy
+
+      - name: Run ruff
+        # ruff has been configured in pyproject.toml (currently: app/connectors,
+        # app/core/access.py, app/core/config.py, app/core/time.py,
+        # app/console_adapters.py, opsconsole/**) since it was first added, but
+        # like mypy before STRUCT-0013 it was never actually invoked here --
+        # nothing enforced [tool.ruff.lint]'s import-order rule in CI. Widen the
+        # workflow only after pyproject.toml's own [tool.ruff] `include` grows.
+        run: python -m ruff check .

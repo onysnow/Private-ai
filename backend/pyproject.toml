@@ -59,4 +59,7 @@ show_error_codes = true
 disallow_untyped_defs = true
 
 [tool.pytest.ini_options]
-addopts = "-q --cov=app --cov-report=term-missing --cov-fail-under=80"
+# opsconsole (ADR-0003) is measured alongside app/ as of this line -- previously
+# only --cov=app, so opsconsole tests had to pass in CI but nothing gated their
+# coverage. Combined coverage at the time this was added: 86.21%.
+addopts = "-q --cov=app --cov=opsconsole --cov-report=term-missing --cov-fail-under=80"
