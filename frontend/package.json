@@ -31,6 +31,8 @@
     "react-hook-form": "^7.88.0",
     "sonner": "^2.0.8",
     "tailwind-merge": "^3.7.0",
+    "vis-data": "^7.1.10",
+    "vis-network": "^9.1.13",
     "zod": "^3.25.76"
   },
   "devDependencies": {
