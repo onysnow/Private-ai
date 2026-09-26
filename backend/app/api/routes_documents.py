@@ -19,6 +19,7 @@ from app.models.domain import Document, Investigation
 from app.services.documents import (
     get_document_detail, ingest_document, list_document_candidates, serialize_document,
 )
+from app.services.extraction_explanations import explain_extraction_candidate, serialize_candidate
 from app.services.openaleph_corpus import (
     get_document_sync, get_openaleph_review_status, import_openaleph_entity_candidates,
     import_openaleph_evidence_candidates, record_openaleph_operation_failure,
@@ -162,7 +163,12 @@ def get_document(document_id: str, db: Session = Depends(get_db)) -> Any:
 
 
 @router.get("/documents/{document_id}/candidates", response_model=None)
-def list_document_candidates_endpoint(document_id: str, status: str | None = None, candidate_type: str | None = None, db: Session = Depends(get_db)) -> Any:
+def list_document_candidates_endpoint(document_id: str, status: str | None = None, candidate_type: str | None = None, explain: bool = False, db: Session = Depends(get_db)) -> Any:
     if db.get(Document, document_id) is None:
         raise HTTPException(404, "Document not found")
-    return list_document_candidates(db, document_id, status, candidate_type)
+    rows = list_document_candidates(db, document_id, status, candidate_type)
+    if not explain:
+        return rows
+    # #190: attach each proposal's per-part reasoning/sources so the review list
+    # can show why every proposal exists without one request per row.
+    return [{**serialize_candidate(row), "explanation": explain_extraction_candidate(db, row)} for row in rows]
