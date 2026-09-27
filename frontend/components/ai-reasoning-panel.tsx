@@ -15,6 +15,7 @@ import type {AiAnalysisCandidate,AiAnalysisCandidateSummary,AiModuleName,AiReaso
 import {isAiAnalysisCandidate,isAiAnalysisCandidateReview,isAiReasoningRunResult,parseAiAnalysisCandidateList} from '../lib/api-validate';
 import {ApiClient,errorMessage} from '../lib/api-client';
 import {Button} from '@/components/ui/button';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 
 type Props={api:ApiClient,investigationId:string,status:AiReasoningStatus|null|undefined};
 
@@ -113,7 +114,7 @@ export function AiReasoningPanel({api,investigationId,status}:Props):ReactElemen
     <p className="muted" data-testid="ai-status">{describeAiStatus(status)}</p>
     {!investigationId?<p className="muted">Select an investigation to run or review AI analysis.</p>:<>
       <div className="searchrow">
-        <select aria-label="Reasoning module" value={module} onChange={(e:ChangeEvent<HTMLSelectElement>)=>setModule(e.target.value as AiModuleName)} disabled={!callable||running}><option value="case_synthesis">Case synthesis</option><option value="hypothesis_test">Hypothesis test</option></select>
+        <Select value={module} onValueChange={(v:string)=>setModule(v as AiModuleName)} disabled={!callable||running}><SelectTrigger aria-label="Reasoning module" className="w-auto"><SelectValue/></SelectTrigger><SelectContent><SelectItem value="case_synthesis">Case synthesis</SelectItem><SelectItem value="hypothesis_test">Hypothesis test</SelectItem></SelectContent></Select>
         <input aria-label="Question" value={question} onChange={(e:ChangeEvent<HTMLInputElement>)=>setQuestion(e.target.value)} placeholder="What does the evidence establish about …?" disabled={!callable||running}/>
         <input aria-label="Max retrieval results" type="number" min={1} max={100} value={maxResults} onChange={(e:ChangeEvent<HTMLInputElement>)=>setMaxResults(Math.min(100,Math.max(1,Number(e.target.value)||30)))} style={{width:80}} disabled={!callable||running}/>
         <label className="muted"><input type="checkbox" checked={includeLeads} onChange={(e:ChangeEvent<HTMLInputElement>)=>setIncludeLeads(e.target.checked)} disabled={!callable||running}/> include external leads</label>
