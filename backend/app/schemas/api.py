@@ -18,6 +18,21 @@ class EntityCreate(BaseModel):
     dataset: str = "reporter"
     origin: str | None = None
 
+class EntityUpdate(BaseModel):
+    """Partial update: caption and/or new property values.
+
+    Property values are additive statements (same provenance ledger used
+    everywhere else), never overwrites or deletes -- a value already present
+    for a prop is left as-is; a new one is appended and recorded as a
+    Statement. Disagreements between old and new values are resolved the
+    same way any other statement disagreement is: a property-conflict
+    decision, not this endpoint.
+    """
+    caption: str | None = None
+    properties: dict[str, list[str]] = Field(default_factory=dict)
+    dataset: str = "reporter"
+    origin: str | None = None
+
 class SourceCreate(BaseModel):
     investigation_id: str
     title: str

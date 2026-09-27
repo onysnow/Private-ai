@@ -89,6 +89,21 @@ describe('EntityForm', () => {
     });
   });
 
+  it('disables the schema field in edit mode with an explanatory note, since PATCH cannot change it', async () => {
+    const entity: CanonicalEntity = {id: 'ent-1', caption: 'Kestrelwood Holdings Ltd', schema: 'Company', properties: {}};
+    render(<EntityForm entity={entity} onSubmit={vi.fn()} />);
+
+    const schemaField = screen.getByPlaceholderText('Person, Organization, Company…');
+    expect(schemaField).toBeDisabled();
+    expect(screen.getByText("Schema can't be changed after creation.")).toBeInTheDocument();
+  });
+
+  it('leaves the schema field enabled in create mode', () => {
+    render(<EntityForm onSubmit={vi.fn()} />);
+    expect(screen.getByPlaceholderText('Person, Organization, Company…')).toBeEnabled();
+    expect(screen.queryByText("Schema can't be changed after creation.")).not.toBeInTheDocument();
+  });
+
   it('re-populates the form when a different entity is passed in without remounting', async () => {
     const entityA: CanonicalEntity = {id: 'ent-1', caption: 'Entity A', schema: 'Person', properties: {}};
     const entityB: CanonicalEntity = {id: 'ent-2', caption: 'Entity B', schema: 'Organization', properties: {}};

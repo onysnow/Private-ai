@@ -17,7 +17,7 @@ from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
 from app.models.domain import Entity
 from app.schemas.api import (
-    CanonicalMergeExecuteRequest, CanonicalResolutionRequest, EntityCreate,
+    CanonicalMergeExecuteRequest, CanonicalResolutionRequest, EntityCreate, EntityUpdate,
     MultiEnrichmentRequest, PostMergeReconciliationRequest, PropertyConflictDecisionRequest,
 )
 from app.services.connectors import enrich_entity as _enrich_entity_single
@@ -42,6 +42,7 @@ from app.services.entities import (
     list_external_relationship_promotions as _list_external_relationship_promotions,
     list_property_conflict_decisions as _list_property_conflict_decisions,
     run_multi_enrichment as _run_multi_enrichment,
+    update_entity as _update_entity,
 )
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -53,6 +54,17 @@ def create_entity(body: EntityCreate, db: Session = Depends(get_db)) -> Any:
         return _create_entity(db, body)
     except LookupError as exc:
         raise HTTPException(404, str(exc))
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+
+
+@router.patch("/entities/{entity_id}", response_model=None)
+def update_entity(entity_id: str, body: EntityUpdate, db: Session = Depends(get_db)) -> Any:
+    entity = db.get(Entity, entity_id)
+    if entity is None:
+        raise HTTPException(404, "Entity not found")
+    try:
+        return _update_entity(db, entity, body)
     except ValueError as exc:
         raise HTTPException(400, str(exc))
 
