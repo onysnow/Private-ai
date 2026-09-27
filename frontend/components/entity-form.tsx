@@ -4,8 +4,11 @@
 // form lifecycle (entry, schema-driven validation incl. nested/structured
 // fields, edit via defaultValues/reset, and create/update submit with error
 // handling). Used in create mode by app/page.tsx's "Add an entity manually"
-// panel (lazy-loaded). Edit mode is not wired: the backend has no entity
-// update endpoint.
+// panel, and in edit mode by the dossier panel's "Edit entity" toggle (both
+// lazy-loaded). PATCH /api/entities/{id} can rename an entity and add new
+// property values, but cannot change its FollowTheMoney schema -- the
+// schema field is disabled in edit mode rather than silently discarding an
+// edit to it.
 import * as React from 'react';
 import {useEffect} from 'react';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -100,8 +103,9 @@ export function EntityForm({entity, onSubmit, onCancel}: EntityFormProps): React
             <FormItem>
               <FormLabel>FollowTheMoney schema</FormLabel>
               <FormControl>
-                <Input placeholder="Person, Organization, Company…" {...field} />
+                <Input placeholder="Person, Organization, Company…" {...field} disabled={isEdit} />
               </FormControl>
+              {isEdit && <p className="muted">Schema can&apos;t be changed after creation.</p>}
               <FormMessage />
             </FormItem>
           )}

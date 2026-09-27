@@ -11,7 +11,7 @@ from app.models.domain import (
     ExternalRelationshipPromotion, Investigation, PropertyConflictDecision,
     RelationshipEdge, Source, Statement, StatementPromotion,
 )
-from app.schemas.api import EntityCreate, PropertyConflictDecisionRequest
+from app.schemas.api import EntityCreate, EntityUpdate, PropertyConflictDecisionRequest
 from app.services.connectors import persist_connector_findings
 from app.services.ftm import make_ftm_entity
 from app.services.provenance import entity_statement_history
@@ -36,6 +36,37 @@ def create_entity(db: Session, body: EntityCreate) -> Entity:
     db.commit()
     db.refresh(row)
     return row
+
+
+def update_entity(db: Session, entity: Entity, body: EntityUpdate) -> Entity:
+    """Rename an entity and/or add new property values, as new Statements.
+
+    Additive only, matching the ledger everywhere else in this codebase:
+    a property value is never removed or overwritten here. Two statements
+    disagreeing on a value (old vs. new) is exactly what
+    decide_property_conflict already exists to resolve, so this function
+    does not attempt to pick a "winner" itself.
+    """
+    if entity.merged_into_entity_id is not None:
+        raise ValueError("Entity has been merged into another entity; edit that entity instead")
+    if body.caption is None and not body.properties:
+        raise ValueError("update must set caption and/or properties")
+    if body.caption is not None:
+        entity.caption = body.caption
+    if body.properties:
+        ftm = make_ftm_entity(entity.schema, entity.caption, body.properties)
+        merged = {k: list(v) for k, v in (entity.properties or {}).items()}
+        for prop, values in ftm["properties"].items():
+            current = merged.setdefault(prop, [])
+            for value in values:
+                if value in current:
+                    continue
+                current.append(value)
+                db.add(Statement(entity_id=entity.id, prop=prop, value=value, dataset=body.dataset, origin=body.origin, original_value=value))
+        entity.properties = merged
+    db.commit()
+    db.refresh(entity)
+    return entity
 
 
 def list_entities(

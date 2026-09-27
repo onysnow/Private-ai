@@ -64,3 +64,24 @@ export function entityFormValuesToProperties(values: EntityFormValues): {caption
   }
   return {caption: values.caption, schema: values.schema, properties};
 }
+
+/** PATCH /api/entities/{id} is additive: a value already on the entity is
+ * left alone, a new one is recorded as a new Statement alongside it (see
+ * backend/app/services/entities.py::update_entity). The edit form shows
+ * every current value as editable text, which would otherwise read as
+ * "replace" -- this picks out only the values genuinely new to each prop,
+ * compared against the entity's existing properties, so a reporter editing
+ * a line in place still adds a value rather than silently erasing one.
+ */
+export function entityPropertyAdditions(
+  existing: Record<string, string[]> | undefined | null,
+  submitted: Record<string, string[]>,
+): Record<string, string[]> {
+  const additions: Record<string, string[]> = {};
+  for (const [key, values] of Object.entries(submitted)) {
+    const current = new Set((existing?.[key] || []).map((v) => v.trim()));
+    const added = values.filter((v) => !current.has(v.trim()));
+    if (added.length > 0) additions[key] = added;
+  }
+  return additions;
+}
