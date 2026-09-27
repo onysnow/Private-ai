@@ -17,11 +17,14 @@
 // source/target selects without any user interaction -- no need to drive
 // the <select> elements by hand.
 //
-// The <Graph> component here is a hand-written inline SVG (task #44's
-// vis-network swap hasn't happened yet), so its edges/nodes are ordinary
-// DOM elements with onClick handlers -- openGraphEdge is exercised through
-// the simpler, always-visible `.relEdge` span in the relationshipList below
-// the graph instead, which fires the exact same handler.
+// The <Graph> component now renders the vis-network <EntityGraph> (issue
+// #39 wiring). vis-network needs a real canvas 2D context, which jsdom does
+// not have, so <EntityGraph> is replaced below with a DOM stub that renders
+// one button per node and edge and calls the same onNodeClick/onEdgeClick
+// props -- matching the convention in tests/test-entity-graph.test.tsx of
+// asserting what the page passes down rather than third-party rendering.
+// Most tests still open edges through the always-visible `.relEdge` span in
+// the relationshipList, which fires the exact same openGraphEdge handler.
 //
 // Also because of that same loadEntities() auto-fill, `entityId` is
 // non-empty by the time attachEvidenceToRelationship/reviewRelationshipEvidence
@@ -36,6 +39,20 @@ import {cleanup, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+vi.mock('../components/entity-graph', () => ({
+  EntityGraph: ({nodes, edges, onNodeClick, onEdgeClick}: {
+    nodes: Array<{id: string; label: string; schema?: string}>;
+    edges: Array<{id: string; from: string; to: string; label?: string}>;
+    onNodeClick?: (id: string) => void;
+    onEdgeClick?: (id: string) => void;
+  }) => (
+    <div data-testid="entity-graph-stub">
+      {nodes.map(n => <button key={n.id} type="button" data-testid={`graph-node-${n.id}`} onClick={() => onNodeClick?.(n.id)}>{`${n.label} (${n.schema ?? ''})`}</button>)}
+      {edges.map(e => <button key={e.id} type="button" data-testid={`graph-edge-${e.id}`} onClick={() => onEdgeClick?.(e.id)}>{`${e.from}->${e.to}:${e.label ?? ''}`}</button>)}
+    </div>
+  ),
+}));
 
 beforeEach(() => {
   if (!window.matchMedia) {
@@ -334,5 +351,43 @@ describe('Home FollowTheMoney relationship graph', () => {
       stance: 'supports',
       rationale: 'Board minutes directly confirm the ownership stake.',
     });
+  });
+
+  it('passes the shown relationships to the entity graph and opens an edge from it', async () => {
+    const {fetchMock} = await bootstrap([entityA, entityB], [relationshipFixture()]);
+
+    expect(await screen.findByTestId('graph-node-ent-1')).toHaveTextContent('Kestrelwood Holdings Ltd (Company)');
+    expect(screen.getByTestId('graph-node-ent-2')).toHaveTextContent('Jane Doe (Person)');
+    expect(screen.getByTestId('graph-edge-rel-1')).toHaveTextContent('ent-1->ent-2:Ownership');
+
+    fetchMock.mockResolvedValueOnce(jsonResponse({reviews: []})); // GET evidence-reviews
+    await userEvent.setup().click(screen.getByTestId('graph-edge-rel-1'));
+
+    await screen.findByText('Kestrelwood Holdings Ltd → Jane Doe');
+    const [reviewsUrl] = fetchMock.mock.calls[13];
+    expect(reviewsUrl).toContain('/api/relationships/rel-1/evidence-reviews');
+  });
+
+  it('creates an entity from the manual entity form and reloads entities', async () => {
+    const {fetchMock} = await bootstrap([entityA, entityB]);
+    const created = {id: 'ent-3', investigation_id: 'inv-1', caption: 'Harbor Trust', schema: 'Company', properties: {}};
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse(created)) // POST /api/entities
+      .mockResolvedValueOnce(jsonResponse([entityA, entityB, created])); // loadEntities reload
+
+    const user = userEvent.setup();
+    await user.click(screen.getByText('Add an entity manually'));
+    await user.type(await screen.findByLabelText('Caption'), 'Harbor Trust');
+    await user.type(screen.getByLabelText('FollowTheMoney schema'), 'Company');
+    await user.click(screen.getByRole('button', {name: /create entity/i}));
+
+    await vi.waitFor(() => expect(fetchMock.mock.calls.length).toBeGreaterThanOrEqual(15));
+    const [postUrl, postInit] = fetchMock.mock.calls[13];
+    expect(postUrl).toContain('/api/entities');
+    expect((postInit as RequestInit).method).toBe('POST');
+    expect(JSON.parse((postInit as RequestInit).body as string)).toEqual({
+      investigation_id: 'inv-1', schema: 'Company', caption: 'Harbor Trust', properties: {},
+    });
+    expect(String(fetchMock.mock.calls[14][0])).toContain('/api/investigations/inv-1/entities');
   });
 });

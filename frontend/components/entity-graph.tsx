@@ -1,8 +1,8 @@
 'use client';
 
 // Issue #39: reusable interactive entity-relationship graph on vis-network.
-// Not wired into any existing page -- per the issue's own "out of scope"
-// note, that integration is separate follow-on work.
+// Used by app/page.tsx's relationship graph section (lazy-loaded, client
+// only).
 //
 // DataSet reactivity: nodes/edges DataSets are created once (in a ref) and
 // kept in sync with the `nodes`/`edges` props via diff-and-update on every

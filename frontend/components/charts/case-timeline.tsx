@@ -21,7 +21,7 @@
 // Events with an unparseable date_start are excluded and counted rather
 // than silently dropped or crashing the chart.
 //
-// Infra only; not wired into any existing page (issue #40's own scope note).
+// Used by app/page.tsx's investigation timeline section (lazy-loaded).
 
 import * as React from 'react';
 import {useMemo} from 'react';

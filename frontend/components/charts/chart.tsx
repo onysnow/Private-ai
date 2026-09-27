@@ -7,7 +7,8 @@
 // (and anything built on it) never pulls in the full echarts bundle -- see
 // that file's docstring for the selective-import rationale.
 //
-// Infra only; not wired into any existing page (issue #40's own scope note).
+// Used via <CaseTimeline> on app/page.tsx; <FinancialFlowSankey> is not
+// wired into a page (no backend endpoint supplies a transaction ledger yet).
 // See components/charts/financial-flow-sankey.tsx and
 // components/charts/case-timeline.tsx for concrete uses.
 

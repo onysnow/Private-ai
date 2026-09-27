@@ -14,7 +14,7 @@
 // reusing the same direct/inferred visual vocabulary (solid vs. dashed,
 // amber for inferred) already established in components/entity-graph.tsx.
 //
-// Infra only; not wired into any existing page (issue #40's own scope note).
+// Not wired into a page: no backend endpoint supplies a transaction ledger yet.
 
 import * as React from 'react';
 import {useMemo, useState} from 'react';

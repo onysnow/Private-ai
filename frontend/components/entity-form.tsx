@@ -3,11 +3,9 @@
 // STRUCT-0041 / issue #41: first concrete demonstration of the full RHF+Zod
 // form lifecycle (entry, schema-driven validation incl. nested/structured
 // fields, edit via defaultValues/reset, and create/update submit with error
-// handling). This is a new, reusable, standalone component -- not wired
-// into app/page.tsx's existing entity UI. That page.tsx integration is
-// tracked as separate follow-on work per issue #41's own "out of scope"
-// note, matching MIGRATION_NOTES.md's one-workflow-section-per-PR strategy
-// for the shadcn migration.
+// handling). Used in create mode by app/page.tsx's "Add an entity manually"
+// panel (lazy-loaded). Edit mode is not wired: the backend has no entity
+// update endpoint.
 import * as React from 'react';
 import {useEffect} from 'react';
 import {zodResolver} from '@hookform/resolvers/zod';
