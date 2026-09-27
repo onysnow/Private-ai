@@ -14,7 +14,8 @@
 // reusing the same direct/inferred visual vocabulary (solid vs. dashed,
 // amber for inferred) already established in components/entity-graph.tsx.
 //
-// Not wired into a page: no backend endpoint supplies a transaction ledger yet.
+// Used by app/page.tsx's money-flow panel (lazy-loaded), fed from
+// GET /api/investigations/{id}/financial-flows.
 
 import * as React from 'react';
 import {useMemo, useState} from 'react';
@@ -23,6 +24,7 @@ import type {EChartsOption} from 'echarts';
 import {Chart} from './chart';
 import {
   aggregateTransactionsByCurrency,
+  findFlowCycle,
   type FinancialFlowTransaction,
 } from '@/lib/financial-flow-types';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
@@ -115,6 +117,7 @@ export function FinancialFlowSankey({
   }
 
   const excludedCurrencies = aggregation?.excludedCurrencies ?? [];
+  const cycle = aggregation ? findFlowCycle(aggregation.links) : null;
 
   return (
     <div className={className}>
@@ -140,11 +143,18 @@ export function FinancialFlowSankey({
           Not shown (different currency, not summed with {activeCurrency}): {excludedCurrencies.join(', ')}.
         </p>
       )}
-      <Chart
-        option={option}
-        height={height}
-        ariaLabel={`Sankey diagram of ${activeCurrency ?? ''} transaction flows between ${aggregation?.nodes.length ?? 0} parties`}
-      />
+      {cycle ? (
+        <p className="text-sm text-muted-foreground" role="note">
+          The {activeCurrency} flows form a cycle ({cycle.join(' → ')}), which a Sankey diagram cannot draw. Every
+          transaction is still listed in the ledger.
+        </p>
+      ) : (
+        <Chart
+          option={option}
+          height={height}
+          ariaLabel={`Sankey diagram of ${activeCurrency ?? ''} transaction flows between ${aggregation?.nodes.length ?? 0} parties`}
+        />
+      )}
     </div>
   );
 }

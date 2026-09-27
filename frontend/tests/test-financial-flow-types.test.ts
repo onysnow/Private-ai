@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 
-import {aggregateTransactionsByCurrency, type FinancialFlowTransaction} from '../lib/financial-flow-types';
+import {aggregateTransactionsByCurrency, findFlowCycle, type FinancialFlowTransaction} from '../lib/financial-flow-types';
 
 function txn(overrides: Partial<FinancialFlowTransaction> & Pick<FinancialFlowTransaction, 'id' | 'from' | 'to' | 'amount' | 'currency'>): FinancialFlowTransaction {
   return {dateTime: '2024-01-01T00:00:00Z', ...overrides};
@@ -71,3 +71,23 @@ describe('aggregateTransactionsByCurrency', () => {
     expect(result.get('USD')?.links).toHaveLength(2);
   });
 });
+
+describe('findFlowCycle', () => {
+  it('returns null for an acyclic flow', () => {
+    expect(findFlowCycle([{source: 'A', target: 'B'}, {source: 'B', target: 'C'}, {source: 'A', target: 'C'}])).toBeNull();
+  });
+
+  it('returns a closed path for a two-party round trip', () => {
+    expect(findFlowCycle([{source: 'A', target: 'B'}, {source: 'B', target: 'A'}])).toEqual(['A', 'B', 'A']);
+  });
+
+  it('finds a longer cycle reached from an acyclic prefix', () => {
+    expect(findFlowCycle([
+      {source: 'X', target: 'A'},
+      {source: 'A', target: 'B'},
+      {source: 'B', target: 'C'},
+      {source: 'C', target: 'A'},
+    ])).toEqual(['A', 'B', 'C', 'A']);
+  });
+});
+
