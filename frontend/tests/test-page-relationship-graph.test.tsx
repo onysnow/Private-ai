@@ -416,7 +416,17 @@ describe('Home FollowTheMoney relationship graph', () => {
       .mockResolvedValueOnce(jsonResponse([entityA, entityB])); // loadEntities reload
 
     const user = userEvent.setup();
-    await user.selectOptions(screen.getAllByRole('combobox').find(el => (el as HTMLSelectElement).value === 'Ownership')!, 'Payment');
+    // Opened via focus + ArrowDown rather than a click on the trigger: this
+    // file's tests each render the same page sharing one jsdom document,
+    // and a plain click on a Select trigger has twice now (converting
+    // relationshipEvidenceAttachId and the reasoning-module select)
+    // reliably failed to open when run after earlier tests in the file --
+    // see MIGRATION_NOTES.md. Using the same workaround directly here
+    // rather than risk rediscovering it.
+    const relSchemaTrigger = screen.getAllByRole('combobox').find(el => el.textContent === 'Ownership')!;
+    relSchemaTrigger.focus();
+    await user.keyboard('{ArrowDown}');
+    await user.click(await screen.findByRole('option', {name: 'Payment'}));
     await user.type(screen.getByLabelText('Payment amount'), '1250.50');
     await user.type(screen.getByLabelText('Payment currency'), 'USD');
     await user.type(screen.getByLabelText('Payment date'), '2024-03-02');
