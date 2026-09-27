@@ -17,12 +17,16 @@ __pycache__/
 .ruff_cache/
 .venv/
 venv/
+.coverage
+backend/.coverage
 
 # Frontend dependencies/build output
 frontend/node_modules/
 frontend/.next/
 node_modules/
 .next/
+frontend/tsconfig.tsbuildinfo
+*.tsbuildinfo
 
 # Local generated snapshots / runtime artifacts
 journalism-workbench-*-source.tar.gz
