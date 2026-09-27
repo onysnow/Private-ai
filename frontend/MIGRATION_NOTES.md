@@ -16,6 +16,7 @@ This PR introduces Tailwind + shadcn/ui primitives and demonstrates adoption in 
 - Provenance trace panel now uses `Card`/`CardHeader`/`CardTitle`/`CardDescription`/`CardContent` (2026-09-27; no form controls in this panel, so no `Input`/`Select` changes -- structural wrapper only; no behavior change, verified with `tsc`/`eslint`/vitest/`next build`)
 - Document ingestion & extraction panel now uses `Card`/`CardHeader`/`CardTitle`/`CardDescription`/`CardContent`; its document-title text `<input>` and its file `<input type="file">` both swapped to `Input` (the shadcn `Input` wraps a plain `<input>`, so `type="file"` works through it unchanged), as did the relationship-schema text `<input>` inside the "stage relationship from reviewed claim" sub-panel; the two entity-picker `<select>`s there are untouched (2026-09-27; no behavior change, verified with `tsc`/`eslint`/vitest/`next build`)
 - Claim verification workspace panel now uses `Card`/`CardHeader`/`CardTitle`/`CardDescription`/`CardContent`; its new-claim text `<input>`, review-rationale `<input>`, and evidence-link-note `<input>` all swapped to `Input`. The verification-status `<select>` is untouched, same reason as other `<select>`s; the confidence `<input type="range">` slider is also untouched -- no shadcn `Slider` component exists in `components/ui/` (2026-09-27; no behavior change, verified with `tsc`/`eslint`/vitest/`next build`)
+- Portable investigation backup & restore panel now uses `Card`/`CardHeader`/`CardTitle`/`CardDescription`/`CardContent` (this one panel also holds the local security/settings status, connector-credentials, orphan-files, and security-audit sub-sections). Its restore-archive file `<input type="file">`, its credential `<input type="password">`, and its audit-prune-confirmation text `<input>` all swapped to `Input`; the credential-provider `<select>` and the two checkboxes (restore confirmation, and none other here) are untouched (2026-09-27; no behavior change, verified with `tsc`/`eslint`/vitest/`next build`)
 
 Note: an earlier draft of this list claimed the API access and investigation
 search panels were already converted; only API access actually was (as of
@@ -25,7 +26,7 @@ this update too.
 
 ## Remaining hand-rolled markup (follow-up punch list)
 
-- Backup/restore, external connectors, and relationship graph panels are still bespoke `<section className="card">` wrappers
+- External connectors and relationship graph panels are still bespoke `<section className="card">` wrappers
 - No section has migrated a `<select>` to the existing shadcn `Select`, or a checkbox to a shadcn `Checkbox`, yet. `Select` exists in `components/ui/` (unused elsewhere) but wiring it in is still its own, bigger PR per `<select>` -- it means switching plain `onChange` to Radix's `onValueChange`-style API and rebuilding each `<option>` list as `SelectItem`s, not just a wrapper swap. No `Checkbox` component exists at all yet; adding one is a separate PR. No `Slider` component exists either, so the one `<input type="range">` in the app (claim confidence) also stays native.
 - Most action controls still use native `<button>`, `<input>`, `<textarea>`, and `<select>`
 - Dialog-like and menu-like interactions are still custom and can migrate to `Dialog` / `DropdownMenu`
