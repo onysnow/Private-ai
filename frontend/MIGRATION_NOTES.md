@@ -9,6 +9,7 @@ This PR introduces Tailwind + shadcn/ui primitives and demonstrates adoption in 
 - Sonner `Toaster` mounted in `page.tsx`
 - Local investigation deletion panel now uses `Card`/`CardHeader`/`CardTitle`/`CardDescription`/`CardContent` and `Input` (2026-09-27; no behavior change, verified with `tsc`/`eslint`/vitest/`next build`)
 - API access panel now uses `Card`/`CardHeader`/`CardTitle`/`CardContent` and `Input` (2026-09-27; no behavior change, verified with `tsc`/`eslint`/vitest/`next build`)
+- Source & exact evidence capture panel now uses `Card`/`CardHeader`/`CardTitle`/`CardDescription`/`CardContent` and `Input` for its three text fields; its `<select>` (source type) is untouched -- no shadcn `Select` is wired up yet, and adding one is a bigger, separate step than this pass's scope (2026-09-27; no behavior change, verified with `tsc`/`eslint`/vitest/`next build`)
 
 Note: an earlier draft of this list claimed the API access and investigation
 search panels were already converted; only API access actually was (as of
@@ -18,6 +19,7 @@ was still plain `<section className="card">` with native `<input>`.
 ## Remaining hand-rolled markup (follow-up punch list)
 
 - Investigation search and most other remaining `<section className="card">` panels are still bespoke JSX wrappers
+- No section has migrated a `<select>` to a shadcn `Select` yet -- that needs its own PR (wiring Radix's onValueChange-style API in place of onChange)
 - Most action controls still use native `<button>`, `<input>`, `<textarea>`, and `<select>`
 - Dialog-like and menu-like interactions are still custom and can migrate to `Dialog` / `DropdownMenu`
 - Claim/evidence and relationship workspaces still render custom list/row layouts that can migrate to `Table`, `Tabs`, and additional `Card` composition
