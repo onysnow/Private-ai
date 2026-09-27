@@ -40,6 +40,14 @@ import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+const {sankeySpy} = vi.hoisted(() => ({sankeySpy: vi.fn()}));
+vi.mock('../components/charts/financial-flow-sankey', () => ({
+  FinancialFlowSankey: (props: Record<string, unknown>) => {
+    sankeySpy(props);
+    return <div data-testid="sankey-stub" />;
+  },
+}));
+
 vi.mock('../components/entity-graph', () => ({
   EntityGraph: ({nodes, edges, onNodeClick, onEdgeClick}: {
     nodes: Array<{id: string; label: string; schema?: string}>;
@@ -389,5 +397,57 @@ describe('Home FollowTheMoney relationship graph', () => {
       investigation_id: 'inv-1', schema: 'Company', caption: 'Harbor Trust', properties: {},
     });
     expect(String(fetchMock.mock.calls[14][0])).toContain('/api/investigations/inv-1/entities');
+  });
+
+  it('creates a Payment relationship with amount, currency, date and purpose', async () => {
+    const {fetchMock} = await bootstrap([entityA, entityB]);
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse({})) // POST /api/relationships
+      .mockResolvedValueOnce(jsonResponse(emptyGraph([]))) // loadRelationships reload
+      .mockResolvedValueOnce(jsonResponse([entityA, entityB])); // loadEntities reload
+
+    const user = userEvent.setup();
+    await user.selectOptions(screen.getAllByRole('combobox').find(el => (el as HTMLSelectElement).value === 'Ownership')!, 'Payment');
+    await user.type(screen.getByLabelText('Payment amount'), '1250.50');
+    await user.type(screen.getByLabelText('Payment currency'), 'USD');
+    await user.type(screen.getByLabelText('Payment date'), '2024-03-02');
+    await user.type(screen.getByLabelText('Payment purpose'), 'consulting');
+    await user.click(screen.getByRole('button', {name: 'Add relationship'}));
+
+    await vi.waitFor(() => expect(fetchMock.mock.calls.length).toBeGreaterThanOrEqual(16));
+    const [postUrl, postInit] = fetchMock.mock.calls[13];
+    expect(postUrl).toContain('/api/relationships');
+    expect(JSON.parse((postInit as RequestInit).body as string)).toMatchObject({
+      schema: 'Payment',
+      properties: {amount: ['1250.50'], currency: ['USD'], date: ['2024-03-02'], purpose: ['consulting']},
+    });
+  });
+
+  it('loads the money-flow ledger on demand and charts complete payments only', async () => {
+    const {fetchMock} = await bootstrap([entityA, entityB]);
+    const row = {
+      id: 'rel-9', relationship_id: 'rel-9', dateTime: '2024-03-02', from: 'Kestrelwood Holdings Ltd', to: 'Jane Doe',
+      from_entity_id: 'ent-1', to_entity_id: 'ent-2', amount: 1250.5, currency: 'USD', statedPurpose: 'consulting',
+      transactionNumber: null, evidence: 'p.2 [supports]', evidence_count: 1, supporting_evidence_count: 1,
+      status: 'no_claim_dependency', flowType: 'direct',
+    };
+    fetchMock.mockResolvedValueOnce(jsonResponse({
+      investigation_id: 'inv-1', transactions: [row],
+      incomplete: [{...row, id: 'rel-10', relationship_id: 'rel-10', amount: null, flowType: 'inferred', problems: ['amount missing']}],
+      currencies: ['USD'], flow_type_rule: 'direct = supporting reviewed evidence', duplicate_rule: 'reviewed duplicates once',
+    }));
+
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Load money flows'}));
+
+    const panel = await screen.findByTestId('money-flows');
+    expect(String(fetchMock.mock.calls[13][0])).toContain('/api/investigations/inv-1/financial-flows');
+    expect(panel).toHaveTextContent('1,250.5 USD');
+    expect(panel).toHaveTextContent('p.2 [supports]');
+    expect(panel).toHaveTextContent('Not charted (1)');
+    expect(panel).toHaveTextContent('amount missing');
+    await screen.findByTestId('sankey-stub');
+    const props = sankeySpy.mock.calls.at(-1)?.[0] as {transactions: Array<{id: string; amount: number; flowType: string}>};
+    expect(props.transactions).toEqual([expect.objectContaining({id: 'rel-9', amount: 1250.5, currency: 'USD', flowType: 'direct'})]);
+    expect(screen.getByRole('button', {name: 'Reload money flows'})).toBeInTheDocument();
   });
 });

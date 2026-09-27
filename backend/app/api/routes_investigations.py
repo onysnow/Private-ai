@@ -50,6 +50,7 @@ from app.services.investigations import (
     list_investigation_sources as _list_investigation_sources,
     list_investigations as _list_investigations,
 )
+from app.services.financial_flows import investigation_financial_ledger
 from app.services.lifecycle import delete_investigation, preview_investigation_deletion
 from app.services.openaleph_corpus import (
     ensure_openaleph_collection,
@@ -307,6 +308,14 @@ def get_investigation_graph(
         db, investigation_id, requested or None,
         include_reconciled_duplicates=include_reconciled_duplicates,
     )
+
+
+@router.get("/investigations/{investigation_id}/financial-flows", response_model=None)
+def get_investigation_financial_flows(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    """Transaction ledger built from canonical Payment relationships. Read-only."""
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
+    return investigation_financial_ledger(db, investigation_id)
 
 
 @router.get("/investigations/{investigation_id}/documents", response_model=None)

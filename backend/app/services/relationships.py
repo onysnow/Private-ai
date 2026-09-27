@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from sqlalchemy import or_, select
@@ -39,6 +40,16 @@ RELATIONSHIP_SCHEMAS = {
         "target_label": "Employer",
         "label": "Employment",
     },
+    # FtM Payment interstitial: payer -> beneficiary. Amount/currency/date/purpose
+    # are ordinary FtM Payment properties; see app/services/financial_flows.py
+    # for the ledger view built from these edges.
+    "Payment": {
+        "source_prop": "payer",
+        "target_prop": "beneficiary",
+        "source_label": "Payer",
+        "target_label": "Beneficiary",
+        "label": "Payment",
+    },
     "UnknownLink": {
         "source_prop": "subject",
         "target_prop": "object",
@@ -54,6 +65,34 @@ def relationship_schema_info(schema: str) -> dict:
     if info is None:
         raise ValueError(f"Unsupported relationship schema: {schema}")
     return info
+
+
+_PARTIAL_ISO_DATE = re.compile(r"^\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?)?$")
+
+
+def validate_payment_properties(props: dict[str, list[str]]) -> None:
+    """Reject Payment values the financial ledger could not read back.
+
+    Only checks what is present: a Payment without an amount, currency or date
+    is still a valid FtM record, and the ledger lists it as incomplete rather
+    than guessing the missing value.
+    """
+    for value in props.get("amount", []):
+        try:
+            float(str(value).replace(",", ""))
+        except ValueError:
+            raise ValueError(f"Payment amount must be a number: {value!r}") from None
+    for value in props.get("currency", []):
+        if not re.fullmatch(r"[A-Za-z]{3}", str(value).strip()):
+            raise ValueError(f"Payment currency must be a 3-letter ISO 4217 code: {value!r}")
+    for prop in ("date", "startDate", "endDate"):
+        for value in props.get(prop, []):
+            if not _PARTIAL_ISO_DATE.match(str(value).strip()):
+                raise ValueError(f"Payment {prop} must be YYYY, YYYY-MM or YYYY-MM-DD: {value!r}")
+    if "currency" in props:
+        props["currency"] = [str(v).strip().upper() for v in props["currency"]]
+    if "amount" in props:
+        props["amount"] = [str(v).replace(",", "").strip() for v in props["amount"]]
 
 
 def relationship_caption(schema: str, source: Entity, target: Entity, properties: dict[str, list[str]]) -> str:
@@ -95,6 +134,8 @@ def create_relationship(
             raise ValueError("Relationship evidence must belong to the same investigation")
 
     props = {key: list(values) for key, values in (properties or {}).items()}
+    if schema == "Payment":
+        validate_payment_properties(props)
     # Endpoint references are authoritative and cannot be overridden by request properties.
     props[info["source_prop"]] = [source.ftm_id]
     props[info["target_prop"]] = [target.ftm_id]

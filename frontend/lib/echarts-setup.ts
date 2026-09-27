@@ -17,7 +17,7 @@
 // not usable here) and the evidence-status palette already established in
 // components/entity-graph.tsx, kept consistent across both visualizations.
 //
-// Used via <CaseTimeline> on app/page.tsx.
+// Used via <CaseTimeline> and <FinancialFlowSankey> on app/page.tsx.
 
 import * as echarts from 'echarts/core';
 import {CustomChart, LineChart, SankeyChart} from 'echarts/charts';

@@ -8,8 +8,8 @@
 // requires each arrow to state "whether direct or inferred" -- captured
 // here as `flowType`.
 //
-// This is infra/type-only, matching issue #40's own scope note ("Out of
-// Scope: modifying existing pages"). No existing page imports this yet.
+// Used by <FinancialFlowSankey>, fed from GET
+// /api/investigations/{id}/financial-flows (canonical Payment relationships).
 
 export type FinancialFlowType = 'direct' | 'inferred';
 
@@ -109,4 +109,43 @@ export function aggregateTransactionsByCurrency(
   }
 
   return result;
+}
+
+/**
+ * ECharts' Sankey series only accepts acyclic graphs (it throws "Sankey is a
+ * DAG" otherwise), but real money can flow in a circle (A -> B -> A). Returns
+ * one cycle as a closed node path (e.g. ['A', 'B', 'A']) so the caller can
+ * say why the diagram is not drawn instead of crashing, or null if none.
+ */
+export function findFlowCycle(links: Pick<FinancialFlowSankeyLink, 'source' | 'target'>[]): string[] | null {
+  const next = new Map<string, string[]>();
+  for (const link of links) {
+    const list = next.get(link.source);
+    if (list) list.push(link.target);
+    else next.set(link.source, [link.target]);
+  }
+  const state = new Map<string, 'visiting' | 'done'>();
+  const path: string[] = [];
+  const visit = (node: string): string[] | null => {
+    state.set(node, 'visiting');
+    path.push(node);
+    for (const target of next.get(node) ?? []) {
+      const seen = state.get(target);
+      if (seen === 'visiting') return [...path.slice(path.indexOf(target)), target];
+      if (seen === undefined) {
+        const found = visit(target);
+        if (found) return found;
+      }
+    }
+    path.pop();
+    state.set(node, 'done');
+    return null;
+  };
+  for (const node of next.keys()) {
+    if (!state.has(node)) {
+      const found = visit(node);
+      if (found) return found;
+    }
+  }
+  return null;
 }

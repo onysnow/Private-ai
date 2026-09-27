@@ -25,7 +25,7 @@ else:
 _FALLBACK_SCHEMAS = {
     "Person", "Company", "Organization", "PublicBody", "LegalEntity", "Asset",
     "RealEstate", "Address", "Contract", "CourtCase", "Project", "Event", "Vehicle",
-    "Ownership", "Directorship", "Membership", "Employment", "UnknownLink",
+    "Ownership", "Directorship", "Membership", "Employment", "UnknownLink", "Payment",
 }
 
 def _schema_exists(schema: str) -> bool:
@@ -37,7 +37,7 @@ def _supports_name(schema: str) -> bool:
     if ftm_model is not None:
         schema_obj = ftm_model.get(schema)
         return schema_obj is not None and "name" in schema_obj.properties
-    return schema not in {"Address", "Ownership", "Directorship", "Membership", "Employment", "UnknownLink"}
+    return schema not in {"Address", "Ownership", "Directorship", "Membership", "Employment", "UnknownLink", "Payment"}
 
 def make_ftm_entity(schema: str, caption: str, properties: dict[str, list[str]]) -> dict:
     if not _schema_exists(schema):

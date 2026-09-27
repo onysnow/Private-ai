@@ -121,4 +121,17 @@ describe('FinancialFlowSankey', () => {
     const lastCall = chartSpy.mock.calls[chartSpy.mock.calls.length - 1][0];
     expect(lastCall.ariaLabel).toContain('EUR');
   });
+
+  it('explains instead of drawing when the charted currency has a cycle', () => {
+    render(
+      <FinancialFlowSankey
+        transactions={[
+          txn({id: 't1', from: 'A', to: 'B', amount: 100, currency: 'USD'}),
+          txn({id: 't2', from: 'B', to: 'A', amount: 40, currency: 'USD'}),
+        ]}
+      />,
+    );
+    expect(screen.getByRole('note')).toHaveTextContent('The USD flows form a cycle (A → B → A)');
+    expect(chartSpy).not.toHaveBeenCalled();
+  });
 });

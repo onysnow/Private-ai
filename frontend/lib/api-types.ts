@@ -114,3 +114,9 @@ export type ProvenanceTraceClaimLink={link_id:string,stance:string,note?:string|
 export type ProvenanceTraceLeadLink={link_id:string,note?:string|null,lead:{id:string,title:string,detail?:string|null,status:string,provider?:string|null}};
 export type ProvenanceTrace={record_type:'entity'|'claim'|'evidence'|'relationship'|'source'|'document'|'lead'|'task',record_id:string,investigation_id:string,root:JsonObject,extraction_lineage:ExtractionLineage|null,evidence_links:ProvenanceTraceEvidenceLink[],claim_links:ProvenanceTraceClaimLink[],relationships:Relationship[],lead_links:ProvenanceTraceLeadLink[]};
 
+// Ledger from GET /api/investigations/{id}/financial-flows (canonical FtM
+// Payment relationships; backend/app/services/financial_flows.py).
+export type FinancialLedgerRow={id:string,relationship_id:string,dateTime:string|null,from:string|null,to:string|null,from_entity_id:string|null,to_entity_id:string|null,amount:number|null,currency:string|null,statedPurpose:string|null,transactionNumber:string|null,evidence:string|null,evidence_count:number,supporting_evidence_count:number,status:string|null,flowType:'direct'|'inferred'};
+export type FinancialLedgerTransaction=FinancialLedgerRow&{from:string,to:string,amount:number,currency:string};
+export type FinancialLedger={investigation_id:string,transactions:FinancialLedgerTransaction[],incomplete:Array<FinancialLedgerRow&{problems:string[]}>,currencies:string[],flow_type_rule:string,duplicate_rule:string};
+

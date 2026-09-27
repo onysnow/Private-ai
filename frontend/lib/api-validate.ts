@@ -1,6 +1,6 @@
 import type {
   Assessment, Candidate, CanonicalDuplicateCandidate, CanonicalMergePreview, CanonicalEntity, PostMergeReconciliation, DocItem, OpenAlephReviewStatus, EnrichmentCluster, EnrichmentSession,
-  EntityDossier, ExternalRelCandidates, ExternalRelationshipReview, ExtractionCandidate, ExtractionExplanation, ExtractionLineage, ExtractionLineageEnvelope,
+  EntityDossier, ExternalRelCandidates, ExternalRelationshipReview, ExtractionCandidate, ExtractionExplanation, FinancialLedger, ExtractionLineage, ExtractionLineageEnvelope,
   Claim, ClaimEvidenceRow, EvidencePoolRow, EvidenceRecord, SourceRecord, Finding, HistoryRow, IdResponse, Investigation, LeadItem, Relationship, GraphResponse, SearchResult, TimelineEvent, BackupPreview, BackupRestoreResult, SettingsStatus, ConnectorCredentialMutation, AiReasoningStatus, AiAnalysisCandidateSummary, AiAnalysisCandidate, AiReasoningRunResult, AiAnalysisCandidateReview, SecurityAlerts, InvestigationDeletionPreview, InvestigationDeletionResult, OrphanStoragePreview, SecurityAuditView, SecurityAuditSummary, SecurityAuditRetentionPreview, SecurityAuditRetentionResult, ProvenanceTrace,
 } from './api-types';
 
@@ -110,3 +110,8 @@ export const isSecurityAuditRetentionPreview=(v:unknown):v is SecurityAuditReten
 export const isSecurityAuditRetentionResult=(v:unknown):v is SecurityAuditRetentionResult=>isObj(v)&&isSecurityAuditRetentionPreview(v)&&num(v,'removed')&&typeof (v as Obj).applied==='boolean';
 
 export const isProvenanceTrace=(v:unknown):v is ProvenanceTrace=>isObj(v)&&['entity','claim','evidence','relationship','source','document','lead','task'].includes(String(v.record_type))&&str(v,'record_id')&&str(v,'investigation_id')&&record(v,'root')&&(v.extraction_lineage===null||isExtractionLineage(v.extraction_lineage))&&arr(v,'evidence_links')&&arr(v,'claim_links')&&arr(v,'relationships')&&arr(v,'lead_links')&&(v.relationships as unknown[]).every(isRelationship);
+
+const optNum=(o:Obj,k:string)=>o[k]===null||num(o,k);
+const isLedgerRow=(v:unknown)=>isObj(v)&&str(v,'id')&&str(v,'relationship_id')&&optStr(v,'dateTime')&&optStr(v,'from')&&optStr(v,'to')&&optNum(v,'amount')&&optStr(v,'currency')&&optStr(v,'statedPurpose')&&optStr(v,'evidence')&&num(v,'evidence_count')&&num(v,'supporting_evidence_count')&&optStr(v,'status')&&(v.flowType==='direct'||v.flowType==='inferred');
+export const isFinancialLedger=(v:unknown):v is FinancialLedger=>isObj(v)&&str(v,'investigation_id')&&arr(v,'transactions')&&(v.transactions as unknown[]).every(t=>isLedgerRow(t)&&str(t as Obj,'from')&&str(t as Obj,'to')&&num(t as Obj,'amount')&&str(t as Obj,'currency'))&&arr(v,'incomplete')&&(v.incomplete as unknown[]).every(r=>isLedgerRow(r)&&arr(r as Obj,'problems'))&&arr(v,'currencies')&&str(v,'flow_type_rule')&&str(v,'duplicate_rule');
+
