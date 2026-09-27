@@ -225,4 +225,25 @@ describe('Home document ingestion & extraction', () => {
       entity_schema: 'Company',
     });
   });
+
+  it('requests explanations with proposals and shows each proposal\'s reasoning panel (#190)', async () => {
+    const {fetchMock} = await bootstrapWithOneDocument();
+    const explanation = {
+      candidate_id: 'cand-1', candidate_type: 'entity', review_status: 'proposed',
+      summary: 'Company named “Kestrelwood Holdings Ltd”',
+      method: {id: 'openaleph_ftm_analyze', label: 'OpenAleph ftm-analyze mention', description: 'Detected by OpenAleph.', automated: true},
+      rationale_basis: 'provider',
+      confidence: {value: 1, basis: 'Fixed value of 1.0 set on import.'},
+      parts: [{id: 'caption', label: 'Name', value: 'Kestrelwood Holdings Ltd', reasoning: ['OpenAleph returned this name as a mention.'], sources: []}],
+      sources: [{kind: 'provider', id: 'm1', label: 'openaleph Mention', provider_entity_id: 'm1', collection_id: '7'}],
+      caveats: [],
+      review_rule: 'Nothing in this proposal is in the investigation until a reporter accepts it.',
+    };
+    fetchMock.mockResolvedValueOnce(jsonResponse([candidateFixture({explanation})]));
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Review proposals'}));
+    await screen.findByText(/Why this was proposed: OpenAleph ftm-analyze mention/);
+    expect(screen.getByText('OpenAleph returned this name as a mention.')).toBeInTheDocument();
+    const [url] = fetchMock.mock.calls[13];
+    expect(String(url)).toContain('/api/documents/doc-1/candidates?status=proposed&explain=true');
+  });
 });

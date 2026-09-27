@@ -16,6 +16,9 @@ from app.db.locking import lock_investigation_transaction
 SUPPORTED_EXTENSIONS = {'.txt', '.md', '.csv', '.html', '.htm', '.pdf', '.docx'}
 NAME_RE = re.compile(r"\b([A-Z][A-Za-z'’.-]+(?:\s+(?:[A-Z][A-Za-z'’.-]+|of|the|and|&)){1,5})\b")
 ORG_SUFFIX = re.compile(r"\b(Inc\.?|LLC|Ltd\.?|Corporation|Corp\.?|Company|Co\.?|Department|Commission|Authority|University|Foundation|Association|Committee|Council|Bank)\b", re.I)
+SENTENCE_SPLIT_RE = re.compile(r'(?<=[.!?])\s+')
+CLAIM_TRIGGER_RE = re.compile(r'\b(is|are|was|were|has|have|had|will|did|does|announced|reported|paid|owns|served|worked|received|filed|approved|voted)\b', re.I)
+CLAIM_MIN_CHARS, CLAIM_MAX_CHARS = 35, 1200
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -70,13 +73,17 @@ def extract_chunks(path: Path) -> list[dict]:
 def _candidate_payloads(chunk: DocumentChunk, *, include_entities: bool = True) -> Iterable[tuple[str, dict, float]]:
     text = chunk.text.strip()
     if not text: return
-    yield ('evidence', {'quote': text, 'locator': chunk.locator, 'span': {'start_char': 0, 'end_char': len(text)}}, 1.0)
+    yield ('evidence', {'quote': text, 'locator': chunk.locator, 'span': {'start_char': 0, 'end_char': len(text)}, 'rationale': {'rule': 'whole_chunk'}}, 1.0)
     # Claims are suggestions only: sentence-like assertions long enough to be useful.
-    for sentence in re.split(r'(?<=[.!?])\s+', text):
+    # Each payload records *why* the rule fired (#190) so review can show it later
+    # even if these rules change; see app/services/extraction_explanations.py.
+    for sentence in SENTENCE_SPLIT_RE.split(text):
         sentence = sentence.strip()
-        if 35 <= len(sentence) <= 1200 and re.search(r'\b(is|are|was|were|has|have|had|will|did|does|announced|reported|paid|owns|served|worked|received|filed|approved|voted)\b', sentence, re.I):
+        trigger = CLAIM_TRIGGER_RE.search(sentence) if CLAIM_MIN_CHARS <= len(sentence) <= CLAIM_MAX_CHARS else None
+        if trigger:
             start = text.find(sentence)
-            yield ('claim', {'text': sentence, 'span': {'start_char': start, 'end_char': start + len(sentence)}}, 0.55)
+            yield ('claim', {'text': sentence, 'span': {'start_char': start, 'end_char': start + len(sentence)},
+                             'rationale': {'rule': 'sentence_assertion', 'trigger': trigger.group(1), 'length': len(sentence)}}, 0.55)
     if not include_entities:
         return
     seen=set()
@@ -84,8 +91,11 @@ def _candidate_payloads(chunk: DocumentChunk, *, include_entities: bool = True) 
         caption = match.group(1).strip(' .,:;')
         if len(caption) < 5 or caption in seen: continue
         seen.add(caption)
-        schema = 'Organization' if ORG_SUFFIX.search(caption) else 'Person'
-        yield ('entity', {'caption': caption, 'suggested_schema': schema, 'span': {'start_char': match.start(1), 'end_char': match.end(1)}}, 0.40)
+        suffix = ORG_SUFFIX.search(caption)
+        schema = 'Organization' if suffix else 'Person'
+        rationale = {'rule': 'capitalized_name_sequence', 'schema_basis': 'organization_suffix' if suffix else 'no_organization_suffix',
+                     'matched_suffix': suffix.group(1) if suffix else None}
+        yield ('entity', {'caption': caption, 'suggested_schema': schema, 'span': {'start_char': match.start(1), 'end_char': match.end(1)}, 'rationale': rationale}, 0.40)
 
 
 def ingest_document(db: Session, *, investigation_id: str, title: str, filename: str, mime_type: str | None, data: bytes, storage_dir: Path) -> Document:

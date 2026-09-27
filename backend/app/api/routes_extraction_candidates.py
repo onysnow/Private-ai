@@ -12,6 +12,7 @@ from app.db.session import get_db
 from app.models.domain import ExtractionCandidate
 from app.schemas.api import ExtractionCandidateReviewRequest
 from app.services.documents import preview_entity_candidate_matches, review_candidate, serialize_extraction_lineage
+from app.services.extraction_explanations import explain_extraction_candidate
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
@@ -33,6 +34,15 @@ def get_extraction_candidate_lineage(candidate_id: str, db: Session = Depends(ge
     if row is None:
         raise HTTPException(404, "Extraction candidate not found")
     return serialize_extraction_lineage(db, row)
+
+
+@router.get("/extraction-candidates/{candidate_id}/explanation", response_model=None)
+def get_extraction_candidate_explanation(candidate_id: str, db: Session = Depends(get_db)) -> Any:
+    """Per-part reasoning and sources behind one proposal (#190). Read-only."""
+    row = db.get(ExtractionCandidate, candidate_id)
+    if row is None:
+        raise HTTPException(404, "Extraction candidate not found")
+    return explain_extraction_candidate(db, row)
 
 
 @router.post("/extraction-candidates/{candidate_id}/review", response_model=None)
