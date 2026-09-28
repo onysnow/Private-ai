@@ -3,36 +3,43 @@
 @tailwind utilities;
 
 /* Dark Academia palette, sourced from Ony's reference swatch (shop5, "Dark Academia").
+   The swatch is two halves: a LEFT set of deep, muted tones and a RIGHT set of lighter,
+   warmer tones. Per direction: the left half carries the app's structure (backgrounds,
+   cards, muted surfaces, borders); the right half is reserved for secondary effects --
+   primary/CTA accents, badges, focus rings, status colors -- not large surfaces.
    Hex -> HSL conversions kept in comments next to each token so a future edit can trace
    a value back to the swatch it came from instead of guessing. */
 @layer base {
   :root {
-    --background: 240 21% 9%;        /* #13131d -- near-black, cool undertone */
-    --foreground: 40 23% 65%;        /* #baac91 -- khaki parchment */
-    --card: 202 21% 13%;             /* #1a2328 -- deep teal-charcoal */
+    --background: 252 100% 1%;       /* #010005 -- left swatch, near-black */
+    --foreground: 40 23% 65%;        /* #baac91 -- right swatch, khaki parchment (text needs a light tone; the left half has none) */
+    --card: 202 21% 13%;             /* #1a2328 -- left swatch, deep teal-charcoal */
     --card-foreground: 40 23% 65%;   /* #baac91 */
-    --popover: 202 21% 13%;          /* #1a2328 */
+    --popover: 202 21% 13%;          /* #1a2328 -- left */
     --popover-foreground: 40 23% 65%;/* #baac91 */
-    --primary: 40 56% 46%;           /* #b98d34 -- antique brass gold */
-    --primary-foreground: 240 21% 9%;/* #13131d */
-    --secondary: 14 60% 25%;         /* #672c1a -- deep rust/oxblood */
-    --secondary-foreground: 25 30% 70%; /* #caaf9c */
-    --muted: 228 6% 16%;             /* #26272b -- charcoal */
-    --muted-foreground: 37 22% 47%;  /* #927e5d -- warm taupe */
-    --accent: 162 23% 29%;           /* #3a5c52 -- forest green */
-    --accent-foreground: 25 30% 70%; /* #caaf9c */
-    --destructive: 7 53% 35%;        /* #89352a -- brick red */
-    --destructive-foreground: 25 30% 70%; /* #caaf9c */
-    --border: 26 43% 15%;            /* #352315 -- dark warm brown */
-    --input: 26 43% 15%;             /* #352315 */
-    --ring: 36 60% 58%;              /* #d4a152 -- brighter gold, focus */
+    --primary: 40 56% 46%;           /* #b98d34 -- right swatch, antique brass gold (secondary/CTA accent) */
+    --primary-foreground: 252 100% 1%; /* #010005 */
+    --secondary: 14 60% 25%;         /* #672c1a -- right swatch, oxblood (secondary accent) */
+    --secondary-foreground: 25 30% 70%; /* #caaf9c -- right */
+    --muted: 228 6% 16%;             /* #26272b -- left swatch, charcoal */
+    --muted-foreground: 37 22% 47%;  /* #927e5d -- right swatch, warm taupe (secondary text) */
+    --accent: 162 23% 29%;           /* #3a5c52 -- left swatch, forest green */
+    --accent-foreground: 25 30% 70%; /* #caaf9c -- right */
+    --destructive: 7 53% 35%;        /* #89352a -- right swatch, brick red (status accent) */
+    --destructive-foreground: 25 30% 70%; /* #caaf9c -- right */
+    --border: 26 43% 15%;            /* #352315 -- left swatch, dark warm brown */
+    --input: 26 43% 15%;             /* #352315 -- left */
+    --ring: 36 60% 58%;              /* #d4a152 -- right swatch, brighter gold, focus detail */
     --radius: 0.5rem;
 
-    /* Extra palette hooks used by the app's legacy (pre-shadcn) hand-rolled classes below. */
+    /* Extra palette hooks used by the app's legacy (pre-shadcn) hand-rolled classes below.
+       Paper/quote surfaces (finding, candidate, explanation) are a deliberate "evidence on
+       parchment" detail, so they draw from the right (lighter) half rather than inventing
+       an off-palette cream. */
     --da-ink: 26 30% 10%;            /* #26201a-ish -- dark ink for text on parchment surfaces */
-    --da-parchment: 39 33% 84%;      /* #e7dcc3 -- aged paper surface */
-    --da-parchment-alt: 38 32% 87%;  /* #efe6d3 -- slightly lighter paper */
-    --da-blue: 209 35% 37%;          /* #3e6181 -- info/link accent */
+    --da-parchment: 25 30% 70%;      /* #caaf9c -- right swatch, pale rose-tan paper */
+    --da-parchment-alt: 40 23% 65%;  /* #baac91 -- right swatch, khaki parchment (same as --foreground) */
+    --da-blue: 209 35% 37%;          /* #3e6181 -- right swatch, info/link accent */
     --font-heading: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', 'Times New Roman', serif;
   }
 
@@ -54,8 +61,8 @@
 }
 
 .shell{max-width:1180px;margin:auto;padding:36px 24px}.top{display:flex;justify-content:space-between;align-items:center}.badge{background:#26272b;border:1px solid #352315;border-radius:999px;padding:7px 11px;color:#caaf9c}.hero{padding:56px 0 32px}.hero h1{font-family:var(--font-heading);font-size:56px;max-width:820px;line-height:1.05;margin:12px 0}.hero p{font-size:19px;line-height:1.6;color:#927e5d;max-width:760px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{background:#1a2328;border:1px solid #352315;border-radius:14px;padding:20px;min-height:160px}.card h3{margin-top:0;font-family:var(--font-heading)}.muted{color:#927e5d}.accent{color:#b98d34}.workflow{margin-top:30px;background:#1a2328;border:1px solid #352315;border-radius:14px;padding:22px}.steps{display:flex;gap:10px;flex-wrap:wrap}.step{padding:10px 14px;background:#26272b;border-radius:10px}@media(max-width:800px){.grid{grid-template-columns:1fr}.hero h1{font-size:40px}}
-select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.searchrow input{flex:1;padding:10px}.searchrow button,.candidate button,.actions button{padding:8px 10px;border:0;border-radius:8px;cursor:pointer}.twocol{display:grid;grid-template-columns:1fr 1.5fr;gap:16px;margin-top:16px}.finding{display:block;width:100%;text-align:left;padding:12px;margin:8px 0;border:1px solid #352315;border-radius:10px;background:#e7dcc3;color:#26201a}.finding small{display:block;color:#6b5a42;margin-top:4px}.candidate{padding:12px;background:#efe6d3;border-radius:10px;margin-bottom:12px;color:#26201a}.statement{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid #352315}.actions{display:flex;flex-wrap:wrap;gap:5px}@media(max-width:800px){.twocol{grid-template-columns:1fr}.statement{display:block}.actions{margin-top:8px}}
+select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.searchrow input{flex:1;padding:10px}.searchrow button,.candidate button,.actions button{padding:8px 10px;border:0;border-radius:8px;cursor:pointer}.twocol{display:grid;grid-template-columns:1fr 1.5fr;gap:16px;margin-top:16px}.finding{display:block;width:100%;text-align:left;padding:12px;margin:8px 0;border:1px solid #352315;border-radius:10px;background:#caaf9c;color:#26201a}.finding small{display:block;color:#6b5a42;margin-top:4px}.candidate{padding:12px;background:#baac91;border-radius:10px;margin-bottom:12px;color:#26201a}.statement{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid #352315}.actions{display:flex;flex-wrap:wrap;gap:5px}@media(max-width:800px){.twocol{grid-template-columns:1fr}.statement{display:block}.actions{margin-top:8px}}
 .ledgerTitle{margin-top:28px;font-family:var(--font-heading)}.ledger{display:grid;gap:10px}.ledgerRow{display:grid;grid-template-columns:minmax(180px,1fr) minmax(220px,1.4fr);gap:18px;padding:12px;border:1px solid #352315;border-radius:10px}.ledgerRow small{color:#927e5d}.ledgerRow a{font-size:12px;color:#b98d34}@media(max-width:720px){.ledgerRow{grid-template-columns:1fr}}
 .graphCard{margin-top:16px}.relationshipForm{display:grid;grid-template-columns:1fr 1.4fr auto 1.4fr 1.2fr auto;gap:8px;align-items:center}.relationshipForm select,.relationshipForm input{padding:9px;border-radius:8px}.relationshipForm button{padding:9px 12px;border:0;border-radius:8px;cursor:pointer}.relationshipList{display:grid;gap:8px;margin-top:16px}.relationshipRow{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center}.relNode{border:1px solid #352315;background:#1a2328;border-radius:10px;padding:10px}.relEdge{color:#b98d34;font-size:13px;text-align:center;cursor:pointer}.relEdge:before,.relEdge:after{content:' — '}.relationshipRow .relNode:last-child{text-align:right}@media(max-width:900px){.relationshipForm{grid-template-columns:1fr}.relationshipForm>span{display:none}.relationshipRow{grid-template-columns:1fr}.relationshipRow .relNode:last-child{text-align:left}.relEdge{text-align:left}}
-.explanation{margin:8px 0;padding:8px 10px;border-left:3px solid #b98d34;background:#efe6d3;color:#26201a}.explanation summary{cursor:pointer}.explanation-parts{margin:6px 0;padding-left:20px}.explanation-parts>li{margin:6px 0}.explanation-sources{list-style:none;padding-left:0;margin:4px 0}.explanation-excerpt{margin:4px 0;padding:6px 8px;background:#e7dcc3;border:1px solid #352315;border-radius:6px;white-space:pre-wrap;color:#26201a}.explanation-excerpt mark{background:#d4a152;color:#26201a}
+.explanation{margin:8px 0;padding:8px 10px;border-left:3px solid #b98d34;background:#baac91;color:#26201a}.explanation summary{cursor:pointer}.explanation-parts{margin:6px 0;padding-left:20px}.explanation-parts>li{margin:6px 0}.explanation-sources{list-style:none;padding-left:0;margin:4px 0}.explanation-excerpt{margin:4px 0;padding:6px 8px;background:#caaf9c;border:1px solid #352315;border-radius:6px;white-space:pre-wrap;color:#26201a}.explanation-excerpt mark{background:#d4a152;color:#26201a}
 .ledger{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px}.ledger th,.ledger td{text-align:left;padding:4px 6px;border-bottom:1px solid #352315;vertical-align:top}
