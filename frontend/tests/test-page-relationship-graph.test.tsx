@@ -277,7 +277,16 @@ describe('Home FollowTheMoney relationship graph', () => {
     expect(attachButton).toBeDisabled();
 
     const user = userEvent.setup();
-    await user.selectOptions(screen.getByDisplayValue('Choose investigation evidence…'), 'ev-1');
+    // Opened via focus + ArrowDown rather than a click on the trigger: this
+    // file's earlier test also renders and interacts with this page, and a
+    // plain userEvent.click(trigger) here reliably fails to register the
+    // opening pointerdown when run after it (passes standalone) -- the same
+    // cross-test userEvent pointer-state issue documented for the
+    // reasoning-module select's test file. See MIGRATION_NOTES.md.
+    const attachTrigger = screen.getAllByRole('combobox').find(el => el.textContent === 'Choose investigation evidence…')!;
+    attachTrigger.focus();
+    await user.keyboard('{ArrowDown}');
+    await user.click(await screen.findByRole('option', {name: 'Board minutes: p.4'}));
     expect(attachButton).not.toBeDisabled();
 
     const attached = relationshipFixture({
