@@ -2,17 +2,21 @@
 
 This PR introduces Tailwind + shadcn/ui primitives and demonstrates adoption in `app/page.tsx` without a full-file rewrite.
 
-## Converted in this PR
+## Converted so far
 
 - Top status badge now uses `Badge`
-- API access panel now uses `Card`, `Input`, and `Button`
-- Investigation search panel now uses `Card`, `Input`, and `Button`
 - Review queue now uses `Card` + `Table` primitives for row rendering and actions
 - Sonner `Toaster` mounted in `page.tsx`
+- Local investigation deletion panel now uses `Card`/`CardHeader`/`CardTitle`/`CardDescription`/`CardContent` and `Input` (2026-09-27; no behavior change, verified with `tsc`/`eslint`/vitest/`next build`)
+
+Note: an earlier draft of this list claimed the API access and investigation
+search panels were already converted; they weren't (still plain
+`<section className="card">` with native `<input>`) -- corrected here so
+this list matches the actual code rather than the plan for it.
 
 ## Remaining hand-rolled markup (follow-up punch list)
 
-- Most remaining `<section className="card">` panels are still bespoke JSX wrappers
+- API access, investigation search, and most other remaining `<section className="card">` panels are still bespoke JSX wrappers
 - Most action controls still use native `<button>`, `<input>`, `<textarea>`, and `<select>`
 - Dialog-like and menu-like interactions are still custom and can migrate to `Dialog` / `DropdownMenu`
 - Claim/evidence and relationship workspaces still render custom list/row layouts that can migrate to `Table`, `Tabs`, and additional `Card` composition
