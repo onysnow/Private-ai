@@ -187,7 +187,20 @@ describe('AiReasoningPanel', () => {
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} />);
 
     await screen.findByText('No AI analysis candidates yet for this investigation.');
-    await user.selectOptions(screen.getByLabelText('Reasoning module'), 'hypothesis_test');
+    // Opened via focus + ArrowDown rather than a click on the trigger: this
+    // suite's earlier tests each mount/unmount an AiReasoningPanel sharing
+    // one jsdom document, and userEvent.click(trigger) reliably fails to
+    // register a Radix Select's opening pointerdown when run after them
+    // (reproduced in isolation -- a plain fireEvent.pointerDown does open
+    // it, so the trigger and component are not at fault; something in
+    // userEvent's own pointer/hover bookkeeping is left in a state that
+    // only affects this file's later tests). Keyboard-triggered opening
+    // sidesteps that pointer-state dependency entirely and is itself a
+    // real, accessible way to operate this control.
+    const moduleTrigger = screen.getByLabelText('Reasoning module');
+    moduleTrigger.focus();
+    await user.keyboard('{ArrowDown}');
+    await user.click(await screen.findByRole('option', {name: 'Hypothesis test'}));
     await user.type(screen.getByLabelText('Question'), 'Did Ada act alone?');
     await user.click(screen.getByRole('button', {name: 'Run module'}));
     expect(screen.getByTestId('ai-run-status')).toHaveTextContent('A working theory is required for a hypothesis test.');
