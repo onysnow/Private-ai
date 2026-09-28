@@ -186,8 +186,8 @@ describe('Home questions & reporting leads', () => {
       screen.getByPlaceholderText('Who approved this contract?'),
       'Second question',
     );
-    const prioritySelect = screen.getByDisplayValue('normal');
-    await user.selectOptions(prioritySelect, 'urgent');
+    await user.click(screen.getAllByRole('combobox').find(el => el.textContent === 'normal')!);
+    await user.click(await screen.findByRole('option', {name: 'urgent'}));
     await user.click(screen.getByRole('button', {name: 'Add lead'}));
 
     await screen.findByText('Second question');
