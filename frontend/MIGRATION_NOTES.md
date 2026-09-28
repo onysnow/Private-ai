@@ -12,6 +12,7 @@ This PR introduces Tailwind + shadcn/ui primitives and demonstrates adoption in 
 - Source & exact evidence capture panel now uses `Card`/`CardHeader`/`CardTitle`/`CardDescription`/`CardContent` and `Input` for its three text fields; its `<select>` (source type) is untouched -- no shadcn `Select` is wired up yet, and adding one is a bigger, separate step than this pass's scope (2026-09-27; no behavior change, verified with `tsc`/`eslint`/vitest/`next build`)
 - Investigation search panel now uses `Card`/`CardHeader`/`CardTitle`/`CardDescription`/`CardContent` and `Input` for its query field; the "include reviewed duplicates" checkbox is untouched, same reason as the `<select>`s above -- no shadcn `Checkbox` component exists in `components/ui/` yet (2026-09-27; no behavior change, verified with `tsc`/`eslint`/vitest/`next build`)
 - Investigation timeline panel now uses `Card`/`CardHeader`/`CardTitle`/`CardDescription`/`CardContent` and `Input` for its two text fields (event title, event date); its two `<select>`s (precision, status) are untouched, same reason as above (2026-09-27; no behavior change, verified with `tsc`/`eslint`/vitest/`next build`)
+- Questions & reporting leads panel now uses `Card`/`CardHeader`/`CardTitle`/`CardDescription`/`CardContent`, `Input` for its title/owner fields, and `Textarea` for the detail field; its priority `<select>` is untouched (2026-09-27; no behavior change, verified with `tsc`/`eslint`/vitest/`next build`). While converting this panel, found that `components/ui/select.tsx` has existed since the original shadcn adoption commit (#27) -- it is a real Radix-backed `Select`, just unused everywhere in the app; the earlier notes below claiming "no shadcn `Select` ... exists in `components/ui/` yet" were wrong on that point. `components/ui/textarea.tsx` also already existed and was already used by `entity-form.tsx`. No `Checkbox` component exists, so that part of the earlier notes stands.
 
 Note: an earlier draft of this list claimed the API access and investigation
 search panels were already converted; only API access actually was (as of
@@ -21,8 +22,8 @@ this update too.
 
 ## Remaining hand-rolled markup (follow-up punch list)
 
-- Provenance trace, backup/restore, document ingestion, leads, claim workspace, external connectors, and relationship graph panels are still bespoke `<section className="card">` wrappers
-- No section has migrated a `<select>` to a shadcn `Select`, or a checkbox to a shadcn `Checkbox`, yet -- neither component exists in `components/ui/` yet; adding either is its own PR (a `Select` also means wiring Radix's `onValueChange`-style API in place of plain `onChange`)
+- Provenance trace, backup/restore, document ingestion, claim workspace, external connectors, and relationship graph panels are still bespoke `<section className="card">` wrappers
+- No section has migrated a `<select>` to the existing shadcn `Select`, or a checkbox to a shadcn `Checkbox`, yet. `Select` exists in `components/ui/` (unused elsewhere) but wiring it in is still its own, bigger PR per `<select>` -- it means switching plain `onChange` to Radix's `onValueChange`-style API and rebuilding each `<option>` list as `SelectItem`s, not just a wrapper swap. No `Checkbox` component exists at all yet; adding one is a separate PR.
 - Most action controls still use native `<button>`, `<input>`, `<textarea>`, and `<select>`
 - Dialog-like and menu-like interactions are still custom and can migrate to `Dialog` / `DropdownMenu`
 - Claim/evidence and relationship workspaces still render custom list/row layouts that can migrate to `Table`, `Tabs`, and additional `Card` composition
