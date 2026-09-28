@@ -226,11 +226,10 @@ describe('Home entity dossier: identity history & property conflicts', () => {
     expect(screen.getByText('Merge audit: ent-2 → ent-1', {exact: false})).toBeInTheDocument();
   });
 
-  it('records a property-conflict decision with a prompted rationale', async () => {
+  it('records a property-conflict decision with a rationale entered in the confirmation dialog', async () => {
     const {fetchMock} = await bootstrapAndOpenDossier(dossierFixture({property_conflicts: [propertyConflict()]}));
 
     expect(screen.queryByText('No unresolved multi-value property conflicts detected.')).not.toBeInTheDocument();
-    const promptSpy = vi.spyOn(window, 'prompt').mockReturnValue('Confirmed via updated filing.');
 
     fetchMock
       .mockResolvedValueOnce(okResponse()) // POST decision
@@ -249,11 +248,14 @@ describe('Home entity dossier: identity history & property conflicts', () => {
       .mockResolvedValueOnce(jsonResponse([])) // GET duplicate-candidates reload
       .mockResolvedValueOnce(jsonResponse(emptyReconciliation())); // GET post-merge-reconciliation reload
 
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Temporal change'}));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: 'Temporal change'}));
+
+    const rationaleInput = await screen.findByRole('textbox', {name: 'Property conflict rationale'});
+    await user.type(rationaleInput, 'Confirmed via updated filing.');
+    await user.click(screen.getByRole('button', {name: 'Confirm'}));
 
     await screen.findByText('Reporter rationale: Confirmed via updated filing.', {exact: false});
-
-    expect(promptSpy).toHaveBeenCalledWith('Reporter rationale for temporal_change:');
 
     const [decisionUrl, decisionInit] = fetchMock.mock.calls[16];
     expect(decisionUrl).toContain('/api/entities/ent-1/property-conflicts/incorporation_date/decisions');
@@ -276,15 +278,18 @@ describe('Home entity dossier: identity history & property conflicts', () => {
     const spacedConflict = propertyConflict({prop: 'registered address', values: [{value: '1 Main St', canonical: true, support_count: 1, conflict_count: 1, canonical_statements: [], external_assessments: []}, {value: '2 Main St', canonical: false, support_count: 1, conflict_count: 1, canonical_statements: [], external_assessments: []}]});
     const {fetchMock} = await bootstrapAndOpenDossier(dossierFixture({property_conflicts: [spacedConflict]}));
 
-    vi.spyOn(window, 'prompt').mockReturnValue('Confirmed by the latest filing.');
-
     fetchMock
       .mockResolvedValueOnce(okResponse()) // POST decision
       .mockResolvedValueOnce(jsonResponse(dossierFixture({property_conflicts: [spacedConflict]}))) // GET dossier reload
       .mockResolvedValueOnce(jsonResponse([])) // GET duplicate-candidates reload
       .mockResolvedValueOnce(jsonResponse(emptyReconciliation())); // GET post-merge-reconciliation reload
 
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Prefer 1 Main St'}));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: 'Prefer 1 Main St'}));
+
+    const rationaleInput = await screen.findByRole('textbox', {name: 'Property conflict rationale'});
+    await user.type(rationaleInput, 'Confirmed by the latest filing.');
+    await user.click(screen.getByRole('button', {name: 'Confirm'}));
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
