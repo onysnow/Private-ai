@@ -199,4 +199,39 @@ describe('Home API-access bootstrap', () => {
     const postClearHeaders = fetchMock.mock.calls[4][1]?.headers as Headers;
     expect(postClearHeaders.get('authorization')).toBeNull();
   });
+
+  it('unmounting the workbench page does not clear the shared API auth token', async () => {
+    // `api` (lib/api-instance.ts) is an explicitly-documented shared singleton
+    // used by /, /settings, and /dashboard specifically so a settings-page auth
+    // change is visible from the workbench without re-importing it. Home's own
+    // mount effect must only abort its in-flight requests on unmount, not wipe
+    // that shared token -- otherwise ordinary client-side navigation away from
+    // `/` (e.g. to Settings) logs every other route out from under the user.
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse({detail: 'no token'}, 401))
+      .mockResolvedValueOnce(jsonResponse(validSettingsStatus))
+      .mockResolvedValueOnce(jsonResponse([]))
+      .mockResolvedValueOnce(jsonResponse({providers: ['aleph']}));
+    vi.stubGlobal('fetch', fetchMock);
+
+    vi.resetModules();
+    const pageMod = await import('../app/page');
+    const Home = pageMod.default;
+    const {api} = await import('../lib/api-instance');
+
+    const user = userEvent.setup();
+    const {unmount} = render(<Home />);
+
+    const tokenInput = await screen.findByPlaceholderText(
+      'Bearer token for this session',
+    );
+    await user.type(tokenInput, 'survives-unmount-token');
+    await user.click(screen.getByRole('button', {name: 'Connect'}));
+    await screen.findByRole('button', {name: 'Clear session token'});
+
+    expect(api.hasAuthToken()).toBe(true);
+    unmount();
+    expect(api.hasAuthToken()).toBe(true);
+  });
 });
