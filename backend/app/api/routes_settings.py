@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource
 from app.core.access import request_is_local_request
+from app.core.authorization import scope_for_request
 from app.core.audit_log import (
     apply_security_audit_retention,
     preview_security_audit_retention,
@@ -45,8 +46,14 @@ def _require_local_request(request: Request) -> None:
 
 
 @router.get("/settings/status", response_model=None)
-def settings_status(db: Session = Depends(get_db)) -> Any:
-    return get_settings_status(db)
+def settings_status(request: Request, db: Session = Depends(get_db)) -> Any:
+    # Polled by the frontend on every page load, so this stays reachable for
+    # any authenticated caller -- but a remote, non-admin scope (the shared
+    # bearer fallback, or a persisted token without global-admin) gets a
+    # reduced payload rather than the server-wide config a local/admin caller
+    # sees. See get_settings_status() for exactly which fields are scrubbed.
+    local = scope_for_request(request).is_global_admin
+    return get_settings_status(db, local=local)
 
 
 @router.get("/settings/security/users", response_model=None)

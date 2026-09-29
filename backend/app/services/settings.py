@@ -28,13 +28,24 @@ def connector_credential_status(provider: str) -> dict:
     return credential_status(settings.connector_credentials_file, provider, fallback)
 
 
-def get_settings_status(db: Session) -> dict:
+def get_settings_status(db: Session, *, local: bool = True) -> dict:
+    """Server config snapshot polled by the frontend on every page load.
+
+    `local` gates the server-wide fields a remote, non-admin caller has no
+    business seeing (OWASP API3: broken object property level authorization --
+    the fix here is a role-scoped payload, not a blanket local-only gate,
+    since legitimate remote reporters still need this endpoint to bootstrap).
+    The response keeps its full shape either way (same keys, same types) so
+    the frontend's runtime validator and TypeScript contract don't have to
+    special-case a caller tier -- only the sensitive values are swapped for
+    safe defaults.
+    """
     persisted_identity_count = len(db.scalars(select(AppUser).where(AppUser.disabled == False)).all())
     ocr = ocr_runtime_status(settings.pdf_ocr_language) if settings.enable_pdf_ocr else None
     return {
         "environment": settings.app_environment,
-        "database": redact_database_url(settings.database_url),
-        "document_storage_dir": str(resolve_storage_root(settings.document_storage_dir)),
+        "database": redact_database_url(settings.database_url) if local else "",
+        "document_storage_dir": str(resolve_storage_root(settings.document_storage_dir)) if local else "",
         "limits": {
             "max_document_bytes": settings.max_document_bytes,
             "max_backup_bytes": settings.max_backup_bytes,
@@ -66,11 +77,11 @@ def get_settings_status(db: Session) -> dict:
         "access": {
             "remote_api_enabled": bool(settings.api_auth_token.strip()) or persisted_identity_count > 0,
             "mode": "persisted_users" if persisted_identity_count else ("shared_bearer" if settings.api_auth_token.strip() else "local_only"),
-            "token_configured": bool(settings.api_auth_token.strip()),
-            "persisted_identity_count": persisted_identity_count,
+            "token_configured": bool(settings.api_auth_token.strip()) if local else False,
+            "persisted_identity_count": persisted_identity_count if local else 0,
             "investigation_scope_configured": bool(settings.api_auth_investigation_ids.strip()),
         },
-        "cors_allowed_origins": settings.cors_origins,
+        "cors_allowed_origins": settings.cors_origins if local else [],
         # STRUCT-0035: a passive alert surface -- the operator sees denial counts
         # without querying the audit log. Full detail: GET /settings/security/alerts.
         "security": security_alerts(window_hours=24.0, max_examples=0),
