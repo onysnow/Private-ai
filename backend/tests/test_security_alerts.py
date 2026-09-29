@@ -70,6 +70,29 @@ def test_settings_status_and_alerts_endpoint_expose_the_surface(tmp_path: Path, 
     assert alerts["remote_hosts"] == [{"client_host": "203.0.113.9", "count": 3}]
     assert client.get("/api/settings/security/alerts", params={"window_hours": 0}).status_code == 422
 
+    assert client.get("/api/settings/security/audit").status_code == 200
+    assert client.get("/api/settings/security/audit/summary").status_code == 200
+
+
+def test_security_audit_read_endpoints_are_local_only(tmp_path: Path, monkeypatch):
+    """A remote caller -- even one holding a valid scoped or shared-bearer token --
+    must not be able to read the server-wide denial log/alerts/summary: that surface
+    spans every investigation and actor, not just whatever the caller is scoped to.
+    Every other security-surface endpoint on this router (user/token/membership CRUD,
+    connector credentials, audit retention preview/apply) already requires a local
+    request; the three read endpoints must match that, not be the odd ones out."""
+    log = tmp_path / "security.jsonl"
+    monkeypatch.setattr(settings, "audit_log_file", str(log))
+    logger = SecurityAuditLogger(log)
+    logger.write(request_id="r", method="POST", path="/api/investigations", status_code=401, client_host="203.0.113.9", local_request=False, event="access_denied")
+
+    client = TestClient(app)
+    remote_headers = {"X-Forwarded-For": "203.0.113.5"}  # downgrades an in-process TestClient call to "remote"
+    for path in ("/api/settings/security/audit", "/api/settings/security/audit/summary", "/api/settings/security/alerts"):
+        denied = client.get(path, headers=remote_headers)
+        assert denied.status_code == 403, f"{path} must reject a remote caller"
+        assert client.get(path).status_code == 200, f"{path} must still work for a genuinely local caller"
+
 
 def test_rate_limiter_state_survives_restart_and_drops_expired_windows(tmp_path: Path):
     state = tmp_path / "auth-failures.json"

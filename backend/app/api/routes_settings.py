@@ -115,12 +115,19 @@ def delete_investigation_membership(user_id: str, investigation_id: str, request
 
 @router.get("/settings/security/audit", response_model=None)
 def get_security_audit(
+    request: Request,
     limit: int = Query(100, ge=1, le=500),
     offset: int = Query(0, ge=0, le=1_000_000),
     event: str | None = None,
     method: str | None = None,
     status_code: int | None = Query(default=None, ge=100, le=599),
 ) -> Any:
+    # Read-only, but this is a server-wide log spanning every investigation and
+    # actor -- an investigation-scoped remote token has no narrower business
+    # reading it than it would rotating another user's token, so this gets the
+    # same local-only guard as every other endpoint on this router that touches
+    # the security surface (retention preview/apply, user/token/membership CRUD).
+    _require_local_request(request)
     return read_security_audit(
         settings.audit_log_file,
         limit=limit,
@@ -132,17 +139,23 @@ def get_security_audit(
 
 
 @router.get("/settings/security/audit/summary", response_model=None)
-def get_security_audit_summary() -> Any:
+def get_security_audit_summary(request: Request) -> Any:
+    _require_local_request(request)
     return summarize_security_audit(settings.audit_log_file)
 
 
 @router.get("/settings/security/alerts", response_model=None)
 def get_security_alerts(
+    request: Request,
     window_hours: float = Query(24.0, gt=0, le=24 * 30),
     max_examples: int = Query(10, ge=0, le=100),
 ) -> Any:
     """Recent denial events (access_denied / auth_rate_limited / browser_write_denied /
-    request_rejected) as counts, busiest remote hosts and latest examples -- STRUCT-0035."""
+    request_rejected) as counts, busiest remote hosts and latest examples -- STRUCT-0035.
+
+    Local-only: this aggregates denial events (including remote IPs) across every
+    investigation and actor on the server, not just the caller's own scope."""
+    _require_local_request(request)
     return security_alerts(window_hours=window_hours, max_examples=max_examples)
 
 
