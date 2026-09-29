@@ -32,6 +32,7 @@ from sqlalchemy import (
     event,
     func,
     insert,
+    inspect,
     select,
     text,
     update,
@@ -39,7 +40,10 @@ from sqlalchemy import (
 
 from opsconsole.core.ids import new_id, now_iso
 
-STORE_VERSION = 1
+# v2: change_sets.undoes (STRUCT: undo-of-undo guard) -- additive, so
+# migrate() below adds the column to any store created under v1 rather than
+# requiring a fresh store.
+STORE_VERSION = 2
 
 
 def _tables(prefix: str) -> tuple[MetaData, dict[str, Table]]:
@@ -76,6 +80,10 @@ def _tables(prefix: str) -> tuple[MetaData, dict[str, Table]]:
         Column("applied_at", String(40)),
         Column("error", Text),
         Column("expires_at", String(40), nullable=False),
+        # v2: the activity_log.id this change-set reverses, when origin="undo".
+        # Lets apply() mark that activity undone once this one actually commits,
+        # instead of only labelling the API response and never persisting it.
+        Column("undoes", String(32)),
     )
     t["saved_queries"] = Table(
         f"{prefix}saved_queries", md,
@@ -193,6 +201,7 @@ class Store:
         return store
 
     def migrate(self) -> None:
+        self._ensure_change_sets_undoes_column()
         self.metadata.create_all(self.engine)
         with self.engine.begin() as conn:
             meta = self.t["store_meta"]
@@ -202,6 +211,23 @@ class Store:
                 conn.execute(insert(meta).values(key="created_at", value=now_iso()))
             created = conn.execute(select(meta.c.value).where(meta.c.key == "created_at")).scalar_one_or_none()
             self.created_at = created
+
+    def _ensure_change_sets_undoes_column(self) -> None:
+        """Additive v1 -> v2 migration: add change_sets.undoes if a store
+        created under STORE_VERSION 1 doesn't have it yet. metadata.create_all()
+        only creates tables that don't exist -- it never alters an existing
+        one -- so a pre-existing change_sets table needs this explicit step.
+        A nullable ADD COLUMN with no default is safe on both sqlite and the
+        host's own dialect."""
+        table = self.t["change_sets"]
+        inspector = inspect(self.engine)
+        if not inspector.has_table(table.name):
+            return  # metadata.create_all() below will create it with the column already present
+        existing = {c["name"] for c in inspector.get_columns(table.name)}
+        if "undoes" in existing:
+            return
+        with self.engine.begin() as conn:
+            conn.execute(text(f"ALTER TABLE {table.name} ADD COLUMN undoes VARCHAR(32)"))
 
     def ping(self) -> tuple[bool, str | None]:
         try:
@@ -292,13 +318,13 @@ class Store:
 
     # --- change-sets ---------------------------------------------------------------------
 
-    def changeset_create(self, *, principal_id: str, table: str, ops: list[dict[str, Any]], origin: str, ttl_seconds: int) -> dict[str, Any]:
+    def changeset_create(self, *, principal_id: str, table: str, ops: list[dict[str, Any]], origin: str, ttl_seconds: int, undoes: str | None = None) -> dict[str, Any]:
         cid = new_id()
         now = datetime.now(timezone.utc)
         row: dict[str, Any] = {
             "id": cid, "created_at": now.isoformat(), "principal_id": principal_id, "status": "pending", "target_table": table,
             "ops": _dumps(ops), "origin": origin, "applied_at": None, "error": None,
-            "expires_at": (now + timedelta(seconds=ttl_seconds)).isoformat(),
+            "expires_at": (now + timedelta(seconds=ttl_seconds)).isoformat(), "undoes": undoes,
         }
         with self.engine.begin() as conn:
             conn.execute(insert(self.t["change_sets"]).values(**row))

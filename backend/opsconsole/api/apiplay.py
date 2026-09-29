@@ -9,6 +9,7 @@ import httpx
 from fastapi import APIRouter, Query, Request
 from pydantic import BaseModel, Field
 
+from opsconsole.config import WritePolicy
 from opsconsole.context import ConsoleContext, ConsoleError
 from opsconsole.core.ids import now_iso
 from opsconsole.core.traffic import iter_api_routes
@@ -73,7 +74,13 @@ def router(ctx: ConsoleContext) -> APIRouter:
 
     @r.post("/api/send", response_model=None)
     def send(request: Request, body: SendIn) -> Any:
-        principal = ctx.read(request)
+        # /api/send lets the caller replay any method/path against this same
+        # server -- a strictly more powerful capability than a row-level
+        # changeset (it can drive any host write endpoint, not just the ones
+        # the console's own table policy governs), so it needs at least the
+        # same write authority as the console's raw-SQL escape hatch, not
+        # merely ctx.read(). It previously bypassed console_writes entirely.
+        principal = ctx.write(request, need=WritePolicy.CHANGESETS_AND_SQL)
         if not body.path.startswith("/"):
             raise ConsoleError(400, "bad_path", "path must start with '/' (requests only go to this server)")
         headers = {k: v for k, v in (body.headers or {}).items() if k.lower() not in ("host", "content-length")}
@@ -85,7 +92,10 @@ def router(ctx: ConsoleContext) -> APIRouter:
             if derived is None:
                 raise ConsoleError(403, "act_as_refused", f"cannot act as {body.act_as!r}")
             headers.update(dict(derived))
-            ctx.audit(principal, request, section="api", action="send.act_as", note=f"{body.method} {body.path} as {body.act_as}")
+        # Always audited now (previously only when act_as was used), so every
+        # replayed request -- not just impersonated ones -- leaves a trail.
+        note = f"{body.method} {body.path}" + (f" as {body.act_as}" if body.act_as else "")
+        ctx.audit(principal, request, section="api", action="send", note=note)
         base = str(request.base_url).rstrip("/")
         started = time.perf_counter()
         try:

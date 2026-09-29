@@ -352,6 +352,35 @@ def test_changesets_preview_apply_guard_undo_and_bulk(host: Any) -> None:
     assert client.post(f"/api/console/data/changesets/{by_pk['id']}/apply", json={"confirm": by_pk["id"]}, headers={"x-remote": "1"}).status_code == 403
 
 
+def test_undo_is_marked_committed_and_cannot_be_repeated(host: Any) -> None:
+    """Store.activity_mark_undone() used to have zero callers, so undo()'s own
+    guard (`if act.get("undone_by")`) never tripped: the same committed activity
+    could be undone again and again, each time producing a fresh pending
+    change-set. Applying the undo change-set must now persist the link back to
+    the activity it reverses and mark it undone, so a second undo is refused."""
+    client, _, parts = host
+    cs = client.post("/api/console/data/changesets", json={"table": "books", "ops": [{"op": "update", "pk": {"id": 2}, "set": {"title": "Second, revised"}}]}).json()
+    client.post(f"/api/console/data/changesets/{cs['id']}/apply", json={"confirm": cs["id"]})
+    activity_id = client.get("/api/console/activity", params={"changeset_id": cs["id"]}).json()["items"][0]["id"]
+    assert client.get(f"/api/console/activity/{activity_id}").json()["undone_by"] is None
+
+    undo = client.post(f"/api/console/activity/{activity_id}/undo").json()
+    assert undo["undoes"] == activity_id and undo["status"] == "pending"
+    # Not marked undone merely by previewing the reversal -- only by applying it.
+    assert client.get(f"/api/console/activity/{activity_id}").json()["undone_by"] is None
+    assert client.post(f"/api/console/activity/{activity_id}/undo").json()["error"] is None, "previewing again before applying is still allowed"
+
+    applied = client.post(f"/api/console/data/changesets/{undo['id']}/apply", json={"confirm": undo["id"]}).json()
+    assert applied["status"] == "applied"
+    with parts["factory"]() as db:
+        assert db.get(Book, 2).title == "Second"
+
+    marked = client.get(f"/api/console/activity/{activity_id}").json()
+    assert marked["undone_by"] == undo["id"]
+    again = client.post(f"/api/console/activity/{activity_id}/undo")
+    assert again.json()["error"]["code"] == "already_undone"
+
+
 # --- query ------------------------------------------------------------------------------------
 
 def test_query_workbench_read_write_explain_saved_history(host: Any) -> None:
@@ -432,6 +461,27 @@ def test_api_routes_traffic_send_probes_collections(host: Any) -> None:
     col = client.post("/api/console/api/collections", json={"name": "smoke", "requests": [{"method": "GET", "path": "/ping"}]}).json()
     assert client.get("/api/console/api/collections").json()["items"][0]["requests"][0]["path"] == "/ping"
     assert client.delete(f"/api/console/api/collections/{col['id']}").json()["deleted"] == col["id"]
+
+
+def test_api_send_respects_console_writes_policy_and_is_always_audited(host: Any, tmp_path: Path) -> None:
+    """/api/send lets a caller replay any method/path against this same server --
+    a strictly more powerful capability than a row-level changeset -- so it must
+    respect the same `console_writes` gate every sibling write endpoint respects,
+    not merely ctx.read()'s "can view the console" check. It also used to audit
+    only the act_as branch; every replay is audited now."""
+    client, _, _ = host
+    before = client.get("/api/console/activity", params={"section": "api"}).json()["items"]
+    sent = client.post("/api/console/api/send", json={"method": "GET", "path": "/ping"})
+    assert sent.status_code == 502  # self_unreachable under TestClient, but it got past auth
+    after = client.get("/api/console/activity", params={"section": "api"}).json()["items"]
+    assert len(after) == len(before) + 1
+    assert after[0]["action"] == "send" and after[0]["note"] == "GET /ping"
+
+    bare_app, bare, _ = make_host(tmp_path / "bare-send", tests=None, users=None, log_sources=(), settings=None, writes=WritePolicy.DISABLED, ui_path=None)
+    with TestClient(bare_app) as c2:
+        refused = c2.post("/api/console/api/send", json={"method": "GET", "path": "/ping"})
+        assert refused.status_code == 403 and refused.json()["error"]["code"] == "writes_disabled"
+    bare.shutdown()
 
 
 # --- tests ------------------------------------------------------------------------------------

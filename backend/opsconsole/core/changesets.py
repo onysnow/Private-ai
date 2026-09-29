@@ -64,7 +64,7 @@ def _pk_of(table: Table, row: Mapping[Any, Any]) -> dict[str, Any]:
     return {c.name: json_safe(row[c.name]) for c in table.primary_key.columns}
 
 
-def preview(ctx: ConsoleContext, *, table_name: str, ops: Sequence[Mapping[str, Any]], principal: Principal, origin: str = "inline") -> dict[str, Any]:
+def preview(ctx: ConsoleContext, *, table_name: str, ops: Sequence[Mapping[str, Any]], principal: Principal, origin: str = "inline", undoes: str | None = None) -> dict[str, Any]:
     table = _table_for_write(ctx, table_name)
     if not ops:
         raise ConsoleError(400, "empty", "no operations")
@@ -107,7 +107,7 @@ def preview(ctx: ConsoleContext, *, table_name: str, ops: Sequence[Mapping[str, 
                         entry["changed"] = [k for k in values if json_safe(values[k]) != json_safe(before.get(k))]
             prepared.append(entry)
     errors = sum(1 for p in prepared if p["error"])
-    row = ctx.store.changeset_create(principal_id=principal.id, table=table.name, ops=prepared, origin=origin, ttl_seconds=ctx.config.limits.changeset_ttl_seconds)
+    row = ctx.store.changeset_create(principal_id=principal.id, table=table.name, ops=prepared, origin=origin, ttl_seconds=ctx.config.limits.changeset_ttl_seconds, undoes=undoes)
     row["errors"] = errors
     row["warnings"] = sum(len(p["warnings"]) for p in prepared)
     ctx.bus.publish("changesets", {"id": row["id"], "status": "pending", "table": table.name, "ops": len(prepared)})
@@ -184,6 +184,13 @@ def apply(ctx: ConsoleContext, *, cid: str, principal: Principal, request: Reque
         raise ConsoleError(409, "database_error", message) from exc
     ctx.store.activity_set_state(activity_ids, "committed")
     ctx.store.changeset_update(cid, status="applied", applied_at=now_iso())
+    if row.get("undoes"):
+        # Only now -- the reversing change-set has actually committed, not just
+        # been previewed -- mark the original activity undone. Without this the
+        # undo() guard above (`if act.get("undone_by")`) never trips: nothing
+        # ever called Store.activity_mark_undone(), so the same activity could
+        # be undone repeatedly, each time producing a fresh pending change-set.
+        ctx.store.activity_mark_undone(row["undoes"], cid)
     ctx.introspector.invalidate_counts(table.name)
     ctx.bus.publish("changesets", {"id": cid, "status": "applied", "table": table.name})
     ctx.bus.publish("data", {"table": table.name, "changed": len(applied), "changeset_id": cid})
@@ -221,9 +228,7 @@ def undo(ctx: ConsoleContext, *, activity_id: str, principal: Principal) -> dict
         op = {"op": "delete", "pk": act["target_pk"]}
     else:
         raise ConsoleError(409, "not_undoable", f"{action} cannot be undone automatically")
-    result = preview(ctx, table_name=table.name, ops=[op], principal=principal, origin="undo")
-    result["undoes"] = activity_id
-    return result
+    return preview(ctx, table_name=table.name, ops=[op], principal=principal, origin="undo", undoes=activity_id)
 
 
 def bulk(ctx: ConsoleContext, *, table_name: str, op: str, values: Mapping[str, Any] | None, pks: Sequence[Mapping[str, Any]] | None,
