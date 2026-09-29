@@ -28,19 +28,23 @@ export type EntityGraphProps = {
   onEdgeClick?: (edgeId: string) => void;
 };
 
-// Color encoding for TAS-style evidentiary status. Keyed off the existing
-// shadcn HSL design tokens (app/globals.css) where one maps cleanly;
-// statuses with no existing token get an explicit, clearly-labeled color
-// here rather than inventing new global CSS variables for a single
-// standalone component.
+// Color encoding for TAS-style evidentiary status. Keyed off the actual
+// current Dark Academia HSL design tokens (app/globals.css) where one maps
+// cleanly; statuses with no existing token get an explicit, clearly-labeled
+// color built from the same palette family rather than an unrelated hue.
+// (Fixed 2026-09-29: this map still held its pre-redesign blue-ish values
+// after the "Redesign Phase 1: trace every palette token to its swatch
+// half" commits changed globals.css -- the comments claimed a token mapping
+// the hardcoded hex/HSL values didn't actually have. The graph rendered
+// off-palette against the rest of the redesigned app.)
 const STATUS_COLOR: Record<EvidenceStatus, {border: string; background: string; dashed?: boolean}> = {
-  documented: {border: 'hsl(228 100% 76%)', background: 'hsl(224 39% 18%)'}, // --primary / --secondary
-  corroborated: {border: '#3fbf7f', background: '#173322'}, // verified-green: independently supported
-  alleged: {border: 'hsl(0 72% 51%)', background: '#3a1414'}, // --destructive
-  inferred: {border: '#c9a227', background: '#332c11', dashed: true}, // amber, dashed: not directly stated
-  hypothesized: {border: '#c9a227', background: '#241f33', dashed: true},
-  contested: {border: 'hsl(0 72% 51%)', background: '#3a1414', dashed: true}, // destructive + dashed: disputed
-  unknown: {border: 'hsl(223 28% 74%)', background: 'hsl(222 43% 12%)'}, // --muted-foreground / --card
+  documented: {border: 'hsl(40 56% 46%)', background: 'hsl(14 60% 14%)'}, // --primary gold border on a --secondary-hue dark surface
+  corroborated: {border: 'hsl(162 55% 45%)', background: 'hsl(162 30% 12%)'}, // brightened --accent forest green: independently supported
+  alleged: {border: 'hsl(7 53% 35%)', background: 'hsl(7 53% 12%)'}, // --destructive brick red
+  inferred: {border: 'hsl(36 60% 58%)', background: 'hsl(36 40% 12%)', dashed: true}, // --ring brighter gold, dashed: not directly stated
+  hypothesized: {border: 'hsl(36 60% 58%)', background: 'hsl(202 21% 13%)', dashed: true}, // --ring gold on --card surface, dashed: tentative
+  contested: {border: 'hsl(7 53% 35%)', background: 'hsl(7 53% 12%)', dashed: true}, // --destructive + dashed: disputed
+  unknown: {border: 'hsl(37 22% 47%)', background: 'hsl(202 21% 13%)'}, // --muted-foreground / --card
 };
 
 function statusColor(status: EvidenceStatus | undefined): {border: string; background: string; dashed?: boolean} {
@@ -55,7 +59,7 @@ function toVisNode(node: EntityGraphNode): VisNode {
     title: node.title ?? node.label,
     shape: 'box',
     color: {border: color.border, background: color.background, highlight: color},
-    font: {color: '#e7ecff'},
+    font: {color: '#caaf9c'}, // --da-parchment: on-theme light tone, legible against the dark node fills above
   };
 }
 
@@ -70,7 +74,7 @@ function toVisEdge(edge: EntityGraphEdge): VisEdge {
     color: {color: color.border, highlight: color.border},
     dashes: Boolean(color.dashed),
     arrows: 'to',
-    font: {color: '#aebcf3', strokeWidth: 0},
+    font: {color: '#caaf9c', strokeWidth: 0}, // --da-parchment: matches node labels, legible against the near-black canvas
   };
 }
 
