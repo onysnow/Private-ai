@@ -4,7 +4,7 @@ Part of the STRUCT-0024 split; see app/models/base.py.
 """
 
 from datetime import datetime
-from sqlalchemy import String, Text, DateTime, ForeignKey
+from sqlalchemy import Boolean, String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from app.core.time import utcnow_naive
 from app.db.session import Base
@@ -16,6 +16,10 @@ class Investigation(Base):
     id: Mapped[str] = mapped_column(String, primary_key=True, default=uid)
     name: Mapped[str] = mapped_column(String(255), index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # True only for the single seeded demo investigation (see
+    # app/services/demo_seed.py) -- lets the frontend offer a "hide demo
+    # data" toggle without guessing from the name/description.
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
 
 

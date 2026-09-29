@@ -50,6 +50,7 @@ from app.services.investigations import (
     list_investigation_sources as _list_investigation_sources,
     list_investigations as _list_investigations,
 )
+from app.services.demo_seed import seed_demo_investigation
 from app.services.financial_flows import investigation_financial_ledger
 from app.services.lifecycle import delete_investigation, preview_investigation_deletion
 from app.services.openaleph_corpus import (
@@ -257,6 +258,15 @@ def create_investigation(body: InvestigationCreate, db: Session = Depends(get_db
 def list_investigations(request: Request, db: Session = Depends(get_db)) -> Any:
     scope = scope_for_request(request)
     return _list_investigations(db, scope)
+
+
+@router.post("/demo/seed", response_model=None)
+def seed_demo(db: Session = Depends(get_db)) -> Any:
+    """Create the one demo investigation (sample entities, relationships,
+    claims/evidence, leads, and a timeline) if it doesn't already exist.
+    Idempotent -- calling this again just returns the existing one."""
+    inv, created = seed_demo_investigation(db)
+    return {"investigation_id": inv.id, "created": created}
 
 
 @router.get("/investigations/{investigation_id}/deletion-preview", response_model=None)

@@ -1,7 +1,7 @@
 export type JsonPrimitive=string|number|boolean|null;
 export type JsonValue=JsonPrimitive|JsonValue[]|{[key:string]:JsonValue};
 export type JsonObject={[key:string]:JsonValue};
-export type Investigation={id:string,name:string};
+export type Investigation={id:string,name:string,is_demo?:boolean};
 export type CanonicalEntity={id:string,caption:string,schema:string,properties:Record<string,string[]>};
 export type Finding={id:string,provider:string,caption:string,schema?:string,properties:Record<string,string[]>,source_url?:string,review_status:string};
 export type Candidate={entity_id:string,caption:string,schema:string,score:number};

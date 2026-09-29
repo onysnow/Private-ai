@@ -6,6 +6,7 @@ import {errorMessage} from '../../lib/api-client';
 import {api} from '../../lib/api-instance';
 import {parseInvestigationList, parseLeadQueue, parseEntityList, parseTimelineBody, isClaim} from '../../lib/api-validate';
 import type {Investigation, LeadItem, CanonicalEntity, TimelineEvent, Claim} from '../../lib/api-types';
+import {filterHiddenDemo} from '../../lib/demo-preference';
 
 // Quick-look overview for whoever opens the app first thing: which
 // investigation is active, and the state of its leads/claims/entities/timeline
@@ -50,7 +51,7 @@ export default function DashboardPage(): ReactElement {
     const controller = new AbortController();
     (async () => {
       try {
-        const list = await api.parsed('/api/investigations', parseInvestigationList, {signal: controller.signal});
+        const list = filterHiddenDemo(await api.parsed('/api/investigations', parseInvestigationList, {signal: controller.signal}));
         setInvestigations(list);
         setSelected(current => current || list[0]?.id || '');
       } catch (err) {
