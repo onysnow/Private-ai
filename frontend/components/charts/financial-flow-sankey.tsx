@@ -37,8 +37,11 @@ export type FinancialFlowSankeyProps = {
   className?: string;
 };
 
-const DIRECT_COLOR = 'hsl(228, 100%, 76%)';
-const INFERRED_COLOR = '#c9a227';
+// Fixed 2026-09-29: matches the real current Dark Academia tokens now used
+// by components/entity-graph.tsx and lib/echarts-setup.ts -- these were
+// still the pre-redesign blue/unrelated-amber values.
+const DIRECT_COLOR = 'hsl(40, 56%, 46%)'; // --primary gold
+const INFERRED_COLOR = 'hsl(36, 60%, 58%)'; // --ring brighter gold, dashed
 
 function pickDefaultCurrency(byCurrency: Map<string, {links: {transactionIds: string[]}[]}>): string | undefined {
   let best: string | undefined;
@@ -105,7 +108,7 @@ export function FinancialFlowSankey({
             },
           })),
           emphasis: {focus: 'adjacency'},
-          label: {color: 'hsl(226, 100%, 97%)'},
+          label: {color: 'hsl(25, 30%, 70%)'}, // --da-parchment, matches the theme's textStyle
           nodeAlign: 'justify',
         },
       ],

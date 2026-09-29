@@ -53,7 +53,7 @@ describe('FinancialFlowSankey', () => {
     expect(option.series[0].links).toHaveLength(2);
   });
 
-  it('styles a direct link solid/blue and an inferred link dashed/amber', () => {
+  it('styles a direct link solid/gold and an inferred link dashed/brighter-gold', () => {
     render(
       <FinancialFlowSankey
         transactions={[
@@ -69,9 +69,9 @@ describe('FinancialFlowSankey', () => {
     const direct = links.find((l) => l.source === 'A');
     const inferred = links.find((l) => l.source === 'B');
     expect(direct?.lineStyle.type).toBe('solid');
-    expect(direct?.lineStyle.color).toBe('hsl(228, 100%, 76%)');
+    expect(direct?.lineStyle.color).toBe('hsl(40, 56%, 46%)');
     expect(inferred?.lineStyle.type).toBe('dashed');
-    expect(inferred?.lineStyle.color).toBe('#c9a227');
+    expect(inferred?.lineStyle.color).toBe('hsl(36, 60%, 58%)');
   });
 
   it('defaults to the currency with the most transactions and lists the others as not shown', () => {

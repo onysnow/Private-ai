@@ -38,12 +38,15 @@ export type CaseTimelineProps = {
 
 type StatusStyle = {fill: string; stroke: string};
 
+// Fixed 2026-09-29: matches the real current Dark Academia tokens now used
+// by components/entity-graph.tsx and lib/echarts-setup.ts -- this map had
+// copied their pre-redesign blue-ish values and never picked up the update.
 const STATUS_STYLE: Record<string, StatusStyle> = {
-  asserted: {fill: 'hsl(228, 100%, 76%)', stroke: 'hsl(228, 100%, 76%)'},
-  verified: {fill: '#3fbf7f', stroke: '#3fbf7f'},
-  approximate: {fill: '#c9a227', stroke: '#c9a227'},
-  disputed: {fill: 'hsl(0, 72%, 51%)', stroke: 'hsl(0, 72%, 51%)'},
-  unresolved: {fill: 'hsl(223, 28%, 74%)', stroke: 'hsl(223, 28%, 74%)'},
+  asserted: {fill: 'hsl(40, 56%, 46%)', stroke: 'hsl(40, 56%, 46%)'}, // --primary gold
+  verified: {fill: 'hsl(162, 55%, 45%)', stroke: 'hsl(162, 55%, 45%)'}, // brightened --accent
+  approximate: {fill: 'hsl(36, 60%, 58%)', stroke: 'hsl(36, 60%, 58%)'}, // --ring brighter gold
+  disputed: {fill: 'hsl(7, 53%, 35%)', stroke: 'hsl(7, 53%, 35%)'}, // --destructive
+  unresolved: {fill: 'hsl(37, 22%, 47%)', stroke: 'hsl(37, 22%, 47%)'}, // --muted-foreground
 };
 const FALLBACK_STYLE: StatusStyle = STATUS_STYLE.unresolved;
 

@@ -18,6 +18,13 @@
 // components/entity-graph.tsx, kept consistent across both visualizations.
 //
 // Used via <CaseTimeline> and <FinancialFlowSankey> on app/page.tsx.
+//
+// Fixed 2026-09-29: this theme (and the evidence-status palette in
+// entity-graph.tsx it was copied from) still held its pre-redesign blue-ish
+// values after the "Redesign Phase 1: trace every palette token to its
+// swatch half" commits changed globals.css's actual tokens -- the comments
+// above were never wrong about the *intent*, just stale on the values. Every
+// literal below now traces to the real current Dark Academia tokens.
 
 import * as echarts from 'echarts/core';
 import {CustomChart, LineChart, SankeyChart} from 'echarts/charts';
@@ -37,36 +44,38 @@ echarts.use([
 
 export const WORKBENCH_THEME_NAME = 'workbench';
 
-// --primary, verified-green, inferred-amber, --destructive, --muted-foreground, a secondary blue.
+// --primary gold, brightened --accent green (verified), --ring brighter gold
+// (inferred), --destructive, --muted-foreground, --da-blue (the palette's own
+// "info/link accent" token -- a real on-swatch blue, not an arbitrary one).
 const CATEGORICAL_PALETTE = [
-  'hsl(228, 100%, 76%)',
-  '#3fbf7f',
-  '#c9a227',
-  'hsl(0, 72%, 51%)',
-  'hsl(223, 28%, 74%)',
-  '#7c8fd6',
+  'hsl(40, 56%, 46%)',
+  'hsl(162, 55%, 45%)',
+  'hsl(36, 60%, 58%)',
+  'hsl(7, 53%, 35%)',
+  'hsl(37, 22%, 47%)',
+  'hsl(209, 35%, 37%)',
 ];
 
 echarts.registerTheme(WORKBENCH_THEME_NAME, {
   color: CATEGORICAL_PALETTE,
   backgroundColor: 'transparent',
-  textStyle: {color: 'hsl(226, 100%, 97%)'},
-  title: {textStyle: {color: 'hsl(226, 100%, 97%)'}},
+  textStyle: {color: 'hsl(25, 30%, 70%)'}, // --da-parchment
+  title: {textStyle: {color: 'hsl(25, 30%, 70%)'}}, // --da-parchment
   tooltip: {
-    backgroundColor: 'hsl(222, 43%, 12%)',
-    borderColor: 'hsl(223, 33%, 24%)',
-    textStyle: {color: 'hsl(226, 100%, 97%)'},
+    backgroundColor: 'hsl(202, 21%, 13%)', // --card / --popover
+    borderColor: 'hsl(26, 43%, 15%)', // --border
+    textStyle: {color: 'hsl(25, 30%, 70%)'}, // --da-parchment
   },
-  legend: {textStyle: {color: 'hsl(223, 28%, 74%)'}},
+  legend: {textStyle: {color: 'hsl(37, 22%, 47%)'}}, // --muted-foreground
   categoryAxis: {
-    axisLine: {lineStyle: {color: 'hsl(223, 33%, 24%)'}},
-    axisLabel: {color: 'hsl(223, 28%, 74%)'},
-    splitLine: {lineStyle: {color: 'hsl(223, 33%, 24%)'}},
+    axisLine: {lineStyle: {color: 'hsl(26, 43%, 15%)'}}, // --border
+    axisLabel: {color: 'hsl(37, 22%, 47%)'}, // --muted-foreground
+    splitLine: {lineStyle: {color: 'hsl(26, 43%, 15%)'}}, // --border
   },
   valueAxis: {
-    axisLine: {lineStyle: {color: 'hsl(223, 33%, 24%)'}},
-    axisLabel: {color: 'hsl(223, 28%, 74%)'},
-    splitLine: {lineStyle: {color: 'hsl(223, 33%, 24%)'}},
+    axisLine: {lineStyle: {color: 'hsl(26, 43%, 15%)'}}, // --border
+    axisLabel: {color: 'hsl(37, 22%, 47%)'}, // --muted-foreground
+    splitLine: {lineStyle: {color: 'hsl(26, 43%, 15%)'}}, // --border
   },
 });
 

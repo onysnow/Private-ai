@@ -82,7 +82,7 @@ export function EntityForm({entity, onSubmit, onCancel}: EntityFormProps): React
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit} noValidate className="entity-form">
+      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
         <FormField
           control={form.control}
           name="caption"
@@ -105,21 +105,24 @@ export function EntityForm({entity, onSubmit, onCancel}: EntityFormProps): React
               <FormControl>
                 <Input placeholder="Person, Organization, Company…" {...field} disabled={isEdit} />
               </FormControl>
-              {isEdit && <p className="muted">Schema can&apos;t be changed after creation.</p>}
+              {isEdit && <p className="text-sm text-muted-foreground">Schema can&apos;t be changed after creation.</p>}
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="entity-form-properties">
-          <div className="entity-form-properties-header">
-            <span>Properties</span>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Properties</span>
             <Button type="button" variant="outline" onClick={() => append({key: '', valuesText: ''})}>
               Add property
             </Button>
           </div>
           {fields.map((field, index) => (
-            <div className="entity-form-property-row" key={field.id}>
+            <div
+              className="grid grid-cols-1 gap-3 rounded-lg border border-border p-3 sm:grid-cols-[1fr_1.5fr_auto] sm:items-end"
+              key={field.id}
+            >
               <FormField
                 control={form.control}
                 name={`properties.${index}.key` as const}
@@ -154,12 +157,15 @@ export function EntityForm({entity, onSubmit, onCancel}: EntityFormProps): React
         </div>
 
         {rootError && (
-          <p className="entity-form-error" role="alert">
+          <p
+            className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive-foreground"
+            role="alert"
+          >
             {rootError}
           </p>
         )}
 
-        <div className="entity-form-actions">
+        <div className="flex gap-2">
           <Button type="submit" disabled={form.formState.isSubmitting}>
             {isEdit ? 'Save changes' : 'Create entity'}
           </Button>
