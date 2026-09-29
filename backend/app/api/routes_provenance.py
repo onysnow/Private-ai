@@ -31,8 +31,18 @@ def get_record_provenance_trace(record_type: str, record_id: str, request: Reque
 
 
 @router.get("/provenance/extraction-lineage", response_model=None)
-def find_extraction_lineage_endpoint(record_type: str, record_id: str, db: Session = Depends(get_db)) -> Any:
+def find_extraction_lineage_endpoint(record_type: str, record_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
     try:
-        return find_extraction_lineage(db, record_type, record_id)
+        result = find_extraction_lineage(db, record_type, record_id)
+        # Unlike /provenance/trace above, this lookup has no natural 404 (a
+        # not-found candidate is a legitimate `{"found": False}` response), so
+        # the scope check has to happen after the fact, only when a candidate
+        # -- and the document/source/chunk text it lineage-traces to -- was
+        # actually found. Without this, a caller scoped to investigation A
+        # could pass an entity/claim/evidence id from investigation B and
+        # read its document text and source URL via this endpoint.
+        if result["lineage"] is not None:
+            require_scope_investigation(scope_for_request(request), result["lineage"]["candidate"]["investigation_id"])
+        return result
     except ValueError as exc:
         raise HTTPException(400, str(exc))
