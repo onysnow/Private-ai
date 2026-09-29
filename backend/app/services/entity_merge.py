@@ -6,6 +6,7 @@ import json
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.db.locking import lock_investigation_transaction
 from app.models.domain import (
     Entity, Statement, LeadLink, TimelineEvent, ResolutionDecision, StatementAssessment,
     StatementPromotion, EnrichmentSession, CrossProviderDecision, RelationshipEdge,
@@ -104,6 +105,15 @@ def preview_entity_merge(db: Session, source: Entity, target: Entity) -> dict:
 
 
 def execute_entity_merge(db: Session, source: Entity, target: Entity, *, preview_digest: str, rationale: str | None = None) -> CanonicalEntityMergeAudit:
+    # Serialize concurrent merges for this investigation before even computing
+    # a preview. Without this, two concurrent requests can both compute the
+    # same pre-merge preview/digest, both pass the staleness check below, and
+    # both run the reference-move loop -- producing two
+    # CanonicalEntityMergeAudit rows for the same merge instead of the second
+    # request failing closed on a stale digest. Same pattern already used by
+    # ingest_document/backup-restore/investigation-delete (app/db/locking.py);
+    # a no-op on SQLite, an advisory xact lock on PostgreSQL.
+    lock_investigation_transaction(db, source.investigation_id)
     preview = preview_entity_merge(db, source, target)
     if preview["preview_digest"] != preview_digest:
         raise ValueError("Merge preview is stale; generate a fresh preview before executing")
