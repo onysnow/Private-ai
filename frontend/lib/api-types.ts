@@ -24,11 +24,18 @@ export type ExternalRelCandidates={schema:string,source_prop:string,target_prop:
 export type TimelineEvent={id:string,kind:string,title:string,description?:string,date_start:string,date_end?:string,precision:string,verification_status:string,provenance:{origin?:string,source_url?:string,[key:string]:JsonValue|undefined},refs:{[key:string]:JsonValue},context?:{source?:{id:string,title:string,url?:string,source_type?:string},evidence?:{id:string,quote?:string,locator?:string,notes?:string,source_id:string},claim?:{id:string,text:string,status:string,confidence:number,evidence_stances?:Array<{stance:string,note?:string}>},claim_advisory?:{needs_review:boolean,status:string,message?:string},relationship_advisory?:{needs_review:boolean,support_state?:string,has_independent_support?:boolean}}};
 export type SearchGroup='canonical'|'evidence'|'reporting'|'workflow'|'review'|'external_lead'|'other';
 export type SearchResult={type:string,group:SearchGroup,id:string,investigation_id:string,title:string,snippet:string,score:number,provenance:{locator?:string,source_url?:string,[key:string]:JsonValue|undefined},metadata:JsonObject};
-export type DocItem={id:string,investigation_id?:string,filename:string,source_id:string,extraction_status:string,extraction_error?:string|null,extraction_issues?:string[],chunk_count:number,candidate_counts:Record<string,number>};
+// A document's own extracted chunks, attached only by the single-document
+// detail endpoint (GET /api/documents/{id}), not by list endpoints. Each
+// ExtractionCandidate.chunk_id points at one of these, and payload.span
+// (ExtractionSpan) gives exact character offsets within chunk.text -- the
+// pair the split-pane review screen (#66) highlights source spans from.
+export type DocumentChunk={id:string,document_id:string,ordinal:number,locator:string,page_number?:number|null,text:string,created_at?:string};
+export type DocItem={id:string,investigation_id?:string,filename:string,source_id:string,extraction_status:string,extraction_error?:string|null,extraction_issues?:string[],chunk_count:number,candidate_counts:Record<string,number>,chunks?:DocumentChunk[]};
 export type CorpusBinding={id:string,investigation_id:string,provider:string,collection_id:string,foreign_id?:string|null,collection_label?:string|null,status:string,created_at?:string,updated_at?:string};
 export type DocumentCorpusSync={id:string,document_id:string,investigation_id:string,provider:string,collection_id:string,provider_record_id?:string|null,status:string,error?:string|null,response_json?:JsonObject,synced_at?:string|null,created_at?:string,updated_at?:string};
 export type OpenAlephReviewStatus={document_id:string,investigation_id:string,provider:'openaleph',document_extraction_status:string,binding:CorpusBinding|null,sync:DocumentCorpusSync|null,ready_for_import:boolean,candidate_counts:Record<string,Record<string,number>>,provider_candidate_total:number,provider_candidate_pending_review:number,provider_candidate_accepted:number,provider_candidate_rejected:number};
-export type ExtractionPayload={caption?:string,text?:string,quote?:string,locator?:string,suggested_schema?:string,[key:string]:JsonValue|undefined};
+export type ExtractionSpan={start_char:number,end_char:number};
+export type ExtractionPayload={caption?:string,text?:string,quote?:string,locator?:string,suggested_schema?:string,span?:ExtractionSpan,[key:string]:JsonValue|undefined};
 // #190: per-part "why was this proposed" breakdown returned by
 // GET /api/extraction-candidates/{id}/explanation and, inline, by
 // GET /api/documents/{id}/candidates?explain=true.

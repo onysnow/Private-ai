@@ -50,6 +50,20 @@ function docFixture(overrides: Record<string, unknown> = {}) {
   };
 }
 
+// A document detail response carrying chunks (Phase 1 split pane): the
+// real GET /api/documents/{id} endpoint always includes these, but most
+// fixtures above omit them since those tests don't exercise the source pane.
+function docWithChunksFixture(overrides: Record<string, unknown> = {}) {
+  return {
+    ...docFixture(),
+    chunks: [
+      {id: 'chunk-1', document_id: 'doc-1', ordinal: 1, locator: 'line 1', page_number: null, text: 'Alpha Corporation signed the deal.'},
+      {id: 'chunk-2', document_id: 'doc-1', ordinal: 2, locator: 'line 2', page_number: null, text: 'A second, unrelated paragraph.'},
+    ],
+    ...overrides,
+  };
+}
+
 function evidenceCandidate(overrides: Record<string, unknown> = {}) {
   return {
     id: 'cand-evidence', candidate_type: 'evidence',
@@ -162,7 +176,7 @@ describe('Document review queue: issues and clarifying questions', () => {
     render(<ReviewPage />);
 
     await screen.findByText('Document 1 of 1');
-    expect(screen.getByText('memo.txt')).toBeInTheDocument();
+    await screen.findByText('memo.txt');
   });
 
   it('shows a clean empty state when nothing needs review', async () => {
@@ -174,5 +188,65 @@ describe('Document review queue: issues and clarifying questions', () => {
     render(<ReviewPage />);
 
     await screen.findByText(/Nothing here needs review right now/);
+  });
+});
+
+describe('Document review queue: split-pane source highlighting', () => {
+  it('highlights only the hovered candidate\'s exact span, in its own chunk, and clears on mouse-leave', async () => {
+    setParams('inv=inv-1&docs=doc-1');
+    const entity = ambiguousEntityCandidate({
+      id: 'cand-entity', chunk_id: 'chunk-1',
+      payload: {caption: 'Alpha Corporation', suggested_schema: 'Organization', span: {start_char: 0, end_char: 17}},
+    });
+    const evidence = evidenceCandidate({
+      id: 'cand-evidence', chunk_id: 'chunk-2',
+      payload: {quote: 'A second, unrelated paragraph.', locator: 'line 2', span: {start_char: 0, end_char: 30}},
+    });
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse(docWithChunksFixture()))
+      .mockResolvedValueOnce(jsonResponse([entity, evidence]));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const ReviewPage = await importReviewPage();
+    render(<ReviewPage />);
+
+    const sourcePane = await screen.findByTestId('source-pane');
+    // Nothing highlighted yet -- no candidate is focused/hovered.
+    expect(within(sourcePane).queryByTestId('source-highlight')).not.toBeInTheDocument();
+
+    // One shared session for every hover/unhover below: user-event tracks
+    // pointer position per-session, so a fresh setup() per call has no
+    // memory of a prior hover and unhover becomes a no-op.
+    const user = userEvent.setup();
+    const entityCard = screen.getByTestId('candidate-cand-entity');
+    await user.hover(entityCard);
+
+    const highlight = within(sourcePane).getByTestId('source-highlight');
+    expect(highlight).toHaveTextContent('Alpha Corporation');
+    // The other chunk's evidence span must not also be lit up at the same time.
+    expect(within(sourcePane).getAllByTestId('source-highlight')).toHaveLength(1);
+
+    await user.unhover(entityCard);
+    expect(within(sourcePane).queryByTestId('source-highlight')).not.toBeInTheDocument();
+
+    const evidenceCard = screen.getByTestId('candidate-cand-evidence');
+    await user.hover(evidenceCard);
+    expect(within(sourcePane).getByTestId('source-highlight')).toHaveTextContent('A second, unrelated paragraph.');
+  });
+
+  it('renders plain chunk text with no crash when a document has no extracted chunks', async () => {
+    setParams('inv=inv-1&docs=doc-1');
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse(docFixture())) // no chunks field at all
+      .mockResolvedValueOnce(jsonResponse([evidenceCandidate()]));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const ReviewPage = await importReviewPage();
+    render(<ReviewPage />);
+
+    await screen.findByTestId('source-pane');
+    expect(screen.getByText(/No extracted source text is available/)).toBeInTheDocument();
   });
 });

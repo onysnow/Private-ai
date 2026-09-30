@@ -1,15 +1,38 @@
 'use client';
 import type {ReactElement} from 'react';
-import {Suspense, useCallback, useEffect, useState} from 'react';
+import {Suspense, useCallback, useEffect, useRef, useState} from 'react';
 import Link from 'next/link';
 import {useSearchParams} from 'next/navigation';
 import {api} from '../../lib/api-instance';
 import {errorMessage} from '../../lib/api-client';
 import {isDocItem, isExtractionCandidate} from '../../lib/api-validate';
-import type {DocItem, ExtractionCandidate} from '../../lib/api-types';
+import type {DocItem, DocumentChunk, ExtractionCandidate} from '../../lib/api-types';
 import {ExtractionExplanationView} from '../../components/extraction-explanation';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+
+// Split-pane source highlighting (design doc Phase 1). Every extraction
+// candidate already carries chunk_id + payload.span (exact character
+// offsets into that chunk's text) from the backend -- confirmed by direct
+// API inspection, not assumed -- so no backend change was needed here.
+// Only ONE candidate's span is ever highlighted at a time: an evidence
+// candidate's span can cover an entire chunk while an entity candidate's
+// span covers a few words inside the same chunk, so highlighting every
+// candidate in a chunk at once would just paint overlapping blocks.
+// Hovering or focusing a candidate card is what selects which one lights up.
+function renderChunkBody(chunk: DocumentChunk, active: {chunk_id?: string, payload: {span?: {start_char: number, end_char: number}}} | null): ReactElement {
+  const span = active && active.chunk_id === chunk.id ? active.payload.span : undefined;
+  if (!span || typeof span.start_char !== 'number' || typeof span.end_char !== 'number' || span.start_char < 0 || span.end_char > chunk.text.length || span.start_char >= span.end_char) {
+    return <>{chunk.text}</>;
+  }
+  return (
+    <>
+      {chunk.text.slice(0, span.start_char)}
+      <mark className="bg-accent/60 rounded px-0.5" data-testid="source-highlight">{chunk.text.slice(span.start_char, span.end_char)}</mark>
+      {chunk.text.slice(span.end_char)}
+    </>
+  );
+}
 
 // One-document-at-a-time review queue for bulk-imported (or any pending)
 // documents. Feature request (2026-09-30): after a bulk import, the reporter
@@ -52,6 +75,8 @@ function ReviewPageInner(): ReactElement {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [totals, setTotals] = useState({accepted: 0, rejected: 0});
   const [queueError, setQueueError] = useState('');
+  const [activeCandidateId, setActiveCandidateId] = useState<string | null>(null);
+  const chunkRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // Fallback mode: no explicit ?docs= list (e.g. the reporter came here
   // directly from "Open review queue"). Find every document in this
@@ -80,7 +105,7 @@ function ReviewPageInner(): ReactElement {
   }, [docIds, invId]);
 
   const loadDoc = useCallback(async (id: string) => {
-    setLoading(true); setAnswers({}); setStatus('');
+    setLoading(true); setAnswers({}); setStatus(''); setActiveCandidateId(null);
     try {
       const [doc, candidates] = await Promise.all([
         api.object(`/api/documents/${id}`, 'document', isDocItem),
@@ -125,6 +150,16 @@ function ReviewPageInner(): ReactElement {
   const goNext = () => setIndex(i => i + 1);
   const goPrev = () => setIndex(i => Math.max(0, i - 1));
 
+  const activeCandidate = activeCandidateId ? current?.candidates.find(c => c.id === activeCandidateId) || null : null;
+
+  // Scroll the chunk holding the focused/hovered candidate's source span into
+  // view in the left pane, so a long document doesn't leave the reporter
+  // hunting for which paragraph a proposal came from.
+  useEffect(() => {
+    if (!activeCandidate?.chunk_id) return;
+    chunkRefs.current[activeCandidate.chunk_id]?.scrollIntoView({block: 'nearest'});
+  }, [activeCandidate]);
+
   if (resolvingQueue) return <main className="p-6"><p className="muted">Finding documents with unreviewed proposals…</p></main>;
   if (queueError) return <main className="p-6"><p className="muted">{queueError}</p></main>;
   if (!docIds || docIds.length === 0) {
@@ -159,6 +194,30 @@ function ReviewPageInner(): ReactElement {
 
       {loading && <p className="muted">Loading…</p>}
       {!loading && current && (
+        <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
+        <Card className="card lg:sticky lg:top-4 lg:max-h-[80vh] lg:overflow-y-auto" data-testid="source-pane">
+          <CardHeader className="pb-3">
+            <CardTitle>Source text</CardTitle>
+            <CardDescription>
+              {activeCandidate ? 'Highlighted span matches the proposal you are focused on.' : 'Hover or focus a proposal on the right to see its exact source span here.'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            {(current.doc.chunks || []).length === 0 && <p className="muted">No extracted source text is available for this document.</p>}
+            {(current.doc.chunks || []).map(chunk => (
+              <div
+                key={chunk.id}
+                ref={el => { chunkRefs.current[chunk.id] = el }}
+                data-testid={`chunk-${chunk.id}`}
+                className={`rounded border p-2 whitespace-pre-wrap ${activeCandidate?.chunk_id === chunk.id ? 'border-accent' : 'border-transparent'}`}
+              >
+                <div className="text-xs muted mb-1">{chunk.locator}</div>
+                {renderChunkBody(chunk, activeCandidate)}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
         <Card className="card">
           <CardHeader className="pb-3">
             <CardTitle>{current.doc.filename}</CardTitle>
@@ -183,8 +242,17 @@ function ReviewPageInner(): ReactElement {
               const suggested = c.payload.suggested_schema || 'Person';
               const answered = answers[c.id];
               const acceptBlocked = clarify && !answered;
+              const isActive = activeCandidateId === c.id;
               return (
-                <div className="candidate" key={c.id} data-testid={`candidate-${c.id}`}>
+                <div
+                  className={`candidate ${isActive ? 'ring-1 ring-accent' : ''}`}
+                  key={c.id}
+                  data-testid={`candidate-${c.id}`}
+                  onMouseEnter={() => setActiveCandidateId(c.id)}
+                  onMouseLeave={() => setActiveCandidateId(cur => (cur === c.id ? null : cur))}
+                  onFocus={() => setActiveCandidateId(c.id)}
+                  onBlur={() => setActiveCandidateId(cur => (cur === c.id ? null : cur))}
+                >
                   <b>{c.candidate_type} proposal</b> <small>· {typeof c.confidence === 'number' ? `${Math.round(c.confidence * 100)}% confidence` : ''}</small>
                   <div>{c.payload.caption || c.payload.text || c.payload.quote || ''}</div>
                   {c.payload.locator && <small>{c.payload.locator}</small>}
@@ -213,6 +281,7 @@ function ReviewPageInner(): ReactElement {
             {status && <p className="muted">{status}</p>}
           </CardContent>
         </Card>
+        </div>
       )}
 
       <div className="flex justify-between">

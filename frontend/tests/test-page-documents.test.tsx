@@ -269,7 +269,7 @@ describe('Home document ingestion & extraction', () => {
 });
 
 describe('Home bulk document import', () => {
-  it('uploads every selected file sequentially, tolerates one failure, and navigates to the review queue', async () => {
+  it('uploads every selected file sequentially, tolerates one failure, and navigates to the batch triage screen', async () => {
     const {fetchMock} = await bootstrapWithOneDocument();
     const fileA = new File(['a'], 'memo-a.txt', {type: 'text/plain'});
     const fileB = new File(['b'], 'memo-b.txt', {type: 'text/plain'});
@@ -286,7 +286,7 @@ describe('Home bulk document import', () => {
     await user.click(screen.getByRole('button', {name: 'Import 3 document(s)'}));
 
     await screen.findByText(/Imported 2 of 3 file\(s\)\. 1 failed and were skipped/, {exact: false});
-    expect(mockPush).toHaveBeenCalledWith('/review?inv=inv-1&docs=doc-a,doc-c');
+    expect(mockPush).toHaveBeenCalledWith('/review/batch?inv=inv-1&docs=doc-a,doc-c');
 
     // Three separate sequential POSTs, one per file, each with its own
     // filename-derived title and no manual title field (unlike the
