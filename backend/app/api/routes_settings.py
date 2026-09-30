@@ -23,6 +23,7 @@ from app.core.config import settings
 from app.db.session import get_db
 from app.models.domain import AppUser
 from app.schemas.api import AppUserCreate, AppUserUpdate, InvestigationMembershipPut
+from app.services.lifecycle import preview_orphan_document_files as _preview_orphan_document_files
 from app.services.settings import (
     create_app_user as _create_app_user,
     delete_connector_credential as _delete_connector_credential,
@@ -230,3 +231,14 @@ def delete_connector_credential(provider: str, request: Request) -> Any:
         raise HTTPException(404, str(exc))
     except RuntimeError as exc:
         raise HTTPException(500, str(exc))
+
+
+@router.get("/settings/storage/orphans", response_model=None)
+def get_orphan_storage_preview(request: Request, db: Session = Depends(get_db)) -> Any:
+    """Preview-only report of files under document storage that no Document row
+    references (STRUCT area: lifecycle.preview_orphan_document_files was implemented
+    and unit-tested but never wired to a route -- the frontend's "Preview retained
+    orphan files" button 404'd on every call). Local-only: this walks the server's
+    whole document storage root, not just the caller's own investigation's files."""
+    _require_local_request(request)
+    return _preview_orphan_document_files(db, settings.document_storage_dir)
