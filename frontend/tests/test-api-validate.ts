@@ -179,3 +179,17 @@ describe('isSettingsStatus with the optional security block (STRUCT-0035)', () =
     expect(isSettingsStatus({...base, security: {...security, needs_attention: 'no'}})).toBe(false);
   });
 });
+
+describe('isSettingsStatus with document_extraction.ocr_runtime.detail', () => {
+  it('accepts null (the healthy-OCR default returned by backend/app/services/pdf_ocr.py), a string, but rejects other types', async () => {
+    const {isSettingsStatus} = await import('../lib/api-validate');
+    const base = {
+      environment: 'test', database: 'sqlite', document_storage_dir: '/d', limits: {}, restore_api_enabled: false,
+      document_extraction: {pdf_ocr_enabled: false, pdf_ocr_language: 'eng', pdf_ocr_dpi: 200, pdf_ocr_min_native_chars: 20, local_entity_suggestions_enabled: true, entity_extraction_owner: 'workbench_local', ocr_runtime: {available: false, requested_languages: [], missing_languages: [], detail: null as unknown as string}},
+      access: {remote_api_enabled: false, mode: 'local_only', token_configured: false}, cors_allowed_origins: [], connectors: {},
+    };
+    expect(isSettingsStatus(base)).toBe(true);
+    expect(isSettingsStatus({...base, document_extraction: {...base.document_extraction, ocr_runtime: {...base.document_extraction.ocr_runtime, detail: 'tesseract not found'}}})).toBe(true);
+    expect(isSettingsStatus({...base, document_extraction: {...base.document_extraction, ocr_runtime: {...base.document_extraction.ocr_runtime, detail: 42 as unknown as string}}})).toBe(false);
+  });
+});
