@@ -114,7 +114,7 @@ async function bootstrapNoInvestigations(): Promise<{
   const Home = await importHome();
   render(<Home />);
   await screen.findByText(
-    'Local-only API access. No bearer token is required on loopback.',
+    'API: local access',
   );
   return {fetchMock};
 }

@@ -87,4 +87,12 @@ select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin
 .section-group>.group-label{display:block;text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:600;color:hsl(var(--muted-foreground));margin-bottom:14px}
 .page-grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
 .page-grid-2>.card{margin:0}
+/* For a pair of related panels whose content length varies a lot (a short
+   utility form next to an open-ended, growing list) -- forcing them into
+   page-grid-2's two equal columns leaves a tall dead gap under the shorter
+   one. section-stack keeps them under one shared group label but stacks
+   them full-width instead, so there's no empty column to stare at. */
+.section-stack>.card{margin:0}
+.section-stack>*+*{margin-top:20px}
+.top{gap:10px 8px;flex-wrap:wrap}
 @media(max-width:960px){.page-grid-2{grid-template-columns:1fr}.shell{padding:28px 16px}.shell>*+*{margin-top:28px}}

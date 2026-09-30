@@ -97,7 +97,7 @@ describe('Home API-access bootstrap', () => {
     render(<Home />);
 
     await screen.findByText(
-      'Local-only API access. No bearer token is required on loopback.',
+      'API: local access',
     );
     expect(
       screen.queryByPlaceholderText('Bearer token for this session'),
@@ -133,7 +133,7 @@ describe('Home API-access bootstrap', () => {
     await user.click(connectButton);
 
     await screen.findByText(
-      'Authenticated for this browser session. Token is held only in memory.',
+      'API: session active',
     );
     expect(
       screen.queryByPlaceholderText('Bearer token for this session'),
@@ -187,7 +187,7 @@ describe('Home API-access bootstrap', () => {
     await user.click(screen.getByRole('button', {name: 'Clear session token'}));
 
     await screen.findByText(
-      'Local-only API access. No bearer token is required on loopback.',
+      'API: local access',
     );
     expect(
       screen.queryByRole('button', {name: 'Clear session token'}),
