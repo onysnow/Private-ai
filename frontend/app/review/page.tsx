@@ -186,7 +186,7 @@ function ReviewPageInner(): ReactElement {
   const hasIssues = Boolean(current?.doc.extraction_error) || Boolean(current?.doc.extraction_issues?.length);
 
   return (
-    <main className="p-6 space-y-4 max-w-3xl mx-auto" data-testid="review-page">
+    <main className="p-6 space-y-4 max-w-5xl mx-auto" data-testid="review-page">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Document review queue</h1>
         <span className="text-sm muted" data-testid="review-position">Document {index + 1} of {docIds.length}</span>

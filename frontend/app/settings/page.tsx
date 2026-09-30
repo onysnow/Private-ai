@@ -161,11 +161,11 @@ export default function SettingsPage(): ReactElement {
   };
 
   return (
-    <div className="mx-auto max-w-[720px] px-6 py-12">
+    <div className="mx-auto max-w-[920px] px-6 py-14">
       <h1 className="text-3xl font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
         Settings
       </h1>
-      <p className="mt-2 text-sm text-muted-foreground">
+      <p className="mt-2 max-w-[640px] text-sm text-muted-foreground">
         API access for this browser session. Connector credentials, backups, and the security audit log are on the{' '}
         <Link href="/" className="text-primary hover:underline">
           main workbench
@@ -173,7 +173,12 @@ export default function SettingsPage(): ReactElement {
         .
       </p>
 
-      <div className="mt-6 rounded-xl border border-border bg-card p-5">
+      {/* API access and the operator console are both short, self-contained
+          cards -- pairing them in a 2-column grid on desktop instead of
+          stacking each full-width, one per row, like "Demo mode" below,
+          which genuinely needs the room. */}
+      <div className="mt-8 grid items-start gap-6 sm:grid-cols-2">
+      <div className="rounded-xl border border-border bg-card p-5">
         <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
           API access
         </h2>
@@ -221,7 +226,7 @@ export default function SettingsPage(): ReactElement {
         </div>
       </div>
 
-      <div className="mt-6 rounded-xl border border-border bg-card p-5">
+      <div className="rounded-xl border border-border bg-card p-5">
         <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
           Operator console
         </h2>
@@ -233,8 +238,9 @@ export default function SettingsPage(): ReactElement {
           Open console
         </Link>
       </div>
+      </div>
 
-      <div className="mt-6 rounded-xl border border-border bg-card p-5">
+      <div className="mt-8 rounded-xl border border-border bg-card p-5">
         <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
           Demo mode
         </h2>
