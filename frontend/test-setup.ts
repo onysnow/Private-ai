@@ -1,4 +1,19 @@
 import '@testing-library/jest-dom/vitest';
+import {vi} from 'vitest';
+
+// app/page.tsx (bulk import) and app/review/page.tsx both use next/navigation
+// hooks, which throw "invariant expected app router to be mounted" outside a
+// real Next.js app-router tree -- every test in this suite renders its page
+// directly with React Testing Library, with no router provider. A global
+// no-op default here is enough for any test that doesn't itself exercise
+// navigation; a test file that needs to assert on push() or read specific
+// search params calls its own vi.mock('next/navigation', ...), which
+// overrides this default for that file only.
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({push: vi.fn(), replace: vi.fn(), back: vi.fn(), forward: vi.fn(), refresh: vi.fn(), prefetch: vi.fn()}),
+  useSearchParams: () => new URLSearchParams(),
+  usePathname: () => '/',
+}));
 
 // jsdom has no ResizeObserver. @radix-ui/react-use-size (used by the Slider
 // primitive) calls it unconditionally on mount, so any test that renders a

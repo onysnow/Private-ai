@@ -29,11 +29,20 @@ def _clean(text: str) -> str:
     return re.sub(r"[ \t]+", " ", (text or '').replace('\x00','')).strip()
 
 
-def extract_chunks(path: Path) -> list[dict]:
+def extract_chunks(path: Path) -> tuple[list[dict], list[str]]:
+    """Extract locator-preserving text chunks from a supported document.
+
+    Returns ``(chunks, issues)``. ``issues`` are non-fatal problems worth
+    surfacing to the reporter (a blank/unreadable page, a DOCX whose content
+    lives only in tables/images we don't read, an empty file) -- the document
+    still reaches ``extraction_status='complete'`` with these attached, unlike
+    a raised exception, which is reserved for a total extraction failure.
+    """
     ext = path.suffix.lower()
     if ext not in SUPPORTED_EXTENSIONS:
         raise ValueError(f"Unsupported document type: {ext or 'unknown'}")
     rows: list[dict] = []
+    issues: list[str] = []
     if ext == '.pdf':
         result = extract_pdf_chunks(
             path,
@@ -45,6 +54,15 @@ def extract_chunks(path: Path) -> list[dict]:
         rows.extend(result.chunks)
         if not rows and result.ocr_error:
             raise RuntimeError(f'PDF contained no extractable text and OCR failed: {result.ocr_error}')
+        if result.blank_pages:
+            total_pages = result.native_pages + result.ocr_pages + result.blank_pages
+            issues.append(
+                f'{result.blank_pages} of {total_pages} page(s) produced no extractable text '
+                '(blank, image quality too low for OCR, or an unsupported page type).'
+            )
+        if result.ocr_error and rows:
+            # Some pages extracted fine; OCR only degraded, not a total failure.
+            issues.append(f'OCR was degraded on at least one page: {result.ocr_error}')
     elif ext == '.docx':
         from docx import Document as DocxDocument
         doc = DocxDocument(str(path))
@@ -52,6 +70,14 @@ def extract_chunks(path: Path) -> list[dict]:
             text = _clean(para.text)
             if text:
                 rows.append({'locator': f'paragraph {i}', 'page_number': None, 'text': text})
+        if not rows:
+            has_tables = len(doc.tables) > 0
+            issues.append(
+                'No paragraph text found in this DOCX.'
+                + (' It contains tables, which this app does not extract yet -- '
+                   'review the original file directly for that content.' if has_tables
+                   else ' If it contains only images or text boxes, that content is not extracted.')
+            )
     else:
         text = path.read_text(encoding='utf-8', errors='replace')
         # Paragraphs retain useful deterministic line ranges when possible.
@@ -67,7 +93,9 @@ def extract_chunks(path: Path) -> list[dict]:
                 loc = f'line {start}' if start == end else f'lines {start}-{end}'
                 rows.append({'locator': loc, 'page_number': None, 'text': ' '.join(buf)})
                 start=None; buf=[]
-    return rows
+        if not rows:
+            issues.append('This file has no readable text content.')
+    return rows, issues
 
 
 def _candidate_payloads(chunk: DocumentChunk, *, include_entities: bool = True) -> Iterable[tuple[str, dict, float]]:
@@ -135,13 +163,14 @@ def ingest_document(db: Session, *, investigation_id: str, title: str, filename:
         doc = Document(investigation_id=investigation_id, source_id=source.id, filename=filename, mime_type=mime_type, sha256=digest, storage_path=str(stored), extraction_status='extracting')
         db.add(doc); db.flush()
         try:
-            chunks = extract_chunks(extraction_path)
+            chunks, issues = extract_chunks(extraction_path)
             for ordinal, item in enumerate(chunks, 1):
                 chunk = DocumentChunk(document_id=doc.id, ordinal=ordinal, **item)
                 db.add(chunk); db.flush()
                 for typ, payload, conf in _candidate_payloads(chunk, include_entities=settings.enable_local_entity_suggestions):
                     db.add(ExtractionCandidate(investigation_id=investigation_id, document_id=doc.id, chunk_id=chunk.id, candidate_type=typ, payload=payload, confidence=conf))
             doc.extraction_status = 'complete'
+            doc.extraction_issues = issues or None
         except Exception as exc:
             doc.extraction_status = 'failed'; doc.extraction_error = str(exc)
 
@@ -172,7 +201,7 @@ def serialize_document(db: Session, doc: Document) -> dict:
     candidates = db.scalars(select(ExtractionCandidate).where(ExtractionCandidate.document_id == doc.id).order_by(ExtractionCandidate.created_at)).all()
     counts: dict[str, int] = {}
     for c in candidates: counts[c.candidate_type] = counts.get(c.candidate_type,0)+1
-    return {'id':doc.id,'investigation_id':doc.investigation_id,'source_id':doc.source_id,'filename':doc.filename,'mime_type':doc.mime_type,'sha256':doc.sha256,'extraction_status':doc.extraction_status,'extraction_error':doc.extraction_error,'created_at':doc.created_at,'chunk_count':len(chunks),'candidate_counts':counts}
+    return {'id':doc.id,'investigation_id':doc.investigation_id,'source_id':doc.source_id,'filename':doc.filename,'mime_type':doc.mime_type,'sha256':doc.sha256,'extraction_status':doc.extraction_status,'extraction_error':doc.extraction_error,'extraction_issues':doc.extraction_issues or [],'created_at':doc.created_at,'chunk_count':len(chunks),'candidate_counts':counts}
 
 
 def serialize_extraction_lineage(db: Session, candidate: ExtractionCandidate) -> dict:

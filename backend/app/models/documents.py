@@ -22,6 +22,12 @@ class Document(Base):
     storage_path: Mapped[str] = mapped_column(Text)
     extraction_status: Mapped[str] = mapped_column(String(32), default="pending", index=True)
     extraction_error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Non-fatal parse problems (blank/unreadable pages, DOCX tables/images that
+    # aren't extracted, an empty text file, etc.) -- distinct from
+    # extraction_error, which is reserved for a hard total-failure outcome.
+    # A document can be "complete" and still carry issues here. list[str],
+    # stored as JSON; empty/None means nothing to flag.
+    extraction_issues: Mapped[list | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
 
 

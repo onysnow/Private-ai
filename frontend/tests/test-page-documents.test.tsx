@@ -15,6 +15,18 @@ import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+// Bulk import (2026-09-30) navigates to /review with useRouter().push() once
+// the whole batch is uploaded. vi.hoisted keeps one stable spy instance that
+// both the mock factory (hoisted above imports) and the test bodies below
+// can reference -- see test-setup.ts's global default for why this mock is
+// needed at all (no real app-router tree exists in these RTL renders).
+const {mockPush} = vi.hoisted(() => ({mockPush: vi.fn()}));
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({push: mockPush, replace: vi.fn(), back: vi.fn(), forward: vi.fn(), refresh: vi.fn(), prefetch: vi.fn()}),
+  useSearchParams: () => new URLSearchParams(),
+  usePathname: () => '/',
+}));
+
 beforeEach(() => {
   if (!window.matchMedia) {
     window.matchMedia = ((query: string) => ({
@@ -33,6 +45,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
+  mockPush.mockClear();
 });
 
 const validSettingsStatus = {
@@ -151,10 +164,17 @@ async function bootstrapWithOneDocument(): Promise<{
 }
 
 function fileInput(): HTMLInputElement {
-  // Two file inputs exist on the page (backup restore, document upload) --
-  // select by `accept` since neither has a distinguishing label/testid.
-  const input = document.querySelector('input[type="file"][accept*=".pdf"]');
+  // Three file inputs exist on the page now (backup restore, single-file
+  // document upload, bulk import) -- the single-upload one is the first
+  // ".pdf"-accepting, non-multiple input in DOM order.
+  const input = document.querySelector('input[type="file"][accept*=".pdf"]:not([multiple])');
   if (!input) throw new Error('document file input not found');
+  return input as HTMLInputElement;
+}
+
+function bulkFileInput(): HTMLInputElement {
+  const input = document.querySelector('input[type="file"][accept*=".pdf"][multiple]');
+  if (!input) throw new Error('bulk import file input not found');
   return input as HTMLInputElement;
 }
 
@@ -245,5 +265,43 @@ describe('Home document ingestion & extraction', () => {
     expect(screen.getByText('OpenAleph returned this name as a mention.')).toBeInTheDocument();
     const [url] = fetchMock.mock.calls[13];
     expect(String(url)).toContain('/api/documents/doc-1/candidates?status=proposed&explain=true');
+  });
+});
+
+describe('Home bulk document import', () => {
+  it('uploads every selected file sequentially, tolerates one failure, and navigates to the review queue', async () => {
+    const {fetchMock} = await bootstrapWithOneDocument();
+    const fileA = new File(['a'], 'memo-a.txt', {type: 'text/plain'});
+    const fileB = new File(['b'], 'memo-b.txt', {type: 'text/plain'});
+    const fileC = new File(['c'], 'memo-c.txt', {type: 'text/plain'});
+
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse(docFixture({id: 'doc-a', filename: 'memo-a.txt'}))) // POST upload A
+      .mockResolvedValueOnce(jsonResponse({detail: 'Document is empty'}, 400)) // POST upload B fails
+      .mockResolvedValueOnce(jsonResponse(docFixture({id: 'doc-c', filename: 'memo-c.txt'}))) // POST upload C
+      .mockResolvedValueOnce(jsonResponse([docFixture(), docFixture({id: 'doc-a'}), docFixture({id: 'doc-c'})])); // documents reload
+
+    const user = userEvent.setup();
+    await user.upload(bulkFileInput(), [fileA, fileB, fileC]);
+    await user.click(screen.getByRole('button', {name: 'Import 3 document(s)'}));
+
+    await screen.findByText(/Imported 2 of 3 file\(s\)\. 1 failed and were skipped/, {exact: false});
+    expect(mockPush).toHaveBeenCalledWith('/review?inv=inv-1&docs=doc-a,doc-c');
+
+    // Three separate sequential POSTs, one per file, each with its own
+    // filename-derived title and no manual title field (unlike the
+    // single-file uploader).
+    const uploadCalls = fetchMock.mock.calls.slice(13, 16);
+    for (const [, init] of uploadCalls) {
+      expect((init as RequestInit).method).toBe('POST');
+    }
+    const bodyA = (uploadCalls[0][1] as RequestInit).body as FormData;
+    expect(bodyA.get('title')).toBe('memo-a');
+    expect((bodyA.get('file') as File).name).toBe('memo-a.txt');
+  });
+
+  it('disables the import button until at least one file is chosen', async () => {
+    await bootstrapWithOneDocument();
+    expect(screen.getByRole('button', {name: 'Import 0 document(s)'})).toBeDisabled();
   });
 });
