@@ -1,0 +1,234 @@
+"""Themes, font pairings, and per-visual presets/options for decks.
+
+Three layers, nearest wins (see the "Visual Editor & Chart Styles" design):
+  1. theme   -- colours and fonts for the whole deck (Deck.style_json)
+  2. preset  -- a named layout for one visual type (visual["style"]["preset"])
+  3. options -- per-visual tweaks (visual["style"]["options"])
+
+Everything here is presentation only. Nothing in a style can change a
+value, a date, a label or a citation, and the catalogue deliberately has no
+control for the misleading options the design refuses: a bar axis that
+starts above zero, 3D, a second value axis. The deck renderer
+(app/services/decks.py) and the in-app preview
+(frontend/components/presentation/slide-canvas.tsx) both read the catalogue
+served by GET /api/presentation-styles, so they cannot drift apart.
+"""
+from __future__ import annotations
+
+from dataclasses import asdict, dataclass
+
+DEFAULT_THEME = "dark_academia"
+DEFAULT_FONTS = "theme"  # use the theme's own pairing
+
+
+@dataclass(frozen=True)
+class Theme:
+    id: str
+    label: str
+    description: str
+    # Title and takeaway slides
+    cover_bg: str
+    cover_line: str
+    cover_text: str
+    cover_muted: str
+    cover_accent: str  # accent used for text on `cover_bg` (passes 4.5:1)
+    # Accents
+    accent: str        # rules, bars, markers
+    accent_text: str   # accent used for text on `page` (passes 4.5:1)
+    alert: str         # open questions, figure values, quote kicker
+    # Reading surfaces
+    page: str
+    panel: str
+    rule: str
+    text: str
+    muted: str
+    bar_muted: str     # bars that are not highlighted
+    heading_font: str
+    body_font: str
+
+
+THEMES: dict[str, Theme] = {t.id: t for t in (
+    Theme(
+        id="dark_academia", label="Dark Academia", description="Warm, archival: night title slides, paper pages, brass accents.",
+        cover_bg="141B1F", cover_line="2B3439", cover_text="ECE3D2", cover_muted="B5A88F", cover_accent="B98D34",
+        accent="B98D34", accent_text="8A6420", alert="672C1A",
+        page="F7F2E8", panel="EDE4D3", rule="D9CDB6", text="1F1B16", muted="6B5B44", bar_muted="CDBFA6",
+        heading_font="Georgia", body_font="Calibri",
+    ),
+    Theme(
+        id="newsprint", label="Newsprint", description="Classic newspaper: white pages, black type, a red accent.",
+        cover_bg="111111", cover_line="333333", cover_text="FFFFFF", cover_muted="BDBDBD", cover_accent="FF5A6E",
+        accent="C8102E", accent_text="A30D25", alert="8B0A1E",
+        page="FFFFFF", panel="F2F2F2", rule="D6D6D6", text="111111", muted="5E5E5E", bar_muted="C9C9C9",
+        heading_font="Source Serif 4", body_font="Source Sans 3",
+    ),
+    Theme(
+        id="ledger", label="Ledger", description="Calm and financial: navy title slides, teal accents.",
+        cover_bg="0F2A44", cover_line="254566", cover_text="F4F7FA", cover_muted="A9BBCD", cover_accent="4FC3B8",
+        accent="13837A", accent_text="0E6A63", alert="0F2A44",
+        page="FBFCFD", panel="EAF0F5", rule="D3DEE8", text="14212E", muted="56667A", bar_muted="C3CFDA",
+        heading_font="IBM Plex Serif", body_font="IBM Plex Sans",
+    ),
+    Theme(
+        id="high_contrast", label="High contrast", description="Maximum legibility: black on white, one dark-blue accent.",
+        cover_bg="000000", cover_line="4D4D4D", cover_text="FFFFFF", cover_muted="E0E0E0", cover_accent="9CC7FF",
+        accent="0B4F9C", accent_text="0B4F9C", alert="000000",
+        page="FFFFFF", panel="F0F0F0", rule="767676", text="000000", muted="3D3D3D", bar_muted="9E9E9E",
+        heading_font="Noto Sans", body_font="Noto Sans",
+    ),
+)}
+
+# All SIL Open Font License families (see the design doc's font table); the
+# app serves them itself via Fontsource. "theme" means: keep the theme's own.
+FONT_PAIRS: dict[str, dict[str, str]] = {
+    "theme": {"label": "Theme default", "heading": "", "body": ""},
+    "classic": {"label": "Classic · Source Serif 4 + Source Sans 3", "heading": "Source Serif 4", "body": "Source Sans 3"},
+    "modern": {"label": "Modern newsroom · Newsreader + Inter", "heading": "Newsreader", "body": "Inter"},
+    "technical": {"label": "Technical · IBM Plex Serif + IBM Plex Sans", "heading": "IBM Plex Serif", "body": "IBM Plex Sans"},
+    "traditional": {"label": "Traditional · Libre Caslon Text + Libre Franklin", "heading": "Libre Caslon Text", "body": "Libre Franklin"},
+    "expressive": {"label": "Expressive · Fraunces + Public Sans", "heading": "Fraunces", "body": "Public Sans"},
+    "bookish": {"label": "Bookish · Literata + Work Sans", "heading": "Literata", "body": "Work Sans"},
+    "multilingual": {"label": "Many languages · Noto Serif + Noto Sans", "heading": "Noto Serif", "body": "Noto Sans"},
+    "editorial": {"label": "Editorial · Spectral + Inter", "heading": "Spectral", "body": "Inter"},
+}
+
+# Option schemas. "choice" values are the only ones accepted; "bool" is a
+# switch; "labels" is a subset of the visual's own item labels.
+_SORT = {"type": "choice", "label": "Sort", "values": ["as_given", "desc", "asc"]}
+VISUAL_OPTIONS: dict[str, dict[str, dict]] = {
+    "bar": {
+        "sort": _SORT,
+        "value_labels": {"type": "bool", "label": "Value labels"},
+        "gridlines": {"type": "bool", "label": "Gridlines and value axis"},
+        "thickness": {"type": "choice", "label": "Bar thickness", "values": ["thin", "regular", "thick"]},
+        "highlight": {"type": "labels", "label": "Highlight bars (others turn grey)"},
+    },
+    "timeline": {
+        "marker": {"type": "choice", "label": "Marker", "values": ["ring", "dot"]},
+        "show_line": {"type": "bool", "label": "Connecting line"},
+    },
+    "figures": {
+        "card_fill": {"type": "bool", "label": "Card background"},
+        "accent_edge": {"type": "bool", "label": "Accent edge"},
+        "value_color": {"type": "choice", "label": "Number colour", "values": ["alert", "accent", "text"]},
+    },
+}
+
+# Each preset is a layout plus option defaults. The first preset of each
+# type is the default and reproduces the v2 look.
+VISUAL_PRESETS: dict[str, list[dict]] = {
+    "bar": [
+        {"id": "horizontal", "label": "Horizontal", "description": "Horizontal bars in the order drafted, values on the bars.",
+         "layout": {"orientation": "horizontal", "axis_line": True},
+         "options": {"sort": "as_given", "value_labels": True, "gridlines": False, "thickness": "regular", "highlight": []}},
+        {"id": "ranked", "label": "Ranked", "description": "Largest first, so the ranking reads top-down.",
+         "layout": {"orientation": "horizontal", "axis_line": True},
+         "options": {"sort": "desc", "value_labels": True, "gridlines": False, "thickness": "regular", "highlight": []}},
+        {"id": "column", "label": "Column", "description": "Vertical columns in the order drafted.",
+         "layout": {"orientation": "vertical", "axis_line": True},
+         "options": {"sort": "as_given", "value_labels": True, "gridlines": False, "thickness": "regular", "highlight": []}},
+        {"id": "minimal", "label": "Labels without axis", "description": "Thin bars and values only: no axis line or gridlines.",
+         "layout": {"orientation": "horizontal", "axis_line": False},
+         "options": {"sort": "as_given", "value_labels": True, "gridlines": False, "thickness": "thin", "highlight": []}},
+    ],
+    "timeline": [
+        {"id": "track", "label": "Horizontal track", "description": "Events spaced along a line, dates above.",
+         "layout": {"direction": "horizontal", "compact": False}, "options": {"marker": "ring", "show_line": True}},
+        {"id": "list", "label": "Vertical list", "description": "One row per event: date, then what happened.",
+         "layout": {"direction": "vertical", "compact": False}, "options": {"marker": "dot", "show_line": True}},
+        {"id": "compact", "label": "Compact", "description": "A short strip under the bullets with small markers.",
+         "layout": {"direction": "horizontal", "compact": True}, "options": {"marker": "dot", "show_line": True}},
+    ],
+    "figures": [
+        {"id": "cards", "label": "Cards", "description": "Stacked cards beside the bullets.",
+         "layout": {"arrangement": "stack"}, "options": {"card_fill": True, "accent_edge": True, "value_color": "alert"}},
+        {"id": "big_numbers", "label": "Big numbers", "description": "Large numbers with thin rules, no cards.",
+         "layout": {"arrangement": "stack"}, "options": {"card_fill": False, "accent_edge": False, "value_color": "accent"}},
+        {"id": "row", "label": "Row of stats", "description": "Side-by-side figures in a band under the bullets.",
+         "layout": {"arrangement": "row"}, "options": {"card_fill": True, "accent_edge": False, "value_color": "alert"}},
+    ],
+}
+
+
+def theme(theme_id: str | None) -> Theme:
+    return THEMES.get(theme_id or "", THEMES[DEFAULT_THEME])
+
+
+def normalize_deck_style(style) -> dict:
+    """{"theme", "fonts"} with unknown values replaced by defaults."""
+    style = style if isinstance(style, dict) else {}
+    theme_id = style.get("theme") if style.get("theme") in THEMES else DEFAULT_THEME
+    fonts = style.get("fonts") if style.get("fonts") in FONT_PAIRS else DEFAULT_FONTS
+    return {"theme": theme_id, "fonts": fonts}
+
+
+def resolved_theme(style) -> Theme:
+    """The deck's theme with its font pairing applied."""
+    style = normalize_deck_style(style)
+    base = theme(style["theme"])
+    pair = FONT_PAIRS[style["fonts"]]
+    if not pair["heading"]:
+        return base
+    data = asdict(base)
+    data.update(heading_font=pair["heading"], body_font=pair["body"])
+    return Theme(**data)
+
+
+def preset(kind: str, preset_id: str | None) -> dict:
+    presets = VISUAL_PRESETS[kind]
+    return next((p for p in presets if p["id"] == preset_id), presets[0])
+
+
+def normalize_visual_style(kind: str, style, item_labels: list[str]) -> dict | None:
+    """Validate a visual's {"preset", "options"}; None when it adds nothing.
+
+    Unknown presets fall back to the type's default; unknown options and
+    out-of-range values are dropped (never raised on -- a deck must always
+    export). `highlight` keeps only labels the visual actually has."""
+    if kind not in VISUAL_PRESETS or not isinstance(style, dict):
+        return None
+    chosen = preset(kind, style.get("preset"))
+    options_in = style.get("options") if isinstance(style.get("options"), dict) else {}
+    options: dict = {}
+    for key, spec in VISUAL_OPTIONS[kind].items():
+        if key not in options_in:
+            continue
+        value = options_in[key]
+        if spec["type"] == "bool" and isinstance(value, bool):
+            options[key] = value
+        elif spec["type"] == "choice" and value in spec["values"]:
+            options[key] = value
+        elif spec["type"] == "labels" and isinstance(value, list):
+            options[key] = [label for label in item_labels if label in value][:8]
+    return {"preset": chosen["id"], "options": options}
+
+
+def resolved_visual_style(visual: dict) -> dict:
+    """Preset layout plus preset options overlaid with the visual's own."""
+    kind = visual["type"]
+    style = visual.get("style") or {}
+    chosen = preset(kind, style.get("preset"))
+    options = dict(chosen["options"])
+    options.update(style.get("options") or {})
+    return {"preset": chosen["id"], "layout": dict(chosen["layout"]), "options": options}
+
+
+def catalog() -> dict:
+    """Everything the style panel and the in-app preview need."""
+    return {
+        "defaults": {"theme": DEFAULT_THEME, "fonts": DEFAULT_FONTS},
+        "themes": [asdict(t) for t in THEMES.values()],
+        "font_pairs": [{"id": key, **value} for key, value in FONT_PAIRS.items()],
+        "visual_presets": VISUAL_PRESETS,
+        "visual_options": VISUAL_OPTIONS,
+    }
+
+
+def contrast_ratio(fg: str, bg: str) -> float:
+    """WCAG 2.x contrast ratio between two RRGGBB colours."""
+    def luminance(hex_color: str) -> float:
+        channels = [int(hex_color[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+        linear = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4 for c in channels]
+        return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+    a, b = sorted((luminance(fg), luminance(bg)), reverse=True)
+    return (a + 0.05) / (b + 0.05)

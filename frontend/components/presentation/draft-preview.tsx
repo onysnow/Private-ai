@@ -9,10 +9,11 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 import type {KeyboardEvent, ReactElement} from 'react';
 import {ChevronLeft, ChevronRight} from 'lucide-react';
 
-import type {AiCitationRef, CitationDetail, DeckSlide, JsonObject, JsonValue, PresentationDraftPayload, PresentationSection, PresentationVisual} from '../../lib/api-types';
+import type {AiCitationRef, CitationDetail, DeckSlide, DeckStyle, JsonObject, JsonValue, PresentationDraftPayload, PresentationSection, PresentationStyleCatalog, PresentationVisual, VisualStyle} from '../../lib/api-types';
 import {Button} from '@/components/ui/button';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {DECK, SlideCanvas, SourcesCanvas, buildCitationLookup, displayDate, formatValue, refKey} from './slide-canvas';
+import {DECK, SlideCanvas, SlideStyleProvider, SourcesCanvas, buildCitationLookup, displayDate, formatValue, refKey, resolveTheme} from './slide-canvas';
+import {StylePanel} from './style-panel';
 import type {CitationLookup} from './slide-canvas';
 
 export type TraceHandler = (detail: CitationDetail) => void;
@@ -126,8 +127,32 @@ function BriefView({draft, lookup, onTrace}: {draft: PresentationDraftPayload, l
 
 type Frame = {kind: 'slide', slide: DeckSlide, contentIndex: number} | {kind: 'sources'};
 
-export function DraftPreview({payload, slides, citationDetails, onTrace}: {payload: JsonObject, slides: DeckSlide[], citationDetails: CitationDetail[], onTrace?: TraceHandler}): ReactElement {
+/** Attach each section's chosen style to its content slide's visual (the Nth
+ *  content slide is section N-1, as in backend deck_slides_from_payload). */
+export function applyVisualStyles(slides: DeckSlide[], visualStyles: Record<string, VisualStyle>): DeckSlide[] {
+  let section = -1;
+  return slides.map(slide => {
+    if ((slide.kind || 'content') !== 'content') return slide;
+    section += 1;
+    const style = visualStyles[String(section)];
+    return slide.visual && style ? {...slide, visual: {...slide.visual, style}} : slide;
+  });
+}
+
+export type DraftPreviewProps = {
+  payload: JsonObject, slides: DeckSlide[], citationDetails: CitationDetail[], onTrace?: TraceHandler,
+  // Style (optional): with a catalogue and change handlers, the Slides tab shows the style panel.
+  catalog?: PresentationStyleCatalog | null,
+  deckStyle?: DeckStyle,
+  onDeckStyleChange?: (style: DeckStyle) => void,
+  visualStyles?: Record<string, VisualStyle>,
+  onVisualStyleChange?: (section: string, style: VisualStyle) => void,
+};
+
+export function DraftPreview({payload, slides: baseSlides, citationDetails, onTrace, catalog, deckStyle, onDeckStyleChange, visualStyles, onVisualStyleChange}: DraftPreviewProps): ReactElement {
   const draft = useMemo(() => asDraft(payload), [payload]);
+  const slides = useMemo(() => applyVisualStyles(baseSlides, visualStyles || {}), [baseSlides, visualStyles]);
+  const theme = useMemo(() => resolveTheme(catalog, deckStyle), [catalog, deckStyle]);
   const lookup = useMemo(() => buildCitationLookup(slides, citationDetails), [slides, citationDetails]);
   const frames = useMemo<Frame[]>(() => {
     let n = 0;
@@ -137,7 +162,7 @@ export function DraftPreview({payload, slides, citationDetails, onTrace}: {paylo
   }, [slides, lookup]);
   const contentTotal = slides.filter(s => (s.kind || 'content') === 'content').length;
   const [current, setCurrent] = useState(0);
-  useEffect(() => setCurrent(0), [slides]);
+  useEffect(() => setCurrent(0), [baseSlides]);
   const go = useCallback((delta: number) => setCurrent(c => Math.min(frames.length - 1, Math.max(0, c + delta))), [frames.length]);
   const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
@@ -149,8 +174,11 @@ export function DraftPreview({payload, slides, citationDetails, onTrace}: {paylo
   const active = frames[current];
   const notes = active?.kind === 'slide' ? active.slide.notes : '';
   const orderedDetails = Array.from(lookup.numbers.entries()).map(([key, n]) => ({n, d: lookup.details.get(key)}));
+  const styling = Boolean(catalog && deckStyle && onDeckStyleChange && onVisualStyleChange);
+  const activeSection = active?.kind === 'slide' && active.contentIndex > 0 ? String(active.contentIndex - 1) : null;
+  const activeVisual = active?.kind === 'slide' ? active.slide.visual || null : null;
 
-  return <Tabs defaultValue="slides" className="w-full" data-testid="draft-preview">
+  return <SlideStyleProvider theme={theme} presets={catalog?.visual_presets}><Tabs defaultValue="slides" className="w-full" data-testid="draft-preview">
     <TabsList>
       <TabsTrigger value="slides">Slides · {frames.length}</TabsTrigger>
       <TabsTrigger value="brief">Brief</TabsTrigger>
@@ -158,6 +186,8 @@ export function DraftPreview({payload, slides, citationDetails, onTrace}: {paylo
     </TabsList>
 
     <TabsContent value="slides">
+      <div className={styling ? 'grid gap-4 lg:grid-cols-[minmax(0,1fr)_16rem]' : ''}>
+      <div className="min-w-0">
       <div tabIndex={0} onKeyDown={onKey} aria-label="Slide preview, use the left and right arrow keys to move between slides" className="rounded-lg outline-none focus-visible:ring-1 focus-visible:ring-ring">
         {active && renderFrame(active, current + 1)}
       </div>
@@ -176,6 +206,13 @@ export function DraftPreview({payload, slides, citationDetails, onTrace}: {paylo
         <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wider text-muted-foreground">Speaker notes</summary>
         <p className="mt-1.5 leading-relaxed text-foreground/90">{notes}</p>
       </details>}
+      </div>
+      {styling && catalog && deckStyle && onDeckStyleChange && onVisualStyleChange && <StylePanel
+        catalog={catalog} deckStyle={deckStyle} onDeckStyle={onDeckStyleChange}
+        visual={activeVisual} sectionLabel={active?.kind === 'slide' ? active.slide.heading : undefined}
+        onVisualStyle={style => { if (activeSection !== null) onVisualStyleChange(activeSection, style); }}
+      />}
+      </div>
     </TabsContent>
 
     <TabsContent value="brief"><BriefView draft={draft} lookup={lookup} onTrace={onTrace}/></TabsContent>
@@ -189,5 +226,5 @@ export function DraftPreview({payload, slides, citationDetails, onTrace}: {paylo
         </li>)}
       </ol>}
     </TabsContent>
-  </Tabs>;
+  </Tabs></SlideStyleProvider>;
 }

@@ -237,6 +237,22 @@ describe('AiReasoningPanel', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1); // only the initial queue load; nothing ran
   });
 
+  const theme = (id: string, label: string) => ({id, label, description: '', cover_bg: '111111', cover_line: '333333', cover_text: 'FFFFFF', cover_muted: 'BDBDBD', cover_accent: 'FF5A6E', accent: 'C8102E', accent_text: 'A30D25', alert: '8B0A1E', page: 'FFFFFF', panel: 'F2F2F2', rule: 'D6D6D6', text: '111111', muted: '5E5E5E', bar_muted: 'C9C9C9', heading_font: 'Source Serif 4', body_font: 'Source Sans 3'});
+  const styleCatalog = {
+    defaults: {theme: 'dark_academia', fonts: 'theme'},
+    themes: [theme('dark_academia', 'Dark Academia'), theme('newsprint', 'Newsprint')],
+    font_pairs: [{id: 'theme', label: 'Theme default', heading: '', body: ''}, {id: 'modern', label: 'Modern newsroom', heading: 'Newsreader', body: 'Inter'}],
+    visual_presets: {
+      bar: [{id: 'horizontal', label: 'Horizontal', description: '', layout: {orientation: 'horizontal'}, options: {}}],
+      timeline: [{id: 'track', label: 'Horizontal track', description: '', layout: {direction: 'horizontal'}, options: {}}],
+      figures: [
+        {id: 'cards', label: 'Cards', description: '', layout: {arrangement: 'stack'}, options: {card_fill: true, accent_edge: true, value_color: 'alert'}},
+        {id: 'row', label: 'Row of stats', description: '', layout: {arrangement: 'row'}, options: {card_fill: true, accent_edge: false, value_color: 'alert'}},
+      ],
+    },
+    visual_options: {bar: {}, timeline: {}, figures: {card_fill: {type: 'bool', label: 'Card background'}}},
+  };
+
   it('runs a presentation draft from picked evidence, previews it as slides and a brief, accepts it, and promotes it to a write-up and a deck', async () => {
     const user = userEvent.setup();
     const traced: string[] = [];
@@ -275,6 +291,7 @@ describe('AiReasoningPanel', () => {
       .mockResolvedValueOnce(jsonResponse({candidate_id: 'cand-9', review_status: 'proposed', payload: {}})) // POST presentation-draft
       .mockResolvedValueOnce(jsonResponse({candidates: [draftSummary()]})) // queue reload
       .mockResolvedValueOnce(jsonResponse(draftDetail())) // GET candidate
+      .mockResolvedValueOnce(jsonResponse(styleCatalog)) // GET /api/presentation-styles (once, on the first open draft)
       .mockResolvedValueOnce(jsonResponse({id: 'cand-9', module: 'presentation_draft', review_status: 'accepted', reviewer_note: null, reviewed_at: '2026-09-30T12:00:00'})) // POST review
       .mockResolvedValueOnce(jsonResponse({candidates: [draftSummary({review_status: 'accepted'})]})) // queue reload
       .mockResolvedValueOnce(jsonResponse(draftDetail({review_status: 'accepted', reviewed_at: '2026-09-30T12:00:00'}))) // GET candidate
@@ -314,6 +331,13 @@ describe('AiReasoningPanel', () => {
     expect(within(contentSlide).getAllByText('$2.4M').length).toBeGreaterThan(0); // figure card
     expect(screen.getByText('Speaker notes')).toBeInTheDocument();
 
+    // Style panel: switch the theme, then the figures' layout preset on this slide.
+    const panel = await screen.findByTestId('style-panel');
+    await user.selectOptions(within(panel).getByLabelText('Theme'), 'newsprint');
+    expect(screen.getAllByRole('img', {name: 'Slide 3: The payment'})[0]).toHaveAttribute('data-theme', 'newsprint');
+    await user.click(within(panel).getByRole('radio', {name: 'Row of stats'}));
+    expect(within(screen.getAllByRole('img', {name: 'Slide 3: The payment'})[0]).getByTestId('slide-figures')).toHaveAttribute('data-preset', 'row');
+
     // Sources tab: the readable label, and clicking it traces the record.
     await user.click(screen.getByRole('tab', {name: 'Sources · 1'}));
     const chip = await screen.findByTestId('evidence-chip');
@@ -330,13 +354,17 @@ describe('AiReasoningPanel', () => {
     await user.click(within(promotePanel).getByRole('button', {name: 'Promote to write-up'}));
     await waitFor(() => expect(within(promotePanel).getByTestId('promote-status')).toHaveTextContent('Promoted to write-up "The Bellcastle consulting fee" (42 word(s), status draft).'));
     expect(within(promotePanel).getByRole('link', {name: 'Download .docx'})).toHaveAttribute('href', 'http://api.test/api/writeups/wu-1/export.docx');
-    const writeupCall = fetchMock.mock.calls[8];
+    const writeupCall = fetchMock.mock.calls[9];
     expect(requestUrl(writeupCall)).toBe('http://api.test/api/ai-analysis-candidates/cand-9/promote-to-writeup');
     expect(JSON.parse(String((writeupCall[1] as RequestInit).body))).toEqual({});
 
     await user.click(within(promotePanel).getByRole('button', {name: 'Promote to deck'}));
     await waitFor(() => expect(within(promotePanel).getByTestId('promote-status')).toHaveTextContent('Promoted to deck "The Bellcastle consulting fee" (4 slide(s)).'));
     expect(within(promotePanel).getByRole('link', {name: 'Download .pptx'})).toHaveAttribute('href', 'http://api.test/api/decks/dk-1/export.pptx');
+    // The deck goes out in the look picked in the style panel.
+    const deckCall = fetchMock.mock.calls[10];
+    expect(requestUrl(deckCall)).toBe('http://api.test/api/ai-analysis-candidates/cand-9/promote-to-deck');
+    expect(JSON.parse(String((deckCall[1] as RequestInit).body))).toEqual({style: {theme: 'newsprint', fonts: 'theme'}, visual_styles: {'0': {preset: 'row', options: {}}}});
   });
 
   it('lets presentation drafts run when the TAS spec is missing, and starts on that module', async () => {

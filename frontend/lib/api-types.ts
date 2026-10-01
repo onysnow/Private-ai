@@ -105,7 +105,12 @@ export type AiCitationRef={record_type:string,record_id:string};
 export type FigureItem={value:string,label:string,evidence:AiCitationRef[]};
 export type TimelineItem={date:string,label:string,evidence:AiCitationRef[]};
 export type BarItem={value:number,label:string,evidence:AiCitationRef[]};
-export type PresentationVisual={type:'figures',items:FigureItem[]}|{type:'timeline',items:TimelineItem[]}|{type:'bar',title?:string,unit?:string,items:BarItem[]};
+// A visual's look (backend app/services/presentation_style.py): a named preset plus option overrides.
+// Style is presentation only -- it never changes a value, a date, a label or a citation.
+export type VisualOptionValue=boolean|string|string[];
+export type VisualStyle={preset?:string,options?:Record<string,VisualOptionValue>};
+export type PresentationVisual=({type:'figures',items:FigureItem[]}|{type:'timeline',items:TimelineItem[]}|{type:'bar',title?:string,unit?:string,items:BarItem[]})&{style?:VisualStyle|null};
+export type VisualKind=PresentationVisual['type'];
 export type PresentationSection={heading:string,body:string,key_points:string[],evidence:AiCitationRef[],visual?:PresentationVisual|null};
 export type PresentationDraftPayload={title:string,goal_restated:string,executive_takeaway:string,sections:PresentationSection[],open_questions:string[]};
 // Readable details for a cited record (backend describe_record_refs) -- what the
@@ -115,7 +120,14 @@ export type CitationDetail={record_type:string,record_id:string,trace_record_typ
 export type Writeup={id:string,investigation_id:string,title:string,status:string,cited_record_refs:AiCitationRef[],content_json?:JsonObject,preview?:string,source_ai_candidate_id?:string|null,created_by?:string|null,created_at:string,updated_at:string,word_count:number};
 export type DeckSlideKind='title'|'statement'|'content'|'questions';
 export type DeckSlide={heading:string,bullets:string[],evidence:AiCitationRef[],kind?:DeckSlideKind,notes?:string,visual?:PresentationVisual|null};
-export type Deck={id:string,investigation_id:string,title:string,slides:DeckSlide[],slide_count:number,source_ai_candidate_id?:string|null,created_by?:string|null,created_at:string,updated_at:string};
+// Deck-wide look: a theme and a font pairing, both ids from GET /api/presentation-styles.
+export type DeckStyle={theme:string,fonts:string};
+export type DeckTheme={id:string,label:string,description:string,cover_bg:string,cover_line:string,cover_text:string,cover_muted:string,cover_accent:string,accent:string,accent_text:string,alert:string,page:string,panel:string,rule:string,text:string,muted:string,bar_muted:string,heading_font:string,body_font:string};
+export type FontPair={id:string,label:string,heading:string,body:string};
+export type VisualPreset={id:string,label:string,description:string,layout:Record<string,string|boolean>,options:Record<string,VisualOptionValue>};
+export type VisualOptionSpec={type:'bool'|'choice'|'labels',label:string,values?:string[]};
+export type PresentationStyleCatalog={defaults:DeckStyle,themes:DeckTheme[],font_pairs:FontPair[],visual_presets:Record<VisualKind,VisualPreset[]>,visual_options:Record<VisualKind,Record<string,VisualOptionSpec>>};
+export type Deck={id:string,investigation_id:string,title:string,slides:DeckSlide[],slide_count:number,style?:DeckStyle,source_ai_candidate_id?:string|null,created_by?:string|null,created_at:string,updated_at:string};
 export type AiAnalysisCandidateSummary={id:string,investigation_id:string,module:AiModuleName|string,request:AiAnalysisRequest,review_status:AiReviewStatus|string,confidence:number,reviewer_note:string|null,accepted_record_type:string|null,accepted_record_id:string|null,created_at:string,reviewed_at:string|null,checked_citation_count:number};
 export type AiAnalysisCandidate=AiAnalysisCandidateSummary&{payload:JsonObject,checked_citation_ids:AiCitationRef[],trace?:JsonObject|null,citation_details?:CitationDetail[],deck_preview?:DeckSlide[]};
 export type AiReasoningRunResult={candidate_id:string,review_status:AiReviewStatus|string,payload:JsonObject};

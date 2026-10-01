@@ -124,10 +124,15 @@ def writeup_content_from_payload(payload: dict, labels: dict[tuple[str, str], di
     return {"type": "doc", "content": content}
 
 
-def deck_slides_from_payload(payload: dict) -> list[dict]:
+def deck_slides_from_payload(payload: dict, visual_styles: dict | None = None) -> list[dict]:
     """title -> takeaway statement -> one content slide per section (the
     section's prose goes to speaker notes) -> open questions. Normalized
-    with the same rules a saved deck gets."""
+    with the same rules a saved deck gets.
+
+    `visual_styles` maps a section's index ("0", "1", ...) to the
+    {"preset", "options"} the reporter picked in the preview; it only
+    changes how that section's visual is drawn, never its data."""
+    visual_styles = visual_styles or {}
     slides: list[dict] = [{
         "kind": "title", "heading": payload.get("title") or "Untitled", "bullets": [payload["goal_restated"]] if payload.get("goal_restated") else [],
         "evidence": [], "notes": "",
@@ -136,14 +141,18 @@ def deck_slides_from_payload(payload: dict) -> list[dict]:
         slides.append({"kind": "statement", "heading": "The takeaway", "bullets": [payload["executive_takeaway"]],
                        "evidence": [], "notes": payload["executive_takeaway"]})
 
-    for section in payload.get("sections") or []:
+    for index, section in enumerate(payload.get("sections") or []):
+        visual = section.get("visual")
+        style = visual_styles.get(str(index))
+        if isinstance(visual, dict) and isinstance(style, dict):
+            visual = {**visual, "style": style}
         slides.append({
             "kind": "content",
             "heading": section.get("heading") or "Untitled section",
             "bullets": section.get("key_points") or [],
             "evidence": section.get("evidence") or [],
             "notes": section.get("body") or "",
-            "visual": section.get("visual"),
+            "visual": visual,
         })
 
     open_questions = payload.get("open_questions") or []
@@ -171,9 +180,10 @@ def promote_candidate_to_writeup(db, candidate: AIAnalysisCandidate, *, title: s
     )
 
 
-def promote_candidate_to_deck(db, candidate: AIAnalysisCandidate, *, title: str | None = None, created_by: str | None = None) -> Deck:
+def promote_candidate_to_deck(db, candidate: AIAnalysisCandidate, *, title: str | None = None, created_by: str | None = None,
+                              style: dict | None = None, visual_styles: dict | None = None) -> Deck:
     payload = _require_promotable(candidate)
-    slides = deck_slides_from_payload(payload)
+    slides = deck_slides_from_payload(payload, visual_styles)
     if title:
         slides[0]["heading"] = title
     return create_deck(
@@ -183,4 +193,5 @@ def promote_candidate_to_deck(db, candidate: AIAnalysisCandidate, *, title: str 
         slides=slides,
         source_ai_candidate_id=candidate.id,
         created_by=created_by,
+        style=style,
     )

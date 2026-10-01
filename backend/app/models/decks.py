@@ -24,6 +24,9 @@ class Deck(Base):
     investigation_id: Mapped[str] = mapped_column(ForeignKey("investigations.id"), index=True)
     title: Mapped[str] = mapped_column(String(512))
     slides_json: Mapped[list] = mapped_column(JSON, default=list)
+    # {"theme", "fonts"} -- see app/services/presentation_style.py. Per-visual
+    # presets/options live on each slide's visual["style"].
+    style_json: Mapped[dict | None] = mapped_column(JSON, default=dict, nullable=True)
     source_ai_candidate_id: Mapped[str | None] = mapped_column(ForeignKey("ai_analysis_candidates.id"), nullable=True, index=True)
     created_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)

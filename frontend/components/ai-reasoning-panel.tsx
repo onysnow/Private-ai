@@ -8,11 +8,11 @@
 // candidate's claims with the exact citation ids it was checked against, and
 // (4) records the human accept/reject decision. Kept out of app/page.tsx so
 // the flow can be rendered and tested on its own (STRUCT-0015 remainder).
-import {useCallback,useEffect,useState} from 'react';
+import {useCallback,useEffect,useRef,useState} from 'react';
 import type {ChangeEvent,ReactElement} from 'react';
 
-import type {AiAnalysisCandidate,AiAnalysisCandidateSummary,AiModuleName,AiReasoningStatus,JsonObject,JsonValue} from '../lib/api-types';
-import {isAiAnalysisCandidate,isAiAnalysisCandidateReview,isAiReasoningRunResult,isDeck,isWriteup,parseAiAnalysisCandidateList} from '../lib/api-validate';
+import type {AiAnalysisCandidate,AiAnalysisCandidateSummary,AiModuleName,AiReasoningStatus,DeckStyle,JsonObject,JsonValue,PresentationStyleCatalog,VisualStyle} from '../lib/api-types';
+import {isAiAnalysisCandidate,isAiAnalysisCandidateReview,isAiReasoningRunResult,isDeck,isPresentationStyleCatalog,isWriteup,parseAiAnalysisCandidateList} from '../lib/api-validate';
 import {ApiClient,errorMessage} from '../lib/api-client';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
@@ -81,6 +81,11 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
   const [promoteTitle,setPromoteTitle]=useState('');
   const [promoteStatus,setPromoteStatus]=useState('');
   const [promoted,setPromoted]=useState<{kind:'writeup'|'deck',id:string,title:string}|null>(null);
+  // Deck look picked in the preview's style panel; sent with "Promote to deck".
+  const [styleCatalog,setStyleCatalog]=useState<PresentationStyleCatalog|null>(null);
+  const [deckStyle,setDeckStyle]=useState<DeckStyle>({theme:'dark_academia',fonts:'theme'});
+  const [visualStyles,setVisualStyles]=useState<Record<string,VisualStyle>>({});
+  const catalogRequested=useRef(false);
 
   // Belt and braces: the backend already folds enabled/provider/key/spec into
   // endpoints_callable, but never offer a run button on a disabled deployment.
@@ -102,8 +107,18 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
 
   useEffect(()=>{setSelected(null);setNote('');setReviewStatus('');setPromoteStatus('');setPromoted(null);void loadQueue()},[loadQueue]);
 
+  // The style catalogue is only needed once a presentation draft is open.
+  useEffect(()=>{
+    if(selected?.module!=='presentation_draft'||catalogRequested.current)return;
+    catalogRequested.current=true;
+    api.object('/api/presentation-styles','presentation styles',isPresentationStyleCatalog)
+      .then(catalog=>{setStyleCatalog(catalog);setDeckStyle(catalog.defaults)})
+      .catch(()=>{catalogRequested.current=false}); // the preview still works in the default look
+  },[api,selected]);
+
   const open=async(id:string)=>{
     setPromoteStatus('');setPromoted(null);setPromoteTitle('');
+    if(selected?.id!==id)setVisualStyles({});
     try{setSelected(await api.object(`/api/ai-analysis-candidates/${id}`,'AI analysis candidate',isAiAnalysisCandidate))}
     catch(error){setSelected(null);setReviewStatus(errorMessage(error,'Could not load the candidate'))}
   };
@@ -159,7 +174,8 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
         setPromoteStatus(`Promoted to write-up "${row.title}" (${row.word_count} word(s), status ${row.status}).`);
         setPromoted({kind:'writeup',id:row.id,title:row.title});
       }else{
-        const row=await api.object(`/api/ai-analysis-candidates/${selected.id}/${path}`,'deck',isDeck,{method:'POST',body});
+        const styled=styleCatalog?{...body,style:deckStyle,visual_styles:visualStyles}:body;
+        const row=await api.object(`/api/ai-analysis-candidates/${selected.id}/${path}`,'deck',isDeck,{method:'POST',body:styled});
         setPromoteStatus(`Promoted to deck "${row.title}" (${row.slide_count} slide(s)).`);
         setPromoted({kind:'deck',id:row.id,title:row.title});
       }
@@ -210,7 +226,9 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
             {payload&&'executive_summary' in payload&&<p><b>Summary:</b> {asStr(payload.executive_summary)}</p>}
             {payload&&'scope_and_limitations' in payload&&<p className="muted"><b>Scope & limitations:</b> {asStr(payload.scope_and_limitations)}</p>}
             {isPresentationDraft&&payload&&<div className="mt-3">
-              <DraftPreview payload={payload} slides={selected.deck_preview||[]} citationDetails={selected.citation_details||[]} onTrace={onTraceRecord}/>
+              <DraftPreview payload={payload} slides={selected.deck_preview||[]} citationDetails={selected.citation_details||[]} onTrace={onTraceRecord}
+                catalog={styleCatalog} deckStyle={deckStyle} onDeckStyleChange={setDeckStyle}
+                visualStyles={visualStyles} onVisualStyleChange={(section,style)=>setVisualStyles(prev=>({...prev,[section]:style}))}/>
             </div>}
             {claims.map((raw,i)=>{const cl=asObj(raw);if(!cl)return null;return <div className="candidate" key={asStr(cl.claim_id)||String(i)}>
               <b>{asStr(cl.claim_id)||`Claim ${i+1}`}</b> <small>{asStr(cl.classification)} · confidence {asStr(cl.confidence)}</small>

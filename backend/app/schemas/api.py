@@ -343,10 +343,26 @@ class PromoteToWriteupRequest(BaseModel):
     title: str | None = None
 
 
+class DeckStyle(BaseModel):
+    theme: str | None = None
+    fonts: str | None = None
+
+
+class VisualStyle(BaseModel):
+    preset: str | None = None
+    options: dict = Field(default_factory=dict)
+
+
 class PromoteToDeckRequest(BaseModel):
     title: str | None = None
+    # Deck theme/fonts, plus per-section visual styles keyed by the section's
+    # index in the draft ("0", "1", ...). Validated against the catalogue in
+    # app/services/presentation_style.py; unknown values fall back to defaults.
+    style: DeckStyle | None = None
+    visual_styles: dict[str, VisualStyle] = Field(default_factory=dict)
 
 
 class DeckUpdate(BaseModel):
     title: str | None = None
     slides_json: list[dict] | None = None
+    style_json: dict | None = None

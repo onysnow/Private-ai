@@ -37,6 +37,7 @@ from app.services.openaleph import probe_openaleph
 from app.services.assistant_context import describe_record_refs
 from app.services.presentation import PROMOTABLE_MODULE, deck_slides_from_payload, payload_citation_refs, promote_candidate_to_deck, promote_candidate_to_writeup
 from app.services.promotion import promote_assessment
+from app.services.presentation_style import catalog as presentation_style_catalog
 from app.services.relationships import RELATIONSHIP_SCHEMAS
 from app.services.search import investigation_search
 from app.services.timeline import create_timeline_event
@@ -119,6 +120,13 @@ def create_timeline_event_endpoint(body: TimelineEventCreate, db: Session = Depe
         raise HTTPException(400, str(exc))
 
 
+@router.get("/presentation-styles", response_model=None)
+def presentation_styles() -> dict[str, Any]:
+    """Themes, font pairings and per-visual presets/options for decks --
+    the one catalogue both the .pptx export and the in-app preview read."""
+    return presentation_style_catalog()
+
+
 @router.get("/relationship-schemas", response_model=None)
 def relationship_schemas() -> dict[str, Any]:
     return {"schemas": RELATIONSHIP_SCHEMAS}
@@ -175,7 +183,11 @@ def promote_ai_analysis_candidate_to_deck_endpoint(candidate_id: str, body: Prom
     if row is None:
         raise HTTPException(404, "AI analysis candidate not found")
     try:
-        deck = promote_candidate_to_deck(db, row, title=body.title)
+        deck = promote_candidate_to_deck(
+            db, row, title=body.title,
+            style=body.style.model_dump() if body.style else None,
+            visual_styles={key: value.model_dump() for key, value in body.visual_styles.items()},
+        )
     except ValueError as exc:
         raise HTTPException(400, str(exc))
     return serialize_deck(deck)
