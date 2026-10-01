@@ -314,3 +314,39 @@ class ClaimReviewRequest(BaseModel):
     status: str
     confidence: float
     rationale: str
+
+
+class WriteupCreate(BaseModel):
+    investigation_id: str
+    title: str = "Untitled write-up"
+    content_json: dict | None = None
+    status: str = "draft"
+
+
+class WriteupUpdate(BaseModel):
+    title: str | None = None
+    content_json: dict | None = None
+    status: str | None = None
+
+
+class RecordRef(BaseModel):
+    record_type: str
+    record_id: str
+
+
+class PresentationDraftRequest(BaseModel):
+    goal: str = Field(min_length=1, max_length=4000)
+    record_refs: list[RecordRef] = Field(min_length=1, max_length=200)
+
+
+class PromoteToWriteupRequest(BaseModel):
+    title: str | None = None
+
+
+class PromoteToDeckRequest(BaseModel):
+    title: str | None = None
+
+
+class DeckUpdate(BaseModel):
+    title: str | None = None
+    slides_json: list[dict] | None = None

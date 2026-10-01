@@ -29,6 +29,8 @@ from app.api.routes_documents import router as documents_router
 from app.api.routes_connector_findings import router as connector_findings_router
 from app.api.routes_settings import router as settings_router
 from app.api.routes_entities import router as entities_router
+from app.api.routes_writeups import router as writeups_router
+from app.api.routes_decks import router as decks_router
 from app.core.config import Settings, settings as default_settings
 from app.core.access import bearer_token, enforce_api_access, enforce_browser_write_access, request_is_local_request
 from app.core.authorization import (
@@ -71,6 +73,8 @@ def register_domain_routers(app: FastAPI) -> None:
     app.include_router(connector_findings_router)
     app.include_router(settings_router)
     app.include_router(entities_router)
+    app.include_router(writeups_router)
+    app.include_router(decks_router)
 
 
 def create_app(

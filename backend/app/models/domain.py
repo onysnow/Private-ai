@@ -66,6 +66,12 @@ from app.models.documents import (
 from app.models.ai import (
     AIAnalysisCandidate,
 )
+from app.models.writeups import (
+    Writeup,
+)
+from app.models.decks import (
+    Deck,
+)
 from app.models.identity import (
     AppUser,
     InvestigationMembership,
@@ -113,6 +119,8 @@ __all__ = [
     "DocumentChunk",
     "ExtractionCandidate",
     "AIAnalysisCandidate",
+    "Writeup",
+    "Deck",
     "AppUser",
     "InvestigationMembership",
 ]

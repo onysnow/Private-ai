@@ -26,7 +26,7 @@ from app.models.domain import (
     EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
-    AIAnalysisCandidate,
+    AIAnalysisCandidate, Writeup, Deck,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -41,7 +41,7 @@ MODEL_BY_TABLE = {
         EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
-        AIAnalysisCandidate,
+        AIAnalysisCandidate, Writeup, Deck,
     ]
 }
 
@@ -58,6 +58,9 @@ RESTORE_ORDER = [
     # backup keeps every proposed/accepted/rejected analysis and its reviewer note,
     # exactly as extraction_candidates keeps the document review trail.
     "ai_analysis_candidates",
+    # Writeups/decks may point at an ai_analysis_candidate (source_ai_candidate_id,
+    # nullable) when they were promoted from one, so they must restore after it.
+    "writeups", "decks",
 ]
 
 
@@ -124,6 +127,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         ReportingTask, ReportingTaskWorkflowEvent, TimelineEvent, ResolutionDecision, CanonicalResolutionDecision, CanonicalEntityMergeAudit, PostMergeReconciliationDecision, PropertyConflictDecision, StatementAssessment,
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
+        Writeup, Deck,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -155,6 +159,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "documents": documents, "investigation_corpus_bindings": corpus_bindings, "document_corpus_syncs": document_syncs, "document_chunks": chunks,
         "extraction_candidates": direct["extraction_candidates"],
         "ai_analysis_candidates": direct["ai_analysis_candidates"],
+        "writeups": direct["writeups"], "decks": direct["decks"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 
