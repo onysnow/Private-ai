@@ -98,8 +98,10 @@ def test_docx_export_round_trips_citations():
     docx = DocxDocument(BytesIO(exported.content))
     full_text = "\n".join(p.text for p in docx.paragraphs)
     assert "The payment" in full_text
-    assert "References" in full_text
-    assert claim["id"] in full_text
+    assert "Sources" in full_text
+    # The source list names the record (here the claim's own text), not its UUID.
+    assert "Meridian paid Bellcastle $2.4M" in full_text.split("Sources", 1)[1]
+    assert claim["id"] not in full_text
 
 
 def test_delete_writeup():

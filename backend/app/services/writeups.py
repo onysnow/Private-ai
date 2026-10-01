@@ -38,17 +38,28 @@ def extract_cited_refs(content_json: dict) -> list[dict]:
     points at, in first-appearance order."""
     seen: set[tuple[str, str]] = set()
     refs: list[dict] = []
-    for node in _walk(content_json or {}):
-        if node.get("type") != "citation":
-            continue
-        attrs = node.get("attrs") or {}
-        record_type, record_id = attrs.get("recordType"), attrs.get("recordId")
+
+    def add(record_type, record_id):
         if not record_type or not record_id:
-            continue
+            return
+        if record_type == "reporting_task":
+            record_type = "task"
         key = (record_type, record_id)
         if key not in seen:
             seen.add(key)
             refs.append({"record_type": record_type, "record_id": record_id})
+
+    for node in _walk(content_json or {}):
+        if node.get("type") == "citation":
+            attrs = node.get("attrs") or {}
+            add(attrs.get("recordType"), attrs.get("recordId"))
+        elif node.get("type") == "evidenceVisual":
+            # A figure/timeline/bar block cites per data point (see
+            # app/services/presentation.py); those count as citations too.
+            for item in (((node.get("attrs") or {}).get("visual") or {}).get("items") or []):
+                for ref in item.get("evidence") or []:
+                    if isinstance(ref, dict):
+                        add(ref.get("record_type"), ref.get("record_id"))
     return refs
 
 
@@ -77,9 +88,21 @@ def extract_plain_text(content_json: dict) -> str:
         if node_type == "hardBreak":
             current.append("\n")
             return
+        if node_type == "evidenceVisual":
+            flush()
+            visual = (node.get("attrs") or {}).get("visual") or {}
+            for item in visual.get("items") or []:
+                lead = item.get("date") or item.get("value")
+                lines.append(f"{lead} — {item.get('label', '')}" if lead not in (None, "") else str(item.get("label", "")))
+            return
+        if node_type == "callout":
+            flush()
+            title = (node.get("attrs") or {}).get("title")
+            if title:
+                lines.append(str(title))
         block_level = node_type in {
             "paragraph", "heading", "listItem", "blockquote", "codeBlock",
-            "bulletList", "orderedList", "doc",
+            "bulletList", "orderedList", "doc", "callout",
         }
         for child in node.get("content") or []:
             visit(child)
@@ -159,14 +182,129 @@ def delete_writeup(db: Session, row: Writeup) -> None:
 
 
 # --- .docx export -----------------------------------------------------------
+#
+# Editorial layout in the app's Dark Academia palette (frontend/app/globals.css),
+# kept light for print: Georgia text, brass accents, the takeaway and open
+# questions set as shaded callouts, figure/timeline/bar blocks as tables (a
+# bar block draws its bars from block characters, so it needs no image
+# library), numbered superscript citation markers, and a Sources section that
+# names each record instead of printing its UUID.
 
-def _render_inline(paragraph, node: dict, citation_index: dict[tuple[str, str], int]) -> None:
+DOCX_BRASS = "8A6420"
+DOCX_OXBLOOD = "672C1A"
+DOCX_INK = "1F1B16"
+DOCX_TAUPE = "7A6950"
+DOCX_PANEL = "F1EADC"
+DOCX_RULE = "D9CDB6"
+DOCX_SERIF = "Georgia"
+DOCX_SANS = "Calibri"
+
+
+def _docx_rgb(hex_color: str):
+    from docx.shared import RGBColor
+    return RGBColor.from_string(hex_color)
+
+
+def _set_run(run, *, size=None, color=None, bold=None, italic=None, font=None, superscript=None, caps=None, spacing=None):
+    from docx.oxml.ns import qn
+    from docx.shared import Pt
+    if font:
+        run.font.name = font
+        rpr = run._element.get_or_add_rPr()
+        fonts = rpr.find(qn("w:rFonts"))
+        if fonts is None:
+            fonts = rpr.makeelement(qn("w:rFonts"), {})
+            rpr.append(fonts)
+        for attr in ("w:ascii", "w:hAnsi", "w:cs", "w:eastAsia"):
+            fonts.set(qn(attr), font)
+    if size:
+        run.font.size = Pt(size)
+    if color:
+        run.font.color.rgb = _docx_rgb(color)
+    if bold is not None:
+        run.font.bold = bold
+    if italic is not None:
+        run.font.italic = italic
+    if superscript:
+        run.font.superscript = True
+    if caps:
+        run.font.small_caps = True
+    if spacing is not None:
+        rpr = run._element.get_or_add_rPr()
+        el = rpr.makeelement(qn("w:spacing"), {qn("w:val"): str(spacing)})
+        rpr.append(el)
+    return run
+
+
+def _shade_cell(cell, fill: str, *, left_border: str | None = None):
+    from docx.oxml.ns import qn
+    tcPr = cell._element.get_or_add_tcPr()
+    shd = tcPr.makeelement(qn("w:shd"), {qn("w:val"): "clear", qn("w:color"): "auto", qn("w:fill"): fill})
+    tcPr.append(shd)
+    borders = tcPr.makeelement(qn("w:tcBorders"), {})
+    for side in ("top", "left", "bottom", "right"):
+        if side == "left" and left_border:
+            el = borders.makeelement(qn(f"w:{side}"), {qn("w:val"): "single", qn("w:sz"): "24", qn("w:color"): left_border, qn("w:space"): "0"})
+        else:
+            el = borders.makeelement(qn(f"w:{side}"), {qn("w:val"): "nil"})
+        borders.append(el)
+    tcPr.append(borders)
+    margins = tcPr.makeelement(qn("w:tcMar"), {})
+    for side, width in (("top", 140), ("bottom", 140), ("left", 220), ("right", 220)):
+        margins.append(margins.makeelement(qn(f"w:{side}"), {qn("w:w"): str(width), qn("w:type"): "dxa"}))
+    tcPr.append(margins)
+
+
+def _bottom_rule(paragraph, color: str = DOCX_BRASS, size: int = 12):
+    from docx.oxml.ns import qn
+    pPr = paragraph._p.get_or_add_pPr()
+    pbdr = pPr.makeelement(qn("w:pBdr"), {})
+    pbdr.append(pbdr.makeelement(qn("w:bottom"), {qn("w:val"): "single", qn("w:sz"): str(size), qn("w:space"): "6", qn("w:color"): color}))
+    pPr.append(pbdr)
+
+
+def _no_table_borders(table):
+    from docx.oxml.ns import qn
+    tblPr = table._tbl.tblPr
+    borders = tblPr.makeelement(qn("w:tblBorders"), {})
+    for side in ("top", "left", "bottom", "right", "insideH", "insideV"):
+        borders.append(borders.makeelement(qn(f"w:{side}"), {qn("w:val"): "nil"}))
+    tblPr.append(borders)
+
+
+def _row_rules(table, color: str = DOCX_RULE):
+    from docx.oxml.ns import qn
+    tblPr = table._tbl.tblPr
+    borders = tblPr.makeelement(qn("w:tblBorders"), {})
+    for side in ("top", "left", "bottom", "right", "insideV"):
+        borders.append(borders.makeelement(qn(f"w:{side}"), {qn("w:val"): "nil"}))
+    borders.append(borders.makeelement(qn("w:insideH"), {qn("w:val"): "single", qn("w:sz"): "4", qn("w:color"): color}))
+    tblPr.append(borders)
+
+
+def _para(container, *, space_before=0, space_after=6, line=1.25, keep_next=False):
+    from docx.shared import Pt
+    p = container.add_paragraph()
+    fmt = p.paragraph_format
+    fmt.space_before = Pt(space_before)
+    fmt.space_after = Pt(space_after)
+    fmt.line_spacing = line
+    if keep_next:
+        fmt.keep_with_next = True
+    return p
+
+
+def _cite_key(record_type, record_id):
+    return ("task" if record_type == "reporting_task" else record_type, record_id)
+
+
+def _render_inline(paragraph, node: dict, citation_index: dict[tuple[str, str], int], *, size=11, color=DOCX_INK, font=DOCX_SERIF, italic=None) -> None:
     node_type = node.get("type")
     if node_type == "text":
         marks = {m.get("type") for m in (node.get("marks") or [])}
         run = paragraph.add_run(node.get("text") or "")
-        run.bold = "bold" in marks
-        run.italic = "italic" in marks
+        _set_run(run, size=size, color=color, font=font, bold="bold" in marks or None,
+                 italic=True if ("italic" in marks or italic) else None)
         if "strike" in marks:
             run.font.strike = True
         return
@@ -175,61 +313,238 @@ def _render_inline(paragraph, node: dict, citation_index: dict[tuple[str, str], 
         return
     if node_type == "citation":
         attrs = node.get("attrs") or {}
-        key = (attrs.get("recordType"), attrs.get("recordId"))
+        key = _cite_key(attrs.get("recordType"), attrs.get("recordId"))
         n = citation_index.setdefault(key, len(citation_index) + 1)
-        run = paragraph.add_run(f" [{n}]")
-        run.font.superscript = True
+        _set_run(paragraph.add_run(f"[{n}]"), size=max(8, size - 3), color=DOCX_BRASS, font=DOCX_SANS, superscript=True)
         return
     for child in node.get("content") or []:
-        _render_inline(paragraph, child, citation_index)
+        _render_inline(paragraph, child, citation_index, size=size, color=color, font=font, italic=italic)
 
 
-def render_writeup_docx(row: Writeup):
-    """Build a python-docx Document from content_json. Citation nodes become
-    numbered superscript markers with a References section listing the full
-    record_type/record_id at the end -- the simplest footnote-equivalent that
-    doesn't require python-docx's limited native footnote support."""
+def _refs_marker(refs, citation_index) -> str:
+    nums = []
+    for ref in refs or []:
+        if isinstance(ref, dict) and ref.get("record_type") and ref.get("record_id"):
+            key = _cite_key(ref["record_type"], ref["record_id"])
+            nums.append(citation_index.setdefault(key, len(citation_index) + 1))
+    return " ".join(f"[{n}]" for n in sorted(set(nums)))
+
+
+def _format_bar_value(value: float, unit: str) -> str:
+    prefix = {"USD": "$", "US$": "$", "$": "$", "EUR": "€", "€": "€", "GBP": "£", "£": "£"}.get(unit.upper() if unit else "", "")
+    suffix = "" if prefix or not unit else f" {unit}"
+    if abs(value) >= 1_000_000:
+        text = f"{value / 1_000_000:,.1f}M"
+    elif abs(value) >= 1_000:
+        text = f"{value / 1_000:,.0f}K"
+    else:
+        text = f"{value:,.0f}" if float(value).is_integer() else f"{value:,.2f}"
+    return f"{prefix}{text}{suffix}"
+
+
+def _set_widths(table, widths_in: list[float]) -> None:
+    from docx.shared import Inches
+    table.autofit = False
+    for column, width in zip(table.columns, widths_in):
+        column.width = Inches(width)
+        for cell in column.cells:
+            cell.width = Inches(width)
+
+
+def _render_visual(docx, visual: dict, citation_index) -> None:
+    from docx.shared import Inches
+    from app.services.decks import display_date
+
+    kind = visual.get("type")
+    items = visual.get("items") or []
+    if not items:
+        return
+    if kind == "figures":
+        table = docx.add_table(rows=1, cols=len(items))
+        _set_widths(table, [6.5 / len(items)] * len(items))
+        _no_table_borders(table)
+        for cell, item in zip(table.rows[0].cells, items):
+            _shade_cell(cell, DOCX_PANEL, left_border=DOCX_OXBLOOD)
+            p = cell.paragraphs[0]
+            _set_run(p.add_run(item.get("value") or ""), size=22, color=DOCX_OXBLOOD, font=DOCX_SERIF)
+            q = cell.add_paragraph()
+            _set_run(q.add_run(item.get("label") or ""), size=9.5, color=DOCX_INK, font=DOCX_SANS)
+            marker = _refs_marker(item.get("evidence"), citation_index)
+            if marker:
+                _set_run(q.add_run(" " + marker), size=8, color=DOCX_BRASS, font=DOCX_SANS, superscript=True)
+    elif kind == "timeline":
+        table = docx.add_table(rows=0, cols=2)
+        _row_rules(table)
+        for item in items:
+            row = table.add_row().cells
+            _set_run(row[0].paragraphs[0].add_run(display_date(item.get("date") or "")), size=10, color=DOCX_BRASS, font=DOCX_SANS, bold=True)
+            p = row[1].paragraphs[0]
+            _set_run(p.add_run(item.get("label") or ""), size=10.5, color=DOCX_INK, font=DOCX_SERIF)
+            marker = _refs_marker(item.get("evidence"), citation_index)
+            if marker:
+                _set_run(p.add_run(" " + marker), size=8, color=DOCX_BRASS, font=DOCX_SANS, superscript=True)
+        _set_widths(table, [1.3, 5.2])
+    elif kind == "bar":
+        if visual.get("title"):
+            p = _para(docx, space_before=6, space_after=2, keep_next=True)
+            _set_run(p.add_run(visual["title"]), size=9.5, color=DOCX_TAUPE, font=DOCX_SANS, bold=True)
+        top = max(abs(i.get("value") or 0) for i in items) or 1
+        table = docx.add_table(rows=0, cols=3)
+        _row_rules(table)
+        for item in items:
+            row = table.add_row().cells
+            p = row[0].paragraphs[0]
+            _set_run(p.add_run(item.get("label") or ""), size=10, color=DOCX_INK, font=DOCX_SANS)
+            marker = _refs_marker(item.get("evidence"), citation_index)
+            if marker:
+                _set_run(p.add_run(" " + marker), size=8, color=DOCX_BRASS, font=DOCX_SANS, superscript=True)
+            blocks = max(1, round(22 * abs(item.get("value") or 0) / top))
+            _set_run(row[1].paragraphs[0].add_run("█" * blocks), size=9, color="B98D34", font=DOCX_SANS)
+            _set_run(row[2].paragraphs[0].add_run(_format_bar_value(item.get("value") or 0, visual.get("unit") or "")), size=10, color=DOCX_INK, font=DOCX_SANS, bold=True)
+        _set_widths(table, [2.2, 3.3, 1.0])
+    _para(docx, space_after=4)
+
+
+def _render_callout(docx, node: dict, citation_index) -> None:
+    attrs = node.get("attrs") or {}
+    tone = attrs.get("tone")
+    accent = DOCX_OXBLOOD if tone == "questions" else DOCX_BRASS
+    table = docx.add_table(rows=1, cols=1)
+    _no_table_borders(table)
+    cell = table.rows[0].cells[0]
+    _shade_cell(cell, DOCX_PANEL, left_border=accent)
+    first = cell.paragraphs[0]
+    _set_run(first.add_run((attrs.get("title") or "").upper()), size=8.5, color=accent, font=DOCX_SANS, bold=True, spacing=30)
+    for child in node.get("content") or []:
+        if child.get("type") in {"bulletList", "orderedList"}:
+            for n, item in enumerate(child.get("content") or [], start=1):
+                p = cell.add_paragraph()
+                p.paragraph_format.space_before = docx_pt(3)
+                _set_run(p.add_run(f"{n:02d}   "), size=10.5, color=accent, font=DOCX_SERIF)
+                for block in item.get("content") or []:
+                    for inline in block.get("content") or []:
+                        _render_inline(p, inline, citation_index, size=10.5)
+        else:
+            p = cell.add_paragraph()
+            p.paragraph_format.space_before = docx_pt(4)
+            p.paragraph_format.line_spacing = 1.25
+            for inline in child.get("content") or []:
+                _render_inline(p, inline, citation_index, size=13 if tone == "takeaway" else 11)
+    _para(docx, space_after=4)
+
+
+def docx_pt(value):
+    from docx.shared import Pt
+    return Pt(value)
+
+
+def render_writeup_docx(row: Writeup, citation_details: list[dict] | None = None):
+    """Build a python-docx Document from content_json. `citation_details`
+    is describe_record_refs()'s output for this write-up's cited refs; the
+    Sources section falls back to type + id when a ref has no detail."""
     from docx import Document as DocxDocument
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.oxml.ns import qn
+    from docx.shared import Inches, Pt
+    from app.core.time import utcnow_naive as _now
 
-    doc = content_json = row.content_json or EMPTY_DOC
+    content_json = row.content_json or EMPTY_DOC
+    details = {(_cite_key(d["record_type"], d["record_id"])): d for d in (citation_details or [])}
     docx = DocxDocument()
-    docx.add_heading(row.title, level=0)
-    citation_index: dict[tuple[str, str], int] = {}
+    for section in docx.sections:
+        section.left_margin = section.right_margin = Inches(1.0)
+        section.top_margin = section.bottom_margin = Inches(0.9)
+    normal = docx.styles["Normal"]
+    normal.font.name = DOCX_SERIF
+    normal.font.size = Pt(11)
+    normal.font.color.rgb = _docx_rgb(DOCX_INK)
 
-    for node in content_json.get("content") or []:
+    # Masthead.
+    p = _para(docx, space_after=2)
+    _set_run(p.add_run("INVESTIGATION BRIEF"), size=8.5, color=DOCX_BRASS, font=DOCX_SANS, bold=True, spacing=40)
+    p = _para(docx, space_after=4, line=1.05)
+    _set_run(p.add_run(row.title), size=24, color=DOCX_INK, font=DOCX_SERIF)
+    meta = _para(docx, space_after=14)
+    stamp = _now()
+    status = (getattr(row, "status", None) or "draft").capitalize()
+    cited = len(extract_cited_refs(content_json))
+    _set_run(meta.add_run(f"{status}  ·  {cited} cited record{'s' if cited != 1 else ''}  ·  {stamp.day} {stamp.strftime('%B %Y')}"),
+             size=9, color=DOCX_TAUPE, font=DOCX_SANS)
+    _bottom_rule(meta)
+
+    citation_index: dict[tuple[str, str], int] = {}
+    nodes = list(content_json.get("content") or [])
+    # A write-up promoted before this layout existed carries its title as a
+    # leading H1; the masthead already shows it.
+    if nodes and nodes[0].get("type") == "heading" and "".join(c.get("text", "") for c in nodes[0].get("content") or []).strip() == row.title.strip():
+        nodes = nodes[1:]
+
+    for node in nodes:
         node_type = node.get("type")
         if node_type == "heading":
-            level = min(max(int((node.get("attrs") or {}).get("level", 1)), 1), 4)
-            p = docx.add_heading("", level=level)
-        elif node_type == "bulletList":
+            level = min(max(int((node.get("attrs") or {}).get("level", 2)), 1), 4)
+            p = _para(docx, space_before=16 if level <= 2 else 10, space_after=4, keep_next=True, line=1.1)
+            for child in node.get("content") or []:
+                _render_inline(p, child, citation_index, size={1: 20, 2: 15, 3: 13}.get(level, 12))
+        elif node_type == "callout":
+            _render_callout(docx, node, citation_index)
+        elif node_type == "evidenceVisual":
+            _render_visual(docx, (node.get("attrs") or {}).get("visual") or {}, citation_index)
+        elif node_type in {"bulletList", "orderedList"}:
+            style = "List Bullet" if node_type == "bulletList" else "List Number"
             for item in node.get("content") or []:
-                p = docx.add_paragraph(style="List Bullet")
+                p = docx.add_paragraph(style=style)
+                p.paragraph_format.space_after = Pt(3)
                 for block in item.get("content") or []:
                     for child in block.get("content") or []:
                         _render_inline(p, child, citation_index)
-            continue
-        elif node_type == "orderedList":
-            for item in node.get("content") or []:
-                p = docx.add_paragraph(style="List Number")
-                for block in item.get("content") or []:
-                    for child in block.get("content") or []:
-                        _render_inline(p, child, citation_index)
-            continue
         elif node_type == "blockquote":
             for block in node.get("content") or []:
-                p = docx.add_paragraph(style="Intense Quote")
+                p = _para(docx, space_after=6)
+                p.paragraph_format.left_indent = Inches(0.4)
                 for child in block.get("content") or []:
-                    _render_inline(p, child, citation_index)
-            continue
+                    _render_inline(p, child, citation_index, italic=True, color=DOCX_TAUPE)
         else:
-            p = docx.add_paragraph()
-        for child in node.get("content") or []:
-            _render_inline(p, child, citation_index)
+            p = _para(docx, space_after=8, line=1.3)
+            for child in node.get("content") or []:
+                _render_inline(p, child, citation_index)
 
     if citation_index:
-        docx.add_page_break()
-        docx.add_heading("References", level=1)
-        for (record_type, record_id), n in sorted(citation_index.items(), key=lambda kv: kv[1]):
-            docx.add_paragraph(f"[{n}] {record_type}:{record_id}", style="List Number")
+        p = _para(docx, space_before=22, space_after=6, keep_next=True)
+        _set_run(p.add_run("Sources"), size=15, color=DOCX_INK, font=DOCX_SERIF)
+        _bottom_rule(p, color=DOCX_RULE, size=6)
+        for key, n in sorted(citation_index.items(), key=lambda kv: kv[1]):
+            d = details.get(key)
+            p = _para(docx, space_after=5, line=1.15)
+            p.paragraph_format.left_indent = Inches(0.4)
+            p.paragraph_format.first_line_indent = Inches(-0.4)
+            _set_run(p.add_run(f"[{n}]\t"), size=9.5, color=DOCX_BRASS, font=DOCX_SANS, bold=True)
+            if d:
+                _set_run(p.add_run(d["type_label"].upper() + "  "), size=7.5, color=DOCX_TAUPE, font=DOCX_SANS, bold=True, spacing=20)
+                _set_run(p.add_run(d.get("label") or key[1]), size=10, color=DOCX_INK, font=DOCX_SANS, bold=True)
+                if d.get("source_title") and d.get("source_title") != d.get("label"):
+                    _set_run(p.add_run(f" — {d['source_title']}"), size=10, color=DOCX_INK, font=DOCX_SANS)
+                if d.get("missing"):
+                    _set_run(p.add_run(" (no longer available)"), size=9, color=DOCX_OXBLOOD, font=DOCX_SANS, italic=True)
+                if d.get("quote"):
+                    p.add_run().add_break()
+                    _set_run(p.add_run(f"“{d['quote']}”"), size=9.5, color=DOCX_TAUPE, font=DOCX_SERIF, italic=True)
+                if d.get("source_url"):
+                    p.add_run().add_break()
+                    _set_run(p.add_run(d["source_url"]), size=8.5, color=DOCX_TAUPE, font=DOCX_SANS)
+            else:
+                _set_run(p.add_run(f"{key[0]}:{key[1]}"), size=10, color=DOCX_INK, font=DOCX_SANS)
 
+    # Footer: title + page number field.
+    footer = docx.sections[0].footer.paragraphs[0]
+    footer.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    _set_run(footer.add_run(f"{row.title}   ·   "), size=8, color=DOCX_TAUPE, font=DOCX_SANS)
+    run = footer.add_run()
+    _set_run(run, size=8, color=DOCX_TAUPE, font=DOCX_SANS)
+    for tag, attrs in (("w:fldChar", {qn("w:fldCharType"): "begin"}), ("w:instrText", {}), ("w:fldChar", {qn("w:fldCharType"): "end"})):
+        el = run._element.makeelement(qn(tag), attrs)
+        if tag == "w:instrText":
+            el.set(qn("xml:space"), "preserve")
+            el.text = " PAGE "
+        run._element.append(el)
     return docx

@@ -109,8 +109,16 @@ def test_promote_to_writeup_builds_a_content_json_with_matching_citations(monkey
         ],
         key=str,
     )
-    # The written brief's prose (body text) and the open question both made it in.
-    assert "Meridian paid Bellcastle Holdings a $2.4M consulting fee" in body["content_json"]["content"][5]["content"][0]["text"]
+    nodes = body["content_json"]["content"]
+    # The title is the write-up's own field, not repeated as a heading.
+    assert not any(n["type"] == "heading" and n["content"][0]["text"] == body["title"] for n in nodes)
+    takeaway = next(n for n in nodes if n["type"] == "callout" and n["attrs"]["tone"] == "takeaway")
+    assert "Meridian paid Bellcastle $2.4M" in takeaway["content"][0]["content"][0]["text"]
+    body_paragraph = next(n for n in nodes if n["type"] == "paragraph" and "consulting fee in November 2023" in (n.get("content") or [{}])[0].get("text", ""))
+    citations = [c for c in body_paragraph["content"] if c["type"] == "citation"]
+    # Citation labels are readable (evidence -> its locator), never a raw UUID.
+    assert {c["attrs"]["label"] for c in citations} >= {"row 41"}
+    assert any(n["type"] == "callout" and n["attrs"]["tone"] == "questions" for n in nodes)
     assert body["word_count"] > 0
 
 
@@ -128,10 +136,14 @@ def test_promote_to_deck_builds_one_slide_per_section_plus_takeaway_and_open_que
     body = r.json()
     assert body["title"] == "The Bellcastle consulting fee"
     assert body["source_ai_candidate_id"] == seeded["candidate_id"]
-    headings = [slide["heading"] for slide in body["slides"]]
-    assert headings == ["Executive takeaway", "The payment", "Open questions"]
-    payment_slide = body["slides"][1]
+    kinds = [slide["kind"] for slide in body["slides"]]
+    assert kinds == ["title", "statement", "content", "questions"]
+    assert body["slides"][0]["heading"] == "The Bellcastle consulting fee"
+    payment_slide = body["slides"][2]
+    assert payment_slide["heading"] == "The payment"
     assert payment_slide["bullets"] == ["$2.4M paid to Bellcastle", "Dated November 2023"]
+    # The section's full prose rides along as speaker notes.
+    assert payment_slide["notes"].startswith("Meridian paid Bellcastle Holdings")
     assert {"record_type": "claim", "record_id": seeded["claim"]["id"]} in payment_slide["evidence"]
     assert {"record_type": "evidence", "record_id": seeded["evidence"]["id"]} in payment_slide["evidence"]
 
@@ -195,3 +207,145 @@ def test_promotion_rejects_wrong_module():
     promote_deck = client.post(f"/api/ai-analysis-candidates/{candidate_id}/promote-to-deck", json={})
     assert promote_deck.status_code == 400, promote_deck.text
     assert "presentation_draft" in promote_deck.text
+
+
+# --- v2: readable citations, visuals, and the designed exports ----------------
+
+def _run_draft(monkeypatch, seeded: dict, payload: dict):
+    settings.enable_ai_features = True
+    settings.ai_provider = "anthropic"
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _FakeLLMClient(json.dumps(payload)))
+    return client.post(
+        f"/api/investigations/{seeded['investigation']['id']}/assistant/presentation-draft",
+        json={"goal": "Summarize the Bellcastle payment.", "record_refs": [
+            {"record_type": "claim", "record_id": seeded["claim"]["id"]},
+            {"record_type": "evidence", "record_id": seeded["evidence"]["id"]},
+        ]},
+    )
+
+
+def _payload_with_visuals(claim_id: str, evidence_id: str, **section_overrides) -> dict:
+    payload = json.loads(_draft_response(claim_id, evidence_id))
+    ev = [{"record_type": "evidence", "record_id": evidence_id}]
+    payload["sections"][0]["visual"] = {"type": "figures", "items": [{"value": "$2.4M", "label": "wired 14 Nov 2023", "evidence": ev}]}
+    payload["sections"].append({
+        "heading": "Sequence", "body": "The wire followed the agreement.", "key_points": ["Agreement, then wire"], "evidence": ev,
+        "visual": {"type": "timeline", "items": [
+            {"date": "2023-11-03", "label": "Agreement signed", "evidence": ev},
+            {"date": "2023-11-14", "label": "$2.4M wired", "evidence": ev},
+        ]},
+    })
+    payload["sections"].append({
+        "heading": "Compared", "body": "The fee dwarfs the others.", "key_points": ["Largest fee"], "evidence": ev,
+        "visual": {"type": "bar", "title": "Consulting fees", "unit": "USD", "items": [
+            {"label": "Bellcastle", "value": 2400000, "evidence": ev},
+            {"label": "Arden", "value": 285000, "evidence": ev},
+        ]},
+    })
+    payload["sections"][-1].update(section_overrides)
+    return payload
+
+
+def test_draft_with_cited_visuals_is_accepted(monkeypatch):
+    seeded = _seeded_investigation()
+    r = _run_draft(monkeypatch, seeded, _payload_with_visuals(seeded["claim"]["id"], seeded["evidence"]["id"]))
+    assert r.status_code == 200, r.text
+    assert r.json()["review_status"] == "proposed"
+
+
+@pytest.mark.parametrize("bad_visual, message", [
+    ({"type": "bar", "title": "x", "unit": "USD", "items": [{"label": "a", "value": "lots", "evidence": "EV"}, {"label": "b", "value": 2, "evidence": "EV"}]}, "value must be a number"),
+    ({"type": "bar", "title": "x", "unit": "USD", "items": [{"label": "a", "value": 1, "evidence": []}, {"label": "b", "value": 2, "evidence": "EV"}]}, "must cite at least one record"),
+    ({"type": "timeline", "items": [{"date": "2023", "label": "only one point", "evidence": "EV"}]}, "2-8 items"),
+    ({"type": "pie", "items": []}, "type must be one of"),
+])
+def test_malformed_or_uncited_visual_is_rejected(monkeypatch, bad_visual, message):
+    seeded = _seeded_investigation()
+    ev = [{"record_type": "evidence", "record_id": seeded["evidence"]["id"]}]
+    def fill(v):
+        return json.loads(json.dumps(v).replace('"EV"', json.dumps(ev)))
+    r = _run_draft(monkeypatch, seeded, _payload_with_visuals(seeded["claim"]["id"], seeded["evidence"]["id"], visual=fill(bad_visual)))
+    assert r.status_code == 422, r.text
+    assert message in r.text
+
+
+def test_visual_citing_a_record_outside_the_selection_is_rejected(monkeypatch):
+    seeded = _seeded_investigation()
+    payload = _payload_with_visuals(seeded["claim"]["id"], seeded["evidence"]["id"])
+    payload["sections"][0]["visual"]["items"][0]["evidence"] = [{"record_type": "evidence", "record_id": "NOT-SELECTED"}]
+    r = _run_draft(monkeypatch, seeded, payload)
+    assert r.status_code == 422, r.text
+    assert "NOT-SELECTED" in r.text
+
+
+def test_candidate_detail_has_readable_citations_and_a_deck_preview(monkeypatch):
+    seeded = _seeded_investigation()
+    r = _run_draft(monkeypatch, seeded, _payload_with_visuals(seeded["claim"]["id"], seeded["evidence"]["id"]))
+    detail = client.get(f"/api/ai-analysis-candidates/{r.json()['candidate_id']}").json()
+    by_type = {d["record_type"]: d for d in detail["citation_details"]}
+    assert by_type["evidence"]["label"] == "row 41"
+    assert by_type["evidence"]["source_title"] == "Wire transfer log"
+    assert by_type["evidence"]["quote"].startswith("$2.4M wired to Bellcastle")
+    assert by_type["claim"]["label"].startswith("Meridian paid Bellcastle a consulting fee")
+    kinds = [s["kind"] for s in detail["deck_preview"]]
+    assert kinds == ["title", "statement", "content", "content", "content", "questions"]
+    assert [s["visual"]["type"] for s in detail["deck_preview"] if s.get("visual")] == ["figures", "timeline", "bar"]
+
+
+def test_describe_record_refs_handles_missing_records_and_task_spellings():
+    from app.services.assistant_context import describe_record_refs
+    inv = client.post("/api/investigations", json={"name": "describe refs"}).json()
+    with SessionLocal() as db:
+        out = describe_record_refs(db, investigation_id=inv["id"], refs=[
+            {"record_type": "claim", "record_id": "gone"},
+            {"record_type": "reporting_task", "record_id": "gone-too"},
+            {"record_type": "claim", "record_id": "gone"},  # duplicate
+        ])
+    assert len(out) == 2
+    assert all(d["missing"] for d in out)
+    assert out[1]["trace_record_type"] == "task" and out[1]["type_label"] == "Task"
+
+
+def test_promoted_deck_exports_native_chart_timeline_and_speaker_notes(monkeypatch):
+    from io import BytesIO
+    from pptx import Presentation
+    seeded = _seeded_investigation()
+    r = _run_draft(monkeypatch, seeded, _payload_with_visuals(seeded["claim"]["id"], seeded["evidence"]["id"]))
+    candidate_id = r.json()["candidate_id"]
+    client.post(f"/api/ai-analysis-candidates/{candidate_id}/review", json={"decision": "accept"})
+    deck = client.post(f"/api/ai-analysis-candidates/{candidate_id}/promote-to-deck", json={}).json()
+    exported = client.get(f"/api/decks/{deck['id']}/export.pptx")
+    assert exported.status_code == 200
+    prs = Presentation(BytesIO(exported.content))
+    slides = list(prs.slides)
+    # title, takeaway, 3 content, questions, sources
+    assert len(slides) == 7
+    assert sum(1 for s in slides for sh in s.shapes if sh.has_chart) == 1
+    text = "\n".join(sh.text_frame.text for s in slides for sh in s.shapes if sh.has_text_frame)
+    assert "3 Nov 2023" in text and "14 Nov 2023" in text  # timeline dates, human-formatted
+    assert "$2.4M" in text  # figure card
+    assert "row 41" in text and "Wire transfer log" in text  # readable sources
+    assert seeded["evidence"]["id"] not in text
+    notes = [s.notes_slide.notes_text_frame.text for s in slides if s.has_notes_slide]
+    assert any(n.startswith("Meridian paid Bellcastle Holdings") for n in notes)
+
+
+def test_promoted_writeup_counts_visual_citations_and_exports_tables(monkeypatch):
+    from io import BytesIO
+    from docx import Document as DocxDocument
+    seeded = _seeded_investigation()
+    r = _run_draft(monkeypatch, seeded, _payload_with_visuals(seeded["claim"]["id"], seeded["evidence"]["id"]))
+    candidate_id = r.json()["candidate_id"]
+    client.post(f"/api/ai-analysis-candidates/{candidate_id}/review", json={"decision": "accept"})
+    writeup = client.post(f"/api/ai-analysis-candidates/{candidate_id}/promote-to-writeup", json={}).json()
+    assert any(n["type"] == "evidenceVisual" for n in writeup["content_json"]["content"])
+    exported = client.get(f"/api/writeups/{writeup['id']}/export.docx")
+    assert exported.status_code == 200
+    docx = DocxDocument(BytesIO(exported.content))
+    paragraphs = [p.text for p in docx.paragraphs]
+    # Masthead title appears once; no duplicate heading of the same text.
+    assert paragraphs.count(writeup["title"]) == 1
+    cells = "\n".join(c.text for t in docx.tables for row in t.rows for c in row.cells)
+    assert "THE TAKEAWAY" in cells and "OPEN QUESTIONS" in cells
+    assert "3 Nov 2023" in cells and "$2.4M" in cells
+    assert "Sources" in paragraphs

@@ -40,6 +40,21 @@ forms for every section, every time.
   - `evidence`: every `{"record_type": ..., "record_id": ...}` this
     section's claims actually rest on, drawn only from the retrieval
     packet's own `citations` list.
+  - `visual`: `null` for most sections. Set it only when a picture of the
+    evidence would carry the point better than prose, AND the cited
+    evidence itself states every number or date the visual shows:
+    - `figures` (1-4 items): headline values a reader should remember,
+      e.g. `{"value": "$2.4M", "label": "wired to Bellcastle, 14 Nov 2023"}`.
+    - `timeline` (2-8 items, in chronological order): dated events, with
+      `date` as precise as the evidence states it (`"2023-11-14"`,
+      `"2023-11"`, or `"Nov 2023"` -- never more precise than the source).
+    - `bar` (2-8 items): genuinely comparable quantities in one `unit`
+      (e.g. several payments in USD). Never mix units, never chart a single
+      value, never derive totals or percentages the evidence doesn't state.
+    Every item carries its own `evidence` list citing the record(s) that
+    state that exact value or date. If you can't cite it, it doesn't go in
+    the visual. A section with no visual is always acceptable; a visual
+    with an unsupported number is not.
 - `open_questions`: gaps in the *selected* evidence that limit what this
   draft can responsibly claim, or that would need a different piece of
   evidence to close. This is not optional filler -- if the goal asks for
@@ -63,4 +78,8 @@ of these, not instead of them)
    contains a contradiction relevant to the goal, surface it rather than
    picking a side.
 4. Write `body` and `key_points` as genuinely different renderings of the
-   same underlying point, not one truncated into the other.
+   same underlying point, not one truncated into the other. Keep each key
+   point under about twelve words, and three to five per section -- they
+   are read off a slide at a glance.
+5. Visuals follow rule 2 at the level of every single value: each figure,
+   date, and bar is traceable to its own cited evidence, or it is left out.

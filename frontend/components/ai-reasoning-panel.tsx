@@ -11,25 +11,35 @@
 import {useCallback,useEffect,useState} from 'react';
 import type {ChangeEvent,ReactElement} from 'react';
 
-import type {AiAnalysisCandidate,AiAnalysisCandidateSummary,AiModuleName,AiReasoningStatus,JsonObject,JsonValue,SearchResult} from '../lib/api-types';
-import {isAiAnalysisCandidate,isAiAnalysisCandidateReview,isAiReasoningRunResult,isDeck,isWriteup,parseAiAnalysisCandidateList,parseSearchBody} from '../lib/api-validate';
+import type {AiAnalysisCandidate,AiAnalysisCandidateSummary,AiModuleName,AiReasoningStatus,JsonObject,JsonValue} from '../lib/api-types';
+import {isAiAnalysisCandidate,isAiAnalysisCandidateReview,isAiReasoningRunResult,isDeck,isWriteup,parseAiAnalysisCandidateList} from '../lib/api-validate';
 import {ApiClient,errorMessage} from '../lib/api-client';
 import {Button} from '@/components/ui/button';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Input} from '@/components/ui/input';
+import {Textarea} from '@/components/ui/textarea';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Download, FileText, Presentation} from 'lucide-react';
+import {RecordPicker} from './presentation/record-picker';
+import type {SelectedRef} from './presentation/record-picker';
+import {DraftPreview} from './presentation/draft-preview';
+import type {TraceHandler} from './presentation/draft-preview';
 
-type Props={api:ApiClient,investigationId:string,status:AiReasoningStatus|null|undefined};
+// onTraceRecord: opens the page's provenance drawer for a cited record (an
+// evidence chip in a presentation draft's preview).
+type Props={api:ApiClient,investigationId:string,status:AiReasoningStatus|null|undefined,onTraceRecord?:TraceHandler};
 
 const MODULE_LABEL:Record<AiModuleName,string>={case_synthesis:'Case synthesis (TAS module 08)',hypothesis_test:'Hypothesis & contradiction test (TAS module 06)',presentation_draft:'Presentation draft (brief/deck from picked evidence)'};
 const moduleLabel=(m:string):string=>(m in MODULE_LABEL?MODULE_LABEL[m as AiModuleName]:m);
 
-// presentation_draft's record picker only offers types the backend will
-// actually accept as a record_ref (app/services/assistant_context.py's
-// SELECTABLE_RECORD_TYPES); search's own hit type for a reporting task is
-// "reporting_task" (matching app/services/search.py), translated to the
-// reporter-facing "task" spelling everywhere else in this app uses.
-const SELECTABLE_SEARCH_TYPES=new Set(['entity','claim','evidence','relationship','source','document','lead','reporting_task']);
-const toRecordType=(hitType:string):string=>hitType==='reporting_task'?'task':hitType;
-type SelectedRef={record_type:string,record_id:string,label:string};
+// presentation_draft is app-local (backend/app/ai/presentation_modules), not
+// vendored TAS content: it can run when the TAS spec isn't checked out, so
+// callability is decided per module rather than from endpoints_callable alone.
+export function moduleCallable(status:AiReasoningStatus|null|undefined,module:AiModuleName):boolean{
+  if(!status||!status.enabled||!status.provider||!status.provider_key_configured)return false;
+  if(module==='presentation_draft')return status.tas_spec.modules.presentation_draft?.available!==false;
+  return Boolean(status.endpoints_callable);
+}
 
 // Endpoint 422s carry a structured detail ({message, invalid_citations|schema_errors});
 // ApiHttpError flattens non-string details to JSON, which is what a reviewer needs to see.
@@ -45,13 +55,14 @@ export function describeAiStatus(status:AiReasoningStatus|null|undefined):string
   if(!status.enabled)return 'AI reasoning is disabled on this deployment (ENABLE_AI_FEATURES is off). The core workbench does not need it.';
   if(!status.provider)return 'AI reasoning is enabled but no provider is selected (AI_PROVIDER must be anthropic or openai).';
   if(!status.provider_key_configured)return `AI provider "${status.provider}" is selected but its API key is not configured.`;
-  if(!status.tas_spec.present)return 'The vendored TAS spec (backend/app/ai/tas_spec) is not checked out, so prompts cannot be built.';
+  const draftAvailable=status.tas_spec.modules.presentation_draft?.available===true;
+  if(!status.tas_spec.present)return draftAvailable?'The vendored TAS spec (backend/app/ai/tas_spec) is not checked out, so case synthesis and hypothesis tests cannot run. Presentation drafts do not use it and are available.':'The vendored TAS spec (backend/app/ai/tas_spec) is not checked out, so prompts cannot be built.';
   const missing=Object.entries(status.tas_spec.modules).filter(([,m])=>!m.available).map(([name])=>name);
   if(missing.length)return `TAS module file(s) missing from the vendored spec: ${missing.join(', ')}.`;
   return `Ready: provider ${status.provider}, TAS spec v${status.tas_spec.version||'?'} vendored.`;
 }
 
-export function AiReasoningPanel({api,investigationId,status}:Props):ReactElement{
+export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Props):ReactElement{
   const [module,setModule]=useState<AiModuleName>('case_synthesis');
   const [question,setQuestion]=useState('');
   const [theory,setTheory]=useState('');
@@ -66,9 +77,6 @@ export function AiReasoningPanel({api,investigationId,status}:Props):ReactElemen
   const [note,setNote]=useState('');
   const [reviewStatus,setReviewStatus]=useState('');
   const [goal,setGoal]=useState('');
-  const [recordQuery,setRecordQuery]=useState('');
-  const [recordResults,setRecordResults]=useState<SearchResult[]>([]);
-  const [recordSearchStatus,setRecordSearchStatus]=useState('');
   const [selectedRefs,setSelectedRefs]=useState<SelectedRef[]>([]);
   const [promoteTitle,setPromoteTitle]=useState('');
   const [promoteStatus,setPromoteStatus]=useState('');
@@ -76,7 +84,12 @@ export function AiReasoningPanel({api,investigationId,status}:Props):ReactElemen
 
   // Belt and braces: the backend already folds enabled/provider/key/spec into
   // endpoints_callable, but never offer a run button on a disabled deployment.
-  const callable=Boolean(status&&status.enabled&&status.endpoints_callable);
+  const callable=moduleCallable(status,module);
+  useEffect(()=>{
+    if(!moduleCallable(status,module)&&moduleCallable(status,'presentation_draft'))setModule('presentation_draft');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[status]);
+  const anyCallable=(['case_synthesis','hypothesis_test','presentation_draft'] as AiModuleName[]).some(m=>moduleCallable(status,m));
 
   const loadQueue=useCallback(async()=>{
     if(!investigationId){setQueue([]);return}
@@ -93,26 +106,6 @@ export function AiReasoningPanel({api,investigationId,status}:Props):ReactElemen
     setPromoteStatus('');setPromoted(null);setPromoteTitle('');
     try{setSelected(await api.object(`/api/ai-analysis-candidates/${id}`,'AI analysis candidate',isAiAnalysisCandidate))}
     catch(error){setSelected(null);setReviewStatus(errorMessage(error,'Could not load the candidate'))}
-  };
-
-  const searchRecords=async()=>{
-    if(!investigationId||!recordQuery.trim())return;
-    setRecordSearchStatus('Searching…');
-    try{
-      const params=new URLSearchParams({q:recordQuery.trim(),investigation_id:investigationId,limit:'25'});
-      const body=await api.parsed(`/api/search?${params.toString()}`,parseSearchBody);
-      const hits=body.results.filter(r=>SELECTABLE_SEARCH_TYPES.has(r.type));
-      setRecordResults(hits);
-      setRecordSearchStatus(hits.length?'':'No matching claims, evidence, entities, leads, tasks, sources, documents, or relationships found.');
-    }catch(error){setRecordResults([]);setRecordSearchStatus(errorMessage(error,'Search failed'))}
-  };
-
-  const addRef=(hit:SearchResult):void=>{
-    const record_type=toRecordType(hit.type);
-    setSelectedRefs(prev=>prev.some(r=>r.record_type===record_type&&r.record_id===hit.id)?prev:[...prev,{record_type,record_id:hit.id,label:hit.title}]);
-  };
-  const removeRef=(record_type:string,record_id:string):void=>{
-    setSelectedRefs(prev=>prev.filter(r=>!(r.record_type===record_type&&r.record_id===record_id)));
   };
 
   const run=async()=>{
@@ -179,48 +172,32 @@ export function AiReasoningPanel({api,investigationId,status}:Props):ReactElemen
   const conflicts=asArr(payload?.contradiction_log);
   const gaps=asArr(payload?.investigative_gaps);
   const isPresentationDraft=selected?.module==='presentation_draft';
-  const sections=asArr(payload?.sections);
-  const openQuestions=asArr(payload?.open_questions);
 
-  return <section className="card" data-testid="ai-reasoning-panel"><h3>AI reasoning (Topic Authority System)</h3>
-    <p className="muted">Bounded reasoning over this investigation&apos;s own evidence. Every run is checked for invented citations and a malformed shape, then parked in a review queue. Accepting marks it as trusted analysis for reporters; it never creates or edits a canonical record.</p>
-    <p className="muted" data-testid="ai-status">{describeAiStatus(status)}</p>
+  return <Card className="card" data-testid="ai-reasoning-panel"><CardHeader className="pb-3"><CardTitle>AI reasoning &amp; presentations</CardTitle>
+    <CardDescription>Bounded reasoning over this investigation&apos;s own evidence, and briefs or decks drafted from evidence you pick. Every run is checked for invented citations and a malformed shape, then parked in a review queue. Accepting marks it as trusted analysis for reporters; it never creates or edits a canonical record.</CardDescription>
+    <p className="muted text-sm" data-testid="ai-status">{describeAiStatus(status)}</p></CardHeader><CardContent>
     {!investigationId?<p className="muted">Select an investigation to run or review AI analysis.</p>:<>
       <div className="searchrow">
-        <Select value={module} onValueChange={(v:string)=>setModule(v as AiModuleName)} disabled={!callable||running}><SelectTrigger aria-label="Reasoning module" className="w-auto"><SelectValue/></SelectTrigger><SelectContent><SelectItem value="case_synthesis">Case synthesis</SelectItem><SelectItem value="hypothesis_test">Hypothesis test</SelectItem><SelectItem value="presentation_draft">Presentation draft</SelectItem></SelectContent></Select>
+        <Select value={module} onValueChange={(v:string)=>setModule(v as AiModuleName)} disabled={!anyCallable||running}><SelectTrigger aria-label="Reasoning module" className="w-auto"><SelectValue/></SelectTrigger><SelectContent><SelectItem value="case_synthesis">Case synthesis</SelectItem><SelectItem value="hypothesis_test">Hypothesis test</SelectItem><SelectItem value="presentation_draft">Presentation draft</SelectItem></SelectContent></Select>
         {module!=='presentation_draft'&&<>
-          <input aria-label="Question" value={question} onChange={(e:ChangeEvent<HTMLInputElement>)=>setQuestion(e.target.value)} placeholder="What does the evidence establish about …?" disabled={!callable||running}/>
-          <input aria-label="Max retrieval results" type="number" min={1} max={100} value={maxResults} onChange={(e:ChangeEvent<HTMLInputElement>)=>setMaxResults(Math.min(100,Math.max(1,Number(e.target.value)||30)))} style={{width:80}} disabled={!callable||running}/>
-          <label className="muted"><input type="checkbox" checked={includeLeads} onChange={(e:ChangeEvent<HTMLInputElement>)=>setIncludeLeads(e.target.checked)} disabled={!callable||running}/> include external leads</label>
+          <Input aria-label="Question" value={question} onChange={(e:ChangeEvent<HTMLInputElement>)=>setQuestion(e.target.value)} placeholder="What does the evidence establish about …?" disabled={!callable||running} className="min-w-[12rem] flex-1"/>
+          <Input aria-label="Max retrieval results" type="number" min={1} max={100} value={maxResults} onChange={(e:ChangeEvent<HTMLInputElement>)=>setMaxResults(Math.min(100,Math.max(1,Number(e.target.value)||30)))} className="w-20" disabled={!callable||running}/>
+          <label className="muted flex items-center gap-1.5 text-sm"><input type="checkbox" className="accent-[hsl(var(--primary))]" checked={includeLeads} onChange={(e:ChangeEvent<HTMLInputElement>)=>setIncludeLeads(e.target.checked)} disabled={!callable||running}/> include external leads</label>
         </>}
         <Button onClick={run} disabled={!callable||running||(module==='presentation_draft'?(!goal.trim()||selectedRefs.length===0):!question.trim())}>{running?'Running…':'Run module'}</Button>
       </div>
-      {module==='hypothesis_test'&&<textarea aria-label="Working theory" value={theory} onChange={(e:ChangeEvent<HTMLTextAreaElement>)=>setTheory(e.target.value)} placeholder="The working theory to test against the evidence (required for a hypothesis test)." disabled={!callable||running}/>}
-      {module==='presentation_draft'&&<div data-testid="presentation-record-picker">
-        <textarea aria-label="Goal" value={goal} onChange={(e:ChangeEvent<HTMLTextAreaElement>)=>setGoal(e.target.value)} placeholder="What should this brief/deck accomplish, using only the evidence you pick below?" disabled={!callable||running}/>
-        <div className="searchrow">
-          <input aria-label="Search records to add" value={recordQuery} onChange={(e:ChangeEvent<HTMLInputElement>)=>setRecordQuery(e.target.value)} placeholder="Search claims, evidence, entities, leads, tasks…" disabled={!callable||running}/>
-          <Button type="button" size="sm" variant="outline" onClick={()=>void searchRecords()} disabled={!callable||running||!recordQuery.trim()}>Search</Button>
-        </div>
-        {recordSearchStatus&&<p className="muted">{recordSearchStatus}</p>}
-        {recordResults.map(hit=>{
-          const record_type=toRecordType(hit.type);
-          const already=selectedRefs.some(r=>r.record_type===record_type&&r.record_id===hit.id);
-          return <div className="candidate" key={`${hit.type}:${hit.id}`}>
-            <span>{hit.title} <small className="muted">({record_type})</small></span>
-            <div className="actions"><Button type="button" size="sm" variant="outline" disabled={already||!callable||running} onClick={()=>addRef(hit)}>{already?'Added':'Add'}</Button></div>
-          </div>;
-        })}
-        <div className="muted">Selected evidence ({selectedRefs.length}) — the draft can only cite what you pick here:</div>
-        {selectedRefs.length===0?<p className="muted">No records selected yet.</p>:<ul>{selectedRefs.map(r=><li key={`${r.record_type}:${r.record_id}`}>{r.label} <small className="muted">({r.record_type})</small> <Button type="button" size="sm" variant="outline" disabled={!callable||running} onClick={()=>removeRef(r.record_type,r.record_id)}>Remove</Button></li>)}</ul>}
+      {module==='hypothesis_test'&&<Textarea className="mt-3" aria-label="Working theory" value={theory} onChange={(e:ChangeEvent<HTMLTextAreaElement>)=>setTheory(e.target.value)} placeholder="The working theory to test against the evidence (required for a hypothesis test)." disabled={!callable||running}/>}
+      {module==='presentation_draft'&&<div className="mt-3 space-y-3">
+        <Textarea aria-label="Goal" value={goal} onChange={(e:ChangeEvent<HTMLTextAreaElement>)=>setGoal(e.target.value)} rows={2} placeholder="What should this brief or deck accomplish? e.g. “Brief my editor on what we can and can’t say about the Bellcastle payment.”" disabled={!callable||running}/>
+        <RecordPicker api={api} investigationId={investigationId} selected={selectedRefs} onChange={setSelectedRefs} disabled={!callable||running}/>
       </div>}
       {runStatus&&<p className="muted" data-testid="ai-run-status">{runStatus}</p>}
-      <div className="twocol">
+      <div className="twocol" style={isPresentationDraft?{gridTemplateColumns:'minmax(220px,0.55fr) minmax(0,2fr)'}:undefined}>
         <div>
-          <div className="searchrow"><b>Review queue</b><select aria-label="Queue filter" value={filter} onChange={(e:ChangeEvent<HTMLSelectElement>)=>setFilter(e.target.value as typeof filter)}><option value="all">all</option><option value="proposed">proposed</option><option value="accepted">accepted</option><option value="rejected">rejected</option></select><Button size="sm" variant="outline" onClick={()=>void loadQueue()}>Refresh</Button></div>
+          <div className="searchrow"><b>Review queue</b><select aria-label="Queue filter" className="h-8 rounded-md border border-input bg-transparent px-2 text-sm text-foreground" value={filter} onChange={(e:ChangeEvent<HTMLSelectElement>)=>setFilter(e.target.value as typeof filter)}><option value="all">all</option><option value="proposed">proposed</option><option value="accepted">accepted</option><option value="rejected">rejected</option></select><Button size="sm" variant="outline" onClick={()=>void loadQueue()}>Refresh</Button></div>
           {queueStatus&&<p className="muted">{queueStatus}</p>}
           {!queue.length&&!queueStatus&&<p className="muted">No AI analysis candidates yet for this investigation.</p>}
-          {queue.map(c=><div className="candidate" key={c.id}><b>{moduleLabel(c.module)}</b> <small>{c.review_status} · {c.checked_citation_count} citation(s) checked · {c.created_at.replace('T',' ').slice(0,16)}</small>
+          {queue.map(c=><div className="candidate" key={c.id} style={selected?.id===c.id?{outline:'2px solid hsl(var(--primary))',outlineOffset:2}:undefined} aria-current={selected?.id===c.id?'true':undefined}><b>{moduleLabel(c.module)}</b> <small>{c.review_status} · {c.checked_citation_count} citation(s) checked · {c.created_at.replace('T',' ').slice(0,16)}</small>
             <div>{asStr(c.request.question??'')||<i>no question recorded</i>}</div>
             {c.reviewer_note&&<small>{c.reviewer_note}</small>}
             <div className="actions"><Button size="sm" variant="outline" onClick={()=>{setReviewStatus('');setNote('');void open(c.id)}}>Open</Button></div>
@@ -232,18 +209,9 @@ export function AiReasoningPanel({api,investigationId,status}:Props):ReactElemen
             <div className="muted"><b>{isPresentationDraft?'Goal:':'Question:'}</b> {asStr(selected.request.question??'')}{selected.request.working_theory?<><br/><b>Working theory:</b> {asStr(selected.request.working_theory)}</>:null}</div>
             {payload&&'executive_summary' in payload&&<p><b>Summary:</b> {asStr(payload.executive_summary)}</p>}
             {payload&&'scope_and_limitations' in payload&&<p className="muted"><b>Scope & limitations:</b> {asStr(payload.scope_and_limitations)}</p>}
-            {isPresentationDraft&&payload&&<>
-              {asStr(payload.title)&&<h3 style={{fontSize:16}}>{asStr(payload.title)}</h3>}
-              {asStr(payload.goal_restated)&&<p className="muted"><b>Goal (as understood):</b> {asStr(payload.goal_restated)}</p>}
-              {asStr(payload.executive_takeaway)&&<p><b>Executive takeaway:</b> {asStr(payload.executive_takeaway)}</p>}
-              {sections.map((raw,i)=>{const s=asObj(raw);if(!s)return null;return <div className="candidate" key={asStr(s.heading)||String(i)}>
-                <b>{asStr(s.heading)||`Section ${i+1}`}</b>
-                <div>{asStr(s.body)}</div>
-                {asArr(s.key_points).length>0&&<ul>{asArr(s.key_points).map((kp,j)=><li key={j}>{asStr(kp)}</li>)}</ul>}
-                <small>Evidence: {asArr(s.evidence).map(refLabel).join(', ')||'none'}</small>
-              </div>})}
-              {openQuestions.length>0&&<div><b>Open questions:</b><ul>{openQuestions.map((q,i)=><li key={i}>{asStr(q)}</li>)}</ul></div>}
-            </>}
+            {isPresentationDraft&&payload&&<div className="mt-3">
+              <DraftPreview payload={payload} slides={selected.deck_preview||[]} citationDetails={selected.citation_details||[]} onTrace={onTraceRecord}/>
+            </div>}
             {claims.map((raw,i)=>{const cl=asObj(raw);if(!cl)return null;return <div className="candidate" key={asStr(cl.claim_id)||String(i)}>
               <b>{asStr(cl.claim_id)||`Claim ${i+1}`}</b> <small>{asStr(cl.classification)} · confidence {asStr(cl.confidence)}</small>
               <div>{asStr(cl.claim)}</div>
@@ -271,25 +239,26 @@ export function AiReasoningPanel({api,investigationId,status}:Props):ReactElemen
               <div className="muted"><b>User prompt (retrieval packet)</b></div><pre style={{whiteSpace:'pre-wrap',fontSize:11,maxHeight:300,overflowY:'auto'}}>{asStr(selected.trace.user_prompt)}</pre>
             </details>}
             {selected.review_status==='proposed'?<>
-              <textarea aria-label="Reviewer note" value={note} onChange={(e:ChangeEvent<HTMLTextAreaElement>)=>setNote(e.target.value)} placeholder="Reviewer note (why this is or is not trustworthy)."/>
+              <Textarea className="mt-3" aria-label="Reviewer note" value={note} onChange={(e:ChangeEvent<HTMLTextAreaElement>)=>setNote(e.target.value)} placeholder="Reviewer note (why this is or is not trustworthy)."/>
               <div className="actions"><Button onClick={()=>void review('accept')}>Accept as trusted analysis</Button><Button variant="outline" onClick={()=>void review('reject')}>Reject</Button></div>
             </>:<p className="muted">Reviewed {selected.reviewed_at?selected.reviewed_at.replace('T',' ').slice(0,16):''}{selected.reviewer_note?` · ${selected.reviewer_note}`:''}</p>}
             {reviewStatus&&<p className="muted" data-testid="ai-review-status">{reviewStatus}</p>}
-            {isPresentationDraft&&selected.review_status==='accepted'&&<div className="card" data-testid="promote-panel">
-              <b>Promote to a reporter-editable artifact</b>
-              <div className="searchrow">
-                <input aria-label="Promoted title" value={promoteTitle} onChange={(e:ChangeEvent<HTMLInputElement>)=>setPromoteTitle(e.target.value)} placeholder={asStr(payload?.title)||'Title (optional — defaults to the draft title)'}/>
-                <Button type="button" size="sm" onClick={()=>void promote('writeup')}>Promote to write-up</Button>
-                <Button type="button" size="sm" variant="outline" onClick={()=>void promote('deck')}>Promote to deck</Button>
+            {isPresentationDraft&&selected.review_status==='accepted'&&<div className="mt-4 rounded-lg border border-border bg-card p-4" data-testid="promote-panel">
+              <div className="text-sm font-semibold text-foreground">Make it a document or a deck</div>
+              <p className="mt-0.5 text-xs text-muted-foreground">Creates an editable write-up or deck from this reviewed draft. You can do both, more than once.</p>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <Input aria-label="Promoted title" value={promoteTitle} onChange={(e:ChangeEvent<HTMLInputElement>)=>setPromoteTitle(e.target.value)} placeholder={asStr(payload?.title)||'Title (optional — defaults to the draft title)'} className="min-w-[14rem] flex-1"/>
+                <Button type="button" size="sm" onClick={()=>void promote('writeup')}><FileText className="mr-1.5 h-4 w-4"/>Promote to write-up</Button>
+                <Button type="button" size="sm" variant="outline" onClick={()=>void promote('deck')}><Presentation className="mr-1.5 h-4 w-4"/>Promote to deck</Button>
               </div>
-              {promoteStatus&&<p className="muted" data-testid="promote-status">{promoteStatus}</p>}
-              {promoted&&<a data-testid="promote-download-link" href={`${api.baseUrl}/api/${promoted.kind==='writeup'?'writeups':'decks'}/${promoted.id}/export.${promoted.kind==='writeup'?'docx':'pptx'}`}>Download {promoted.kind==='writeup'?'.docx':'.pptx'}</a>}
+              {promoteStatus&&<p className="mt-2 text-sm text-muted-foreground" data-testid="promote-status">{promoteStatus}</p>}
+              {promoted&&<a data-testid="promote-download-link" href={`${api.baseUrl}/api/${promoted.kind==='writeup'?'writeups':'decks'}/${promoted.id}/export.${promoted.kind==='writeup'?'docx':'pptx'}`} className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"><Download className="h-4 w-4"/>Download {promoted.kind==='writeup'?'.docx':'.pptx'}</a>}
             </div>}
           </div>}
         </div>
       </div>
     </>}
-  </section>;
+  </CardContent></Card>;
 }
 
 export default AiReasoningPanel;

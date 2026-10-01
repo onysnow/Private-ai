@@ -150,6 +150,77 @@ def _hit_for_selected_record(db: Session, *, investigation_id: str, record_type:
     )
 
 
+_TYPE_LABELS = {
+    "entity": "Entity", "claim": "Claim", "evidence": "Evidence", "relationship": "Relationship",
+    "source": "Source", "document": "Document", "lead": "Lead", "task": "Task",
+}
+
+
+def _clip(text: str | None, limit: int) -> str:
+    text = (text or "").strip().replace("\n", " ")
+    return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
+
+
+def describe_record_refs(db: Session, *, investigation_id: str, refs: list[dict]) -> list[dict]:
+    """Human-readable details for citation refs, for display (the review
+    panel's evidence chips) and export (a deck's or brief's source list) --
+    the places a raw `evidence:7f3c…` UUID means nothing to a reader.
+
+    Accepts both task spellings ("task" and search's "reporting_task"),
+    since a model citing a task copies whatever the packet called it.
+    Never raises for a ref that no longer resolves (a record deleted after
+    the draft was written): it comes back with `missing=True` so an export
+    still renders instead of failing outright.
+
+    Returned keys: record_type (as given), record_id, trace_record_type
+    (the provenance-trace spelling), type_label, label (one-line name),
+    quote, locator, source_title, source_url, detail, missing.
+    """
+    from app.models.domain import Claim, Evidence, Source
+
+    out: list[dict] = []
+    seen: set[tuple[str, str]] = set()
+    for ref in refs or []:
+        record_type, record_id = ref.get("record_type"), ref.get("record_id")
+        if not record_type or not record_id or (record_type, record_id) in seen:
+            continue
+        seen.add((record_type, record_id))
+        lookup_type = "task" if record_type == "reporting_task" else record_type
+        item = {
+            "record_type": record_type, "record_id": record_id, "trace_record_type": lookup_type,
+            "type_label": _TYPE_LABELS.get(lookup_type, lookup_type.replace("_", " ").title()),
+            "label": "", "quote": None, "locator": None, "source_title": None, "source_url": None,
+            "detail": None, "missing": False,
+        }
+        try:
+            hit = _hit_for_selected_record(db, investigation_id=investigation_id, record_type=lookup_type, record_id=record_id)
+        except ValueError:
+            item.update(label="Record no longer available", missing=True)
+            out.append(item)
+            continue
+        provenance, metadata = hit.provenance or {}, hit.metadata or {}
+        if lookup_type == "claim":
+            claim = db.get(Claim, record_id)
+            item.update(label=_clip(claim.text if claim else hit.snippet, 160), detail=f"Claim · {metadata.get('status') or 'unverified'}")
+        elif lookup_type == "evidence":
+            evidence = db.get(Evidence, record_id)
+            source = db.get(Source, evidence.source_id) if evidence else None
+            item.update(
+                label=_clip(evidence.locator if evidence and evidence.locator else hit.title, 120),
+                quote=_clip(metadata.get("quote") or metadata.get("notes"), 400) or None,
+                locator=provenance.get("locator"), source_title=source.title if source else hit.title,
+                source_url=provenance.get("source_url"), detail=source.title if source else None,
+            )
+        elif lookup_type == "entity":
+            item.update(label=_clip(hit.title, 120), detail=metadata.get("schema"))
+        elif lookup_type == "source":
+            item.update(label=_clip(hit.title, 160), source_title=hit.title, source_url=provenance.get("url"), detail=metadata.get("source_type"))
+        else:
+            item.update(label=_clip(hit.title, 160), detail=_clip(hit.snippet, 200) or None)
+        out.append(item)
+    return out
+
+
 def _citation(hit: dict) -> dict:
     provenance = hit.get("provenance") or {}
     return {

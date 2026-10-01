@@ -68,8 +68,9 @@ def test_pptx_export():
     from io import BytesIO
     from pptx import Presentation
     prs = Presentation(BytesIO(exported.content))
-    # title slide + 2 content slides + 1 references slide (one slide cites evidence)
+    # title slide + 2 content slides + 1 sources slide (one slide cites evidence)
     assert len(list(prs.slides)) == 4
+    assert prs.slide_width > prs.slide_height  # 16:9, not the stock 4:3
     texts = []
     for slide in prs.slides:
         for shape in slide.shapes:
@@ -78,5 +79,7 @@ def test_pptx_export():
     joined = "\n".join(texts)
     assert "Overview" in joined
     assert "Meridian paid Bellcastle $2.4M" in joined
-    assert "References" in joined
-    assert "clm-1" in joined
+    assert "Where every statement comes from" in joined
+    # The seeded deck cites a claim id that doesn't exist; the sources slide
+    # says so in words instead of printing the raw id or failing the export.
+    assert "Record no longer available" in joined

@@ -13,6 +13,7 @@ from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
 from app.models.domain import Investigation, Writeup
 from app.schemas.api import WriteupCreate, WriteupUpdate
+from app.services.assistant_context import describe_record_refs
 from app.services.writeups import create_writeup, delete_writeup, list_writeups, render_writeup_docx, serialize_writeup, update_writeup
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -77,7 +78,8 @@ def export_writeup_docx(writeup_id: str, db: Session = Depends(get_db)):
     row = db.get(Writeup, writeup_id)
     if row is None:
         raise HTTPException(404, "Write-up not found")
-    docx = render_writeup_docx(row)
+    details = describe_record_refs(db, investigation_id=row.investigation_id, refs=row.cited_record_refs or [])
+    docx = render_writeup_docx(row, details)
     buf = BytesIO()
     docx.save(buf)
     buf.seek(0)

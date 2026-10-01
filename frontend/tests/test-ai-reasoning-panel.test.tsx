@@ -237,8 +237,9 @@ describe('AiReasoningPanel', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1); // only the initial queue load; nothing ran
   });
 
-  it('runs a presentation draft from picked evidence, shows its sections, accepts it, and promotes it to a write-up and a deck', async () => {
+  it('runs a presentation draft from picked evidence, previews it as slides and a brief, accepts it, and promotes it to a write-up and a deck', async () => {
     const user = userEvent.setup();
+    const traced: string[] = [];
     const draftPayload = {
       title: 'The Bellcastle consulting fee',
       goal_restated: 'Summarize what the selected evidence shows about the Bellcastle payment.',
@@ -248,30 +249,39 @@ describe('AiReasoningPanel', () => {
         body: 'Meridian paid Bellcastle Holdings a $2.4M consulting fee in November 2023.',
         key_points: ['$2.4M paid to Bellcastle', 'Dated November 2023'],
         evidence: [{record_type: 'claim', record_id: 'claim-1'}],
+        visual: {type: 'figures', items: [{value: '$2.4M', label: 'wired 14 Nov 2023', evidence: [{record_type: 'claim', record_id: 'claim-1'}]}]},
       }],
       open_questions: ['Whether the fee was disclosed to the board.'],
     };
+    const deckPreview = [
+      {kind: 'title', heading: 'The Bellcastle consulting fee', bullets: [draftPayload.goal_restated], evidence: [], notes: '', visual: null},
+      {kind: 'statement', heading: 'The takeaway', bullets: [draftPayload.executive_takeaway], evidence: [], notes: '', visual: null},
+      {kind: 'content', heading: 'The payment', bullets: draftPayload.sections[0].key_points, evidence: draftPayload.sections[0].evidence, notes: draftPayload.sections[0].body, visual: draftPayload.sections[0].visual},
+      {kind: 'questions', heading: "What the record doesn't yet show", bullets: draftPayload.open_questions, evidence: [], notes: '', visual: null},
+    ];
+    const citationDetails = [{record_type: 'claim', record_id: 'claim-1', trace_record_type: 'claim', type_label: 'Claim', label: 'Meridian paid Bellcastle $2.4M', quote: null, locator: null, source_title: null, source_url: null, detail: 'Claim · supported', missing: false}];
     const draftSummary = (overrides: Record<string, unknown> = {}) => summary({
       id: 'cand-9', module: 'presentation_draft',
       request: {question: 'Summarize the Bellcastle payment.', record_refs: [{record_type: 'claim', record_id: 'claim-1'}]},
       ...overrides,
     });
+    const draftDetail = (overrides: Record<string, unknown> = {}) => ({...fullCandidate(), ...draftSummary(overrides), payload: draftPayload, deck_preview: deckPreview, citation_details: citationDetails});
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(jsonResponse({candidates: []})) // initial queue
       .mockResolvedValueOnce(jsonResponse({ // GET /api/search
-        results: [{type: 'claim', group: 'reporting', id: 'claim-1', investigation_id: 'inv-1', title: 'Meridian paid Bellcastle $2.4M', snippet: '…', score: 1, provenance: {}, metadata: {}}],
+        results: [{type: 'claim', group: 'reporting', id: 'claim-1', investigation_id: 'inv-1', title: 'Claim', snippet: 'Meridian paid Bellcastle $2.4M', score: 1, provenance: {}, metadata: {}}],
         counts: {claim: 1}, group_counts: {reporting: 1},
       }))
       .mockResolvedValueOnce(jsonResponse({candidate_id: 'cand-9', review_status: 'proposed', payload: {}})) // POST presentation-draft
       .mockResolvedValueOnce(jsonResponse({candidates: [draftSummary()]})) // queue reload
-      .mockResolvedValueOnce(jsonResponse({...fullCandidate(), ...draftSummary(), payload: draftPayload})) // GET candidate
+      .mockResolvedValueOnce(jsonResponse(draftDetail())) // GET candidate
       .mockResolvedValueOnce(jsonResponse({id: 'cand-9', module: 'presentation_draft', review_status: 'accepted', reviewer_note: null, reviewed_at: '2026-09-30T12:00:00'})) // POST review
       .mockResolvedValueOnce(jsonResponse({candidates: [draftSummary({review_status: 'accepted'})]})) // queue reload
-      .mockResolvedValueOnce(jsonResponse({...fullCandidate(), ...draftSummary({review_status: 'accepted', reviewed_at: '2026-09-30T12:00:00'}), payload: draftPayload})) // GET candidate
+      .mockResolvedValueOnce(jsonResponse(draftDetail({review_status: 'accepted', reviewed_at: '2026-09-30T12:00:00'}))) // GET candidate
       .mockResolvedValueOnce(jsonResponse({id: 'wu-1', investigation_id: 'inv-1', title: 'The Bellcastle consulting fee', status: 'draft', cited_record_refs: [{record_type: 'claim', record_id: 'claim-1'}], created_at: '2026-09-30T12:01:00', updated_at: '2026-09-30T12:01:00', word_count: 42})) // POST promote-to-writeup
-      .mockResolvedValueOnce(jsonResponse({id: 'dk-1', investigation_id: 'inv-1', title: 'The Bellcastle consulting fee', slides: [{heading: 'The payment', bullets: ['$2.4M paid to Bellcastle'], evidence: [{record_type: 'claim', record_id: 'claim-1'}]}], slide_count: 3, created_at: '2026-09-30T12:02:00', updated_at: '2026-09-30T12:02:00'})); // POST promote-to-deck
+      .mockResolvedValueOnce(jsonResponse({id: 'dk-1', investigation_id: 'inv-1', title: 'The Bellcastle consulting fee', slides: deckPreview, slide_count: 4, created_at: '2026-09-30T12:02:00', updated_at: '2026-09-30T12:02:00'})); // POST promote-to-deck
     vi.stubGlobal('fetch', fetchMock);
-    render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} />);
+    render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} onTraceRecord={d => traced.push(`${d.trace_record_type}:${d.record_id}`)} />);
     await screen.findByText('No AI analysis candidates yet for this investigation.');
 
     const moduleTrigger = screen.getByLabelText('Reasoning module');
@@ -281,32 +291,38 @@ describe('AiReasoningPanel', () => {
     await user.type(screen.getByLabelText('Goal'), 'Summarize the Bellcastle payment.');
 
     await user.type(screen.getByLabelText('Search records to add'), 'Bellcastle');
-    await user.click(screen.getByRole('button', {name: 'Search'}));
-    await screen.findByText('Meridian paid Bellcastle $2.4M');
-    expect(screen.getByText('(claim)')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', {name: 'Add'}));
-    await screen.findByText('Selected evidence (1) — the draft can only cite what you pick here:');
+    await user.click(within(screen.getByTestId('presentation-record-picker')).getByRole('button', {name: 'Search'}));
+    // A claim hit is labelled by its own text, not search's generic "Claim" title.
+    await user.click(await screen.findByRole('button', {name: 'Add Claim: Meridian paid Bellcastle $2.4M'}));
+    expect(screen.getByTestId('selected-count')).toHaveTextContent('Selected evidence · 1');
 
     const runButton = screen.getByRole('button', {name: 'Run module'});
     expect(runButton).not.toBeDisabled();
     await user.click(runButton);
 
-    const detail = await screen.findByTestId('ai-candidate-detail');
+    await screen.findByTestId('draft-preview');
     const runCall = fetchMock.mock.calls[2];
     expect(requestUrl(runCall)).toBe('http://api.test/api/investigations/inv-1/assistant/presentation-draft');
     expect(JSON.parse(String((runCall[1] as RequestInit).body))).toEqual({goal: 'Summarize the Bellcastle payment.', record_refs: [{record_type: 'claim', record_id: 'claim-1'}]});
-    // Raw payload JSON is also dumped in a <details><pre> below, so anything
-    // that also appears verbatim there needs getAllByText (rendered copy +
-    // JSON dump), matching this file's existing pattern for similar payloads.
-    expect(within(detail).getAllByText('The Bellcastle consulting fee').length).toBeGreaterThan(0);
-    expect(within(detail).getAllByText(/Meridian paid Bellcastle \$2.4M in November 2023\./).length).toBeGreaterThan(0);
-    expect(within(detail).getAllByText('The payment').length).toBeGreaterThan(0);
-    expect(within(detail).getAllByText(/Meridian paid Bellcastle Holdings a \$2.4M consulting fee/).length).toBeGreaterThan(0);
-    expect(within(detail).getAllByText('$2.4M paid to Bellcastle').length).toBeGreaterThan(0);
-    expect(within(detail).getByText(/Evidence: claim:claim-1/)).toBeInTheDocument();
-    expect(within(detail).getAllByText('Whether the fee was disclosed to the board.').length).toBeGreaterThan(0);
-    expect(screen.queryByTestId('promote-panel')).not.toBeInTheDocument(); // not accepted yet
 
+    // Slides: title + takeaway + 1 content + questions + sources = 5 frames.
+    expect(screen.getByTestId('slide-position')).toHaveTextContent('1 / 5');
+    await user.click(screen.getByRole('button', {name: 'Next slide'}));
+    await user.click(screen.getByRole('button', {name: 'Next slide'}));
+    const contentSlide = screen.getAllByRole('img', {name: 'Slide 3: The payment'})[0];
+    expect(within(contentSlide).getByText('$2.4M paid to Bellcastle')).toBeInTheDocument();
+    expect(within(contentSlide).getAllByText('$2.4M').length).toBeGreaterThan(0); // figure card
+    expect(screen.getByText('Speaker notes')).toBeInTheDocument();
+
+    // Sources tab: the readable label, and clicking it traces the record.
+    await user.click(screen.getByRole('tab', {name: 'Sources · 1'}));
+    const chip = await screen.findByTestId('evidence-chip');
+    expect(chip).toHaveTextContent('Meridian paid Bellcastle $2.4M');
+    expect(chip).not.toHaveTextContent('claim-1');
+    await user.click(chip);
+    expect(traced).toEqual(['claim:claim-1']);
+
+    expect(screen.queryByTestId('promote-panel')).not.toBeInTheDocument(); // not accepted yet
     await user.click(screen.getByRole('button', {name: 'Accept as trusted analysis'}));
     await waitFor(() => expect(screen.getByTestId('ai-review-status')).toHaveTextContent('Recorded: accepted.'));
 
@@ -319,7 +335,25 @@ describe('AiReasoningPanel', () => {
     expect(JSON.parse(String((writeupCall[1] as RequestInit).body))).toEqual({});
 
     await user.click(within(promotePanel).getByRole('button', {name: 'Promote to deck'}));
-    await waitFor(() => expect(within(promotePanel).getByTestId('promote-status')).toHaveTextContent('Promoted to deck "The Bellcastle consulting fee" (3 slide(s)).'));
+    await waitFor(() => expect(within(promotePanel).getByTestId('promote-status')).toHaveTextContent('Promoted to deck "The Bellcastle consulting fee" (4 slide(s)).'));
     expect(within(promotePanel).getByRole('link', {name: 'Download .pptx'})).toHaveAttribute('href', 'http://api.test/api/decks/dk-1/export.pptx');
+  });
+
+  it('lets presentation drafts run when the TAS spec is missing, and starts on that module', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(jsonResponse({candidates: []}));
+    vi.stubGlobal('fetch', fetchMock);
+    const noTas: AiReasoningStatus = {
+      ...readyStatus, endpoints_callable: false,
+      tas_spec: {present: false, version: null, modules: {
+        case_synthesis: {spec_file: 'x', available: false}, hypothesis_test: {spec_file: 'y', available: false},
+        presentation_draft: {spec_file: 'presentation_modules/PRESENTATION_DRAFT.md', available: true},
+      }},
+    };
+    render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={noTas} />);
+    await screen.findByText('No AI analysis candidates yet for this investigation.');
+    expect(screen.getByTestId('ai-status')).toHaveTextContent(/Presentation drafts do not use it and are available/);
+    expect(screen.getByLabelText('Goal')).not.toBeDisabled();
+    expect(screen.getByLabelText('Search records to add')).not.toBeDisabled();
+    expect(screen.queryByLabelText('Question')).not.toBeInTheDocument();
   });
 });

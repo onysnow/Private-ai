@@ -121,11 +121,67 @@ OUTPUT_SCHEMAS = {
                 "body": "string - full prose paragraph(s), for a written brief",
                 "key_points": ["string - the same content as body, rewritten as terse slide bullets"],
                 "evidence": [{"record_type": "string", "record_id": "string"}],
+                "visual": "null, OR exactly one of these three shapes -- use one only when the cited evidence itself states the numbers/dates (never estimate, round beyond the source, or compute values the evidence does not state):\n"
+                          "  {\"type\": \"figures\", \"items\": [{\"value\": \"string, e.g. '$2.4M'\", \"label\": \"string\", \"evidence\": [{\"record_type\": \"string\", \"record_id\": \"string\"}]}]}  (1-4 items)\n"
+                          "  {\"type\": \"timeline\", \"items\": [{\"date\": \"string, ISO date or as precise as the evidence states\", \"label\": \"string\", \"evidence\": [...]}]}  (2-8 items, chronological)\n"
+                          "  {\"type\": \"bar\", \"title\": \"string\", \"unit\": \"string, e.g. 'USD'\", \"items\": [{\"label\": \"string\", \"value\": number, \"evidence\": [...]}]}  (2-8 items, comparable quantities only)",
             }
         ],
         "open_questions": ["string - gaps in the selected evidence that limit what this draft can claim"],
     },
 }
+
+VISUAL_TYPES = {"figures": (1, 4), "timeline": (2, 8), "bar": (2, 8)}
+
+
+def _validate_presentation_visuals(payload: dict) -> list[str]:
+    """presentation_draft-specific checks beyond _REQUIRED_SHAPE: section
+    key_points/evidence types, and the optional `visual` block. Every data
+    point in a visual must cite at least one record -- a chart value with
+    no evidence behind it is exactly the kind of invented number this
+    module must never produce (the cited refs themselves are then checked
+    against the packet by validate_citations, like every other ref)."""
+    errors: list[str] = []
+    for i, section in enumerate(payload.get("sections") or []):
+        if not isinstance(section, dict):
+            continue
+        if "key_points" in section and not (isinstance(section["key_points"], list) and all(isinstance(k, str) for k in section["key_points"])):
+            errors.append(f"sections[{i}].key_points must be a list of strings")
+        if "evidence" in section and not isinstance(section["evidence"], list):
+            errors.append(f"sections[{i}].evidence must be a list")
+        visual = section.get("visual")
+        if visual is None:
+            continue
+        where = f"sections[{i}].visual"
+        if not isinstance(visual, dict):
+            errors.append(f"{where} must be an object or null")
+            continue
+        kind = visual.get("type")
+        if kind not in VISUAL_TYPES:
+            errors.append(f"{where}.type must be one of {sorted(VISUAL_TYPES)}")
+            continue
+        items = visual.get("items")
+        low, high = VISUAL_TYPES[kind]
+        if not isinstance(items, list) or not (low <= len(items) <= high):
+            errors.append(f"{where}.items must be a list of {low}-{high} items for type {kind!r}")
+            continue
+        for j, item in enumerate(items):
+            at = f"{where}.items[{j}]"
+            if not isinstance(item, dict):
+                errors.append(f"{at} must be an object")
+                continue
+            if not isinstance(item.get("label"), str) or not item["label"].strip():
+                errors.append(f"{at}.label must be a non-empty string")
+            if kind == "figures" and not isinstance(item.get("value"), str):
+                errors.append(f"{at}.value must be a string")
+            if kind == "timeline" and not isinstance(item.get("date"), str):
+                errors.append(f"{at}.date must be a string")
+            if kind == "bar" and (isinstance(item.get("value"), bool) or not isinstance(item.get("value"), (int, float))):
+                errors.append(f"{at}.value must be a number")
+            evidence = item.get("evidence")
+            if not isinstance(evidence, list) or not evidence:
+                errors.append(f"{at}.evidence must cite at least one record")
+    return errors
 
 
 # TAS v1.9 CORE/CONTROL_SURFACE.md §4 defines five session flags. Only the two
@@ -292,6 +348,8 @@ def validate_output_shape(module: str, payload: dict) -> list[str]:
                         errors.append(f"{key}[{i}].{req_key} must be a {req_type.__name__}")
         elif not isinstance(value, expected):
             errors.append(f"field {key!r} must be a {expected.__name__}")
+    if module == "presentation_draft" and not errors:
+        errors.extend(_validate_presentation_visuals(payload))
     return errors
 
 

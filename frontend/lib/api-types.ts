@@ -101,14 +101,23 @@ export type AiAnalysisRequest={question?:string|null,working_theory?:string|null
 export type AiCitationRef={record_type:string,record_id:string};
 // A presentation_draft candidate's payload (app/ai/presentation_modules/PRESENTATION_DRAFT.md):
 // the same draft rendered two ways -- `body` for a written brief, `key_points` for a slide.
-export type PresentationSection={heading:string,body:string,key_points:string[],evidence:AiCitationRef[]};
+// A section's optional visual (backend app/ai/reasoning.py VISUAL_TYPES): every data point cites its own records.
+export type FigureItem={value:string,label:string,evidence:AiCitationRef[]};
+export type TimelineItem={date:string,label:string,evidence:AiCitationRef[]};
+export type BarItem={value:number,label:string,evidence:AiCitationRef[]};
+export type PresentationVisual={type:'figures',items:FigureItem[]}|{type:'timeline',items:TimelineItem[]}|{type:'bar',title?:string,unit?:string,items:BarItem[]};
+export type PresentationSection={heading:string,body:string,key_points:string[],evidence:AiCitationRef[],visual?:PresentationVisual|null};
 export type PresentationDraftPayload={title:string,goal_restated:string,executive_takeaway:string,sections:PresentationSection[],open_questions:string[]};
+// Readable details for a cited record (backend describe_record_refs) -- what the
+// review panel shows instead of a UUID, and what an evidence chip traces.
+export type CitationDetail={record_type:string,record_id:string,trace_record_type:string,type_label:string,label:string,quote:string|null,locator:string|null,source_title:string|null,source_url:string|null,detail:string|null,missing:boolean};
 // Promotion targets for an accepted presentation_draft candidate (app/services/presentation.py).
 export type Writeup={id:string,investigation_id:string,title:string,status:string,cited_record_refs:AiCitationRef[],content_json?:JsonObject,preview?:string,source_ai_candidate_id?:string|null,created_by?:string|null,created_at:string,updated_at:string,word_count:number};
-export type DeckSlide={heading:string,bullets:string[],evidence:AiCitationRef[]};
+export type DeckSlideKind='title'|'statement'|'content'|'questions';
+export type DeckSlide={heading:string,bullets:string[],evidence:AiCitationRef[],kind?:DeckSlideKind,notes?:string,visual?:PresentationVisual|null};
 export type Deck={id:string,investigation_id:string,title:string,slides:DeckSlide[],slide_count:number,source_ai_candidate_id?:string|null,created_by?:string|null,created_at:string,updated_at:string};
 export type AiAnalysisCandidateSummary={id:string,investigation_id:string,module:AiModuleName|string,request:AiAnalysisRequest,review_status:AiReviewStatus|string,confidence:number,reviewer_note:string|null,accepted_record_type:string|null,accepted_record_id:string|null,created_at:string,reviewed_at:string|null,checked_citation_count:number};
-export type AiAnalysisCandidate=AiAnalysisCandidateSummary&{payload:JsonObject,checked_citation_ids:AiCitationRef[],trace?:JsonObject|null};
+export type AiAnalysisCandidate=AiAnalysisCandidateSummary&{payload:JsonObject,checked_citation_ids:AiCitationRef[],trace?:JsonObject|null,citation_details?:CitationDetail[],deck_preview?:DeckSlide[]};
 export type AiReasoningRunResult={candidate_id:string,review_status:AiReviewStatus|string,payload:JsonObject};
 export type AiAnalysisCandidateReview={id:string,module:string,review_status:AiReviewStatus|string,reviewer_note:string|null,reviewed_at:string|null};
 export type SecurityAlerts={window_hours:number,since:string,total_denials:number,by_event:Record<string,number>,remote_hosts:{client_host:string,count:number}[],recent:JsonObject[],attention_threshold:number,needs_attention:boolean,records_scanned:number,malformed_lines:number,read_error:boolean};

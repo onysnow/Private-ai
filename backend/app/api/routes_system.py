@@ -34,7 +34,8 @@ from app.ai.reasoning import review_ai_analysis_candidate, serialize_ai_analysis
 from app.services.decks import serialize_deck
 from app.services.evidence import create_evidence
 from app.services.openaleph import probe_openaleph
-from app.services.presentation import promote_candidate_to_deck, promote_candidate_to_writeup
+from app.services.assistant_context import describe_record_refs
+from app.services.presentation import PROMOTABLE_MODULE, deck_slides_from_payload, payload_citation_refs, promote_candidate_to_deck, promote_candidate_to_writeup
 from app.services.promotion import promote_assessment
 from app.services.relationships import RELATIONSHIP_SCHEMAS
 from app.services.search import investigation_search
@@ -128,7 +129,14 @@ def get_ai_analysis_candidate_endpoint(candidate_id: str, db: Session = Depends(
     row = db.get(AIAnalysisCandidate, candidate_id)
     if row is None:
         raise HTTPException(404, "AI analysis candidate not found")
-    return serialize_ai_analysis_candidate(row)
+    data = serialize_ai_analysis_candidate(row)
+    if row.module == PROMOTABLE_MODULE:
+        # Readable labels for every ref the draft cites, so the review panel
+        # can show "Ex. 14, p. 3" + the quote instead of a UUID.
+        data["citation_details"] = describe_record_refs(db, investigation_id=row.investigation_id, refs=payload_citation_refs(row.payload))
+        # The exact slides a promotion would create, for the panel's preview.
+        data["deck_preview"] = deck_slides_from_payload(row.payload or {})
+    return data
 
 
 @router.post("/ai-analysis-candidates/{candidate_id}/review", response_model=None)

@@ -12,7 +12,8 @@ from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
 from app.models.domain import Deck, Investigation
 from app.schemas.api import DeckUpdate
-from app.services.decks import delete_deck, list_decks, render_deck_pptx, serialize_deck, update_deck
+from app.services.assistant_context import describe_record_refs
+from app.services.decks import deck_citation_refs, delete_deck, list_decks, render_deck_pptx, serialize_deck, update_deck
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
@@ -55,7 +56,8 @@ def export_deck_pptx(deck_id: str, db: Session = Depends(get_db)):
     row = db.get(Deck, deck_id)
     if row is None:
         raise HTTPException(404, "Deck not found")
-    prs = render_deck_pptx(row)
+    details = describe_record_refs(db, investigation_id=row.investigation_id, refs=deck_citation_refs(row.slides_json or []))
+    prs = render_deck_pptx(row, details)
     buf = BytesIO()
     prs.save(buf)
     buf.seek(0)
