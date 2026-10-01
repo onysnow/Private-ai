@@ -33,7 +33,7 @@ from app.db.session import get_db
 from app.models.domain import Investigation
 from app.schemas.api import (
     CaseSynthesisRequest, HypothesisTestRequest, InvestigationCreate,
-    InvestigationQuestionContextRequest,
+    InvestigationQuestionContextRequest, PresentationDraftRequest,
 )
 from app.services.assistant_context import build_question_context
 from app.services.exports import build_investigation_export
@@ -123,14 +123,14 @@ def investigation_question_context(
         raise HTTPException(404, str(exc))
 
 
-def _run_reasoning_endpoint(db: Session, *, investigation_id: str, module: str, question: str, max_results: int, include_external_leads: bool, working_theory: str | None = None, control_flags: dict | None = None) -> dict[str, Any]:
+def _run_reasoning_endpoint(db: Session, *, investigation_id: str, module: str, question: str, max_results: int = 30, include_external_leads: bool = True, working_theory: str | None = None, control_flags: dict | None = None, record_refs: list[dict] | None = None) -> dict[str, Any]:
     if not settings.enable_ai_features or not (settings.ai_provider or "").strip():
         raise HTTPException(400, "AI reasoning endpoints are not enabled on this deployment (enable_ai_features and ai_provider must both be set)")
     try:
         candidate = run_reasoning_module(
             db, investigation_id=investigation_id, module=module, question=question,
             working_theory=working_theory, max_results=max_results, include_external_leads=include_external_leads,
-            control_flags=control_flags,
+            control_flags=control_flags, record_refs=record_refs,
         )
         return {"candidate_id": candidate.id, "review_status": candidate.review_status, "payload": candidate.payload}
     except ReasoningInputError as exc:
@@ -182,6 +182,25 @@ def investigation_hypothesis_test(
         max_results=body.max_results, include_external_leads=body.include_external_leads,
         working_theory=body.working_theory,
         control_flags={"severity_floor": body.severity_floor, "source_tier_floor": body.source_tier_floor},
+    )
+
+
+@router.post("/investigations/{investigation_id}/assistant/presentation-draft", response_model=None)
+def investigation_presentation_draft(
+    investigation_id: str, body: PresentationDraftRequest, db: Session = Depends(get_db),
+) -> Any:
+    """Draft a brief/deck from a reporter-selected evidence set and a goal.
+
+    App-local reasoning module (not vendored TAS -- see
+    app/ai/presentation_modules/PRESENTATION_DRAFT.md), reusing the same
+    citation-validated LLM pipeline and non-canonical-write guarantee as
+    /assistant/case-synthesis and /assistant/hypothesis-test above: the
+    result is a review_status="proposed" AIAnalysisCandidate, promoted to
+    a Writeup and/or Deck only by a separate, human action.
+    """
+    return _run_reasoning_endpoint(
+        db, investigation_id=investigation_id, module="presentation_draft", question=body.goal,
+        record_refs=[ref.model_dump() for ref in body.record_refs],
     )
 
 

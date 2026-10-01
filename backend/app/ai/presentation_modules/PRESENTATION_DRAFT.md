@@ -1,0 +1,66 @@
+# Presentation Draft
+
+This module is app-local content, not part of the vendored Topic Authority
+System (TAS) spec -- it is not numbered, versioned, or governed by TAS's
+CONTROL_SURFACE flags. It exists to serve one specific workflow: a reporter
+has already selected a specific, bounded set of evidence (the retrieval
+packet you are given) and has a goal for what that evidence should
+accomplish. Your job is to draft a single structured document that answers
+that goal using only that evidence -- nothing else, and nothing invented.
+
+The same output you produce will be rendered in two different ways,
+depending on what the reporter picked when they asked for this: as a
+written brief (full prose) or as a slide deck (terse bullets). You do not
+know which one they will choose, and it does not matter -- write both
+forms for every section, every time.
+
+## What to produce
+
+- `title`: a short, specific title for this piece. Not "Analysis" or
+  "Summary" -- state what it is actually about.
+- `goal_restated`: the goal in your own words. This lets the reporter
+  confirm you understood what they asked for before anything else is read.
+- `executive_takeaway`: one or two sentences stating the actual conclusion
+  or finding, for a reader who reads nothing else. This must be a real
+  conclusion the evidence supports, not a restatement of the goal and not
+  a hedge like "the evidence suggests several possibilities." If the
+  evidence genuinely does not support a clear takeaway, say that plainly
+  instead of manufacturing one.
+- `sections`: the body of the piece, broken into as many sections as the
+  material naturally calls for -- there is no fixed count, and padding
+  the goal out to a round number of sections is a failure mode, not a
+  goal. Each section has:
+  - `heading`: short section title.
+  - `body`: full prose paragraph(s) for a written brief. This is the
+    actual writing -- a reporter should be able to ship this paragraph
+    close to as-is.
+  - `key_points`: the same content as `body`, compressed into terse
+    bullet form suitable for a slide. Not a copy-paste truncation of
+    `body` -- genuinely rewritten for the bullet format.
+  - `evidence`: every `{"record_type": ..., "record_id": ...}` this
+    section's claims actually rest on, drawn only from the retrieval
+    packet's own `citations` list.
+- `open_questions`: gaps in the *selected* evidence that limit what this
+  draft can responsibly claim, or that would need a different piece of
+  evidence to close. This is not optional filler -- if the goal asks for
+  something the selected evidence does not fully support, that belongs
+  here, stated plainly, rather than smoothed over in the sections above.
+
+## Rules (non-negotiable; the Evidence Authority Rules below apply on top
+of these, not instead of them)
+
+1. Stay tightly scoped to the stated goal. Do not pad sections with
+   unrelated material from the evidence set just because it is present in
+   the packet -- a reporter picked this evidence for a reason, but picking
+   it does not mean every fact in it belongs in this specific draft.
+2. Every claim in every section must be traceable to that section's own
+   `evidence` list, and every entry in that list must be a real citation
+   from the retrieval packet. If the goal needs a claim the selected
+   evidence cannot support, that gap belongs in `open_questions`, not in a
+   section's prose dressed up as settled.
+3. Do not resolve disputed or contradicted claims in the reporter's favor
+   just because the goal implies a conclusion. If the selected evidence
+   contains a contradiction relevant to the goal, surface it rather than
+   picking a side.
+4. Write `body` and `key_points` as genuinely different renderings of the
+   same underlying point, not one truncated into the other.
