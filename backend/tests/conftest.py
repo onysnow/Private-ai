@@ -29,9 +29,20 @@ already constructs, not a fresh hardcoded engine: several test files call
 binding, which a fixture that swapped in a different engine object would
 silently fail to isolate.
 """
-import pytest
+import os
 
-from app.db.session import Base, engine
+# Background jobs run in-process for the suite on either database, so an
+# upload answers with the read document as tests expect; the Procrastinate
+# path has its own tests (test_background_jobs_procrastinate.py). Must be set
+# before app.core.config builds its settings.
+os.environ.setdefault("JOB_RUNNER", "inline")
+# Read documents in the test process so tests can substitute the reader;
+# test_document_reader.py covers the separate reader process.
+os.environ.setdefault("DOCUMENT_READ_IN_SUBPROCESS", "false")
+
+import pytest  # noqa: E402
+
+from app.db.session import Base, engine  # noqa: E402
 
 
 @pytest.fixture(autouse=True)

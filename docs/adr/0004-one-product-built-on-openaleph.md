@@ -74,10 +74,11 @@ character positions; or OpenAleph's project slows or changes licence.
 
 - [ ] Measure the full stack on a typical reporter laptop (memory, start-up, idle CPU)
 - [x] Clear the CI type errors; add `tools/check_all.py` and a pre-commit hook
-- [ ] Next.js static export served by the API at port 8000; retire `static/index.html`
-- [ ] Launcher starts the Docker stack
+- [x] Next.js static export served by the API at port 8000; retire `static/index.html`
+- [x] Launcher starts the Docker stack
 - [ ] Run the OpenAleph document path live end to end and add it to CI
-- [ ] Upload hands documents to OpenAleph and returns at once; Workbench jobs on Procrastinate
+- [x] Upload returns at once; Workbench jobs on Procrastinate (`app/jobs`)
+- [ ] Upload hands documents to OpenAleph first
 - [ ] Own parser and pattern name-finder become an OpenAleph-down fallback
 - [ ] Ollama adapter and quote check
 - [ ] Response models, generated client, panel split

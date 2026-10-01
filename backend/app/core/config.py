@@ -71,6 +71,13 @@ class Settings(BaseSettings):
     # means <repo>/frontend/out (a local `npm run build`); Docker images set
     # FRONTEND_DIST_DIR=/srv/frontend (backend/Dockerfile).
     frontend_dist_dir: str = ""
+    # Background jobs (app/jobs/runner.py): auto | inline | procrastinate.
+    # auto = Procrastinate on PostgreSQL, in-process on SQLite.
+    job_runner: str = "auto"
+    job_worker_concurrency: int = 2
+    # Read documents (OCR) in a separate process so the API keeps answering
+    # (app/services/document_reader.py).
+    document_read_in_subprocess: bool = True
     app_log_file: str = "./data/logs/app.jsonl"
     console_dir: str = "./data/console"   # test-run logs and the isolated test database
     # What the console may change: disabled | changesets | changesets_and_sql (ADR-0003).

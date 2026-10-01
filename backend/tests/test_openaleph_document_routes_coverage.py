@@ -15,6 +15,8 @@ looked up from their own namespace, so patching the service module itself
 would not be observed here), since exercising every real OpenAleph
 client/HTTP interaction is already the service-level suite's job.
 """
+from types import SimpleNamespace
+
 from fastapi.testclient import TestClient
 
 from app.db.session import Base, SessionLocal, engine
@@ -193,7 +195,7 @@ def test_upload_400_for_empty_file():
 
 
 def test_upload_reraises_non_investigation_value_error(monkeypatch):
-    """The one ValueError message ingest_document can raise that isn't
+    """The one ValueError message store_document can raise that isn't
     "Investigation not found" (e.g. a storage-path safety violation) is
     deliberately re-raised rather than swallowed as a 404 -- it should
     surface as an unhandled 500, not a misleading 404.
@@ -203,7 +205,7 @@ def test_upload_reraises_non_investigation_value_error(monkeypatch):
     def _boom(db, **kwargs):
         raise ValueError('Refusing to write outside the storage root')
 
-    monkeypatch.setattr('app.api.routes_documents.ingest_document', _boom)
+    monkeypatch.setattr('app.api.routes_documents.store_document', _boom)
     with TestClient(app, raise_server_exceptions=False) as raw_client:
         r = raw_client.post(
             '/api/documents/upload',
@@ -218,7 +220,10 @@ def test_upload_auto_syncs_to_openaleph_when_enabled(monkeypatch):
     monkeypatch.setattr('app.api.routes_documents.settings.openaleph_enabled', True)
     monkeypatch.setattr('app.api.routes_documents.settings.openaleph_auto_sync_documents', True)
     canned = {'status': 'synced', 'auto': True}
-    monkeypatch.setattr('app.api.routes_documents.sync_document_to_openaleph', lambda db, document_id: object())
+    # The upload's background job (app/jobs/handlers.py) does the sync.
+    synced = []
+    monkeypatch.setattr('app.services.openaleph_corpus.sync_document_to_openaleph',
+                        lambda db, document_id: synced.append(document_id) or SimpleNamespace(status='synced', error=None))
     monkeypatch.setattr('app.api.routes_documents.serialize_sync', lambda row: canned)
 
     r = client.post(
@@ -228,23 +233,18 @@ def test_upload_auto_syncs_to_openaleph_when_enabled(monkeypatch):
     )
     assert r.status_code == 200, r.text
     assert r.json()['openaleph_sync'] == canned
+    assert synced == [r.json()['id']]
+    assert r.json()['job']['status'] == 'succeeded'
+    assert r.json()['job']['message'] == 'Document read and sent to OpenAleph'
 
 
 def test_upload_422_when_extraction_fails(monkeypatch):
     inv = _new_investigation('OpenAleph route coverage: upload extraction fails')
 
-    def _fake_ingest_document(db, *, investigation_id, title, filename, mime_type, data, storage_dir):
-        source = Source(investigation_id=investigation_id, title=title, source_type='document', metadata_json={})
-        db.add(source); db.flush()
-        doc = Document(
-            investigation_id=investigation_id, source_id=source.id, filename=filename, mime_type=mime_type,
-            sha256='deadbeef' * 8, storage_path='/tmp/does-not-matter', extraction_status='failed',
-            extraction_error='simulated extraction failure',
-        )
-        db.add(doc); db.commit(); db.refresh(doc)
-        return doc
+    def _fail(path):
+        raise RuntimeError('simulated extraction failure')
 
-    monkeypatch.setattr('app.api.routes_documents.ingest_document', _fake_ingest_document)
+    monkeypatch.setattr('app.services.documents.extract_chunks', _fail)
     r = client.post(
         '/api/documents/upload',
         data={'investigation_id': inv, 'title': 'x'},
@@ -252,6 +252,8 @@ def test_upload_422_when_extraction_fails(monkeypatch):
     )
     assert r.status_code == 422, r.text
     assert r.json()['detail']['error'] == 'simulated extraction failure'
+    assert r.json()['detail']['job']['status'] == 'failed'
+    assert r.json()['detail']['job']['error'] == 'simulated extraction failure'
 
 
 # --- get_document / list_document_candidates_endpoint: 404 branches ---

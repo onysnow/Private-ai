@@ -29,6 +29,7 @@ from app.api.routes_settings import router as settings_router
 from app.api.routes_entities import router as entities_router
 from app.api.routes_writeups import router as writeups_router
 from app.api.routes_decks import router as decks_router
+from app.api.routes_jobs import router as jobs_router
 from app.core.config import Settings, settings as default_settings
 from app.core.access import bearer_token, enforce_api_access, enforce_browser_write_access, request_is_local_request
 from app.core.authorization import (
@@ -42,6 +43,7 @@ from app.core.audit_log import SecurityAuditLogger, new_request_id, should_audit
 from app.core.app_log import configure_app_logging, current_request_id
 from app.console_adapters import build_console_config
 from app.web.frontend import mount_frontend
+from app.jobs.runner import JobRunner, resolve_runner
 from opsconsole import mount as mount_console
 
 
@@ -74,6 +76,7 @@ def register_domain_routers(app: FastAPI) -> None:
     app.include_router(entities_router)
     app.include_router(writeups_router)
     app.include_router(decks_router)
+    app.include_router(jobs_router)
 
 
 def create_app(
@@ -115,11 +118,20 @@ def create_app(
     app_engine: Engine = engine if engine is not None else (build_engine(database_url) if database_url else default_engine)
     session_factory = build_session_factory(app_engine) if app_engine is not default_engine else SessionLocal
 
+    jobs = JobRunner(
+        resolve_runner(app_settings.job_runner, app_engine), session_factory, app_engine,
+        concurrency=app_settings.job_worker_concurrency,
+    )
+
     @asynccontextmanager
     async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
         if bootstrap_schema:
             ensure_database_schema(app_engine)
-        yield
+        await jobs.start()
+        try:
+            yield
+        finally:
+            await jobs.stop()
         console = getattr(_app.state, "opsconsole", None)
         if console is not None:
             console.shutdown()
@@ -141,6 +153,7 @@ def create_app(
         return JSONResponse(status_code=500, content={"detail": f"Internal server error (request {request_id})"}, headers={"X-Request-ID": request_id})
     app.state.engine = app_engine
     app.state.session_factory = session_factory
+    app.state.jobs = jobs
     if app_engine is not default_engine:
         def _app_get_db() -> Iterator[Session]:
             db = session_factory()

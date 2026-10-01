@@ -81,6 +81,11 @@ the screen it builds, because browser calls reach the containerized API through
 Docker's port publishing rather than loopback. Override `API_AUTH_TOKEN` in your
 shell or `.env` if you want a different local token.
 
+Uploading a document saves it and answers at once; reading it (and OCR for
+scans) runs as a background job on the Procrastinate queue inside the API, and
+the screen shows its progress. A read that fails can be retried from the
+document's **Retry reading** button. `GET /api/jobs` lists jobs.
+
 Elasticsearch wants about 1 GB of heap (`OPENALEPH_ES_JAVA_OPTS`). This repo has
 one git submodule ([`topic-authority-system`](https://github.com/onysnow/topic-authority-system)
 at `backend/app/ai/tas_spec/`); run `git submodule update --init --recursive` after
@@ -92,7 +97,9 @@ cloning for full development.
 OpenAleph: a reduced mode for development, not the product. It creates a private
 `.venv` (Python 3.12, installed via `winget` if missing), installs pinned
 dependencies, builds the screen into `frontend/out` if Node.js is installed, and
-opens `http://127.0.0.1:8000`. If setup fails, check
+opens `http://127.0.0.1:8000`. On SQLite there is no job queue: an upload is
+read before it answers, off the server's main loop so other requests still
+get through. If setup fails, check
 `journalism-workbench-setup.log` and run **`Repair developer setup (no Docker).bat`**.
 
 For front-end work, `cd frontend && npm run dev` serves the screen with hot reload

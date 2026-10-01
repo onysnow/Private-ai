@@ -79,7 +79,7 @@ def test_restore_order_covers_every_investigation_owned_table():
         if any(fk.column.table.name == "investigations" for fk in table.foreign_keys)
     }
     # Tables that are deliberately not portable (per-deployment state, not investigation content).
-    non_portable = {"investigation_memberships", "openaleph_operation_failures"}
+    non_portable = {"investigation_memberships", "openaleph_operation_failures", "background_jobs"}
     missing = owned - set(RESTORE_ORDER) - non_portable
     assert not missing, f"investigation-owned tables absent from RESTORE_ORDER: {sorted(missing)}"
     assert "ai_analysis_candidates" in RESTORE_ORDER

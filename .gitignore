@@ -36,3 +36,6 @@ SNAPSHOT_MANIFEST.json
 *.log
 .DS_Store
 Thumbs.db
+# Per-process coverage files (pytest-cov in reader subprocesses)
+.coverage.*
+backend/.coverage.*

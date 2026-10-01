@@ -76,6 +76,9 @@ from app.models.identity import (
     AppUser,
     InvestigationMembership,
 )
+from app.models.jobs import (
+    BackgroundJob,
+)
 
 __all__ = [
     "uid",
@@ -123,4 +126,5 @@ __all__ = [
     "Deck",
     "AppUser",
     "InvestigationMembership",
+    "BackgroundJob",
 ]

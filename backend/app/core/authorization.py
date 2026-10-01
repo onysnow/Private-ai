@@ -161,6 +161,7 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
     # Lazy import keeps authorization infrastructure independent from ORM import order.
     from app.models.domain import (
         AIAnalysisCandidate,
+        BackgroundJob,
         Claim,
         ConnectorFinding,
         Document,
@@ -186,6 +187,7 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         "review_id": (ExternalRelationshipReview, "investigation_id"),
         "session_id": (EnrichmentSession, "investigation_id"),
         "document_id": (Document, "investigation_id"),
+        "job_id": (BackgroundJob, "investigation_id"),
     }
     if key in direct:
         model, attr = direct[key]

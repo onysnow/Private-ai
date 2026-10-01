@@ -2,22 +2,29 @@
 group 5). OpenAleph-corpus sync/review endpoints already delegated
 fully to app/services/openaleph_corpus.py. Detail/candidates queries
 moved into app/services/documents.py (get_document_detail,
-list_document_candidates) alongside ingest_document/serialize_document.
+list_document_candidates) alongside store_document/serialize_document.
+Reading an upload runs as a background job (app/jobs, ADR-0004).
 
 GET /investigations/{investigation_id}/documents stays in routes.py:
 its URL prefix is /investigations, so it belongs with group 8.
 """
 from typing import Any
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
+import logging
+
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, Response, UploadFile
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
+from starlette.concurrency import run_in_threadpool
 
 from app.api.dependencies import authorize_request_resource, read_upload_limited
 from app.core.config import settings
 from app.db.session import get_db
-from app.models.domain import Document, Investigation
+from app.jobs.handlers import EXTRACT_DOCUMENT
+from app.jobs.records import create_job, serialize_job
+from app.jobs.runner import job_runner
+from app.models.domain import BackgroundJob, Document, Investigation
 from app.services.documents import (
-    get_document_detail, ingest_document, list_document_candidates, serialize_document,
+    get_document_detail, list_document_candidates, serialize_document, store_document,
 )
 from app.services.extraction_explanations import explain_extraction_candidate, serialize_candidate
 from app.services.openaleph_corpus import (
@@ -28,6 +35,7 @@ from app.services.openaleph_corpus import (
 from app.services.security import resolve_storage_root
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
+logger = logging.getLogger("journalism.jobs")
 
 
 @router.get("/documents/{document_id}/corpus/openaleph", response_model=None)
@@ -119,18 +127,28 @@ def import_openaleph_document_entities(document_id: str, request: Request, db: S
 
 @router.post("/documents/upload", response_model=None)
 async def upload_document(
+    request: Request,
+    response: Response,
     investigation_id: str = Form(...),
     title: str = Form(""),
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
 ) -> Any:
+    """Save the file, then read it as a background job.
+
+    On PostgreSQL (the product) this answers 202 as soon as the file is saved:
+    the document is ``queued`` and ``job`` says how to follow it
+    (GET /api/jobs/{id}). In developer mode (SQLite) the job runs before the
+    reply, off the event loop, so the answer is the read document as before.
+    """
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     data = await read_upload_limited(file, settings.max_document_bytes)
     if not data:
         raise HTTPException(400, "Document is empty")
     try:
-        doc = ingest_document(
+        doc = await run_in_threadpool(
+            store_document,
             db, investigation_id=investigation_id, title=title or file.filename or "Document",
             filename=file.filename or "document", mime_type=file.content_type, data=data,
             storage_dir=resolve_storage_root(settings.document_storage_dir),
@@ -139,18 +157,39 @@ async def upload_document(
         if str(exc) == "Investigation not found":
             raise HTTPException(404, str(exc))
         raise
+    runner = job_runner(request)
+    job = create_job(
+        db, kind=EXTRACT_DOCUMENT, investigation_id=doc.investigation_id,
+        subject_type="document", subject_id=doc.id, runner=runner.mode,
+    )
+    try:
+        await runner.submit(job, db)
+    except Exception as exc:
+        # The file is saved; record why reading it could not start so the
+        # reporter can retry from the screen instead of re-uploading.
+        logger.error("could not queue document job", exc_info=(type(exc), exc, exc.__traceback__),
+                     extra={"job_id": job.id})
+        db.rollback()
+        row = db.get(BackgroundJob, job.id)
+        if row is not None:
+            row.status, row.error, row.message = "failed", f"Could not queue the job: {type(exc).__name__}", "Not started"
+            db.commit()
+    db.expire_all()
+    doc = db.get(Document, doc.id) or doc
+    job_row = db.get(BackgroundJob, job.id)
+    job_out = serialize_job(job_row) if job_row is not None else None
     if doc.extraction_status == "failed":
         raise HTTPException(422, jsonable_encoder({
                 "message": "Document saved but extraction failed",
                 "document": serialize_document(db, doc),
                 "error": doc.extraction_error,
+                "job": job_out,
             }))
     result = serialize_document(db, doc)
-    if settings.openaleph_enabled and settings.openaleph_auto_sync_documents:
-        sync_row = sync_document_to_openaleph(db, doc.id)
-        result["openaleph_sync"] = serialize_sync(sync_row)
-    else:
-        result["openaleph_sync"] = serialize_sync(get_document_sync(db, doc.id))
+    result["job"] = job_out
+    result["openaleph_sync"] = serialize_sync(get_document_sync(db, doc.id))
+    if job_out is None or not job_out["finished"]:
+        response.status_code = 202
     return result
 
 

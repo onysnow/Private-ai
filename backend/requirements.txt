@@ -13,3 +13,7 @@ alembic==1.20.0
 PyMuPDF==1.28.2
 Pillow==12.3.0
 openaleph-client==1.1.4
+# Background job queue on PostgreSQL (ADR-0004). Its schema is vendored in
+# alembic/sql/; upgrading this pin needs a migration that runs procrastinate's
+# own migration files for the versions in between.
+procrastinate==3.10.0

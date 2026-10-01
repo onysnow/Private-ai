@@ -144,7 +144,7 @@ function bootstrapCalls(documents: unknown[] = []) {
   ];
 }
 
-async function bootstrapWithOneDocument(): Promise<{
+async function bootstrapWithOneDocument(document: Record<string, unknown> = docFixture()): Promise<{
   fetchMock: ReturnType<typeof vi.fn>;
 }> {
   const fetchMock = vi
@@ -152,14 +152,14 @@ async function bootstrapWithOneDocument(): Promise<{
     .mockResolvedValueOnce(jsonResponse(validSettingsStatus)) // GET settings/status
     .mockResolvedValueOnce(jsonResponse([investigation])) // GET investigations
     .mockResolvedValueOnce(jsonResponse({providers: ['aleph']})); // GET connectors
-  for (const response of bootstrapCalls([docFixture()])) {
+  for (const response of bootstrapCalls([document])) {
     fetchMock.mockResolvedValueOnce(response);
   }
   vi.stubGlobal('fetch', fetchMock);
 
   const Home = await importHome();
   render(<Home />);
-  await screen.findByText('board-minutes.pdf');
+  await screen.findByText(String(document.filename));
   return {fetchMock};
 }
 
@@ -265,6 +265,63 @@ describe('Home document ingestion & extraction', () => {
     expect(screen.getByText('OpenAleph returned this name as a mention.')).toBeInTheDocument();
     const [url] = fetchMock.mock.calls[13];
     expect(String(url)).toContain('/api/documents/doc-1/candidates?status=proposed&explain=true');
+  });
+});
+
+function jobFixture(overrides: Record<string, unknown> = {}) {
+  return {
+    id: 'job-1', kind: 'extract_document', investigation_id: 'inv-1', subject_type: 'document', subject_id: 'doc-2',
+    status: 'queued', finished: false, progress: null, message: 'Waiting to start', error: null, attempts: 0,
+    runner: 'procrastinate', ...overrides,
+  };
+}
+
+describe('Home document reading runs as a background job (ADR-0004)', () => {
+  it('follows a queued read until it finishes, then loads the proposals', async () => {
+    const {fetchMock} = await bootstrapWithOneDocument();
+    const queued = docFixture({id: 'doc-2', filename: 'scan.pdf', extraction_status: 'queued', chunk_count: 0, candidate_counts: {}, job: jobFixture()});
+    const read = docFixture({id: 'doc-2', filename: 'scan.pdf', extraction_status: 'complete', chunk_count: 3, candidate_counts: {entity: 1}});
+
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse(queued, 202)) // POST /api/documents/upload
+      .mockResolvedValueOnce(jsonResponse([docFixture(), queued])) // GET documents (shows it as queued)
+      .mockResolvedValueOnce(jsonResponse(jobFixture({status: 'running', progress: 5, message: 'Reading the document'}))) // GET job
+      .mockResolvedValueOnce(jsonResponse(jobFixture({status: 'succeeded', finished: true, progress: 100, message: 'Document read', attempts: 1}))) // GET job
+      .mockResolvedValueOnce(jsonResponse(read)) // GET /api/documents/doc-2
+      .mockResolvedValueOnce(jsonResponse([docFixture(), read])) // GET documents reload
+      .mockResolvedValueOnce(jsonResponse([candidateFixture({id: 'cand-2'})])); // GET candidates
+
+    const user = userEvent.setup();
+    await user.upload(fileInput(), new File(['pdf-bytes'], 'scan.pdf', {type: 'application/pdf'}));
+    await user.click(screen.getByRole('button', {name: 'Upload & extract'}));
+
+    await screen.findByText('Saved. Reading the document: Reading the document (5%)');
+    await screen.findByText('Kestrelwood Holdings Ltd', {}, {timeout: 4000});
+    const urls = fetchMock.mock.calls.slice(13).map(([url]) => String(url));
+    expect(urls[2]).toContain('/api/jobs/job-1');
+    expect(urls[3]).toContain('/api/jobs/job-1');
+    expect(urls[4]).toContain('/api/documents/doc-2');
+    expect(urls[6]).toContain('/api/documents/doc-2/candidates');
+  });
+
+  it('says when reading failed and retries it from the document row', async () => {
+    const failedDoc = docFixture({id: 'doc-9', filename: 'broken.pdf', extraction_status: 'failed', chunk_count: 0, candidate_counts: {}});
+    const {fetchMock} = await bootstrapWithOneDocument(failedDoc);
+    const failedJob = jobFixture({id: 'job-9', subject_id: 'doc-9', status: 'failed', finished: true, error: 'scan unreadable', attempts: 1});
+
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse([failedJob])) // GET /api/jobs?subject_id=doc-9
+      .mockResolvedValueOnce(jsonResponse(jobFixture({id: 'job-9', subject_id: 'doc-9', status: 'succeeded', finished: true, message: 'Document read', attempts: 2}))) // POST retry
+      .mockResolvedValueOnce(jsonResponse([docFixture({id: 'doc-9', filename: 'broken.pdf', extraction_status: 'complete'})])); // GET documents reload
+
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Retry reading'}));
+    await screen.findByText('broken.pdf: Document read');
+    expect(screen.queryByRole('button', {name: 'Retry reading'})).not.toBeInTheDocument();
+    const [listUrl] = fetchMock.mock.calls[13];
+    expect(String(listUrl)).toContain('/api/jobs?subject_id=doc-9');
+    const [retryUrl, retryInit] = fetchMock.mock.calls[14];
+    expect(String(retryUrl)).toContain('/api/jobs/job-9/retry');
+    expect((retryInit as RequestInit).method).toBe('POST');
   });
 });
 

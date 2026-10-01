@@ -10,6 +10,7 @@ from app.services.ftm import make_ftm_entity
 from app.services.security import contained_path, resolve_storage_root
 from app.services.resolution import candidate_entities
 from app.services.pdf_ocr import extract_pdf_chunks
+from app.services.document_reader import read_chunks
 from app.core.config import settings
 from app.db.locking import lock_investigation_transaction
 
@@ -127,17 +128,31 @@ def _candidate_payloads(chunk: DocumentChunk, *, include_entities: bool = True) 
 
 
 def ingest_document(db: Session, *, investigation_id: str, title: str, filename: str, mime_type: str | None, data: bytes, storage_dir: Path) -> Document:
+    """Store one uploaded document and read it, in one call.
+
+    The upload route runs the same two steps, ``store_document`` and then
+    ``extract_document`` as a background job; this is for callers that want
+    the finished document back directly (tests and scripts).
+    """
+    doc = store_document(
+        db, investigation_id=investigation_id, title=title, filename=filename,
+        mime_type=mime_type, data=data, storage_dir=storage_dir,
+    )
+    return extract_document(db, doc.id) or doc
+
+
+def store_document(db: Session, *, investigation_id: str, title: str, filename: str, mime_type: str | None, data: bytes, storage_dir: Path) -> Document:
     """Persist one uploaded document without racing investigation deletion.
+
+    Saves the file, its Source and a Document row with
+    ``extraction_status='queued'``; reading the text is ``extract_document``.
 
     PostgreSQL writers take the same transaction advisory lock used by destructive
     restore/delete operations, then re-check that the investigation still exists.
     File bytes are first written under ``.upload-staging`` and are only promoted to
-    the canonical document path after all database rows/chunks/candidates have been
-    prepared. If the database commit fails, a newly promoted file is removed so a
-    failed upload does not leave reporter data orphaned on disk.
-
-    Extraction failures remain a valid committed document state: the reporter keeps
-    the source file and can see ``extraction_status=failed`` exactly as before.
+    the canonical document path after the database rows have been prepared. If the
+    database commit fails, a newly promoted file is removed so a failed upload does
+    not leave reporter data orphaned on disk.
     """
     storage_dir = resolve_storage_root(storage_dir)
     storage_dir.mkdir(parents=True, exist_ok=True)
@@ -154,25 +169,13 @@ def ingest_document(db: Session, *, investigation_id: str, title: str, filename:
     staging_root.mkdir(parents=True, exist_ok=True)
     staged = contained_path(staging_root, f'{uuid.uuid4().hex}_{safe_name}')
     staged.write_bytes(data)
-    extraction_path = stored if stored.exists() else staged
     created_final = False
 
     try:
         source = Source(investigation_id=investigation_id, title=title or filename, source_type='document', metadata_json={'filename': filename, 'mime_type': mime_type, 'sha256': digest})
         db.add(source); db.flush()
-        doc = Document(investigation_id=investigation_id, source_id=source.id, filename=filename, mime_type=mime_type, sha256=digest, storage_path=str(stored), extraction_status='extracting')
+        doc = Document(investigation_id=investigation_id, source_id=source.id, filename=filename, mime_type=mime_type, sha256=digest, storage_path=str(stored), extraction_status='queued')
         db.add(doc); db.flush()
-        try:
-            chunks, issues = extract_chunks(extraction_path)
-            for ordinal, item in enumerate(chunks, 1):
-                chunk = DocumentChunk(document_id=doc.id, ordinal=ordinal, **item)
-                db.add(chunk); db.flush()
-                for typ, payload, conf in _candidate_payloads(chunk, include_entities=settings.enable_local_entity_suggestions):
-                    db.add(ExtractionCandidate(investigation_id=investigation_id, document_id=doc.id, chunk_id=chunk.id, candidate_type=typ, payload=payload, confidence=conf))
-            doc.extraction_status = 'complete'
-            doc.extraction_issues = issues or None
-        except Exception as exc:
-            doc.extraction_status = 'failed'; doc.extraction_error = str(exc)
 
         # Promote the staged bytes only after relational state has been prepared.
         if not stored.exists():
@@ -194,6 +197,50 @@ def ingest_document(db: Session, *, investigation_id: str, title: str, filename:
             staging_root.rmdir()
         except OSError:
             pass
+
+
+def extract_document(db: Session, document_id: str) -> Document | None:
+    """Read a stored document into locator-preserving chunks and proposals.
+
+    Returns None when the document (or its investigation) was deleted before
+    this ran. Extraction failures remain a valid committed document state: the
+    reporter keeps the source file and sees ``extraction_status='failed'``
+    with the reason, and nothing half-read is kept. A document that already
+    has chunks is never read twice.
+    """
+    doc = db.get(Document, document_id)
+    if doc is None:
+        return None
+    lock_investigation_transaction(db, doc.investigation_id)
+    db.refresh(doc)
+    if db.get(Investigation, doc.investigation_id) is None:
+        return None
+    if db.scalar(select(DocumentChunk.id).where(DocumentChunk.document_id == doc.id).limit(1)) is not None:
+        raise ValueError('Document has already been read')
+    doc.extraction_status = 'extracting'
+    doc.extraction_error = None
+    try:
+        chunks, issues = read_chunks(Path(doc.storage_path))
+        for ordinal, item in enumerate(chunks, 1):
+            chunk = DocumentChunk(document_id=doc.id, ordinal=ordinal, **item)
+            db.add(chunk); db.flush()
+            for typ, payload, conf in _candidate_payloads(chunk, include_entities=settings.enable_local_entity_suggestions):
+                db.add(ExtractionCandidate(investigation_id=doc.investigation_id, document_id=doc.id, chunk_id=chunk.id, candidate_type=typ, payload=payload, confidence=conf))
+        doc.extraction_status = 'complete'
+        doc.extraction_issues = issues or None
+        db.commit()
+    except Exception as exc:
+        # Drop any chunks/proposals added before the failure, then record why.
+        db.rollback()
+        failed = db.get(Document, document_id)
+        if failed is None:
+            return None
+        failed.extraction_status = 'failed'
+        failed.extraction_error = str(exc) or type(exc).__name__
+        db.commit()
+        doc = failed
+    db.refresh(doc)
+    return doc
 
 
 def serialize_document(db: Session, doc: Document) -> dict:
