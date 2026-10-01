@@ -131,7 +131,16 @@ services:
       - api
 
   backend:
-    build: ./backend
+    # One image, one port: the API plus the workbench screen it serves at "/"
+    # (ADR-0004). The build context is the repo root so the image can build
+    # the frontend in its first stage.
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      args:
+        # Browser calls reach the API through Docker's port publishing, so they
+        # don't count as loopback; the dev bundle carries the dev token.
+        NEXT_PUBLIC_API_AUTH_TOKEN: ${API_AUTH_TOKEN:-docker-compose-local-dev-token}
     environment:
       DATABASE_URL: postgresql+psycopg://journalism:${POSTGRES_PASSWORD:-journalism-local-dev}@workbench-db:5432/journalism
       OPENALEPH_ENABLED: ${OPENALEPH_ENABLED:-true}
@@ -160,18 +169,6 @@ services:
     # (/api/integrations/openaleph/status) and reports it as down until it is up.
     volumes:
       - ./backend:/app
-
-  frontend:
-    build: ./frontend
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000
-      NEXT_PUBLIC_API_AUTH_TOKEN: ${API_AUTH_TOKEN:-docker-compose-local-dev-token}
-      NEXT_PUBLIC_OPENALEPH_URL: http://localhost:8080
-    ports:
-      - "127.0.0.1:3000:3000"
-    depends_on:
-      backend:
-        condition: service_healthy
 
   # Database inspector for local development: browse and edit workbench-db tables, run SQL.
   # Chosen over pgweb/CloudBeaver/sqladmin on 2026-09-21 (see dev-log.md). Bound to localhost only;

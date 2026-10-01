@@ -114,11 +114,12 @@ export function Navbar(): ReactElement {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Link href="/console">
+          {/* A plain link, not next/link: on the API's own origin the operator console owns /console/*, so a client-side route change would fetch its own data from the console and fail. A full page load of /console/ always reaches the workbench page that embeds it (ADR-0004). */}
+          <a href="/console/">
             <Badge variant="outline" className="cursor-pointer">
               backend console
             </Badge>
-          </Link>
+          </a>
           <Badge>{APP_VERSION}</Badge>
         </div>
       </div>
@@ -151,13 +152,13 @@ export function Navbar(): ReactElement {
               </Link>
             ))}
             <div className="my-1 h-px bg-border" />
-            <Link
-              href="/console"
+            <a
+              href="/console/"
               onClick={() => setMobileOpen(false)}
               className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
             >
               Backend console
-            </Link>
+            </a>
           </div>
         </nav>
       ) : null}

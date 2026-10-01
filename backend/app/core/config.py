@@ -67,6 +67,10 @@ class Settings(BaseSettings):
     # inspect tables, run read-only SQL, list/probe endpoints, run the test suite
     # against an isolated database, and read the structured application log.
     console_enabled: bool = True
+    # The Next.js workbench's static export (ADR-0004), served at "/". Empty
+    # means <repo>/frontend/out (a local `npm run build`); Docker images set
+    # FRONTEND_DIST_DIR=/srv/frontend (backend/Dockerfile).
+    frontend_dist_dir: str = ""
     app_log_file: str = "./data/logs/app.jsonl"
     console_dir: str = "./data/console"   # test-run logs and the isolated test database
     # What the console may change: disabled | changesets | changesets_and_sql (ADR-0003).

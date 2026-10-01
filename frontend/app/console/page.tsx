@@ -11,7 +11,7 @@
 import type {ReactElement} from 'react';
 import Link from 'next/link';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
 const CONSOLE_UI_PATH = '/console';
 
 export default function ConsolePage(): ReactElement {

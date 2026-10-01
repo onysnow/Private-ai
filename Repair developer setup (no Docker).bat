@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions
 cd /d "%~dp0"
-title Repair Journalism Workbench DEV 1.24
+title Repair Journalism Workbench developer setup (no Docker)
 set "SETUP_LOG=journalism-workbench-setup.log"
 set "PY="
 

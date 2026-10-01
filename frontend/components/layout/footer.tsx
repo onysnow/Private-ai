@@ -20,9 +20,9 @@ export function Footer(): ReactElement {
           <Link href="/settings" className="hover:text-foreground">
             Settings
           </Link>
-          <Link href="/console" className="hover:text-foreground">
+          <a href="/console/" className="hover:text-foreground">
             Backend console
-          </Link>
+          </a>
           <a
             href="https://github.com/onysnow/Private-ai"
             target="_blank"

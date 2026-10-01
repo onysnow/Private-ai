@@ -10,11 +10,11 @@ operator -- not the public internet. Keep it behind a reverse proxy you control.
 
 - A Linux host with Docker Engine + Compose v2, and a TLS reverse proxy (Caddy, nginx,
   Traefik) terminating HTTPS for one hostname, e.g. `https://workbench.example.org`.
-- The proxy forwards `/` to `127.0.0.1:3000` (frontend), the API path to
-  `127.0.0.1:8000`, and a second hostname to `127.0.0.1:8080` (the OpenAleph UI). The
-  compose file binds those three to the host loopback only (`BIND_ADDRESS`, default
-  `127.0.0.1`); the two databases, Elasticsearch, Redis and the OpenAleph workers/API
-  are internal-network only.
+- The proxy forwards the workbench hostname to `127.0.0.1:8000` (the API, which also
+  serves the workbench screen at `/` -- one origin, ADR-0004) and a second hostname to
+  `127.0.0.1:8080` (the OpenAleph UI). The compose file binds those two to the host
+  loopback only (`BIND_ADDRESS`, default `127.0.0.1`); the two databases,
+  Elasticsearch, Redis and the OpenAleph workers/API are internal-network only.
 - OpenAleph is part of the stack, not optional. Budget for it: Elasticsearch alone wants
   ~1 GB heap (`OPENALEPH_ES_JAVA_OPTS`, default `-Xms1g -Xmx1g`), the OpenAleph images
   are linux/amd64, and the archive volume grows with every ingested document.
@@ -28,7 +28,6 @@ Required -- the stack refuses to start without them:
 | `POSTGRES_PASSWORD` | Database password. `openssl rand -hex 24`. |
 | `API_AUTH_TOKEN` | Shared bearer token for remote API access. `openssl rand -hex 32`. Rotate by changing it and restarting `backend`; persisted per-user tokens (Settings → Security → Users) keep working. |
 | `PUBLIC_ORIGIN` | The https origin the proxy serves (`https://workbench.example.org`). Becomes the only allowed CORS origin. |
-| `PUBLIC_API_URL` | The URL the *browser* reaches the API at, as routed by your proxy. Baked into the frontend bundle at build time -- change it and rebuild. |
 | `PUBLIC_OPENALEPH_URL` | The https URL the proxy serves the OpenAleph UI at (e.g. `https://aleph.example.org`, forwarded to `127.0.0.1:8080`). |
 | `OPENALEPH_SECRET_KEY` | OpenAleph's session/signing secret. `openssl rand -hex 32`. |
 | `OPENALEPH_DB_PASSWORD` | Password for OpenAleph's own Postgres 17 (separate from the workbench database on purpose -- two products, two ownership boundaries). |
@@ -44,15 +43,16 @@ unless you are actively restoring -- see §5), `WORKBENCH_TAG` (image tag, defau
 `latest`), `BIND_ADDRESS`.
 
 Deliberately absent: `NEXT_PUBLIC_API_AUTH_TOKEN`. The dev compose bakes the shared
-token into the public JavaScript bundle; on a shared host that hands the token to
+token into the workbench screen it builds; on a shared host that hands the token to
 anyone who can load the page. Reporters paste their token into the app's "API access"
-panel instead.
+panel instead. There is no `PUBLIC_API_URL` either: the screen calls the API on its
+own origin.
 
 ## 3. First start
 
 ```bash
 docker compose -f docker-compose.prod.yml up -d --build
-docker compose -f docker-compose.prod.yml ps          # backend/frontend healthy
+docker compose -f docker-compose.prod.yml ps          # backend healthy
 curl -s http://127.0.0.1:8000/api/health              # {"status":"ok"} from the host
 ```
 
@@ -89,7 +89,7 @@ the schema it is talking to. So:
 
 ```bash
 # 1. stop the app, keep the database
-docker compose -f docker-compose.prod.yml stop backend frontend
+docker compose -f docker-compose.prod.yml stop backend
 # 2. downgrade one migration at a time from the NEW image (it knows the migration)
 docker compose -f docker-compose.prod.yml run --rm backend alembic downgrade -1
 #    ...repeat, or `alembic downgrade <revision>` for the exact target;

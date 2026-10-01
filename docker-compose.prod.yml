@@ -6,12 +6,12 @@
 # host. This file:
 #   - runs the image that was built (no source bind-mount; a deploy is a rebuild);
 #   - refuses to start without real secrets (${VAR:?...} -- no defaults);
-#   - keeps the backend/frontend bound to the loopback of the host by default
+#   - keeps the backend (API + workbench screen, one port) bound to the host loopback by default
 #     (BIND_ADDRESS) so a TLS reverse proxy (Caddy, nginx, Traefik) in front is
 #     the only thing reachable from the network; the database has no host port;
 #   - persists backend data (documents, audit log, connector secrets, limiter
 #     state) in a named volume so the audit trail survives a redeploy;
-#   - does not bake a bearer token into the public frontend bundle. Reporters
+#   - does not bake a bearer token into the workbench screen. Reporters
 #     enter their own token (or persisted-user token) in the app's "API access"
 #     panel; the dev file's public token variable is deliberately absent.
 #
@@ -160,7 +160,11 @@ services:
       retries: 10
 
   backend:
-    build: ./backend
+    # The API and the workbench screen it serves at "/" (ADR-0004). No bearer
+    # token is baked into the screen: users enter one in Settings.
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     image: journalism-workbench-backend:${WORKBENCH_TAG:-latest}
     restart: unless-stopped
     environment:
@@ -198,22 +202,6 @@ services:
     # images are large and Elasticsearch is slow to come up; the workbench must be
     # reachable while that happens. The backend probes OpenAleph on demand
     # (/api/integrations/openaleph/status) and reports it as down until it is up.
-
-  frontend:
-    build:
-      context: ./frontend
-      args:
-        NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:?set PUBLIC_API_URL to the https URL the browser reaches the API at, e.g. https://workbench.example.org/api-root}
-    image: journalism-workbench-frontend:${WORKBENCH_TAG:-latest}
-    restart: unless-stopped
-    environment:
-      NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:?set PUBLIC_API_URL}
-      NEXT_PUBLIC_OPENALEPH_URL: ${PUBLIC_OPENALEPH_URL:?set PUBLIC_OPENALEPH_URL}
-    ports:
-      - "${BIND_ADDRESS:-127.0.0.1}:3000:3000"
-    depends_on:
-      backend:
-        condition: service_healthy
 
 volumes:
   workbench-pgdata:

@@ -57,26 +57,46 @@ This project has been developed iteratively -- product-facing milestones live in
 
 I'd rather this table be accurate than impressive. The architecture and domain modeling are the mature part of this project; production-hardening the deployment story is the current, active work — you're looking at it happen in CI on every push, not just taking my word for it.
 
-## Running it locally (Windows, no Docker required)
+## Running it (Windows)
 
-1. Extract/clone the repo to a normal writable folder. This repo has one git submodule ([`topic-authority-system`](https://github.com/onysnow/topic-authority-system) at `backend/app/ai/tas_spec/`, the standalone evidence-discipline methodology behind the AI reasoning layer); run `git submodule update --init --recursive` after cloning if you're doing full development rather than just running the app (the launcher below doesn't require it).
-2. Double-click **`Start Journalism Workbench.bat`**.
-3. First run creates a private `.venv`, installs pinned dependencies, and verifies imports before marking setup complete. Requires Python 3.12 (the launcher will try to install it via `winget` if missing).
-4. The app opens at `http://127.0.0.1:8000`, backed by a local SQLite database (`backend/journalism.db`). No PostgreSQL, no Node.js, no Docker needed for this mode.
+The product is the Docker stack: the Workbench, its PostgreSQL database and
+OpenAleph, with the Workbench screen served by the API at one address
+([ADR-0004](docs/adr/0004-one-product-built-on-openaleph.md)).
 
-If setup fails, check `journalism-workbench-setup.log` and run **`Repair Journalism Workbench.bat`**.
+1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and start it.
+2. Double-click **`Start Journalism Workbench.bat`**. The first start downloads and builds everything and can take 10 minutes or more; later starts take seconds.
+3. The workbench opens at `http://127.0.0.1:8000`. **`Stop Journalism Workbench.bat`** stops it and keeps your data.
 
-### Full stack (Next.js UI + Postgres + OpenAleph), once #6 lands
+| What | Where |
+|---|---|
+| Workbench | `http://127.0.0.1:8000` |
+| API docs | `http://127.0.0.1:8000/docs` |
+| OpenAleph UI / API | `http://127.0.0.1:8080` / `http://127.0.0.1:8001` |
+| Database editor (Adminer) | `http://127.0.0.1:8081` (System `PostgreSQL`, Server `workbench-db`, Username `journalism`, Password `POSTGRES_PASSWORD`, default `journalism-local-dev`, Database `journalism`) |
 
-```bash
-docker compose up --build
-```
+From a terminal the same thing is `docker compose up --build -d`.
 
-The default stack starts the Workbench database, API, and Next.js UI: use `http://localhost:3000` for the UI and `http://localhost:8000/docs` for API docs. A database inspector (Adminer) is at `http://localhost:8081` — System `PostgreSQL`, Server `workbench-db`, Username `journalism`, Password `POSTGRES_PASSWORD` (default `journalism-local-dev`), Database `journalism`.
+The development compose file bakes a localhost-only development bearer token into
+the screen it builds, because browser calls reach the containerized API through
+Docker's port publishing rather than loopback. Override `API_AUTH_TOKEN` in your
+shell or `.env` if you want a different local token.
 
-Docker Compose wires a localhost-only development bearer token between the frontend and backend automatically so the browser UI can talk to the containerized API through the published `localhost` port. Override `API_AUTH_TOKEN` in your shell or `.env` if you want a different local token.
+Elasticsearch wants about 1 GB of heap (`OPENALEPH_ES_JAVA_OPTS`). This repo has
+one git submodule ([`topic-authority-system`](https://github.com/onysnow/topic-authority-system)
+at `backend/app/ai/tas_spec/`); run `git submodule update --init --recursive` after
+cloning for full development.
 
-OpenAleph is part of the stack, not an add-on: `docker compose up --build` boots the workbench **and** the local OpenAleph services (Postgres 17, Elasticsearch, Redis, ingest/analyze workers, API and UI), with the backend wired to it (`OPENALEPH_ENABLED=true` by default). The OpenAleph API is at `http://localhost:8001` and its UI at `http://localhost:8080`. Elasticsearch wants about 1 GB of heap (`OPENALEPH_ES_JAVA_OPTS`); on a small machine you can still run the workbench alone with `OPENALEPH_ENABLED=false docker compose up workbench-db backend frontend adminer`, but that is a reduced mode, not the product.
+### Developer mode (no Docker)
+
+**`Start without Docker (developer).bat`** runs the API alone on SQLite, without
+OpenAleph: a reduced mode for development, not the product. It creates a private
+`.venv` (Python 3.12, installed via `winget` if missing), installs pinned
+dependencies, builds the screen into `frontend/out` if Node.js is installed, and
+opens `http://127.0.0.1:8000`. If setup fails, check
+`journalism-workbench-setup.log` and run **`Repair developer setup (no Docker).bat`**.
+
+For front-end work, `cd frontend && npm run dev` serves the screen with hot reload
+at `http://localhost:3000`, talking to the API at `http://localhost:8000`.
 
 To have uploads flow into the OpenAleph corpus automatically and let OpenAleph's `ftm-analyze` own entity extraction:
 
@@ -91,9 +111,9 @@ Everything the backend does is viewable without leaving the machine. Start from 
 
 | Surface | Where | What it shows |
 |---|---|---|
-| Backend console | `http://127.0.0.1:8000/console` (also `/console` in the Next.js app) | Database status and every table with live row counts on **any** dialect — including the SQLite file the Windows launcher uses, which Adminer cannot open; page through rows; run read-only SQL; the complete route table with a live probe of the id-free endpoints; run the real test suite against an isolated database and watch it; the structured application log (every request with status/duration, every unhandled error with its traceback, searchable by request id); the security alert counts. Loopback-only. |
+| Backend console | `http://127.0.0.1:8000/console` (inside the workbench: `/console/`) | Database status and every table with live row counts on **any** dialect — including the SQLite file developer mode uses, which Adminer cannot open; page through rows; run read-only SQL; the complete route table with a live probe of the id-free endpoints; run the real test suite against an isolated database and watch it; the structured application log (every request with status/duration, every unhandled error with its traceback, searchable by request id); the security alert counts. Loopback-only: inside the Docker stack, browser requests arrive from Docker's network, so the console refuses them. |
 | Swagger / ReDoc | `http://127.0.0.1:8000/docs`, `/redoc` | Every endpoint with its schema, callable in the browser. |
-| Adminer | `http://127.0.0.1:8081` (Docker: `docker compose up -d workbench-db adminer`) | Browse **and edit** rows in the Postgres database. Server `workbench-db`, user `journalism`, password `POSTGRES_PASSWORD` (`journalism-local-dev` by default). The Windows launcher now uses this Postgres automatically when the container is running, so what you do in the app is what Adminer shows. |
+| Adminer | `http://127.0.0.1:8081` (Docker: `docker compose up -d workbench-db adminer`) | Browse **and edit** rows in the Postgres database. Server `workbench-db`, user `journalism`, password `POSTGRES_PASSWORD` (`journalism-local-dev` by default). Developer mode uses this Postgres automatically when the container is running, so what you do in the app is what Adminer shows. |
 | OpenAleph UI | `http://localhost:8080` | The corpus side: collections, ingested documents, extracted entities. |
 | Settings → status | `GET /api/settings/status` | Config as the running process sees it (database, storage, access mode, connectors, AI provider and limits, TAS spec version, security denials). |
 | Security audit | `GET /api/settings/security/audit`, `…/summary`, `…/alerts` | The tamper-evident JSONL of every write and every denial. |

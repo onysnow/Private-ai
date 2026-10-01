@@ -234,9 +234,9 @@ export default function SettingsPage(): ReactElement {
           The backend console is loopback-only by design -- no bearer token grants remote access to it. Open it from{' '}
           <code>localhost</code> or <code>127.0.0.1</code> directly.
         </p>
-        <Link href="/console" className="mt-3 inline-block text-sm text-primary hover:underline">
+        <a href="/console/" className="mt-3 inline-block text-sm text-primary hover:underline">
           Open console
-        </Link>
+        </a>
       </div>
       </div>
 

@@ -1,5 +1,5 @@
-"""Covers STRUCT-0029: the Docker HEALTHCHECKs added to backend/Dockerfile
-and frontend/Dockerfile rely on GET /api/health being reachable from an
+"""Covers STRUCT-0029: the Docker HEALTHCHECK in backend/Dockerfile (the one
+image since ADR-0004) relies on GET /api/health being reachable from an
 unauthenticated, local (loopback) caller -- exactly how the healthcheck
 command runs inside the container. Nothing previously verified this.
 """

@@ -5,7 +5,9 @@ import {ApiClient} from './api-client';
 // change (api.setAuthToken/clearAuthToken) affects the exact same instance
 // the workbench fetches through, without pulling the whole workbench page
 // module into the /settings route's bundle.
-export const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// ?? (not ||): an empty value is meaningful -- it means "same origin", which
+// is what the static production build uses (see next.config.mjs).
+export const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
 export const api = new ApiClient(API);
 
 const DEFAULT_API_AUTH_TOKEN = process.env.NEXT_PUBLIC_API_AUTH_TOKEN?.trim() || '';

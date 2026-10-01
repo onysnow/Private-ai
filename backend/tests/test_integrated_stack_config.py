@@ -21,9 +21,16 @@ def test_root_compose_declares_core_stack_with_openaleph_always_on():
         "api",
         "ui",
         "backend",
-        "frontend",
     }
     assert required.issubset(services)
+    # ADR-0004: the API serves the workbench screen; there is no separate
+    # frontend container or port 3000.
+    assert "frontend" not in services
+    assert services["backend"]["build"] == {
+        "context": ".",
+        "dockerfile": "backend/Dockerfile",
+        "args": {"NEXT_PUBLIC_API_AUTH_TOKEN": "${API_AUTH_TOKEN:-docker-compose-local-dev-token}"},
+    }
 
     backend_env = services["backend"]["environment"]
     assert backend_env["OPENALEPH_ENABLED"] == "${OPENALEPH_ENABLED:-true}"
@@ -34,7 +41,6 @@ def test_root_compose_declares_core_stack_with_openaleph_always_on():
     assert backend_env["ENABLE_AI_FEATURES"] == "false"
 
     assert services["backend"]["depends_on"]["workbench-db"]["condition"] == "service_healthy"
-    assert services["frontend"]["environment"]["NEXT_PUBLIC_API_AUTH_TOKEN"] == "${API_AUTH_TOKEN:-docker-compose-local-dev-token}"
     assert services["ingest"]["image"].startswith("ghcr.io/openaleph/ingest-file:")
     assert services["analyze"]["image"].startswith("ghcr.io/openaleph/ftm-analyze:")
     assert services["api"]["image"].startswith("ghcr.io/openaleph/openaleph:")
@@ -61,7 +67,7 @@ def test_integrated_stack_uses_separate_postgres_ownership_boundaries():
 def test_production_compose_has_no_dev_shortcuts():
     """STRUCT-0031: docker-compose.prod.yml must never regress into the dev file's
     shape -- no source bind-mount, no default secrets, no host port on the DB,
-    no bearer token baked into the frontend bundle, data on a named volume."""
+    no bearer token baked into the workbench screen, data on a named volume."""
     import re
 
     root = Path(__file__).resolve().parents[2]
@@ -69,7 +75,7 @@ def test_production_compose_has_no_dev_shortcuts():
     compose = yaml.safe_load(text)
     services = compose["services"]
     openaleph = {"postgres", "elasticsearch", "redis", "ingest", "analyze", "worker", "api", "ui"}
-    assert set(services) == {"workbench-db", "backend", "frontend"} | openaleph, "workbench + OpenAleph, nothing dev-only (no adminer)"
+    assert set(services) == {"workbench-db", "backend"} | openaleph, "workbench + OpenAleph, nothing dev-only (no adminer, no separate frontend: ADR-0004)"
     for name in openaleph:
         assert "profiles" not in services[name] and services[name].get("restart") == "unless-stopped", name
         if name != "ui":
@@ -80,10 +86,9 @@ def test_production_compose_has_no_dev_shortcuts():
     assert "api" not in services["backend"]["depends_on"], "the workbench must come up even while OpenAleph is still pulling/starting"
 
     assert "ports" not in services["workbench-db"], "database must not be published on the host"
-    for name in ("backend", "frontend"):
-        assert services[name].get("restart") == "unless-stopped"
-        for mapping in services[name]["ports"]:
-            assert mapping.startswith("${BIND_ADDRESS:-127.0.0.1}:"), mapping
+    assert services["backend"].get("restart") == "unless-stopped"
+    for mapping in services["backend"]["ports"]:
+        assert mapping.startswith("${BIND_ADDRESS:-127.0.0.1}:"), mapping
     assert not any(v.startswith("./") for v in services["backend"].get("volumes", [])), "no source bind-mount in production"
     assert "workbench-data:/app/data" in services["backend"]["volumes"]
     assert set(compose["volumes"]) == {"workbench-pgdata", "workbench-data", "openaleph-pgdata", "openaleph-elasticsearch-data", "openaleph-redis-data", "openaleph-archive"}
@@ -96,5 +101,5 @@ def test_production_compose_has_no_dev_shortcuts():
     assert env["ENABLE_RESTORE_API"] == "${ENABLE_RESTORE_API:-false}"
     assert env["AUDIT_LOG_FILE"].startswith("/app/data/") and env["API_AUTH_FAILURE_STATE_FILE"].startswith("/app/data/")
     assert "NEXT_PUBLIC_API_AUTH_TOKEN" not in text, "the shared token must not be baked into the public bundle"
-    assert services["frontend"]["build"]["args"]["NEXT_PUBLIC_API_URL"].startswith("${PUBLIC_API_URL:?")
+    assert services["backend"]["build"] == {"context": ".", "dockerfile": "backend/Dockerfile"}, "no build args: nothing baked into the screen"
     assert (root / "DEPLOYMENT.md").read_text(encoding="utf-8").count("alembic downgrade") >= 1, "runbook must cover schema rollback"

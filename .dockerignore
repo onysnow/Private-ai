@@ -1,0 +1,33 @@
+# Build context for backend/Dockerfile is the repository root. Never send local
+# reporter data, secrets, or build output into it.
+.git
+**/.env
+**/.env.*
+!**/.env.example
+
+# Data
+**/*.db
+**/*.sqlite*
+data/
+backend/data/
+_to_delete/
+
+# Python
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.venv/
+.venv/
+backend/.coverage
+
+# Node / Next.js (stage 1 runs its own npm ci and build)
+**/node_modules/
+frontend/.next/
+frontend/out/
+frontend/tsconfig.tsbuildinfo
+**/npm-debug.log*
+
+# Logs and local tooling
+**/*.log

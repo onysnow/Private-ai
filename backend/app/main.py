@@ -1,13 +1,11 @@
 import logging
 from contextlib import asynccontextmanager
-from pathlib import Path
 from time import monotonic
 from typing import Any, AsyncIterator, Awaitable, Callable, Iterator
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 from sqlalchemy import Engine
 from sqlalchemy.orm import Session
 
@@ -43,6 +41,7 @@ from app.core.rate_limiter import FixedWindowRateLimiter
 from app.core.audit_log import SecurityAuditLogger, new_request_id, should_audit_request
 from app.core.app_log import configure_app_logging, current_request_id
 from app.console_adapters import build_console_config
+from app.web.frontend import mount_frontend
 from opsconsole import mount as mount_console
 
 
@@ -289,19 +288,15 @@ def create_app(
             )
         return response
 
-    static_dir = Path(__file__).parent / "static"
-    app.mount("/static", StaticFiles(directory=static_dir), name="static")
-
-    @app.get("/", include_in_schema=False)
-    def home() -> FileResponse:
-        return FileResponse(static_dir / "index.html")
-
     if app_settings.console_enabled:
         # The operator console (ADR-0003): a host-agnostic package mounted with the
         # app's adapters. /api/console/* answers loopback callers only (see
         # app/console_adapters.py); the UI is served at /console and the Next.js
-        # /console page embeds it.
+        # /console page embeds it when the workbench runs on its own dev server.
         mount_console(app, build_console_config(app_settings, app_engine, session_factory, app_version=app.version))
+
+    # The workbench screen (ADR-0004), last: a "/" mount takes whatever is left.
+    mount_frontend(app, app_settings.frontend_dist_dir)
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
