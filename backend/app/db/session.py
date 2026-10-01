@@ -21,31 +21,31 @@ class _SerializedCursor(sqlite3.Cursor):
     toasts whenever the page fired its parallel load requests.
     """
 
-    def execute(self, *args: Any, **kwargs: Any):  # type: ignore[override]
+    def execute(self, *args: Any, **kwargs: Any) -> Any:
         with self.connection._lock:  # type: ignore[attr-defined]
             return super().execute(*args, **kwargs)
 
-    def executemany(self, *args: Any, **kwargs: Any):  # type: ignore[override]
+    def executemany(self, *args: Any, **kwargs: Any) -> Any:
         with self.connection._lock:  # type: ignore[attr-defined]
             return super().executemany(*args, **kwargs)
 
-    def executescript(self, *args: Any, **kwargs: Any):  # type: ignore[override]
+    def executescript(self, *args: Any, **kwargs: Any) -> Any:
         with self.connection._lock:  # type: ignore[attr-defined]
             return super().executescript(*args, **kwargs)
 
-    def fetchone(self):  # type: ignore[override]
+    def fetchone(self) -> Any:
         with self.connection._lock:  # type: ignore[attr-defined]
             return super().fetchone()
 
-    def fetchmany(self, *args: Any, **kwargs: Any):  # type: ignore[override]
+    def fetchmany(self, *args: Any, **kwargs: Any) -> Any:
         with self.connection._lock:  # type: ignore[attr-defined]
             return super().fetchmany(*args, **kwargs)
 
-    def fetchall(self):  # type: ignore[override]
+    def fetchall(self) -> Any:
         with self.connection._lock:  # type: ignore[attr-defined]
             return super().fetchall()
 
-    def close(self):  # type: ignore[override]
+    def close(self) -> Any:
         with self.connection._lock:  # type: ignore[attr-defined]
             return super().close()
 
@@ -61,34 +61,34 @@ class _SerializedConnection(sqlite3.Connection):
     connection and therefore one SQLite transaction.
     """
 
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._lock = threading.RLock()
 
-    def cursor(self, factory: Any = None):  # type: ignore[override]
+    def cursor(self, factory: Any = None) -> Any:
         return super().cursor(factory or _SerializedCursor)
 
-    def execute(self, *args: Any, **kwargs: Any):  # type: ignore[override]
+    def execute(self, *args: Any, **kwargs: Any) -> Any:
         with self._lock:
             return super().execute(*args, **kwargs)
 
-    def executemany(self, *args: Any, **kwargs: Any):  # type: ignore[override]
+    def executemany(self, *args: Any, **kwargs: Any) -> Any:
         with self._lock:
             return super().executemany(*args, **kwargs)
 
-    def executescript(self, *args: Any, **kwargs: Any):  # type: ignore[override]
+    def executescript(self, *args: Any, **kwargs: Any) -> Any:
         with self._lock:
             return super().executescript(*args, **kwargs)
 
-    def commit(self):  # type: ignore[override]
+    def commit(self) -> Any:
         with self._lock:
             return super().commit()
 
-    def rollback(self):  # type: ignore[override]
+    def rollback(self) -> Any:
         with self._lock:
             return super().rollback()
 
-    def close(self):  # type: ignore[override]
+    def close(self) -> Any:
         with self._lock:
             return super().close()
 

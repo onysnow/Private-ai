@@ -23,6 +23,10 @@ renders (GET /api/ai-analysis-candidates/{id} returns it as
 """
 from __future__ import annotations
 
+from typing import Any
+
+from sqlalchemy.orm import Session
+
 from app.models.domain import AIAnalysisCandidate, Deck, Writeup
 from app.services.assistant_context import describe_record_refs
 from app.services.decks import _normalize_slides, create_deck, normalize_visual
@@ -36,7 +40,7 @@ def payload_citation_refs(payload: dict | None) -> list[dict]:
     visual items), first-appearance order, de-duplicated."""
     seen, refs = set(), []
 
-    def visit(node):
+    def visit(node: Any) -> None:
         if isinstance(node, dict):
             rt, rid = node.get("record_type"), node.get("record_id")
             if isinstance(rt, str) and isinstance(rid, str) and (rt, rid) not in seen:
@@ -66,13 +70,13 @@ def _require_promotable(candidate: AIAnalysisCandidate) -> dict:
 def _short_label(detail: dict | None, ref: dict) -> str:
     if not detail:
         return f"{ref['record_type']}:{ref['record_id'][:8]}"
-    label = detail.get("locator") or detail.get("label") or ref["record_id"][:8]
+    label = str(detail.get("locator") or detail.get("label") or ref["record_id"][:8])
     return label if len(label) <= 60 else label[:59] + "…"
 
 
 def _citation_node(ref: dict, labels: dict[tuple[str, str], dict]) -> dict:
     record_type, record_id = ref.get("record_type"), ref.get("record_id")
-    detail = labels.get((record_type, record_id))
+    detail = labels.get((str(record_type), str(record_id)))
     # Citation nodes use the reporter-facing "task" spelling, like every other
     # citation in a write-up (see app/services/writeups.py).
     trace_type = "task" if record_type == "reporting_task" else record_type
@@ -162,12 +166,12 @@ def deck_slides_from_payload(payload: dict, visual_styles: dict | None = None) -
     return _normalize_slides(slides)
 
 
-def _labels(db, candidate: AIAnalysisCandidate, payload: dict) -> dict[tuple[str, str], dict]:
+def _labels(db: Session, candidate: AIAnalysisCandidate, payload: dict) -> dict[tuple[str, str], dict]:
     details = describe_record_refs(db, investigation_id=candidate.investigation_id, refs=payload_citation_refs(payload))
     return {(d["record_type"], d["record_id"]): d for d in details}
 
 
-def promote_candidate_to_writeup(db, candidate: AIAnalysisCandidate, *, title: str | None = None, created_by: str | None = None) -> Writeup:
+def promote_candidate_to_writeup(db: Session, candidate: AIAnalysisCandidate, *, title: str | None = None, created_by: str | None = None) -> Writeup:
     payload = _require_promotable(candidate)
     return create_writeup(
         db,
@@ -180,7 +184,7 @@ def promote_candidate_to_writeup(db, candidate: AIAnalysisCandidate, *, title: s
     )
 
 
-def promote_candidate_to_deck(db, candidate: AIAnalysisCandidate, *, title: str | None = None, created_by: str | None = None,
+def promote_candidate_to_deck(db: Session, candidate: AIAnalysisCandidate, *, title: str | None = None, created_by: str | None = None,
                               style: dict | None = None, visual_styles: dict | None = None) -> Deck:
     payload = _require_promotable(candidate)
     slides = deck_slides_from_payload(payload, visual_styles)

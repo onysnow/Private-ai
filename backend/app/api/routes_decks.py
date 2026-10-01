@@ -52,7 +52,7 @@ def delete_deck_endpoint(deck_id: str, db: Session = Depends(get_db)) -> Any:
 
 
 @router.get("/decks/{deck_id}/export.pptx")
-def export_deck_pptx(deck_id: str, db: Session = Depends(get_db)):
+def export_deck_pptx(deck_id: str, db: Session = Depends(get_db)) -> StreamingResponse:
     row = db.get(Deck, deck_id)
     if row is None:
         raise HTTPException(404, "Deck not found")

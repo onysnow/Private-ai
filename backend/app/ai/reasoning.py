@@ -579,7 +579,7 @@ def run_reasoning_module(
 
         if module in RECORD_REF_MODULES:
             packet = build_selected_record_context(
-                db, investigation_id=investigation_id, record_refs=record_refs, goal=question,
+                db, investigation_id=investigation_id, record_refs=record_refs or [], goal=question,
             )
         else:
             packet = build_question_context(

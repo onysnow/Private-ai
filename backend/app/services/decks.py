@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import math
 from datetime import date
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -37,7 +38,7 @@ SLIDE_KINDS = {"title", "statement", "content", "questions"}
 VISUAL_LIMITS = {"figures": 4, "timeline": 8, "bar": 8}
 
 
-def _clean_refs(refs) -> list[dict]:
+def _clean_refs(refs: Any) -> list[dict]:
     return [
         {"record_type": e.get("record_type"), "record_id": e.get("record_id")}
         for e in (refs or [])
@@ -45,17 +46,17 @@ def _clean_refs(refs) -> list[dict]:
     ]
 
 
-def normalize_visual(visual) -> dict | None:
+def normalize_visual(visual: Any) -> dict | None:
     """Keep a well-formed visual, drop anything else. A deck must always
     export, so a malformed visual is discarded rather than raised on."""
     if not isinstance(visual, dict) or visual.get("type") not in VISUAL_LIMITS:
         return None
     kind = visual["type"]
-    items = []
+    items: list[dict[str, Any]] = []
     for item in (visual.get("items") or [])[: VISUAL_LIMITS[kind]]:
         if not isinstance(item, dict) or not str(item.get("label") or "").strip():
             continue
-        clean = {"label": str(item["label"])[:200], "evidence": _clean_refs(item.get("evidence"))}
+        clean: dict[str, Any] = {"label": str(item["label"])[:200], "evidence": _clean_refs(item.get("evidence"))}
         if kind == "figures":
             clean["value"] = str(item.get("value") or "")[:40]
         elif kind == "timeline":
@@ -68,7 +69,7 @@ def normalize_visual(visual) -> dict | None:
         items.append(clean)
     if not items or (kind in {"timeline", "bar"} and len(items) < 2):
         return None
-    out = {"type": kind, "items": items}
+    out: dict[str, Any] = {"type": kind, "items": items}
     if kind == "bar":
         out["title"] = str(visual.get("title") or "")[:200]
         out["unit"] = str(visual.get("unit") or "")[:40]
@@ -248,11 +249,11 @@ class _DeckRenderer:
         self.page = 0
 
     # --- primitives ---------------------------------------------------------
-    def _rgb(self, hex_color: str):
+    def _rgb(self, hex_color: str) -> Any:
         from pptx.dml.color import RGBColor
         return RGBColor.from_string(hex_color)
 
-    def new_slide(self, background: str):
+    def new_slide(self, background: str) -> Any:
         slide = self.prs.slides.add_slide(self.layout)
         fill = slide.background.fill
         fill.solid()
@@ -260,7 +261,7 @@ class _DeckRenderer:
         self.page += 1
         return slide
 
-    def rect(self, slide, x, y, w, h, color, *, rounded=False):
+    def rect(self, slide: Any, x: float, y: float, w: float, h: float, color: str, *, rounded: bool = False) -> Any:
         from pptx.enum.shapes import MSO_SHAPE
         shape = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE if rounded else MSO_SHAPE.RECTANGLE,
                                        self.Inches(x), self.Inches(y), self.Inches(w), self.Inches(h))
@@ -272,7 +273,7 @@ class _DeckRenderer:
             shape.adjustments[0] = 0.06
         return shape
 
-    def oval(self, slide, cx, cy, d, color, *, ring: str | None = None):
+    def oval(self, slide: Any, cx: float, cy: float, d: float, color: str, *, ring: str | None = None) -> Any:
         from pptx.enum.shapes import MSO_SHAPE
         from pptx.util import Pt
         shape = slide.shapes.add_shape(MSO_SHAPE.OVAL, self.Inches(cx - d / 2), self.Inches(cy - d / 2), self.Inches(d), self.Inches(d))
@@ -286,7 +287,7 @@ class _DeckRenderer:
         shape.shadow.inherit = False
         return shape
 
-    def _frame(self, box, *, anchor="top"):
+    def _frame(self, box: Any, *, anchor: str = "top") -> Any:
         from pptx.enum.text import MSO_ANCHOR, MSO_AUTO_SIZE
         tf = box.text_frame
         tf.word_wrap = True
@@ -295,7 +296,7 @@ class _DeckRenderer:
         tf.vertical_anchor = {"top": MSO_ANCHOR.TOP, "middle": MSO_ANCHOR.MIDDLE, "bottom": MSO_ANCHOR.BOTTOM}[anchor]
         return tf
 
-    def _run(self, paragraph, text, *, size, color, font=None, bold=False, italic=False, spacing: int | None = None):
+    def _run(self, paragraph: Any, text: str, *, size: float, color: str, font: str | None = None, bold: bool = False, italic: bool = False, spacing: int | None = None) -> Any:
         from pptx.util import Pt
         run = paragraph.add_run()
         run.text = text
@@ -308,8 +309,8 @@ class _DeckRenderer:
             run.font._element.set("spc", str(spacing))  # letter-spacing, hundredths of a point
         return run
 
-    def text(self, slide, x, y, w, h, text, *, size, color, font=None, bold=False, italic=False,
-             align="left", anchor="top", spacing: int | None = None, line_spacing: float | None = None):
+    def text(self, slide: Any, x: float, y: float, w: float, h: float, text: str, *, size: float, color: str, font: str | None = None, bold: bool = False, italic: bool = False,
+             align: str = "left", anchor: str = "top", spacing: int | None = None, line_spacing: float | None = None) -> Any:
         from pptx.enum.text import PP_ALIGN
         box = slide.shapes.add_textbox(self.Inches(x), self.Inches(y), self.Inches(w), self.Inches(h))
         tf = self._frame(box, anchor=anchor)
@@ -320,7 +321,7 @@ class _DeckRenderer:
         self._run(p, text, size=size, color=color, font=font, bold=bold, italic=italic, spacing=spacing)
         return box
 
-    def place_title(self, slide, x, y, w, h, text, *, size, color, anchor="top", line_spacing=1.05):
+    def place_title(self, slide: Any, x: float, y: float, w: float, h: float, text: str, *, size: float, color: str, anchor: str = "top", line_spacing: float = 1.05) -> Any:
         """Use the layout's real title placeholder (so the slide has a title
         in PowerPoint's outline and for screen readers), restyled in place."""
         from pptx.enum.text import PP_ALIGN
@@ -334,7 +335,7 @@ class _DeckRenderer:
         self._run(p, text, size=size, color=color, font=self.t.heading_font)
         return shape
 
-    def bullets(self, slide, x, y, w, h, items: list[str], *, color=None, bullet_color=None, sizes=(28, 26, 24, 22, 20, 18, 16, 15, 14)):
+    def bullets(self, slide: Any, x: float, y: float, w: float, h: float, items: list[str], *, color: str | None = None, bullet_color: str | None = None, sizes: tuple[int, ...] = (28, 26, 24, 22, 20, 18, 16, 15, 14)) -> Any:
         color = color or self.t.text
         bullet_color = bullet_color or self.t.accent
         from lxml import etree
@@ -364,14 +365,14 @@ class _DeckRenderer:
             self._run(p, item, size=size, color=color)
         return box
 
-    def kicker(self, slide, x, y, text, color):
+    def kicker(self, slide: Any, x: float, y: float, text: str, color: str) -> Any:
         return self.text(slide, x, y, 8.0, 0.3, text.upper(), size=11, color=color, bold=True, spacing=220)
 
-    def notes(self, slide, text: str):
+    def notes(self, slide: Any, text: str) -> None:
         if text.strip():
             slide.notes_slide.notes_text_frame.text = text.strip()
 
-    def footer(self, slide, refs: list[dict], *, dark: bool):
+    def footer(self, slide: Any, refs: list[dict], *, dark: bool) -> None:
         nums = sorted({self.numbers[(r["record_type"], r["record_id"])] for r in refs if (r["record_type"], r["record_id"]) in self.numbers})
         muted = self.t.cover_muted if dark else self.t.muted
         line = self.t.cover_line if dark else self.t.rule
@@ -382,7 +383,7 @@ class _DeckRenderer:
         self.text(slide, SLIDE_W_IN - MARGIN_IN - 6.0, 6.98, 6.0, 0.3, f"{short_title}   ·   {self.page}", size=10, color=muted, align="right")
 
     # --- slide kinds --------------------------------------------------------
-    def title_slide(self, heading: str, subtitle: str, source_count: int):
+    def title_slide(self, heading: str, subtitle: str, source_count: int) -> None:
         slide = self.new_slide(self.t.cover_bg)
         self.rect(slide, 0, 0, 0.18, SLIDE_H_IN, self.t.accent)
         self.kicker(slide, 0.95, 1.35, "Investigation brief", self.t.cover_accent)
@@ -396,7 +397,7 @@ class _DeckRenderer:
         stamp = f"Prepared from {source_count} cited record{'s' if source_count != 1 else ''}  ·  {today.day} {today.strftime('%B %Y')}"
         self.text(slide, 0.95, 6.75, 10.0, 0.3, stamp, size=11, color=self.t.cover_muted)
 
-    def statement_slide(self, slide_data: dict):
+    def statement_slide(self, slide_data: dict) -> None:
         slide = self.new_slide(self.t.cover_bg)
         text = " ".join(slide_data.get("bullets") or []) or slide_data.get("heading") or ""
         self.kicker(slide, 0.95, 1.2, slide_data.get("heading") or "The takeaway", self.t.cover_accent)
@@ -408,11 +409,10 @@ class _DeckRenderer:
         self.notes(slide, slide_data.get("notes") or "")
         self.footer(slide, slide_data.get("evidence") or [], dark=True)
 
-    def _evidence_panel(self, slide, x, y, w, h, refs: list[dict]):
+    def _evidence_panel(self, slide: Any, x: float, y: float, w: float, h: float, refs: list[dict]) -> None:
         self.rect(slide, x, y, w, h, self.t.panel, rounded=True)
         self.kicker(slide, x + 0.3, y + 0.28, "From the record", self.t.alert)
-        details = [self.details.get((r["record_type"], r["record_id"])) for r in refs]
-        details = [d for d in details if d]
+        details = [d for d in (self.details.get((r["record_type"], r["record_id"])) for r in refs) if d]
         quoted = [d for d in details if d.get("quote")][:2]
         cursor = y + 0.75
         inner_w = w - 0.6
@@ -455,11 +455,11 @@ class _DeckRenderer:
                 self.text(slide, x + 0.3, cursor + 0.25, inner_w, per - 0.3, d.get("label") or "", size=13, color=self.t.text, line_spacing=1.05)
                 cursor += per
 
-    def _cite_marks(self, refs) -> str:
+    def _cite_marks(self, refs: Any) -> str:
         nums = sorted({self.numbers[(r["record_type"], r["record_id"])] for r in refs or [] if (r["record_type"], r["record_id"]) in self.numbers})
         return " ".join(f"[{n}]" for n in nums)
 
-    def _figures(self, slide, x, y, w, h, items: list[dict], style: dict):
+    def _figures(self, slide: Any, x: float, y: float, w: float, h: float, items: list[dict], style: dict) -> None:
         """Cards / big numbers stacked in a column, or a row of stats."""
         opts = style["options"]
         value_color = {"alert": self.t.alert, "accent": self.t.accent_text, "text": self.t.text}[opts.get("value_color", "alert")]
@@ -490,7 +490,7 @@ class _DeckRenderer:
             label_size = 15 if cell_h > 1.6 and cell_w > 3 else 13 if cell_h > 1.1 else 11
             self.text(slide, left + pad, top + 0.2 + cell_h * 0.5, cell_w - pad - 0.25, cell_h * 0.5 - 0.3, label, size=label_size, color=self.t.text, line_spacing=1.05)
 
-    def _bar_chart(self, slide, x, y, w, h, visual: dict, style: dict):
+    def _bar_chart(self, slide: Any, x: float, y: float, w: float, h: float, visual: dict, style: dict) -> None:
         """A native (editable) PowerPoint bar chart. The value axis always
         includes zero -- no style can start a bar anywhere else."""
         from pptx.chart.data import CategoryChartData
@@ -562,7 +562,7 @@ class _DeckRenderer:
         category_axis.tick_labels.font.size = Pt(12)
         category_axis.tick_labels.font.color.rgb = self._rgb(self.t.text)
 
-    def _timeline(self, slide, x, y, w, h, items: list[dict], style: dict):
+    def _timeline(self, slide: Any, x: float, y: float, w: float, h: float, items: list[dict], style: dict) -> None:
         opts, layout = style["options"], style["layout"]
         n = len(items)
         ring = opts.get("marker", "ring") == "ring"
@@ -597,7 +597,7 @@ class _DeckRenderer:
             label = item["label"] + (" " + marks if marks else "")
             self.text(slide, cx - step / 2 + 0.08, line_y + 0.25, step - 0.16, h - (0.85 if compact else 1.05), label, size=label_size, color=self.t.text, align="center", line_spacing=1.05)
 
-    def content_slide(self, slide_data: dict, index: int, total: int):
+    def content_slide(self, slide_data: dict, index: int, total: int) -> None:
         slide = self.new_slide(self.t.page)
         visual = slide_data.get("visual")
         self.kicker(slide, MARGIN_IN, 0.42, f"{index:02d} / {total:02d}", self.t.accent_text)
@@ -607,33 +607,34 @@ class _DeckRenderer:
         self.rect(slide, MARGIN_IN, 1.78, 0.9, 0.045, self.t.accent)
         bullets = slide_data.get("bullets") or []
         refs = list(slide_data.get("evidence") or [])
-        kind = (visual or {}).get("type")
-        style = resolved_visual_style(visual) if visual else None
+        vis: dict = visual if isinstance(visual, dict) else {}
+        kind = vis.get("type")
+        style: dict = resolved_visual_style(vis) if kind else {}
         if kind == "timeline":
             layout = style["layout"]
             if layout.get("direction") == "vertical":
                 if bullets:
                     self.bullets(slide, MARGIN_IN, 2.1, 5.0, 4.55, bullets, sizes=(22, 20, 18, 16, 15, 14))
-                self._timeline(slide, 6.0 if bullets else MARGIN_IN, 2.1, 6.55 if bullets else 11.8, 4.55, visual["items"], style)
+                self._timeline(slide, 6.0 if bullets else MARGIN_IN, 2.1, 6.55 if bullets else 11.8, 4.55, vis["items"], style)
             else:
                 compact = bool(layout.get("compact"))
                 band = 1.75 if compact else 2.45
                 if bullets:
                     self.bullets(slide, MARGIN_IN, 2.05, 11.8, 4.6 - band, bullets, sizes=(22, 20, 18, 16, 15, 14))
-                self._timeline(slide, MARGIN_IN + 0.1, (6.7 - band) if bullets else 2.6, 11.6, band if bullets else 3.6, visual["items"], style)
+                self._timeline(slide, MARGIN_IN + 0.1, (6.7 - band) if bullets else 2.6, 11.6, band if bullets else 3.6, vis["items"], style)
         elif kind == "bar":
             if bullets:
                 self.bullets(slide, MARGIN_IN, 2.1, 5.3, 4.55, bullets, sizes=(22, 20, 18, 16, 15, 14))
-            self._bar_chart(slide, 6.45 if bullets else MARGIN_IN, 2.0, 6.1 if bullets else 11.8, 4.7, visual, style)
+            self._bar_chart(slide, 6.45 if bullets else MARGIN_IN, 2.0, 6.1 if bullets else 11.8, 4.7, vis, style)
         elif kind == "figures":
             if style["layout"].get("arrangement") == "row":
                 if bullets:
                     self.bullets(slide, MARGIN_IN, 2.05, 11.8, 2.3, bullets, sizes=(22, 20, 18, 16, 15, 14))
-                self._figures(slide, MARGIN_IN, 4.6 if bullets else 2.3, 11.8, 2.0 if bullets else 3.0, visual["items"], style)
+                self._figures(slide, MARGIN_IN, 4.6 if bullets else 2.3, 11.8, 2.0 if bullets else 3.0, vis["items"], style)
             else:
                 if bullets:
                     self.bullets(slide, MARGIN_IN, 2.1, 6.9, 4.55, bullets)
-                self._figures(slide, 8.15 if bullets else MARGIN_IN, 2.05, 4.45 if bullets else 11.8, 4.6, visual["items"], style)
+                self._figures(slide, 8.15 if bullets else MARGIN_IN, 2.05, 4.45 if bullets else 11.8, 4.6, vis["items"], style)
         else:
             if bullets:
                 self.bullets(slide, MARGIN_IN, 2.1, 6.9, 4.55, bullets)
@@ -643,7 +644,7 @@ class _DeckRenderer:
         self.notes(slide, slide_data.get("notes") or "")
         self.footer(slide, refs, dark=False)
 
-    def questions_slide(self, slide_data: dict):
+    def questions_slide(self, slide_data: dict) -> None:
         slide = self.new_slide(self.t.page)
         self.kicker(slide, MARGIN_IN, 0.42, "Open questions", self.t.alert)
         self.place_title(slide, MARGIN_IN, 0.72, 11.8, 0.95, slide_data.get("heading") or "What the record doesn't yet show", size=32, color=self.t.text, anchor="middle")
@@ -661,7 +662,7 @@ class _DeckRenderer:
         self.notes(slide, slide_data.get("notes") or "")
         self.footer(slide, slide_data.get("evidence") or [], dark=False)
 
-    def sources_slides(self, refs_in_order: list[tuple[str, str]]):
+    def sources_slides(self, refs_in_order: list[tuple[str, str]]) -> None:
         per_slide = 10
         chunks = [refs_in_order[i:i + per_slide] for i in range(0, len(refs_in_order), per_slide)]
         for c, chunk in enumerate(chunks):
@@ -686,7 +687,7 @@ class _DeckRenderer:
             self.footer(slide, [], dark=False)
 
 
-def render_deck_pptx(row: Deck, citation_details: list[dict] | None = None):
+def render_deck_pptx(row: Deck, citation_details: list[dict] | None = None) -> Any:
     """Render a deck to a python-pptx Presentation (16:9).
 
     `citation_details` is describe_record_refs()'s output for this deck's

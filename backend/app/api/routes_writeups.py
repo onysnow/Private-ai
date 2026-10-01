@@ -74,7 +74,7 @@ def delete_writeup_endpoint(writeup_id: str, db: Session = Depends(get_db)) -> A
 
 
 @router.get("/writeups/{writeup_id}/export.docx")
-def export_writeup_docx(writeup_id: str, db: Session = Depends(get_db)):
+def export_writeup_docx(writeup_id: str, db: Session = Depends(get_db)) -> StreamingResponse:
     row = db.get(Writeup, writeup_id)
     if row is None:
         raise HTTPException(404, "Write-up not found")

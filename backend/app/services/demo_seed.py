@@ -24,10 +24,12 @@ was created).
 """
 from __future__ import annotations
 
+from typing import Any
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models.domain import Investigation
+from app.models.domain import Entity, Investigation, TimelineEvent
 from app.schemas.api import (
     ClaimCreate, EntityCreate, LeadCreate, ReportingTaskCreate, TimelineEventCreate,
 )
@@ -105,7 +107,7 @@ def seed_demo_investigation(db: Session) -> tuple[Investigation, bool]:
     })
 
     # -- Entities ---------------------------------------------------------
-    def entity(schema: str, caption: str, properties: dict[str, list[str]] | None = None):
+    def entity(schema: str, caption: str, properties: dict[str, list[str]] | None = None) -> Entity:
         return create_entity(db, EntityCreate(
             investigation_id=inv_id, schema=schema, caption=caption,
             properties=properties or {},
@@ -119,7 +121,7 @@ def seed_demo_investigation(db: Session) -> tuple[Investigation, bool]:
     vessel = entity("Asset", "MV Fair Tern (cargo vessel)")
 
     # -- Relationships ------------------------------------------------------
-    def relate(schema: str, source, target, properties: dict[str, list[str]] | None = None, evidence_id: str | None = None):
+    def relate(schema: str, source: Entity, target: Entity, properties: dict[str, list[str]] | None = None, evidence_id: str | None = None) -> Any:
         return create_relationship(
             db, investigation_id=inv_id, schema=schema,
             source_entity_id=source.id, target_entity_id=target.id,
@@ -189,7 +191,7 @@ def seed_demo_investigation(db: Session) -> tuple[Investigation, bool]:
     ))
 
     # -- Timeline -------------------------------------------------------------
-    def event(title: str, date_start: str, **kw):
+    def event(title: str, date_start: str, **kw: Any) -> TimelineEvent:
         return create_timeline_event(db, TimelineEventCreate(
             investigation_id=inv_id, title=title, date_start=date_start, **kw,
         ))

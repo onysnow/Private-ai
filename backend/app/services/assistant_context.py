@@ -48,42 +48,42 @@ def _hit_for_selected_record(db: Session, *, investigation_id: str, record_type:
         raise ValueError(f"record_type must be one of: {', '.join(sorted(SELECTABLE_RECORD_TYPES))}")
 
     if record_type == "entity":
-        row = db.get(Entity, record_id)
-        if row is None or row.investigation_id != investigation_id:
+        entity_row = db.get(Entity, record_id)
+        if entity_row is None or entity_row.investigation_id != investigation_id:
             raise RecordNotFoundError(record_type, record_id)
-        active, alias_chain = resolve_active_entity(db, row)
+        active, alias_chain = resolve_active_entity(db, entity_row)
         is_alias = bool(alias_chain)
-        properties_text = " ".join(f"{p} {' '.join(str(v) for v in (vals or []))}" for p, vals in (row.properties or {}).items())
+        properties_text = " ".join(f"{p} {' '.join(str(v) for v in (vals or []))}" for p, vals in (entity_row.properties or {}).items())
         return SearchHit(
-            "entity", row.id, row.investigation_id,
-            row.caption if not is_alias else f"{row.caption} → {active.caption}",
-            _snippet(properties_text or row.caption, ""), 1.0,
-            {"kind": "merged_alias" if is_alias else "canonical", "ftm_id": row.ftm_id, **_trace("entity", active.id)},
-            {"schema": row.schema, "properties": row.properties or {}},
+            "entity", entity_row.id, entity_row.investigation_id,
+            entity_row.caption if not is_alias or active is None else f"{entity_row.caption} → {active.caption}",
+            _snippet(properties_text or entity_row.caption, ""), 1.0,
+            {"kind": "merged_alias" if is_alias else "canonical", "ftm_id": entity_row.ftm_id, **_trace("entity", active.id if active is not None else entity_row.id)},
+            {"schema": entity_row.schema, "properties": entity_row.properties or {}},
         )
 
     if record_type == "claim":
-        row = db.get(Claim, record_id)
-        if row is None or row.investigation_id != investigation_id:
+        claim_row = db.get(Claim, record_id)
+        if claim_row is None or claim_row.investigation_id != investigation_id:
             raise RecordNotFoundError(record_type, record_id)
         return SearchHit(
-            "claim", row.id, row.investigation_id, "Claim", _snippet(row.text, ""), 1.0,
-            {"kind": "reporter_claim", **_trace("claim", row.id)},
-            {"status": row.status, "confidence": row.confidence},
+            "claim", claim_row.id, claim_row.investigation_id, "Claim", _snippet(claim_row.text, ""), 1.0,
+            {"kind": "reporter_claim", **_trace("claim", claim_row.id)},
+            {"status": claim_row.status, "confidence": claim_row.confidence},
         )
 
     if record_type == "evidence":
-        row = db.get(Evidence, record_id)
-        if row is None:
+        evidence_row = db.get(Evidence, record_id)
+        if evidence_row is None:
             raise RecordNotFoundError(record_type, record_id)
-        source = db.get(Source, row.source_id)
+        source = db.get(Source, evidence_row.source_id)
         if source is None or source.investigation_id != investigation_id:
             raise RecordNotFoundError(record_type, record_id)
         return SearchHit(
-            "evidence", row.id, source.investigation_id, source.title,
-            _snippet(row.quote or row.notes or row.locator, ""), 1.0,
-            {"kind": "evidence", "source_id": source.id, "source_url": source.url, "locator": row.locator, **_trace("evidence", row.id)},
-            {"quote": row.quote, "notes": row.notes},
+            "evidence", evidence_row.id, source.investigation_id, source.title,
+            _snippet(evidence_row.quote or evidence_row.notes or evidence_row.locator, ""), 1.0,
+            {"kind": "evidence", "source_id": source.id, "source_url": source.url, "locator": evidence_row.locator, **_trace("evidence", evidence_row.id)},
+            {"quote": evidence_row.quote, "notes": evidence_row.notes},
         )
 
     if record_type == "relationship":
@@ -102,51 +102,51 @@ def _hit_for_selected_record(db: Session, *, investigation_id: str, record_type:
         )
 
     if record_type == "source":
-        row = db.get(Source, record_id)
-        if row is None or row.investigation_id != investigation_id:
+        source_row = db.get(Source, record_id)
+        if source_row is None or source_row.investigation_id != investigation_id:
             raise RecordNotFoundError(record_type, record_id)
         return SearchHit(
-            "source", row.id, row.investigation_id, row.title,
-            _snippet(row.url or str(row.metadata_json or ""), ""), 1.0,
-            {"kind": "source", "url": row.url, **_trace("source", row.id)},
-            {"source_type": row.source_type},
+            "source", source_row.id, source_row.investigation_id, source_row.title,
+            _snippet(source_row.url or str(source_row.metadata_json or ""), ""), 1.0,
+            {"kind": "source", "url": source_row.url, **_trace("source", source_row.id)},
+            {"source_type": source_row.source_type},
         )
 
     if record_type == "document":
-        row = db.get(Document, record_id)
-        if row is None or row.investigation_id != investigation_id:
+        document_row = db.get(Document, record_id)
+        if document_row is None or document_row.investigation_id != investigation_id:
             raise RecordNotFoundError(record_type, record_id)
-        source = db.get(Source, row.source_id)
+        source = db.get(Source, document_row.source_id)
         return SearchHit(
-            "document", row.id, row.investigation_id, source.title if source else row.filename,
-            _snippet(row.filename, ""), 1.0,
-            {"kind": "document", "source_id": row.source_id, "sha256": row.sha256, **_trace("document", row.id)},
-            {"filename": row.filename, "extraction_status": row.extraction_status},
+            "document", document_row.id, document_row.investigation_id, source.title if source else document_row.filename,
+            _snippet(document_row.filename, ""), 1.0,
+            {"kind": "document", "source_id": document_row.source_id, "sha256": document_row.sha256, **_trace("document", document_row.id)},
+            {"filename": document_row.filename, "extraction_status": document_row.extraction_status},
         )
 
     if record_type == "lead":
-        row = db.get(Lead, record_id)
-        if row is None or row.investigation_id != investigation_id:
+        lead_row = db.get(Lead, record_id)
+        if lead_row is None or lead_row.investigation_id != investigation_id:
             raise RecordNotFoundError(record_type, record_id)
-        profile = db.scalar(select(LeadProfile).where(LeadProfile.lead_id == row.id))
+        profile = db.scalar(select(LeadProfile).where(LeadProfile.lead_id == lead_row.id))
         return SearchHit(
-            "lead", row.id, row.investigation_id, row.title,
-            _snippet(row.detail or (profile.next_action if profile else None), ""), 1.0,
-            {"kind": "lead", "provider": row.provider, **_trace("lead", row.id)},
-            {"status": row.status, "priority": profile.priority if profile else "normal"},
+            "lead", lead_row.id, lead_row.investigation_id, lead_row.title,
+            _snippet(lead_row.detail or (profile.next_action if profile else None), ""), 1.0,
+            {"kind": "lead", "provider": lead_row.provider, **_trace("lead", lead_row.id)},
+            {"status": lead_row.status, "priority": profile.priority if profile else "normal"},
         )
 
     # record_type == "task": investigation_search()'s own hit type for this
     # model is "reporting_task" (see SEARCH_GROUPS), not "task" -- matched
     # here, not the SELECTABLE_RECORD_TYPES spelling, so this record cites
     # identically regardless of how it entered a retrieval packet.
-    row = db.get(ReportingTask, record_id)
-    if row is None or row.investigation_id != investigation_id:
+    task_row = db.get(ReportingTask, record_id)
+    if task_row is None or task_row.investigation_id != investigation_id:
         raise RecordNotFoundError(record_type, record_id)
     return SearchHit(
-        "reporting_task", row.id, row.investigation_id, row.title, _snippet(row.detail, ""), 1.0,
-        {"kind": "reporting_task", "lead_id": row.lead_id, **_trace("task", row.id)},
-        {"status": row.status, "priority": row.priority, "owner": row.owner},
+        "reporting_task", task_row.id, task_row.investigation_id, task_row.title, _snippet(task_row.detail, ""), 1.0,
+        {"kind": "reporting_task", "lead_id": task_row.lead_id, **_trace("task", task_row.id)},
+        {"status": task_row.status, "priority": task_row.priority, "owner": task_row.owner},
     )
 
 
@@ -336,10 +336,10 @@ def build_selected_record_context(
     # in SELECTABLE_RECORD_TYPES, and a connector finding isn't one of them --
     # external/unreviewed evidence never enters this packet at all, rather
     # than entering and then being segregated the way search results are.
-    context = {key: grouped.get(key, []) for key in ("canonical", "evidence", "reporting", "workflow", "review")}
+    context = {group_key: grouped.get(group_key, []) for group_key in ("canonical", "evidence", "reporting", "workflow", "review")}
     citations, seen = [], set()
-    for key in ("canonical", "evidence", "reporting", "workflow", "review"):
-        for item in context[key]:
+    for group_key in ("canonical", "evidence", "reporting", "workflow", "review"):
+        for item in context[group_key]:
             citation = item["citation"]
             ident = (citation["record_type"], citation["record_id"])
             if ident not in seen:

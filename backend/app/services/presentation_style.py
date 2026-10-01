@@ -16,6 +16,7 @@ served by GET /api/presentation-styles, so they cannot drift apart.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+from typing import Any
 
 DEFAULT_THEME = "dark_academia"
 DEFAULT_FONTS = "theme"  # use the theme's own pairing
@@ -154,7 +155,7 @@ def theme(theme_id: str | None) -> Theme:
     return THEMES.get(theme_id or "", THEMES[DEFAULT_THEME])
 
 
-def normalize_deck_style(style) -> dict:
+def normalize_deck_style(style: Any) -> dict:
     """{"theme", "fonts"} with unknown values replaced by defaults."""
     style = style if isinstance(style, dict) else {}
     theme_id = style.get("theme") if style.get("theme") in THEMES else DEFAULT_THEME
@@ -162,7 +163,7 @@ def normalize_deck_style(style) -> dict:
     return {"theme": theme_id, "fonts": fonts}
 
 
-def resolved_theme(style) -> Theme:
+def resolved_theme(style: Any) -> Theme:
     """The deck's theme with its font pairing applied."""
     style = normalize_deck_style(style)
     base = theme(style["theme"])
@@ -179,7 +180,7 @@ def preset(kind: str, preset_id: str | None) -> dict:
     return next((p for p in presets if p["id"] == preset_id), presets[0])
 
 
-def normalize_visual_style(kind: str, style, item_labels: list[str]) -> dict | None:
+def normalize_visual_style(kind: str, style: Any, item_labels: list[str]) -> dict | None:
     """Validate a visual's {"preset", "options"}; None when it adds nothing.
 
     Unknown presets fall back to the type's default; unknown options and
@@ -188,7 +189,8 @@ def normalize_visual_style(kind: str, style, item_labels: list[str]) -> dict | N
     if kind not in VISUAL_PRESETS or not isinstance(style, dict):
         return None
     chosen = preset(kind, style.get("preset"))
-    options_in = style.get("options") if isinstance(style.get("options"), dict) else {}
+    raw_options = style.get("options")
+    options_in: dict = raw_options if isinstance(raw_options, dict) else {}
     options: dict = {}
     for key, spec in VISUAL_OPTIONS[kind].items():
         if key not in options_in:
@@ -228,7 +230,7 @@ def contrast_ratio(fg: str, bg: str) -> float:
     """WCAG 2.x contrast ratio between two RRGGBB colours."""
     def luminance(hex_color: str) -> float:
         channels = [int(hex_color[i:i + 2], 16) / 255 for i in (0, 2, 4)]
-        linear = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4 for c in channels]
+        linear: list[float] = [c / 12.92 if c <= 0.03928 else float(((c + 0.055) / 1.055) ** 2.4) for c in channels]
         return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
     a, b = sorted((luminance(fg), luminance(bg)), reverse=True)
     return (a + 0.05) / (b + 0.05)

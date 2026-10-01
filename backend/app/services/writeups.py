@@ -39,7 +39,7 @@ def extract_cited_refs(content_json: dict) -> list[dict]:
     seen: set[tuple[str, str]] = set()
     refs: list[dict] = []
 
-    def add(record_type, record_id):
+    def add(record_type: Any, record_id: Any) -> None:
         if not record_type or not record_id:
             return
         if record_type == "reporting_task":
@@ -71,12 +71,12 @@ def extract_plain_text(content_json: dict) -> str:
     lines: list[str] = []
     current: list[str] = []
 
-    def flush():
+    def flush() -> None:
         if current:
             lines.append("".join(current).strip())
             current.clear()
 
-    def visit(node: dict):
+    def visit(node: dict) -> None:
         node_type = node.get("type")
         if node_type == "text":
             current.append(node.get("text") or "")
@@ -115,7 +115,7 @@ def extract_plain_text(content_json: dict) -> str:
 
 
 def serialize_writeup(row: Writeup, *, include_content: bool = True) -> dict:
-    data = {
+    data: dict[str, Any] = {
         "id": row.id,
         "investigation_id": row.investigation_id,
         "title": row.title,
@@ -200,12 +200,12 @@ DOCX_SERIF = "Georgia"
 DOCX_SANS = "Calibri"
 
 
-def _docx_rgb(hex_color: str):
+def _docx_rgb(hex_color: str) -> Any:
     from docx.shared import RGBColor
     return RGBColor.from_string(hex_color)
 
 
-def _set_run(run, *, size=None, color=None, bold=None, italic=None, font=None, superscript=None, caps=None, spacing=None):
+def _set_run(run: Any, *, size: float | None = None, color: str | None = None, bold: bool | None = None, italic: bool | None = None, font: str | None = None, superscript: bool | None = None, caps: bool | None = None, spacing: int | None = None) -> Any:
     from docx.oxml.ns import qn
     from docx.shared import Pt
     if font:
@@ -236,7 +236,7 @@ def _set_run(run, *, size=None, color=None, bold=None, italic=None, font=None, s
     return run
 
 
-def _shade_cell(cell, fill: str, *, left_border: str | None = None):
+def _shade_cell(cell: Any, fill: str, *, left_border: str | None = None) -> None:
     from docx.oxml.ns import qn
     tcPr = cell._element.get_or_add_tcPr()
     shd = tcPr.makeelement(qn("w:shd"), {qn("w:val"): "clear", qn("w:color"): "auto", qn("w:fill"): fill})
@@ -255,7 +255,7 @@ def _shade_cell(cell, fill: str, *, left_border: str | None = None):
     tcPr.append(margins)
 
 
-def _bottom_rule(paragraph, color: str = DOCX_BRASS, size: int = 12):
+def _bottom_rule(paragraph: Any, color: str = DOCX_BRASS, size: int = 12) -> None:
     from docx.oxml.ns import qn
     pPr = paragraph._p.get_or_add_pPr()
     pbdr = pPr.makeelement(qn("w:pBdr"), {})
@@ -263,7 +263,7 @@ def _bottom_rule(paragraph, color: str = DOCX_BRASS, size: int = 12):
     pPr.append(pbdr)
 
 
-def _no_table_borders(table):
+def _no_table_borders(table: Any) -> None:
     from docx.oxml.ns import qn
     tblPr = table._tbl.tblPr
     borders = tblPr.makeelement(qn("w:tblBorders"), {})
@@ -272,7 +272,7 @@ def _no_table_borders(table):
     tblPr.append(borders)
 
 
-def _row_rules(table, color: str = DOCX_RULE):
+def _row_rules(table: Any, color: str = DOCX_RULE) -> None:
     from docx.oxml.ns import qn
     tblPr = table._tbl.tblPr
     borders = tblPr.makeelement(qn("w:tblBorders"), {})
@@ -282,7 +282,7 @@ def _row_rules(table, color: str = DOCX_RULE):
     tblPr.append(borders)
 
 
-def _para(container, *, space_before=0, space_after=6, line=1.25, keep_next=False):
+def _para(container: Any, *, space_before: float = 0, space_after: float = 6, line: float = 1.25, keep_next: bool = False) -> Any:
     from docx.shared import Pt
     p = container.add_paragraph()
     fmt = p.paragraph_format
@@ -294,11 +294,11 @@ def _para(container, *, space_before=0, space_after=6, line=1.25, keep_next=Fals
     return p
 
 
-def _cite_key(record_type, record_id):
+def _cite_key(record_type: Any, record_id: Any) -> tuple[Any, Any]:
     return ("task" if record_type == "reporting_task" else record_type, record_id)
 
 
-def _render_inline(paragraph, node: dict, citation_index: dict[tuple[str, str], int], *, size=11, color=DOCX_INK, font=DOCX_SERIF, italic=None) -> None:
+def _render_inline(paragraph: Any, node: dict, citation_index: dict[tuple[str, str], int], *, size: float = 11, color: str = DOCX_INK, font: str = DOCX_SERIF, italic: bool | None = None) -> None:
     node_type = node.get("type")
     if node_type == "text":
         marks = {m.get("type") for m in (node.get("marks") or [])}
@@ -321,7 +321,7 @@ def _render_inline(paragraph, node: dict, citation_index: dict[tuple[str, str], 
         _render_inline(paragraph, child, citation_index, size=size, color=color, font=font, italic=italic)
 
 
-def _refs_marker(refs, citation_index) -> str:
+def _refs_marker(refs: Any, citation_index: dict[tuple[str, str], int]) -> str:
     nums = []
     for ref in refs or []:
         if isinstance(ref, dict) and ref.get("record_type") and ref.get("record_id"):
@@ -342,7 +342,7 @@ def _format_bar_value(value: float, unit: str) -> str:
     return f"{prefix}{text}{suffix}"
 
 
-def _set_widths(table, widths_in: list[float]) -> None:
+def _set_widths(table: Any, widths_in: list[float]) -> None:
     from docx.shared import Inches
     table.autofit = False
     for column, width in zip(table.columns, widths_in):
@@ -351,7 +351,7 @@ def _set_widths(table, widths_in: list[float]) -> None:
             cell.width = Inches(width)
 
 
-def _render_visual(docx, visual: dict, citation_index) -> None:
+def _render_visual(docx: Any, visual: dict, citation_index: dict[tuple[str, str], int]) -> None:
     from docx.shared import Inches
     from app.services.decks import display_date
 
@@ -405,7 +405,7 @@ def _render_visual(docx, visual: dict, citation_index) -> None:
     _para(docx, space_after=4)
 
 
-def _render_callout(docx, node: dict, citation_index) -> None:
+def _render_callout(docx: Any, node: dict, citation_index: dict[tuple[str, str], int]) -> None:
     attrs = node.get("attrs") or {}
     tone = attrs.get("tone")
     accent = DOCX_OXBLOOD if tone == "questions" else DOCX_BRASS
@@ -433,12 +433,12 @@ def _render_callout(docx, node: dict, citation_index) -> None:
     _para(docx, space_after=4)
 
 
-def docx_pt(value):
+def docx_pt(value: float) -> Any:
     from docx.shared import Pt
     return Pt(value)
 
 
-def render_writeup_docx(row: Writeup, citation_details: list[dict] | None = None):
+def render_writeup_docx(row: Writeup, citation_details: list[dict] | None = None) -> Any:
     """Build a python-docx Document from content_json. `citation_details`
     is describe_record_refs()'s output for this write-up's cited refs; the
     Sources section falls back to type + id when a ref has no detail."""
