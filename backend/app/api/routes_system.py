@@ -25,16 +25,21 @@ from app.models.domain import AIAnalysisCandidate, Investigation, Source, Statem
 from app.schemas.api import (
     AIAnalysisCandidateReviewRequest,
     EvidenceCreate,
+    PromoteToDeckRequest,
+    PromoteToWriteupRequest,
     StatementPromotionRequest,
     TimelineEventCreate,
 )
 from app.ai.reasoning import review_ai_analysis_candidate, serialize_ai_analysis_candidate
+from app.services.decks import serialize_deck
 from app.services.evidence import create_evidence
 from app.services.openaleph import probe_openaleph
+from app.services.presentation import promote_candidate_to_deck, promote_candidate_to_writeup
 from app.services.promotion import promote_assessment
 from app.services.relationships import RELATIONSHIP_SCHEMAS
 from app.services.search import investigation_search
 from app.services.timeline import create_timeline_event
+from app.services.writeups import serialize_writeup
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
@@ -135,6 +140,37 @@ def review_ai_analysis_candidate_endpoint(candidate_id: str, body: AIAnalysisCan
         return review_ai_analysis_candidate(db, row, decision=body.decision, note=body.note)
     except ValueError as exc:
         raise HTTPException(400, str(exc))
+
+
+@router.post("/ai-analysis-candidates/{candidate_id}/promote-to-writeup", response_model=None)
+def promote_ai_analysis_candidate_to_writeup_endpoint(candidate_id: str, body: PromoteToWriteupRequest, db: Session = Depends(get_db)) -> Any:
+    """Turn an accepted presentation_draft candidate into a reporter-editable
+    Writeup (see app/services/presentation.py). Not idempotent -- each call
+    creates a new write-up, since a reporter may want more than one brief
+    from the same underlying draft."""
+    row = db.get(AIAnalysisCandidate, candidate_id)
+    if row is None:
+        raise HTTPException(404, "AI analysis candidate not found")
+    try:
+        writeup = promote_candidate_to_writeup(db, row, title=body.title)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+    return serialize_writeup(writeup)
+
+
+@router.post("/ai-analysis-candidates/{candidate_id}/promote-to-deck", response_model=None)
+def promote_ai_analysis_candidate_to_deck_endpoint(candidate_id: str, body: PromoteToDeckRequest, db: Session = Depends(get_db)) -> Any:
+    """Turn an accepted presentation_draft candidate into a reporter-editable
+    Deck (see app/services/presentation.py). Not idempotent, for the same
+    reason as the write-up promotion endpoint above."""
+    row = db.get(AIAnalysisCandidate, candidate_id)
+    if row is None:
+        raise HTTPException(404, "AI analysis candidate not found")
+    try:
+        deck = promote_candidate_to_deck(db, row, title=body.title)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+    return serialize_deck(deck)
 
 
 @router.post("/evidence", response_model=None)
