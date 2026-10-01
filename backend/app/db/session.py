@@ -1,3 +1,5 @@
+import sqlite3
+import threading
 from typing import Any, Iterator
 
 from sqlalchemy import Engine, create_engine
@@ -7,6 +9,90 @@ from app.core.config import settings
 from app.db import validation as _validation  # noqa: F401 - registers cross-dialect ORM guards
 from app.db import mutation_guard as _mutation_guard  # noqa: F401 - registers PostgreSQL mutation locks
 
+class _SerializedCursor(sqlite3.Cursor):
+    """A cursor whose every DBAPI call holds its connection's lock.
+
+    See _SerializedConnection: with StaticPool every request thread shares one
+    sqlite3 connection, and Python's sqlite3 module does not make concurrent
+    calls on one connection safe -- overlapping execute/fetch calls from two
+    threads returned truncated result sets (a 200-row SELECT coming back with
+    106 rows, or none) and raised `sqlite3.InterfaceError: bad parameter or
+    other API misuse`, which reached the UI as random "Failed to fetch"
+    toasts whenever the page fired its parallel load requests.
+    """
+
+    def execute(self, *args: Any, **kwargs: Any):  # type: ignore[override]
+        with self.connection._lock:  # type: ignore[attr-defined]
+            return super().execute(*args, **kwargs)
+
+    def executemany(self, *args: Any, **kwargs: Any):  # type: ignore[override]
+        with self.connection._lock:  # type: ignore[attr-defined]
+            return super().executemany(*args, **kwargs)
+
+    def executescript(self, *args: Any, **kwargs: Any):  # type: ignore[override]
+        with self.connection._lock:  # type: ignore[attr-defined]
+            return super().executescript(*args, **kwargs)
+
+    def fetchone(self):  # type: ignore[override]
+        with self.connection._lock:  # type: ignore[attr-defined]
+            return super().fetchone()
+
+    def fetchmany(self, *args: Any, **kwargs: Any):  # type: ignore[override]
+        with self.connection._lock:  # type: ignore[attr-defined]
+            return super().fetchmany(*args, **kwargs)
+
+    def fetchall(self):  # type: ignore[override]
+        with self.connection._lock:  # type: ignore[attr-defined]
+            return super().fetchall()
+
+    def close(self):  # type: ignore[override]
+        with self.connection._lock:  # type: ignore[attr-defined]
+            return super().close()
+
+
+class _SerializedConnection(sqlite3.Connection):
+    """sqlite3 connection that serializes every call made through it.
+
+    The lock is held for one DBAPI call at a time (never across a request,
+    an await, or a whole transaction), so it cannot deadlock against the
+    event loop or a nested session; it only stops two threads' calls from
+    overlapping inside the sqlite3 module. Transaction semantics are
+    unchanged from before: StaticPool already meant every session shared one
+    connection and therefore one SQLite transaction.
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any):
+        super().__init__(*args, **kwargs)
+        self._lock = threading.RLock()
+
+    def cursor(self, factory: Any = None):  # type: ignore[override]
+        return super().cursor(factory or _SerializedCursor)
+
+    def execute(self, *args: Any, **kwargs: Any):  # type: ignore[override]
+        with self._lock:
+            return super().execute(*args, **kwargs)
+
+    def executemany(self, *args: Any, **kwargs: Any):  # type: ignore[override]
+        with self._lock:
+            return super().executemany(*args, **kwargs)
+
+    def executescript(self, *args: Any, **kwargs: Any):  # type: ignore[override]
+        with self._lock:
+            return super().executescript(*args, **kwargs)
+
+    def commit(self):  # type: ignore[override]
+        with self._lock:
+            return super().commit()
+
+    def rollback(self):  # type: ignore[override]
+        with self._lock:
+            return super().rollback()
+
+    def close(self):  # type: ignore[override]
+        with self._lock:
+            return super().close()
+
+
 def build_engine(database_url: str) -> Engine:
     """Build an Engine for `database_url` with this app's dialect rules.
 
@@ -14,7 +100,9 @@ def build_engine(database_url: str) -> Engine:
     instance created with `create_app(database_url=...)` gets its own via this
     same function, so the SQLite pooling rule cannot drift between the two.
     """
-    connect_args = {"check_same_thread": False} if database_url.startswith("sqlite") else {}
+    # factory: see _SerializedConnection -- required because of the shared
+    # StaticPool connection below.
+    connect_args: dict[str, Any] = {"check_same_thread": False, "factory": _SerializedConnection} if database_url.startswith("sqlite") else {}
     engine_kwargs: dict[str, Any] = {"pool_pre_ping": True, "connect_args": connect_args}
     if database_url.startswith("sqlite"):
         # STRUCT-0011: force a single persistent connection for ANY SQLite backend, not
