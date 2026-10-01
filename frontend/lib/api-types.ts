@@ -92,11 +92,21 @@ export type ApiAccessStatus={remote_api_enabled:boolean,mode:'local_only'|'share
 export type DocumentExtractionStatus={pdf_ocr_enabled:boolean,pdf_ocr_language:string,pdf_ocr_dpi:number,pdf_ocr_min_native_chars:number,local_entity_suggestions_enabled:boolean,entity_extraction_owner:'workbench_local'|'openaleph_ftm_analyze',ocr_runtime:{available:boolean,tessdata:string|null,requested_languages:string[],missing_languages:string[],detail:string}};
 // TAS reasoning layer (issue #36). `ai` is optional on SettingsStatus so a frontend built from this
 // commit still validates an older backend's settings payload; the panel treats absence as "unknown".
-export type AiModuleName='case_synthesis'|'hypothesis_test';
+export type AiModuleName='case_synthesis'|'hypothesis_test'|'presentation_draft';
 export type AiReviewStatus='proposed'|'accepted'|'rejected';
 export type AiReasoningStatus={enabled:boolean,provider:string|null,provider_key_configured:boolean,endpoints_callable:boolean,tas_spec:{present:boolean,version:string|null,modules:Record<string,{spec_file:string,available:boolean}>}};
-export type AiAnalysisRequest={question?:string|null,working_theory?:string|null,max_results?:number,include_external_leads?:boolean};
+// presentation_draft's request stores the goal in `question` (same field the
+// other two modules use) and the reporter-picked evidence in `record_refs`.
+export type AiAnalysisRequest={question?:string|null,working_theory?:string|null,max_results?:number,include_external_leads?:boolean,record_refs?:AiCitationRef[]|null};
 export type AiCitationRef={record_type:string,record_id:string};
+// A presentation_draft candidate's payload (app/ai/presentation_modules/PRESENTATION_DRAFT.md):
+// the same draft rendered two ways -- `body` for a written brief, `key_points` for a slide.
+export type PresentationSection={heading:string,body:string,key_points:string[],evidence:AiCitationRef[]};
+export type PresentationDraftPayload={title:string,goal_restated:string,executive_takeaway:string,sections:PresentationSection[],open_questions:string[]};
+// Promotion targets for an accepted presentation_draft candidate (app/services/presentation.py).
+export type Writeup={id:string,investigation_id:string,title:string,status:string,cited_record_refs:AiCitationRef[],content_json?:JsonObject,preview?:string,source_ai_candidate_id?:string|null,created_by?:string|null,created_at:string,updated_at:string,word_count:number};
+export type DeckSlide={heading:string,bullets:string[],evidence:AiCitationRef[]};
+export type Deck={id:string,investigation_id:string,title:string,slides:DeckSlide[],slide_count:number,source_ai_candidate_id?:string|null,created_by?:string|null,created_at:string,updated_at:string};
 export type AiAnalysisCandidateSummary={id:string,investigation_id:string,module:AiModuleName|string,request:AiAnalysisRequest,review_status:AiReviewStatus|string,confidence:number,reviewer_note:string|null,accepted_record_type:string|null,accepted_record_id:string|null,created_at:string,reviewed_at:string|null,checked_citation_count:number};
 export type AiAnalysisCandidate=AiAnalysisCandidateSummary&{payload:JsonObject,checked_citation_ids:AiCitationRef[],trace?:JsonObject|null};
 export type AiReasoningRunResult={candidate_id:string,review_status:AiReviewStatus|string,payload:JsonObject};
