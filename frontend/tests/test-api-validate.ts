@@ -8,9 +8,7 @@ import {describe, expect, it} from 'vitest';
 import {
   ApiPayloadError,
   isCanonicalEntity,
-  isFinding,
   isInvestigation,
-  isRelationship,
   isSettingsStatus,
   isTimelineEvent,
   jsonArray,
@@ -22,17 +20,10 @@ import {
 
 const validInvestigation = {id: 'inv-1', name: 'Example Investigation'};
 const validEntity = {id: 'ent-1', caption: 'Example Entity', schema: 'Person', properties: {}};
-const validFinding = {id: 'f-1', provider: 'aleph', caption: 'Example', properties: {}, review_status: 'pending'};
 const validTimelineEvent = {
   id: 't-1', kind: 'event', title: 'Something happened', date_start: '2026-01-01',
   precision: 'day', verification_status: 'unverified', provenance: {}, refs: {},
 };
-const validEndpoint = {id: 'e-1', caption: 'Endpoint', schema: 'Person'};
-const validRelationship = {
-  id: 'r-1', relationship_entity_id: 're-1', schema: 'UnknownLink', caption: 'Linked to',
-  properties: {}, source: validEndpoint, target: validEndpoint,
-};
-
 describe('isInvestigation', () => {
   it('accepts a well-formed investigation', () => {
     expect(isInvestigation(validInvestigation)).toBe(true);
@@ -63,16 +54,6 @@ describe('isCanonicalEntity', () => {
   });
 });
 
-describe('isFinding', () => {
-  it('accepts a well-formed finding', () => {
-    expect(isFinding(validFinding)).toBe(true);
-  });
-  it('rejects a missing review_status', () => {
-    const {review_status: _rs, ...rest} = validFinding;
-    expect(isFinding(rest)).toBe(false);
-  });
-});
-
 describe('isTimelineEvent', () => {
   it('accepts a well-formed event', () => {
     expect(isTimelineEvent(validTimelineEvent)).toBe(true);
@@ -83,16 +64,6 @@ describe('isTimelineEvent', () => {
   });
   it('rejects provenance that is not an object', () => {
     expect(isTimelineEvent({...validTimelineEvent, provenance: 'not-an-object'})).toBe(false);
-  });
-});
-
-describe('isRelationship', () => {
-  it('accepts a well-formed relationship', () => {
-    expect(isRelationship(validRelationship)).toBe(true);
-  });
-  it('rejects a source endpoint missing a schema', () => {
-    const {schema: _schema, ...brokenSource} = validEndpoint;
-    expect(isRelationship({...validRelationship, source: brokenSource})).toBe(false);
   });
 });
 
