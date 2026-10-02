@@ -34,6 +34,7 @@ from opsconsole.core.introspect import SchemaIntrospector
 from opsconsole.core.supervisor import TaskSupervisor
 from opsconsole.core.traffic import TrafficBuffer
 from opsconsole.manifest import sections
+from opsconsole.schemas import CONSOLE_REFUSALS
 from opsconsole.store import Store
 
 log = logging.getLogger("opsconsole")
@@ -80,7 +81,7 @@ def mount(app: FastAPI, config: ConsoleConfig) -> ConsoleHandle:
     ctx.on_store_open.append(_reconcile_pending_activity)
     follower = LogFollower(ctx)
 
-    router = APIRouter(prefix=config.route_prefix)
+    router = APIRouter(prefix=config.route_prefix, responses=CONSOLE_REFUSALS)
     router.include_router(overview.router(ctx))
     router.include_router(data.router(ctx))
     router.include_router(schema.router(ctx))

@@ -24,8 +24,9 @@ from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Document, Investigation
 from app.schemas.responses import (
-    DocumentDetailOut, DocumentUploadOut, ExtractionCandidateOut, OpenAlephDocumentSyncOut, OpenAlephEntityImportOut,
-    OpenAlephEvidenceImportOut, OpenAlephReviewRefreshOut, OpenAlephReviewStatusOut,
+    DocumentDetailOut, DocumentReadFailedOut, DocumentUploadOut, ExtractionCandidateOut, OpenAlephDocumentSyncOut,
+    OpenAlephEntityImportOut, OpenAlephEvidenceImportOut, OpenAlephReviewRefreshOut, OpenAlephReviewStatusOut,
+    ValidationErrorOut, upstream,
 )
 from app.services.documents import (
     get_document_detail, list_document_candidates, serialize_document, store_document,
@@ -57,7 +58,7 @@ def get_openaleph_document_review_status(document_id: str, db: Session = Depends
         raise HTTPException(404, str(exc))
 
 
-@router.post("/documents/{document_id}/corpus/openaleph/sync", response_model=OpenAlephDocumentSyncOut)
+@router.post("/documents/{document_id}/corpus/openaleph/sync", response_model=OpenAlephDocumentSyncOut, responses=upstream("OpenAleph", 503))
 def sync_openaleph_document(document_id: str, db: Session = Depends(get_db)) -> dict[str, Any]:
     try:
         row = sync_document_to_openaleph(db, document_id)
@@ -68,7 +69,8 @@ def sync_openaleph_document(document_id: str, db: Session = Depends(get_db)) -> 
     return {"sync": serialize_sync(row)}
 
 
-@router.post("/documents/{document_id}/corpus/openaleph/refresh-review", response_model=OpenAlephReviewRefreshOut)
+@router.post("/documents/{document_id}/corpus/openaleph/refresh-review", response_model=OpenAlephReviewRefreshOut,
+             responses=upstream("OpenAleph", 502))
 def refresh_openaleph_document_review(document_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
     """Refresh OpenAleph Page + Mention candidates without auto-accepting either."""
     try:
@@ -88,7 +90,8 @@ def refresh_openaleph_document_review(document_id: str, request: Request, db: Se
         raise HTTPException(502, f"OpenAleph review refresh failed. Details were logged server-side (request {request.state.request_id}).")
 
 
-@router.post("/documents/{document_id}/corpus/openaleph/import-evidence", response_model=OpenAlephEvidenceImportOut)
+@router.post("/documents/{document_id}/corpus/openaleph/import-evidence", response_model=OpenAlephEvidenceImportOut,
+             responses=upstream("OpenAleph", 502))
 def import_openaleph_document_evidence(document_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
     """Stage OpenAleph page text as review-required evidence candidates."""
     try:
@@ -108,7 +111,8 @@ def import_openaleph_document_evidence(document_id: str, request: Request, db: S
         raise HTTPException(502, f"OpenAleph extraction import failed. Details were logged server-side (request {request.state.request_id}).")
 
 
-@router.post("/documents/{document_id}/corpus/openaleph/import-entities", response_model=OpenAlephEntityImportOut)
+@router.post("/documents/{document_id}/corpus/openaleph/import-entities", response_model=OpenAlephEntityImportOut,
+             responses=upstream("OpenAleph", 502))
 def import_openaleph_document_entities(document_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
     """Stage OpenAleph/ftm-analyze Mention entities for explicit reporter review."""
     try:
@@ -128,7 +132,11 @@ def import_openaleph_document_entities(document_id: str, request: Request, db: S
         raise HTTPException(502, f"OpenAleph entity import failed. Details were logged server-side (request {request.state.request_id}).")
 
 
-@router.post("/documents/upload", response_model=DocumentUploadOut)
+@router.post("/documents/upload", response_model=DocumentUploadOut, responses={
+    202: {"model": DocumentUploadOut, "description": "Saved; the document is read by a background job (follow `job`)"},
+    422: {"model": ValidationErrorOut | DocumentReadFailedOut,
+          "description": "The input does not match the route, or the file was saved but could not be read"},
+})
 async def upload_document(
     request: Request,
     response: Response,

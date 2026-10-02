@@ -20,6 +20,9 @@ export default defineConfig({
     // The app uses Zod 3 (package.json); checked 2026-10-01 that the plugin
     // supports it via compatibilityVersion. The database keeps UTC times
     // without an offset (backend app/core/time.py), so those must pass too.
+    // (The response models declare their times with a pattern that allows
+    // both, Timestamp in backend/app/schemas/responses.py; this covers any
+    // "date-time" format the schema may still carry.)
     {name: 'zod', compatibilityVersion: 3, dates: {local: true, offset: true}},
     {name: '@hey-api/sdk', validator: true},
     '@tanstack/react-query',

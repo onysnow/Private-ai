@@ -37,7 +37,12 @@ export const zAiAnalysisCandidateReviewOut = z.object({
   id: z.string(),
   module: z.string(),
   review_status: z.string(),
-  reviewed_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  reviewed_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
   reviewer_note: z.string().nullable(),
 });
 
@@ -56,14 +61,23 @@ export const zAiAnalysisCandidateSummaryOut = z.object({
   accepted_record_type: z.string().nullable(),
   checked_citation_count: z.number().int(),
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   id: z.string(),
   investigation_id: z.string(),
   module: z.string(),
   rejection_reason: z.string().nullable(),
   request: z.record(z.unknown()),
   review_status: z.string(),
-  reviewed_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  reviewed_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
   reviewer_note: z.string().nullable(),
 });
 
@@ -108,6 +122,49 @@ export const zAiModuleStatusOut = z.object({
   available: z.boolean(),
   spec_file: z.string(),
   vendored_tas: z.boolean(),
+});
+
+/**
+ * AiOutputRejectionOut
+ *
+ * Why a model's answer was kept only as a rejected proposal, with what the
+ * check found: references to records the run was not given, missing parts,
+ * or quotes not found in the records they cite (app/ai/reasoning.py
+ * describe_reasoning_failure). The findings are pieces of the model's own
+ * answer, so their keys are the model's.
+ */
+export const zAiOutputRejectionOut = z.object({
+  invalid_citations: z.array(z.record(z.unknown())).nullish(),
+  message: z.string(),
+  removed: z.array(z.record(z.unknown())).nullish(),
+  schema_errors: z.array(z.string()).nullish(),
+});
+
+/**
+ * AiOutputRejectedOut
+ *
+ * A reasoning run whose answer did not pass its checks (422).
+ */
+export const zAiOutputRejectedOut = z.object({
+  detail: zAiOutputRejectionOut,
+});
+
+/**
+ * AiOutputUnusableOut
+ */
+export const zAiOutputUnusableOut = z.object({
+  message: z.string(),
+  rejection_reason: z.string(),
+});
+
+/**
+ * AiModelFailedOut
+ *
+ * A reasoning run whose answer could not be used at all (502): cut off,
+ * or not JSON. Kept as a rejected proposal; `rejection_reason` says which.
+ */
+export const zAiModelFailedOut = z.object({
+  detail: zAiOutputUnusableOut,
 });
 
 /**
@@ -195,23 +252,38 @@ export const zAppUserMembershipOut = z.object({
  */
 export const zAppUserOut = z.object({
   disabled: z.boolean(),
-  disabled_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  disabled_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
   display_name: z.string(),
   global_role: z.string(),
   id: z.string(),
   memberships: z.array(zAppUserMembershipOut),
-  token_created_at: z.string().datetime({ offset: true, local: true }),
+  token_created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   token_last_used_at: z
     .string()
-    .datetime({ offset: true, local: true })
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
     .nullable(),
   token_revoked_at: z
     .string()
-    .datetime({ offset: true, local: true })
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
     .nullable(),
   token_rotated_at: z
     .string()
-    .datetime({ offset: true, local: true })
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
     .nullable(),
   token_status: z.enum(['active', 'disabled', 'revoked']),
 });
@@ -221,7 +293,11 @@ export const zAppUserOut = z.object({
  */
 export const zAppUserTokenRevokedOut = z.object({
   id: z.string(),
-  token_revoked_at: z.string().datetime({ offset: true, local: true }),
+  token_revoked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   token_status: z.literal('revoked'),
 });
 
@@ -233,9 +309,17 @@ export const zAppUserTokenRevokedOut = z.object({
 export const zAppUserTokenRotatedOut = z.object({
   id: z.string(),
   token: z.string(),
-  token_created_at: z.string().datetime({ offset: true, local: true }),
+  token_created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   token_notice: z.string(),
-  token_rotated_at: z.string().datetime({ offset: true, local: true }),
+  token_rotated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
 });
 
 /**
@@ -252,7 +336,12 @@ export const zAppUserUpdate = z.object({
  */
 export const zAppUserUpdatedOut = z.object({
   disabled: z.boolean(),
-  disabled_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  disabled_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
   display_name: z.string(),
   global_role: z.string(),
   id: z.string(),
@@ -269,10 +358,19 @@ export const zAppUserUpdatedOut = z.object({
  */
 export const zBackgroundJobOut = z.object({
   attempts: z.number().int(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   error: z.string().nullable(),
   finished: z.boolean(),
-  finished_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
   id: z.string(),
   investigation_id: z.string().nullable(),
   kind: z.string(),
@@ -280,11 +378,20 @@ export const zBackgroundJobOut = z.object({
   progress: z.number().int().nullable(),
   result: z.unknown().optional(),
   runner: z.string(),
-  started_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
   status: z.enum(['queued', 'running', 'succeeded', 'failed', 'cancelled']),
   subject_id: z.string().nullable(),
   subject_type: z.string().nullable(),
-  updated_at: z.string().datetime({ offset: true, local: true }),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
 });
 
 /**
@@ -393,7 +500,11 @@ export const zCanonicalDuplicateCandidateOut = z.object({
  * The record of a merge: the preview it was executed from and what moved.
  */
 export const zCanonicalEntityMergeAuditOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   id: z.string(),
   investigation_id: z.string(),
   moved_counts_json: z.record(z.number().int()),
@@ -430,7 +541,11 @@ export const zCanonicalMergeExecuteRequest = z.object({
  */
 export const zCanonicalResolutionDecisionOut = z.object({
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   entity_a_id: z.string(),
   entity_b_id: z.string(),
@@ -581,7 +696,11 @@ export const zClaimEvidenceLinkCreate = z.object({
  */
 export const zClaimEvidenceLinkOut = z.object({
   claim_id: z.string(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   evidence_id: z.string(),
   id: z.string(),
   note: z.string().nullish(),
@@ -593,7 +712,11 @@ export const zClaimEvidenceLinkOut = z.object({
  */
 export const zClaimOut = z.object({
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   id: z.string(),
   investigation_id: z.string(),
   status: z.string(),
@@ -605,7 +728,11 @@ export const zClaimOut = z.object({
  */
 export const zClaimReviewEventOut = z.object({
   claim_id: z.string(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   from_confidence: z.number(),
   from_status: z.string(),
   id: z.string(),
@@ -637,7 +764,11 @@ export const zClaimUpdate = z.object({
  */
 export const zClusterDecisionOut = z.object({
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   id: z.string(),
   rationale: z.string().nullish(),
@@ -731,7 +862,11 @@ export const zConnectorCredentialStatusOut = z.object({
  */
 export const zConnectorFindingOut = z.object({
   caption: z.string(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   id: z.string(),
   investigation_id: z.string(),
   properties: z.record(z.unknown()),
@@ -749,13 +884,22 @@ export const zConnectorFindingOut = z.object({
  */
 export const zConnectorRunOut = z.object({
   error: z.string().nullish(),
-  finished_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   id: z.string(),
   investigation_id: z.string(),
   provider: z.string(),
   query: z.string(),
   result_count: z.number().int(),
-  started_at: z.string().datetime({ offset: true, local: true }),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   status: z.string(),
 });
 
@@ -858,7 +1002,11 @@ export const zCoreCapabilitiesOut = z.object({
 export const zCrossProviderDecisionOut = z.object({
   cluster_key: z.string(),
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   entity_id: z.string(),
   finding_ids: z.array(z.string()),
@@ -981,7 +1129,11 @@ export const zDemoSeedOut = z.object({
  * DocumentChunkOut
  */
 export const zDocumentChunkOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   document_id: z.string(),
   id: z.string(),
   locator: z.string(),
@@ -999,7 +1151,11 @@ export const zDocumentDetailOut = z.object({
   candidate_counts: z.record(z.number().int()),
   chunk_count: z.number().int(),
   chunks: z.array(zDocumentChunkOut),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   extraction_error: z.string().nullish(),
   extraction_issues: z.array(z.string()),
   extraction_status: z.string(),
@@ -1017,7 +1173,11 @@ export const zDocumentDetailOut = z.object({
 export const zDocumentOut = z.object({
   candidate_counts: z.record(z.number().int()),
   chunk_count: z.number().int(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   extraction_error: z.string().nullish(),
   extraction_issues: z.array(z.string()),
   extraction_status: z.string(),
@@ -1027,6 +1187,26 @@ export const zDocumentOut = z.object({
   mime_type: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
+});
+
+/**
+ * DocumentReadFailureOut
+ */
+export const zDocumentReadFailureOut = z.object({
+  document: zDocumentOut,
+  error: z.string().nullable(),
+  job: zBackgroundJobOut.nullable(),
+  message: z.string(),
+});
+
+/**
+ * DocumentReadFailedOut
+ *
+ * An upload whose file was saved but could not be read (422): the saved
+ * document, why it failed, and the job that tried (routes_documents.py).
+ */
+export const zDocumentReadFailedOut = z.object({
+  detail: zDocumentReadFailureOut,
 });
 
 /**
@@ -1117,7 +1297,11 @@ export const zEnrichmentRunResultOut = z.object({
  * EnrichmentSessionFindingOut
  */
 export const zEnrichmentSessionFindingOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   finding_id: z.string(),
   id: z.string(),
   provider: z.string(),
@@ -1131,12 +1315,21 @@ export const zEnrichmentSessionFindingOut = z.object({
  */
 export const zEnrichmentSessionOut = z.object({
   entity_id: z.string(),
-  finished_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   id: z.string(),
   investigation_id: z.string(),
   providers: z.array(z.string()),
   runs: z.array(zEnrichmentRunResultOut),
-  started_at: z.string().datetime({ offset: true, local: true }),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   status: z.string(),
   total_results: z.number().int(),
 });
@@ -1148,11 +1341,20 @@ export const zEnrichmentSessionOut = z.object({
  */
 export const zEnrichmentSessionRowOut = z.object({
   entity_id: z.string(),
-  finished_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   id: z.string(),
   investigation_id: z.string(),
   providers: z.array(z.string()),
-  started_at: z.string().datetime({ offset: true, local: true }),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   status: z.string(),
   total_results: z.number().int(),
 });
@@ -1162,13 +1364,23 @@ export const zEnrichmentSessionRowOut = z.object({
  */
 export const zEnrichmentSessionRunOut = z.object({
   error: z.string().nullish(),
-  finished_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   id: z.string(),
   provider: z.string(),
   result_count: z.number().int(),
   run_id: z.string().nullish(),
   session_id: z.string(),
-  started_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   status: z.string(),
 });
 
@@ -1179,12 +1391,21 @@ export const zEnrichmentSessionRunOut = z.object({
  */
 export const zEnrichmentSessionDetailOut = z.object({
   entity_id: z.string(),
-  finished_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   id: z.string(),
   investigation_id: z.string(),
   providers: z.array(z.string()),
   runs: z.array(zEnrichmentSessionRunOut),
-  started_at: z.string().datetime({ offset: true, local: true }),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   status: z.string(),
   total_results: z.number().int(),
 });
@@ -1245,7 +1466,11 @@ export const zEntityCreate = z.object({
 export const zEntityOut = z.object({
   canonical_id: z.string().nullish(),
   caption: z.string(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   ftm_id: z.string(),
   id: z.string(),
   investigation_id: z.string(),
@@ -1262,9 +1487,19 @@ export const zEntityOut = z.object({
 export const zEntityStatementOut = z.object({
   dataset: z.string(),
   entity_id: z.string(),
-  first_seen: z.string().datetime({ offset: true, local: true }).nullish(),
+  first_seen: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   id: z.string(),
-  last_seen: z.string().datetime({ offset: true, local: true }).nullish(),
+  last_seen: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   origin: z.string().nullish(),
   original_value: z.string().nullish(),
   prop: z.string(),
@@ -1288,6 +1523,17 @@ export const zEntityUpdate = z.object({
   dataset: z.string().optional().default('reporter'),
   origin: z.string().nullish(),
   properties: z.record(z.array(z.string())).optional(),
+});
+
+/**
+ * ErrorOut
+ *
+ * Why a request was refused, in a sentence: the detail of an
+ * HTTPException, or of one of the checks every request passes first (access,
+ * request size; app/main.py api_access_guard, app/core/access.py).
+ */
+export const zErrorOut = z.object({
+  detail: z.string(),
 });
 
 /**
@@ -1559,7 +1805,11 @@ export const zExternalRelationshipPromotionOut = z.object({
   finding_id: z.string(),
   id: z.string(),
   investigation_id: z.string(),
-  promoted_at: z.string().datetime({ offset: true, local: true }),
+  promoted_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   provider: z.string(),
   relationship_edge_id: z.string(),
   relationship_entity_id: z.string(),
@@ -1571,7 +1821,11 @@ export const zExternalRelationshipPromotionOut = z.object({
  * ExternalRelationshipReviewOut
  */
 export const zExternalRelationshipReviewOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   finding_id: z.string(),
   id: z.string(),
@@ -1665,14 +1919,23 @@ export const zExtractionCandidateOut = z.object({
   candidate_type: z.string(),
   chunk_id: z.string().nullish(),
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   document_id: z.string(),
   explanation: zExtractionExplanationOut.nullish(),
   id: z.string(),
   investigation_id: z.string(),
   payload: z.record(z.unknown()),
   review_status: z.string(),
-  reviewed_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  reviewed_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   reviewer_note: z.string().nullish(),
 });
 
@@ -1790,7 +2053,11 @@ export const zIdentityAliasOut = z.object({
  * IdentityMergeAuditOut
  */
 export const zIdentityMergeAuditOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   id: z.string(),
   moved_counts: z.record(z.number().int()),
   rationale: z.string().nullish(),
@@ -1893,7 +2160,11 @@ export const zInvestigationMembershipPut = z.object({
  * InvestigationOut
  */
 export const zInvestigationOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   description: z.string().nullish(),
   id: z.string(),
   is_demo: z.boolean(),
@@ -1954,7 +2225,11 @@ export const zLeadLinkCreate = z.object({
  * What a lead points at: exactly one record, named by its kind.
  */
 export const zLeadLinkOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   id: z.string(),
   label: z.string().nullish(),
   lead_id: z.string(),
@@ -1971,7 +2246,11 @@ export const zLeadLinkOut = z.object({
  * A lead as stored (without its profile, links and history).
  */
 export const zLeadRowOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   detail: z.string().nullish(),
   id: z.string(),
   investigation_id: z.string(),
@@ -2006,7 +2285,11 @@ export const zLeadUpdate = z.object({
  * LeadWorkflowEventOut
  */
 export const zLeadWorkflowEventOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   from_status: z.string().nullish(),
   id: z.string(),
   lead_id: z.string(),
@@ -2023,13 +2306,22 @@ export const zLineageCandidateOut = z.object({
   candidate_type: z.string(),
   chunk_id: z.string().nullish(),
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   document_id: z.string(),
   id: z.string(),
   investigation_id: z.string(),
   payload: z.record(z.unknown()),
   review_status: z.string(),
-  reviewed_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  reviewed_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   reviewer_note: z.string().nullish(),
 });
 
@@ -2051,7 +2343,11 @@ export const zLineageChunkOut = z.object({
  * LineageDocumentOut
  */
 export const zLineageDocumentOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   extraction_status: z.string(),
   filename: z.string(),
   id: z.string(),
@@ -2132,7 +2428,11 @@ export const zMergeEntityOut = z.object({
  */
 export const zIdentityDecisionOut = z.object({
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   id: z.string(),
   other_entity: zMergeEntityOut.nullish(),
@@ -2227,13 +2527,21 @@ export const zDocumentExtractionSettingsOut = z.object({
 export const zOpenAlephBindingOut = z.object({
   collection_id: z.string(),
   collection_label: z.string().nullish(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   foreign_id: z.string().nullish(),
   id: z.string(),
   investigation_id: z.string(),
   provider: z.string(),
   status: z.string(),
-  updated_at: z.string().datetime({ offset: true, local: true }),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
 });
 
 /**
@@ -2281,7 +2589,11 @@ export const zOpenAlephEvidenceImportOut = z.object({
  * A failed OpenAleph pipeline step, kept server-side so a 502 can be explained later.
  */
 export const zOpenAlephOperationFailureOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   document_id: z.string().nullable(),
   error: z.string(),
   id: z.string(),
@@ -2320,7 +2632,11 @@ export const zOpenAlephStatusOut = z.object({
  */
 export const zOpenAlephSyncOut = z.object({
   collection_id: z.string(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   document_id: z.string(),
   error: z.string().nullish(),
   id: z.string(),
@@ -2329,8 +2645,17 @@ export const zOpenAlephSyncOut = z.object({
   provider_record_id: z.string().nullish(),
   response_json: z.record(z.unknown()),
   status: z.string(),
-  synced_at: z.string().datetime({ offset: true, local: true }).nullish(),
-  updated_at: z.string().datetime({ offset: true, local: true }),
+  synced_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
 });
 
 /**
@@ -2342,7 +2667,11 @@ export const zOpenAlephSyncOut = z.object({
 export const zDocumentUploadOut = z.object({
   candidate_counts: z.record(z.number().int()),
   chunk_count: z.number().int(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   extraction_error: z.string().nullish(),
   extraction_issues: z.array(z.string()),
   extraction_status: z.string(),
@@ -2483,7 +2812,11 @@ export const zPropertyTemporalIntervalOut = z.object({
  * A property-conflict decision as the dossier shows it.
  */
 export const zDossierConflictDecisionOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   id: z.string(),
   preferred_value: z.string().nullish(),
@@ -2514,7 +2847,11 @@ export const zDossierPropertyConflictOut = z.object({
  * A reporter's decision on a property with several values, as stored.
  */
 export const zPropertyConflictDecisionOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   entity_id: z.string(),
   id: z.string(),
@@ -2568,7 +2905,11 @@ export const zQueryRef = z.object({
  * A reporter's decision on one duplicate pair after a merge.
  */
 export const zReconciliationDecisionOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   entity_id: z.string(),
   id: z.string(),
@@ -2706,7 +3047,11 @@ export const zRelationshipEvidenceAttachRequest = z.object({
  * RelationshipEvidenceReviewOut
  */
 export const zRelationshipEvidenceReviewOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   evidence_id: z.string(),
   id: z.string(),
   rationale: z.string().nullish(),
@@ -2742,7 +3087,11 @@ export const zRelationshipAdvisoryOut = z.object({
 export const zRelationshipEvidenceAttachmentOut = z.object({
   attached_by: z.string().nullish(),
   attachment_id: z.string(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   evidence: zEvidenceWithSourceOut.nullish(),
   latest_review: zRelationshipEvidenceReviewOut.nullish(),
   note: z.string().nullish(),
@@ -2854,7 +3203,11 @@ export const zReportingTaskUpdate = z.object({
  */
 export const zResolutionDecisionOut = z.object({
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   entity_id: z.string().nullish(),
   finding_id: z.string(),
@@ -3135,7 +3488,11 @@ export const zSourceCreate = z.object({
  * SourceOut
  */
 export const zSourceOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   id: z.string(),
   investigation_id: z.string(),
   metadata_json: z.record(z.unknown()).nullish(),
@@ -3151,7 +3508,11 @@ export const zSourceOut = z.object({
  * claim's evidence list and review workspace show it.
  */
 export const zClaimEvidenceRowOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   evidence: zEvidenceOut.nullish(),
   id: z.string(),
   note: z.string().nullish(),
@@ -3235,7 +3596,11 @@ export const zLeadTriageOut = z.object({
  * A reporter's assessment of one value a finding asserts, as stored.
  */
 export const zStatementAssessmentOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   entity_id: z.string().nullish(),
   finding_id: z.string(),
   id: z.string(),
@@ -3279,9 +3644,19 @@ export const zStatementHistoryRowOut = z.object({
  */
 export const zStatementOut = z.object({
   dataset: z.string(),
-  first_seen: z.string().datetime({ offset: true, local: true }).nullish(),
+  first_seen: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   id: z.string(),
-  last_seen: z.string().datetime({ offset: true, local: true }).nullish(),
+  last_seen: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   origin: z.string().nullish(),
   original_value: z.string().nullish(),
   prop: z.string(),
@@ -3301,7 +3676,11 @@ export const zEntityRelationshipOut = z.object({
   ]),
   aggregate_provenance: zAggregateProvenanceOut.nullish(),
   caption: z.string().nullish(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   direction: z.enum(['outgoing', 'incoming']),
   ftm_id: z.string().nullish(),
   id: z.string(),
@@ -3334,7 +3713,11 @@ export const zRelationshipOut = z.object({
   ]),
   aggregate_provenance: zAggregateProvenanceOut.nullish(),
   caption: z.string().nullish(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   ftm_id: z.string().nullish(),
   id: z.string(),
   investigation_id: z.string(),
@@ -3414,7 +3797,11 @@ export const zStatementPromotionOut = z.object({
   id: z.string(),
   investigation_id: z.string(),
   original_value: z.string(),
-  promoted_at: z.string().datetime({ offset: true, local: true }),
+  promoted_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   provider: z.string(),
   reviewer_note: z.string().nullish(),
   source_url: z.string().nullish(),
@@ -3447,7 +3834,11 @@ export const zStatementPromotionRequest = z.object({
  * TaskWorkflowEventOut
  */
 export const zTaskWorkflowEventOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   from_status: z.string().nullish(),
   id: z.string(),
   lead_provenance: z.record(z.unknown()).nullish(),
@@ -3459,7 +3850,11 @@ export const zTaskWorkflowEventOut = z.object({
  * ReportingTaskOut
  */
 export const zReportingTaskOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   detail: z.string().nullish(),
   due_date: z.string().nullish(),
   history: z.array(zTaskWorkflowEventOut),
@@ -3471,14 +3866,22 @@ export const zReportingTaskOut = z.object({
   status: z.string(),
   task_context: z.record(z.unknown()).nullish(),
   title: z.string(),
-  updated_at: z.string().datetime({ offset: true, local: true }),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
 });
 
 /**
  * LeadOut
  */
 export const zLeadOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   detail: z.string().nullish(),
   history: z.array(zLeadWorkflowEventOut),
   id: z.string(),
@@ -3634,7 +4037,11 @@ export const zEntityDossierOut = z.object({
  */
 export const zTimelineEventRowOut = z.object({
   claim_id: z.string().nullish(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   dataset: z.string(),
   date_end: z.string().nullish(),
   date_start: z.string(),
@@ -3780,10 +4187,14 @@ export const zOrphanStoragePreviewOut = z.object({
 });
 
 /**
- * ValidationError
+ * ValidationIssueOut
+ *
+ * One problem with a request's input: where it is (`loc`), what is wrong
+ * (`msg`) and the error type. FastAPI's own shape for it
+ * (fastapi/openapi/utils.py validation_error_definition).
  */
-export const zValidationError = z.object({
-  ctx: z.record(z.unknown()).optional(),
+export const zValidationIssueOut = z.object({
+  ctx: z.record(z.unknown()).nullish(),
   input: z.unknown().optional(),
   loc: z.array(z.union([z.string(), z.number().int()])),
   msg: z.string(),
@@ -3791,10 +4202,13 @@ export const zValidationError = z.object({
 });
 
 /**
- * HTTPValidationError
+ * ValidationErrorOut
+ *
+ * FastAPI's answer (422) when a request's input does not match what the
+ * route declares (fastapi.exception_handlers.request_validation_exception_handler).
  */
-export const zHttpValidationError = z.object({
-  detail: z.array(zValidationError).optional(),
+export const zValidationErrorOut = z.object({
+  detail: z.array(zValidationIssueOut),
 });
 
 /**
@@ -4075,7 +4489,11 @@ export const zAiAnalysisCandidateOut = z.object({
   checked_citation_ids: z.array(zRecordRefOut),
   citation_details: z.array(zCitationDetailOut).nullish(),
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   deck_preview: z.array(zDeckSlideOut).nullish(),
   id: z.string(),
   investigation_id: z.string(),
@@ -4084,7 +4502,12 @@ export const zAiAnalysisCandidateOut = z.object({
   rejection_reason: z.string().nullable(),
   request: z.record(z.unknown()),
   review_status: z.string(),
-  reviewed_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  reviewed_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
   reviewer_note: z.string().nullable(),
   trace: z.record(z.unknown()).nullable(),
 });
@@ -4095,7 +4518,11 @@ export const zAiAnalysisCandidateOut = z.object({
  * A presentation deck. Every key is always sent, so the nullable ones have no default.
  */
 export const zDeckOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   created_by: z.string().nullable(),
   id: z.string(),
   investigation_id: z.string(),
@@ -4104,7 +4531,11 @@ export const zDeckOut = z.object({
   source_ai_candidate_id: z.string().nullable(),
   style: zDeckStyleOut,
   title: z.string(),
-  updated_at: z.string().datetime({ offset: true, local: true }),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
 });
 
 /**
@@ -4132,14 +4563,22 @@ export const zWriteupCreate = z.object({
 export const zWriteupOut = z.object({
   cited_record_refs: z.array(zRecordRefOut),
   content_json: z.record(z.unknown()),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   created_by: z.string().nullable(),
   id: z.string(),
   investigation_id: z.string(),
   source_ai_candidate_id: z.string().nullable(),
   status: z.string(),
   title: z.string(),
-  updated_at: z.string().datetime({ offset: true, local: true }),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   word_count: z.number().int(),
 });
 
@@ -4150,7 +4589,11 @@ export const zWriteupOut = z.object({
  */
 export const zWriteupSummaryOut = z.object({
   cited_record_refs: z.array(zRecordRefOut),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   created_by: z.string().nullable(),
   id: z.string(),
   investigation_id: z.string(),
@@ -4158,7 +4601,11 @@ export const zWriteupSummaryOut = z.object({
   source_ai_candidate_id: z.string().nullable(),
   status: z.string(),
   title: z.string(),
-  updated_at: z.string().datetime({ offset: true, local: true }),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   word_count: z.number().int(),
 });
 
@@ -4957,7 +5404,7 @@ export const zListInvestigationAiAnalysisCandidatesQuery = z.object({
   review_status: z.string().nullish(),
   module: z.string().nullish(),
   limit: z.number().int().gte(1).lte(500).optional().default(100),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -5017,7 +5464,7 @@ export const zListClaimsPath = z.object({
 
 export const zListClaimsQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -5033,7 +5480,7 @@ export const zListConnectorFindingsPath = z.object({
 
 export const zListConnectorFindingsQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -5049,7 +5496,7 @@ export const zListConnectorRunsPath = z.object({
 
 export const zListConnectorRunsQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -5115,7 +5562,7 @@ export const zListDocumentsPath = z.object({
 
 export const zListDocumentsQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -5132,7 +5579,7 @@ export const zListEntitiesPath = z.object({
 export const zListEntitiesQuery = z.object({
   include_relationships: z.boolean().optional().default(false),
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -5148,7 +5595,7 @@ export const zListInvestigationEvidencePath = z.object({
 
 export const zListInvestigationEvidenceQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -5200,7 +5647,7 @@ export const zListLeadsPath = z.object({
 
 export const zListLeadsQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -5220,7 +5667,7 @@ export const zLeadQueueQuery = z.object({
   owner: z.string().nullish(),
   unresolved_only: z.boolean().optional().default(true),
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -5235,7 +5682,7 @@ export const zListInvestigationRelationshipsPath = z.object({
 export const zListInvestigationRelationshipsQuery = z.object({
   include_reconciled_duplicates: z.boolean().optional().default(true),
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -5252,7 +5699,7 @@ export const zListReportingTasksPath = z.object({
 
 export const zListReportingTasksQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -5268,7 +5715,7 @@ export const zListSourcesPath = z.object({
 
 export const zListSourcesQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -5287,7 +5734,7 @@ export const zGetInvestigationTimelineQuery = z.object({
   verification_status: z.array(z.string()).nullish(),
   include_record_activity: z.boolean().optional().default(false),
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**

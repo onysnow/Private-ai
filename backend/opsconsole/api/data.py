@@ -22,6 +22,11 @@ from opsconsole.core.paging import (
     related_counts,
 )
 
+# The furthest into a table a page may start: the database takes OFFSET as a
+# 64-bit integer, and a larger one failed with a server error instead of a
+# refusal. No table here comes near this many rows.
+MAX_OFFSET = 2**31 - 1
+
 
 class ChangeSetIn(BaseModel):
     table: str = Field(max_length=255)
@@ -66,7 +71,7 @@ def router(ctx: ConsoleContext) -> APIRouter:
 
     @r.get("/data/tables/{name}/rows", response_model=s.ConsoleRowsOut)
     def rows(request: Request, name: str, limit: int = Query(default=None, ge=1, le=10_000), cursor: str | None = Query(default=None, max_length=2000),
-             offset: int = Query(0, ge=0), sort: str | None = Query(default=None, max_length=128), order: str = Query("desc", pattern="^(asc|desc)$"),
+             offset: int = Query(0, ge=0, le=MAX_OFFSET), sort: str | None = Query(default=None, max_length=128), order: str = Query("desc", pattern="^(asc|desc)$"),
              q: str | None = Query(default=None, max_length=200), with_count: bool = Query(True)) -> Any:
         ctx.read(request)
         table = _table(name)

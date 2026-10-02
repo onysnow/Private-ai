@@ -48,6 +48,29 @@ class ConsoleErrorOut(ConsoleModel):
     detail: str
 
 
+class ConsoleRequestErrorOut(ConsoleModel):
+    """A request refused before the console saw it, so in FastAPI's usual
+    shape: a body that is not valid JSON (400, fastapi/routing.py), or one of
+    the host's own checks in front of every route (its access checks answer
+    403)."""
+    detail: str
+
+
+# The statuses the console refuses with (every ConsoleError(4xx) in the package),
+# declared for all its routes (mount.py). A 400 or a 403 can also come from
+# before the console (ConsoleRequestErrorOut). FastAPI adds its own 422 entry
+# for input that does not match a route, unless the host declares one for every
+# route.
+CONSOLE_REFUSALS: dict[int | str, dict[str, Any]] = {
+    400: {"model": ConsoleErrorOut | ConsoleRequestErrorOut,
+          "description": "Refused: the request cannot be carried out as it is, or its body is not valid JSON"},
+    403: {"model": ConsoleErrorOut | ConsoleRequestErrorOut,
+          "description": "Not allowed: for this caller, with writes set as they are, or on this table or setting"},
+    404: {"model": ConsoleErrorOut, "description": "Not found"},
+    409: {"model": ConsoleErrorOut, "description": "In conflict with what is there now, or with a run in progress"},
+}
+
+
 # --- manifest, health, server ---------------------------------------------------------------
 
 class ConsolePrincipalOut(ConsoleModel):

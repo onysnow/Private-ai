@@ -12,6 +12,7 @@ from opsconsole import schemas as s
 from opsconsole.config import WritePolicy
 from opsconsole.context import ConsoleContext, ConsoleError
 from opsconsole.core import sqlscreen
+from opsconsole.store import SavedQueryNameTaken
 
 
 class RunIn(BaseModel):
@@ -103,15 +104,22 @@ def router(ctx: ConsoleContext) -> APIRouter:
         ctx.read(request)
         return {"items": ctx.store.saved_list()}
 
+    def _upsert(principal_id: str, body: SavedIn, qid: str | None = None) -> Any:
+        try:
+            return ctx.store.saved_upsert(name=body.name, sql=body.sql, params=body.params, created_by=principal_id, pinned=body.pinned, qid=qid)
+        except SavedQueryNameTaken as exc:
+            # Names are unique: renaming one saved query to another's name used to fail with a 500.
+            raise ConsoleError(409, "name_taken", str(exc)) from exc
+
     @r.post("/query/saved", response_model=s.ConsoleSavedQueryOut)
     def save(request: Request, body: SavedIn) -> Any:
         principal = ctx.read(request)
-        return ctx.store.saved_upsert(name=body.name, sql=body.sql, params=body.params, created_by=principal.id, pinned=body.pinned)
+        return _upsert(principal.id, body)
 
     @r.put("/query/saved/{qid}", response_model=s.ConsoleSavedQueryOut)
     def update_saved(request: Request, qid: str, body: SavedIn) -> Any:
         principal = ctx.read(request)
-        return ctx.store.saved_upsert(name=body.name, sql=body.sql, params=body.params, created_by=principal.id, pinned=body.pinned, qid=qid)
+        return _upsert(principal.id, body, qid)
 
     @r.delete("/query/saved/{qid}", response_model=s.ConsoleDeletedOut)
     def delete_saved(request: Request, qid: str) -> Any:

@@ -28,11 +28,13 @@ import type {
   CanonicalEntityResolutionErrors,
   CanonicalEntityResolutionResponses,
   CapabilitiesData,
+  CapabilitiesErrors,
   CapabilitiesResponses,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchErrors,
   ConnectorSearchResponses,
+  ConnectorsErrors,
   ConnectorsResponses,
   ConvertLeadEndpointData,
   ConvertLeadEndpointErrors,
@@ -197,6 +199,7 @@ import type {
   GetOpenalephDocumentSyncErrors,
   GetOpenalephDocumentSyncResponses,
   GetOrphanStoragePreviewData,
+  GetOrphanStoragePreviewErrors,
   GetOrphanStoragePreviewResponses,
   GetRecordProvenanceTraceData,
   GetRecordProvenanceTraceErrors,
@@ -211,11 +214,13 @@ import type {
   GetSecurityAuditRetentionPreviewErrors,
   GetSecurityAuditRetentionPreviewResponses,
   GetSecurityAuditSummaryData,
+  GetSecurityAuditSummaryErrors,
   GetSecurityAuditSummaryResponses,
   GetWriteupEndpointData,
   GetWriteupEndpointErrors,
   GetWriteupEndpointResponses,
   HealthData,
+  HealthErrors,
   HealthResponses,
   ImportOpenalephDocumentEntitiesData,
   ImportOpenalephDocumentEntitiesErrors,
@@ -257,6 +262,7 @@ import type {
   LinkLeadErrors,
   LinkLeadResponses,
   ListAppUsersData,
+  ListAppUsersErrors,
   ListAppUsersResponses,
   ListAssessmentsData,
   ListAssessmentsErrors,
@@ -319,6 +325,7 @@ import type {
   ListInvestigationRelationshipsErrors,
   ListInvestigationRelationshipsResponses,
   ListInvestigationsData,
+  ListInvestigationsErrors,
   ListInvestigationsResponses,
   ListJobsEndpointData,
   ListJobsEndpointErrors,
@@ -351,8 +358,10 @@ import type {
   ListWriteupsEndpointErrors,
   ListWriteupsEndpointResponses,
   OpenalephIntegrationStatusData,
+  OpenalephIntegrationStatusErrors,
   OpenalephIntegrationStatusResponses,
   PresentationStylesData,
+  PresentationStylesErrors,
   PresentationStylesResponses,
   PreviewBackupRestoreData,
   PreviewBackupRestoreErrors,
@@ -379,6 +388,7 @@ import type {
   RefreshOpenalephDocumentReviewErrors,
   RefreshOpenalephDocumentReviewResponses,
   RelationshipSchemasData,
+  RelationshipSchemasErrors,
   RelationshipSchemasResponses,
   RemoveInvestigationData,
   RemoveInvestigationErrors,
@@ -420,8 +430,10 @@ import type {
   SearchWorkbenchErrors,
   SearchWorkbenchResponses,
   SeedDemoData,
+  SeedDemoErrors,
   SeedDemoResponses,
   SettingsStatusData,
+  SettingsStatusErrors,
   SettingsStatusResponses,
   SyncOpenalephDocumentData,
   SyncOpenalephDocumentErrors,
@@ -1067,23 +1079,25 @@ export const restoreBackup = <ThrowOnError extends boolean = false>(
  */
 export const capabilities = <ThrowOnError extends boolean = false>(
   options?: Options<CapabilitiesData, ThrowOnError>,
-): RequestResult<CapabilitiesResponses, unknown, ThrowOnError> =>
-  (options?.client ?? client).get<CapabilitiesResponses, unknown, ThrowOnError>(
-    {
-      requestValidator: async (data) =>
-        await z
-          .object({
-            body: z.never().optional(),
-            path: z.never().optional(),
-            query: z.never().optional(),
-          })
-          .parseAsync(data),
-      responseValidator: async (data) =>
-        await zCapabilitiesResponse.parseAsync(data),
-      url: '/api/capabilities',
-      ...options,
-    },
-  );
+): RequestResult<CapabilitiesResponses, CapabilitiesErrors, ThrowOnError> =>
+  (options?.client ?? client).get<
+    CapabilitiesResponses,
+    CapabilitiesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCapabilitiesResponse.parseAsync(data),
+    url: '/api/capabilities',
+    ...options,
+  });
 
 /**
  * Create Claim Endpoint
@@ -1561,8 +1575,12 @@ export const reviewFinding = <ThrowOnError extends boolean = false>(
  */
 export const connectors = <ThrowOnError extends boolean = false>(
   options?: Options<ConnectorsData, ThrowOnError>,
-): RequestResult<ConnectorsResponses, unknown, ThrowOnError> =>
-  (options?.client ?? client).get<ConnectorsResponses, unknown, ThrowOnError>({
+): RequestResult<ConnectorsResponses, ConnectorsErrors, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ConnectorsResponses,
+    ConnectorsErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) =>
       await z
         .object({
@@ -1764,8 +1782,12 @@ export const exportDeckPptx = <ThrowOnError extends boolean = false>(
  */
 export const seedDemo = <ThrowOnError extends boolean = false>(
   options?: Options<SeedDemoData, ThrowOnError>,
-): RequestResult<SeedDemoResponses, unknown, ThrowOnError> =>
-  (options?.client ?? client).post<SeedDemoResponses, unknown, ThrowOnError>({
+): RequestResult<SeedDemoResponses, SeedDemoErrors, ThrowOnError> =>
+  (options?.client ?? client).post<
+    SeedDemoResponses,
+    SeedDemoErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) =>
       await z
         .object({
@@ -2991,8 +3013,8 @@ export const reviewExtractionCandidate = <ThrowOnError extends boolean = false>(
  */
 export const health = <ThrowOnError extends boolean = false>(
   options?: Options<HealthData, ThrowOnError>,
-): RequestResult<HealthResponses, unknown, ThrowOnError> =>
-  (options?.client ?? client).get<HealthResponses, unknown, ThrowOnError>({
+): RequestResult<HealthResponses, HealthErrors, ThrowOnError> =>
+  (options?.client ?? client).get<HealthResponses, HealthErrors, ThrowOnError>({
     requestValidator: async (data) =>
       await z
         .object({
@@ -3015,10 +3037,14 @@ export const openalephIntegrationStatus = <
   ThrowOnError extends boolean = false,
 >(
   options?: Options<OpenalephIntegrationStatusData, ThrowOnError>,
-): RequestResult<OpenalephIntegrationStatusResponses, unknown, ThrowOnError> =>
+): RequestResult<
+  OpenalephIntegrationStatusResponses,
+  OpenalephIntegrationStatusErrors,
+  ThrowOnError
+> =>
   (options?.client ?? client).get<
     OpenalephIntegrationStatusResponses,
-    unknown,
+    OpenalephIntegrationStatusErrors,
     ThrowOnError
   >({
     requestValidator: async (data) =>
@@ -3040,10 +3066,14 @@ export const openalephIntegrationStatus = <
  */
 export const listInvestigations = <ThrowOnError extends boolean = false>(
   options?: Options<ListInvestigationsData, ThrowOnError>,
-): RequestResult<ListInvestigationsResponses, unknown, ThrowOnError> =>
+): RequestResult<
+  ListInvestigationsResponses,
+  ListInvestigationsErrors,
+  ThrowOnError
+> =>
   (options?.client ?? client).get<
     ListInvestigationsResponses,
-    unknown,
+    ListInvestigationsErrors,
     ThrowOnError
   >({
     requestValidator: async (data) =>
@@ -4292,10 +4322,14 @@ export const linkLead = <ThrowOnError extends boolean = false>(
  */
 export const presentationStyles = <ThrowOnError extends boolean = false>(
   options?: Options<PresentationStylesData, ThrowOnError>,
-): RequestResult<PresentationStylesResponses, unknown, ThrowOnError> =>
+): RequestResult<
+  PresentationStylesResponses,
+  PresentationStylesErrors,
+  ThrowOnError
+> =>
   (options?.client ?? client).get<
     PresentationStylesResponses,
-    unknown,
+    PresentationStylesErrors,
     ThrowOnError
   >({
     requestValidator: async (data) =>
@@ -4377,10 +4411,14 @@ export const getRecordProvenanceTrace = <ThrowOnError extends boolean = false>(
  */
 export const relationshipSchemas = <ThrowOnError extends boolean = false>(
   options?: Options<RelationshipSchemasData, ThrowOnError>,
-): RequestResult<RelationshipSchemasResponses, unknown, ThrowOnError> =>
+): RequestResult<
+  RelationshipSchemasResponses,
+  RelationshipSchemasErrors,
+  ThrowOnError
+> =>
   (options?.client ?? client).get<
     RelationshipSchemasResponses,
-    unknown,
+    RelationshipSchemasErrors,
     ThrowOnError
   >({
     requestValidator: async (data) =>
@@ -4860,10 +4898,14 @@ export const getSecurityAuditRetentionPreview = <
  */
 export const getSecurityAuditSummary = <ThrowOnError extends boolean = false>(
   options?: Options<GetSecurityAuditSummaryData, ThrowOnError>,
-): RequestResult<GetSecurityAuditSummaryResponses, unknown, ThrowOnError> =>
+): RequestResult<
+  GetSecurityAuditSummaryResponses,
+  GetSecurityAuditSummaryErrors,
+  ThrowOnError
+> =>
   (options?.client ?? client).get<
     GetSecurityAuditSummaryResponses,
-    unknown,
+    GetSecurityAuditSummaryErrors,
     ThrowOnError
   >({
     requestValidator: async (data) =>
@@ -4885,23 +4927,25 @@ export const getSecurityAuditSummary = <ThrowOnError extends boolean = false>(
  */
 export const listAppUsers = <ThrowOnError extends boolean = false>(
   options?: Options<ListAppUsersData, ThrowOnError>,
-): RequestResult<ListAppUsersResponses, unknown, ThrowOnError> =>
-  (options?.client ?? client).get<ListAppUsersResponses, unknown, ThrowOnError>(
-    {
-      requestValidator: async (data) =>
-        await z
-          .object({
-            body: z.never().optional(),
-            path: z.never().optional(),
-            query: z.never().optional(),
-          })
-          .parseAsync(data),
-      responseValidator: async (data) =>
-        await zListAppUsersResponse.parseAsync(data),
-      url: '/api/settings/security/users',
-      ...options,
-    },
-  );
+): RequestResult<ListAppUsersResponses, ListAppUsersErrors, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ListAppUsersResponses,
+    ListAppUsersErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListAppUsersResponse.parseAsync(data),
+    url: '/api/settings/security/users',
+    ...options,
+  });
 
 /**
  * Create App User
@@ -5090,10 +5134,10 @@ export const rotateAppUserToken = <ThrowOnError extends boolean = false>(
  */
 export const settingsStatus = <ThrowOnError extends boolean = false>(
   options?: Options<SettingsStatusData, ThrowOnError>,
-): RequestResult<SettingsStatusResponses, unknown, ThrowOnError> =>
+): RequestResult<SettingsStatusResponses, SettingsStatusErrors, ThrowOnError> =>
   (options?.client ?? client).get<
     SettingsStatusResponses,
-    unknown,
+    SettingsStatusErrors,
     ThrowOnError
   >({
     requestValidator: async (data) =>
@@ -5121,10 +5165,14 @@ export const settingsStatus = <ThrowOnError extends boolean = false>(
  */
 export const getOrphanStoragePreview = <ThrowOnError extends boolean = false>(
   options?: Options<GetOrphanStoragePreviewData, ThrowOnError>,
-): RequestResult<GetOrphanStoragePreviewResponses, unknown, ThrowOnError> =>
+): RequestResult<
+  GetOrphanStoragePreviewResponses,
+  GetOrphanStoragePreviewErrors,
+  ThrowOnError
+> =>
   (options?.client ?? client).get<
     GetOrphanStoragePreviewResponses,
-    unknown,
+    GetOrphanStoragePreviewErrors,
     ThrowOnError
   >({
     requestValidator: async (data) =>
