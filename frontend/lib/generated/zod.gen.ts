@@ -260,13 +260,6 @@ export const zAppUserUpdatedOut = z.object({
 });
 
 /**
- * ApplyIn
- */
-export const zApplyIn = z.object({
-  confirm: z.string().max(64),
-});
-
-/**
  * BackgroundJobOut
  *
  * One piece of slow work and where it stands; the screen polls this.
@@ -367,17 +360,6 @@ export const zBodyUploadDocument = z.object({
   file: z.string(),
   investigation_id: z.string(),
   title: z.string().optional().default(''),
-});
-
-/**
- * BulkIn
- */
-export const zBulkIn = z.object({
-  filters: z.record(z.string()).nullish(),
-  op: z.string().regex(/^(update|delete)$/),
-  pks: z.array(z.record(z.unknown())).max(10000).nullish(),
-  q: z.string().max(200).nullish(),
-  set: z.record(z.unknown()).nullish(),
 });
 
 /**
@@ -488,14 +470,6 @@ export const zCaseSynthesisRequest = z.object({
   question: z.string().min(1).max(4000),
   severity_floor: z.enum(['ALL', 'MATERIAL', 'BLOCKING']).nullish(),
   source_tier_floor: z.enum(['A', 'B', 'C', 'D', 'E', 'F']).nullish(),
-});
-
-/**
- * ChangeSetIn
- */
-export const zChangeSetIn = z.object({
-  ops: z.array(z.record(z.unknown())).min(1).max(10000),
-  table: z.string().max(255),
 });
 
 /**
@@ -701,21 +675,6 @@ export const zClusterPairOut = z.object({
 });
 
 /**
- * CollectionIn
- */
-export const zCollectionIn = z.object({
-  name: z.string().min(1).max(255),
-  requests: z.array(z.record(z.unknown())).max(200).optional(),
-});
-
-/**
- * ConfirmIn
- */
-export const zConfirmIn = z.object({
-  confirm: z.string().max(255),
-});
-
-/**
  * ConnectorCredentialPut
  *
  * A connector's secret (PUT /settings/connectors/{provider}/credential).
@@ -891,14 +850,6 @@ export const zCoreCapabilitiesOut = z.object({
 });
 
 /**
- * CreateIn
- */
-export const zCreateIn = z.object({
-  kind: z.string().max(64),
-  selection: z.string().max(500).nullish(),
-});
-
-/**
  * CrossProviderDecisionOut
  *
  * A reporter's decision that findings from different providers are, or
@@ -1024,14 +975,6 @@ export const zDeletionUnsafePath = z.object({
 export const zDemoSeedOut = z.object({
   created: z.boolean(),
   investigation_id: z.string(),
-});
-
-/**
- * DisabledIn
- */
-export const zDisabledIn = z.object({
-  confirm: z.string().max(255),
-  disabled: z.boolean(),
 });
 
 /**
@@ -1407,15 +1350,6 @@ export const zAggregateProvenanceOut = z.object({
 });
 
 /**
- * ExplainIn
- */
-export const zExplainIn = z.object({
-  analyze: z.boolean().optional().default(false),
-  params: z.record(z.unknown()).nullish(),
-  sql: z.string().min(1).max(20000),
-});
-
-/**
  * ExplanationClaimRefOut
  */
 export const zExplanationClaimRefOut = z.object({
@@ -1787,14 +1721,6 @@ export const zFindingReviewRequest = z.object({
 });
 
 /**
- * FlagIn
- */
-export const zFlagIn = z.object({
-  confirm: z.string().max(128),
-  value: z.unknown(),
-});
-
-/**
  * FontPairOut
  *
  * A heading and body font; empty names mean "keep the theme's own".
@@ -1982,20 +1908,6 @@ export const zInvestigationQuestionContextRequest = z.object({
   include_reconciled_duplicates: z.boolean().optional().default(false),
   max_results: z.number().int().gte(1).lte(100).optional().default(30),
   question: z.string().min(1).max(4000),
-});
-
-/**
- * IssueIn
- */
-export const zIssueIn = z.object({
-  confirm: z.string().max(255),
-  ttl_seconds: z
-    .number()
-    .int()
-    .gte(60)
-    .lte(31536000)
-    .optional()
-    .default(2592000),
 });
 
 /**
@@ -2490,18 +2402,6 @@ export const zOrphanFileOut = z.object({
   modified_at: z.number(),
   relative_path: z.string(),
   size_bytes: z.number().int(),
-});
-
-/**
- * PlanIn
- */
-export const zPlanIn = z.object({
-  target: z
-    .string()
-    .max(64)
-    .regex(/^[A-Za-z0-9_\-+@:^~]+$/)
-    .optional()
-    .default('head'),
 });
 
 /**
@@ -3001,14 +2901,6 @@ export const zBackupPreviewOut = z.object({
 });
 
 /**
- * RestoreIn
- */
-export const zRestoreIn = z.object({
-  confirm: z.string().max(255),
-  kind: z.string().max(64),
-});
-
-/**
  * RetrievalSummaryOut
  */
 export const zRetrievalSummaryOut = z.object({
@@ -3035,24 +2927,6 @@ export const zQuestionContextOut = z.object({
   reasoning_contract: z.record(z.boolean()),
   retrieval: zRetrievalSummaryOut,
   warnings: z.array(z.string()),
-});
-
-/**
- * RolesIn
- */
-export const zRolesIn = z.object({
-  confirm: z.string().max(255),
-  roles: z.array(z.string()).max(50),
-});
-
-/**
- * SavedIn
- */
-export const zSavedIn = z.object({
-  name: z.string().min(1).max(255),
-  params: z.array(z.record(z.unknown())).optional(),
-  pinned: z.boolean().optional().default(false),
-  sql: z.string().min(1).max(20000),
 });
 
 /**
@@ -3209,19 +3083,6 @@ export const zSecurityAlertsOut = z.object({
   since: z.string(),
   total_denials: z.number().int(),
   window_hours: z.number(),
-});
-
-/**
- * SendIn
- */
-export const zSendIn = z.object({
-  act_as: z.string().max(255).nullish(),
-  body: z.unknown().optional(),
-  headers: z.record(z.string()).nullish(),
-  method: z.string().regex(/^(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)$/),
-  path: z.string().min(1).max(2000),
-  query: z.record(z.string()).nullish(),
-  timeout_seconds: z.number().gte(0.5).lte(60).optional().default(10),
 });
 
 /**
@@ -3919,19 +3780,6 @@ export const zOrphanStoragePreviewOut = z.object({
 });
 
 /**
- * UpgradeIn
- */
-export const zUpgradeIn = z.object({
-  confirm: z.string().max(64),
-  target: z
-    .string()
-    .max(64)
-    .regex(/^[A-Za-z0-9_\-+@:^~]+$/)
-    .optional()
-    .default('head'),
-});
-
-/**
  * ValidationError
  */
 export const zValidationError = z.object({
@@ -4330,35 +4178,6 @@ export const zWriteupsOut = z.object({
   writeups: z.array(zWriteupSummaryOut),
 });
 
-/**
- * RunIn
- */
-export const zOpsconsoleApiChecksRunIn = z.object({
-  only: z.array(z.string()).max(200).nullish(),
-});
-
-/**
- * RunIn
- */
-export const zOpsconsoleApiQueryRunIn = z.object({
-  confirm: z.string().max(16).nullish(),
-  max_rows: z.number().int().gte(1).lte(10000).nullish(),
-  mode: z
-    .string()
-    .regex(/^(read|write)$/)
-    .optional()
-    .default('read'),
-  params: z.record(z.unknown()).nullish(),
-  sql: z.string().min(1).max(20000),
-});
-
-/**
- * RunIn
- */
-export const zOpsconsoleApiTestsRunIn = z.object({
-  selection: z.string().max(500).nullish(),
-});
-
 export const zGetAiAnalysisCandidateEndpointPath = z.object({
   candidate_id: z.string(),
 });
@@ -4621,250 +4440,6 @@ export const zConnectorSearchPath = z.object({
  * Successful Response
  */
 export const zConnectorSearchResponse = z.array(zConnectorFindingOut);
-
-export const zConsoleActivityActivityQuery = z.object({
-  limit: z.number().int().gte(1).lte(1000).optional().default(100),
-  principal: z.string().max(255).nullish(),
-  section: z.string().max(32).nullish(),
-  table: z.string().max(255).nullish(),
-  since: z.string().max(40).nullish(),
-  changeset_id: z.string().max(32).nullish(),
-});
-
-export const zConsoleActivityActivityDetailPath = z.object({
-  aid: z.string(),
-});
-
-export const zConsoleActivityUndoPath = z.object({
-  aid: z.string(),
-});
-
-export const zConsoleApiplaySaveCollectionBody = zCollectionIn;
-
-export const zConsoleApiplayDeleteCollectionPath = z.object({
-  cid: z.string(),
-});
-
-export const zConsoleApiplaySendBody = zSendIn;
-
-export const zConsoleApiplayTrafficQuery = z.object({
-  since_seconds: z.number().int().gte(1).lte(86400).nullish(),
-});
-
-export const zConsoleApiplayRecentQuery = z.object({
-  limit: z.number().int().gte(1).lte(2000).optional().default(100),
-  route: z.string().max(512).nullish(),
-});
-
-export const zConsoleBackupsCreateBody = zCreateIn;
-
-export const zConsoleBackupsRunsQuery = z.object({
-  limit: z.number().int().gte(1).lte(200).optional().default(20),
-});
-
-export const zConsoleBackupsRestoreBody = zRestoreIn;
-
-export const zConsoleBackupsRestorePath = z.object({
-  bid: z.string(),
-});
-
-export const zConsoleBackupsPlanPath = z.object({
-  bid: z.string(),
-});
-
-export const zConsoleBackupsPlanQuery = z.object({
-  kind: z.string().max(64),
-});
-
-export const zConsoleBackupsDownloadPath = z.object({
-  kind: z.string(),
-  bid: z.string(),
-});
-
-/**
- * Body
- */
-export const zConsoleChecksRunBody = zOpsconsoleApiChecksRunIn.nullable();
-
-export const zConsoleChecksRunsQuery = z.object({
-  limit: z.number().int().gte(1).lte(200).optional().default(20),
-});
-
-export const zConsoleChecksRunDetailPath = z.object({
-  rid: z.string(),
-});
-
-export const zConsoleConfigSectionFlagBody = zFlagIn;
-
-export const zConsoleConfigSectionFlagPath = z.object({
-  name: z.string(),
-});
-
-export const zConsoleDataListChangesetsQuery = z.object({
-  status: z.string().max(16).nullish(),
-  limit: z.number().int().gte(1).lte(500).optional().default(50),
-});
-
-export const zConsoleDataCreateChangesetBody = zChangeSetIn;
-
-export const zConsoleDataGetChangesetPath = z.object({
-  cid: z.string(),
-});
-
-export const zConsoleDataApplyChangesetBody = zApplyIn;
-
-export const zConsoleDataApplyChangesetPath = z.object({
-  cid: z.string(),
-});
-
-export const zConsoleDataDiscardChangesetPath = z.object({
-  cid: z.string(),
-});
-
-export const zConsoleDataTableDetailPath = z.object({
-  name: z.string(),
-});
-
-export const zConsoleDataBulkBody = zBulkIn;
-
-export const zConsoleDataBulkPath = z.object({
-  name: z.string(),
-});
-
-export const zConsoleDataExportPath = z.object({
-  name: z.string(),
-});
-
-export const zConsoleDataExportQuery = z.object({
-  fmt: z
-    .string()
-    .regex(/^(csv|json)$/)
-    .optional()
-    .default('csv'),
-  q: z.string().max(200).nullish(),
-});
-
-export const zConsoleDataRowsPath = z.object({
-  name: z.string(),
-});
-
-export const zConsoleDataRowsQuery = z.object({
-  limit: z.number().int().gte(1).lte(10000).optional(),
-  cursor: z.string().max(2000).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
-  sort: z.string().max(128).nullish(),
-  order: z
-    .string()
-    .regex(/^(asc|desc)$/)
-    .optional()
-    .default('desc'),
-  q: z.string().max(200).nullish(),
-  with_count: z.boolean().optional().default(true),
-});
-
-export const zConsoleDataRowPath = z.object({
-  name: z.string(),
-  pk: z.string(),
-});
-
-export const zConsoleOverviewEventsQuery = z.object({
-  topics: z.string().max(500).optional().default('*'),
-});
-
-export const zConsoleOverviewHealthQuery = z.object({
-  tiles: z.string().max(500).nullish(),
-});
-
-export const zConsoleLogsTailPath = z.object({
-  source: z.string(),
-});
-
-export const zConsoleLogsTailQuery = z.object({
-  limit: z.number().int().gte(1).lte(5000).optional().default(200),
-  level: z.string().max(16).nullish(),
-  request_id: z.string().max(64).nullish(),
-  logger: z.string().max(128).nullish(),
-  contains: z.string().max(200).nullish(),
-  since: z.string().max(40).nullish(),
-  follow: z.boolean().optional().default(false),
-});
-
-export const zConsoleQueryExplainBody = zExplainIn;
-
-export const zConsoleQueryHistoryQuery = z.object({
-  limit: z.number().int().gte(1).lte(500).optional().default(50),
-});
-
-export const zConsoleQueryRunBody = zOpsconsoleApiQueryRunIn;
-
-export const zConsoleQuerySaveBody = zSavedIn;
-
-export const zConsoleQueryDeleteSavedPath = z.object({
-  qid: z.string(),
-});
-
-export const zConsoleQueryUpdateSavedBody = zSavedIn;
-
-export const zConsoleQueryUpdateSavedPath = z.object({
-  qid: z.string(),
-});
-
-export const zConsoleSchemaPlanBody = zPlanIn;
-
-export const zConsoleSchemaUpgradeBody = zUpgradeIn;
-
-/**
- * Body
- */
-export const zConsoleTestsRunBody = zOpsconsoleApiTestsRunIn.nullable();
-
-export const zConsoleTestsRunsQuery = z.object({
-  limit: z.number().int().gte(1).lte(200).optional().default(20),
-});
-
-export const zConsoleTestsRunStatusPath = z.object({
-  rid: z.string(),
-});
-
-export const zConsoleTestsRunStatusQuery = z.object({
-  tail: z.number().int().gte(1).lte(2000).optional().default(60),
-});
-
-export const zConsoleTestsCancelPath = z.object({
-  rid: z.string(),
-});
-
-export const zConsoleTestsRunLogPath = z.object({
-  rid: z.string(),
-});
-
-export const zConsoleTestsTreeQuery = z.object({
-  refresh: z.boolean().optional().default(false),
-});
-
-export const zConsoleUsersRevokeBody = zConfirmIn;
-
-export const zConsoleUsersRevokePath = z.object({
-  tid: z.string(),
-});
-
-export const zConsoleUsersSetDisabledBody = zDisabledIn;
-
-export const zConsoleUsersSetDisabledPath = z.object({
-  uid: z.string(),
-});
-
-export const zConsoleUsersSetRolesBody = zRolesIn;
-
-export const zConsoleUsersSetRolesPath = z.object({
-  uid: z.string(),
-});
-
-export const zConsoleUsersIssueBody = zIssueIn;
-
-export const zConsoleUsersIssuePath = z.object({
-  uid: z.string(),
-});
 
 export const zDeleteDeckEndpointPath = z.object({
   deck_id: z.string(),

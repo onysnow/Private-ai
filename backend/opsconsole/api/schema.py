@@ -7,6 +7,7 @@ from typing import Any
 from fastapi import APIRouter, Request
 from pydantic import BaseModel, Field
 
+from opsconsole import schemas as s
 from opsconsole.context import ConsoleContext
 from opsconsole.core import migrations
 
@@ -23,31 +24,31 @@ def router(ctx: ConsoleContext) -> APIRouter:
     r = APIRouter()
     intro = ctx.introspector
 
-    @r.get("/schema/map", response_model=None)
+    @r.get("/schema/map", response_model=s.ConsoleSchemaMapOut)
     def schema_map(request: Request) -> Any:
         ctx.read(request)
         with ctx.config.engine.connect() as conn:
             tables = [intro.table_summary(conn, t) for t in intro.model_tables()]
         return {"tables": tables, "edges": intro.edges(), "drift": intro.drift(), "domains": sorted({t["domain"] for t in tables if t["domain"]})}
 
-    @r.get("/schema/dictionary", response_model=None)
+    @r.get("/schema/dictionary", response_model=s.ConsoleDataDictionaryOut)
     def dictionary(request: Request) -> Any:
         ctx.read(request)
         return {"tables": [intro.table_detail(t) for t in intro.model_tables()], "unindexed_foreign_keys": intro.unindexed_foreign_keys()}
 
     if ctx.config.alembic_ini is not None:
 
-        @r.get("/schema/migrations", response_model=None)
+        @r.get("/schema/migrations", response_model=s.ConsoleMigrationStateOut)
         def migration_state(request: Request) -> Any:
             ctx.read(request)
             return migrations.migration_state(ctx)
 
-        @r.post("/schema/migrations/plan", response_model=None)
+        @r.post("/schema/migrations/plan", response_model=s.ConsoleMigrationPlanOut)
         def plan(request: Request, body: PlanIn) -> Any:
             ctx.read(request)
             return migrations.plan(ctx, body.target)
 
-        @r.post("/schema/migrations/upgrade", response_model=None)
+        @r.post("/schema/migrations/upgrade", response_model=s.ConsoleRunStatusOut)
         def upgrade(request: Request, body: UpgradeIn) -> Any:
             principal = ctx.write(request)
             ctx.confirm(body.confirm, "upgrade")

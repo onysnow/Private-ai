@@ -3433,6 +3433,4223 @@
         "title": "ConnectorsOut",
         "type": "object"
       },
+      "ConsoleActivityListOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleActivityOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ConsoleActivityListOut",
+        "type": "object"
+      },
+      "ConsoleActivityOut": {
+        "description": "One thing someone did through the console. `target_pk`, `before` and\n`after` are the host's own values, as they were recorded.",
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "after": {
+            "title": "After"
+          },
+          "at": {
+            "title": "At",
+            "type": "string"
+          },
+          "before": {
+            "title": "Before"
+          },
+          "changeset_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Changeset Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "principal_id": {
+            "title": "Principal Id",
+            "type": "string"
+          },
+          "principal_label": {
+            "title": "Principal Label",
+            "type": "string"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "section": {
+            "title": "Section",
+            "type": "string"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          },
+          "target_pk": {
+            "title": "Target Pk"
+          },
+          "target_table": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Table"
+          },
+          "undone_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Undone By"
+          }
+        },
+        "required": [
+          "id",
+          "at",
+          "principal_id",
+          "principal_label",
+          "request_id",
+          "section",
+          "action",
+          "target_table",
+          "target_pk",
+          "before",
+          "after",
+          "changeset_id",
+          "run_id",
+          "note",
+          "undone_by",
+          "state"
+        ],
+        "title": "ConsoleActivityOut",
+        "type": "object"
+      },
+      "ConsoleAppliedOpOut": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "After"
+          },
+          "op": {
+            "enum": [
+              "insert",
+              "update",
+              "delete"
+            ],
+            "title": "Op",
+            "type": "string"
+          },
+          "pk": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pk"
+          }
+        },
+        "required": [
+          "op",
+          "pk",
+          "after"
+        ],
+        "title": "ConsoleAppliedOpOut",
+        "type": "object"
+      },
+      "ConsoleBackupOut": {
+        "properties": {
+          "bytes": {
+            "title": "Bytes",
+            "type": "integer"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "verified": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified"
+          }
+        },
+        "required": [
+          "id",
+          "created_at",
+          "bytes",
+          "kind",
+          "label",
+          "verified"
+        ],
+        "title": "ConsoleBackupOut",
+        "type": "object"
+      },
+      "ConsoleBackupProviderOut": {
+        "description": "One provider's backups, or why they could not be listed.",
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleBackupOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "items",
+          "error"
+        ],
+        "title": "ConsoleBackupProviderOut",
+        "type": "object"
+      },
+      "ConsoleBackupsOut": {
+        "properties": {
+          "providers": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleBackupProviderOut"
+            },
+            "title": "Providers",
+            "type": "array"
+          },
+          "running": {
+            "$ref": "#/components/schemas/ConsoleBackupsRunningOut"
+          }
+        },
+        "required": [
+          "providers",
+          "running"
+        ],
+        "title": "ConsoleBackupsOut",
+        "type": "object"
+      },
+      "ConsoleBackupsRunningOut": {
+        "properties": {
+          "backup": {
+            "title": "Backup",
+            "type": "boolean"
+          },
+          "restore": {
+            "title": "Restore",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "backup",
+          "restore"
+        ],
+        "title": "ConsoleBackupsRunningOut",
+        "type": "object"
+      },
+      "ConsoleChangeOpOut": {
+        "description": "One operation of a change-set as previewed: the row before and after\n(the host's columns) and what to look at before applying. `changed`\nnames the columns an update changes and is sent for updates only.",
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "After"
+          },
+          "before": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Before"
+          },
+          "changed": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Changed"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "op": {
+            "enum": [
+              "insert",
+              "update",
+              "delete"
+            ],
+            "title": "Op",
+            "type": "string"
+          },
+          "pk": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pk"
+          },
+          "set": {
+            "additionalProperties": true,
+            "title": "Set",
+            "type": "object"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "op",
+          "pk",
+          "set",
+          "before",
+          "after",
+          "warnings",
+          "error"
+        ],
+        "title": "ConsoleChangeOpOut",
+        "type": "object"
+      },
+      "ConsoleChangeSetAppliedOut": {
+        "properties": {
+          "activity_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Activity Ids",
+            "type": "array"
+          },
+          "applied": {
+            "title": "Applied",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleAppliedOpOut"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "status": {
+            "const": "applied",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "applied",
+          "activity_ids",
+          "results"
+        ],
+        "title": "ConsoleChangeSetAppliedOut",
+        "type": "object"
+      },
+      "ConsoleChangeSetDiscardedOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "const": "discarded",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "ConsoleChangeSetDiscardedOut",
+        "type": "object"
+      },
+      "ConsoleChangeSetOut": {
+        "description": "A change-set as the console keeps it.",
+        "properties": {
+          "applied_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applied At"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "expires_at": {
+            "title": "Expires At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "ops": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleChangeOpOut"
+            },
+            "title": "Ops",
+            "type": "array"
+          },
+          "origin": {
+            "title": "Origin",
+            "type": "string"
+          },
+          "principal_id": {
+            "title": "Principal Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "target_table": {
+            "title": "Target Table",
+            "type": "string"
+          },
+          "undoes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Undoes"
+          }
+        },
+        "required": [
+          "id",
+          "created_at",
+          "principal_id",
+          "status",
+          "target_table",
+          "ops",
+          "origin",
+          "applied_at",
+          "error",
+          "expires_at",
+          "undoes"
+        ],
+        "title": "ConsoleChangeSetOut",
+        "type": "object"
+      },
+      "ConsoleChangeSetPreviewOut": {
+        "description": "A new change-set, with how many operations carry an error and how many warnings.",
+        "properties": {
+          "applied_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applied At"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "errors": {
+            "title": "Errors",
+            "type": "integer"
+          },
+          "expires_at": {
+            "title": "Expires At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "ops": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleChangeOpOut"
+            },
+            "title": "Ops",
+            "type": "array"
+          },
+          "origin": {
+            "title": "Origin",
+            "type": "string"
+          },
+          "principal_id": {
+            "title": "Principal Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "target_table": {
+            "title": "Target Table",
+            "type": "string"
+          },
+          "undoes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Undoes"
+          },
+          "warnings": {
+            "title": "Warnings",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "created_at",
+          "principal_id",
+          "status",
+          "target_table",
+          "ops",
+          "origin",
+          "applied_at",
+          "error",
+          "expires_at",
+          "undoes",
+          "errors",
+          "warnings"
+        ],
+        "title": "ConsoleChangeSetPreviewOut",
+        "type": "object"
+      },
+      "ConsoleChangeSetsOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleChangeSetOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ConsoleChangeSetsOut",
+        "type": "object"
+      },
+      "ConsoleCheckLastOut": {
+        "properties": {
+          "at": {
+            "title": "At",
+            "type": "string"
+          },
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "count",
+          "run_id",
+          "at"
+        ],
+        "title": "ConsoleCheckLastOut",
+        "type": "object"
+      },
+      "ConsoleCheckOut": {
+        "properties": {
+          "builtin": {
+            "title": "Builtin",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "last": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ConsoleCheckLastOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "section": {
+            "title": "Section",
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "info",
+              "warn",
+              "fail"
+            ],
+            "title": "Severity",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "severity",
+          "section",
+          "builtin",
+          "last"
+        ],
+        "title": "ConsoleCheckOut",
+        "type": "object"
+      },
+      "ConsoleCheckResultOut": {
+        "description": "One check's result in a run. A sample is a row id, a \"table.column\"\nstring, or a (table, key) pair, as the check reported it.",
+        "properties": {
+          "check_id": {
+            "title": "Check Id",
+            "type": "string"
+          },
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
+          },
+          "hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hint"
+          },
+          "ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ms"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "samples": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "items": {},
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Samples",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "check_id",
+          "status",
+          "count",
+          "samples",
+          "hint",
+          "ms"
+        ],
+        "title": "ConsoleCheckResultOut",
+        "type": "object"
+      },
+      "ConsoleCheckRunOut": {
+        "properties": {
+          "exit_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exit Code"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "lines": {
+            "title": "Lines",
+            "type": "integer"
+          },
+          "live": {
+            "title": "Live",
+            "type": "boolean"
+          },
+          "log_path": {
+            "title": "Log Path",
+            "type": "string"
+          },
+          "principal_id": {
+            "title": "Principal Id",
+            "type": "string"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleCheckResultOut"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "selection": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selection"
+          },
+          "started_at": {
+            "title": "Started At",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "tail": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tail",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "selection",
+          "principal_id",
+          "started_at",
+          "finished_at",
+          "status",
+          "summary",
+          "log_path",
+          "exit_code",
+          "live",
+          "tail",
+          "lines",
+          "results"
+        ],
+        "title": "ConsoleCheckRunOut",
+        "type": "object"
+      },
+      "ConsoleChecksOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleCheckOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "last_run": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ConsoleRunOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "last_run"
+        ],
+        "title": "ConsoleChecksOut",
+        "type": "object"
+      },
+      "ConsoleCollectionOut": {
+        "description": "A saved list of requests to replay; each request is as the UI saved it.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "requests": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Requests",
+            "type": "array"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "requests",
+          "updated_at"
+        ],
+        "title": "ConsoleCollectionOut",
+        "type": "object"
+      },
+      "ConsoleCollectionsOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleCollectionOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ConsoleCollectionsOut",
+        "type": "object"
+      },
+      "ConsoleColumnDriftOut": {
+        "properties": {
+          "extra_in_db": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Extra In Db",
+            "type": "array"
+          },
+          "missing_in_db": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing In Db",
+            "type": "array"
+          }
+        },
+        "required": [
+          "missing_in_db",
+          "extra_in_db"
+        ],
+        "title": "ConsoleColumnDriftOut",
+        "type": "object"
+      },
+      "ConsoleColumnOut": {
+        "properties": {
+          "default": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default"
+          },
+          "enum": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enum"
+          },
+          "indexed": {
+            "title": "Indexed",
+            "type": "boolean"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "live": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live"
+          },
+          "masked": {
+            "title": "Masked",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "nullable": {
+            "title": "Nullable",
+            "type": "boolean"
+          },
+          "primary_key": {
+            "title": "Primary Key",
+            "type": "boolean"
+          },
+          "references": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleColumnRefOut"
+            },
+            "title": "References",
+            "type": "array"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "unique": {
+            "title": "Unique",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "type",
+          "kind",
+          "nullable",
+          "primary_key",
+          "indexed",
+          "default",
+          "references",
+          "masked",
+          "unique",
+          "enum",
+          "live"
+        ],
+        "title": "ConsoleColumnOut",
+        "type": "object"
+      },
+      "ConsoleColumnRefOut": {
+        "properties": {
+          "column": {
+            "title": "Column",
+            "type": "string"
+          },
+          "table": {
+            "title": "Table",
+            "type": "string"
+          }
+        },
+        "required": [
+          "table",
+          "column"
+        ],
+        "title": "ConsoleColumnRefOut",
+        "type": "object"
+      },
+      "ConsoleConfigOut": {
+        "properties": {
+          "env_file": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Env File"
+          },
+          "example_file": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Example File"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleConfigRowOut"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "undocumented": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Undocumented",
+            "type": "array"
+          },
+          "unknown_in_env_file": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Unknown In Env File",
+            "type": "array"
+          }
+        },
+        "required": [
+          "env_file",
+          "example_file",
+          "rows",
+          "undocumented",
+          "unknown_in_env_file"
+        ],
+        "title": "ConsoleConfigOut",
+        "type": "object"
+      },
+      "ConsoleConfigRowOut": {
+        "description": "One setting: its value (masked when it is a secret), where the value\ncame from, and its default. The value is the host's own.",
+        "properties": {
+          "default": {
+            "title": "Default"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "documented": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Documented"
+          },
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "is_default": {
+            "title": "Is Default",
+            "type": "boolean"
+          },
+          "mutable": {
+            "title": "Mutable",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "secret": {
+            "title": "Secret",
+            "type": "boolean"
+          },
+          "source": {
+            "enum": [
+              "environment",
+              "env_file",
+              "default"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value"
+          }
+        },
+        "required": [
+          "name",
+          "field",
+          "value",
+          "secret",
+          "source",
+          "default",
+          "is_default",
+          "documented",
+          "mutable",
+          "type",
+          "description"
+        ],
+        "title": "ConsoleConfigRowOut",
+        "type": "object"
+      },
+      "ConsoleDataDictionaryOut": {
+        "properties": {
+          "tables": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleTableDetailOut"
+            },
+            "title": "Tables",
+            "type": "array"
+          },
+          "unindexed_foreign_keys": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Unindexed Foreign Keys",
+            "type": "array"
+          }
+        },
+        "required": [
+          "tables",
+          "unindexed_foreign_keys"
+        ],
+        "title": "ConsoleDataDictionaryOut",
+        "type": "object"
+      },
+      "ConsoleDeletedOut": {
+        "description": "The id of what was deleted.",
+        "properties": {
+          "deleted": {
+            "title": "Deleted",
+            "type": "string"
+          }
+        },
+        "required": [
+          "deleted"
+        ],
+        "title": "ConsoleDeletedOut",
+        "type": "object"
+      },
+      "ConsoleDiskErrorOut": {
+        "description": "A watched directory whose disk could not be read.",
+        "properties": {
+          "error": {
+            "title": "Error",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "error"
+        ],
+        "title": "ConsoleDiskErrorOut",
+        "type": "object"
+      },
+      "ConsoleDiskUsageOut": {
+        "properties": {
+          "free_gb": {
+            "title": "Free Gb",
+            "type": "number"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "total_gb": {
+            "title": "Total Gb",
+            "type": "number"
+          },
+          "used_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Used Pct"
+          }
+        },
+        "required": [
+          "path",
+          "free_gb",
+          "total_gb",
+          "used_pct"
+        ],
+        "title": "ConsoleDiskUsageOut",
+        "type": "object"
+      },
+      "ConsoleDriftOut": {
+        "description": "Where the models and the live database disagree.",
+        "properties": {
+          "columns": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ConsoleColumnDriftOut"
+            },
+            "title": "Columns",
+            "type": "object"
+          },
+          "extra_tables": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Extra Tables",
+            "type": "array"
+          },
+          "missing_tables": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing Tables",
+            "type": "array"
+          }
+        },
+        "required": [
+          "missing_tables",
+          "extra_tables",
+          "columns"
+        ],
+        "title": "ConsoleDriftOut",
+        "type": "object"
+      },
+      "ConsoleExplainOut": {
+        "description": "A query plan: PostgreSQL's JSON plan, or another dialect's plan as text.",
+        "properties": {
+          "dialect": {
+            "title": "Dialect",
+            "type": "string"
+          },
+          "plan": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          }
+        },
+        "required": [
+          "dialect",
+          "plan",
+          "text"
+        ],
+        "title": "ConsoleExplainOut",
+        "type": "object"
+      },
+      "ConsoleFilterOut": {
+        "properties": {
+          "column": {
+            "title": "Column",
+            "type": "string"
+          },
+          "op": {
+            "title": "Op",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "column",
+          "op",
+          "value"
+        ],
+        "title": "ConsoleFilterOut",
+        "type": "object"
+      },
+      "ConsoleFlagSetOut": {
+        "description": "A setting changed at runtime (not persisted), with its value before and after.",
+        "properties": {
+          "after": {
+            "title": "After"
+          },
+          "before": {
+            "title": "Before"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "before",
+          "after"
+        ],
+        "title": "ConsoleFlagSetOut",
+        "type": "object"
+      },
+      "ConsoleHealthOut": {
+        "properties": {
+          "at": {
+            "title": "At",
+            "type": "string"
+          },
+          "overall": {
+            "enum": [
+              "ok",
+              "warn",
+              "fail",
+              "error"
+            ],
+            "title": "Overall",
+            "type": "string"
+          },
+          "tiles": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleTileOut"
+            },
+            "title": "Tiles",
+            "type": "array"
+          }
+        },
+        "required": [
+          "at",
+          "overall",
+          "tiles"
+        ],
+        "title": "ConsoleHealthOut",
+        "type": "object"
+      },
+      "ConsoleIndexOut": {
+        "properties": {
+          "columns": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Columns",
+            "type": "array"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "unique": {
+            "title": "Unique",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "columns",
+          "unique"
+        ],
+        "title": "ConsoleIndexOut",
+        "type": "object"
+      },
+      "ConsoleLimitsOut": {
+        "properties": {
+          "activity_days": {
+            "title": "Activity Days",
+            "type": "integer"
+          },
+          "apply_timeout_seconds": {
+            "title": "Apply Timeout Seconds",
+            "type": "integer"
+          },
+          "bulk_rows": {
+            "title": "Bulk Rows",
+            "type": "integer"
+          },
+          "changeset_ttl_seconds": {
+            "title": "Changeset Ttl Seconds",
+            "type": "integer"
+          },
+          "exact_count_rows": {
+            "title": "Exact Count Rows",
+            "type": "integer"
+          },
+          "export_rows": {
+            "title": "Export Rows",
+            "type": "integer"
+          },
+          "log_lines": {
+            "title": "Log Lines",
+            "type": "integer"
+          },
+          "max_rows": {
+            "title": "Max Rows",
+            "type": "integer"
+          },
+          "offset_max": {
+            "title": "Offset Max",
+            "type": "integer"
+          },
+          "output_lines": {
+            "title": "Output Lines",
+            "type": "integer"
+          },
+          "query_history_rows": {
+            "title": "Query History Rows",
+            "type": "integer"
+          },
+          "query_seconds": {
+            "title": "Query Seconds",
+            "type": "integer"
+          },
+          "response_body_bytes": {
+            "title": "Response Body Bytes",
+            "type": "integer"
+          },
+          "result_bytes": {
+            "title": "Result Bytes",
+            "type": "integer"
+          },
+          "rows": {
+            "title": "Rows",
+            "type": "integer"
+          },
+          "runs_per_kind": {
+            "title": "Runs Per Kind",
+            "type": "integer"
+          },
+          "sse_queue": {
+            "title": "Sse Queue",
+            "type": "integer"
+          },
+          "traffic_entries": {
+            "title": "Traffic Entries",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rows",
+          "max_rows",
+          "export_rows",
+          "bulk_rows",
+          "query_seconds",
+          "result_bytes",
+          "response_body_bytes",
+          "exact_count_rows",
+          "offset_max",
+          "log_lines",
+          "traffic_entries",
+          "output_lines",
+          "activity_days",
+          "query_history_rows",
+          "runs_per_kind",
+          "changeset_ttl_seconds",
+          "apply_timeout_seconds",
+          "sse_queue"
+        ],
+        "title": "ConsoleLimitsOut",
+        "type": "object"
+      },
+      "ConsoleLogLineOut": {
+        "additionalProperties": true,
+        "description": "One log line. A source adds keys of its own: a JSONL line keeps every\nfield it had, and the console's activity adds the principal and the\nactivity id.",
+        "properties": {
+          "level": {
+            "title": "Level",
+            "type": "string"
+          },
+          "logger": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logger"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
+          },
+          "ts": {
+            "title": "Ts",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ts",
+          "level",
+          "message",
+          "logger",
+          "request_id"
+        ],
+        "title": "ConsoleLogLineOut",
+        "type": "object"
+      },
+      "ConsoleLogSourceOut": {
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "available",
+          "reason"
+        ],
+        "title": "ConsoleLogSourceOut",
+        "type": "object"
+      },
+      "ConsoleLogSourcesOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleLogSourceOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ConsoleLogSourcesOut",
+        "type": "object"
+      },
+      "ConsoleLogTailOut": {
+        "description": "The newest lines of one source. `available` is left out for the\nconsole's own activity, which is always there; `reason` is sent only\nwhen a source cannot be read.",
+        "properties": {
+          "available": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Available"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleLogLineOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "returned": {
+            "title": "Returned",
+            "type": "integer"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "items",
+          "returned"
+        ],
+        "title": "ConsoleLogTailOut",
+        "type": "object"
+      },
+      "ConsoleManifestOut": {
+        "description": "What this console can do here, so the UI renders only what exists.",
+        "properties": {
+          "app_name": {
+            "title": "App Name",
+            "type": "string"
+          },
+          "app_version": {
+            "title": "App Version",
+            "type": "string"
+          },
+          "console_version": {
+            "title": "Console Version",
+            "type": "string"
+          },
+          "database_label": {
+            "title": "Database Label",
+            "type": "string"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/ConsoleLimitsOut"
+          },
+          "links": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Links",
+            "type": "object"
+          },
+          "prefix": {
+            "title": "Prefix",
+            "type": "string"
+          },
+          "principal": {
+            "$ref": "#/components/schemas/ConsolePrincipalOut"
+          },
+          "sections": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleSectionOut"
+            },
+            "title": "Sections",
+            "type": "array"
+          },
+          "sse": {
+            "title": "Sse",
+            "type": "boolean"
+          },
+          "store": {
+            "enum": [
+              "sqlite",
+              "host"
+            ],
+            "title": "Store",
+            "type": "string"
+          },
+          "ui_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ui Path"
+          },
+          "writes": {
+            "enum": [
+              "disabled",
+              "changesets",
+              "changesets_and_sql"
+            ],
+            "title": "Writes",
+            "type": "string"
+          }
+        },
+        "required": [
+          "app_name",
+          "app_version",
+          "console_version",
+          "database_label",
+          "principal",
+          "sections",
+          "prefix",
+          "ui_path",
+          "sse",
+          "links",
+          "writes",
+          "store",
+          "limits"
+        ],
+        "title": "ConsoleManifestOut",
+        "type": "object"
+      },
+      "ConsoleMigrationOut": {
+        "properties": {
+          "applied": {
+            "title": "Applied",
+            "type": "boolean"
+          },
+          "down_revision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ],
+            "title": "Down Revision"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "revision": {
+            "title": "Revision",
+            "type": "string"
+          }
+        },
+        "required": [
+          "revision",
+          "down_revision",
+          "message",
+          "applied"
+        ],
+        "title": "ConsoleMigrationOut",
+        "type": "object"
+      },
+      "ConsoleMigrationPlanOut": {
+        "description": "The SQL an upgrade would run, without running it.",
+        "properties": {
+          "from": {
+            "title": "From",
+            "type": "string"
+          },
+          "sql": {
+            "title": "Sql",
+            "type": "string"
+          },
+          "to": {
+            "title": "To",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "sql"
+        ],
+        "title": "ConsoleMigrationPlanOut",
+        "type": "object"
+      },
+      "ConsoleMigrationStateOut": {
+        "description": "Where the database is relative to the migration head. `error` is sent\nonly when Alembic could not be read.",
+        "properties": {
+          "at_head": {
+            "title": "At Head",
+            "type": "boolean"
+          },
+          "behind_by": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Behind By"
+          },
+          "current": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "heads": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Heads",
+            "type": "array"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleMigrationOut"
+            },
+            "title": "History",
+            "type": "array"
+          }
+        },
+        "required": [
+          "current",
+          "heads",
+          "at_head",
+          "behind_by",
+          "history"
+        ],
+        "title": "ConsoleMigrationStateOut",
+        "type": "object"
+      },
+      "ConsoleOutboundRefOut": {
+        "properties": {
+          "column": {
+            "title": "Column",
+            "type": "string"
+          },
+          "table": {
+            "title": "Table",
+            "type": "string"
+          },
+          "target_column": {
+            "title": "Target Column",
+            "type": "string"
+          }
+        },
+        "required": [
+          "column",
+          "table",
+          "target_column"
+        ],
+        "title": "ConsoleOutboundRefOut",
+        "type": "object"
+      },
+      "ConsolePrincipalOut": {
+        "properties": {
+          "can_write": {
+            "title": "Can Write",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "is_local": {
+            "title": "Is Local",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "roles",
+          "is_local",
+          "can_write"
+        ],
+        "title": "ConsolePrincipalOut",
+        "type": "object"
+      },
+      "ConsoleQueryHistoryOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleQueryHistoryRowOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ConsoleQueryHistoryOut",
+        "type": "object"
+      },
+      "ConsoleQueryHistoryRowOut": {
+        "properties": {
+          "at": {
+            "title": "At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "mode": {
+            "title": "Mode",
+            "type": "string"
+          },
+          "ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ms"
+          },
+          "principal_id": {
+            "title": "Principal Id",
+            "type": "string"
+          },
+          "rows": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rows"
+          },
+          "sql": {
+            "title": "Sql",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "at",
+          "principal_id",
+          "sql",
+          "mode",
+          "rows",
+          "ms",
+          "error"
+        ],
+        "title": "ConsoleQueryHistoryRowOut",
+        "type": "object"
+      },
+      "ConsoleReadResultOut": {
+        "description": "A read query's result (rolled back; capped by rows, bytes and time).",
+        "properties": {
+          "byte_capped": {
+            "title": "Byte Capped",
+            "type": "boolean"
+          },
+          "columns": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Columns",
+            "type": "array"
+          },
+          "mode": {
+            "const": "read",
+            "title": "Mode",
+            "type": "string"
+          },
+          "ms": {
+            "title": "Ms",
+            "type": "number"
+          },
+          "returned": {
+            "title": "Returned",
+            "type": "integer"
+          },
+          "rows": {
+            "items": {
+              "items": {},
+              "type": "array"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "truncated": {
+            "title": "Truncated",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "mode",
+          "columns",
+          "rows",
+          "returned",
+          "truncated",
+          "byte_capped",
+          "ms"
+        ],
+        "title": "ConsoleReadResultOut",
+        "type": "object"
+      },
+      "ConsoleRelatedCountOut": {
+        "properties": {
+          "column": {
+            "title": "Column",
+            "type": "string"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "filter": {
+            "title": "Filter",
+            "type": "string"
+          },
+          "table": {
+            "title": "Table",
+            "type": "string"
+          }
+        },
+        "required": [
+          "table",
+          "column",
+          "count",
+          "filter"
+        ],
+        "title": "ConsoleRelatedCountOut",
+        "type": "object"
+      },
+      "ConsoleRestorePlanOut": {
+        "properties": {
+          "backup_id": {
+            "title": "Backup Id",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          },
+          "will_replace": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Will Replace",
+            "type": "array"
+          }
+        },
+        "required": [
+          "backup_id",
+          "summary",
+          "will_replace",
+          "warnings"
+        ],
+        "title": "ConsoleRestorePlanOut",
+        "type": "object"
+      },
+      "ConsoleRoleOut": {
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "grants": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Grants",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "grants"
+        ],
+        "title": "ConsoleRoleOut",
+        "type": "object"
+      },
+      "ConsoleRolesOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleRoleOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ConsoleRolesOut",
+        "type": "object"
+      },
+      "ConsoleRouteOut": {
+        "description": "One route of the host: its parameters, who may call it, and the traffic it has had.",
+        "properties": {
+          "auth": {
+            "title": "Auth",
+            "type": "string"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "console": {
+            "title": "Console",
+            "type": "boolean"
+          },
+          "method": {
+            "title": "Method",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "notes": {
+            "title": "Notes",
+            "type": "string"
+          },
+          "params": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleRouteParamOut"
+            },
+            "title": "Params",
+            "type": "array"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
+          "traffic": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ConsoleRouteTrafficOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "method",
+          "path",
+          "name",
+          "summary",
+          "tags",
+          "params",
+          "body",
+          "console",
+          "auth",
+          "roles",
+          "notes",
+          "traffic"
+        ],
+        "title": "ConsoleRouteOut",
+        "type": "object"
+      },
+      "ConsoleRouteParamOut": {
+        "description": "A route parameter as the host's OpenAPI schema describes it.",
+        "properties": {
+          "in": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "In"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "required": {
+            "title": "Required",
+            "type": "boolean"
+          },
+          "schema": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schema"
+          }
+        },
+        "required": [
+          "name",
+          "in",
+          "required",
+          "schema"
+        ],
+        "title": "ConsoleRouteParamOut",
+        "type": "object"
+      },
+      "ConsoleRouteTrafficOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "last_seen": {
+            "title": "Last Seen",
+            "type": "number"
+          },
+          "p50_ms": {
+            "title": "P50 Ms",
+            "type": "number"
+          },
+          "p95_ms": {
+            "title": "P95 Ms",
+            "type": "number"
+          },
+          "status_4xx": {
+            "title": "Status 4Xx",
+            "type": "integer"
+          },
+          "status_5xx": {
+            "title": "Status 5Xx",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "count",
+          "p50_ms",
+          "p95_ms",
+          "status_4xx",
+          "status_5xx",
+          "last_seen"
+        ],
+        "title": "ConsoleRouteTrafficOut",
+        "type": "object"
+      },
+      "ConsoleRoutesOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleRouteOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ConsoleRoutesOut",
+        "type": "object"
+      },
+      "ConsoleRowOut": {
+        "description": "One row, how many rows elsewhere point at it, and what its columns point at.",
+        "properties": {
+          "pk": {
+            "additionalProperties": true,
+            "title": "Pk",
+            "type": "object"
+          },
+          "references": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/ConsoleColumnRefOut"
+              },
+              "type": "array"
+            },
+            "title": "References",
+            "type": "object"
+          },
+          "related": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleRelatedCountOut"
+            },
+            "title": "Related",
+            "type": "array"
+          },
+          "row": {
+            "additionalProperties": true,
+            "title": "Row",
+            "type": "object"
+          },
+          "table": {
+            "title": "Table",
+            "type": "string"
+          }
+        },
+        "required": [
+          "table",
+          "pk",
+          "row",
+          "related",
+          "references"
+        ],
+        "title": "ConsoleRowOut",
+        "type": "object"
+      },
+      "ConsoleRowsOut": {
+        "description": "One page of a table's rows. Each row is the host's own (column -> value;\nmasked columns read \"••••\"). `next` is the cursor for the following page.",
+        "properties": {
+          "estimated": {
+            "title": "Estimated",
+            "type": "boolean"
+          },
+          "filters": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleFilterOut"
+            },
+            "title": "Filters",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "keyset": {
+            "title": "Keyset",
+            "type": "boolean"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "next": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next"
+          },
+          "order": {
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "title": "Order",
+            "type": "string"
+          },
+          "q": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Q"
+          },
+          "sort": {
+            "title": "Sort",
+            "type": "string"
+          },
+          "table": {
+            "title": "Table",
+            "type": "string"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          }
+        },
+        "required": [
+          "table",
+          "items",
+          "next",
+          "sort",
+          "order",
+          "keyset",
+          "limit",
+          "total",
+          "estimated",
+          "filters",
+          "q"
+        ],
+        "title": "ConsoleRowsOut",
+        "type": "object"
+      },
+      "ConsoleRunLogOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "lines": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Lines",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "lines",
+          "count"
+        ],
+        "title": "ConsoleRunLogOut",
+        "type": "object"
+      },
+      "ConsoleRunOut": {
+        "description": "A run as the console's store keeps it. `summary` is what the run\nreported, in its kind's own shape (a test run's counts, a probe run's\nresults), or the error that stopped it.",
+        "properties": {
+          "exit_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exit Code"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "log_path": {
+            "title": "Log Path",
+            "type": "string"
+          },
+          "principal_id": {
+            "title": "Principal Id",
+            "type": "string"
+          },
+          "selection": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selection"
+          },
+          "started_at": {
+            "title": "Started At",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "selection",
+          "principal_id",
+          "started_at",
+          "finished_at",
+          "status",
+          "summary",
+          "log_path",
+          "exit_code"
+        ],
+        "title": "ConsoleRunOut",
+        "type": "object"
+      },
+      "ConsoleRunStatusOut": {
+        "description": "A run with its latest output lines, and whether it is still going.",
+        "properties": {
+          "exit_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exit Code"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "lines": {
+            "title": "Lines",
+            "type": "integer"
+          },
+          "live": {
+            "title": "Live",
+            "type": "boolean"
+          },
+          "log_path": {
+            "title": "Log Path",
+            "type": "string"
+          },
+          "principal_id": {
+            "title": "Principal Id",
+            "type": "string"
+          },
+          "selection": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selection"
+          },
+          "started_at": {
+            "title": "Started At",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "tail": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tail",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "selection",
+          "principal_id",
+          "started_at",
+          "finished_at",
+          "status",
+          "summary",
+          "log_path",
+          "exit_code",
+          "live",
+          "tail",
+          "lines"
+        ],
+        "title": "ConsoleRunStatusOut",
+        "type": "object"
+      },
+      "ConsoleRunsOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleRunOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ConsoleRunsOut",
+        "type": "object"
+      },
+      "ConsoleSavedQueriesOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleSavedQueryRowOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ConsoleSavedQueriesOut",
+        "type": "object"
+      },
+      "ConsoleSavedQueryOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "params": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Params",
+            "type": "array"
+          },
+          "pinned": {
+            "title": "Pinned",
+            "type": "boolean"
+          },
+          "sql": {
+            "title": "Sql",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "sql",
+          "params",
+          "updated_at",
+          "pinned"
+        ],
+        "title": "ConsoleSavedQueryOut",
+        "type": "object"
+      },
+      "ConsoleSavedQueryRowOut": {
+        "properties": {
+          "created_by": {
+            "title": "Created By",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "params": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Params",
+            "type": "array"
+          },
+          "pinned": {
+            "title": "Pinned",
+            "type": "boolean"
+          },
+          "sql": {
+            "title": "Sql",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "sql",
+          "params",
+          "updated_at",
+          "pinned",
+          "created_by"
+        ],
+        "title": "ConsoleSavedQueryRowOut",
+        "type": "object"
+      },
+      "ConsoleSchemaEdgeOut": {
+        "properties": {
+          "from_column": {
+            "title": "From Column",
+            "type": "string"
+          },
+          "from_table": {
+            "title": "From Table",
+            "type": "string"
+          },
+          "to_column": {
+            "title": "To Column",
+            "type": "string"
+          },
+          "to_table": {
+            "title": "To Table",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from_table",
+          "from_column",
+          "to_table",
+          "to_column"
+        ],
+        "title": "ConsoleSchemaEdgeOut",
+        "type": "object"
+      },
+      "ConsoleSchemaMapOut": {
+        "properties": {
+          "domains": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Domains",
+            "type": "array"
+          },
+          "drift": {
+            "$ref": "#/components/schemas/ConsoleDriftOut"
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleSchemaEdgeOut"
+            },
+            "title": "Edges",
+            "type": "array"
+          },
+          "tables": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleTableSummaryOut"
+            },
+            "title": "Tables",
+            "type": "array"
+          }
+        },
+        "required": [
+          "tables",
+          "edges",
+          "drift",
+          "domains"
+        ],
+        "title": "ConsoleSchemaMapOut",
+        "type": "object"
+      },
+      "ConsoleSectionOut": {
+        "description": "A section the UI may show and what it can do on this host. Backups\nname their provider kinds and logs their sources; other sections leave\nboth keys out.",
+        "properties": {
+          "capabilities": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Capabilities",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kinds": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kinds"
+          },
+          "sources": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sources"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "capabilities"
+        ],
+        "title": "ConsoleSectionOut",
+        "type": "object"
+      },
+      "ConsoleSentOut": {
+        "description": "What this server answered a replayed request. `body` is the reply\nparsed when it is JSON, and its text otherwise.",
+        "properties": {
+          "body": {
+            "title": "Body"
+          },
+          "bytes": {
+            "title": "Bytes",
+            "type": "integer"
+          },
+          "headers": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Headers",
+            "type": "object"
+          },
+          "ms": {
+            "title": "Ms",
+            "type": "number"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
+          },
+          "status": {
+            "title": "Status",
+            "type": "integer"
+          },
+          "truncated": {
+            "title": "Truncated",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "status",
+          "headers",
+          "body",
+          "truncated",
+          "bytes",
+          "ms",
+          "request_id"
+        ],
+        "title": "ConsoleSentOut",
+        "type": "object"
+      },
+      "ConsoleServerMetricsOut": {
+        "description": "The process and its machine. Numbers that need psutil are null without it.",
+        "properties": {
+          "cpu_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cpu Count"
+          },
+          "cpu_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cpu Percent"
+          },
+          "disks": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ConsoleDiskUsageOut"
+                },
+                {
+                  "$ref": "#/components/schemas/ConsoleDiskErrorOut"
+                }
+              ]
+            },
+            "title": "Disks",
+            "type": "object"
+          },
+          "in_docker": {
+            "title": "In Docker",
+            "type": "boolean"
+          },
+          "load_average": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Load Average"
+          },
+          "pid": {
+            "title": "Pid",
+            "type": "integer"
+          },
+          "platform": {
+            "title": "Platform",
+            "type": "string"
+          },
+          "psutil": {
+            "title": "Psutil",
+            "type": "boolean"
+          },
+          "python": {
+            "title": "Python",
+            "type": "string"
+          },
+          "rss_mb": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rss Mb"
+          },
+          "started_at": {
+            "title": "Started At",
+            "type": "number"
+          },
+          "threads": {
+            "title": "Threads",
+            "type": "integer"
+          },
+          "uptime_seconds": {
+            "title": "Uptime Seconds",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "uptime_seconds",
+          "started_at",
+          "pid",
+          "python",
+          "platform",
+          "cpu_count",
+          "load_average",
+          "cpu_percent",
+          "rss_mb",
+          "threads",
+          "in_docker",
+          "disks",
+          "psutil"
+        ],
+        "title": "ConsoleServerMetricsOut",
+        "type": "object"
+      },
+      "ConsoleTableDetailOut": {
+        "description": "One table: the model's columns and indexes next to the live database's.",
+        "properties": {
+          "columns": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleColumnOut"
+            },
+            "title": "Columns",
+            "type": "array"
+          },
+          "doc": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doc"
+          },
+          "domain": {
+            "title": "Domain",
+            "type": "string"
+          },
+          "drift": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ConsoleColumnDriftOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "indexes": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleIndexOut"
+            },
+            "title": "Indexes",
+            "type": "array"
+          },
+          "live": {
+            "title": "Live",
+            "type": "boolean"
+          },
+          "live_indexes": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleIndexOut"
+            },
+            "title": "Live Indexes",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "primary_key": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Primary Key",
+            "type": "array"
+          },
+          "readonly": {
+            "title": "Readonly",
+            "type": "boolean"
+          },
+          "referenced_by": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleColumnRefOut"
+            },
+            "title": "Referenced By",
+            "type": "array"
+          },
+          "references": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleOutboundRefOut"
+            },
+            "title": "References",
+            "type": "array"
+          },
+          "unique_constraints": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleUniqueConstraintOut"
+            },
+            "title": "Unique Constraints",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "domain",
+          "doc",
+          "live",
+          "readonly",
+          "primary_key",
+          "columns",
+          "indexes",
+          "live_indexes",
+          "unique_constraints",
+          "drift",
+          "references",
+          "referenced_by"
+        ],
+        "title": "ConsoleTableDetailOut",
+        "type": "object"
+      },
+      "ConsoleTableSummaryOut": {
+        "properties": {
+          "columns": {
+            "title": "Columns",
+            "type": "integer"
+          },
+          "domain": {
+            "title": "Domain",
+            "type": "string"
+          },
+          "estimated": {
+            "title": "Estimated",
+            "type": "boolean"
+          },
+          "live": {
+            "title": "Live",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "primary_key": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Primary Key",
+            "type": "array"
+          },
+          "readonly": {
+            "title": "Readonly",
+            "type": "boolean"
+          },
+          "referenced_by": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Referenced By",
+            "type": "array"
+          },
+          "references": {
+            "items": {
+              "type": "string"
+            },
+            "title": "References",
+            "type": "array"
+          },
+          "rows": {
+            "title": "Rows",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "domain",
+          "live",
+          "rows",
+          "estimated",
+          "columns",
+          "primary_key",
+          "readonly",
+          "references",
+          "referenced_by"
+        ],
+        "title": "ConsoleTableSummaryOut",
+        "type": "object"
+      },
+      "ConsoleTablesOut": {
+        "properties": {
+          "domains": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Domains",
+            "type": "array"
+          },
+          "extra_tables": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Extra Tables",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleTableSummaryOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items",
+          "extra_tables",
+          "domains"
+        ],
+        "title": "ConsoleTablesOut",
+        "type": "object"
+      },
+      "ConsoleTestNodeOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "file",
+              "class",
+              "test"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "parent",
+          "title"
+        ],
+        "title": "ConsoleTestNodeOut",
+        "type": "object"
+      },
+      "ConsoleTestRunsOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleRunOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "running": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Running"
+          }
+        },
+        "required": [
+          "items",
+          "running"
+        ],
+        "title": "ConsoleTestRunsOut",
+        "type": "object"
+      },
+      "ConsoleTestTreeOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleTestNodeOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "ConsoleTestTreeOut",
+        "type": "object"
+      },
+      "ConsoleTileOut": {
+        "description": "One health tile. `details` is the tile's own: a host tile puts what it likes there.",
+        "properties": {
+          "details": {
+            "additionalProperties": true,
+            "title": "Details",
+            "type": "object"
+          },
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "ms": {
+            "title": "Ms",
+            "type": "integer"
+          },
+          "refresh_seconds": {
+            "title": "Refresh Seconds",
+            "type": "integer"
+          },
+          "section": {
+            "title": "Section",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "ok",
+              "warn",
+              "fail",
+              "error"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "state",
+          "headline",
+          "details",
+          "section",
+          "refresh_seconds",
+          "ms"
+        ],
+        "title": "ConsoleTileOut",
+        "type": "object"
+      },
+      "ConsoleTokenIssuedOut": {
+        "description": "A new token, shown this once: the console does not keep it.",
+        "properties": {
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "plaintext": {
+            "title": "Plaintext",
+            "type": "string"
+          },
+          "token_id": {
+            "title": "Token Id",
+            "type": "string"
+          },
+          "user": {
+            "title": "User",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user",
+          "token_id",
+          "plaintext",
+          "expires_at",
+          "note"
+        ],
+        "title": "ConsoleTokenIssuedOut",
+        "type": "object"
+      },
+      "ConsoleTokenOut": {
+        "properties": {
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "issued_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issued At"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At"
+          },
+          "revoked_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoked At"
+          }
+        },
+        "required": [
+          "id",
+          "issued_at",
+          "expires_at",
+          "last_used_at",
+          "revoked_at"
+        ],
+        "title": "ConsoleTokenOut",
+        "type": "object"
+      },
+      "ConsoleTokenRevokedOut": {
+        "properties": {
+          "revoked": {
+            "title": "Revoked",
+            "type": "boolean"
+          },
+          "token": {
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "revoked"
+        ],
+        "title": "ConsoleTokenRevokedOut",
+        "type": "object"
+      },
+      "ConsoleTrafficBufferOut": {
+        "properties": {
+          "capacity": {
+            "title": "Capacity",
+            "type": "integer"
+          },
+          "fill": {
+            "title": "Fill",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "fill",
+          "capacity",
+          "total"
+        ],
+        "title": "ConsoleTrafficBufferOut",
+        "type": "object"
+      },
+      "ConsoleTrafficEntryOut": {
+        "properties": {
+          "method": {
+            "title": "Method",
+            "type": "string"
+          },
+          "ms": {
+            "title": "Ms",
+            "type": "number"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "principal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Principal"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
+          },
+          "route": {
+            "title": "Route",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "integer"
+          },
+          "t": {
+            "title": "T",
+            "type": "number"
+          }
+        },
+        "required": [
+          "t",
+          "method",
+          "route",
+          "path",
+          "status",
+          "ms",
+          "request_id",
+          "principal"
+        ],
+        "title": "ConsoleTrafficEntryOut",
+        "type": "object"
+      },
+      "ConsoleTrafficOut": {
+        "properties": {
+          "buffer": {
+            "$ref": "#/components/schemas/ConsoleTrafficBufferOut"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleTrafficSnapshotOut"
+            },
+            "title": "History",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleTrafficSummaryOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items",
+          "buffer",
+          "history"
+        ],
+        "title": "ConsoleTrafficOut",
+        "type": "object"
+      },
+      "ConsoleTrafficRecentOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleTrafficEntryOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ConsoleTrafficRecentOut",
+        "type": "object"
+      },
+      "ConsoleTrafficSnapshotOut": {
+        "properties": {
+          "at": {
+            "title": "At",
+            "type": "string"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "max_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Ms"
+          },
+          "method": {
+            "title": "Method",
+            "type": "string"
+          },
+          "p50_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50 Ms"
+          },
+          "p95_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95 Ms"
+          },
+          "route": {
+            "title": "Route",
+            "type": "string"
+          },
+          "status_4xx": {
+            "title": "Status 4Xx",
+            "type": "integer"
+          },
+          "status_5xx": {
+            "title": "Status 5Xx",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "at",
+          "route",
+          "method",
+          "count",
+          "p50_ms",
+          "p95_ms",
+          "max_ms",
+          "status_4xx",
+          "status_5xx"
+        ],
+        "title": "ConsoleTrafficSnapshotOut",
+        "type": "object"
+      },
+      "ConsoleTrafficSummaryOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "last_seen": {
+            "title": "Last Seen",
+            "type": "number"
+          },
+          "max_ms": {
+            "title": "Max Ms",
+            "type": "number"
+          },
+          "method": {
+            "title": "Method",
+            "type": "string"
+          },
+          "p50_ms": {
+            "title": "P50 Ms",
+            "type": "number"
+          },
+          "p95_ms": {
+            "title": "P95 Ms",
+            "type": "number"
+          },
+          "route": {
+            "title": "Route",
+            "type": "string"
+          },
+          "status_4xx": {
+            "title": "Status 4Xx",
+            "type": "integer"
+          },
+          "status_5xx": {
+            "title": "Status 5Xx",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "method",
+          "route",
+          "count",
+          "p50_ms",
+          "p95_ms",
+          "max_ms",
+          "status_4xx",
+          "status_5xx",
+          "last_seen"
+        ],
+        "title": "ConsoleTrafficSummaryOut",
+        "type": "object"
+      },
+      "ConsoleUniqueConstraintOut": {
+        "properties": {
+          "columns": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Columns",
+            "type": "array"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "required": [
+          "name",
+          "columns"
+        ],
+        "title": "ConsoleUniqueConstraintOut",
+        "type": "object"
+      },
+      "ConsoleUserDisabledOut": {
+        "properties": {
+          "disabled": {
+            "title": "Disabled",
+            "type": "boolean"
+          },
+          "user": {
+            "title": "User",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user",
+          "disabled"
+        ],
+        "title": "ConsoleUserDisabledOut",
+        "type": "object"
+      },
+      "ConsoleUserOut": {
+        "description": "A user as the host's directory describes it; `extra` is the host's own.",
+        "properties": {
+          "disabled": {
+            "title": "Disabled",
+            "type": "boolean"
+          },
+          "extra": {
+            "additionalProperties": true,
+            "title": "Extra",
+            "type": "object"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "last_seen_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Seen At"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "tokens": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleTokenOut"
+            },
+            "title": "Tokens",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "roles",
+          "disabled",
+          "last_seen_at",
+          "tokens",
+          "extra"
+        ],
+        "title": "ConsoleUserOut",
+        "type": "object"
+      },
+      "ConsoleUserRolesOut": {
+        "properties": {
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "user": {
+            "title": "User",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user",
+          "roles"
+        ],
+        "title": "ConsoleUserRolesOut",
+        "type": "object"
+      },
+      "ConsoleUsersOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleUserOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ConsoleUsersOut",
+        "type": "object"
+      },
+      "ConsoleWriteResultOut": {
+        "description": "A write statement's result: rows changed, and any rows it returned (at most 500).",
+        "properties": {
+          "columns": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Columns",
+            "type": "array"
+          },
+          "mode": {
+            "const": "write",
+            "title": "Mode",
+            "type": "string"
+          },
+          "ms": {
+            "title": "Ms",
+            "type": "number"
+          },
+          "rowcount": {
+            "title": "Rowcount",
+            "type": "integer"
+          },
+          "rows": {
+            "items": {
+              "items": {},
+              "type": "array"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "mode",
+          "rowcount",
+          "columns",
+          "rows",
+          "ms"
+        ],
+        "title": "ConsoleWriteResultOut",
+        "type": "object"
+      },
       "ContextCitationOut": {
         "description": "A record the model may cite, with where to trace it.",
         "properties": {
@@ -17455,7 +21672,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleActivityListOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17492,7 +21711,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleActivityOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17529,7 +21750,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleChangeSetPreviewOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17555,7 +21778,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleCollectionsOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17579,7 +21804,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleCollectionOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17616,7 +21843,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleDeletedOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17642,7 +21871,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleRunStatusOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17658,7 +21889,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleRoutesOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17684,7 +21917,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleSentOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17730,7 +21965,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleTrafficOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17787,7 +22024,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleTrafficRecentOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17813,7 +22052,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleBackupsOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17837,7 +22078,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleRunStatusOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17877,7 +22120,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleRunsOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17924,7 +22169,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleRunStatusOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17971,7 +22218,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleRestorePlanOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18016,11 +22265,14 @@
         "responses": {
           "200": {
             "content": {
-              "application/json": {
-                "schema": {}
+              "*/*": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "The backup file, as its provider wrote it"
           },
           "422": {
             "content": {
@@ -18043,7 +22295,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleChecksOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18076,7 +22330,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleRunStatusOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18116,7 +22372,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleRunsOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18153,7 +22411,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleCheckRunOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18179,7 +22439,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleConfigOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18216,7 +22478,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleFlagSetOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18273,7 +22537,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleChangeSetsOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18307,7 +22573,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleChangeSetPreviewOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18344,7 +22612,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleChangeSetOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18391,7 +22661,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleChangeSetAppliedOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18428,7 +22700,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleChangeSetDiscardedOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18454,7 +22728,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleTablesOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18481,7 +22757,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleTableDetailOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18528,7 +22806,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleChangeSetPreviewOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18593,10 +22873,20 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "The table's rows as CSV, or as a JSON array of rows (the host's columns)"
           },
           "422": {
             "content": {
@@ -18724,7 +23014,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleRowsOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18770,7 +23062,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleRowOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18808,11 +23102,13 @@
         "responses": {
           "200": {
             "content": {
-              "application/json": {
-                "schema": {}
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Server-sent events: one `event:` and `data:` pair per console event, JSON in `data`"
           },
           "422": {
             "content": {
@@ -18854,7 +23150,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleHealthOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18880,7 +23178,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleServerMetricsOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -18896,7 +23196,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleLogSourcesOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19030,7 +23332,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleLogTailOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19056,7 +23360,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleManifestOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19082,7 +23388,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleExplainOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19122,7 +23430,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleQueryHistoryOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19158,7 +23468,24 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "discriminator": {
+                    "mapping": {
+                      "read": "#/components/schemas/ConsoleReadResultOut",
+                      "write": "#/components/schemas/ConsoleWriteResultOut"
+                    },
+                    "propertyName": "mode"
+                  },
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ConsoleReadResultOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ConsoleWriteResultOut"
+                    }
+                  ],
+                  "title": "Response Console Query Run"
+                }
               }
             },
             "description": "Successful Response"
@@ -19184,7 +23511,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleSavedQueriesOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19208,7 +23537,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleSavedQueryOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19245,7 +23576,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleDeletedOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19290,7 +23623,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleSavedQueryOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19316,7 +23651,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleDataDictionaryOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19332,7 +23669,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleSchemaMapOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19348,7 +23687,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleMigrationStateOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19374,7 +23715,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleMigrationPlanOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19410,7 +23753,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleRunStatusOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19436,7 +23781,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleRunStatusOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19469,7 +23816,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleRunStatusOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19509,7 +23858,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleTestRunsOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19558,7 +23909,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleRunStatusOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19595,7 +23948,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleRunStatusOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19632,7 +23987,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleRunLogOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19670,7 +24027,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleTestTreeOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19696,7 +24055,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleUsersOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19712,7 +24073,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleRolesOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19749,7 +24112,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleTokenRevokedOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19796,7 +24161,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleUserDisabledOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19843,7 +24210,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleUserRolesOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19890,7 +24259,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleTokenIssuedOut"
+                }
               }
             },
             "description": "Successful Response"

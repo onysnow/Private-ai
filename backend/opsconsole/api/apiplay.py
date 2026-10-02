@@ -9,6 +9,7 @@ import httpx
 from fastapi import APIRouter, Query, Request
 from pydantic import BaseModel, Field
 
+from opsconsole import schemas as s
 from opsconsole.config import WritePolicy
 from opsconsole.context import ConsoleContext, ConsoleError
 from opsconsole.core.ids import now_iso
@@ -67,12 +68,12 @@ def router(ctx: ConsoleContext) -> APIRouter:
         out.sort(key=lambda x: (x["path"], x["method"]))
         return out
 
-    @r.get("/api/routes", response_model=None)
+    @r.get("/api/routes", response_model=s.ConsoleRoutesOut)
     def routes(request: Request) -> Any:
         ctx.read(request)
         return {"items": _routes(request)}
 
-    @r.post("/api/send", response_model=None)
+    @r.post("/api/send", response_model=s.ConsoleSentOut)
     def send(request: Request, body: SendIn) -> Any:
         # /api/send lets the caller replay any method/path against this same
         # server -- a strictly more powerful capability than a row-level
@@ -119,36 +120,36 @@ def router(ctx: ConsoleContext) -> APIRouter:
 
     if ctx.config.request_hook:
 
-        @r.get("/api/traffic", response_model=None)
+        @r.get("/api/traffic", response_model=s.ConsoleTrafficOut)
         def traffic(request: Request, since_seconds: int | None = Query(default=None, ge=1, le=86_400)) -> Any:
             ctx.read(request)
             since = time.time() - since_seconds if since_seconds else None
             fill, cap = ctx.traffic.fill()
             return {"items": ctx.traffic.summary(since=since), "buffer": {"fill": fill, "capacity": cap, "total": ctx.traffic.total}, "history": ctx.store.traffic_history(route=None, limit=200)}
 
-        @r.get("/api/traffic/recent", response_model=None)
+        @r.get("/api/traffic/recent", response_model=s.ConsoleTrafficRecentOut)
         def recent(request: Request, limit: int = Query(100, ge=1, le=2000), route: str | None = Query(default=None, max_length=512)) -> Any:
             ctx.read(request)
             return {"items": ctx.traffic.recent(limit, route=route)}
 
-    @r.post("/api/probes/run", response_model=None)
+    @r.post("/api/probes/run", response_model=s.ConsoleRunStatusOut)
     def probes(request: Request) -> Any:
         principal = ctx.read(request)
         base = str(request.base_url).rstrip("/")
         suite = [Probe("GET", "/openapi.json", (200,), "OpenAPI document"), Probe("GET", f"{ctx.config.route_prefix}/manifest", (200,), "Console manifest")] + list(ctx.config.api_probe_suite)
         return _run_probes(ctx, principal, base, suite)
 
-    @r.get("/api/collections", response_model=None)
+    @r.get("/api/collections", response_model=s.ConsoleCollectionsOut)
     def collections(request: Request) -> Any:
         ctx.read(request)
         return {"items": ctx.store.collections_list()}
 
-    @r.post("/api/collections", response_model=None)
+    @r.post("/api/collections", response_model=s.ConsoleCollectionOut)
     def save_collection(request: Request, body: CollectionIn) -> Any:
         ctx.read(request)
         return ctx.store.collection_upsert(name=body.name, requests=body.requests)
 
-    @r.delete("/api/collections/{cid}", response_model=None)
+    @r.delete("/api/collections/{cid}", response_model=s.ConsoleDeletedOut)
     def delete_collection(request: Request, cid: str) -> Any:
         ctx.read(request)
         if not ctx.store.collection_delete(cid):

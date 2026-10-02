@@ -8,6 +8,7 @@ from typing import Any
 from fastapi import APIRouter, Query, Request
 from pydantic import BaseModel, Field
 
+from opsconsole import schemas as s
 from opsconsole.config import WritePolicy
 from opsconsole.context import ConsoleContext, ConsoleError
 from opsconsole.core import sqlscreen
@@ -41,7 +42,7 @@ def router(ctx: ConsoleContext) -> APIRouter:
     def _error(exc: Exception) -> ConsoleError:
         return ConsoleError(400, "query_error", f"{exc.__class__.__name__}: {str(exc).splitlines()[0][:500]}")
 
-    @r.post("/query/run", response_model=None)
+    @r.post("/query/run", response_model=s.ConsoleQueryResultOut)
     def run(request: Request, body: RunIn) -> Any:
         started = time.perf_counter()
         if body.mode == "write":
@@ -82,7 +83,7 @@ def router(ctx: ConsoleContext) -> APIRouter:
         ctx.store.history_add(principal_id=principal.id, sql=body.sql, mode="read", rows=result["returned"], ms=int(result["ms"]), error=None, keep=limits.query_history_rows)
         return {"mode": "read", **result}
 
-    @r.post("/query/explain", response_model=None)
+    @r.post("/query/explain", response_model=s.ConsoleExplainOut)
     def explain(request: Request, body: ExplainIn) -> Any:
         ctx.read(request)
         try:
@@ -97,29 +98,29 @@ def router(ctx: ConsoleContext) -> APIRouter:
         except Exception as exc:
             raise _error(exc) from exc
 
-    @r.get("/query/saved", response_model=None)
+    @r.get("/query/saved", response_model=s.ConsoleSavedQueriesOut)
     def saved(request: Request) -> Any:
         ctx.read(request)
         return {"items": ctx.store.saved_list()}
 
-    @r.post("/query/saved", response_model=None)
+    @r.post("/query/saved", response_model=s.ConsoleSavedQueryOut)
     def save(request: Request, body: SavedIn) -> Any:
         principal = ctx.read(request)
         return ctx.store.saved_upsert(name=body.name, sql=body.sql, params=body.params, created_by=principal.id, pinned=body.pinned)
 
-    @r.put("/query/saved/{qid}", response_model=None)
+    @r.put("/query/saved/{qid}", response_model=s.ConsoleSavedQueryOut)
     def update_saved(request: Request, qid: str, body: SavedIn) -> Any:
         principal = ctx.read(request)
         return ctx.store.saved_upsert(name=body.name, sql=body.sql, params=body.params, created_by=principal.id, pinned=body.pinned, qid=qid)
 
-    @r.delete("/query/saved/{qid}", response_model=None)
+    @r.delete("/query/saved/{qid}", response_model=s.ConsoleDeletedOut)
     def delete_saved(request: Request, qid: str) -> Any:
         ctx.read(request)
         if not ctx.store.saved_delete(qid):
             raise ConsoleError(404, "unknown_query", "no such saved query")
         return {"deleted": qid}
 
-    @r.get("/query/history", response_model=None)
+    @r.get("/query/history", response_model=s.ConsoleQueryHistoryOut)
     def history(request: Request, limit: int = Query(50, ge=1, le=500)) -> Any:
         ctx.read(request)
         return {"items": ctx.store.history_list(limit)}

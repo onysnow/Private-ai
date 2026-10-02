@@ -6,6 +6,14 @@ import {defineConfig} from '@hey-api/openapi-ts';
 export default defineConfig({
   input: './openapi.json',
   output: {path: './lib/generated', postProcess: ['prettier']},
+  // The operator console's routes (/api/console, ADR-0003) are in the API
+  // schema, but this front end never calls them: the console has its own
+  // framework-free UI, served by the backend at /console (ADR-0003, D5).
+  // Its 65 operations are left out of the generated client, and the schemas
+  // only they use with them (unreferenced schemas are dropped by default).
+  // A filter between slashes is a regular expression over "METHOD /path"
+  // (@hey-api/shared createFiltersSetAndRegExps, createOperationKey).
+  parser: {filters: {operations: {exclude: ['/^[A-Z]+ \\/api\\/console\\//']}}},
   plugins: [
     '@hey-api/client-fetch',
     '@hey-api/typescript',
