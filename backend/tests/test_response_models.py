@@ -332,3 +332,85 @@ def test_backup_replies(demo, tmp_path):
         assert allowed["can_restore"] and allowed["lineage_integrity"]["valid"]
         _same_through_model(r.BackupPreviewOut, allowed)
         _same_through_model(r.BackupRestoreResultOut, restore_investigation_export(fresh, package, tmp_path / "fresh"))
+
+
+# --- Claims, leads and reporting tasks (slice 4) -----------------------------------
+
+def test_claim_replies(demo):
+    from app.models.domain import Claim, Evidence, Source
+    from app.schemas.api import ClaimCreate
+    from app.services.claims import (
+        claim_review_workspace, create_claim, link_claim_evidence, list_claim_evidence, review_claim, update_claim,
+    )
+    from app.services.investigations import list_investigation_claims
+
+    db, inv, _doc, _candidates, _accepted = demo
+    claims = list_investigation_claims(db, inv.id)
+    assert claims
+    _same_through_model(list[r.ClaimOut], claims)
+
+    # The demo seed links evidence and relationships to its claims, so a
+    # workspace has every part filled.
+    workspaces = [claim_review_workspace(db, claim) for claim in claims]
+    assert any(space["evidence"] for space in workspaces) and any(space["dependent_relationships"] for space in workspaces)
+    for space in workspaces:
+        _same_through_model(r.ClaimReviewWorkspaceOut, space)
+    _same_through_model(list[r.ClaimEvidenceRowOut], list_claim_evidence(db, claims[0].id))
+
+    created = create_claim(db, ClaimCreate(investigation_id=inv.id, text="The wire cleared on 3 March.", status="unverified", confidence=0.2))
+    _same_through_model(r.ClaimOut, created)
+    _same_through_model(r.ClaimOut, update_claim(db, created, {"status": "supported", "confidence": 0.6}))
+    evidence = db.query(Evidence).join(Source, Source.id == Evidence.source_id).filter(Source.investigation_id == inv.id).first()
+    link = link_claim_evidence(db, created, evidence, stance="supports", note="matches the ledger")
+    _same_through_model(r.ClaimEvidenceLinkOut, link)
+    claim, event = review_claim(db, db.get(Claim, created.id), status="confirmed", confidence=0.9, rationale="Two sources agree.")
+    _same_through_model(r.ClaimReviewResultOut, {"claim": claim, "review": event, "workspace": claim_review_workspace(db, claim)})
+
+
+def test_lead_and_task_replies(demo):
+    from app.models.domain import Lead, RelationshipEdge, ReportingTask
+    from app.schemas.api import LeadConvertRequest, LeadCreate, LeadLinkCreate, LeadUpdate, ReportingTaskCreate, ReportingTaskUpdate
+    from app.services.investigations import lead_queue, list_investigation_leads, list_investigation_reporting_tasks
+    from app.services.leads import (
+        convert_lead, create_lead, create_lead_link, create_relationship_context_lead, create_reporting_task, list_lead_links,
+        serialize_lead, serialize_link, serialize_task, update_lead, update_reporting_task,
+    )
+
+    db, inv, _doc, _candidates, _accepted = demo
+    queue = lead_queue(db, inv.id, status=None, priority=None, owner=None, unresolved_only=False)
+    assert queue["items"]
+    _same_through_model(r.LeadQueueOut, queue)
+
+    lead = create_lead(db, LeadCreate(investigation_id=inv.id, title="Who signed the wire?", detail="Ask the bank."))
+    _same_through_model(r.LeadOut, serialize_lead(db, lead))
+    lead = update_lead(db, lead, {"priority": "high", "owner": "AJ", "status": "active", "note": "picked up"})
+    _same_through_model(r.LeadOut, serialize_lead(db, lead))
+    edge = db.query(RelationshipEdge).filter(RelationshipEdge.investigation_id == inv.id).first()
+    link = create_lead_link(db, lead, LeadLinkCreate(relationship_id=edge.id, note="the wire"))
+    _same_through_model(r.LeadLinkOut, serialize_link(db, link))
+    _same_through_model(list[r.LeadLinkOut], list_lead_links(db, lead.id))
+    # A lead from a relationship's context carries links of every kind the trace found.
+    context_lead = create_relationship_context_lead(db, edge)
+    db.commit()
+    _same_through_model(r.LeadOut, serialize_lead(db, db.get(Lead, context_lead.id)))
+
+    # Converting makes a claim or a task; the reply says which.
+    as_claim = convert_lead(db, lead, LeadConvertRequest(kind="claim", text="The bank confirmed the signer."))
+    _same_through_model(r.LeadConversionOut, as_claim)
+    as_task = convert_lead(db, lead, LeadConvertRequest(kind="task", title="Call the bank", priority="urgent", owner="AJ"))
+    _same_through_model(r.LeadConversionOut, as_task)
+
+    task = create_reporting_task(db, ReportingTaskCreate(investigation_id=inv.id, title="File the records request", lead_id=lead.id, due_date="2026-11-01"))
+    _same_through_model(r.ReportingTaskOut, serialize_task(db, task))
+    task = update_reporting_task(db, db.get(ReportingTask, task.id), ReportingTaskUpdate(status="in_progress", workflow_note="started"))
+    reply = serialize_task(db, task)
+    assert reply["task_context"] and len(reply["history"]) == 2
+    _same_through_model(r.ReportingTaskOut, reply)
+
+    # The lists now hold a lead with links, tasks and a status history.
+    queue = lead_queue(db, inv.id, status=None, priority=None, owner=None, unresolved_only=False)
+    full = next(item for item in queue["items"] if item["id"] == lead.id)
+    assert full["links"] and full["tasks"] and len(full["history"]) > 1
+    _same_through_model(r.LeadQueueOut, queue)
+    _same_through_model(list[r.LeadOut], list_investigation_leads(db, inv.id))
+    _same_through_model(list[r.ReportingTaskOut], list_investigation_reporting_tasks(db, inv.id))

@@ -358,14 +358,17 @@ import type {
   ConsoleUsersSetRolesError,
   ConvertLeadEndpointData,
   ConvertLeadEndpointError,
+  ConvertLeadEndpointResponse,
   CreateAppUserData,
   CreateAppUserError,
   CreateCanonicalRelationshipData,
   CreateCanonicalRelationshipError,
   CreateClaimEndpointData,
   CreateClaimEndpointError,
+  CreateClaimEndpointResponse,
   CreateClaimReviewData,
   CreateClaimReviewError,
+  CreateClaimReviewResponse,
   CreateEntityData,
   CreateEntityError,
   CreateEvidenceEndpointData,
@@ -378,10 +381,13 @@ import type {
   CreateInvestigationError,
   CreateLeadEndpointData,
   CreateLeadEndpointError,
+  CreateLeadEndpointResponse,
   CreateLeadFromRelationshipContextData,
   CreateLeadFromRelationshipContextError,
+  CreateLeadFromRelationshipContextResponse,
   CreateReportingTaskEndpointData,
   CreateReportingTaskEndpointError,
+  CreateReportingTaskEndpointResponse,
   CreateSourceEndpointData,
   CreateSourceEndpointError,
   CreateSourceEndpointResponse,
@@ -442,6 +448,7 @@ import type {
   GetAiAnalysisCandidateEndpointError,
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceError,
+  GetClaimReviewWorkspaceResponse,
   GetDeckEndpointData,
   GetDeckEndpointError,
   GetDocumentData,
@@ -469,6 +476,7 @@ import type {
   GetJobEndpointResponse,
   GetLeadData,
   GetLeadError,
+  GetLeadResponse,
   GetOpenalephCorpusBindingData,
   GetOpenalephCorpusBindingError,
   GetOpenalephDocumentReviewStatusData,
@@ -518,17 +526,22 @@ import type {
   InvestigationVisualPreviewResponse,
   LeadQueueData,
   LeadQueueError,
+  LeadQueueResponse,
   LinkClaimEvidenceEndpointData,
   LinkClaimEvidenceEndpointError,
+  LinkClaimEvidenceEndpointResponse,
   LinkLeadData,
   LinkLeadError,
+  LinkLeadResponse,
   ListAppUsersData,
   ListAssessmentsData,
   ListAssessmentsError,
   ListClaimEvidenceEndpointData,
   ListClaimEvidenceEndpointError,
+  ListClaimEvidenceEndpointResponse,
   ListClaimsData,
   ListClaimsError,
+  ListClaimsResponse,
   ListConnectorFindingsData,
   ListConnectorFindingsError,
   ListConnectorRunsData,
@@ -573,8 +586,10 @@ import type {
   ListJobsEndpointResponse,
   ListLeadLinksEndpointData,
   ListLeadLinksEndpointError,
+  ListLeadLinksEndpointResponse,
   ListLeadsData,
   ListLeadsError,
+  ListLeadsResponse,
   ListOpenalephCorpusFailuresData,
   ListOpenalephCorpusFailuresError,
   ListPropertyConflictDecisionsData,
@@ -583,6 +598,7 @@ import type {
   ListRelationshipEvidenceReviewsError,
   ListReportingTasksData,
   ListReportingTasksError,
+  ListReportingTasksResponse,
   ListSourceEvidenceEndpointData,
   ListSourceEvidenceEndpointError,
   ListSourceEvidenceEndpointResponse,
@@ -652,14 +668,17 @@ import type {
   UpdateAppUserError,
   UpdateClaimEndpointData,
   UpdateClaimEndpointError,
+  UpdateClaimEndpointResponse,
   UpdateDeckEndpointData,
   UpdateDeckEndpointError,
   UpdateEntityData,
   UpdateEntityError,
   UpdateLeadEndpointData,
   UpdateLeadEndpointError,
+  UpdateLeadEndpointResponse,
   UpdateReportingTaskEndpointData,
   UpdateReportingTaskEndpointError,
+  UpdateReportingTaskEndpointResponse,
   UpdateWriteupEndpointData,
   UpdateWriteupEndpointError,
   UploadDocumentData,
@@ -939,12 +958,12 @@ export const capabilitiesOptions = (options?: Options<CapabilitiesData>) =>
 export const createClaimEndpointMutation = (
   options?: Partial<Options<CreateClaimEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  CreateClaimEndpointResponse,
   CreateClaimEndpointError,
   Options<CreateClaimEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    CreateClaimEndpointResponse,
     CreateClaimEndpointError,
     Options<CreateClaimEndpointData>
   > = {
@@ -966,12 +985,12 @@ export const createClaimEndpointMutation = (
 export const updateClaimEndpointMutation = (
   options?: Partial<Options<UpdateClaimEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  UpdateClaimEndpointResponse,
   UpdateClaimEndpointError,
   Options<UpdateClaimEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    UpdateClaimEndpointResponse,
     UpdateClaimEndpointError,
     Options<UpdateClaimEndpointData>
   > = {
@@ -998,9 +1017,9 @@ export const listClaimEvidenceEndpointOptions = (
   options: Options<ListClaimEvidenceEndpointData>,
 ) =>
   queryOptions<
-    unknown,
+    ListClaimEvidenceEndpointResponse,
     ListClaimEvidenceEndpointError,
-    unknown,
+    ListClaimEvidenceEndpointResponse,
     ReturnType<typeof listClaimEvidenceEndpointQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -1021,12 +1040,12 @@ export const listClaimEvidenceEndpointOptions = (
 export const linkClaimEvidenceEndpointMutation = (
   options?: Partial<Options<LinkClaimEvidenceEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  LinkClaimEvidenceEndpointResponse,
   LinkClaimEvidenceEndpointError,
   Options<LinkClaimEvidenceEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    LinkClaimEvidenceEndpointResponse,
     LinkClaimEvidenceEndpointError,
     Options<LinkClaimEvidenceEndpointData>
   > = {
@@ -1080,9 +1099,9 @@ export const getClaimReviewWorkspaceOptions = (
   options: Options<GetClaimReviewWorkspaceData>,
 ) =>
   queryOptions<
-    unknown,
+    GetClaimReviewWorkspaceResponse,
     GetClaimReviewWorkspaceError,
-    unknown,
+    GetClaimReviewWorkspaceResponse,
     ReturnType<typeof getClaimReviewWorkspaceQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -1103,12 +1122,12 @@ export const getClaimReviewWorkspaceOptions = (
 export const createClaimReviewMutation = (
   options?: Partial<Options<CreateClaimReviewData>>,
 ): UseMutationOptions<
-  unknown,
+  CreateClaimReviewResponse,
   CreateClaimReviewError,
   Options<CreateClaimReviewData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    CreateClaimReviewResponse,
     CreateClaimReviewError,
     Options<CreateClaimReviewData>
   > = {
@@ -4869,9 +4888,9 @@ export const listClaimsQueryKey = (options: Options<ListClaimsData>) =>
  */
 export const listClaimsOptions = (options: Options<ListClaimsData>) =>
   queryOptions<
-    unknown,
+    ListClaimsResponse,
     ListClaimsError,
-    unknown,
+    ListClaimsResponse,
     ReturnType<typeof listClaimsQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -4896,9 +4915,9 @@ export const listClaimsInfiniteQueryKey = (
  */
 export const listClaimsInfiniteOptions = (options: Options<ListClaimsData>) => {
   const opts = infiniteQueryOptions<
-    unknown,
+    ListClaimsResponse,
     ListClaimsError,
-    InfiniteData<unknown>,
+    InfiniteData<ListClaimsResponse>,
     QueryKey<Options<ListClaimsData>>,
     | number
     | Pick<
@@ -5569,9 +5588,9 @@ export const listLeadsQueryKey = (options: Options<ListLeadsData>) =>
  */
 export const listLeadsOptions = (options: Options<ListLeadsData>) =>
   queryOptions<
-    unknown,
+    ListLeadsResponse,
     ListLeadsError,
-    unknown,
+    ListLeadsResponse,
     ReturnType<typeof listLeadsQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -5596,9 +5615,9 @@ export const listLeadsInfiniteQueryKey = (
  */
 export const listLeadsInfiniteOptions = (options: Options<ListLeadsData>) => {
   const opts = infiniteQueryOptions<
-    unknown,
+    ListLeadsResponse,
     ListLeadsError,
-    InfiniteData<unknown>,
+    InfiniteData<ListLeadsResponse>,
     QueryKey<Options<ListLeadsData>>,
     | number
     | Pick<
@@ -5644,9 +5663,9 @@ export const leadQueueQueryKey = (options: Options<LeadQueueData>) =>
  */
 export const leadQueueOptions = (options: Options<LeadQueueData>) =>
   queryOptions<
-    unknown,
+    LeadQueueResponse,
     LeadQueueError,
-    unknown,
+    LeadQueueResponse,
     ReturnType<typeof leadQueueQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -5671,9 +5690,9 @@ export const leadQueueInfiniteQueryKey = (
  */
 export const leadQueueInfiniteOptions = (options: Options<LeadQueueData>) => {
   const opts = infiniteQueryOptions<
-    unknown,
+    LeadQueueResponse,
     LeadQueueError,
-    InfiniteData<unknown>,
+    InfiniteData<LeadQueueResponse>,
     QueryKey<Options<LeadQueueData>>,
     | number
     | Pick<
@@ -5802,9 +5821,9 @@ export const listReportingTasksOptions = (
   options: Options<ListReportingTasksData>,
 ) =>
   queryOptions<
-    unknown,
+    ListReportingTasksResponse,
     ListReportingTasksError,
-    unknown,
+    ListReportingTasksResponse,
     ReturnType<typeof listReportingTasksQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -5831,9 +5850,9 @@ export const listReportingTasksInfiniteOptions = (
   options: Options<ListReportingTasksData>,
 ) => {
   const opts = infiniteQueryOptions<
-    unknown,
+    ListReportingTasksResponse,
     ListReportingTasksError,
-    InfiniteData<unknown>,
+    InfiniteData<ListReportingTasksResponse>,
     QueryKey<Options<ListReportingTasksData>>,
     | number
     | Pick<
@@ -6232,12 +6251,12 @@ export const retryJobEndpointMutation = (
 export const createLeadEndpointMutation = (
   options?: Partial<Options<CreateLeadEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  CreateLeadEndpointResponse,
   CreateLeadEndpointError,
   Options<CreateLeadEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    CreateLeadEndpointResponse,
     CreateLeadEndpointError,
     Options<CreateLeadEndpointData>
   > = {
@@ -6261,9 +6280,9 @@ export const getLeadQueryKey = (options: Options<GetLeadData>) =>
  */
 export const getLeadOptions = (options: Options<GetLeadData>) =>
   queryOptions<
-    unknown,
+    GetLeadResponse,
     GetLeadError,
-    unknown,
+    GetLeadResponse,
     ReturnType<typeof getLeadQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -6284,12 +6303,12 @@ export const getLeadOptions = (options: Options<GetLeadData>) =>
 export const updateLeadEndpointMutation = (
   options?: Partial<Options<UpdateLeadEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  UpdateLeadEndpointResponse,
   UpdateLeadEndpointError,
   Options<UpdateLeadEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    UpdateLeadEndpointResponse,
     UpdateLeadEndpointError,
     Options<UpdateLeadEndpointData>
   > = {
@@ -6311,12 +6330,12 @@ export const updateLeadEndpointMutation = (
 export const convertLeadEndpointMutation = (
   options?: Partial<Options<ConvertLeadEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  ConvertLeadEndpointResponse,
   ConvertLeadEndpointError,
   Options<ConvertLeadEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    ConvertLeadEndpointResponse,
     ConvertLeadEndpointError,
     Options<ConvertLeadEndpointData>
   > = {
@@ -6343,9 +6362,9 @@ export const listLeadLinksEndpointOptions = (
   options: Options<ListLeadLinksEndpointData>,
 ) =>
   queryOptions<
-    unknown,
+    ListLeadLinksEndpointResponse,
     ListLeadLinksEndpointError,
-    unknown,
+    ListLeadLinksEndpointResponse,
     ReturnType<typeof listLeadLinksEndpointQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -6365,9 +6384,13 @@ export const listLeadLinksEndpointOptions = (
  */
 export const linkLeadMutation = (
   options?: Partial<Options<LinkLeadData>>,
-): UseMutationOptions<unknown, LinkLeadError, Options<LinkLeadData>> => {
+): UseMutationOptions<
+  LinkLeadResponse,
+  LinkLeadError,
+  Options<LinkLeadData>
+> => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    LinkLeadResponse,
     LinkLeadError,
     Options<LinkLeadData>
   > = {
@@ -6613,12 +6636,12 @@ export const reviewRelationshipEvidenceEndpointMutation = (
 export const createLeadFromRelationshipContextMutation = (
   options?: Partial<Options<CreateLeadFromRelationshipContextData>>,
 ): UseMutationOptions<
-  unknown,
+  CreateLeadFromRelationshipContextResponse,
   CreateLeadFromRelationshipContextError,
   Options<CreateLeadFromRelationshipContextData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    CreateLeadFromRelationshipContextResponse,
     CreateLeadFromRelationshipContextError,
     Options<CreateLeadFromRelationshipContextData>
   > = {
@@ -6640,12 +6663,12 @@ export const createLeadFromRelationshipContextMutation = (
 export const createReportingTaskEndpointMutation = (
   options?: Partial<Options<CreateReportingTaskEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  CreateReportingTaskEndpointResponse,
   CreateReportingTaskEndpointError,
   Options<CreateReportingTaskEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    CreateReportingTaskEndpointResponse,
     CreateReportingTaskEndpointError,
     Options<CreateReportingTaskEndpointData>
   > = {
@@ -6667,12 +6690,12 @@ export const createReportingTaskEndpointMutation = (
 export const updateReportingTaskEndpointMutation = (
   options?: Partial<Options<UpdateReportingTaskEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  UpdateReportingTaskEndpointResponse,
   UpdateReportingTaskEndpointError,
   Options<UpdateReportingTaskEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    UpdateReportingTaskEndpointResponse,
     UpdateReportingTaskEndpointError,
     Options<UpdateReportingTaskEndpointData>
   > = {

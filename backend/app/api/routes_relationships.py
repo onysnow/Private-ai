@@ -13,6 +13,7 @@ from app.models.domain import Investigation, RelationshipEdge
 from app.schemas.api import (
     RelationshipCreate, RelationshipEvidenceAttachRequest, RelationshipEvidenceReviewRequest,
 )
+from app.schemas.responses import LeadOut
 from app.services.leads import create_relationship_context_lead, serialize_lead
 from app.services.relationships import (
     attach_relationship_evidence, create_relationship, relationship_evidence_review_history,
@@ -69,7 +70,7 @@ def review_relationship_evidence_endpoint(relationship_id: str, evidence_id: str
     return serialize_relationship(db, edge)
 
 
-@router.post("/relationships/{relationship_id}/lead-from-context", response_model=None)
+@router.post("/relationships/{relationship_id}/lead-from-context", response_model=LeadOut)
 def create_lead_from_relationship_context(relationship_id: str, db: Session = Depends(get_db)) -> Any:
     edge = db.get(RelationshipEdge, relationship_id)
     if edge is None:

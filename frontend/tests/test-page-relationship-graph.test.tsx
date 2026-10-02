@@ -115,10 +115,12 @@ function relationshipFixture(overrides: Record<string, unknown> = {}) {
   };
 }
 
+// The evidence pool is read through the generated client now, which checks
+// the reply's full shape (lib/generated/types.gen.ts).
 function evidencePoolRow() {
   return {
-    evidence: {id: 'ev-1', source_id: 'src-1', quote: 'Approved 3/3, signed by CFO.', locator: 'p.4'},
-    source: {id: 'src-1', title: 'Board minutes'},
+    evidence: {id: 'ev-1', source_id: 'src-1', quote: 'Approved 3/3, signed by CFO.', locator: 'p.4', notes: null},
+    source: {id: 'src-1', investigation_id: 'inv-1', title: 'Board minutes', url: null, source_type: 'document', metadata_json: {}, created_at: '2026-10-01T00:00:00'},
   };
 }
 

@@ -19,8 +19,8 @@ type Props = {
   investigationId: string;
   sourceCount: number;
   evidenceCount: number;
-  /** Panels still on the page's own state reload their copies here. */
-  onSaved: () => Promise<void> | void;
+  /** Anything not reading the shared data cache reloads its copies here. */
+  onSaved?: () => Promise<void> | void;
 };
 
 const SOURCE_TYPES: [string, string][] = [
@@ -71,7 +71,7 @@ export function SourceCapturePanel({investigationId, sourceCount, evidenceCount,
       await Promise.all([
         queryClient.invalidateQueries({queryKey: listSourcesQueryKey({path})}),
         queryClient.invalidateQueries({queryKey: listInvestigationEvidenceQueryKey({path})}),
-        onSaved(),
+        onSaved?.(),
       ]);
     } catch (error) {
       setStatus(errorMessage(error, 'Source/evidence capture failed'));

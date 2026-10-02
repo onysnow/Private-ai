@@ -240,12 +240,65 @@ export const zClaimDependencyOut = z.object({
 });
 
 /**
+ * ClaimDependentRelationshipOut
+ *
+ * A canonical relationship that rests on evidence linked to the claim.
+ */
+export const zClaimDependentRelationshipOut = z.object({
+  evidence_ids: z.array(z.string()),
+  id: z.string(),
+  relationship_entity_id: z.string().nullish(),
+  source_entity_id: z.string(),
+  target_entity_id: z.string(),
+});
+
+/**
  * ClaimEvidenceLinkCreate
  */
 export const zClaimEvidenceLinkCreate = z.object({
   evidence_id: z.string(),
   note: z.string().nullish(),
   stance: z.string(),
+});
+
+/**
+ * ClaimEvidenceLinkOut
+ *
+ * The link itself, as stored (the reply to linking evidence to a claim).
+ */
+export const zClaimEvidenceLinkOut = z.object({
+  claim_id: z.string(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  evidence_id: z.string(),
+  id: z.string(),
+  note: z.string().nullish(),
+  stance: z.string(),
+});
+
+/**
+ * ClaimOut
+ */
+export const zClaimOut = z.object({
+  confidence: z.number(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  id: z.string(),
+  investigation_id: z.string(),
+  status: z.string(),
+  text: z.string(),
+});
+
+/**
+ * ClaimReviewEventOut
+ */
+export const zClaimReviewEventOut = z.object({
+  claim_id: z.string(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  from_confidence: z.number(),
+  from_status: z.string(),
+  id: z.string(),
+  rationale: z.string(),
+  to_confidence: z.number(),
+  to_status: z.string(),
 });
 
 /**
@@ -889,6 +942,23 @@ export const zLeadLinkCreate = z.object({
 });
 
 /**
+ * LeadLinkOut
+ *
+ * What a lead points at: exactly one record, named by its kind.
+ */
+export const zLeadLinkOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  id: z.string(),
+  label: z.string().nullish(),
+  lead_id: z.string(),
+  note: z.string().nullish(),
+  target_id: z.string().nullish(),
+  type: z
+    .enum(['entity', 'source', 'claim', 'evidence', 'relationship'])
+    .nullish(),
+});
+
+/**
  * LeadUpdate
  */
 export const zLeadUpdate = z.object({
@@ -899,6 +969,18 @@ export const zLeadUpdate = z.object({
   priority: z.string().nullish(),
   status: z.string().nullish(),
   title: z.string().nullish(),
+});
+
+/**
+ * LeadWorkflowEventOut
+ */
+export const zLeadWorkflowEventOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  from_status: z.string().nullish(),
+  id: z.string(),
+  lead_id: z.string(),
+  note: z.string().nullish(),
+  to_status: z.string(),
 });
 
 /**
@@ -1499,6 +1581,21 @@ export const zSourceOut = z.object({
 });
 
 /**
+ * ClaimEvidenceRowOut
+ *
+ * One linked evidence record with the source it came from, as the
+ * claim's evidence list and review workspace show it.
+ */
+export const zClaimEvidenceRowOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  evidence: zEvidenceOut.nullish(),
+  id: z.string(),
+  note: z.string().nullish(),
+  source: zSourceOut.nullish(),
+  stance: z.string(),
+});
+
+/**
  * EvidencePoolRow
  *
  * One evidence record with the source it came from.
@@ -1506,6 +1603,56 @@ export const zSourceOut = z.object({
 export const zEvidencePoolRow = z.object({
   evidence: zEvidenceOut,
   source: zSourceOut,
+});
+
+/**
+ * StanceCountsOut
+ *
+ * How many evidence links take each stance.
+ */
+export const zStanceCountsOut = z.object({
+  context: z.number().int(),
+  contradicts: z.number().int(),
+  supports: z.number().int(),
+});
+
+/**
+ * ClaimReviewWorkspaceOut
+ */
+export const zClaimReviewWorkspaceOut = z.object({
+  claim: zClaimOut,
+  dependent_relationships: z.array(zClaimDependentRelationshipOut),
+  evidence: z.array(zClaimEvidenceRowOut),
+  review_history: z.array(zClaimReviewEventOut),
+  stance_counts: zStanceCountsOut,
+});
+
+/**
+ * ClaimReviewResultOut
+ *
+ * The reply to recording a review: the claim as it now stands, the
+ * immutable review event, and the workspace refreshed.
+ */
+export const zClaimReviewResultOut = z.object({
+  claim: zClaimOut,
+  review: zClaimReviewEventOut,
+  workspace: zClaimReviewWorkspaceOut,
+});
+
+/**
+ * LeadTriageOut
+ *
+ * Evidence tension around the records a lead links to: a queue-attention
+ * signal only, never a change to the lead or its records.
+ */
+export const zLeadTriageOut = z.object({
+  attention_score: z.number().int(),
+  disputed_claim_count: z.number().int(),
+  linked_claim_count: z.number().int(),
+  needs_attention: z.boolean(),
+  reasons: z.array(z.string()),
+  relationship_evidence_review_counts: z.record(z.number().int()),
+  stance_counts: zStanceCountsOut,
 });
 
 /**
@@ -1581,6 +1728,89 @@ export const zRelationshipOut = z.object({
  */
 export const zStatementPromotionRequest = z.object({
   note: z.string().nullish(),
+});
+
+/**
+ * TaskWorkflowEventOut
+ */
+export const zTaskWorkflowEventOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  from_status: z.string().nullish(),
+  id: z.string(),
+  lead_provenance: z.record(z.unknown()).nullish(),
+  note: z.string().nullish(),
+  to_status: z.string(),
+});
+
+/**
+ * ReportingTaskOut
+ */
+export const zReportingTaskOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  detail: z.string().nullish(),
+  due_date: z.string().nullish(),
+  history: z.array(zTaskWorkflowEventOut),
+  id: z.string(),
+  investigation_id: z.string(),
+  lead_id: z.string().nullish(),
+  owner: z.string().nullish(),
+  priority: z.string(),
+  status: z.string(),
+  task_context: z.record(z.unknown()).nullish(),
+  title: z.string(),
+  updated_at: z.string().datetime({ offset: true, local: true }),
+});
+
+/**
+ * LeadOut
+ */
+export const zLeadOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  detail: z.string().nullish(),
+  history: z.array(zLeadWorkflowEventOut),
+  id: z.string(),
+  investigation_id: z.string(),
+  kind: z.enum(['connector', 'question']),
+  links: z.array(zLeadLinkOut),
+  next_action: z.string().nullish(),
+  owner: z.string().nullish(),
+  priority: z.string(),
+  provider: z.string().nullish(),
+  provider_record_id: z.string().nullish(),
+  status: z.string(),
+  tasks: z.array(zReportingTaskOut),
+  title: z.string(),
+  triage: zLeadTriageOut,
+});
+
+/**
+ * LeadClaimConversionOut
+ */
+export const zLeadClaimConversionOut = z.object({
+  kind: z.literal('claim'),
+  lead: zLeadOut,
+  record: zClaimOut,
+});
+
+/**
+ * LeadQueueOut
+ *
+ * The leads of a case in triage order, with counts by status.
+ */
+export const zLeadQueueOut = z.object({
+  counts: z.record(z.number().int()),
+  investigation_id: z.string(),
+  items: z.array(zLeadOut),
+  total: z.number().int(),
+});
+
+/**
+ * LeadTaskConversionOut
+ */
+export const zLeadTaskConversionOut = z.object({
+  kind: z.literal('task'),
+  lead: zLeadOut,
+  record: zReportingTaskOut,
 });
 
 /**
@@ -2029,21 +2259,43 @@ export const zRestoreBackupResponse = zBackupRestoreResultOut;
 
 export const zCreateClaimEndpointBody = zClaimCreate;
 
+/**
+ * Successful Response
+ */
+export const zCreateClaimEndpointResponse = zClaimOut;
+
 export const zUpdateClaimEndpointBody = zClaimUpdate;
 
 export const zUpdateClaimEndpointPath = z.object({
   claim_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zUpdateClaimEndpointResponse = zClaimOut;
+
 export const zListClaimEvidenceEndpointPath = z.object({
   claim_id: z.string(),
 });
+
+/**
+ * Response List Claim Evidence Endpoint
+ *
+ * Successful Response
+ */
+export const zListClaimEvidenceEndpointResponse = z.array(zClaimEvidenceRowOut);
 
 export const zLinkClaimEvidenceEndpointBody = zClaimEvidenceLinkCreate;
 
 export const zLinkClaimEvidenceEndpointPath = z.object({
   claim_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zLinkClaimEvidenceEndpointResponse = zClaimEvidenceLinkOut;
 
 export const zCreateExtractedRelationshipProposalBody =
   zExtractedRelationshipProposalCreate;
@@ -2062,11 +2314,21 @@ export const zGetClaimReviewWorkspacePath = z.object({
   claim_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zGetClaimReviewWorkspaceResponse = zClaimReviewWorkspaceOut;
+
 export const zCreateClaimReviewBody = zClaimReviewRequest;
 
 export const zCreateClaimReviewPath = z.object({
   claim_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zCreateClaimReviewResponse = zClaimReviewResultOut;
 
 export const zListAssessmentsPath = z.object({
   finding_id: z.string(),
@@ -2702,6 +2964,13 @@ export const zListClaimsQuery = z.object({
   offset: z.number().int().gte(0).optional().default(0),
 });
 
+/**
+ * Response List Claims
+ *
+ * Successful Response
+ */
+export const zListClaimsResponse = z.array(zClaimOut);
+
 export const zListConnectorFindingsPath = z.object({
   investigation_id: z.string(),
 });
@@ -2818,6 +3087,13 @@ export const zListLeadsQuery = z.object({
   offset: z.number().int().gte(0).optional().default(0),
 });
 
+/**
+ * Response List Leads
+ *
+ * Successful Response
+ */
+export const zListLeadsResponse = z.array(zLeadOut);
+
 export const zLeadQueuePath = z.object({
   investigation_id: z.string(),
 });
@@ -2830,6 +3106,11 @@ export const zLeadQueueQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
   offset: z.number().int().gte(0).optional().default(0),
 });
+
+/**
+ * Successful Response
+ */
+export const zLeadQueueResponse = zLeadQueueOut;
 
 export const zListInvestigationRelationshipsPath = z.object({
   investigation_id: z.string(),
@@ -2849,6 +3130,13 @@ export const zListReportingTasksQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
   offset: z.number().int().gte(0).optional().default(0),
 });
+
+/**
+ * Response List Reporting Tasks
+ *
+ * Successful Response
+ */
+export const zListReportingTasksResponse = z.array(zReportingTaskOut);
 
 export const zListSourcesPath = z.object({
   investigation_id: z.string(),
@@ -2954,9 +3242,19 @@ export const zRetryJobEndpointResponse = zBackgroundJobOut;
 
 export const zCreateLeadEndpointBody = zLeadCreate;
 
+/**
+ * Successful Response
+ */
+export const zCreateLeadEndpointResponse = zLeadOut;
+
 export const zGetLeadPath = z.object({
   lead_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zGetLeadResponse = zLeadOut;
 
 export const zUpdateLeadEndpointBody = zLeadUpdate;
 
@@ -2964,21 +3262,48 @@ export const zUpdateLeadEndpointPath = z.object({
   lead_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zUpdateLeadEndpointResponse = zLeadOut;
+
 export const zConvertLeadEndpointBody = zLeadConvertRequest;
 
 export const zConvertLeadEndpointPath = z.object({
   lead_id: z.string(),
 });
 
+/**
+ * Response Convert Lead Endpoint
+ *
+ * Successful Response
+ */
+export const zConvertLeadEndpointResponse = z.discriminatedUnion('kind', [
+  zLeadClaimConversionOut,
+  zLeadTaskConversionOut,
+]);
+
 export const zListLeadLinksEndpointPath = z.object({
   lead_id: z.string(),
 });
+
+/**
+ * Response List Lead Links Endpoint
+ *
+ * Successful Response
+ */
+export const zListLeadLinksEndpointResponse = z.array(zLeadLinkOut);
 
 export const zLinkLeadBody = zLeadLinkCreate;
 
 export const zLinkLeadPath = z.object({
   lead_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zLinkLeadResponse = zLeadLinkOut;
 
 export const zFindExtractionLineageEndpointQuery = z.object({
   record_type: z.string(),
@@ -3026,13 +3351,28 @@ export const zCreateLeadFromRelationshipContextPath = z.object({
   relationship_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zCreateLeadFromRelationshipContextResponse = zLeadOut;
+
 export const zCreateReportingTaskEndpointBody = zReportingTaskCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateReportingTaskEndpointResponse = zReportingTaskOut;
 
 export const zUpdateReportingTaskEndpointBody = zReportingTaskUpdate;
 
 export const zUpdateReportingTaskEndpointPath = z.object({
   task_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zUpdateReportingTaskEndpointResponse = zReportingTaskOut;
 
 export const zSearchWorkbenchQuery = z.object({
   q: z.string().min(1),

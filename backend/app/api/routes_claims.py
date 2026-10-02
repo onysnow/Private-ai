@@ -18,7 +18,9 @@ from app.services.claims import (
     claim_review_workspace, create_claim, link_claim_evidence, list_claim_evidence,
     review_claim, update_claim, validate_claim_fields,
 )
-from app.schemas.responses import ExtractionCandidateOut
+from app.schemas.responses import (
+    ClaimEvidenceLinkOut, ClaimEvidenceRowOut, ClaimOut, ClaimReviewResultOut, ClaimReviewWorkspaceOut, ExtractionCandidateOut,
+)
 from app.services.documents import propose_relationship_from_extracted_claim, serialize_candidate
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -33,7 +35,7 @@ def create_extracted_relationship_proposal(claim_id: str, body: ExtractedRelatio
     return serialize_candidate(row)
 
 
-@router.post("/claims/{claim_id}/evidence", response_model=None)
+@router.post("/claims/{claim_id}/evidence", response_model=ClaimEvidenceLinkOut)
 def link_claim_evidence_endpoint(claim_id: str, body: ClaimEvidenceLinkCreate, db: Session = Depends(get_db)) -> Any:
     claim = db.get(Claim, claim_id)
     evidence = db.get(Evidence, body.evidence_id)
@@ -47,7 +49,7 @@ def link_claim_evidence_endpoint(claim_id: str, body: ClaimEvidenceLinkCreate, d
         raise HTTPException(400, str(exc))
 
 
-@router.get("/claims/{claim_id}/evidence", response_model=None)
+@router.get("/claims/{claim_id}/evidence", response_model=list[ClaimEvidenceRowOut])
 def list_claim_evidence_endpoint(claim_id: str, db: Session = Depends(get_db)) -> Any:
     claim = db.get(Claim, claim_id)
     if claim is None:
@@ -55,7 +57,7 @@ def list_claim_evidence_endpoint(claim_id: str, db: Session = Depends(get_db)) -
     return list_claim_evidence(db, claim_id)
 
 
-@router.post("/claims", response_model=None)
+@router.post("/claims", response_model=ClaimOut)
 def create_claim_endpoint(body: ClaimCreate, db: Session = Depends(get_db)) -> Any:
     if db.get(Investigation, body.investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
@@ -65,7 +67,7 @@ def create_claim_endpoint(body: ClaimCreate, db: Session = Depends(get_db)) -> A
         raise HTTPException(400, str(exc))
 
 
-@router.get("/claims/{claim_id}/review-workspace", response_model=None)
+@router.get("/claims/{claim_id}/review-workspace", response_model=ClaimReviewWorkspaceOut)
 def get_claim_review_workspace(claim_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(Claim, claim_id)
     if row is None:
@@ -73,7 +75,7 @@ def get_claim_review_workspace(claim_id: str, db: Session = Depends(get_db)) -> 
     return claim_review_workspace(db, row)
 
 
-@router.post("/claims/{claim_id}/reviews", response_model=None)
+@router.post("/claims/{claim_id}/reviews", response_model=ClaimReviewResultOut)
 def create_claim_review(claim_id: str, body: ClaimReviewRequest, db: Session = Depends(get_db)) -> dict[str, Any]:
     row = db.get(Claim, claim_id)
     if row is None:
@@ -86,7 +88,7 @@ def create_claim_review(claim_id: str, body: ClaimReviewRequest, db: Session = D
     return {"claim": claim, "review": event, "workspace": claim_review_workspace(db, claim)}
 
 
-@router.patch("/claims/{claim_id}", response_model=None)
+@router.patch("/claims/{claim_id}", response_model=ClaimOut)
 def update_claim_endpoint(claim_id: str, body: ClaimUpdate, db: Session = Depends(get_db)) -> Any:
     row = db.get(Claim, claim_id)
     if row is None:

@@ -21,7 +21,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {mockApi} from '../test-support/mock-api';
 import type {MockApi} from '../test-support/mock-api';
-import {pageRoutes} from '../test-support/page-routes';
+import {leadQueueBody, pageRoutes} from '../test-support/page-routes';
 
 beforeEach(() => {
   if (!window.matchMedia) {
@@ -52,24 +52,32 @@ async function importHome(): Promise<() => ReactElement> {
 const investigation = {id: 'inv-1', name: 'Kestrelwood filings'};
 const LEADS_QUEUE = 'GET /api/investigations/inv-1/leads/queue';
 
+// Replies carry the full shape the API declares (lib/generated/types.gen.ts):
+// the panel's generated client checks each one.
 function leadFixture(overrides: Record<string, unknown> = {}) {
   return {
     id: 'lead-1',
+    investigation_id: 'inv-1',
     title: 'Who approved this contract?',
     status: 'unreviewed',
     priority: 'high',
     owner: 'A. Reporter',
     detail: 'Need to confirm the approver identity.',
     provider: null,
+    provider_record_id: null,
+    kind: 'question',
     next_action: null,
+    created_at: '2026-10-01T00:00:00',
     links: [],
     tasks: [],
+    history: [],
     triage: {
       needs_attention: true,
       attention_score: 2,
       stance_counts: {supports: 1, contradicts: 0, context: 0},
       linked_claim_count: 0,
       disputed_claim_count: 0,
+      relationship_evidence_review_counts: {supports: 0, contradicts: 0, context: 0, superseded: 0, unresolved: 0, unreviewed: 0},
       reasons: ['unresolved contradiction'],
     },
     ...overrides,
@@ -108,11 +116,12 @@ describe('Home questions & reporting leads', () => {
   it('creates a lead (POST then PATCH priority/owner) and reloads the queue', async () => {
     const api = await bootstrapWithOneLead();
 
+    const second = leadFixture({id: 'lead-2', title: 'Second question', status: 'unreviewed', priority: 'urgent', owner: ''});
     api.add({
-      'POST /api/leads': {id: 'lead-2'},
-      'PATCH /api/leads/lead-2': {},
+      'POST /api/leads': leadFixture({id: 'lead-2', title: 'Second question', priority: 'normal', owner: null}),
+      'PATCH /api/leads/lead-2': second,
       // The queue the reload finds: both leads.
-      [LEADS_QUEUE]: {items: [leadFixture(), leadFixture({id: 'lead-2', title: 'Second question', status: 'unreviewed', priority: 'urgent', owner: ''})]},
+      [LEADS_QUEUE]: leadQueueBody('inv-1', [leadFixture(), second]),
     });
 
     const user = userEvent.setup();
@@ -164,9 +173,13 @@ describe('Home questions & reporting leads', () => {
   it('converts a lead to a claim and reloads both leads and claims', async () => {
     const api = await bootstrapWithOneLead();
 
+    const converted = leadFixture({status: 'converted'});
     api.add({
-      'POST /api/leads/lead-1/convert': {claim_id: 'claim-1'},
-      [LEADS_QUEUE]: {items: [leadFixture({status: 'converted'})]},
+      'POST /api/leads/lead-1/convert': {
+        kind: 'claim', lead: converted,
+        record: {id: 'claim-1', investigation_id: 'inv-1', text: 'Who approved this contract?', status: 'lead', confidence: 0, created_at: '2026-10-02T00:00:00'},
+      },
+      [LEADS_QUEUE]: leadQueueBody('inv-1', [converted]),
     });
 
     await userEvent.setup().click(screen.getByRole('button', {name: 'Make claim'}));

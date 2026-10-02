@@ -705,11 +705,14 @@ import {
   zConsoleUsersSetRolesPath,
   zConvertLeadEndpointBody,
   zConvertLeadEndpointPath,
+  zConvertLeadEndpointResponse,
   zCreateAppUserBody,
   zCreateCanonicalRelationshipBody,
   zCreateClaimEndpointBody,
+  zCreateClaimEndpointResponse,
   zCreateClaimReviewBody,
   zCreateClaimReviewPath,
+  zCreateClaimReviewResponse,
   zCreateEntityBody,
   zCreateEvidenceEndpointBody,
   zCreateEvidenceEndpointResponse,
@@ -718,8 +721,11 @@ import {
   zCreateExtractedRelationshipProposalResponse,
   zCreateInvestigationBody,
   zCreateLeadEndpointBody,
+  zCreateLeadEndpointResponse,
   zCreateLeadFromRelationshipContextPath,
+  zCreateLeadFromRelationshipContextResponse,
   zCreateReportingTaskEndpointBody,
+  zCreateReportingTaskEndpointResponse,
   zCreateSourceEndpointBody,
   zCreateSourceEndpointResponse,
   zCreateTimelineEventEndpointBody,
@@ -759,6 +765,7 @@ import {
   zFindingCandidatesPath,
   zGetAiAnalysisCandidateEndpointPath,
   zGetClaimReviewWorkspacePath,
+  zGetClaimReviewWorkspaceResponse,
   zGetDeckEndpointPath,
   zGetDocumentPath,
   zGetDocumentResponse,
@@ -777,6 +784,7 @@ import {
   zGetJobEndpointPath,
   zGetJobEndpointResponse,
   zGetLeadPath,
+  zGetLeadResponse,
   zGetOpenalephCorpusBindingPath,
   zGetOpenalephDocumentReviewStatusPath,
   zGetOpenalephDocumentReviewStatusResponse,
@@ -810,14 +818,19 @@ import {
   zInvestigationVisualPreviewResponse,
   zLeadQueuePath,
   zLeadQueueQuery,
+  zLeadQueueResponse,
   zLinkClaimEvidenceEndpointBody,
   zLinkClaimEvidenceEndpointPath,
+  zLinkClaimEvidenceEndpointResponse,
   zLinkLeadBody,
   zLinkLeadPath,
+  zLinkLeadResponse,
   zListAssessmentsPath,
   zListClaimEvidenceEndpointPath,
+  zListClaimEvidenceEndpointResponse,
   zListClaimsPath,
   zListClaimsQuery,
+  zListClaimsResponse,
   zListConnectorFindingsPath,
   zListConnectorFindingsQuery,
   zListConnectorRunsPath,
@@ -850,13 +863,16 @@ import {
   zListJobsEndpointQuery,
   zListJobsEndpointResponse,
   zListLeadLinksEndpointPath,
+  zListLeadLinksEndpointResponse,
   zListLeadsPath,
   zListLeadsQuery,
+  zListLeadsResponse,
   zListOpenalephCorpusFailuresPath,
   zListPropertyConflictDecisionsPath,
   zListRelationshipEvidenceReviewsPath,
   zListReportingTasksPath,
   zListReportingTasksQuery,
+  zListReportingTasksResponse,
   zListSourceEvidenceEndpointPath,
   zListSourceEvidenceEndpointResponse,
   zListSourcesPath,
@@ -910,14 +926,17 @@ import {
   zUpdateAppUserPath,
   zUpdateClaimEndpointBody,
   zUpdateClaimEndpointPath,
+  zUpdateClaimEndpointResponse,
   zUpdateDeckEndpointBody,
   zUpdateDeckEndpointPath,
   zUpdateEntityBody,
   zUpdateEntityPath,
   zUpdateLeadEndpointBody,
   zUpdateLeadEndpointPath,
+  zUpdateLeadEndpointResponse,
   zUpdateReportingTaskEndpointBody,
   zUpdateReportingTaskEndpointPath,
+  zUpdateReportingTaskEndpointResponse,
   zUpdateWriteupEndpointBody,
   zUpdateWriteupEndpointPath,
   zUploadDocumentBody,
@@ -1220,6 +1239,8 @@ export const createClaimEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateClaimEndpointResponse.parseAsync(data),
     url: '/api/claims',
     ...options,
     headers: {
@@ -1251,6 +1272,8 @@ export const updateClaimEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateClaimEndpointResponse.parseAsync(data),
     url: '/api/claims/{claim_id}',
     ...options,
     headers: {
@@ -1282,6 +1305,8 @@ export const listClaimEvidenceEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListClaimEvidenceEndpointResponse.parseAsync(data),
     url: '/api/claims/{claim_id}/evidence',
     ...options,
   });
@@ -1309,6 +1334,8 @@ export const linkClaimEvidenceEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zLinkClaimEvidenceEndpointResponse.parseAsync(data),
     url: '/api/claims/{claim_id}/evidence',
     ...options,
     headers: {
@@ -1375,6 +1402,8 @@ export const getClaimReviewWorkspace = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetClaimReviewWorkspaceResponse.parseAsync(data),
     url: '/api/claims/{claim_id}/review-workspace',
     ...options,
   });
@@ -1402,6 +1431,8 @@ export const createClaimReview = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateClaimReviewResponse.parseAsync(data),
     url: '/api/claims/{claim_id}/reviews',
     ...options,
     headers: {
@@ -5114,6 +5145,8 @@ export const listClaims = <ThrowOnError extends boolean = false>(
           query: zListClaimsQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListClaimsResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/claims',
     ...options,
   });
@@ -5502,6 +5535,8 @@ export const listLeads = <ThrowOnError extends boolean = false>(
           query: zListLeadsQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListLeadsResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/leads',
     ...options,
   });
@@ -5525,6 +5560,8 @@ export const leadQueue = <ThrowOnError extends boolean = false>(
           query: zLeadQueueQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zLeadQueueResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/leads/queue',
     ...options,
   });
@@ -5581,6 +5618,8 @@ export const listReportingTasks = <ThrowOnError extends boolean = false>(
           query: zListReportingTasksQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListReportingTasksResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/reporting-tasks',
     ...options,
   });
@@ -5875,6 +5914,8 @@ export const createLeadEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateLeadEndpointResponse.parseAsync(data),
     url: '/api/leads',
     ...options,
     headers: {
@@ -5899,6 +5940,8 @@ export const getLead = <ThrowOnError extends boolean = false>(
             query: z.never().optional(),
           })
           .parseAsync(data),
+      responseValidator: async (data) =>
+        await zGetLeadResponse.parseAsync(data),
       url: '/api/leads/{lead_id}',
       ...options,
     },
@@ -5927,6 +5970,8 @@ export const updateLeadEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateLeadEndpointResponse.parseAsync(data),
     url: '/api/leads/{lead_id}',
     ...options,
     headers: {
@@ -5958,6 +6003,8 @@ export const convertLeadEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zConvertLeadEndpointResponse.parseAsync(data),
     url: '/api/leads/{lead_id}/convert',
     ...options,
     headers: {
@@ -5989,6 +6036,8 @@ export const listLeadLinksEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListLeadLinksEndpointResponse.parseAsync(data),
     url: '/api/leads/{lead_id}/links',
     ...options,
   });
@@ -6012,6 +6061,7 @@ export const linkLead = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) => await zLinkLeadResponse.parseAsync(data),
     url: '/api/leads/{lead_id}/links',
     ...options,
     headers: {
@@ -6282,6 +6332,8 @@ export const createLeadFromRelationshipContext = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateLeadFromRelationshipContextResponse.parseAsync(data),
     url: '/api/relationships/{relationship_id}/lead-from-context',
     ...options,
   });
@@ -6311,6 +6363,8 @@ export const createReportingTaskEndpoint = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateReportingTaskEndpointResponse.parseAsync(data),
     url: '/api/reporting-tasks',
     ...options,
     headers: {
@@ -6344,6 +6398,8 @@ export const updateReportingTaskEndpoint = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateReportingTaskEndpointResponse.parseAsync(data),
     url: '/api/reporting-tasks/{task_id}',
     ...options,
     headers: {

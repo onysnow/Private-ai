@@ -20,7 +20,9 @@ import {ExtractionExplanationView} from '../../components/extraction-explanation
 import {errorMessage, isAbortError} from '../../lib/api-client';
 import {checkedReply} from '../../lib/api-generated';
 import {api} from '../../lib/api-instance';
-import {listDocumentsOptions, listDocumentsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
+import {
+  listClaimsQueryKey, listDocumentsOptions, listDocumentsQueryKey, listInvestigationEvidenceQueryKey, listSourcesQueryKey,
+} from '../../lib/generated/@tanstack/react-query.gen';
 import {
   createExtractedRelationshipProposal, getDocument, getOpenalephDocumentReviewStatus, listDocumentCandidatesEndpoint, listJobsEndpoint,
   refreshOpenalephDocumentReview, retryJobEndpoint, reviewExtractionCandidate, syncOpenalephDocument,
@@ -40,7 +42,7 @@ type Props = {
   investigationId: string;
   entities: EntityOption[];
   /** Panels still on the page's own state reload their copies here after a
-   * proposal is accepted or rejected (entities, claims, evidence, sources). */
+   * proposal is accepted or rejected (the entities). */
   onReviewed: () => Promise<void> | void;
 };
 
@@ -252,7 +254,15 @@ export function DocumentsPanel({investigationId, entities, onReviewed}: Props): 
     try {
       await reviewExtractionCandidate({path: {candidate_id: c.id}, body, throwOnError: true});
       setCandidates(cur => cur.filter(x => x.id !== c.id));
-      await Promise.all([reloadDocuments(), onReviewed()]);
+      // An accepted proposal may have made an entity, a claim, evidence (with
+      // its source) or a relationship: every list that could show it is stale.
+      await Promise.all([
+        reloadDocuments(),
+        queryClient.invalidateQueries({queryKey: listClaimsQueryKey({path})}),
+        queryClient.invalidateQueries({queryKey: listInvestigationEvidenceQueryKey({path})}),
+        queryClient.invalidateQueries({queryKey: listSourcesQueryKey({path})}),
+        onReviewed(),
+      ]);
       setDocStatus(`${c.candidate_type} proposal ${decision === 'accept' ? 'accepted' : 'rejected'}. Its document/chunk/review lineage is retained for provenance tracing.`);
     } catch (error) {
       setDocStatus(errorMessage(error, 'Extraction review failed'));

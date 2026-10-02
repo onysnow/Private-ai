@@ -31,7 +31,8 @@ from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Investigation
 from app.schemas.responses import (
-    DocumentOut, EvidencePoolRow, InvestigationDeletionPreview, InvestigationDeletionResult, SourceOut, TimelineOut,
+    ClaimOut, DocumentOut, EvidencePoolRow, InvestigationDeletionPreview, InvestigationDeletionResult, LeadOut, LeadQueueOut,
+    ReportingTaskOut, SourceOut, TimelineOut,
 )
 from app.schemas.api import (
     CaseSynthesisRequest, HypothesisTestRequest, InvestigationCreate,
@@ -398,7 +399,7 @@ def list_sources(
     return _list_investigation_sources(db, investigation_id, limit=limit, offset=offset)
 
 
-@router.get("/investigations/{investigation_id}/claims", response_model=None)
+@router.get("/investigations/{investigation_id}/claims", response_model=list[ClaimOut])
 def list_claims(
     investigation_id: str,
     limit: int | None = Query(default=None, ge=1, le=500),
@@ -410,7 +411,7 @@ def list_claims(
     return _list_investigation_claims(db, investigation_id, limit=limit, offset=offset)
 
 
-@router.get("/investigations/{investigation_id}/leads", response_model=None)
+@router.get("/investigations/{investigation_id}/leads", response_model=list[LeadOut])
 def list_leads(
     investigation_id: str,
     limit: int | None = Query(default=None, ge=1, le=500),
@@ -422,7 +423,7 @@ def list_leads(
     return _list_investigation_leads(db, investigation_id, limit=limit, offset=offset)
 
 
-@router.get("/investigations/{investigation_id}/leads/queue", response_model=None)
+@router.get("/investigations/{investigation_id}/leads/queue", response_model=LeadQueueOut)
 def lead_queue(
     investigation_id: str,
     status: list[str] | None = Query(default=None),
@@ -441,7 +442,7 @@ def lead_queue(
     )
 
 
-@router.get("/investigations/{investigation_id}/reporting-tasks", response_model=None)
+@router.get("/investigations/{investigation_id}/reporting-tasks", response_model=list[ReportingTaskOut])
 def list_reporting_tasks(
     investigation_id: str,
     limit: int | None = Query(default=None, ge=1, le=500),

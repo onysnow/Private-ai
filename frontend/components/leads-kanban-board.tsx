@@ -18,7 +18,26 @@ import {Input} from './ui/input';
 import {Textarea} from './ui/textarea';
 import {Badge} from './ui/badge';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from './ui/select';
-import type {LeadItem, LeadLink, ReportingTask} from '../lib/api-types';
+
+// The board asks only for what it draws, so a lead fits whether it came
+// through the generated API client (LeadOut) or the hand-written types
+// (LeadItem). The feature that loads the queue (features/leads) makes the
+// changes the callbacks report.
+export type LeadLinkCard = {id?: string | null; type?: string | null; target_id?: string | null; label?: string | null; note?: string | null};
+export type TaskCard = {id: string; title?: string | null; status?: string | null; history?: unknown[] | null};
+export type LeadCard = {
+  id: string;
+  title: string;
+  detail?: string | null;
+  provider?: string | null;
+  status: string;
+  priority: string;
+  owner?: string | null;
+  next_action?: string | null;
+  links: LeadLinkCard[];
+  tasks: TaskCard[];
+  triage: {needs_attention: boolean; attention_score: number; reasons: string[]; stance_counts: {supports: number; contradicts: number; context: number}};
+};
 
 // Kanban columns mirror the backend's LEAD_STATUSES exactly
 // (app/services/leads.py) -- dragging a card to a column PATCHes
@@ -32,7 +51,9 @@ const COLUMNS: {id: string; label: string}[] = [
 ];
 
 interface LeadsKanbanBoardProps {
-  leads: LeadItem[];
+  leads: LeadCard[];
+  /** What went wrong with the last change, if anything. */
+  problem?: string;
   leadTitle: string;
   setLeadTitle: (v: string) => void;
   leadDetail: string;
@@ -43,14 +64,14 @@ interface LeadsKanbanBoardProps {
   setLeadOwner: (v: string) => void;
   onCreateLead: () => void;
   onStatusChange: (id: string, status: string) => void;
-  onTraceLink: (lead: LeadItem, link: LeadLink) => void;
-  onTraceTask: (task: ReportingTask, leadTitle: string) => void;
+  onTraceLink: (lead: LeadCard, link: LeadLinkCard) => void;
+  onTraceTask: (task: TaskCard, leadTitle: string) => void;
   onTaskStatus: (id: string, status: 'in_progress' | 'blocked' | 'done') => void;
   onConvert: (id: string, kind: 'claim' | 'task') => void;
 }
 
-function LeadCard({lead, onStatusChange, onTraceLink, onTraceTask, onTaskStatus, onConvert, dragHandleProps}: {
-  lead: LeadItem;
+function LeadCardView({lead, onStatusChange, onTraceLink, onTraceTask, onTaskStatus, onConvert, dragHandleProps}: {
+  lead: LeadCard;
   onStatusChange: LeadsKanbanBoardProps['onStatusChange'];
   onTraceLink: LeadsKanbanBoardProps['onTraceLink'];
   onTraceTask: LeadsKanbanBoardProps['onTraceTask'];
@@ -120,19 +141,19 @@ function LeadCard({lead, onStatusChange, onTraceLink, onTraceTask, onTaskStatus,
   );
 }
 
-function DraggableLeadCard(props: Parameters<typeof LeadCard>[0]) {
+function DraggableLeadCard(props: Parameters<typeof LeadCardView>[0]) {
   const {attributes, listeners, setNodeRef, transform, isDragging} = useDraggable({id: props.lead.id});
   const style = transform
     ? {transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`, zIndex: 10, opacity: isDragging ? 0.4 : 1}
     : undefined;
   return (
     <div ref={setNodeRef} style={style}>
-      <LeadCard {...props} dragHandleProps={{...attributes, ...listeners}} />
+      <LeadCardView {...props} dragHandleProps={{...attributes, ...listeners}} />
     </div>
   );
 }
 
-function KanbanColumn({column, leads, children}: {column: {id: string; label: string}; leads: LeadItem[]; children: ReactNode}): ReactElement {
+function KanbanColumn({column, leads, children}: {column: {id: string; label: string}; leads: LeadCard[]; children: ReactNode}): ReactElement {
   const {setNodeRef, isOver} = useDroppable({id: column.id});
   return (
     <div
@@ -194,6 +215,7 @@ export function LeadsKanbanBoard(props: LeadsKanbanBoardProps): ReactElement {
           <Button onClick={props.onCreateLead}>Add lead</Button>
         </div>
         <Textarea value={props.leadDetail} onChange={(e: ChangeEvent<HTMLTextAreaElement>) => props.setLeadDetail(e.target.value)} placeholder="What is known, what is missing, and why it matters?" />
+        {props.problem && <p className="muted">{props.problem}</p>}
 
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <div className="flex gap-3 overflow-x-auto pb-2">
@@ -208,7 +230,7 @@ export function LeadsKanbanBoard(props: LeadsKanbanBoardProps): ReactElement {
           <DragOverlay>
             {activeLead ? (
               <div className="w-[260px]">
-                <LeadCard lead={activeLead} onStatusChange={onStatusChange} onTraceLink={onTraceLink} onTraceTask={onTraceTask} onTaskStatus={onTaskStatus} onConvert={onConvert} />
+                <LeadCardView lead={activeLead} onStatusChange={onStatusChange} onTraceLink={onTraceLink} onTraceTask={onTraceTask} onTaskStatus={onTaskStatus} onConvert={onConvert} />
               </div>
             ) : null}
           </DragOverlay>
@@ -218,7 +240,7 @@ export function LeadsKanbanBoard(props: LeadsKanbanBoardProps): ReactElement {
           <div className="space-y-2">
             <div className="text-xs text-muted-foreground">Leads with an unrecognized status (not shown above):</div>
             {overflow.map(lead => (
-              <LeadCard key={lead.id} lead={lead} onStatusChange={onStatusChange} onTraceLink={onTraceLink} onTraceTask={onTraceTask} onTaskStatus={onTaskStatus} onConvert={onConvert} />
+              <LeadCardView key={lead.id} lead={lead} onStatusChange={onStatusChange} onTraceLink={onTraceLink} onTraceTask={onTraceTask} onTaskStatus={onTaskStatus} onConvert={onConvert} />
             ))}
           </div>
         )}

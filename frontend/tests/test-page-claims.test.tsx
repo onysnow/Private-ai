@@ -46,6 +46,8 @@ const investigation = {id: 'inv-1', name: 'Kestrelwood filings'};
 const CLAIMS = 'GET /api/investigations/inv-1/claims';
 const WORKSPACE = 'GET /api/claims/claim-1/review-workspace';
 
+// Replies carry the full shape the API declares (lib/generated/types.gen.ts):
+// the panel's generated client checks each one.
 function claimFixture(overrides: Record<string, unknown> = {}) {
   return {
     id: 'claim-1',
@@ -53,14 +55,15 @@ function claimFixture(overrides: Record<string, unknown> = {}) {
     text: 'The contract was approved on March 3.',
     status: 'unverified',
     confidence: 0.4,
+    created_at: '2026-10-01T00:00:00',
     ...overrides,
   };
 }
 
 function evidencePoolRow() {
   return {
-    evidence: {id: 'ev-1', source_id: 'src-1', quote: 'Approved 3/3, signed by CFO.', locator: 'p.4'},
-    source: {id: 'src-1', title: 'Board minutes'},
+    evidence: {id: 'ev-1', source_id: 'src-1', quote: 'Approved 3/3, signed by CFO.', locator: 'p.4', notes: null},
+    source: {id: 'src-1', investigation_id: 'inv-1', title: 'Board minutes', url: null, source_type: 'document', metadata_json: {}, created_at: '2026-10-01T00:00:00'},
   };
 }
 
@@ -129,7 +132,8 @@ describe('Home claim verification workspace', () => {
     expect(screen.getByRole('button', {name: 'Record review'})).toBeDisabled();
 
     const updated = claimFixture({status: 'confirmed', confidence: 0.9});
-    api.add({'POST /api/claims/claim-1/reviews': {claim: updated, workspace: emptyWorkspace(updated)}});
+    const review = {id: 'rev-1', claim_id: 'claim-1', from_status: 'unverified', to_status: 'confirmed', from_confidence: 0.4, to_confidence: 0.9, rationale: 'Board minutes confirm the date directly.', created_at: '2026-10-02T00:00:00'};
+    api.add({'POST /api/claims/claim-1/reviews': {claim: updated, review, workspace: {...emptyWorkspace(updated), review_history: [review]}}});
 
     const user = userEvent.setup();
     await user.click(screen.getAllByRole('combobox').find(el => el.textContent === 'unverified')!);
@@ -158,12 +162,12 @@ describe('Home claim verification workspace', () => {
     await screen.findByText('No evidence is linked to this claim yet.');
 
     api.add({
-      'POST /api/claims/claim-1/evidence': {},
-      // The workspace openClaim re-fetches afterwards now carries the link.
+      'POST /api/claims/claim-1/evidence': {id: 'link-1', claim_id: 'claim-1', evidence_id: 'ev-1', stance: 'supports', note: null, created_at: '2026-10-02T00:00:00'},
+      // The workspace, fetched again afterwards, now carries the link.
       [WORKSPACE]: {
         ...emptyWorkspace(claimFixture()),
         evidence: [
-          {id: 'link-1', stance: 'supports', evidence: evidencePoolRow().evidence, source: evidencePoolRow().source, note: null},
+          {id: 'link-1', stance: 'supports', evidence: evidencePoolRow().evidence, source: evidencePoolRow().source, note: null, created_at: '2026-10-02T00:00:00'},
         ],
         stance_counts: {supports: 1, contradicts: 0, context: 0},
       },

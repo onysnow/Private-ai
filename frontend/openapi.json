@@ -913,6 +913,49 @@
         "title": "ClaimDependencyOut",
         "type": "object"
       },
+      "ClaimDependentRelationshipOut": {
+        "description": "A canonical relationship that rests on evidence linked to the claim.",
+        "properties": {
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "relationship_entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relationship Entity Id"
+          },
+          "source_entity_id": {
+            "title": "Source Entity Id",
+            "type": "string"
+          },
+          "target_entity_id": {
+            "title": "Target Entity Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source_entity_id",
+          "target_entity_id",
+          "evidence_ids"
+        ],
+        "title": "ClaimDependentRelationshipOut",
+        "type": "object"
+      },
       "ClaimEvidenceLinkCreate": {
         "properties": {
           "evidence_id": {
@@ -942,6 +985,196 @@
         "title": "ClaimEvidenceLinkCreate",
         "type": "object"
       },
+      "ClaimEvidenceLinkOut": {
+        "description": "The link itself, as stored (the reply to linking evidence to a claim).",
+        "properties": {
+          "claim_id": {
+            "title": "Claim Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "evidence_id": {
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "stance": {
+            "title": "Stance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "claim_id",
+          "evidence_id",
+          "stance",
+          "created_at"
+        ],
+        "title": "ClaimEvidenceLinkOut",
+        "type": "object"
+      },
+      "ClaimEvidenceRowOut": {
+        "description": "One linked evidence record with the source it came from, as the\nclaim's evidence list and review workspace show it.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EvidenceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SourceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stance": {
+            "title": "Stance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "stance",
+          "created_at"
+        ],
+        "title": "ClaimEvidenceRowOut",
+        "type": "object"
+      },
+      "ClaimOut": {
+        "properties": {
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "text",
+          "status",
+          "confidence",
+          "created_at"
+        ],
+        "title": "ClaimOut",
+        "type": "object"
+      },
+      "ClaimReviewEventOut": {
+        "properties": {
+          "claim_id": {
+            "title": "Claim Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "from_confidence": {
+            "title": "From Confidence",
+            "type": "number"
+          },
+          "from_status": {
+            "title": "From Status",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "rationale": {
+            "title": "Rationale",
+            "type": "string"
+          },
+          "to_confidence": {
+            "title": "To Confidence",
+            "type": "number"
+          },
+          "to_status": {
+            "title": "To Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "claim_id",
+          "from_status",
+          "to_status",
+          "from_confidence",
+          "to_confidence",
+          "rationale",
+          "created_at"
+        ],
+        "title": "ClaimReviewEventOut",
+        "type": "object"
+      },
       "ClaimReviewRequest": {
         "properties": {
           "confidence": {
@@ -963,6 +1196,67 @@
           "rationale"
         ],
         "title": "ClaimReviewRequest",
+        "type": "object"
+      },
+      "ClaimReviewResultOut": {
+        "description": "The reply to recording a review: the claim as it now stands, the\nimmutable review event, and the workspace refreshed.",
+        "properties": {
+          "claim": {
+            "$ref": "#/components/schemas/ClaimOut"
+          },
+          "review": {
+            "$ref": "#/components/schemas/ClaimReviewEventOut"
+          },
+          "workspace": {
+            "$ref": "#/components/schemas/ClaimReviewWorkspaceOut"
+          }
+        },
+        "required": [
+          "claim",
+          "review",
+          "workspace"
+        ],
+        "title": "ClaimReviewResultOut",
+        "type": "object"
+      },
+      "ClaimReviewWorkspaceOut": {
+        "properties": {
+          "claim": {
+            "$ref": "#/components/schemas/ClaimOut"
+          },
+          "dependent_relationships": {
+            "items": {
+              "$ref": "#/components/schemas/ClaimDependentRelationshipOut"
+            },
+            "title": "Dependent Relationships",
+            "type": "array"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/ClaimEvidenceRowOut"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "review_history": {
+            "items": {
+              "$ref": "#/components/schemas/ClaimReviewEventOut"
+            },
+            "title": "Review History",
+            "type": "array"
+          },
+          "stance_counts": {
+            "$ref": "#/components/schemas/StanceCountsOut"
+          }
+        },
+        "required": [
+          "claim",
+          "evidence",
+          "dependent_relationships",
+          "review_history",
+          "stance_counts"
+        ],
+        "title": "ClaimReviewWorkspaceOut",
         "type": "object"
       },
       "ClaimUpdate": {
@@ -3465,6 +3759,28 @@
         "title": "IssueIn",
         "type": "object"
       },
+      "LeadClaimConversionOut": {
+        "properties": {
+          "kind": {
+            "const": "claim",
+            "title": "Kind",
+            "type": "string"
+          },
+          "lead": {
+            "$ref": "#/components/schemas/LeadOut"
+          },
+          "record": {
+            "$ref": "#/components/schemas/ClaimOut"
+          }
+        },
+        "required": [
+          "kind",
+          "record",
+          "lead"
+        ],
+        "title": "LeadClaimConversionOut",
+        "type": "object"
+      },
       "LeadConvertRequest": {
         "properties": {
           "detail": {
@@ -3683,6 +3999,319 @@
         "title": "LeadLinkCreate",
         "type": "object"
       },
+      "LeadLinkOut": {
+        "description": "What a lead points at: exactly one record, named by its kind.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "lead_id": {
+            "title": "Lead Id",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "target_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Id"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "enum": [
+                  "entity",
+                  "source",
+                  "claim",
+                  "evidence",
+                  "relationship"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
+          }
+        },
+        "required": [
+          "id",
+          "lead_id",
+          "created_at"
+        ],
+        "title": "LeadLinkOut",
+        "type": "object"
+      },
+      "LeadOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/LeadWorkflowEventOut"
+            },
+            "title": "History",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "connector",
+              "question"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "links": {
+            "items": {
+              "$ref": "#/components/schemas/LeadLinkOut"
+            },
+            "title": "Links",
+            "type": "array"
+          },
+          "next_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action"
+          },
+          "owner": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner"
+          },
+          "priority": {
+            "title": "Priority",
+            "type": "string"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "provider_record_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Record Id"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "tasks": {
+            "items": {
+              "$ref": "#/components/schemas/ReportingTaskOut"
+            },
+            "title": "Tasks",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "triage": {
+            "$ref": "#/components/schemas/LeadTriageOut"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "title",
+          "kind",
+          "status",
+          "priority",
+          "created_at",
+          "links",
+          "tasks",
+          "history",
+          "triage"
+        ],
+        "title": "LeadOut",
+        "type": "object"
+      },
+      "LeadQueueOut": {
+        "description": "The leads of a case in triage order, with counts by status.",
+        "properties": {
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LeadOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "total",
+          "counts",
+          "items"
+        ],
+        "title": "LeadQueueOut",
+        "type": "object"
+      },
+      "LeadTaskConversionOut": {
+        "properties": {
+          "kind": {
+            "const": "task",
+            "title": "Kind",
+            "type": "string"
+          },
+          "lead": {
+            "$ref": "#/components/schemas/LeadOut"
+          },
+          "record": {
+            "$ref": "#/components/schemas/ReportingTaskOut"
+          }
+        },
+        "required": [
+          "kind",
+          "record",
+          "lead"
+        ],
+        "title": "LeadTaskConversionOut",
+        "type": "object"
+      },
+      "LeadTriageOut": {
+        "description": "Evidence tension around the records a lead links to: a queue-attention\nsignal only, never a change to the lead or its records.",
+        "properties": {
+          "attention_score": {
+            "title": "Attention Score",
+            "type": "integer"
+          },
+          "disputed_claim_count": {
+            "title": "Disputed Claim Count",
+            "type": "integer"
+          },
+          "linked_claim_count": {
+            "title": "Linked Claim Count",
+            "type": "integer"
+          },
+          "needs_attention": {
+            "title": "Needs Attention",
+            "type": "boolean"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasons",
+            "type": "array"
+          },
+          "relationship_evidence_review_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Relationship Evidence Review Counts",
+            "type": "object"
+          },
+          "stance_counts": {
+            "$ref": "#/components/schemas/StanceCountsOut"
+          }
+        },
+        "required": [
+          "needs_attention",
+          "attention_score",
+          "stance_counts",
+          "linked_claim_count",
+          "disputed_claim_count",
+          "relationship_evidence_review_counts",
+          "reasons"
+        ],
+        "title": "LeadTriageOut",
+        "type": "object"
+      },
       "LeadUpdate": {
         "properties": {
           "detail": {
@@ -3764,6 +4393,57 @@
           }
         },
         "title": "LeadUpdate",
+        "type": "object"
+      },
+      "LeadWorkflowEventOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "from_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Status"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "lead_id": {
+            "title": "Lead Id",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "to_status": {
+            "title": "To Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "lead_id",
+          "to_status",
+          "created_at"
+        ],
+        "title": "LeadWorkflowEventOut",
         "type": "object"
       },
       "LineageCandidateOut": {
@@ -5463,6 +6143,115 @@
         "title": "ReportingTaskCreate",
         "type": "object"
       },
+      "ReportingTaskOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/TaskWorkflowEventOut"
+            },
+            "title": "History",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "lead_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Id"
+          },
+          "owner": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner"
+          },
+          "priority": {
+            "title": "Priority",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "task_context": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Context"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "title",
+          "status",
+          "priority",
+          "created_at",
+          "updated_at",
+          "history"
+        ],
+        "title": "ReportingTaskOut",
+        "type": "object"
+      },
       "ReportingTaskUpdate": {
         "properties": {
           "detail": {
@@ -5990,6 +6779,30 @@
         "title": "SourceOut",
         "type": "object"
       },
+      "StanceCountsOut": {
+        "description": "How many evidence links take each stance.",
+        "properties": {
+          "context": {
+            "title": "Context",
+            "type": "integer"
+          },
+          "contradicts": {
+            "title": "Contradicts",
+            "type": "integer"
+          },
+          "supports": {
+            "title": "Supports",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "supports",
+          "contradicts",
+          "context"
+        ],
+        "title": "StanceCountsOut",
+        "type": "object"
+      },
       "StatementAssessmentRequest": {
         "properties": {
           "entity_id": {
@@ -6185,6 +6998,64 @@
           }
         },
         "title": "StatementPromotionRequest",
+        "type": "object"
+      },
+      "TaskWorkflowEventOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "from_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Status"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "lead_provenance": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Provenance"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "to_status": {
+            "title": "To Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "to_status",
+          "created_at"
+        ],
+        "title": "TaskWorkflowEventOut",
         "type": "object"
       },
       "TimelineClaimAdvisoryOut": {
@@ -8013,7 +8884,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -8060,7 +8933,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -8097,7 +8972,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ClaimEvidenceRowOut"
+                  },
+                  "title": "Response List Claim Evidence Endpoint",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -8142,7 +9023,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimEvidenceLinkOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -8228,7 +9111,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimReviewWorkspaceOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -8275,7 +9160,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimReviewResultOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -13555,7 +14442,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ClaimOut"
+                  },
+                  "title": "Response List Claims",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -14312,7 +15205,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LeadOut"
+                  },
+                  "title": "Response List Leads",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -14442,7 +15341,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/LeadQueueOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -14584,7 +15485,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ReportingTaskOut"
+                  },
+                  "title": "Response List Reporting Tasks",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -15160,7 +16067,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/LeadOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -15197,7 +16106,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/LeadOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -15242,7 +16153,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/LeadOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -15289,7 +16202,24 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "discriminator": {
+                    "mapping": {
+                      "claim": "#/components/schemas/LeadClaimConversionOut",
+                      "task": "#/components/schemas/LeadTaskConversionOut"
+                    },
+                    "propertyName": "kind"
+                  },
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/LeadClaimConversionOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/LeadTaskConversionOut"
+                    }
+                  ],
+                  "title": "Response Convert Lead Endpoint"
+                }
               }
             },
             "description": "Successful Response"
@@ -15326,7 +16256,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LeadLinkOut"
+                  },
+                  "title": "Response List Lead Links Endpoint",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -15371,7 +16307,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/LeadLinkOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -15713,7 +16651,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/LeadOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -15749,7 +16689,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ReportingTaskOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -15796,7 +16738,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ReportingTaskOut"
+                }
               }
             },
             "description": "Successful Response"

@@ -550,6 +550,34 @@ export type ClaimDependencyOut = {
 };
 
 /**
+ * ClaimDependentRelationshipOut
+ *
+ * A canonical relationship that rests on evidence linked to the claim.
+ */
+export type ClaimDependentRelationshipOut = {
+  /**
+   * Evidence Ids
+   */
+  evidence_ids: Array<string>;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Relationship Entity Id
+   */
+  relationship_entity_id?: string | null;
+  /**
+   * Source Entity Id
+   */
+  source_entity_id: string;
+  /**
+   * Target Entity Id
+   */
+  target_entity_id: string;
+};
+
+/**
  * ClaimEvidenceLinkCreate
  */
 export type ClaimEvidenceLinkCreate = {
@@ -568,6 +596,133 @@ export type ClaimEvidenceLinkCreate = {
 };
 
 /**
+ * ClaimEvidenceLinkOut
+ *
+ * The link itself, as stored (the reply to linking evidence to a claim).
+ */
+export type ClaimEvidenceLinkOut = {
+  /**
+   * Claim Id
+   */
+  claim_id: string;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Evidence Id
+   */
+  evidence_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Note
+   */
+  note?: string | null;
+  /**
+   * Stance
+   */
+  stance: string;
+};
+
+/**
+ * ClaimEvidenceRowOut
+ *
+ * One linked evidence record with the source it came from, as the
+ * claim's evidence list and review workspace show it.
+ */
+export type ClaimEvidenceRowOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  evidence?: EvidenceOut | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Note
+   */
+  note?: string | null;
+  source?: SourceOut | null;
+  /**
+   * Stance
+   */
+  stance: string;
+};
+
+/**
+ * ClaimOut
+ */
+export type ClaimOut = {
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * ClaimReviewEventOut
+ */
+export type ClaimReviewEventOut = {
+  /**
+   * Claim Id
+   */
+  claim_id: string;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * From Confidence
+   */
+  from_confidence: number;
+  /**
+   * From Status
+   */
+  from_status: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Rationale
+   */
+  rationale: string;
+  /**
+   * To Confidence
+   */
+  to_confidence: number;
+  /**
+   * To Status
+   */
+  to_status: string;
+};
+
+/**
  * ClaimReviewRequest
  */
 export type ClaimReviewRequest = {
@@ -583,6 +738,38 @@ export type ClaimReviewRequest = {
    * Status
    */
   status: string;
+};
+
+/**
+ * ClaimReviewResultOut
+ *
+ * The reply to recording a review: the claim as it now stands, the
+ * immutable review event, and the workspace refreshed.
+ */
+export type ClaimReviewResultOut = {
+  claim: ClaimOut;
+  review: ClaimReviewEventOut;
+  workspace: ClaimReviewWorkspaceOut;
+};
+
+/**
+ * ClaimReviewWorkspaceOut
+ */
+export type ClaimReviewWorkspaceOut = {
+  claim: ClaimOut;
+  /**
+   * Dependent Relationships
+   */
+  dependent_relationships: Array<ClaimDependentRelationshipOut>;
+  /**
+   * Evidence
+   */
+  evidence: Array<ClaimEvidenceRowOut>;
+  /**
+   * Review History
+   */
+  review_history: Array<ClaimReviewEventOut>;
+  stance_counts: StanceCountsOut;
 };
 
 /**
@@ -2042,6 +2229,18 @@ export type IssueIn = {
 };
 
 /**
+ * LeadClaimConversionOut
+ */
+export type LeadClaimConversionOut = {
+  /**
+   * Kind
+   */
+  kind: 'claim';
+  lead: LeadOut;
+  record: ClaimOut;
+};
+
+/**
  * LeadConvertRequest
  */
 export type LeadConvertRequest = {
@@ -2140,6 +2339,183 @@ export type LeadLinkCreate = {
 };
 
 /**
+ * LeadLinkOut
+ *
+ * What a lead points at: exactly one record, named by its kind.
+ */
+export type LeadLinkOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Label
+   */
+  label?: string | null;
+  /**
+   * Lead Id
+   */
+  lead_id: string;
+  /**
+   * Note
+   */
+  note?: string | null;
+  /**
+   * Target Id
+   */
+  target_id?: string | null;
+  /**
+   * Type
+   */
+  type?: 'entity' | 'source' | 'claim' | 'evidence' | 'relationship' | null;
+};
+
+/**
+ * LeadOut
+ */
+export type LeadOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Detail
+   */
+  detail?: string | null;
+  /**
+   * History
+   */
+  history: Array<LeadWorkflowEventOut>;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Kind
+   */
+  kind: 'connector' | 'question';
+  /**
+   * Links
+   */
+  links: Array<LeadLinkOut>;
+  /**
+   * Next Action
+   */
+  next_action?: string | null;
+  /**
+   * Owner
+   */
+  owner?: string | null;
+  /**
+   * Priority
+   */
+  priority: string;
+  /**
+   * Provider
+   */
+  provider?: string | null;
+  /**
+   * Provider Record Id
+   */
+  provider_record_id?: string | null;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Tasks
+   */
+  tasks: Array<ReportingTaskOut>;
+  /**
+   * Title
+   */
+  title: string;
+  triage: LeadTriageOut;
+};
+
+/**
+ * LeadQueueOut
+ *
+ * The leads of a case in triage order, with counts by status.
+ */
+export type LeadQueueOut = {
+  /**
+   * Counts
+   */
+  counts: {
+    [key: string]: number;
+  };
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Items
+   */
+  items: Array<LeadOut>;
+  /**
+   * Total
+   */
+  total: number;
+};
+
+/**
+ * LeadTaskConversionOut
+ */
+export type LeadTaskConversionOut = {
+  /**
+   * Kind
+   */
+  kind: 'task';
+  lead: LeadOut;
+  record: ReportingTaskOut;
+};
+
+/**
+ * LeadTriageOut
+ *
+ * Evidence tension around the records a lead links to: a queue-attention
+ * signal only, never a change to the lead or its records.
+ */
+export type LeadTriageOut = {
+  /**
+   * Attention Score
+   */
+  attention_score: number;
+  /**
+   * Disputed Claim Count
+   */
+  disputed_claim_count: number;
+  /**
+   * Linked Claim Count
+   */
+  linked_claim_count: number;
+  /**
+   * Needs Attention
+   */
+  needs_attention: boolean;
+  /**
+   * Reasons
+   */
+  reasons: Array<string>;
+  /**
+   * Relationship Evidence Review Counts
+   */
+  relationship_evidence_review_counts: {
+    [key: string]: number;
+  };
+  stance_counts: StanceCountsOut;
+};
+
+/**
  * LeadUpdate
  */
 export type LeadUpdate = {
@@ -2171,6 +2547,36 @@ export type LeadUpdate = {
    * Title
    */
   title?: string | null;
+};
+
+/**
+ * LeadWorkflowEventOut
+ */
+export type LeadWorkflowEventOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * From Status
+   */
+  from_status?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Lead Id
+   */
+  lead_id: string;
+  /**
+   * Note
+   */
+  note?: string | null;
+  /**
+   * To Status
+   */
+  to_status: string;
 };
 
 /**
@@ -3205,6 +3611,66 @@ export type ReportingTaskCreate = {
 };
 
 /**
+ * ReportingTaskOut
+ */
+export type ReportingTaskOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Detail
+   */
+  detail?: string | null;
+  /**
+   * Due Date
+   */
+  due_date?: string | null;
+  /**
+   * History
+   */
+  history: Array<TaskWorkflowEventOut>;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Lead Id
+   */
+  lead_id?: string | null;
+  /**
+   * Owner
+   */
+  owner?: string | null;
+  /**
+   * Priority
+   */
+  priority: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Task Context
+   */
+  task_context?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Updated At
+   */
+  updated_at: string;
+};
+
+/**
  * ReportingTaskUpdate
  */
 export type ReportingTaskUpdate = {
@@ -3531,6 +3997,26 @@ export type SourceOut = {
 };
 
 /**
+ * StanceCountsOut
+ *
+ * How many evidence links take each stance.
+ */
+export type StanceCountsOut = {
+  /**
+   * Context
+   */
+  context: number;
+  /**
+   * Contradicts
+   */
+  contradicts: number;
+  /**
+   * Supports
+   */
+  supports: number;
+};
+
+/**
  * StatementAssessmentRequest
  */
 export type StatementAssessmentRequest = {
@@ -3643,6 +4129,38 @@ export type StatementPromotionRequest = {
    * Note
    */
   note?: string | null;
+};
+
+/**
+ * TaskWorkflowEventOut
+ */
+export type TaskWorkflowEventOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * From Status
+   */
+  from_status?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Lead Provenance
+   */
+  lead_provenance?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Note
+   */
+  note?: string | null;
+  /**
+   * To Status
+   */
+  to_status: string;
 };
 
 /**
@@ -4732,8 +5250,11 @@ export type CreateClaimEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ClaimOut;
 };
+
+export type CreateClaimEndpointResponse =
+  CreateClaimEndpointResponses[keyof CreateClaimEndpointResponses];
 
 export type UpdateClaimEndpointData = {
   body: ClaimUpdate;
@@ -4761,8 +5282,11 @@ export type UpdateClaimEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ClaimOut;
 };
+
+export type UpdateClaimEndpointResponse =
+  UpdateClaimEndpointResponses[keyof UpdateClaimEndpointResponses];
 
 export type ListClaimEvidenceEndpointData = {
   body?: never;
@@ -4788,10 +5312,15 @@ export type ListClaimEvidenceEndpointError =
 
 export type ListClaimEvidenceEndpointResponses = {
   /**
+   * Response List Claim Evidence Endpoint
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<ClaimEvidenceRowOut>;
 };
+
+export type ListClaimEvidenceEndpointResponse =
+  ListClaimEvidenceEndpointResponses[keyof ListClaimEvidenceEndpointResponses];
 
 export type LinkClaimEvidenceEndpointData = {
   body: ClaimEvidenceLinkCreate;
@@ -4819,8 +5348,11 @@ export type LinkClaimEvidenceEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ClaimEvidenceLinkOut;
 };
+
+export type LinkClaimEvidenceEndpointResponse =
+  LinkClaimEvidenceEndpointResponses[keyof LinkClaimEvidenceEndpointResponses];
 
 export type CreateExtractedRelationshipProposalData = {
   body: ExtractedRelationshipProposalCreate;
@@ -4880,8 +5412,11 @@ export type GetClaimReviewWorkspaceResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ClaimReviewWorkspaceOut;
 };
+
+export type GetClaimReviewWorkspaceResponse =
+  GetClaimReviewWorkspaceResponses[keyof GetClaimReviewWorkspaceResponses];
 
 export type CreateClaimReviewData = {
   body: ClaimReviewRequest;
@@ -4909,8 +5444,11 @@ export type CreateClaimReviewResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ClaimReviewResultOut;
 };
+
+export type CreateClaimReviewResponse =
+  CreateClaimReviewResponses[keyof CreateClaimReviewResponses];
 
 export type ListAssessmentsData = {
   body?: never;
@@ -8518,10 +9056,14 @@ export type ListClaimsError = ListClaimsErrors[keyof ListClaimsErrors];
 
 export type ListClaimsResponses = {
   /**
+   * Response List Claims
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<ClaimOut>;
 };
+
+export type ListClaimsResponse = ListClaimsResponses[keyof ListClaimsResponses];
 
 export type ListConnectorFindingsData = {
   body?: never;
@@ -9006,10 +9548,14 @@ export type ListLeadsError = ListLeadsErrors[keyof ListLeadsErrors];
 
 export type ListLeadsResponses = {
   /**
+   * Response List Leads
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<LeadOut>;
 };
+
+export type ListLeadsResponse = ListLeadsResponses[keyof ListLeadsResponses];
 
 export type LeadQueueData = {
   body?: never;
@@ -9061,8 +9607,10 @@ export type LeadQueueResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: LeadQueueOut;
 };
+
+export type LeadQueueResponse = LeadQueueResponses[keyof LeadQueueResponses];
 
 export type ListInvestigationRelationshipsData = {
   body?: never;
@@ -9139,10 +9687,15 @@ export type ListReportingTasksError =
 
 export type ListReportingTasksResponses = {
   /**
+   * Response List Reporting Tasks
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<ReportingTaskOut>;
 };
+
+export type ListReportingTasksResponse =
+  ListReportingTasksResponses[keyof ListReportingTasksResponses];
 
 export type ListSourcesData = {
   body?: never;
@@ -9500,8 +10053,11 @@ export type CreateLeadEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: LeadOut;
 };
+
+export type CreateLeadEndpointResponse =
+  CreateLeadEndpointResponses[keyof CreateLeadEndpointResponses];
 
 export type GetLeadData = {
   body?: never;
@@ -9528,8 +10084,10 @@ export type GetLeadResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: LeadOut;
 };
+
+export type GetLeadResponse = GetLeadResponses[keyof GetLeadResponses];
 
 export type UpdateLeadEndpointData = {
   body: LeadUpdate;
@@ -9557,8 +10115,11 @@ export type UpdateLeadEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: LeadOut;
 };
+
+export type UpdateLeadEndpointResponse =
+  UpdateLeadEndpointResponses[keyof UpdateLeadEndpointResponses];
 
 export type ConvertLeadEndpointData = {
   body: LeadConvertRequest;
@@ -9584,10 +10145,21 @@ export type ConvertLeadEndpointError =
 
 export type ConvertLeadEndpointResponses = {
   /**
+   * Response Convert Lead Endpoint
+   *
    * Successful Response
    */
-  200: unknown;
+  200:
+    | ({
+        kind: 'claim';
+      } & LeadClaimConversionOut)
+    | ({
+        kind: 'task';
+      } & LeadTaskConversionOut);
 };
+
+export type ConvertLeadEndpointResponse =
+  ConvertLeadEndpointResponses[keyof ConvertLeadEndpointResponses];
 
 export type ListLeadLinksEndpointData = {
   body?: never;
@@ -9613,10 +10185,15 @@ export type ListLeadLinksEndpointError =
 
 export type ListLeadLinksEndpointResponses = {
   /**
+   * Response List Lead Links Endpoint
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<LeadLinkOut>;
 };
+
+export type ListLeadLinksEndpointResponse =
+  ListLeadLinksEndpointResponses[keyof ListLeadLinksEndpointResponses];
 
 export type LinkLeadData = {
   body: LeadLinkCreate;
@@ -9643,8 +10220,10 @@ export type LinkLeadResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: LeadLinkOut;
 };
+
+export type LinkLeadResponse = LinkLeadResponses[keyof LinkLeadResponses];
 
 export type PresentationStylesData = {
   body?: never;
@@ -9887,8 +10466,11 @@ export type CreateLeadFromRelationshipContextResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: LeadOut;
 };
+
+export type CreateLeadFromRelationshipContextResponse =
+  CreateLeadFromRelationshipContextResponses[keyof CreateLeadFromRelationshipContextResponses];
 
 export type CreateReportingTaskEndpointData = {
   body: ReportingTaskCreate;
@@ -9911,8 +10493,11 @@ export type CreateReportingTaskEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ReportingTaskOut;
 };
+
+export type CreateReportingTaskEndpointResponse =
+  CreateReportingTaskEndpointResponses[keyof CreateReportingTaskEndpointResponses];
 
 export type UpdateReportingTaskEndpointData = {
   body: ReportingTaskUpdate;
@@ -9940,8 +10525,11 @@ export type UpdateReportingTaskEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ReportingTaskOut;
 };
+
+export type UpdateReportingTaskEndpointResponse =
+  UpdateReportingTaskEndpointResponses[keyof UpdateReportingTaskEndpointResponses];
 
 export type SearchWorkbenchData = {
   body?: never;

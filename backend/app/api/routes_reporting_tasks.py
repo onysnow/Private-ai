@@ -18,12 +18,13 @@ from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
 from app.models.domain import Investigation, ReportingTask
 from app.schemas.api import ReportingTaskCreate, ReportingTaskUpdate
+from app.schemas.responses import ReportingTaskOut
 from app.services.leads import create_reporting_task, serialize_task, update_reporting_task
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.post("/reporting-tasks", response_model=None)
+@router.post("/reporting-tasks", response_model=ReportingTaskOut)
 def create_reporting_task_endpoint(body: ReportingTaskCreate, db: Session = Depends(get_db)) -> Any:
     if db.get(Investigation, body.investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
@@ -33,7 +34,7 @@ def create_reporting_task_endpoint(body: ReportingTaskCreate, db: Session = Depe
         raise HTTPException(400, str(exc))
 
 
-@router.patch("/reporting-tasks/{task_id}", response_model=None)
+@router.patch("/reporting-tasks/{task_id}", response_model=ReportingTaskOut)
 def update_reporting_task_endpoint(task_id: str, body: ReportingTaskUpdate, db: Session = Depends(get_db)) -> Any:
     row = db.get(ReportingTask, task_id)
     if row is None:

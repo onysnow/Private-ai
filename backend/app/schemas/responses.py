@@ -908,3 +908,183 @@ class BackupRestoreResultOut(ResponseModel):
     restored_counts: dict[str, int]
     # The archive's own manifest.json, echoed back as it was read.
     manifest: dict[str, Any]
+
+
+# --- Claims --------------------------------------------------------------------
+
+class ClaimOut(ResponseModel):
+    id: str
+    investigation_id: str
+    text: str
+    status: str  # lead | unverified | supported | confirmed | disputed | rejected
+    confidence: float
+    created_at: datetime
+
+
+class StanceCountsOut(ResponseModel):
+    """How many evidence links take each stance."""
+    supports: int
+    contradicts: int
+    context: int
+
+
+class ClaimEvidenceLinkOut(ResponseModel):
+    """The link itself, as stored (the reply to linking evidence to a claim)."""
+    id: str
+    claim_id: str
+    evidence_id: str
+    stance: str  # supports | contradicts | context
+    note: str | None = None
+    created_at: datetime
+
+
+class ClaimEvidenceRowOut(ResponseModel):
+    """One linked evidence record with the source it came from, as the
+    claim's evidence list and review workspace show it."""
+    id: str
+    stance: str
+    note: str | None = None
+    created_at: datetime
+    evidence: EvidenceOut | None = None
+    source: SourceOut | None = None
+
+
+class ClaimDependentRelationshipOut(ResponseModel):
+    """A canonical relationship that rests on evidence linked to the claim."""
+    id: str
+    relationship_entity_id: str | None = None
+    source_entity_id: str
+    target_entity_id: str
+    evidence_ids: list[str]
+
+
+class ClaimReviewEventOut(ResponseModel):
+    id: str
+    claim_id: str
+    from_status: str
+    to_status: str
+    from_confidence: float
+    to_confidence: float
+    rationale: str
+    created_at: datetime
+
+
+class ClaimReviewWorkspaceOut(ResponseModel):
+    claim: ClaimOut
+    evidence: list[ClaimEvidenceRowOut]
+    dependent_relationships: list[ClaimDependentRelationshipOut]
+    review_history: list[ClaimReviewEventOut]
+    stance_counts: StanceCountsOut
+
+
+class ClaimReviewResultOut(ResponseModel):
+    """The reply to recording a review: the claim as it now stands, the
+    immutable review event, and the workspace refreshed."""
+    claim: ClaimOut
+    review: ClaimReviewEventOut
+    workspace: ClaimReviewWorkspaceOut
+
+
+# --- Leads and reporting tasks -------------------------------------------------
+
+class LeadLinkOut(ResponseModel):
+    """What a lead points at: exactly one record, named by its kind."""
+    id: str
+    lead_id: str
+    type: Literal["entity", "source", "claim", "evidence", "relationship"] | None = None
+    target_id: str | None = None
+    label: str | None = None
+    note: str | None = None
+    created_at: datetime
+
+
+class TaskWorkflowEventOut(ResponseModel):
+    id: str
+    from_status: str | None = None
+    to_status: str
+    note: str | None = None
+    created_at: datetime
+    # The lead's context frozen when the event was recorded, in the shape
+    # that version wrote; a later edit never rewrites it.
+    lead_provenance: dict[str, Any] | None = None
+
+
+class ReportingTaskOut(ResponseModel):
+    id: str
+    investigation_id: str
+    lead_id: str | None = None
+    title: str
+    detail: str | None = None
+    status: str  # todo | in_progress | blocked | done | cancelled
+    priority: str  # low | normal | high | urgent
+    owner: str | None = None
+    due_date: str | None = None
+    created_at: datetime
+    updated_at: datetime
+    history: list[TaskWorkflowEventOut]
+    # The newest frozen lead snapshot from the history, for the task list.
+    task_context: dict[str, Any] | None = None
+
+
+class LeadWorkflowEventOut(ResponseModel):
+    id: str
+    lead_id: str
+    from_status: str | None = None
+    to_status: str
+    note: str | None = None
+    created_at: datetime
+
+
+class LeadTriageOut(ResponseModel):
+    """Evidence tension around the records a lead links to: a queue-attention
+    signal only, never a change to the lead or its records."""
+    needs_attention: bool
+    attention_score: int
+    stance_counts: StanceCountsOut
+    linked_claim_count: int
+    disputed_claim_count: int
+    relationship_evidence_review_counts: dict[str, int]
+    reasons: list[str]
+
+
+class LeadOut(ResponseModel):
+    id: str
+    investigation_id: str
+    title: str
+    detail: str | None = None
+    provider: str | None = None
+    provider_record_id: str | None = None
+    kind: Literal["connector", "question"]
+    status: str  # unreviewed | active | blocked | resolved | rejected
+    priority: str
+    owner: str | None = None
+    next_action: str | None = None
+    created_at: datetime
+    links: list[LeadLinkOut]
+    tasks: list[ReportingTaskOut]
+    history: list[LeadWorkflowEventOut]
+    triage: LeadTriageOut
+
+
+class LeadQueueOut(ResponseModel):
+    """The leads of a case in triage order, with counts by status."""
+    investigation_id: str
+    total: int
+    counts: dict[str, int]
+    items: list[LeadOut]
+
+
+class LeadClaimConversionOut(ResponseModel):
+    kind: Literal["claim"]
+    record: ClaimOut
+    lead: LeadOut
+
+
+class LeadTaskConversionOut(ResponseModel):
+    kind: Literal["task"]
+    record: ReportingTaskOut
+    lead: LeadOut
+
+
+# Converting a lead makes a claim or a task; `kind` says which record follows.
+LeadConversionOut = Annotated[LeadClaimConversionOut | LeadTaskConversionOut, Field(discriminator="kind")]

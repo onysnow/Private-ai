@@ -12,6 +12,7 @@ from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
 from app.models.domain import Investigation, Lead
 from app.schemas.api import LeadConvertRequest, LeadCreate, LeadLinkCreate, LeadUpdate
+from app.schemas.responses import LeadConversionOut, LeadLinkOut, LeadOut
 from app.services.leads import (
     convert_lead, create_lead, create_lead_link, list_lead_links, serialize_lead, serialize_link, update_lead,
 )
@@ -19,7 +20,7 @@ from app.services.leads import (
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.post("/leads", response_model=None)
+@router.post("/leads", response_model=LeadOut)
 def create_lead_endpoint(body: LeadCreate, db: Session = Depends(get_db)) -> Any:
     if db.get(Investigation, body.investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
@@ -30,7 +31,7 @@ def create_lead_endpoint(body: LeadCreate, db: Session = Depends(get_db)) -> Any
     return serialize_lead(db, row)
 
 
-@router.get("/leads/{lead_id}", response_model=None)
+@router.get("/leads/{lead_id}", response_model=LeadOut)
 def get_lead(lead_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(Lead, lead_id)
     if row is None:
@@ -38,7 +39,7 @@ def get_lead(lead_id: str, db: Session = Depends(get_db)) -> Any:
     return serialize_lead(db, row)
 
 
-@router.patch("/leads/{lead_id}", response_model=None)
+@router.patch("/leads/{lead_id}", response_model=LeadOut)
 def update_lead_endpoint(lead_id: str, body: LeadUpdate, db: Session = Depends(get_db)) -> Any:
     row = db.get(Lead, lead_id)
     if row is None:
@@ -51,7 +52,7 @@ def update_lead_endpoint(lead_id: str, body: LeadUpdate, db: Session = Depends(g
     return serialize_lead(db, row)
 
 
-@router.post("/leads/{lead_id}/links", response_model=None)
+@router.post("/leads/{lead_id}/links", response_model=LeadLinkOut)
 def link_lead(lead_id: str, body: LeadLinkCreate, db: Session = Depends(get_db)) -> Any:
     lead = db.get(Lead, lead_id)
     if lead is None:
@@ -63,14 +64,14 @@ def link_lead(lead_id: str, body: LeadLinkCreate, db: Session = Depends(get_db))
     return serialize_link(db, row)
 
 
-@router.get("/leads/{lead_id}/links", response_model=None)
+@router.get("/leads/{lead_id}/links", response_model=list[LeadLinkOut])
 def list_lead_links_endpoint(lead_id: str, db: Session = Depends(get_db)) -> Any:
     if db.get(Lead, lead_id) is None:
         raise HTTPException(404, "Lead not found")
     return list_lead_links(db, lead_id)
 
 
-@router.post("/leads/{lead_id}/convert", response_model=None)
+@router.post("/leads/{lead_id}/convert", response_model=LeadConversionOut)
 def convert_lead_endpoint(lead_id: str, body: LeadConvertRequest, db: Session = Depends(get_db)) -> Any:
     lead = db.get(Lead, lead_id)
     if lead is None:

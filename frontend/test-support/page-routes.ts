@@ -3,12 +3,12 @@
 //
 // On mount the page asks for the settings status, the investigation list
 // and the connector names, then opens the first investigation (or the one
-// named in ?inv=) and loads its records: findings, entities, graph, leads
-// queue, claims, evidence and sources from the page itself, and the
-// timeline, the sources, the documents and the AI reasoning queue from the
-// panels that load their own data. Those loads run side by side, and more
-// move onto TanStack Query with every panel, so a test says what the server
-// holds for the case and never in what order the page asks.
+// named in ?inv=) and loads its records: findings, entities and graph from
+// the page itself, and the timeline, sources, evidence, documents, claims,
+// leads queue and AI reasoning queue from the panels that load their own
+// data. Those loads run side by side, and more move onto TanStack Query with
+// every panel, so a test says what the server holds for the case and never
+// in what order the page asks.
 //
 // Usage:
 //   const api = mockApi(pageRoutes({investigations: [investigation], leads: [leadFixture()]}));
@@ -97,6 +97,14 @@ export function timelineBody(investigationId: string, events: unknown[] = []): T
   };
 }
 
+export type LeadQueueBody = {investigation_id: string; total: number; counts: Record<string, number>; items: unknown[]};
+
+/** A lead queue reply in the generated LeadQueueOut shape, which the leads
+ * panel checks; its counts are tallied from the leads given. */
+export function leadQueueBody(investigationId: string, leads: unknown[] = []): LeadQueueBody {
+  return {investigation_id: investigationId, total: leads.length, counts: tally(leads, 'status'), items: leads};
+}
+
 /** What the server holds for one investigation. Anything left out is empty,
  * which every loader accepts without inspecting a row. */
 export type InvestigationRecords = {
@@ -105,6 +113,7 @@ export type InvestigationRecords = {
   graph?: GraphBody;
   /** Timeline events, in the generated TimelineEventOut shape. */
   events?: unknown[];
+  /** Leads, in the generated LeadOut shape. */
   leads?: unknown[];
   claims?: unknown[];
   evidence?: unknown[];
@@ -122,7 +131,7 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/entities`]: records.entities ?? [],
     [`GET ${base}/graph`]: records.graph ?? emptyGraph(),
     [`GET ${base}/timeline`]: timelineBody(id, records.events ?? []),
-    [`GET ${base}/leads/queue`]: {items: records.leads ?? []},
+    [`GET ${base}/leads/queue`]: leadQueueBody(id, records.leads ?? []),
     [`GET ${base}/claims`]: records.claims ?? [],
     [`GET ${base}/evidence`]: records.evidence ?? [],
     [`GET ${base}/sources`]: records.sources ?? [],
