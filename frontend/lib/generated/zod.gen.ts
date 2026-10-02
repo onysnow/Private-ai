@@ -760,6 +760,7 @@ export const zDocumentDetailOut = z.object({
   id: z.string(),
   investigation_id: z.string(),
   mime_type: z.string().nullish(),
+  openaleph_document_id: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
 });
@@ -778,6 +779,7 @@ export const zDocumentOut = z.object({
   id: z.string(),
   investigation_id: z.string(),
   mime_type: z.string().nullish(),
+  openaleph_document_id: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
 });
@@ -1378,6 +1380,7 @@ export const zExtractionCandidateReviewRequest = z.object({
   entity_schema: z.string().nullish(),
   matched_entity_id: z.string().nullish(),
   note: z.string().nullish(),
+  target_entity_id: z.string().nullish(),
 });
 
 /**
@@ -1442,8 +1445,9 @@ export const zExtractionCandidateOut = z.object({
  * ExtractionReviewOut
  *
  * The reply to a review decision: the proposal as it now stands and, for
- * an acceptance, the record it made (an entity, claim, evidence record or
- * relationship, each in its own shape).
+ * an acceptance, the record it made (an entity, claim, evidence record,
+ * relationship, or for an email or phone proposal the statement added to
+ * the chosen entity, each in its own shape).
  */
 export const zExtractionReviewOut = z.object({
   candidate: zExtractionCandidateOut,
@@ -1525,6 +1529,44 @@ export const zHypothesisTestRequest = z.object({
   severity_floor: z.enum(['ALL', 'MATERIAL', 'BLOCKING']).nullish(),
   source_tier_floor: z.enum(['A', 'B', 'C', 'D', 'E', 'F']).nullish(),
   working_theory: z.string().min(1).max(2000),
+});
+
+/**
+ * IdentifierTargetEntityOut
+ */
+export const zIdentifierTargetEntityOut = z.object({
+  caption: z.string(),
+  entity_id: z.string(),
+  schema: z.string(),
+});
+
+/**
+ * IdentifierTargetProposalOut
+ *
+ * An entity proposal of the same document, still waiting: accepting it
+ * first makes it an entity the email or phone can be attached to.
+ */
+export const zIdentifierTargetProposalOut = z.object({
+  candidate_id: z.string(),
+  caption: z.string(),
+  schema_question: z.boolean(),
+  suggested_schema: z.string(),
+});
+
+/**
+ * IdentifierTargetsOut
+ *
+ * Which entities an email or phone proposal can belong to (ADR-0006),
+ * the document's own first. Only schemas with the property are listed.
+ */
+export const zIdentifierTargetsOut = z.object({
+  candidate_id: z.string(),
+  document_entities: z.array(zIdentifierTargetEntityOut),
+  document_proposals: z.array(zIdentifierTargetProposalOut),
+  kind: z.enum(['email', 'phone']),
+  other_entities: z.array(zIdentifierTargetEntityOut),
+  property: z.string(),
+  value: z.string(),
 });
 
 /**
@@ -2060,6 +2102,7 @@ export const zDocumentUploadOut = z.object({
   investigation_id: z.string(),
   job: zBackgroundJobOut.nullish(),
   mime_type: z.string().nullish(),
+  openaleph_document_id: z.string().nullish(),
   openaleph_sync: zOpenAlephSyncOut.nullish(),
   sha256: z.string(),
   source_id: z.string(),
@@ -4193,6 +4236,15 @@ export const zSyncOpenalephDocumentPath = z.object({
  */
 export const zSyncOpenalephDocumentResponse = zOpenAlephDocumentSyncOut;
 
+export const zAnalyzeOpenalephDocumentPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zAnalyzeOpenalephDocumentResponse = zBackgroundJobOut;
+
 export const zEnrichmentSessionDetailPath = z.object({
   session_id: z.string(),
 });
@@ -4502,6 +4554,15 @@ export const zGetExtractionCandidateExplanationPath = z.object({
  */
 export const zGetExtractionCandidateExplanationResponse =
   zExtractionExplanationOut;
+
+export const zGetIdentifierTargetsPath = z.object({
+  candidate_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetIdentifierTargetsResponse = zIdentifierTargetsOut;
 
 export const zGetExtractionCandidateLineagePath = z.object({
   candidate_id: z.string(),

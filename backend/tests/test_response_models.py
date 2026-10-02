@@ -258,6 +258,31 @@ def test_extraction_candidate_replies(demo):
     _same_through_model(r.ExtractionCandidateOut, {**serialize_candidate(staged), "explanation": explanation})
 
 
+def test_openaleph_name_and_identifier_replies(demo):
+    """ADR-0006: proposals made from OpenAleph's analysis, their
+    explanations, the choice of owner for an email, and its acceptance."""
+    from app.models.domain import Entity, ExtractionCandidate
+    from app.services.documents import list_document_candidates, review_candidate
+    from app.services.identifier_proposals import identifier_targets
+    from app.services.openaleph_analysis import Analysis, import_analysis_proposals
+
+    db, inv, doc, _candidates, _accepted = demo
+    import_analysis_proposals(db, doc.id, Analysis(collection_id="7", entity_id="e1", schema="PlainText", properties={
+        "companiesMentioned": ["bellcastle trading group"], "namesMentioned": ["Audit Desk"],
+        "emailMentioned": ["desk@meridian.example"], "detectedLanguage": ["eng"]}))
+    explained = [row for row in list_document_candidates(db, doc.id, "proposed", None, explain=True)
+                 if row["payload"].get("provenance", {}).get("extraction_method") == "openaleph_ftm_analyze"]
+    assert {row["candidate_type"] for row in explained} == {"entity", "identifier"}
+    _same_through_model(list[r.ExtractionCandidateOut], explained)
+    email = db.query(ExtractionCandidate).filter(ExtractionCandidate.document_id == doc.id,
+                                                 ExtractionCandidate.candidate_type == "identifier").one()
+    targets = identifier_targets(db, email)
+    assert targets["other_entities"], "the demo seed has people and companies to choose from"
+    _same_through_model(r.IdentifierTargetsOut, targets)
+    owner = db.get(Entity, targets["other_entities"][0]["entity_id"])
+    _same_through_model(r.ExtractionReviewOut, review_candidate(db, email, decision="accept", target_entity_id=owner.id))
+
+
 class _FakeOpenAleph:
     """The two OpenAleph calls a sync makes, answered locally."""
 
@@ -290,14 +315,15 @@ def test_openaleph_corpus_replies(demo, monkeypatch):
     def pages(*, collection_id, document_record_id):
         return [{"id": "oa-page-1", "schema": "Page", "properties": {"index": ["1"], "bodyText": ["Provider page text."]}}]
 
-    def mentions(*, collection_id, document_record_id):
-        return [{"id": "oa-mention-1", "schema": "Mention", "properties": {"name": ["Example Person"], "detectedSchema": ["Person"]}}]
+    def analysed(entity_id):
+        # ftm-analyze's results, written on the document entity (ADR-0006).
+        return {"id": entity_id, "schema": "PlainText", "properties": {"peopleMentioned": ["example person"], "detectedLanguage": ["eng"]}}
 
-    refreshed = refresh_openaleph_review_candidates(db, doc.id, evidence_searcher=pages, entity_searcher=mentions)
+    refreshed = refresh_openaleph_review_candidates(db, doc.id, evidence_searcher=pages, entity_fetcher=analysed)
     assert refreshed["status"]["provider_candidate_total"] == 2
     _same_through_model(r.OpenAlephReviewRefreshOut, refreshed)
     _same_through_model(r.OpenAlephEvidenceImportOut, import_openaleph_evidence_candidates(db, doc.id, searcher=pages))
-    _same_through_model(r.OpenAlephEntityImportOut, import_openaleph_entity_candidates(db, doc.id, searcher=mentions))
+    _same_through_model(r.OpenAlephEntityImportOut, import_openaleph_entity_candidates(db, doc.id, fetch_entity=analysed))
     after = get_openaleph_review_status(db, doc.id)
     assert after["sync"] and after["binding"] and after["ready_for_import"]
     _same_through_model(r.OpenAlephReviewStatusOut, after)

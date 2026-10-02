@@ -33,6 +33,15 @@ def _schema_exists(schema: str) -> bool:
         return ftm_model.get(schema) is not None
     return schema in _FALLBACK_SCHEMAS
 
+def schema_has_property(schema: str, prop: str) -> bool:
+    """Whether a FollowTheMoney schema has the property (e.g. a Person has an
+    email, an Address does not). False for an unknown schema."""
+    if ftm_model is None:
+        return False
+    schema_obj = ftm_model.get(schema)
+    return schema_obj is not None and prop in schema_obj.properties
+
+
 def _supports_name(schema: str) -> bool:
     if ftm_model is not None:
         schema_obj = ftm_model.get(schema)

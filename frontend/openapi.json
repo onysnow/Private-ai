@@ -2967,6 +2967,17 @@
             ],
             "title": "Mime Type"
           },
+          "openaleph_document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Openaleph Document Id"
+          },
           "sha256": {
             "title": "Sha256",
             "type": "string"
@@ -3101,6 +3112,17 @@
             ],
             "title": "Mime Type"
           },
+          "openaleph_document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Openaleph Document Id"
+          },
           "sha256": {
             "title": "Sha256",
             "type": "string"
@@ -3198,6 +3220,17 @@
               }
             ],
             "title": "Mime Type"
+          },
+          "openaleph_document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Openaleph Document Id"
           },
           "openaleph_sync": {
             "anyOf": [
@@ -6184,6 +6217,17 @@
               }
             ],
             "title": "Note"
+          },
+          "target_entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Entity Id"
           }
         },
         "required": [
@@ -6370,7 +6414,7 @@
         "type": "object"
       },
       "ExtractionReviewOut": {
-        "description": "The reply to a review decision: the proposal as it now stands and, for\nan acceptance, the record it made (an entity, claim, evidence record or\nrelationship, each in its own shape).",
+        "description": "The reply to a review decision: the proposal as it now stands and, for\nan acceptance, the record it made (an entity, claim, evidence record,\nrelationship, or for an email or phone proposal the statement added to\nthe chosen entity, each in its own shape).",
         "properties": {
           "candidate": {
             "$ref": "#/components/schemas/ExtractionCandidateOut"
@@ -6780,6 +6824,115 @@
           "question"
         ],
         "title": "HypothesisTestRequest",
+        "type": "object"
+      },
+      "IdentifierTargetEntityOut": {
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id",
+          "caption",
+          "schema"
+        ],
+        "title": "IdentifierTargetEntityOut",
+        "type": "object"
+      },
+      "IdentifierTargetProposalOut": {
+        "description": "An entity proposal of the same document, still waiting: accepting it\nfirst makes it an entity the email or phone can be attached to.",
+        "properties": {
+          "candidate_id": {
+            "title": "Candidate Id",
+            "type": "string"
+          },
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "schema_question": {
+            "title": "Schema Question",
+            "type": "boolean"
+          },
+          "suggested_schema": {
+            "title": "Suggested Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "caption",
+          "suggested_schema",
+          "schema_question"
+        ],
+        "title": "IdentifierTargetProposalOut",
+        "type": "object"
+      },
+      "IdentifierTargetsOut": {
+        "description": "Which entities an email or phone proposal can belong to (ADR-0006),\nthe document's own first. Only schemas with the property are listed.",
+        "properties": {
+          "candidate_id": {
+            "title": "Candidate Id",
+            "type": "string"
+          },
+          "document_entities": {
+            "items": {
+              "$ref": "#/components/schemas/IdentifierTargetEntityOut"
+            },
+            "title": "Document Entities",
+            "type": "array"
+          },
+          "document_proposals": {
+            "items": {
+              "$ref": "#/components/schemas/IdentifierTargetProposalOut"
+            },
+            "title": "Document Proposals",
+            "type": "array"
+          },
+          "kind": {
+            "enum": [
+              "email",
+              "phone"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "other_entities": {
+            "items": {
+              "$ref": "#/components/schemas/IdentifierTargetEntityOut"
+            },
+            "title": "Other Entities",
+            "type": "array"
+          },
+          "property": {
+            "title": "Property",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "kind",
+          "property",
+          "value",
+          "document_entities",
+          "document_proposals",
+          "other_entities"
+        ],
+        "title": "IdentifierTargetsOut",
         "type": "object"
       },
       "IdentityAliasOut": {
@@ -17703,7 +17856,7 @@
     },
     "/api/documents/{document_id}/corpus/openaleph/import-entities": {
       "post": {
-        "description": "Stage OpenAleph/ftm-analyze Mention entities for explicit reporter review.",
+        "description": "Stage the names, IBANs, emails and phones OpenAleph's ftm-analyze left on\nthe document for explicit reporter review (ADR-0006). Reads what is\nthere now; \"Find names again\" (…/openaleph/analyze) asks for a new run.",
         "operationId": "import_openaleph_document_entities",
         "parameters": [
           {
@@ -17783,7 +17936,7 @@
     },
     "/api/documents/{document_id}/corpus/openaleph/refresh-review": {
       "post": {
-        "description": "Refresh OpenAleph Page + Mention candidates without auto-accepting either.",
+        "description": "Refresh OpenAleph page-text and name proposals without auto-accepting either.",
         "operationId": "refresh_openaleph_document_review",
         "parameters": [
           {
@@ -17898,6 +18051,46 @@
           }
         },
         "summary": "Sync Openaleph Document"
+      }
+    },
+    "/api/documents/{document_id}/openaleph/analyze": {
+      "post": {
+        "description": "\"Find names again\": OpenAleph analyses the document again\n(POST /api/2/entities/{id}/analyze) and what it finds becomes proposals,\nas a background job (ADR-0006). Answers 202 with the job while it runs;\nin developer mode (SQLite) the job has finished when this answers.",
+        "operationId": "analyze_openaleph_document",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackgroundJobOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Analyze Openaleph Document"
       }
     },
     "/api/enrichment-sessions/{session_id}": {
@@ -19137,6 +19330,46 @@
           }
         },
         "summary": "Get Extraction Candidate Explanation"
+      }
+    },
+    "/api/extraction-candidates/{candidate_id}/identifier-targets": {
+      "get": {
+        "description": "The entities an email or phone proposal can belong to, this\ndocument's own first (ADR-0006). Accepting it needs one of them.",
+        "operationId": "get_identifier_targets",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "candidate_id",
+            "required": true,
+            "schema": {
+              "title": "Candidate Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentifierTargetsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Identifier Targets"
       }
     },
     "/api/extraction-candidates/{candidate_id}/lineage": {

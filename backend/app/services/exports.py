@@ -173,9 +173,15 @@ def _lineage_integrity(records: dict[str, list[dict[str, Any]]]) -> dict[str, An
         "entity": {row.get("id") for row in records.get("entities", [])},
         "claim": {row.get("id") for row in records.get("claims", [])},
         "evidence": {row.get("id") for row in records.get("evidence", [])},
+        # An accepted email or phone proposal made a statement on the entity
+        # the reporter chose (identifier_proposals.py, ADR-0006).
+        "statement": {row.get("id") for row in records.get("statements", [])},
     }
 
     counts = {"proposed": 0, "accepted": 0, "rejected": 0, "other": 0}
+    # "statement" is counted only when present, so a backup made before
+    # identifier proposals existed still matches the lineage its manifest
+    # declares (the restore compares the two dicts whole).
     accepted_by_type = {"entity": 0, "claim": 0, "evidence": 0}
     errors: list[str] = []
 
@@ -221,7 +227,7 @@ def _lineage_integrity(records: dict[str, list[dict[str, Any]]]) -> dict[str, An
             elif record_id not in accepted_tables[record_type]:
                 errors.append(f"accepted candidate {candidate_id} references missing {record_type} {record_id}")
             else:
-                accepted_by_type[record_type] += 1
+                accepted_by_type[record_type] = accepted_by_type.get(record_type, 0) + 1
         elif record_type or record_id:
             errors.append(f"non-accepted candidate {candidate_id} unexpectedly carries accepted-record linkage")
 

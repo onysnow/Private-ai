@@ -51,6 +51,22 @@ def test_root_compose_declares_core_stack_with_openaleph_always_on():
     assert "api" not in services["backend"]["depends_on"], "the workbench must come up even while OpenAleph is still pulling/starting"
     _assert_openaleph_setup_runs_first(services)
     _assert_render_service(services, production=False)
+    _assert_ingest_keeps_document_text(services)
+
+
+def _assert_ingest_keeps_document_text(services):
+    """ADR-0006: ingest-file queues ftm-analyze only for emitted entities
+    that carry text (should_analyze, ingestors/tasks.py), and with
+    OPENALEPH_PROCRASTINATE_DEHYDRATE_ENTITIES at its default (true) the
+    entities it emits are stripped of their text -- so no name was ever
+    found. The ingest service turns it off; every other OpenAleph setting
+    stays the shared one, and no other service needs it."""
+    ingest = services["ingest"]["environment"]
+    assert ingest["OPENALEPH_PROCRASTINATE_DEHYDRATE_ENTITIES"] == "false"
+    shared = services["analyze"]["environment"]
+    assert {key: value for key, value in ingest.items() if key != "OPENALEPH_PROCRASTINATE_DEHYDRATE_ENTITIES"} == shared
+    for name in ("analyze", "worker", "api", "openaleph-setup"):
+        assert "OPENALEPH_PROCRASTINATE_DEHYDRATE_ENTITIES" not in services[name]["environment"], name
 
 
 def _assert_render_service(services, *, production: bool):
@@ -111,6 +127,7 @@ def test_production_compose_has_no_dev_shortcuts():
     assert set(services) == {"workbench-db", "backend", "openaleph-setup", "render"} | openaleph, "workbench + render + OpenAleph, nothing dev-only (no adminer, no separate frontend: ADR-0004)"
     _assert_openaleph_setup_runs_first(services)
     _assert_render_service(services, production=True)
+    _assert_ingest_keeps_document_text(services)
     for name in openaleph:
         assert "profiles" not in services[name] and services[name].get("restart") == "unless-stopped", name
         if name != "ui":

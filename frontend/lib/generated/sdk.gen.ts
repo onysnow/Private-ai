@@ -15,6 +15,9 @@ import type {
   AlephSearchData,
   AlephSearchErrors,
   AlephSearchResponses,
+  AnalyzeOpenalephDocumentData,
+  AnalyzeOpenalephDocumentErrors,
+  AnalyzeOpenalephDocumentResponses,
   AssessStatementData,
   AssessStatementErrors,
   AssessStatementResponses,
@@ -350,6 +353,9 @@ import type {
   GetExtractionEntityMatchesData,
   GetExtractionEntityMatchesErrors,
   GetExtractionEntityMatchesResponses,
+  GetIdentifierTargetsData,
+  GetIdentifierTargetsErrors,
+  GetIdentifierTargetsResponses,
   GetInvestigationFinancialFlowsData,
   GetInvestigationFinancialFlowsErrors,
   GetInvestigationFinancialFlowsResponses,
@@ -632,6 +638,8 @@ import type {
 import {
   zAlephSearchBody,
   zAlephSearchResponse,
+  zAnalyzeOpenalephDocumentPath,
+  zAnalyzeOpenalephDocumentResponse,
   zAssessStatementBody,
   zAssessStatementPath,
   zAssessStatementResponse,
@@ -800,6 +808,8 @@ import {
   zGetExtractionCandidateLineagePath,
   zGetExtractionCandidateLineageResponse,
   zGetExtractionEntityMatchesPath,
+  zGetIdentifierTargetsPath,
+  zGetIdentifierTargetsResponse,
   zGetInvestigationFinancialFlowsPath,
   zGetInvestigationFinancialFlowsResponse,
   zGetInvestigationGraphPath,
@@ -3860,7 +3870,9 @@ export const getOpenalephDocumentSync = <ThrowOnError extends boolean = false>(
 /**
  * Import Openaleph Document Entities
  *
- * Stage OpenAleph/ftm-analyze Mention entities for explicit reporter review.
+ * Stage the names, IBANs, emails and phones OpenAleph's ftm-analyze left on
+ * the document for explicit reporter review (ADR-0006). Reads what is
+ * there now; "Find names again" (…/openaleph/analyze) asks for a new run.
  */
 export const importOpenalephDocumentEntities = <
   ThrowOnError extends boolean = false,
@@ -3926,7 +3938,7 @@ export const importOpenalephDocumentEvidence = <
 /**
  * Refresh Openaleph Document Review
  *
- * Refresh OpenAleph Page + Mention candidates without auto-accepting either.
+ * Refresh OpenAleph page-text and name proposals without auto-accepting either.
  */
 export const refreshOpenalephDocumentReview = <
   ThrowOnError extends boolean = false,
@@ -4015,6 +4027,40 @@ export const syncOpenalephDocument = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zSyncOpenalephDocumentResponse.parseAsync(data),
     url: '/api/documents/{document_id}/corpus/openaleph/sync',
+    ...options,
+  });
+
+/**
+ * Analyze Openaleph Document
+ *
+ * "Find names again": OpenAleph analyses the document again
+ * (POST /api/2/entities/{id}/analyze) and what it finds becomes proposals,
+ * as a background job (ADR-0006). Answers 202 with the job while it runs;
+ * in developer mode (SQLite) the job has finished when this answers.
+ */
+export const analyzeOpenalephDocument = <ThrowOnError extends boolean = false>(
+  options: Options<AnalyzeOpenalephDocumentData, ThrowOnError>,
+): RequestResult<
+  AnalyzeOpenalephDocumentResponses,
+  AnalyzeOpenalephDocumentErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    AnalyzeOpenalephDocumentResponses,
+    AnalyzeOpenalephDocumentErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zAnalyzeOpenalephDocumentPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAnalyzeOpenalephDocumentResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/openaleph/analyze',
     ...options,
   });
 
@@ -4873,6 +4919,38 @@ export const getExtractionCandidateExplanation = <
     responseValidator: async (data) =>
       await zGetExtractionCandidateExplanationResponse.parseAsync(data),
     url: '/api/extraction-candidates/{candidate_id}/explanation',
+    ...options,
+  });
+
+/**
+ * Get Identifier Targets
+ *
+ * The entities an email or phone proposal can belong to, this
+ * document's own first (ADR-0006). Accepting it needs one of them.
+ */
+export const getIdentifierTargets = <ThrowOnError extends boolean = false>(
+  options: Options<GetIdentifierTargetsData, ThrowOnError>,
+): RequestResult<
+  GetIdentifierTargetsResponses,
+  GetIdentifierTargetsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetIdentifierTargetsResponses,
+    GetIdentifierTargetsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetIdentifierTargetsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetIdentifierTargetsResponse.parseAsync(data),
+    url: '/api/extraction-candidates/{candidate_id}/identifier-targets',
     ...options,
   });
 

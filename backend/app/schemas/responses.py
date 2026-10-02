@@ -711,6 +711,8 @@ class DocumentOut(ResponseModel):
     created_at: datetime
     chunk_count: int
     candidate_counts: dict[str, int]
+    # OpenAleph's id for the document when OpenAleph holds it (ADR-0006).
+    openaleph_document_id: str | None = None
 
 
 class DocumentChunkOut(ResponseModel):
@@ -890,10 +892,40 @@ class ExtractionCandidateOut(ResponseModel):
 
 class ExtractionReviewOut(ResponseModel):
     """The reply to a review decision: the proposal as it now stands and, for
-    an acceptance, the record it made (an entity, claim, evidence record or
-    relationship, each in its own shape)."""
+    an acceptance, the record it made (an entity, claim, evidence record,
+    relationship, or for an email or phone proposal the statement added to
+    the chosen entity, each in its own shape)."""
     candidate: ExtractionCandidateOut
     record: dict[str, Any] | None = None
+
+
+class IdentifierTargetEntityOut(ResponseModel):
+    entity_id: str
+    caption: str
+    schema_: str = Field(alias="schema")
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class IdentifierTargetProposalOut(ResponseModel):
+    """An entity proposal of the same document, still waiting: accepting it
+    first makes it an entity the email or phone can be attached to."""
+    candidate_id: str
+    caption: str
+    suggested_schema: str
+    schema_question: bool
+
+
+class IdentifierTargetsOut(ResponseModel):
+    """Which entities an email or phone proposal can belong to (ADR-0006),
+    the document's own first. Only schemas with the property are listed."""
+    candidate_id: str
+    kind: Literal["email", "phone"]
+    property: str
+    value: str
+    document_entities: list[IdentifierTargetEntityOut]
+    document_proposals: list[IdentifierTargetProposalOut]
+    other_entities: list[IdentifierTargetEntityOut]
 
 
 # --- OpenAleph corpus ------------------------------------------------------------

@@ -11,6 +11,7 @@ import {
 import { client } from '../client.gen';
 import {
   alephSearch,
+  analyzeOpenalephDocument,
   assessStatement,
   attachRelationshipEvidenceEndpoint,
   cancelJobEndpoint,
@@ -129,6 +130,7 @@ import {
   getExtractionCandidateExplanation,
   getExtractionCandidateLineage,
   getExtractionEntityMatches,
+  getIdentifierTargets,
   getInvestigationFinancialFlows,
   getInvestigationGraph,
   getInvestigationTimeline,
@@ -231,6 +233,9 @@ import type {
   AlephSearchData,
   AlephSearchError,
   AlephSearchResponse,
+  AnalyzeOpenalephDocumentData,
+  AnalyzeOpenalephDocumentError,
+  AnalyzeOpenalephDocumentResponse,
   AssessStatementData,
   AssessStatementError,
   AssessStatementResponse,
@@ -489,6 +494,9 @@ import type {
   GetExtractionCandidateLineageResponse,
   GetExtractionEntityMatchesData,
   GetExtractionEntityMatchesError,
+  GetIdentifierTargetsData,
+  GetIdentifierTargetsError,
+  GetIdentifierTargetsResponse,
   GetInvestigationFinancialFlowsData,
   GetInvestigationFinancialFlowsError,
   GetInvestigationFinancialFlowsResponse,
@@ -3619,7 +3627,9 @@ export const getOpenalephDocumentSyncOptions = (
 /**
  * Import Openaleph Document Entities
  *
- * Stage OpenAleph/ftm-analyze Mention entities for explicit reporter review.
+ * Stage the names, IBANs, emails and phones OpenAleph's ftm-analyze left on
+ * the document for explicit reporter review (ADR-0006). Reads what is
+ * there now; "Find names again" (…/openaleph/analyze) asks for a new run.
  */
 export const importOpenalephDocumentEntitiesMutation = (
   options?: Partial<Options<ImportOpenalephDocumentEntitiesData>>,
@@ -3677,7 +3687,7 @@ export const importOpenalephDocumentEvidenceMutation = (
 /**
  * Refresh Openaleph Document Review
  *
- * Refresh OpenAleph Page + Mention candidates without auto-accepting either.
+ * Refresh OpenAleph page-text and name proposals without auto-accepting either.
  */
 export const refreshOpenalephDocumentReviewMutation = (
   options?: Partial<Options<RefreshOpenalephDocumentReviewData>>,
@@ -3750,6 +3760,38 @@ export const syncOpenalephDocumentMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await syncOpenalephDocument({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Analyze Openaleph Document
+ *
+ * "Find names again": OpenAleph analyses the document again
+ * (POST /api/2/entities/{id}/analyze) and what it finds becomes proposals,
+ * as a background job (ADR-0006). Answers 202 with the job while it runs;
+ * in developer mode (SQLite) the job has finished when this answers.
+ */
+export const analyzeOpenalephDocumentMutation = (
+  options?: Partial<Options<AnalyzeOpenalephDocumentData>>,
+): UseMutationOptions<
+  AnalyzeOpenalephDocumentResponse,
+  AnalyzeOpenalephDocumentError,
+  Options<AnalyzeOpenalephDocumentData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AnalyzeOpenalephDocumentResponse,
+    AnalyzeOpenalephDocumentError,
+    Options<AnalyzeOpenalephDocumentData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await analyzeOpenalephDocument({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -4533,6 +4575,37 @@ export const getExtractionCandidateExplanationOptions = (
       return data;
     },
     queryKey: getExtractionCandidateExplanationQueryKey(options),
+  });
+
+export const getIdentifierTargetsQueryKey = (
+  options: Options<GetIdentifierTargetsData>,
+) => createQueryKey('getIdentifierTargets', options);
+
+/**
+ * Get Identifier Targets
+ *
+ * The entities an email or phone proposal can belong to, this
+ * document's own first (ADR-0006). Accepting it needs one of them.
+ */
+export const getIdentifierTargetsOptions = (
+  options: Options<GetIdentifierTargetsData>,
+) =>
+  queryOptions<
+    GetIdentifierTargetsResponse,
+    GetIdentifierTargetsError,
+    GetIdentifierTargetsResponse,
+    ReturnType<typeof getIdentifierTargetsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getIdentifierTargets({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getIdentifierTargetsQueryKey(options),
   });
 
 export const getExtractionCandidateLineageQueryKey = (

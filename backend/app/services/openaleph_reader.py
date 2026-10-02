@@ -26,7 +26,8 @@ import httpx
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.services.openaleph_corpus import PROVIDER, _first_property, openaleph_auth_headers
+from app.services import openaleph_http
+from app.services.openaleph_corpus import PROVIDER, _first_property
 
 Report = Callable[[int | None, str | None], None]
 PARAGRAPH_SPLIT_RE = re.compile(r"\n\s*\n")
@@ -44,6 +45,7 @@ class OpenAlephText:
     issues: list[str] = field(default_factory=list)
     collection_id: str = ""
     provider_document_id: str = ""
+    schema: str = "Document"              # the FtM schema OpenAleph gave the document
 
 
 def reading_with_openaleph() -> bool:
@@ -57,16 +59,9 @@ def reading_with_openaleph() -> bool:
     return bool(settings.openaleph_enabled)
 
 
-def fetch_openaleph_entity(entity_id: str, *, transport: httpx.BaseTransport | None = None) -> dict | None:
+def fetch_openaleph_entity(entity_id: str) -> dict | None:
     """One entity from OpenAleph, or None while it is not indexed yet."""
-    headers = {"User-Agent": "JournalismWorkbench/0.93", **openaleph_auth_headers(transport)}
-    with httpx.Client(timeout=max(settings.openaleph_probe_timeout_seconds, 10.0), follow_redirects=True, transport=transport) as client:
-        response = client.get(f"{settings.openaleph_base_url.rstrip('/')}/api/2/entities/{entity_id}", headers=headers)
-    if response.status_code == 404:
-        return None
-    response.raise_for_status()
-    payload = response.json()
-    return payload if isinstance(payload, dict) else None
+    return openaleph_http.get_entity(entity_id)
 
 
 def _clean(text: str) -> str:
@@ -175,4 +170,5 @@ def read_with_openaleph(
             })
     if not chunks:
         raise OpenAlephUnavailable("OpenAleph returned no text for this file")
-    return OpenAlephText(chunks=chunks, issues=issues, collection_id=collection_id, provider_document_id=record_id)
+    return OpenAlephText(chunks=chunks, issues=issues, collection_id=collection_id, provider_document_id=record_id,
+                         schema=str((entity or {}).get("schema") or "Document"))
