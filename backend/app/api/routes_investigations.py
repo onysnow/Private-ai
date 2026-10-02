@@ -22,7 +22,7 @@ from app.ai.reasoning import (
     list_ai_analysis_candidates,
     validate_reasoning_request,
 )
-from app.api.dependencies import authorize_request_resource
+from app.api.dependencies import MAX_OFFSET, authorize_request_resource
 from app.core.authorization import current_authorization_scope, require_scope_investigation_admin, scope_for_request
 from app.core.config import settings
 from app.db.session import get_db
@@ -31,9 +31,10 @@ from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Investigation
 from app.schemas.responses import (
-    ClaimOut, ConnectorFindingOut, ConnectorRunOut, DocumentOut, EvidencePoolRow, FinancialLedgerOut, GraphOut,
-    InvestigationDeletionPreview, InvestigationDeletionResult, InvestigationOut, LeadOut, LeadQueueOut, RelationshipOut,
-    ReportingTaskOut, SourceOut, TimelineOut,
+    AiAnalysisCandidatesOut, AiModelFailedOut, AiOutputRejectedOut, AiReasoningRunOut, ClaimOut, ErrorOut, ConnectorFindingOut, ConnectorRunOut, DemoSeedOut, DocumentOut,
+    EvidencePoolRow, FinancialLedgerOut, GraphOut, InvestigationDeletionPreview, InvestigationDeletionResult,
+    InvestigationOut, LeadOut, LeadQueueOut, OpenAlephCorpusBindingOut, OpenAlephOperationFailureOut,
+    QuestionContextOut, RelationshipOut, ReportingTaskOut, SourceOut, TimelineOut, ValidationErrorOut, file_response, upstream,
 )
 from app.schemas.api import (
     CaseSynthesisRequest, HypothesisTestRequest, InvestigationCreate,
@@ -73,15 +74,27 @@ from app.services.timeline import investigation_timeline
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
+# A reasoning run that is queued answers 202 with the job to follow (Foundation Fixes fix 4);
+# one whose answer fails its checks is refused (422) with what the check found, and
+# one the provider failed, or whose answer is unusable, answers 502 (app/ai/reasoning.py
+# describe_reasoning_failure).
+QUEUED_RUN: dict[int | str, dict[str, Any]] = {
+    202: {"model": AiReasoningRunOut, "description": "Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})"},
+    422: {"model": ValidationErrorOut | AiOutputRejectedOut,
+          "description": "The input does not match the route, or the model's answer did not pass its checks"},
+    502: {"model": ErrorOut | AiModelFailedOut,
+          "description": "The AI provider failed (the details are logged on the server), or its answer could not be used at all"},
+}
 
-@router.get("/investigations/{investigation_id}/corpus/openaleph", response_model=None)
+
+@router.get("/investigations/{investigation_id}/corpus/openaleph", response_model=OpenAlephCorpusBindingOut)
 def get_openaleph_corpus_binding(investigation_id: str, db: Session = Depends(get_db)) -> dict[str, Any]:
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     return {"binding": serialize_binding(get_binding(db, investigation_id))}
 
 
-@router.get("/investigations/{investigation_id}/corpus/openaleph/failures", response_model=None)
+@router.get("/investigations/{investigation_id}/corpus/openaleph/failures", response_model=list[OpenAlephOperationFailureOut])
 def list_openaleph_corpus_failures(investigation_id: str, db: Session = Depends(get_db)) -> Any:
     """Server-side trace of failed OpenAleph pipeline operations (STRUCT-0027).
 
@@ -94,7 +107,8 @@ def list_openaleph_corpus_failures(investigation_id: str, db: Session = Depends(
     return list_openaleph_operation_failures(db, investigation_id)
 
 
-@router.post("/investigations/{investigation_id}/corpus/openaleph/ensure", response_model=None)
+@router.post("/investigations/{investigation_id}/corpus/openaleph/ensure", response_model=OpenAlephCorpusBindingOut,
+             responses=upstream("OpenAleph", 502, 503))
 def ensure_openaleph_corpus_binding(investigation_id: str, request: Request, db: Session = Depends(get_db)) -> dict[str, Any]:
     try:
         binding = ensure_openaleph_collection(db, investigation_id)
@@ -112,7 +126,7 @@ def ensure_openaleph_corpus_binding(investigation_id: str, request: Request, db:
     return {"binding": serialize_binding(binding)}
 
 
-@router.post("/investigations/{investigation_id}/assistant/context", response_model=None)
+@router.post("/investigations/{investigation_id}/assistant/context", response_model=QuestionContextOut)
 def investigation_question_context(
     investigation_id: str, body: InvestigationQuestionContextRequest, db: Session = Depends(get_db),
 ) -> Any:
@@ -170,7 +184,7 @@ async def _run_reasoning_endpoint(request: Request, response: Response, db: Sess
     return {"candidate_id": None, "job": serialize_job(row)}
 
 
-@router.post("/investigations/{investigation_id}/assistant/case-synthesis", response_model=None)
+@router.post("/investigations/{investigation_id}/assistant/case-synthesis", response_model=AiReasoningRunOut, responses=QUEUED_RUN)
 async def investigation_case_synthesis(
     investigation_id: str, body: CaseSynthesisRequest, request: Request, response: Response, db: Session = Depends(get_db),
 ) -> Any:
@@ -186,7 +200,7 @@ async def investigation_case_synthesis(
     )
 
 
-@router.post("/investigations/{investigation_id}/assistant/hypothesis-test", response_model=None)
+@router.post("/investigations/{investigation_id}/assistant/hypothesis-test", response_model=AiReasoningRunOut, responses=QUEUED_RUN)
 async def investigation_hypothesis_test(
     investigation_id: str, body: HypothesisTestRequest, request: Request, response: Response, db: Session = Depends(get_db),
 ) -> Any:
@@ -202,7 +216,7 @@ async def investigation_hypothesis_test(
     )
 
 
-@router.post("/investigations/{investigation_id}/assistant/presentation-draft", response_model=None)
+@router.post("/investigations/{investigation_id}/assistant/presentation-draft", response_model=AiReasoningRunOut, responses=QUEUED_RUN)
 async def investigation_presentation_draft(
     investigation_id: str, body: PresentationDraftRequest, request: Request, response: Response, db: Session = Depends(get_db),
 ) -> Any:
@@ -221,13 +235,13 @@ async def investigation_presentation_draft(
     )
 
 
-@router.get("/investigations/{investigation_id}/ai-analysis-candidates", response_model=None)
+@router.get("/investigations/{investigation_id}/ai-analysis-candidates", response_model=AiAnalysisCandidatesOut)
 def list_investigation_ai_analysis_candidates(
     investigation_id: str,
     review_status: str | None = None,
     module: str | None = None,
     limit: int = Query(default=100, ge=1, le=500),
-    offset: int = Query(default=0, ge=0),
+    offset: int = Query(default=0, ge=0, le=MAX_OFFSET),
     db: Session = Depends(get_db),
 ) -> dict[str, Any]:
     """The review queue for TAS reasoning output, newest first. Payloads are
@@ -250,7 +264,7 @@ def get_investigation_timeline(
     verification_status: list[str] | None = Query(default=None),
     include_record_activity: bool = False,
     limit: int | None = Query(default=None, ge=1, le=500),
-    offset: int = Query(default=0, ge=0),
+    offset: int = Query(default=0, ge=0, le=MAX_OFFSET),
     db: Session = Depends(get_db),
 ) -> Any:
     try:
@@ -263,7 +277,8 @@ def get_investigation_timeline(
         raise HTTPException(404, str(exc))
 
 
-@router.get("/investigations/{investigation_id}/export")
+@router.get("/investigations/{investigation_id}/export", response_class=Response,
+            responses=file_response("application/zip", "A portable backup of the investigation (.jwbackup.zip)"))
 def export_investigation(
     investigation_id: str,
     include_documents: bool = True,
@@ -296,7 +311,7 @@ def list_investigations(request: Request, db: Session = Depends(get_db)) -> Any:
     return _list_investigations(db, scope)
 
 
-@router.post("/demo/seed", response_model=None)
+@router.post("/demo/seed", response_model=DemoSeedOut)
 def seed_demo(db: Session = Depends(get_db)) -> Any:
     """Create the one demo investigation (sample entities, relationships,
     claims/evidence, leads, and a timeline) if it doesn't already exist.
@@ -327,7 +342,7 @@ def list_investigation_relationships(
     investigation_id: str,
     include_reconciled_duplicates: bool = Query(default=True),
     limit: int | None = Query(default=None, ge=1, le=500),
-    offset: int = Query(default=0, ge=0),
+    offset: int = Query(default=0, ge=0, le=MAX_OFFSET),
     db: Session = Depends(get_db),
 ) -> Any:
     if db.get(Investigation, investigation_id) is None:
@@ -368,7 +383,7 @@ def get_investigation_financial_flows(investigation_id: str, db: Session = Depen
 def list_documents(
     investigation_id: str,
     limit: int | None = Query(default=None, ge=1, le=500),
-    offset: int = Query(default=0, ge=0),
+    offset: int = Query(default=0, ge=0, le=MAX_OFFSET),
     db: Session = Depends(get_db),
 ) -> Any:
     if db.get(Investigation, investigation_id) is None:
@@ -380,7 +395,7 @@ def list_documents(
 def list_investigation_evidence(
     investigation_id: str,
     limit: int | None = Query(default=None, ge=1, le=500),
-    offset: int = Query(default=0, ge=0),
+    offset: int = Query(default=0, ge=0, le=MAX_OFFSET),
     db: Session = Depends(get_db),
 ) -> Any:
     if db.get(Investigation, investigation_id) is None:
@@ -392,7 +407,7 @@ def list_investigation_evidence(
 def list_sources(
     investigation_id: str,
     limit: int | None = Query(default=None, ge=1, le=500),
-    offset: int = Query(default=0, ge=0),
+    offset: int = Query(default=0, ge=0, le=MAX_OFFSET),
     db: Session = Depends(get_db),
 ) -> Any:
     if db.get(Investigation, investigation_id) is None:
@@ -404,7 +419,7 @@ def list_sources(
 def list_claims(
     investigation_id: str,
     limit: int | None = Query(default=None, ge=1, le=500),
-    offset: int = Query(default=0, ge=0),
+    offset: int = Query(default=0, ge=0, le=MAX_OFFSET),
     db: Session = Depends(get_db),
 ) -> Any:
     if db.get(Investigation, investigation_id) is None:
@@ -416,7 +431,7 @@ def list_claims(
 def list_leads(
     investigation_id: str,
     limit: int | None = Query(default=None, ge=1, le=500),
-    offset: int = Query(default=0, ge=0),
+    offset: int = Query(default=0, ge=0, le=MAX_OFFSET),
     db: Session = Depends(get_db),
 ) -> Any:
     if db.get(Investigation, investigation_id) is None:
@@ -432,7 +447,7 @@ def lead_queue(
     owner: str | None = None,
     unresolved_only: bool = True,
     limit: int | None = Query(default=None, ge=1, le=500),
-    offset: int = Query(default=0, ge=0),
+    offset: int = Query(default=0, ge=0, le=MAX_OFFSET),
     db: Session = Depends(get_db),
 ) -> Any:
     if db.get(Investigation, investigation_id) is None:
@@ -447,7 +462,7 @@ def lead_queue(
 def list_reporting_tasks(
     investigation_id: str,
     limit: int | None = Query(default=None, ge=1, le=500),
-    offset: int = Query(default=0, ge=0),
+    offset: int = Query(default=0, ge=0, le=MAX_OFFSET),
     db: Session = Depends(get_db),
 ) -> Any:
     if db.get(Investigation, investigation_id) is None:
@@ -459,7 +474,7 @@ def list_reporting_tasks(
 def list_connector_runs(
     investigation_id: str,
     limit: int | None = Query(default=None, ge=1, le=500),
-    offset: int = Query(default=0, ge=0),
+    offset: int = Query(default=0, ge=0, le=MAX_OFFSET),
     db: Session = Depends(get_db),
 ) -> Any:
     if db.get(Investigation, investigation_id) is None:
@@ -471,7 +486,7 @@ def list_connector_runs(
 def list_connector_findings(
     investigation_id: str,
     limit: int | None = Query(default=None, ge=1, le=500),
-    offset: int = Query(default=0, ge=0),
+    offset: int = Query(default=0, ge=0, le=MAX_OFFSET),
     db: Session = Depends(get_db),
 ) -> Any:
     if db.get(Investigation, investigation_id) is None:

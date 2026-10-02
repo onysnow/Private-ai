@@ -115,3 +115,22 @@ def test_lead_queue_surfaces_contradiction_pressure_without_overwriting_reporter
     assert triage["attention_score"] == 5
     assert by_id[pressured["id"]]["priority"] == "normal"
     assert items.index(by_id[pressured["id"]]) < items.index(by_id[ordinary["id"]])
+
+
+def test_a_null_for_a_required_field_leaves_it_and_a_null_for_an_optional_one_clears_it():
+    """Found by tests/test_api_contract.py: a PATCH sending null for a lead's
+    priority, or a task's title, status or priority, failed with a server error
+    (NOT NULL). Those fields are now left as they are, as a lead's title and
+    status already were; an owner sent as null is still cleared."""
+    inv = make_investigation("Null updates")
+    lead = client.post("/api/leads", json={"investigation_id": inv["id"], "title": "Who signed?"}).json()
+    client.patch(f"/api/leads/{lead['id']}", json={"priority": "high", "owner": "AJ"})
+    updated = client.patch(f"/api/leads/{lead['id']}", json={"priority": None, "owner": None})
+    assert updated.status_code == 200, updated.text
+    assert updated.json()["priority"] == "high" and updated.json()["owner"] is None
+
+    task = client.post(f"/api/leads/{lead['id']}/convert", json={"kind": "task", "title": "Request the minutes", "owner": "AJ"}).json()["record"]
+    patched = client.patch(f"/api/reporting-tasks/{task['id']}", json={"title": None, "status": None, "priority": None, "owner": None})
+    assert patched.status_code == 200, patched.text
+    body = patched.json()
+    assert (body["title"], body["status"], body["priority"], body["owner"]) == ("Request the minutes", task["status"], task["priority"], None)

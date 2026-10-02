@@ -69,8 +69,12 @@ METHODS: dict[str, dict[str, Any]] = {
         "automated": True,
     },
     "openaleph_ftm_analyze": {
-        "label": "OpenAleph ftm-analyze mention",
-        "description": "OpenAleph's ftm-analyze named-entity step detected a mention in the document and returned its name and detected schema.",
+        "label": "OpenAleph name-finding (ftm-analyze)",
+        "description": ("OpenAleph's ftm-analyze service read the document and wrote what it found onto it: names of people, "
+                        "companies and places (spaCy's named-entity models, one per detected language), and email addresses, "
+                        "phone numbers and IBANs (pattern rules checked against FollowTheMoney's value types). For an email, "
+                        "OpenAleph also records the sender and recipients from its headers. The Workbench then finds each "
+                        "value again in the document text to show where it is."),
         "automated": True,
     },
     "reporter_staged": {
@@ -156,6 +160,56 @@ def _chunk_method_reason(chunk_ref: dict | None) -> str | None:
     return f"The chunk text at {where} was read directly from the file."
 
 
+# What each ftm-analyze property is, for explanations (FtM Analyzable schema labels).
+ANALYSIS_PROPERTY_LABELS = {
+    "peopleMentioned": "people", "companiesMentioned": "companies", "locationMentioned": "locations",
+    "ibanMentioned": "IBANs", "namesMentioned": "names", "emailMentioned": "email addresses",
+    "phoneMentioned": "phone numbers",
+}
+ANALYSIS_SCHEMA_REASONS = {
+    "peopleMentioned": "OpenAleph filed it under people, so the proposal is a Person.",
+    "companiesMentioned": ("OpenAleph filed it under companies, so the proposal is a Company. spaCy's organisation tag "
+                           "covers public bodies and other organisations too; change the type when accepting if needed."),
+    "locationMentioned": "OpenAleph filed it under locations, so the proposal is an Address.",
+    "ibanMentioned": "OpenAleph recognised an IBAN, so the proposal is a BankAccount with that IBAN.",
+    "namesMentioned": "OpenAleph recorded the name without saying what kind of entity it is, so you are asked whether it is a person, a company or an organisation.",
+}
+ANALYSIS_CONFIDENCE = {
+    "named": ("Fixed value of 0.85 for every name ftm-analyze finds: it keeps a name only when its fastText type model is at "
+              "least 85% sure (ner_type_model_confidence, ftm-analyze 5.3.1). It is that floor, not a score for this name."),
+    "pattern": ("Fixed value of 1.0: the value matched OpenAleph's pattern and FollowTheMoney accepted it as a valid value "
+                "of its type. It says nothing about whom the value belongs to."),
+    "unknown_kind": "Fixed value of 0.5: OpenAleph did not say what kind of entity this name is.",
+}
+
+
+def _analysis_found_by_reasoning(payload: dict, provenance: dict) -> list[str]:
+    """Who in OpenAleph found the value and how, then where the Workbench found it."""
+    prop = str(provenance.get("provider_property") or "")
+    value = payload.get("openaleph_value") or payload.get("value") or payload.get("caption")
+    label = ANALYSIS_PROPERTY_LABELS.get(prop, prop or "values")
+    reasons: list[str] = []
+    if provenance.get("found_by") == "ingest-file email headers":
+        reasons.append(f"OpenAleph read “{value}” from the email's sender and recipient headers and listed it under {label} ({prop}).")
+    elif provenance.get("ner_engine") == "spacy":
+        models = ", ".join(str(m) for m in provenance.get("ner_models") or []) or "its default model"
+        reasons.append(f"OpenAleph's ftm-analyze found “{value}” with spaCy's named-entity recognition ({models}) and listed it under {label} ({prop}).")
+    elif provenance.get("pattern"):
+        reasons.append(f"OpenAleph's ftm-analyze matched “{value}” with its {provenance['pattern']} pattern and listed it under {label} ({prop}).")
+    else:
+        reasons.append(f"OpenAleph's ftm-analyze listed “{value}” under {label} ({prop}).")
+    raw_count = payload.get("occurrence_count")
+    count = raw_count if isinstance(raw_count, int) else 0
+    if payload.get("located"):
+        where = payload.get("locator") or "the document"
+        reasons.append(f"The Workbench found it in the document text at {where}, written “{payload.get('caption')}”"
+                       + (f", and in {count - 1} more place(s)." if count > 1 else "."))
+    elif payload.get("located") is False:
+        reasons.append("The Workbench could not find it in the document text, so nothing is highlighted. OpenAleph may have "
+                       "read it from text the Workbench does not show, such as email headers or file metadata.")
+    return reasons
+
+
 def _part(pid: str, label: str, value: Any, reasoning: Sequence[str | None], sources: Sequence[dict | None]) -> dict[str, Any]:
     return {"id": pid, "label": label, "value": value, "reasoning": [r for r in reasoning if r], "sources": [s for s in sources if s]}
 
@@ -227,12 +281,30 @@ def _explain_entity(candidate: ExtractionCandidate, payload: dict, lineage: dict
     chunk = _chunk_ref(lineage, payload)
     provider = _provider_ref(provenance)
     caveats: list[str] = []
-    if provenance.get("extraction_method") == "openaleph_ftm_analyze":
+    confidence_basis = "Fixed value of 0.40 assigned to every name this rule matches. It is not computed per name."
+    if provenance.get("extraction_method") == "openaleph_ftm_analyze" and provenance.get("provider_schema") == "Mention":
+        # Staged from a Mention entity before ADR-0006 replaced that import.
         method, basis = "openaleph_ftm_analyze", "provider"
         name_reasoning = ["OpenAleph's ftm-analyze step returned this name as a mention detected in the document."]
         schema_reasoning = [f"OpenAleph reported the detected schema, normalized here to {schema}."]
+        confidence_basis = "Fixed value of 1.0 set on import: it records that OpenAleph returned this mention, not how likely the identification is correct."
         if chunk is None:
             caveats.append("OpenAleph returned no page locator for this mention; find it in the document before accepting.")
+    elif provenance.get("extraction_method") == "openaleph_ftm_analyze":
+        method, basis = "openaleph_ftm_analyze", "provider"
+        prop = str(provenance.get("provider_property") or "")
+        name_reasoning = _analysis_found_by_reasoning(payload, provenance)
+        schema_reasoning = [ANALYSIS_SCHEMA_REASONS.get(prop, f"OpenAleph reported the kind of entity, proposed here as {schema}.")]
+        if prop == "ibanMentioned":
+            confidence_basis = ANALYSIS_CONFIDENCE["pattern"]
+        elif prop == "namesMentioned":
+            confidence_basis = ANALYSIS_CONFIDENCE["unknown_kind"]
+        else:
+            confidence_basis = ANALYSIS_CONFIDENCE["named"]
+        if chunk is None:
+            caveats.append("This name has no highlighted place in the document; find it in the original before accepting.")
+        if provenance.get("ner_engine") == "spacy":
+            caveats.append("Named-entity models make mistakes: check that this is a real name and that its kind is right.")
     else:
         suffix = ORG_SUFFIX.search(caption)
         rationale, basis = _recorded_or_reconstructed(payload, {
@@ -260,9 +332,38 @@ def _explain_entity(candidate: ExtractionCandidate, payload: dict, lineage: dict
     return {
         "summary": f"{schema} named “{caption}”",
         "method_id": method, "rationale_basis": basis, "parts": parts, "caveats": caveats,
-        "confidence_basis": ("Fixed value of 1.0 set on import: it records that OpenAleph returned this mention, not how likely the identification is correct."
-                             if method == "openaleph_ftm_analyze" else
-                             "Fixed value of 0.40 assigned to every name this rule matches. It is not computed per name."),
+        "confidence_basis": confidence_basis,
+    }
+
+
+def _explain_identifier(candidate: ExtractionCandidate, payload: dict, lineage: dict, provenance: dict) -> dict[str, Any]:
+    """An email address or phone number OpenAleph found: whose it is, the
+    reporter decides on acceptance (identifier_proposals.py)."""
+    kind = payload.get("kind")
+    noun = {"email": "Email address", "phone": "Phone number"}.get(str(kind), "Identifier")
+    prop = {"email": "email", "phone": "phone"}.get(str(kind), "identifier")
+    value = payload.get("value") or ""
+    chunk = _chunk_ref(lineage, payload)
+    provider = _provider_ref(provenance)
+    reasoning = _analysis_found_by_reasoning(payload, provenance)
+    if payload.get("caption") and payload.get("caption") != value:
+        reasoning.append(f"OpenAleph stores it as “{value}”, the form FollowTheMoney uses for a {noun.lower()}.")
+    parts = [
+        _part("value", noun, value, reasoning, [chunk, provider]),
+        _part("owner", "Belongs to", None, [
+            f"Not decided. OpenAleph finds the {noun.lower()} but not whose it is; when you accept, you choose the entity, "
+            f"and it is added to that entity's {prop} property.",
+        ], []),
+    ]
+    caveats = [
+        f"Accepting adds the {noun.lower()} to the entity you choose, as a reviewed statement pointing at this place in the document. Nothing is attached automatically.",
+    ]
+    if chunk is None:
+        caveats.append(f"This {noun.lower()} has no highlighted place in the document; find it in the original before accepting.")
+    return {
+        "summary": f"{noun} “{value}”",
+        "method_id": "openaleph_ftm_analyze", "rationale_basis": "provider", "parts": parts, "caveats": caveats,
+        "confidence_basis": ANALYSIS_CONFIDENCE["pattern"],
     }
 
 
@@ -336,6 +437,8 @@ def explain_extraction_candidate(db: Session, candidate: ExtractionCandidate) ->
         body = _explain_entity(candidate, payload, lineage, provenance)
     elif kind == "relationship":
         body = _explain_relationship(db, candidate, payload, lineage, provenance)
+    elif kind == "identifier":
+        body = _explain_identifier(candidate, payload, lineage, provenance)
     else:
         body = {"summary": f"{kind} proposal", "method_id": "unknown", "rationale_basis": "reconstructed", "parts": [],
                 "caveats": [f"No explanation is defined for “{kind}” proposals."], "confidence_basis": "Unknown."}

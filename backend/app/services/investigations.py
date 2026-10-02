@@ -9,7 +9,7 @@ from app.models.domain import (
     Lead, ReportingTask, Source,
 )
 from app.schemas.api import InvestigationCreate
-from app.services.documents import serialize_document
+from app.services.documents import openaleph_document_ids, serialize_document
 from app.services.leads import LEAD_STATUSES, list_leads_serialized, serialize_tasks_batch
 
 
@@ -43,7 +43,8 @@ def list_investigation_documents(db: Session, investigation_id: str, *, limit: i
     if limit is not None:
         stmt = stmt.limit(limit)
     rows = db.scalars(stmt).all()
-    return [serialize_document(db, row) for row in rows]
+    openaleph_ids = openaleph_document_ids(db, [row.id for row in rows])
+    return [serialize_document(db, row, openaleph_ids=openaleph_ids) for row in rows]
 
 
 def list_investigation_evidence(db: Session, investigation_id: str, *, limit: int | None = None, offset: int = 0) -> list[dict]:

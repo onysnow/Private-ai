@@ -14,7 +14,7 @@ import {cleanup, render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {LeadsKanbanBoard} from '../components/leads-kanban-board';
-import type {LeadItem} from '../lib/api-types';
+import type {LeadCard} from '../components/leads-kanban-board';
 
 beforeEach(() => {
   if (!window.matchMedia) {
@@ -35,7 +35,7 @@ afterEach(() => {
   cleanup();
 });
 
-function leadFixture(overrides: Partial<LeadItem> = {}): LeadItem {
+function leadFixture(overrides: Partial<LeadCard> = {}): LeadCard {
   return {
     id: 'lead-1',
     title: 'Who approved this contract?',
@@ -51,15 +51,13 @@ function leadFixture(overrides: Partial<LeadItem> = {}): LeadItem {
       needs_attention: true,
       attention_score: 2,
       stance_counts: {supports: 1, contradicts: 0, context: 0},
-      linked_claim_count: 0,
-      disputed_claim_count: 0,
       reasons: ['unresolved contradiction'],
     },
     ...overrides,
   };
 }
 
-function renderBoard(leads: LeadItem[], overrides: Partial<Parameters<typeof LeadsKanbanBoard>[0]> = {}) {
+function renderBoard(leads: LeadCard[], overrides: Partial<Parameters<typeof LeadsKanbanBoard>[0]> = {}) {
   const onStatusChange = vi.fn();
   const onCreateLead = vi.fn();
   const onTraceLink = vi.fn();

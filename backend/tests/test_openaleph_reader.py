@@ -17,8 +17,9 @@ from app.db.session import SessionLocal
 from app.jobs.handlers import HANDLERS
 from app.jobs.records import create_job, execute_job
 from app.models.domain import BackgroundJob, Document, DocumentChunk, ExtractionCandidate, Investigation
-from app.services import openaleph_corpus, openaleph_reader
+from app.services import openaleph_analysis, openaleph_corpus, openaleph_reader
 from app.services.documents import store_document
+from app.services.openaleph_analysis import Analysis
 from app.services.openaleph_reader import OpenAlephUnavailable, read_with_openaleph
 
 TEXT = b"Acme Holdings Inc. paid the Harbor Commission on 12 March 2024.\n\nMaria Lopez approved the contract.\n"
@@ -80,10 +81,10 @@ def test_paged_document_is_read_by_openaleph_page_by_page(tmp_path, monkeypatch,
     monkeypatch.setattr(openaleph_reader, "fetch_openaleph_entity", lambda record_id: next(answers))
     pages = [_page(2, "The council approved the contract on 3 May."), _page(1, "Acme Holdings Inc. paid the Harbor Commission."), _page(3, "   ")]
     monkeypatch.setattr(openaleph_corpus, "_openaleph_search", lambda **kw: pages)
-    monkeypatch.setattr(openaleph_corpus, "_openaleph_mention_search",
-                        lambda **kw: [{"id": "m1", "schema": "Mention", "properties": {"name": ["Acme Holdings Inc."], "detectedSchema": ["Company"]}}])
-    monkeypatch.setattr(openaleph_corpus, "get_document_sync",
-                        lambda db, document_id: SimpleNamespace(status="synced", provider_record_id="2.abc", collection_id="7"))
+    # ftm-analyze's result, as OpenAleph writes it on the document (lower-cased, normalised).
+    monkeypatch.setattr(openaleph_analysis, "find_names", lambda collection_id, entity_id, schema, report: Analysis(
+        collection_id=collection_id, entity_id=entity_id, schema=schema,
+        properties={"companiesMentioned": ["acme holdings inc"], "detectedLanguage": ["eng"]}))
 
     status, job = _run(document_id)
     assert status == "succeeded", job.error
@@ -104,6 +105,10 @@ def test_paged_document_is_read_by_openaleph_page_by_page(tmp_path, monkeypatch,
         }
         entity = next(c for c in candidates if c.candidate_type == "entity")
         assert entity.payload["provenance"]["extraction_method"] == "openaleph_ftm_analyze"
+        # Found again on page 1, in its original spelling.
+        assert entity.chunk_id == chunks[0].id
+        assert entity.payload["caption"] == "Acme Holdings Inc"
+        assert chunks[0].text[entity.payload["span"]["start_char"]:entity.payload["span"]["end_char"]] == "Acme Holdings Inc"
 
 
 def test_unpaged_text_is_read_by_openaleph_paragraph_by_paragraph(tmp_path, monkeypatch, openaleph_on):
@@ -112,9 +117,11 @@ def test_unpaged_text_is_read_by_openaleph_paragraph_by_paragraph(tmp_path, monk
     body = "Acme Holdings Inc. paid the Harbor Commission on 12 March 2024.\n\nMaria Lopez, the commission chair,\napproved the contract."
     monkeypatch.setattr(openaleph_reader, "fetch_openaleph_entity", lambda record_id: _entity("success", "PlainText", bodyText=body))
     monkeypatch.setattr(openaleph_corpus, "_openaleph_search", lambda **kw: [])
-    monkeypatch.setattr(openaleph_corpus, "_openaleph_mention_search", lambda **kw: [])
+    monkeypatch.setattr(openaleph_analysis, "find_names", lambda collection_id, entity_id, schema, report: Analysis(
+        collection_id=collection_id, entity_id=entity_id, schema=schema))
     status, job = _run(document_id)
-    assert status == "succeeded" and job.message == "Read by OpenAleph (2 paragraph(s))"
+    assert status == "succeeded"
+    assert job.message == "Read by OpenAleph (2 paragraph(s)); OpenAleph gave no analysis, and the Workbench's own name-finder is switched off"
     with SessionLocal() as db:
         chunks = db.query(DocumentChunk).filter_by(document_id=document_id).order_by(DocumentChunk.ordinal).all()
         assert [(c.locator, c.text) for c in chunks] == [

@@ -8,6 +8,7 @@ from fastapi.routing import APIRoute
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import Engine
+from sqlalchemy.exc import DataError
 from sqlalchemy.orm import Session
 
 from app.db.session import SessionLocal, build_engine, build_session_factory, engine as default_engine, get_db
@@ -31,6 +32,7 @@ from app.api.routes_entities import router as entities_router
 from app.api.routes_writeups import router as writeups_router
 from app.api.routes_decks import router as decks_router
 from app.api.routes_jobs import router as jobs_router
+from app.api.routes_corpus import router as corpus_router
 from app.api.routes_visuals import router as visuals_router
 from app.core.config import Settings, settings as default_settings
 from app.core.access import bearer_token, enforce_api_access, enforce_browser_write_access, request_is_local_request
@@ -44,6 +46,7 @@ from app.core.rate_limiter import FixedWindowRateLimiter
 from app.core.audit_log import SecurityAuditLogger, new_request_id, should_audit_request
 from app.core.app_log import configure_app_logging, current_request_id
 from app.console_adapters import build_console_config
+from app.schemas.responses import API_REFUSALS
 from app.web.frontend import mount_frontend
 from app.jobs.runner import JobRunner, resolve_runner
 from opsconsole import mount as mount_console
@@ -80,6 +83,7 @@ def register_domain_routers(app: FastAPI) -> None:
     app.include_router(decks_router)
     app.include_router(jobs_router)
     app.include_router(visuals_router)
+    app.include_router(corpus_router)
 
 
 def operation_id(route: APIRoute) -> str:
@@ -89,6 +93,13 @@ def operation_id(route: APIRoute) -> str:
     if module.startswith("opsconsole"):
         return f"console_{module.rsplit('.', 1)[-1]}_{route.name}"
     return route.name
+
+
+def _holds_nul_character(exc: Exception) -> bool:
+    """Whether a database error is PostgreSQL refusing a NUL character: psycopg's
+    own check (its message) or the server's (SQLSTATE 22P05)."""
+    original = getattr(exc, "orig", None)
+    return getattr(original, "sqlstate", None) == "22P05" or "NUL (0x00)" in str(original)
 
 
 def create_app(
@@ -151,8 +162,10 @@ def create_app(
     # Operation ids are the route functions' names (unique; pinned by
     # tests/test_response_models.py), so the generated front-end client reads
     # `investigationDeletionPreview`, not the name, path and method run together.
+    # Every route, the console's included, declares how it refuses: the checks
+    # in front of all of them (api_access_guard below) answer in that shape too.
     app = FastAPI(title="Journalism Workbench API", version="1.24.0", lifespan=lifespan,
-                  generate_unique_id_function=operation_id)
+                  generate_unique_id_function=operation_id, responses=API_REFUSALS)
     if app_settings.app_log_file:
         configure_app_logging(app_settings.app_log_file)
     app_logger = logging.getLogger("journalism.request")
@@ -183,6 +196,17 @@ def create_app(
     async def investigation_authorization_denied(_request: Request, _exc: Exception) -> JSONResponse:
         # Fail closed without revealing whether a different investigation exists.
         return JSONResponse(status_code=404, content={"detail": "Investigation not found"})
+
+    @app.exception_handler(DataError)
+    async def text_the_database_cannot_keep(request: Request, exc: Exception) -> JSONResponse:
+        # PostgreSQL keeps no NUL character (U+0000) in text or JSON: psycopg
+        # refuses it before sending (psycopg/types/string.py), or the server does
+        # (SQLSTATE 22P05, untranslatable_character). It is the request that has
+        # to change, so it is refused instead of failing as a server error
+        # (tests/test_api_contract.py found it). Any other data error is one.
+        if _holds_nul_character(exc):
+            return JSONResponse(status_code=400, content={"detail": "Text cannot contain the NUL character (U+0000)."})
+        return await unhandled_exception(request, exc)
 
     app.add_middleware(
         CORSMiddleware,

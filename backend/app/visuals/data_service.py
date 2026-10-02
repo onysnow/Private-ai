@@ -111,7 +111,9 @@ class VisualData:
             params={str(k): str(v) for k, v in (data.get("params") or {}).items()},
             unit=str(data.get("unit", "")), unit_kind=str(data.get("unit_kind", "count")),
             series_kind=str(data.get("series_kind", "category")), record_noun=str(data.get("record_noun", "records")),
-            rows=rows, currency=data.get("currency"), record_count=int(data.get("record_count", 0)),
+            # A currency is a code like "USD"; anything else a stored chart carries is dropped.
+            rows=rows, currency=data.get("currency") if isinstance(data.get("currency"), str) else None,
+            record_count=int(data.get("record_count", 0)),
             omitted=[o for o in (data.get("omitted") or []) if isinstance(o, dict)],
             x_unit=str(data["x_unit"]) if data.get("x_unit") is not None else None,
             x_unit_kind=str(data["x_unit_kind"]) if data.get("x_unit_kind") is not None else None,

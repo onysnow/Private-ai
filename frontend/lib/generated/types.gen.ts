@@ -102,6 +102,206 @@ export type AggregateProvenanceOut = {
 };
 
 /**
+ * AiAnalysisCandidateOut
+ *
+ * One proposal in full. `payload` is the model's output in its module's
+ * own schema (app/ai/reasoning.py OUTPUT_SCHEMAS), or the raw text of a run
+ * whose output could not be used; `trace` is what the model was sent
+ * (rows from before the trace was kept have none). A presentation draft
+ * also carries readable details for every record it cites and the slides
+ * a promotion would make; other modules leave both keys out.
+ */
+export type AiAnalysisCandidateOut = {
+  /**
+   * Accepted Record Id
+   */
+  accepted_record_id: string | null;
+  /**
+   * Accepted Record Type
+   */
+  accepted_record_type: string | null;
+  /**
+   * Checked Citation Count
+   */
+  checked_citation_count: number;
+  /**
+   * Checked Citation Ids
+   */
+  checked_citation_ids: Array<RecordRefOut>;
+  /**
+   * Citation Details
+   */
+  citation_details?: Array<CitationDetailOut> | null;
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Deck Preview
+   */
+  deck_preview?: Array<DeckSlideOut> | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Payload
+   */
+  payload: {
+    [key: string]: unknown;
+  };
+  /**
+   * Rejection Reason
+   */
+  rejection_reason: string | null;
+  /**
+   * Request
+   */
+  request: {
+    [key: string]: unknown;
+  };
+  /**
+   * Review Status
+   */
+  review_status: string;
+  /**
+   * Reviewed At
+   */
+  reviewed_at: string | null;
+  /**
+   * Reviewer Note
+   */
+  reviewer_note: string | null;
+  /**
+   * Trace
+   */
+  trace: {
+    [key: string]: unknown;
+  } | null;
+};
+
+/**
+ * AiAnalysisCandidateReviewOut
+ *
+ * The reply to a review decision on a proposal.
+ */
+export type AiAnalysisCandidateReviewOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Review Status
+   */
+  review_status: string;
+  /**
+   * Reviewed At
+   */
+  reviewed_at: string | null;
+  /**
+   * Reviewer Note
+   */
+  reviewer_note: string | null;
+};
+
+/**
+ * AiAnalysisCandidateSummaryOut
+ *
+ * A reasoning run's proposal as the review queue lists it, without its
+ * payload. `request` is what the reporter asked, as recorded when the run
+ * was made; its keys depend on the version that recorded it (record_refs
+ * arrived with presentation drafts, for one), so it stays open.
+ * `rejection_reason` is one of the automatic rejection reasons, "reviewer"
+ * for a human rejection, or null when not rejected.
+ */
+export type AiAnalysisCandidateSummaryOut = {
+  /**
+   * Accepted Record Id
+   */
+  accepted_record_id: string | null;
+  /**
+   * Accepted Record Type
+   */
+  accepted_record_type: string | null;
+  /**
+   * Checked Citation Count
+   */
+  checked_citation_count: number;
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Rejection Reason
+   */
+  rejection_reason: string | null;
+  /**
+   * Request
+   */
+  request: {
+    [key: string]: unknown;
+  };
+  /**
+   * Review Status
+   */
+  review_status: string;
+  /**
+   * Reviewed At
+   */
+  reviewed_at: string | null;
+  /**
+   * Reviewer Note
+   */
+  reviewer_note: string | null;
+};
+
+/**
+ * AiAnalysisCandidatesOut
+ */
+export type AiAnalysisCandidatesOut = {
+  /**
+   * Candidates
+   */
+  candidates: Array<AiAnalysisCandidateSummaryOut>;
+};
+
+/**
  * AiControlFlagOut
  */
 export type AiControlFlagOut = {
@@ -158,6 +358,16 @@ export type AiLimitsOut = {
 };
 
 /**
+ * AiModelFailedOut
+ *
+ * A reasoning run whose answer could not be used at all (502): cut off,
+ * or not JSON. Kept as a rejected proposal; `rejection_reason` says which.
+ */
+export type AiModelFailedOut = {
+  detail: AiOutputUnusableOut;
+};
+
+/**
  * AiModuleStatusOut
  */
 export type AiModuleStatusOut = {
@@ -173,6 +383,87 @@ export type AiModuleStatusOut = {
    * Vendored Tas
    */
   vendored_tas: boolean;
+};
+
+/**
+ * AiOutputRejectedOut
+ *
+ * A reasoning run whose answer did not pass its checks (422).
+ */
+export type AiOutputRejectedOut = {
+  detail: AiOutputRejectionOut;
+};
+
+/**
+ * AiOutputRejectionOut
+ *
+ * Why a model's answer was kept only as a rejected proposal, with what the
+ * check found: references to records the run was not given, missing parts,
+ * or quotes not found in the records they cite (app/ai/reasoning.py
+ * describe_reasoning_failure). The findings are pieces of the model's own
+ * answer, so their keys are the model's.
+ */
+export type AiOutputRejectionOut = {
+  /**
+   * Invalid Citations
+   */
+  invalid_citations?: Array<{
+    [key: string]: unknown;
+  }> | null;
+  /**
+   * Message
+   */
+  message: string;
+  /**
+   * Removed
+   */
+  removed?: Array<{
+    [key: string]: unknown;
+  }> | null;
+  /**
+   * Schema Errors
+   */
+  schema_errors?: Array<string> | null;
+};
+
+/**
+ * AiOutputUnusableOut
+ */
+export type AiOutputUnusableOut = {
+  /**
+   * Message
+   */
+  message: string;
+  /**
+   * Rejection Reason
+   */
+  rejection_reason: string;
+};
+
+/**
+ * AiReasoningRunOut
+ *
+ * The reply to a reasoning run. Run in the request (developer mode): the
+ * proposal it made for review, with the finished job. Queued (the Docker
+ * stack, HTTP 202): no proposal yet, and the job to follow; its `result`
+ * holds this same proposal when it is done.
+ */
+export type AiReasoningRunOut = {
+  /**
+   * Candidate Id
+   */
+  candidate_id: string | null;
+  job: BackgroundJobOut;
+  /**
+   * Payload
+   */
+  payload?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Review Status
+   */
+  review_status?: string | null;
 };
 
 /**
@@ -292,6 +583,154 @@ export type AppUserCreate = {
 };
 
 /**
+ * AppUserCreatedOut
+ *
+ * A new identity and its token, shown this once: only the token's digest is kept.
+ */
+export type AppUserCreatedOut = {
+  /**
+   * Display Name
+   */
+  display_name: string;
+  /**
+   * Global Role
+   */
+  global_role: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Token
+   */
+  token: string;
+  /**
+   * Token Notice
+   */
+  token_notice: string;
+};
+
+/**
+ * AppUserMembershipOut
+ */
+export type AppUserMembershipOut = {
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Role
+   */
+  role: string;
+};
+
+/**
+ * AppUserOut
+ *
+ * A persisted API identity: its token's history, never the token or its digest.
+ */
+export type AppUserOut = {
+  /**
+   * Disabled
+   */
+  disabled: boolean;
+  /**
+   * Disabled At
+   */
+  disabled_at: string | null;
+  /**
+   * Display Name
+   */
+  display_name: string;
+  /**
+   * Global Role
+   */
+  global_role: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Memberships
+   */
+  memberships: Array<AppUserMembershipOut>;
+  /**
+   * Token Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  token_created_at: string;
+  /**
+   * Token Last Used At
+   */
+  token_last_used_at: string | null;
+  /**
+   * Token Revoked At
+   */
+  token_revoked_at: string | null;
+  /**
+   * Token Rotated At
+   */
+  token_rotated_at: string | null;
+  /**
+   * Token Status
+   */
+  token_status: 'active' | 'disabled' | 'revoked';
+};
+
+/**
+ * AppUserTokenRevokedOut
+ */
+export type AppUserTokenRevokedOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Token Revoked At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  token_revoked_at: string;
+  /**
+   * Token Status
+   */
+  token_status: 'revoked';
+};
+
+/**
+ * AppUserTokenRotatedOut
+ *
+ * The replacement token, shown this once.
+ */
+export type AppUserTokenRotatedOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Token
+   */
+  token: string;
+  /**
+   * Token Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  token_created_at: string;
+  /**
+   * Token Notice
+   */
+  token_notice: string;
+  /**
+   * Token Rotated At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  token_rotated_at: string;
+};
+
+/**
  * AppUserUpdate
  */
 export type AppUserUpdate = {
@@ -310,13 +749,33 @@ export type AppUserUpdate = {
 };
 
 /**
- * ApplyIn
+ * AppUserUpdatedOut
  */
-export type ApplyIn = {
+export type AppUserUpdatedOut = {
   /**
-   * Confirm
+   * Disabled
    */
-  confirm: string;
+  disabled: boolean;
+  /**
+   * Disabled At
+   */
+  disabled_at: string | null;
+  /**
+   * Display Name
+   */
+  display_name: string;
+  /**
+   * Global Role
+   */
+  global_role: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Token Status
+   */
+  token_status: 'active' | 'disabled' | 'revoked';
 };
 
 /**
@@ -334,6 +793,8 @@ export type BackgroundJobOut = {
   attempts: number;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -394,8 +855,32 @@ export type BackgroundJobOut = {
   subject_type: string | null;
   /**
    * Updated At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   updated_at: string;
+};
+
+/**
+ * BackupInspectOut
+ *
+ * A checked archive's own manifest.json, echoed back as read (only its
+ * format, version, checksums and lineage are verified), and how many rows
+ * of each table it holds.
+ */
+export type BackupInspectOut = {
+  /**
+   * Manifest
+   */
+  manifest: {
+    [key: string]: unknown;
+  };
+  /**
+   * Record Counts
+   */
+  record_counts: {
+    [key: string]: number;
+  };
 };
 
 /**
@@ -485,6 +970,47 @@ export type BackupRestoreResultOut = {
 };
 
 /**
+ * BarItemOut
+ */
+export type BarItemOut = {
+  /**
+   * Evidence
+   */
+  evidence: Array<RecordRefOut>;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Value
+   */
+  value: number | number;
+};
+
+/**
+ * BarVisualOut
+ */
+export type BarVisualOut = {
+  /**
+   * Items
+   */
+  items: Array<BarItemOut>;
+  style?: VisualStyleOut | null;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Type
+   */
+  type: 'bar';
+  /**
+   * Unit
+   */
+  unit: string;
+};
+
+/**
  * Body_inspect_backup
  */
 export type BodyInspectBackup = {
@@ -530,38 +1056,6 @@ export type BodyUploadDocument = {
    * Title
    */
   title?: string;
-};
-
-/**
- * BulkIn
- */
-export type BulkIn = {
-  /**
-   * Filters
-   */
-  filters?: {
-    [key: string]: string;
-  } | null;
-  /**
-   * Op
-   */
-  op: string;
-  /**
-   * Pks
-   */
-  pks?: Array<{
-    [key: string]: unknown;
-  }> | null;
-  /**
-   * Q
-   */
-  q?: string | null;
-  /**
-   * Set
-   */
-  set?: {
-    [key: string]: unknown;
-  } | null;
 };
 
 /**
@@ -624,6 +1118,8 @@ export type CanonicalDuplicateCandidateOut = {
 export type CanonicalEntityMergeAuditOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -747,6 +1243,8 @@ export type CanonicalResolutionDecisionOut = {
   confidence: number;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -828,6 +1326,30 @@ export type CanonicalStatementOut = {
 };
 
 /**
+ * CapabilitiesOut
+ */
+export type CapabilitiesOut = {
+  /**
+   * Ai Features Enabled
+   */
+  ai_features_enabled: boolean;
+  core: CoreCapabilitiesOut;
+  /**
+   * Mode
+   */
+  mode: 'integrated_preview' | 'core_preview';
+  /**
+   * Note
+   */
+  note: string;
+  platforms: PlatformsOut;
+  /**
+   * Product
+   */
+  product: string;
+};
+
+/**
  * CaseSynthesisRequest
  */
 export type CaseSynthesisRequest = {
@@ -854,22 +1376,6 @@ export type CaseSynthesisRequest = {
 };
 
 /**
- * ChangeSetIn
- */
-export type ChangeSetIn = {
-  /**
-   * Ops
-   */
-  ops: Array<{
-    [key: string]: unknown;
-  }>;
-  /**
-   * Table
-   */
-  table: string;
-};
-
-/**
  * ChartKind
  */
 export type ChartKind =
@@ -884,6 +1390,49 @@ export type ChartKind =
   | 'scatter'
   | 'timeline'
   | 'sankey';
+
+/**
+ * ChartVisualOut
+ *
+ * A checked chart (app/ai/chart_check.py) as a deck keeps it: the order
+ * slip, the data the Workbench cooked from the records (every value with
+ * its records), the check report and the chart's words, as the draft or
+ * the deck editor stored them; and the drawing that passed, when the deck
+ * came from a checked draft. The deck insists only on a valid order slip
+ * and its data (app/services/decks.py normalize_chart_visual), so the
+ * report and the words are passed on as stored.
+ */
+export type ChartVisualOut = {
+  data: VisualDataOut;
+  /**
+   * Option
+   */
+  option?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Report
+   */
+  report: {
+    [key: string]: unknown;
+  };
+  /**
+   * Spec
+   */
+  spec: {
+    [key: string]: unknown;
+  };
+  /**
+   * Text
+   */
+  text: {
+    [key: string]: unknown;
+  };
+  /**
+   * Type
+   */
+  type: 'chart';
+};
 
 /**
  * CheckItemOut
@@ -931,6 +1480,59 @@ export type CheckReportOut = {
    * Warnings
    */
   warnings: Array<CheckItemOut>;
+};
+
+/**
+ * CitationDetailOut
+ *
+ * A cited record in words, for the review panel's evidence chips and an
+ * export's source list; `missing` when the record no longer resolves.
+ */
+export type CitationDetailOut = {
+  /**
+   * Detail
+   */
+  detail: string | null;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Locator
+   */
+  locator: string | null;
+  /**
+   * Missing
+   */
+  missing: boolean;
+  /**
+   * Quote
+   */
+  quote: string | null;
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type: string;
+  /**
+   * Source Title
+   */
+  source_title: string | null;
+  /**
+   * Source Url
+   */
+  source_url: string | null;
+  /**
+   * Trace Record Type
+   */
+  trace_record_type: string;
+  /**
+   * Type Label
+   */
+  type_label: string;
 };
 
 /**
@@ -1051,6 +1653,8 @@ export type ClaimEvidenceLinkOut = {
   claim_id: string;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -1080,6 +1684,8 @@ export type ClaimEvidenceLinkOut = {
 export type ClaimEvidenceRowOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   evidence?: EvidenceOut | null;
@@ -1108,6 +1714,8 @@ export type ClaimOut = {
   confidence: number;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -1138,6 +1746,8 @@ export type ClaimReviewEventOut = {
   claim_id: string;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -1244,6 +1854,8 @@ export type ClusterDecisionOut = {
   confidence: number;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -1333,29 +1945,17 @@ export type ClusterReasonOut = {
 };
 
 /**
- * CollectionIn
+ * ConnectorCredentialPut
+ *
+ * A connector's secret (PUT /settings/connectors/{provider}/credential).
+ * Optional here so a missing secret gets the same 400 a blank one does
+ * (app/services/settings.py save_connector_credential).
  */
-export type CollectionIn = {
+export type ConnectorCredentialPut = {
   /**
-   * Name
+   * Credential
    */
-  name: string;
-  /**
-   * Requests
-   */
-  requests?: Array<{
-    [key: string]: unknown;
-  }>;
-};
-
-/**
- * ConfirmIn
- */
-export type ConfirmIn = {
-  /**
-   * Confirm
-   */
-  confirm: string;
+  credential?: string | null;
 };
 
 /**
@@ -1463,6 +2063,8 @@ export type ConnectorFindingOut = {
   caption: string;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -1545,6 +2147,8 @@ export type ConnectorRunOut = {
   result_count: number;
   /**
    * Started At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   started_at: string;
   /**
@@ -1596,17 +2200,294 @@ export type ConnectorsOut = {
 };
 
 /**
- * CreateIn
+ * ContextCitationOut
+ *
+ * A record the model may cite, with where to trace it.
  */
-export type CreateIn = {
+export type ContextCitationOut = {
   /**
-   * Kind
+   * Locator
    */
-  kind: string;
+  locator: string | null;
   /**
-   * Selection
+   * Record Id
    */
-  selection?: string | null;
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type: string;
+  /**
+   * Source Id
+   */
+  source_id: string | null;
+  /**
+   * Source Url
+   */
+  source_url: string | null;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Trace Record Id
+   */
+  trace_record_id: string | null;
+  /**
+   * Trace Record Type
+   */
+  trace_record_type: string | null;
+};
+
+/**
+ * ContextGroupsOut
+ */
+export type ContextGroupsOut = {
+  /**
+   * Canonical
+   */
+  canonical: Array<ContextItemOut>;
+  /**
+   * Evidence
+   */
+  evidence: Array<ContextItemOut>;
+  /**
+   * Reporting
+   */
+  reporting: Array<ContextItemOut>;
+  /**
+   * Review
+   */
+  review: Array<ContextItemOut>;
+  /**
+   * Workflow
+   */
+  workflow: Array<ContextItemOut>;
+};
+
+/**
+ * ContextItemOut
+ *
+ * One search hit in the retrieval packet. `provenance` and `metadata`
+ * are the search hit's own (each record type adds its own keys).
+ */
+export type ContextItemOut = {
+  citation: ContextCitationOut;
+  /**
+   * Metadata
+   */
+  metadata: {
+    [key: string]: unknown;
+  };
+  /**
+   * Provenance
+   */
+  provenance: {
+    [key: string]: unknown;
+  };
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type: string;
+  /**
+   * Score
+   */
+  score: number;
+  /**
+   * Snippet
+   */
+  snippet: string;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * CoreCapabilitiesOut
+ *
+ * The parts of the core workbench this server runs; every one runs without AI.
+ */
+export type CoreCapabilitiesOut = {
+  /**
+   * Backup Restore
+   */
+  backup_restore: boolean;
+  /**
+   * Claims
+   */
+  claims: boolean;
+  /**
+   * Connectors
+   */
+  connectors: boolean;
+  /**
+   * Documents
+   */
+  documents: boolean;
+  /**
+   * Dossiers
+   */
+  dossiers: boolean;
+  /**
+   * Evidence
+   */
+  evidence: boolean;
+  /**
+   * Investigations
+   */
+  investigations: boolean;
+  /**
+   * Leads And Tasks
+   */
+  leads_and_tasks: boolean;
+  /**
+   * Provenance
+   */
+  provenance: boolean;
+  /**
+   * Relationships
+   */
+  relationships: boolean;
+  /**
+   * Search
+   */
+  search: boolean;
+  /**
+   * Sources
+   */
+  sources: boolean;
+  /**
+   * Timeline
+   */
+  timeline: boolean;
+};
+
+/**
+ * CorpusPendingOut
+ *
+ * What the next push would change, and the records it cannot send (with why).
+ */
+export type CorpusPendingOut = {
+  /**
+   * Cannot Send
+   */
+  cannot_send: Array<string>;
+  /**
+   * To Remove
+   */
+  to_remove: number;
+  /**
+   * To Send
+   */
+  to_send: number;
+};
+
+/**
+ * CorpusPushOut
+ *
+ * The last push of confirmed records to the investigation's collection.
+ */
+export type CorpusPushOut = {
+  /**
+   * Error
+   */
+  error: string | null;
+  /**
+   * Finished At
+   */
+  finished_at: string | null;
+  /**
+   * Message
+   */
+  message: string | null;
+  /**
+   * Removals Waiting
+   */
+  removals_waiting: number;
+  /**
+   * Removed
+   */
+  removed: number;
+  /**
+   * Sent
+   */
+  sent: number;
+  /**
+   * Started At
+   */
+  started_at: string | null;
+  /**
+   * Status
+   */
+  status: 'never' | 'running' | 'succeeded' | 'waiting' | 'failed';
+  /**
+   * Unchanged
+   */
+  unchanged: number;
+};
+
+/**
+ * CorpusSyncNowOut
+ *
+ * The answer to "Sync now": queued for the worker, or run here and finished.
+ */
+export type CorpusSyncNowOut = {
+  /**
+   * Queued
+   */
+  queued: boolean;
+  /**
+   * Ran
+   */
+  ran: boolean;
+  sync: CorpusSyncOut;
+};
+
+/**
+ * CorpusSyncOut
+ *
+ * The "Corpus sync" line: is OpenAleph in step with what reporters confirmed?
+ */
+export type CorpusSyncOut = {
+  /**
+   * Background
+   */
+  background: boolean;
+  /**
+   * Collection Id
+   */
+  collection_id: string | null;
+  /**
+   * Collection Label
+   */
+  collection_label: string | null;
+  /**
+   * Consecutive Failures
+   */
+  consecutive_failures: number;
+  /**
+   * Enabled
+   */
+  enabled: boolean;
+  /**
+   * Failures
+   */
+  failures: Array<OpenAlephOperationFailureOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  pending: CorpusPendingOut;
+  push: CorpusPushOut;
+  /**
+   * Pushed Records
+   */
+  pushed_records: number;
 };
 
 /**
@@ -1626,6 +2507,8 @@ export type CrossProviderDecisionOut = {
   confidence: number;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -1733,6 +2616,100 @@ export type DataTableRowOut = {
 };
 
 /**
+ * DeckOut
+ *
+ * A presentation deck. Every key is always sent, so the nullable ones have no default.
+ */
+export type DeckOut = {
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Slide Count
+   */
+  slide_count: number;
+  /**
+   * Slides
+   */
+  slides: Array<DeckSlideOut>;
+  /**
+   * Source Ai Candidate Id
+   */
+  source_ai_candidate_id: string | null;
+  style: DeckStyleOut;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Updated At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  updated_at: string;
+};
+
+/**
+ * DeckSlideOut
+ *
+ * One slide as a deck stores it (app/services/decks.py _normalize_slides).
+ */
+export type DeckSlideOut = {
+  /**
+   * Bullets
+   */
+  bullets: Array<string>;
+  /**
+   * Evidence
+   */
+  evidence: Array<RecordRefOut>;
+  /**
+   * Heading
+   */
+  heading: string;
+  /**
+   * Kind
+   */
+  kind: 'title' | 'statement' | 'content' | 'questions';
+  /**
+   * Notes
+   */
+  notes: string;
+  /**
+   * Visual
+   */
+  visual:
+    | ({
+        type: 'figures';
+      } & FiguresVisualOut)
+    | ({
+        type: 'timeline';
+      } & TimelineVisualOut)
+    | ({
+        type: 'bar';
+      } & BarVisualOut)
+    | ({
+        type: 'chart';
+      } & ChartVisualOut)
+    | null;
+};
+
+/**
  * DeckStyle
  */
 export type DeckStyle = {
@@ -1744,6 +2721,110 @@ export type DeckStyle = {
    * Theme
    */
   theme?: string | null;
+};
+
+/**
+ * DeckStyleOut
+ *
+ * A deck's look: a theme id and a font-pair id from the style catalogue.
+ */
+export type DeckStyleOut = {
+  /**
+   * Fonts
+   */
+  fonts: string;
+  /**
+   * Theme
+   */
+  theme: string;
+};
+
+/**
+ * DeckThemeOut
+ *
+ * One deck theme: colours as six hex digits without '#', and its own fonts.
+ */
+export type DeckThemeOut = {
+  /**
+   * Accent
+   */
+  accent: string;
+  /**
+   * Accent Text
+   */
+  accent_text: string;
+  /**
+   * Alert
+   */
+  alert: string;
+  /**
+   * Bar Muted
+   */
+  bar_muted: string;
+  /**
+   * Body Font
+   */
+  body_font: string;
+  /**
+   * Cover Accent
+   */
+  cover_accent: string;
+  /**
+   * Cover Bg
+   */
+  cover_bg: string;
+  /**
+   * Cover Line
+   */
+  cover_line: string;
+  /**
+   * Cover Muted
+   */
+  cover_muted: string;
+  /**
+   * Cover Text
+   */
+  cover_text: string;
+  /**
+   * Description
+   */
+  description: string;
+  /**
+   * Heading Font
+   */
+  heading_font: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Muted
+   */
+  muted: string;
+  /**
+   * Page
+   */
+  page: string;
+  /**
+   * Palette
+   */
+  palette: Array<string>;
+  /**
+   * Panel
+   */
+  panel: string;
+  /**
+   * Rule
+   */
+  rule: string;
+  /**
+   * Text
+   */
+  text: string;
 };
 
 /**
@@ -1766,6 +2847,26 @@ export type DeckUpdate = {
    * Title
    */
   title?: string | null;
+};
+
+/**
+ * DecksOut
+ */
+export type DecksOut = {
+  /**
+   * Decks
+   */
+  decks: Array<DeckOut>;
+};
+
+/**
+ * DeletedOut
+ */
+export type DeletedOut = {
+  /**
+   * Deleted
+   */
+  deleted: boolean;
 };
 
 /**
@@ -1835,17 +2936,17 @@ export type DeletionUnsafePath = {
 };
 
 /**
- * DisabledIn
+ * DemoSeedOut
  */
-export type DisabledIn = {
+export type DemoSeedOut = {
   /**
-   * Confirm
+   * Created
    */
-  confirm: string;
+  created: boolean;
   /**
-   * Disabled
+   * Investigation Id
    */
-  disabled: boolean;
+  investigation_id: string;
 };
 
 /**
@@ -1854,6 +2955,8 @@ export type DisabledIn = {
 export type DocumentChunkOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -1904,6 +3007,8 @@ export type DocumentDetailOut = {
   chunks: Array<DocumentChunkOut>;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -1934,6 +3039,10 @@ export type DocumentDetailOut = {
    * Mime Type
    */
   mime_type?: string | null;
+  /**
+   * Openaleph Document Id
+   */
+  openaleph_document_id?: string | null;
   /**
    * Sha256
    */
@@ -1991,6 +3100,8 @@ export type DocumentOut = {
   chunk_count: number;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -2022,6 +3133,10 @@ export type DocumentOut = {
    */
   mime_type?: string | null;
   /**
+   * Openaleph Document Id
+   */
+  openaleph_document_id?: string | null;
+  /**
    * Sha256
    */
   sha256: string;
@@ -2029,6 +3144,32 @@ export type DocumentOut = {
    * Source Id
    */
   source_id: string;
+};
+
+/**
+ * DocumentReadFailedOut
+ *
+ * An upload whose file was saved but could not be read (422): the saved
+ * document, why it failed, and the job that tried (routes_documents.py).
+ */
+export type DocumentReadFailedOut = {
+  detail: DocumentReadFailureOut;
+};
+
+/**
+ * DocumentReadFailureOut
+ */
+export type DocumentReadFailureOut = {
+  document: DocumentOut;
+  /**
+   * Error
+   */
+  error: string | null;
+  job: BackgroundJobOut | null;
+  /**
+   * Message
+   */
+  message: string;
 };
 
 /**
@@ -2050,6 +3191,8 @@ export type DocumentUploadOut = {
   chunk_count: number;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -2081,6 +3224,10 @@ export type DocumentUploadOut = {
    * Mime Type
    */
   mime_type?: string | null;
+  /**
+   * Openaleph Document Id
+   */
+  openaleph_document_id?: string | null;
   openaleph_sync?: OpenAlephSyncOut | null;
   /**
    * Sha256
@@ -2126,6 +3273,8 @@ export type DossierClaimOut = {
 export type DossierConflictDecisionOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -2488,6 +3637,8 @@ export type EnrichmentSessionDetailOut = {
   runs: Array<EnrichmentSessionRunOut>;
   /**
    * Started At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   started_at: string;
   /**
@@ -2506,6 +3657,8 @@ export type EnrichmentSessionDetailOut = {
 export type EnrichmentSessionFindingOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -2558,6 +3711,8 @@ export type EnrichmentSessionOut = {
   runs: Array<EnrichmentRunResultOut>;
   /**
    * Started At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   started_at: string;
   /**
@@ -2598,6 +3753,8 @@ export type EnrichmentSessionRowOut = {
   providers: Array<string>;
   /**
    * Started At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   started_at: string;
   /**
@@ -2830,6 +3987,36 @@ export type EntityIdentityHistoryOut = {
 };
 
 /**
+ * EntityMatchPreviewOut
+ *
+ * Canonical entities an entity proposal may be, before the reporter decides.
+ */
+export type EntityMatchPreviewOut = {
+  /**
+   * Candidate Id
+   */
+  candidate_id: string;
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Identity Rule
+   */
+  identity_rule: string;
+  /**
+   * Matches
+   */
+  matches: Array<EntityCandidateOut>;
+  provider_lead: ProviderLeadOut;
+  /**
+   * Schema
+   */
+  schema: string;
+  strong_match: EntityCandidateOut | null;
+};
+
+/**
  * EntityOut
  *
  * A canonical FollowTheMoney entity as stored. `merged_into_entity_id`
@@ -2846,6 +4033,8 @@ export type EntityOut = {
   caption: string;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -2894,6 +4083,8 @@ export type EntityRelationshipOut = {
   caption?: string | null;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -3022,6 +4213,20 @@ export type EntityUpdate = {
 };
 
 /**
+ * ErrorOut
+ *
+ * Why a request was refused, in a sentence: the detail of an
+ * HTTPException, or of one of the checks every request passes first (access,
+ * request size; app/main.py api_access_guard, app/core/access.py).
+ */
+export type ErrorOut = {
+  /**
+   * Detail
+   */
+  detail: string;
+};
+
+/**
  * EvidenceCreate
  */
 export type EvidenceCreate = {
@@ -3122,26 +4327,6 @@ export type EvidenceWithSourceOut = {
    */
   quote?: string | null;
   source?: EvidenceSourceOut | null;
-};
-
-/**
- * ExplainIn
- */
-export type ExplainIn = {
-  /**
-   * Analyze
-   */
-  analyze?: boolean;
-  /**
-   * Params
-   */
-  params?: {
-    [key: string]: unknown;
-  } | null;
-  /**
-   * Sql
-   */
-  sql: string;
 };
 
 /**
@@ -3585,6 +4770,8 @@ export type ExternalRelationshipPromotionOut = {
   investigation_id: string;
   /**
    * Promoted At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   promoted_at: string;
   /**
@@ -3615,6 +4802,8 @@ export type ExternalRelationshipPromotionOut = {
 export type ExternalRelationshipReviewOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -3735,6 +4924,8 @@ export type ExtractionCandidateOut = {
   confidence: number;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -3806,6 +4997,10 @@ export type ExtractionCandidateReviewRequest = {
    * Note
    */
   note?: string | null;
+  /**
+   * Target Entity Id
+   */
+  target_entity_id?: string | null;
 };
 
 /**
@@ -3889,8 +5084,9 @@ export type ExtractionLineageOut = {
  * ExtractionReviewOut
  *
  * The reply to a review decision: the proposal as it now stands and, for
- * an acceptance, the record it made (an entity, claim, evidence record or
- * relationship, each in its own shape).
+ * an acceptance, the record it made (an entity, claim, evidence record,
+ * relationship, or for an email or phone proposal the statement added to
+ * the chosen entity, each in its own shape).
  */
 export type ExtractionReviewOut = {
   candidate: ExtractionCandidateOut;
@@ -3900,6 +5096,39 @@ export type ExtractionReviewOut = {
   record?: {
     [key: string]: unknown;
   } | null;
+};
+
+/**
+ * FigureItemOut
+ */
+export type FigureItemOut = {
+  /**
+   * Evidence
+   */
+  evidence: Array<RecordRefOut>;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Value
+   */
+  value: string;
+};
+
+/**
+ * FiguresVisualOut
+ */
+export type FiguresVisualOut = {
+  /**
+   * Items
+   */
+  items: Array<FigureItemOut>;
+  style?: VisualStyleOut | null;
+  /**
+   * Type
+   */
+  type: 'figures';
 };
 
 /**
@@ -4016,17 +5245,27 @@ export type FindingReviewRequest = {
 };
 
 /**
- * FlagIn
+ * FontPairOut
+ *
+ * A heading and body font; empty names mean "keep the theme's own".
  */
-export type FlagIn = {
+export type FontPairOut = {
   /**
-   * Confirm
+   * Body
    */
-  confirm: string;
+  body: string;
   /**
-   * Value
+   * Heading
    */
-  value: unknown;
+  heading: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Label
+   */
+  label: string;
 };
 
 /**
@@ -4103,13 +5342,13 @@ export type GraphReconciliationOut = {
 };
 
 /**
- * HTTPValidationError
+ * HealthOut
  */
-export type HttpValidationError = {
+export type HealthOut = {
   /**
-   * Detail
+   * Status
    */
-  detail?: Array<ValidationError>;
+  status: 'ok';
 };
 
 /**
@@ -4140,6 +5379,86 @@ export type HypothesisTestRequest = {
    * Working Theory
    */
   working_theory: string;
+};
+
+/**
+ * IdentifierTargetEntityOut
+ */
+export type IdentifierTargetEntityOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
+ * IdentifierTargetProposalOut
+ *
+ * An entity proposal of the same document, still waiting: accepting it
+ * first makes it an entity the email or phone can be attached to.
+ */
+export type IdentifierTargetProposalOut = {
+  /**
+   * Candidate Id
+   */
+  candidate_id: string;
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Schema Question
+   */
+  schema_question: boolean;
+  /**
+   * Suggested Schema
+   */
+  suggested_schema: string;
+};
+
+/**
+ * IdentifierTargetsOut
+ *
+ * Which entities an email or phone proposal can belong to (ADR-0006),
+ * the document's own first. Only schemas with the property are listed.
+ */
+export type IdentifierTargetsOut = {
+  /**
+   * Candidate Id
+   */
+  candidate_id: string;
+  /**
+   * Document Entities
+   */
+  document_entities: Array<IdentifierTargetEntityOut>;
+  /**
+   * Document Proposals
+   */
+  document_proposals: Array<IdentifierTargetProposalOut>;
+  /**
+   * Kind
+   */
+  kind: 'email' | 'phone';
+  /**
+   * Other Entities
+   */
+  other_entities: Array<IdentifierTargetEntityOut>;
+  /**
+   * Property
+   */
+  property: string;
+  /**
+   * Value
+   */
+  value: string;
 };
 
 /**
@@ -4174,6 +5493,8 @@ export type IdentityDecisionOut = {
   confidence: number;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -4197,6 +5518,8 @@ export type IdentityDecisionOut = {
 export type IdentityMergeAuditOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -4396,6 +5719,24 @@ export type InvestigationDeletionResult = {
 };
 
 /**
+ * InvestigationMembershipOut
+ */
+export type InvestigationMembershipOut = {
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Role
+   */
+  role: string;
+  /**
+   * User Id
+   */
+  user_id: string;
+};
+
+/**
  * InvestigationMembershipPut
  */
 export type InvestigationMembershipPut = {
@@ -4411,6 +5752,8 @@ export type InvestigationMembershipPut = {
 export type InvestigationOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -4451,20 +5794,6 @@ export type InvestigationQuestionContextRequest = {
    * Question
    */
   question: string;
-};
-
-/**
- * IssueIn
- */
-export type IssueIn = {
-  /**
-   * Confirm
-   */
-  confirm: string;
-  /**
-   * Ttl Seconds
-   */
-  ttl_seconds?: number;
 };
 
 /**
@@ -4585,6 +5914,8 @@ export type LeadLinkCreate = {
 export type LeadLinkOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -4619,6 +5950,8 @@ export type LeadLinkOut = {
 export type LeadOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -4714,6 +6047,8 @@ export type LeadQueueOut = {
 export type LeadRowOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -4834,6 +6169,8 @@ export type LeadUpdate = {
 export type LeadWorkflowEventOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -4884,6 +6221,8 @@ export type LineageCandidateOut = {
   confidence: number;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -4964,6 +6303,8 @@ export type LineageChunkOut = {
 export type LineageDocumentOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -5193,6 +6534,8 @@ export type OpenAlephBindingOut = {
   collection_label?: string | null;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -5217,8 +6560,19 @@ export type OpenAlephBindingOut = {
   status: string;
   /**
    * Updated At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   updated_at: string;
+};
+
+/**
+ * OpenAlephCorpusBindingOut
+ *
+ * The investigation's OpenAleph collection, or null before one is set up.
+ */
+export type OpenAlephCorpusBindingOut = {
+  binding: OpenAlephBindingOut | null;
 };
 
 /**
@@ -5313,6 +6667,55 @@ export type OpenAlephEvidenceImportOut = {
 };
 
 /**
+ * OpenAlephOperationFailureOut
+ *
+ * A failed OpenAleph operation, kept for the reporter and the operator
+ * (and so a 502 can be explained later).
+ */
+export type OpenAlephOperationFailureOut = {
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Document Id
+   */
+  document_id: string | null;
+  /**
+   * Error
+   */
+  error: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Operation
+   */
+  operation: string;
+};
+
+/**
+ * OpenAlephPlatformOut
+ */
+export type OpenAlephPlatformOut = {
+  /**
+   * Enabled
+   */
+  enabled: boolean;
+  /**
+   * Role
+   */
+  role: string;
+};
+
+/**
  * OpenAlephReviewRefreshOut
  */
 export type OpenAlephReviewRefreshOut = {
@@ -5384,6 +6787,43 @@ export type OpenAlephReviewStatusOut = {
 };
 
 /**
+ * OpenAlephStatusOut
+ *
+ * Whether the local OpenAleph corpus platform answers its search API.
+ * Every key is always sent, so the nullable one has no default.
+ */
+export type OpenAlephStatusOut = {
+  /**
+   * Api Usable
+   */
+  api_usable: boolean;
+  /**
+   * Base Url
+   */
+  base_url: string;
+  /**
+   * Configured
+   */
+  configured: boolean;
+  /**
+   * Detail
+   */
+  detail: string;
+  /**
+   * Http Status
+   */
+  http_status: number | null;
+  /**
+   * Reachable
+   */
+  reachable: boolean;
+  /**
+   * Ui Url
+   */
+  ui_url: string;
+};
+
+/**
  * OpenAlephSyncOut
  *
  * How one document stands in the OpenAleph corpus.
@@ -5395,6 +6835,8 @@ export type OpenAlephSyncOut = {
   collection_id: string;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -5437,6 +6879,8 @@ export type OpenAlephSyncOut = {
   synced_at?: string | null;
   /**
    * Updated At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   updated_at: string;
 };
@@ -5500,13 +6944,10 @@ export type OrphanStoragePreviewOut = {
 };
 
 /**
- * PlanIn
+ * PlatformsOut
  */
-export type PlanIn = {
-  /**
-   * Target
-   */
-  target?: string;
+export type PlatformsOut = {
+  openaleph: OpenAlephPlatformOut;
 };
 
 /**
@@ -5576,6 +7017,26 @@ export type PresentationDraftRequest = {
 };
 
 /**
+ * PresentationStyleCatalogOut
+ *
+ * Everything the deck style panel and the in-app preview need; the .pptx
+ * export reads the same catalogue, so the two cannot drift apart.
+ */
+export type PresentationStyleCatalogOut = {
+  defaults: DeckStyleOut;
+  /**
+   * Font Pairs
+   */
+  font_pairs: Array<FontPairOut>;
+  /**
+   * Themes
+   */
+  themes: Array<DeckThemeOut>;
+  visual_options: VisualOptionsOut;
+  visual_presets: VisualPresetsOut;
+};
+
+/**
  * PromoteToDeckRequest
  */
 export type PromoteToDeckRequest = {
@@ -5610,6 +7071,8 @@ export type PromoteToWriteupRequest = {
 export type PropertyConflictDecisionOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -5781,6 +7244,26 @@ export type ProvenanceTraceOut = {
 };
 
 /**
+ * ProviderLeadOut
+ *
+ * What an outside provider said the name resolves to: a lead only, never a choice.
+ */
+export type ProviderLeadOut = {
+  /**
+   * Provider
+   */
+  provider: string | null;
+  /**
+   * Provider Entity Id
+   */
+  provider_entity_id: string | null;
+  /**
+   * Provider Resolved Entity Id
+   */
+  provider_resolved_entity_id: string | null;
+};
+
+/**
  * QueryRef
  *
  * One catalogued query and its parameters, as the AI writes them.
@@ -5799,6 +7282,44 @@ export type QueryRef = {
 };
 
 /**
+ * QuestionContextOut
+ *
+ * The provenance-bearing packet a reasoning model would be given for a
+ * question. External connector results are a separate, unverified bucket
+ * and never among the citations.
+ */
+export type QuestionContextOut = {
+  /**
+   * Citations
+   */
+  citations: Array<ContextCitationOut>;
+  context: ContextGroupsOut;
+  /**
+   * External Leads
+   */
+  external_leads: Array<ContextItemOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Reasoning Contract
+   */
+  reasoning_contract: {
+    [key: string]: boolean;
+  };
+  retrieval: RetrievalSummaryOut;
+  /**
+   * Warnings
+   */
+  warnings: Array<string>;
+};
+
+/**
  * ReconciliationDecisionOut
  *
  * A reporter's decision on one duplicate pair after a merge.
@@ -5806,6 +7327,8 @@ export type QueryRef = {
 export type ReconciliationDecisionOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -6112,6 +7635,8 @@ export type RelationshipEvidenceAttachmentOut = {
   attachment_id: string;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   evidence?: EvidenceWithSourceOut | null;
@@ -6128,6 +7653,8 @@ export type RelationshipEvidenceAttachmentOut = {
 export type RelationshipEvidenceReviewOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -6203,6 +7730,8 @@ export type RelationshipOut = {
   caption?: string | null;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -6317,6 +7846,46 @@ export type RelationshipReconciliationOut = {
 };
 
 /**
+ * RelationshipSchemaOut
+ *
+ * How the workbench draws one FollowTheMoney relationship schema: its two ends' properties and labels.
+ */
+export type RelationshipSchemaOut = {
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Source Label
+   */
+  source_label: string;
+  /**
+   * Source Prop
+   */
+  source_prop: string;
+  /**
+   * Target Label
+   */
+  target_label: string;
+  /**
+   * Target Prop
+   */
+  target_prop: string;
+};
+
+/**
+ * RelationshipSchemasOut
+ */
+export type RelationshipSchemasOut = {
+  /**
+   * Schemas
+   */
+  schemas: {
+    [key: string]: RelationshipSchemaOut;
+  };
+};
+
+/**
  * ReportingTaskCreate
  */
 export type ReportingTaskCreate = {
@@ -6360,6 +7929,8 @@ export type ReportingTaskCreate = {
 export type ReportingTaskOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -6410,6 +7981,8 @@ export type ReportingTaskOut = {
   title: string;
   /**
    * Updated At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   updated_at: string;
 };
@@ -6460,6 +8033,8 @@ export type ResolutionDecisionOut = {
   confidence: number;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -6533,55 +8108,33 @@ export type RestoreConflictOut = {
 };
 
 /**
- * RestoreIn
+ * RetrievalSummaryOut
  */
-export type RestoreIn = {
+export type RetrievalSummaryOut = {
   /**
-   * Confirm
+   * Counts
    */
-  confirm: string;
+  counts: {
+    [key: string]: number;
+  };
   /**
-   * Kind
+   * Group Counts
    */
-  kind: string;
-};
-
-/**
- * RolesIn
- */
-export type RolesIn = {
+  group_counts: {
+    [key: string]: number;
+  };
   /**
-   * Confirm
+   * Query
    */
-  confirm: string;
+  query: string | null;
   /**
-   * Roles
+   * Returned Matches
    */
-  roles: Array<string>;
-};
-
-/**
- * SavedIn
- */
-export type SavedIn = {
+  returned_matches: number;
   /**
-   * Name
+   * Total Matches
    */
-  name: string;
-  /**
-   * Params
-   */
-  params?: Array<{
-    [key: string]: unknown;
-  }>;
-  /**
-   * Pinned
-   */
-  pinned?: boolean;
-  /**
-   * Sql
-   */
-  sql: string;
+  total_matches: number;
 };
 
 /**
@@ -6808,6 +8361,31 @@ export type SecurityAuditRetentionPreviewOut = {
 };
 
 /**
+ * SecurityAuditRetentionRequest
+ *
+ * Prune the security audit log (POST /settings/security/audit/retention).
+ *
+ * Strict, so `true` or "90" is refused rather than converted: the route
+ * refused anything but a whole number and text before this body was typed.
+ * The ranges and the confirmation text are checked by the audit log itself
+ * (app/core/audit_log.py), which answers 400 with the reason.
+ */
+export type SecurityAuditRetentionRequest = {
+  /**
+   * Confirmation
+   */
+  confirmation?: string;
+  /**
+   * Keep Days
+   */
+  keep_days?: number;
+  /**
+   * Max Records
+   */
+  max_records?: number;
+};
+
+/**
  * SecurityAuditRetentionResultOut
  */
 export type SecurityAuditRetentionResultOut = {
@@ -6960,44 +8538,6 @@ export type SecurityRemoteHostOut = {
 };
 
 /**
- * SendIn
- */
-export type SendIn = {
-  /**
-   * Act As
-   */
-  act_as?: string | null;
-  /**
-   * Body
-   */
-  body?: unknown;
-  /**
-   * Headers
-   */
-  headers?: {
-    [key: string]: string;
-  } | null;
-  /**
-   * Method
-   */
-  method: string;
-  /**
-   * Path
-   */
-  path: string;
-  /**
-   * Query
-   */
-  query?: {
-    [key: string]: string;
-  } | null;
-  /**
-   * Timeout Seconds
-   */
-  timeout_seconds?: number;
-};
-
-/**
  * SettingsLimitsOut
  */
 export type SettingsLimitsOut = {
@@ -7098,6 +8638,8 @@ export type SourceCreate = {
 export type SourceOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -7156,6 +8698,8 @@ export type StanceCountsOut = {
 export type StatementAssessmentOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -7356,6 +8900,8 @@ export type StatementPromotionOut = {
   original_value: string;
   /**
    * Promoted At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   promoted_at: string;
   /**
@@ -7392,6 +8938,8 @@ export type StatementPromotionRequest = {
 export type TaskWorkflowEventOut = {
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -7631,6 +9179,8 @@ export type TimelineEventRowOut = {
   claim_id?: string | null;
   /**
    * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
   /**
@@ -7696,6 +9246,24 @@ export type TimelineEventRowOut = {
 };
 
 /**
+ * TimelineItemOut
+ */
+export type TimelineItemOut = {
+  /**
+   * Date
+   */
+  date: string;
+  /**
+   * Evidence
+   */
+  evidence: Array<RecordRefOut>;
+  /**
+   * Label
+   */
+  label: string;
+};
+
+/**
  * TimelineOut
  */
 export type TimelineOut = {
@@ -7731,6 +9299,21 @@ export type TimelineOut = {
   verification_counts: {
     [key: string]: number;
   };
+};
+
+/**
+ * TimelineVisualOut
+ */
+export type TimelineVisualOut = {
+  /**
+   * Items
+   */
+  items: Array<TimelineItemOut>;
+  style?: VisualStyleOut | null;
+  /**
+   * Type
+   */
+  type: 'timeline';
 };
 
 /**
@@ -7877,43 +9460,46 @@ export type UnsafeDocumentReferenceOut = {
 };
 
 /**
- * UpgradeIn
+ * ValidationErrorOut
+ *
+ * FastAPI's answer (422) when a request's input does not match what the
+ * route declares (fastapi.exception_handlers.request_validation_exception_handler).
  */
-export type UpgradeIn = {
+export type ValidationErrorOut = {
   /**
-   * Confirm
+   * Detail
    */
-  confirm: string;
-  /**
-   * Target
-   */
-  target?: string;
+  detail: Array<ValidationIssueOut>;
 };
 
 /**
- * ValidationError
+ * ValidationIssueOut
+ *
+ * One problem with a request's input: where it is (`loc`), what is wrong
+ * (`msg`) and the error type. FastAPI's own shape for it
+ * (fastapi/openapi/utils.py validation_error_definition).
  */
-export type ValidationError = {
+export type ValidationIssueOut = {
   /**
-   * Context
+   * Ctx
    */
   ctx?: {
     [key: string]: unknown;
-  };
+  } | null;
   /**
    * Input
    */
   input?: unknown;
   /**
-   * Location
+   * Loc
    */
   loc: Array<string | number>;
   /**
-   * Message
+   * Msg
    */
   msg: string;
   /**
-   * Error Type
+   * Type
    */
   type: string;
 };
@@ -8045,6 +9631,50 @@ export type VisualDataRowOut = {
 };
 
 /**
+ * VisualOptionSpecOut
+ *
+ * What one option accepts. `values` lists the choices and is sent only for a choice.
+ */
+export type VisualOptionSpecOut = {
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Type
+   */
+  type: 'bool' | 'choice' | 'labels';
+  /**
+   * Values
+   */
+  values?: Array<string> | null;
+};
+
+/**
+ * VisualOptionsOut
+ */
+export type VisualOptionsOut = {
+  /**
+   * Bar
+   */
+  bar: {
+    [key: string]: VisualOptionSpecOut;
+  };
+  /**
+   * Figures
+   */
+  figures: {
+    [key: string]: VisualOptionSpecOut;
+  };
+  /**
+   * Timeline
+   */
+  timeline: {
+    [key: string]: VisualOptionSpecOut;
+  };
+};
+
+/**
  * VisualParamOut
  */
 export type VisualParamOut = {
@@ -8060,6 +9690,56 @@ export type VisualParamOut = {
    * Description
    */
   description: string;
+};
+
+/**
+ * VisualPresetOut
+ *
+ * A named layout for one visual type, with its option defaults.
+ */
+export type VisualPresetOut = {
+  /**
+   * Description
+   */
+  description: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Layout
+   */
+  layout: {
+    [key: string]: string | boolean;
+  };
+  /**
+   * Options
+   */
+  options: {
+    [key: string]: boolean | string | Array<string>;
+  };
+};
+
+/**
+ * VisualPresetsOut
+ */
+export type VisualPresetsOut = {
+  /**
+   * Bar
+   */
+  bar: Array<VisualPresetOut>;
+  /**
+   * Figures
+   */
+  figures: Array<VisualPresetOut>;
+  /**
+   * Timeline
+   */
+  timeline: Array<VisualPresetOut>;
 };
 
 /**
@@ -8268,6 +9948,24 @@ export type VisualStyle = {
 };
 
 /**
+ * VisualStyleOut
+ *
+ * A visual's chosen preset and the options it overrides.
+ */
+export type VisualStyleOut = {
+  /**
+   * Options
+   */
+  options: {
+    [key: string]: boolean | string | Array<string>;
+  };
+  /**
+   * Preset
+   */
+  preset: string;
+};
+
+/**
  * WriteupCreate
  */
 export type WriteupCreate = {
@@ -8292,6 +9990,120 @@ export type WriteupCreate = {
 };
 
 /**
+ * WriteupOut
+ *
+ * A write-up with its document: TipTap/ProseMirror JSON, as the editor saved it.
+ */
+export type WriteupOut = {
+  /**
+   * Cited Record Refs
+   */
+  cited_record_refs: Array<RecordRefOut>;
+  /**
+   * Content Json
+   */
+  content_json: {
+    [key: string]: unknown;
+  };
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Source Ai Candidate Id
+   */
+  source_ai_candidate_id: string | null;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Updated At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  updated_at: string;
+  /**
+   * Word Count
+   */
+  word_count: number;
+};
+
+/**
+ * WriteupSummaryOut
+ *
+ * A write-up as the list shows it: the first 280 characters of its text instead of the document.
+ */
+export type WriteupSummaryOut = {
+  /**
+   * Cited Record Refs
+   */
+  cited_record_refs: Array<RecordRefOut>;
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Preview
+   */
+  preview: string;
+  /**
+   * Source Ai Candidate Id
+   */
+  source_ai_candidate_id: string | null;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Updated At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  updated_at: string;
+  /**
+   * Word Count
+   */
+  word_count: number;
+};
+
+/**
  * WriteupUpdate
  */
 export type WriteupUpdate = {
@@ -8312,51 +10124,13 @@ export type WriteupUpdate = {
 };
 
 /**
- * RunIn
+ * WriteupsOut
  */
-export type OpsconsoleApiChecksRunIn = {
+export type WriteupsOut = {
   /**
-   * Only
+   * Writeups
    */
-  only?: Array<string> | null;
-};
-
-/**
- * RunIn
- */
-export type OpsconsoleApiQueryRunIn = {
-  /**
-   * Confirm
-   */
-  confirm?: string | null;
-  /**
-   * Max Rows
-   */
-  max_rows?: number | null;
-  /**
-   * Mode
-   */
-  mode?: string;
-  /**
-   * Params
-   */
-  params?: {
-    [key: string]: unknown;
-  } | null;
-  /**
-   * Sql
-   */
-  sql: string;
-};
-
-/**
- * RunIn
- */
-export type OpsconsoleApiTestsRunIn = {
-  /**
-   * Selection
-   */
-  selection?: string | null;
+  writeups: Array<WriteupSummaryOut>;
 };
 
 export type GetAiAnalysisCandidateEndpointData = {
@@ -8373,9 +10147,13 @@ export type GetAiAnalysisCandidateEndpointData = {
 
 export type GetAiAnalysisCandidateEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetAiAnalysisCandidateEndpointError =
@@ -8385,8 +10163,11 @@ export type GetAiAnalysisCandidateEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AiAnalysisCandidateOut;
 };
+
+export type GetAiAnalysisCandidateEndpointResponse =
+  GetAiAnalysisCandidateEndpointResponses[keyof GetAiAnalysisCandidateEndpointResponses];
 
 export type PromoteAiAnalysisCandidateToDeckEndpointData = {
   body: PromoteToDeckRequest;
@@ -8402,9 +10183,13 @@ export type PromoteAiAnalysisCandidateToDeckEndpointData = {
 
 export type PromoteAiAnalysisCandidateToDeckEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type PromoteAiAnalysisCandidateToDeckEndpointError =
@@ -8414,8 +10199,11 @@ export type PromoteAiAnalysisCandidateToDeckEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: DeckOut;
 };
+
+export type PromoteAiAnalysisCandidateToDeckEndpointResponse =
+  PromoteAiAnalysisCandidateToDeckEndpointResponses[keyof PromoteAiAnalysisCandidateToDeckEndpointResponses];
 
 export type PromoteAiAnalysisCandidateToWriteupEndpointData = {
   body: PromoteToWriteupRequest;
@@ -8431,9 +10219,13 @@ export type PromoteAiAnalysisCandidateToWriteupEndpointData = {
 
 export type PromoteAiAnalysisCandidateToWriteupEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type PromoteAiAnalysisCandidateToWriteupEndpointError =
@@ -8443,8 +10235,11 @@ export type PromoteAiAnalysisCandidateToWriteupEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: WriteupOut;
 };
+
+export type PromoteAiAnalysisCandidateToWriteupEndpointResponse =
+  PromoteAiAnalysisCandidateToWriteupEndpointResponses[keyof PromoteAiAnalysisCandidateToWriteupEndpointResponses];
 
 export type ReviewAiAnalysisCandidateEndpointData = {
   body: AiAnalysisCandidateReviewRequest;
@@ -8460,9 +10255,13 @@ export type ReviewAiAnalysisCandidateEndpointData = {
 
 export type ReviewAiAnalysisCandidateEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ReviewAiAnalysisCandidateEndpointError =
@@ -8472,8 +10271,11 @@ export type ReviewAiAnalysisCandidateEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AiAnalysisCandidateReviewOut;
 };
+
+export type ReviewAiAnalysisCandidateEndpointResponse =
+  ReviewAiAnalysisCandidateEndpointResponses[keyof ReviewAiAnalysisCandidateEndpointResponses];
 
 export type InspectBackupData = {
   body: BodyInspectBackup;
@@ -8484,9 +10286,13 @@ export type InspectBackupData = {
 
 export type InspectBackupErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type InspectBackupError = InspectBackupErrors[keyof InspectBackupErrors];
@@ -8495,8 +10301,11 @@ export type InspectBackupResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: BackupInspectOut;
 };
+
+export type InspectBackupResponse =
+  InspectBackupResponses[keyof InspectBackupResponses];
 
 export type PreviewBackupRestoreData = {
   body: BodyPreviewBackupRestore;
@@ -8507,9 +10316,13 @@ export type PreviewBackupRestoreData = {
 
 export type PreviewBackupRestoreErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type PreviewBackupRestoreError =
@@ -8534,9 +10347,13 @@ export type RestoreBackupData = {
 
 export type RestoreBackupErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type RestoreBackupError = RestoreBackupErrors[keyof RestoreBackupErrors];
@@ -8558,12 +10375,28 @@ export type CapabilitiesData = {
   url: '/api/capabilities';
 };
 
+export type CapabilitiesErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CapabilitiesError = CapabilitiesErrors[keyof CapabilitiesErrors];
+
 export type CapabilitiesResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: CapabilitiesOut;
 };
+
+export type CapabilitiesResponse =
+  CapabilitiesResponses[keyof CapabilitiesResponses];
 
 export type CreateClaimEndpointData = {
   body: ClaimCreate;
@@ -8574,9 +10407,13 @@ export type CreateClaimEndpointData = {
 
 export type CreateClaimEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type CreateClaimEndpointError =
@@ -8606,9 +10443,13 @@ export type UpdateClaimEndpointData = {
 
 export type UpdateClaimEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type UpdateClaimEndpointError =
@@ -8638,9 +10479,13 @@ export type ListClaimEvidenceEndpointData = {
 
 export type ListClaimEvidenceEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListClaimEvidenceEndpointError =
@@ -8672,9 +10517,13 @@ export type LinkClaimEvidenceEndpointData = {
 
 export type LinkClaimEvidenceEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type LinkClaimEvidenceEndpointError =
@@ -8704,9 +10553,13 @@ export type CreateExtractedRelationshipProposalData = {
 
 export type CreateExtractedRelationshipProposalErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type CreateExtractedRelationshipProposalError =
@@ -8736,9 +10589,13 @@ export type GetClaimReviewWorkspaceData = {
 
 export type GetClaimReviewWorkspaceErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetClaimReviewWorkspaceError =
@@ -8768,9 +10625,13 @@ export type CreateClaimReviewData = {
 
 export type CreateClaimReviewErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type CreateClaimReviewError =
@@ -8800,9 +10661,13 @@ export type ListAssessmentsData = {
 
 export type ListAssessmentsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListAssessmentsError =
@@ -8834,9 +10699,13 @@ export type AssessStatementData = {
 
 export type AssessStatementErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type AssessStatementError =
@@ -8866,9 +10735,13 @@ export type FindingCandidatesData = {
 
 export type FindingCandidatesErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type FindingCandidatesError =
@@ -8900,9 +10773,13 @@ export type ExternalRelationshipCandidatesData = {
 
 export type ExternalRelationshipCandidatesErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ExternalRelationshipCandidatesError =
@@ -8932,9 +10809,13 @@ export type ListExternalRelationshipReviewsData = {
 
 export type ListExternalRelationshipReviewsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListExternalRelationshipReviewsError =
@@ -8966,9 +10847,13 @@ export type ReviewExternalRelationshipData = {
 
 export type ReviewExternalRelationshipErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ReviewExternalRelationshipError =
@@ -8998,9 +10883,13 @@ export type ResolveFindingData = {
 
 export type ResolveFindingErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ResolveFindingError =
@@ -9030,9 +10919,13 @@ export type ReviewFindingData = {
 
 export type ReviewFindingErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ReviewFindingError = ReviewFindingErrors[keyof ReviewFindingErrors];
@@ -9054,6 +10947,19 @@ export type ConnectorsData = {
   url: '/api/connectors';
 };
 
+export type ConnectorsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ConnectorsError = ConnectorsErrors[keyof ConnectorsErrors];
+
 export type ConnectorsResponses = {
   /**
    * Successful Response
@@ -9072,9 +10978,17 @@ export type AlephSearchData = {
 
 export type AlephSearchErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * The connector failed; the details are logged on the server
+   */
+  502: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type AlephSearchError = AlephSearchErrors[keyof AlephSearchErrors];
@@ -9105,9 +11019,17 @@ export type ConnectorSearchData = {
 
 export type ConnectorSearchErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * The connector failed; the details are logged on the server
+   */
+  502: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ConnectorSearchError =
@@ -9125,1700 +11047,6 @@ export type ConnectorSearchResponses = {
 export type ConnectorSearchResponse =
   ConnectorSearchResponses[keyof ConnectorSearchResponses];
 
-export type ConsoleActivityActivityData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Limit
-     */
-    limit?: number;
-    /**
-     * Principal
-     */
-    principal?: string | null;
-    /**
-     * Section
-     */
-    section?: string | null;
-    /**
-     * Table
-     */
-    table?: string | null;
-    /**
-     * Since
-     */
-    since?: string | null;
-    /**
-     * Changeset Id
-     */
-    changeset_id?: string | null;
-  };
-  url: '/api/console/activity';
-};
-
-export type ConsoleActivityActivityErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleActivityActivityError =
-  ConsoleActivityActivityErrors[keyof ConsoleActivityActivityErrors];
-
-export type ConsoleActivityActivityResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleActivityActivityDetailData = {
-  body?: never;
-  path: {
-    /**
-     * Aid
-     */
-    aid: string;
-  };
-  query?: never;
-  url: '/api/console/activity/{aid}';
-};
-
-export type ConsoleActivityActivityDetailErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleActivityActivityDetailError =
-  ConsoleActivityActivityDetailErrors[keyof ConsoleActivityActivityDetailErrors];
-
-export type ConsoleActivityActivityDetailResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleActivityUndoData = {
-  body?: never;
-  path: {
-    /**
-     * Aid
-     */
-    aid: string;
-  };
-  query?: never;
-  url: '/api/console/activity/{aid}/undo';
-};
-
-export type ConsoleActivityUndoErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleActivityUndoError =
-  ConsoleActivityUndoErrors[keyof ConsoleActivityUndoErrors];
-
-export type ConsoleActivityUndoResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleApiplayCollectionsData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/console/api/collections';
-};
-
-export type ConsoleApiplayCollectionsResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleApiplaySaveCollectionData = {
-  body: CollectionIn;
-  path?: never;
-  query?: never;
-  url: '/api/console/api/collections';
-};
-
-export type ConsoleApiplaySaveCollectionErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleApiplaySaveCollectionError =
-  ConsoleApiplaySaveCollectionErrors[keyof ConsoleApiplaySaveCollectionErrors];
-
-export type ConsoleApiplaySaveCollectionResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleApiplayDeleteCollectionData = {
-  body?: never;
-  path: {
-    /**
-     * Cid
-     */
-    cid: string;
-  };
-  query?: never;
-  url: '/api/console/api/collections/{cid}';
-};
-
-export type ConsoleApiplayDeleteCollectionErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleApiplayDeleteCollectionError =
-  ConsoleApiplayDeleteCollectionErrors[keyof ConsoleApiplayDeleteCollectionErrors];
-
-export type ConsoleApiplayDeleteCollectionResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleApiplayProbesData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/console/api/probes/run';
-};
-
-export type ConsoleApiplayProbesResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleApiplayRoutesData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/console/api/routes';
-};
-
-export type ConsoleApiplayRoutesResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleApiplaySendData = {
-  body: SendIn;
-  path?: never;
-  query?: never;
-  url: '/api/console/api/send';
-};
-
-export type ConsoleApiplaySendErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleApiplaySendError =
-  ConsoleApiplaySendErrors[keyof ConsoleApiplaySendErrors];
-
-export type ConsoleApiplaySendResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleApiplayTrafficData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Since Seconds
-     */
-    since_seconds?: number | null;
-  };
-  url: '/api/console/api/traffic';
-};
-
-export type ConsoleApiplayTrafficErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleApiplayTrafficError =
-  ConsoleApiplayTrafficErrors[keyof ConsoleApiplayTrafficErrors];
-
-export type ConsoleApiplayTrafficResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleApiplayRecentData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Limit
-     */
-    limit?: number;
-    /**
-     * Route
-     */
-    route?: string | null;
-  };
-  url: '/api/console/api/traffic/recent';
-};
-
-export type ConsoleApiplayRecentErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleApiplayRecentError =
-  ConsoleApiplayRecentErrors[keyof ConsoleApiplayRecentErrors];
-
-export type ConsoleApiplayRecentResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleBackupsListBackupsData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/console/backups';
-};
-
-export type ConsoleBackupsListBackupsResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleBackupsCreateData = {
-  body: CreateIn;
-  path?: never;
-  query?: never;
-  url: '/api/console/backups';
-};
-
-export type ConsoleBackupsCreateErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleBackupsCreateError =
-  ConsoleBackupsCreateErrors[keyof ConsoleBackupsCreateErrors];
-
-export type ConsoleBackupsCreateResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleBackupsRunsData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Limit
-     */
-    limit?: number;
-  };
-  url: '/api/console/backups/runs';
-};
-
-export type ConsoleBackupsRunsErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleBackupsRunsError =
-  ConsoleBackupsRunsErrors[keyof ConsoleBackupsRunsErrors];
-
-export type ConsoleBackupsRunsResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleBackupsRestoreData = {
-  body: RestoreIn;
-  path: {
-    /**
-     * Bid
-     */
-    bid: string;
-  };
-  query?: never;
-  url: '/api/console/backups/{bid}/restore';
-};
-
-export type ConsoleBackupsRestoreErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleBackupsRestoreError =
-  ConsoleBackupsRestoreErrors[keyof ConsoleBackupsRestoreErrors];
-
-export type ConsoleBackupsRestoreResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleBackupsPlanData = {
-  body?: never;
-  path: {
-    /**
-     * Bid
-     */
-    bid: string;
-  };
-  query: {
-    /**
-     * Kind
-     */
-    kind: string;
-  };
-  url: '/api/console/backups/{bid}/restore/plan';
-};
-
-export type ConsoleBackupsPlanErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleBackupsPlanError =
-  ConsoleBackupsPlanErrors[keyof ConsoleBackupsPlanErrors];
-
-export type ConsoleBackupsPlanResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleBackupsDownloadData = {
-  body?: never;
-  path: {
-    /**
-     * Kind
-     */
-    kind: string;
-    /**
-     * Bid
-     */
-    bid: string;
-  };
-  query?: never;
-  url: '/api/console/backups/{kind}/{bid}/download';
-};
-
-export type ConsoleBackupsDownloadErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleBackupsDownloadError =
-  ConsoleBackupsDownloadErrors[keyof ConsoleBackupsDownloadErrors];
-
-export type ConsoleBackupsDownloadResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleChecksRegistryData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/console/checks';
-};
-
-export type ConsoleChecksRegistryResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleChecksRunData = {
-  /**
-   * Body
-   */
-  body?: OpsconsoleApiChecksRunIn | null;
-  path?: never;
-  query?: never;
-  url: '/api/console/checks/run';
-};
-
-export type ConsoleChecksRunErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleChecksRunError =
-  ConsoleChecksRunErrors[keyof ConsoleChecksRunErrors];
-
-export type ConsoleChecksRunResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleChecksRunsData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Limit
-     */
-    limit?: number;
-  };
-  url: '/api/console/checks/runs';
-};
-
-export type ConsoleChecksRunsErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleChecksRunsError =
-  ConsoleChecksRunsErrors[keyof ConsoleChecksRunsErrors];
-
-export type ConsoleChecksRunsResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleChecksRunDetailData = {
-  body?: never;
-  path: {
-    /**
-     * Rid
-     */
-    rid: string;
-  };
-  query?: never;
-  url: '/api/console/checks/runs/{rid}';
-};
-
-export type ConsoleChecksRunDetailErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleChecksRunDetailError =
-  ConsoleChecksRunDetailErrors[keyof ConsoleChecksRunDetailErrors];
-
-export type ConsoleChecksRunDetailResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleConfigSectionConfigData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/console/config';
-};
-
-export type ConsoleConfigSectionConfigResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleConfigSectionFlagData = {
-  body: FlagIn;
-  path: {
-    /**
-     * Name
-     */
-    name: string;
-  };
-  query?: never;
-  url: '/api/console/config/flags/{name}';
-};
-
-export type ConsoleConfigSectionFlagErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleConfigSectionFlagError =
-  ConsoleConfigSectionFlagErrors[keyof ConsoleConfigSectionFlagErrors];
-
-export type ConsoleConfigSectionFlagResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleDataListChangesetsData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Status
-     */
-    status?: string | null;
-    /**
-     * Limit
-     */
-    limit?: number;
-  };
-  url: '/api/console/data/changesets';
-};
-
-export type ConsoleDataListChangesetsErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleDataListChangesetsError =
-  ConsoleDataListChangesetsErrors[keyof ConsoleDataListChangesetsErrors];
-
-export type ConsoleDataListChangesetsResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleDataCreateChangesetData = {
-  body: ChangeSetIn;
-  path?: never;
-  query?: never;
-  url: '/api/console/data/changesets';
-};
-
-export type ConsoleDataCreateChangesetErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleDataCreateChangesetError =
-  ConsoleDataCreateChangesetErrors[keyof ConsoleDataCreateChangesetErrors];
-
-export type ConsoleDataCreateChangesetResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleDataGetChangesetData = {
-  body?: never;
-  path: {
-    /**
-     * Cid
-     */
-    cid: string;
-  };
-  query?: never;
-  url: '/api/console/data/changesets/{cid}';
-};
-
-export type ConsoleDataGetChangesetErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleDataGetChangesetError =
-  ConsoleDataGetChangesetErrors[keyof ConsoleDataGetChangesetErrors];
-
-export type ConsoleDataGetChangesetResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleDataApplyChangesetData = {
-  body: ApplyIn;
-  path: {
-    /**
-     * Cid
-     */
-    cid: string;
-  };
-  query?: never;
-  url: '/api/console/data/changesets/{cid}/apply';
-};
-
-export type ConsoleDataApplyChangesetErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleDataApplyChangesetError =
-  ConsoleDataApplyChangesetErrors[keyof ConsoleDataApplyChangesetErrors];
-
-export type ConsoleDataApplyChangesetResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleDataDiscardChangesetData = {
-  body?: never;
-  path: {
-    /**
-     * Cid
-     */
-    cid: string;
-  };
-  query?: never;
-  url: '/api/console/data/changesets/{cid}/discard';
-};
-
-export type ConsoleDataDiscardChangesetErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleDataDiscardChangesetError =
-  ConsoleDataDiscardChangesetErrors[keyof ConsoleDataDiscardChangesetErrors];
-
-export type ConsoleDataDiscardChangesetResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleDataTablesData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/console/data/tables';
-};
-
-export type ConsoleDataTablesResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleDataTableDetailData = {
-  body?: never;
-  path: {
-    /**
-     * Name
-     */
-    name: string;
-  };
-  query?: never;
-  url: '/api/console/data/tables/{name}';
-};
-
-export type ConsoleDataTableDetailErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleDataTableDetailError =
-  ConsoleDataTableDetailErrors[keyof ConsoleDataTableDetailErrors];
-
-export type ConsoleDataTableDetailResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleDataBulkData = {
-  body: BulkIn;
-  path: {
-    /**
-     * Name
-     */
-    name: string;
-  };
-  query?: never;
-  url: '/api/console/data/tables/{name}/bulk';
-};
-
-export type ConsoleDataBulkErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleDataBulkError =
-  ConsoleDataBulkErrors[keyof ConsoleDataBulkErrors];
-
-export type ConsoleDataBulkResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleDataExportData = {
-  body?: never;
-  path: {
-    /**
-     * Name
-     */
-    name: string;
-  };
-  query?: {
-    /**
-     * Fmt
-     */
-    fmt?: string;
-    /**
-     * Q
-     */
-    q?: string | null;
-  };
-  url: '/api/console/data/tables/{name}/export';
-};
-
-export type ConsoleDataExportErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleDataExportError =
-  ConsoleDataExportErrors[keyof ConsoleDataExportErrors];
-
-export type ConsoleDataExportResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleDataRowsData = {
-  body?: never;
-  path: {
-    /**
-     * Name
-     */
-    name: string;
-  };
-  query?: {
-    /**
-     * Limit
-     */
-    limit?: number;
-    /**
-     * Cursor
-     */
-    cursor?: string | null;
-    /**
-     * Offset
-     */
-    offset?: number;
-    /**
-     * Sort
-     */
-    sort?: string | null;
-    /**
-     * Order
-     */
-    order?: string;
-    /**
-     * Q
-     */
-    q?: string | null;
-    /**
-     * With Count
-     */
-    with_count?: boolean;
-  };
-  url: '/api/console/data/tables/{name}/rows';
-};
-
-export type ConsoleDataRowsErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleDataRowsError =
-  ConsoleDataRowsErrors[keyof ConsoleDataRowsErrors];
-
-export type ConsoleDataRowsResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleDataRowData = {
-  body?: never;
-  path: {
-    /**
-     * Name
-     */
-    name: string;
-    /**
-     * Pk
-     */
-    pk: string;
-  };
-  query?: never;
-  url: '/api/console/data/tables/{name}/rows/{pk}';
-};
-
-export type ConsoleDataRowErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleDataRowError =
-  ConsoleDataRowErrors[keyof ConsoleDataRowErrors];
-
-export type ConsoleDataRowResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleOverviewEventsData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Topics
-     */
-    topics?: string;
-  };
-  url: '/api/console/events';
-};
-
-export type ConsoleOverviewEventsErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleOverviewEventsError =
-  ConsoleOverviewEventsErrors[keyof ConsoleOverviewEventsErrors];
-
-export type ConsoleOverviewEventsResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleOverviewHealthData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Tiles
-     */
-    tiles?: string | null;
-  };
-  url: '/api/console/health';
-};
-
-export type ConsoleOverviewHealthErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleOverviewHealthError =
-  ConsoleOverviewHealthErrors[keyof ConsoleOverviewHealthErrors];
-
-export type ConsoleOverviewHealthResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleOverviewServerData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/console/health/server';
-};
-
-export type ConsoleOverviewServerResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleLogsListSourcesData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/console/logs/sources';
-};
-
-export type ConsoleLogsListSourcesResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleLogsTailData = {
-  body?: never;
-  path: {
-    /**
-     * Source
-     */
-    source: string;
-  };
-  query?: {
-    /**
-     * Limit
-     */
-    limit?: number;
-    /**
-     * Level
-     */
-    level?: string | null;
-    /**
-     * Request Id
-     */
-    request_id?: string | null;
-    /**
-     * Logger
-     */
-    logger?: string | null;
-    /**
-     * Contains
-     */
-    contains?: string | null;
-    /**
-     * Since
-     */
-    since?: string | null;
-    /**
-     * Follow
-     */
-    follow?: boolean;
-  };
-  url: '/api/console/logs/{source}';
-};
-
-export type ConsoleLogsTailErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleLogsTailError =
-  ConsoleLogsTailErrors[keyof ConsoleLogsTailErrors];
-
-export type ConsoleLogsTailResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleOverviewManifestData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/console/manifest';
-};
-
-export type ConsoleOverviewManifestResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleQueryExplainData = {
-  body: ExplainIn;
-  path?: never;
-  query?: never;
-  url: '/api/console/query/explain';
-};
-
-export type ConsoleQueryExplainErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleQueryExplainError =
-  ConsoleQueryExplainErrors[keyof ConsoleQueryExplainErrors];
-
-export type ConsoleQueryExplainResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleQueryHistoryData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Limit
-     */
-    limit?: number;
-  };
-  url: '/api/console/query/history';
-};
-
-export type ConsoleQueryHistoryErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleQueryHistoryError =
-  ConsoleQueryHistoryErrors[keyof ConsoleQueryHistoryErrors];
-
-export type ConsoleQueryHistoryResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleQueryRunData = {
-  body: OpsconsoleApiQueryRunIn;
-  path?: never;
-  query?: never;
-  url: '/api/console/query/run';
-};
-
-export type ConsoleQueryRunErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleQueryRunError =
-  ConsoleQueryRunErrors[keyof ConsoleQueryRunErrors];
-
-export type ConsoleQueryRunResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleQuerySavedData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/console/query/saved';
-};
-
-export type ConsoleQuerySavedResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleQuerySaveData = {
-  body: SavedIn;
-  path?: never;
-  query?: never;
-  url: '/api/console/query/saved';
-};
-
-export type ConsoleQuerySaveErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleQuerySaveError =
-  ConsoleQuerySaveErrors[keyof ConsoleQuerySaveErrors];
-
-export type ConsoleQuerySaveResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleQueryDeleteSavedData = {
-  body?: never;
-  path: {
-    /**
-     * Qid
-     */
-    qid: string;
-  };
-  query?: never;
-  url: '/api/console/query/saved/{qid}';
-};
-
-export type ConsoleQueryDeleteSavedErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleQueryDeleteSavedError =
-  ConsoleQueryDeleteSavedErrors[keyof ConsoleQueryDeleteSavedErrors];
-
-export type ConsoleQueryDeleteSavedResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleQueryUpdateSavedData = {
-  body: SavedIn;
-  path: {
-    /**
-     * Qid
-     */
-    qid: string;
-  };
-  query?: never;
-  url: '/api/console/query/saved/{qid}';
-};
-
-export type ConsoleQueryUpdateSavedErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleQueryUpdateSavedError =
-  ConsoleQueryUpdateSavedErrors[keyof ConsoleQueryUpdateSavedErrors];
-
-export type ConsoleQueryUpdateSavedResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleSchemaDictionaryData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/console/schema/dictionary';
-};
-
-export type ConsoleSchemaDictionaryResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleSchemaSchemaMapData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/console/schema/map';
-};
-
-export type ConsoleSchemaSchemaMapResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleSchemaMigrationStateData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/console/schema/migrations';
-};
-
-export type ConsoleSchemaMigrationStateResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleSchemaPlanData = {
-  body: PlanIn;
-  path?: never;
-  query?: never;
-  url: '/api/console/schema/migrations/plan';
-};
-
-export type ConsoleSchemaPlanErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleSchemaPlanError =
-  ConsoleSchemaPlanErrors[keyof ConsoleSchemaPlanErrors];
-
-export type ConsoleSchemaPlanResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleSchemaUpgradeData = {
-  body: UpgradeIn;
-  path?: never;
-  query?: never;
-  url: '/api/console/schema/migrations/upgrade';
-};
-
-export type ConsoleSchemaUpgradeErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleSchemaUpgradeError =
-  ConsoleSchemaUpgradeErrors[keyof ConsoleSchemaUpgradeErrors];
-
-export type ConsoleSchemaUpgradeResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleTestsRerunFailedData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/console/tests/rerun-failed';
-};
-
-export type ConsoleTestsRerunFailedResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleTestsRunData = {
-  /**
-   * Body
-   */
-  body?: OpsconsoleApiTestsRunIn | null;
-  path?: never;
-  query?: never;
-  url: '/api/console/tests/run';
-};
-
-export type ConsoleTestsRunErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleTestsRunError =
-  ConsoleTestsRunErrors[keyof ConsoleTestsRunErrors];
-
-export type ConsoleTestsRunResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleTestsRunsData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Limit
-     */
-    limit?: number;
-  };
-  url: '/api/console/tests/runs';
-};
-
-export type ConsoleTestsRunsErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleTestsRunsError =
-  ConsoleTestsRunsErrors[keyof ConsoleTestsRunsErrors];
-
-export type ConsoleTestsRunsResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleTestsRunStatusData = {
-  body?: never;
-  path: {
-    /**
-     * Rid
-     */
-    rid: string;
-  };
-  query?: {
-    /**
-     * Tail
-     */
-    tail?: number;
-  };
-  url: '/api/console/tests/runs/{rid}';
-};
-
-export type ConsoleTestsRunStatusErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleTestsRunStatusError =
-  ConsoleTestsRunStatusErrors[keyof ConsoleTestsRunStatusErrors];
-
-export type ConsoleTestsRunStatusResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleTestsCancelData = {
-  body?: never;
-  path: {
-    /**
-     * Rid
-     */
-    rid: string;
-  };
-  query?: never;
-  url: '/api/console/tests/runs/{rid}/cancel';
-};
-
-export type ConsoleTestsCancelErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleTestsCancelError =
-  ConsoleTestsCancelErrors[keyof ConsoleTestsCancelErrors];
-
-export type ConsoleTestsCancelResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleTestsRunLogData = {
-  body?: never;
-  path: {
-    /**
-     * Rid
-     */
-    rid: string;
-  };
-  query?: never;
-  url: '/api/console/tests/runs/{rid}/log';
-};
-
-export type ConsoleTestsRunLogErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleTestsRunLogError =
-  ConsoleTestsRunLogErrors[keyof ConsoleTestsRunLogErrors];
-
-export type ConsoleTestsRunLogResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleTestsTreeData = {
-  body?: never;
-  path?: never;
-  query?: {
-    /**
-     * Refresh
-     */
-    refresh?: boolean;
-  };
-  url: '/api/console/tests/tree';
-};
-
-export type ConsoleTestsTreeErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleTestsTreeError =
-  ConsoleTestsTreeErrors[keyof ConsoleTestsTreeErrors];
-
-export type ConsoleTestsTreeResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleUsersListUsersData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/console/users';
-};
-
-export type ConsoleUsersListUsersResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleUsersRolesData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: '/api/console/users/roles';
-};
-
-export type ConsoleUsersRolesResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleUsersRevokeData = {
-  body: ConfirmIn;
-  path: {
-    /**
-     * Tid
-     */
-    tid: string;
-  };
-  query?: never;
-  url: '/api/console/users/tokens/{tid}/revoke';
-};
-
-export type ConsoleUsersRevokeErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleUsersRevokeError =
-  ConsoleUsersRevokeErrors[keyof ConsoleUsersRevokeErrors];
-
-export type ConsoleUsersRevokeResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleUsersSetDisabledData = {
-  body: DisabledIn;
-  path: {
-    /**
-     * Uid
-     */
-    uid: string;
-  };
-  query?: never;
-  url: '/api/console/users/{uid}/disabled';
-};
-
-export type ConsoleUsersSetDisabledErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleUsersSetDisabledError =
-  ConsoleUsersSetDisabledErrors[keyof ConsoleUsersSetDisabledErrors];
-
-export type ConsoleUsersSetDisabledResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleUsersSetRolesData = {
-  body: RolesIn;
-  path: {
-    /**
-     * Uid
-     */
-    uid: string;
-  };
-  query?: never;
-  url: '/api/console/users/{uid}/roles';
-};
-
-export type ConsoleUsersSetRolesErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleUsersSetRolesError =
-  ConsoleUsersSetRolesErrors[keyof ConsoleUsersSetRolesErrors];
-
-export type ConsoleUsersSetRolesResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
-export type ConsoleUsersIssueData = {
-  body: IssueIn;
-  path: {
-    /**
-     * Uid
-     */
-    uid: string;
-  };
-  query?: never;
-  url: '/api/console/users/{uid}/tokens';
-};
-
-export type ConsoleUsersIssueErrors = {
-  /**
-   * Validation Error
-   */
-  422: HttpValidationError;
-};
-
-export type ConsoleUsersIssueError =
-  ConsoleUsersIssueErrors[keyof ConsoleUsersIssueErrors];
-
-export type ConsoleUsersIssueResponses = {
-  /**
-   * Successful Response
-   */
-  200: unknown;
-};
-
 export type DeleteDeckEndpointData = {
   body?: never;
   path: {
@@ -10833,9 +11061,13 @@ export type DeleteDeckEndpointData = {
 
 export type DeleteDeckEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type DeleteDeckEndpointError =
@@ -10845,8 +11077,11 @@ export type DeleteDeckEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: DeletedOut;
 };
+
+export type DeleteDeckEndpointResponse =
+  DeleteDeckEndpointResponses[keyof DeleteDeckEndpointResponses];
 
 export type GetDeckEndpointData = {
   body?: never;
@@ -10862,9 +11097,13 @@ export type GetDeckEndpointData = {
 
 export type GetDeckEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetDeckEndpointError =
@@ -10874,8 +11113,11 @@ export type GetDeckEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: DeckOut;
 };
+
+export type GetDeckEndpointResponse =
+  GetDeckEndpointResponses[keyof GetDeckEndpointResponses];
 
 export type UpdateDeckEndpointData = {
   body: DeckUpdate;
@@ -10891,9 +11133,13 @@ export type UpdateDeckEndpointData = {
 
 export type UpdateDeckEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type UpdateDeckEndpointError =
@@ -10903,8 +11149,11 @@ export type UpdateDeckEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: DeckOut;
 };
+
+export type UpdateDeckEndpointResponse =
+  UpdateDeckEndpointResponses[keyof UpdateDeckEndpointResponses];
 
 export type ExportDeckPptxData = {
   body?: never;
@@ -10920,9 +11169,13 @@ export type ExportDeckPptxData = {
 
 export type ExportDeckPptxErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ExportDeckPptxError =
@@ -10930,10 +11183,13 @@ export type ExportDeckPptxError =
 
 export type ExportDeckPptxResponses = {
   /**
-   * Successful Response
+   * The deck as an editable PowerPoint file
    */
-  200: unknown;
+  200: Blob | File;
 };
+
+export type ExportDeckPptxResponse =
+  ExportDeckPptxResponses[keyof ExportDeckPptxResponses];
 
 export type SeedDemoData = {
   body?: never;
@@ -10942,12 +11198,27 @@ export type SeedDemoData = {
   url: '/api/demo/seed';
 };
 
+export type SeedDemoErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SeedDemoError = SeedDemoErrors[keyof SeedDemoErrors];
+
 export type SeedDemoResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: DemoSeedOut;
 };
+
+export type SeedDemoResponse = SeedDemoResponses[keyof SeedDemoResponses];
 
 export type UploadDocumentData = {
   body: BodyUploadDocument;
@@ -10958,9 +11229,15 @@ export type UploadDocumentData = {
 
 export type UploadDocumentErrors = {
   /**
-   * Validation Error
+   * Response 422 Upload Document
+   *
+   * The input does not match the route, or the file was saved but could not be read
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut | DocumentReadFailedOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type UploadDocumentError =
@@ -10971,6 +11248,10 @@ export type UploadDocumentResponses = {
    * Successful Response
    */
   200: DocumentUploadOut;
+  /**
+   * Saved; the document is read by a background job (follow `job`)
+   */
+  202: DocumentUploadOut;
 };
 
 export type UploadDocumentResponse =
@@ -10990,9 +11271,13 @@ export type GetDocumentData = {
 
 export type GetDocumentErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetDocumentError = GetDocumentErrors[keyof GetDocumentErrors];
@@ -11034,9 +11319,13 @@ export type ListDocumentCandidatesEndpointData = {
 
 export type ListDocumentCandidatesEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListDocumentCandidatesEndpointError =
@@ -11068,9 +11357,13 @@ export type GetOpenalephDocumentSyncData = {
 
 export type GetOpenalephDocumentSyncErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetOpenalephDocumentSyncError =
@@ -11100,9 +11393,17 @@ export type ImportOpenalephDocumentEntitiesData = {
 
 export type ImportOpenalephDocumentEntitiesErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * OpenAleph failed; the details are logged on the server
+   */
+  502: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ImportOpenalephDocumentEntitiesError =
@@ -11132,9 +11433,17 @@ export type ImportOpenalephDocumentEvidenceData = {
 
 export type ImportOpenalephDocumentEvidenceErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * OpenAleph failed; the details are logged on the server
+   */
+  502: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ImportOpenalephDocumentEvidenceError =
@@ -11164,9 +11473,17 @@ export type RefreshOpenalephDocumentReviewData = {
 
 export type RefreshOpenalephDocumentReviewErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * OpenAleph failed; the details are logged on the server
+   */
+  502: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type RefreshOpenalephDocumentReviewError =
@@ -11196,9 +11513,13 @@ export type GetOpenalephDocumentReviewStatusData = {
 
 export type GetOpenalephDocumentReviewStatusErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetOpenalephDocumentReviewStatusError =
@@ -11228,9 +11549,17 @@ export type SyncOpenalephDocumentData = {
 
 export type SyncOpenalephDocumentErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * OpenAleph is not available here: switched off, or its client is not installed
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type SyncOpenalephDocumentError =
@@ -11246,6 +11575,42 @@ export type SyncOpenalephDocumentResponses = {
 export type SyncOpenalephDocumentResponse =
   SyncOpenalephDocumentResponses[keyof SyncOpenalephDocumentResponses];
 
+export type AnalyzeOpenalephDocumentData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/openaleph/analyze';
+};
+
+export type AnalyzeOpenalephDocumentErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AnalyzeOpenalephDocumentError =
+  AnalyzeOpenalephDocumentErrors[keyof AnalyzeOpenalephDocumentErrors];
+
+export type AnalyzeOpenalephDocumentResponses = {
+  /**
+   * Successful Response
+   */
+  200: BackgroundJobOut;
+};
+
+export type AnalyzeOpenalephDocumentResponse =
+  AnalyzeOpenalephDocumentResponses[keyof AnalyzeOpenalephDocumentResponses];
+
 export type EnrichmentSessionDetailData = {
   body?: never;
   path: {
@@ -11260,9 +11625,13 @@ export type EnrichmentSessionDetailData = {
 
 export type EnrichmentSessionDetailErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type EnrichmentSessionDetailError =
@@ -11292,9 +11661,13 @@ export type EnrichmentSessionClustersData = {
 
 export type EnrichmentSessionClustersErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type EnrichmentSessionClustersError =
@@ -11326,9 +11699,13 @@ export type DecideCrossProviderClusterData = {
 
 export type DecideCrossProviderClusterErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type DecideCrossProviderClusterError =
@@ -11353,9 +11730,13 @@ export type CreateEntityData = {
 
 export type CreateEntityErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type CreateEntityError = CreateEntityErrors[keyof CreateEntityErrors];
@@ -11384,9 +11765,13 @@ export type UpdateEntityData = {
 
 export type UpdateEntityErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type UpdateEntityError = UpdateEntityErrors[keyof UpdateEntityErrors];
@@ -11415,9 +11800,13 @@ export type CanonicalEntityResolutionData = {
 
 export type CanonicalEntityResolutionErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type CanonicalEntityResolutionError =
@@ -11447,9 +11836,13 @@ export type ListCrossProviderDecisionsData = {
 
 export type ListCrossProviderDecisionsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListCrossProviderDecisionsError =
@@ -11481,9 +11874,13 @@ export type GetEntityDossierData = {
 
 export type GetEntityDossierErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetEntityDossierError =
@@ -11513,9 +11910,13 @@ export type EntityDuplicateCandidatesData = {
 
 export type EntityDuplicateCandidatesErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type EntityDuplicateCandidatesError =
@@ -11547,9 +11948,13 @@ export type EnrichEntityMultiData = {
 
 export type EnrichEntityMultiErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type EnrichEntityMultiError =
@@ -11583,9 +11988,17 @@ export type EnrichEntityData = {
 
 export type EnrichEntityErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * The connector failed; the details are logged on the server
+   */
+  502: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type EnrichEntityError = EnrichEntityErrors[keyof EnrichEntityErrors];
@@ -11616,9 +12029,13 @@ export type ListEntityEnrichmentSessionsData = {
 
 export type ListEntityEnrichmentSessionsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListEntityEnrichmentSessionsError =
@@ -11650,9 +12067,13 @@ export type ListExternalRelationshipPromotionsData = {
 
 export type ListExternalRelationshipPromotionsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListExternalRelationshipPromotionsError =
@@ -11684,9 +12105,13 @@ export type EntityMergeExecuteData = {
 
 export type EntityMergeExecuteErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type EntityMergeExecuteError =
@@ -11716,9 +12141,13 @@ export type EntityMergeHistoryData = {
 
 export type EntityMergeHistoryErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type EntityMergeHistoryError =
@@ -11755,9 +12184,13 @@ export type EntityMergePreviewData = {
 
 export type EntityMergePreviewErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type EntityMergePreviewError =
@@ -11787,9 +12220,13 @@ export type EntityPostMergeReconciliationData = {
 
 export type EntityPostMergeReconciliationErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type EntityPostMergeReconciliationError =
@@ -11819,9 +12256,13 @@ export type DecideEntityPostMergeReconciliationData = {
 
 export type DecideEntityPostMergeReconciliationErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type DecideEntityPostMergeReconciliationError =
@@ -11851,9 +12292,13 @@ export type ListEntityPromotionsData = {
 
 export type ListEntityPromotionsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListEntityPromotionsError =
@@ -11889,9 +12334,13 @@ export type ListPropertyConflictDecisionsData = {
 
 export type ListPropertyConflictDecisionsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListPropertyConflictDecisionsError =
@@ -11927,9 +12376,13 @@ export type DecidePropertyConflictData = {
 
 export type DecidePropertyConflictErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type DecidePropertyConflictError =
@@ -11959,9 +12412,13 @@ export type ListEntityRelationshipsData = {
 
 export type ListEntityRelationshipsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListEntityRelationshipsError =
@@ -11993,9 +12450,13 @@ export type ListEntityStatementHistoryData = {
 
 export type ListEntityStatementHistoryErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListEntityStatementHistoryError =
@@ -12027,9 +12488,13 @@ export type ListEntityStatementsData = {
 
 export type ListEntityStatementsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListEntityStatementsError =
@@ -12056,9 +12521,13 @@ export type CreateEvidenceEndpointData = {
 
 export type CreateEvidenceEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type CreateEvidenceEndpointError =
@@ -12088,9 +12557,13 @@ export type PromoteExternalRelationshipData = {
 
 export type PromoteExternalRelationshipErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type PromoteExternalRelationshipError =
@@ -12120,9 +12593,13 @@ export type GetExtractionEntityMatchesData = {
 
 export type GetExtractionEntityMatchesErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetExtractionEntityMatchesError =
@@ -12132,8 +12609,11 @@ export type GetExtractionEntityMatchesResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: EntityMatchPreviewOut;
 };
+
+export type GetExtractionEntityMatchesResponse =
+  GetExtractionEntityMatchesResponses[keyof GetExtractionEntityMatchesResponses];
 
 export type GetExtractionCandidateExplanationData = {
   body?: never;
@@ -12149,9 +12629,13 @@ export type GetExtractionCandidateExplanationData = {
 
 export type GetExtractionCandidateExplanationErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetExtractionCandidateExplanationError =
@@ -12167,6 +12651,42 @@ export type GetExtractionCandidateExplanationResponses = {
 export type GetExtractionCandidateExplanationResponse =
   GetExtractionCandidateExplanationResponses[keyof GetExtractionCandidateExplanationResponses];
 
+export type GetIdentifierTargetsData = {
+  body?: never;
+  path: {
+    /**
+     * Candidate Id
+     */
+    candidate_id: string;
+  };
+  query?: never;
+  url: '/api/extraction-candidates/{candidate_id}/identifier-targets';
+};
+
+export type GetIdentifierTargetsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetIdentifierTargetsError =
+  GetIdentifierTargetsErrors[keyof GetIdentifierTargetsErrors];
+
+export type GetIdentifierTargetsResponses = {
+  /**
+   * Successful Response
+   */
+  200: IdentifierTargetsOut;
+};
+
+export type GetIdentifierTargetsResponse =
+  GetIdentifierTargetsResponses[keyof GetIdentifierTargetsResponses];
+
 export type GetExtractionCandidateLineageData = {
   body?: never;
   path: {
@@ -12181,9 +12701,13 @@ export type GetExtractionCandidateLineageData = {
 
 export type GetExtractionCandidateLineageErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetExtractionCandidateLineageError =
@@ -12213,9 +12737,13 @@ export type ReviewExtractionCandidateData = {
 
 export type ReviewExtractionCandidateErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ReviewExtractionCandidateError =
@@ -12238,12 +12766,27 @@ export type HealthData = {
   url: '/api/health';
 };
 
+export type HealthErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type HealthError = HealthErrors[keyof HealthErrors];
+
 export type HealthResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: HealthOut;
 };
+
+export type HealthResponse = HealthResponses[keyof HealthResponses];
 
 export type OpenalephIntegrationStatusData = {
   body?: never;
@@ -12252,12 +12795,29 @@ export type OpenalephIntegrationStatusData = {
   url: '/api/integrations/openaleph/status';
 };
 
+export type OpenalephIntegrationStatusErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type OpenalephIntegrationStatusError =
+  OpenalephIntegrationStatusErrors[keyof OpenalephIntegrationStatusErrors];
+
 export type OpenalephIntegrationStatusResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: OpenAlephStatusOut;
 };
+
+export type OpenalephIntegrationStatusResponse =
+  OpenalephIntegrationStatusResponses[keyof OpenalephIntegrationStatusResponses];
 
 export type ListInvestigationsData = {
   body?: never;
@@ -12265,6 +12825,20 @@ export type ListInvestigationsData = {
   query?: never;
   url: '/api/investigations';
 };
+
+export type ListInvestigationsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListInvestigationsError =
+  ListInvestigationsErrors[keyof ListInvestigationsErrors];
 
 export type ListInvestigationsResponses = {
   /**
@@ -12287,9 +12861,13 @@ export type CreateInvestigationData = {
 
 export type CreateInvestigationErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type CreateInvestigationError =
@@ -12324,9 +12902,13 @@ export type RemoveInvestigationData = {
 
 export type RemoveInvestigationErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type RemoveInvestigationError =
@@ -12373,9 +12955,13 @@ export type ListInvestigationAiAnalysisCandidatesData = {
 
 export type ListInvestigationAiAnalysisCandidatesErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListInvestigationAiAnalysisCandidatesError =
@@ -12385,8 +12971,11 @@ export type ListInvestigationAiAnalysisCandidatesResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AiAnalysisCandidatesOut;
 };
+
+export type ListInvestigationAiAnalysisCandidatesResponse =
+  ListInvestigationAiAnalysisCandidatesResponses[keyof ListInvestigationAiAnalysisCandidatesResponses];
 
 export type InvestigationCaseSynthesisData = {
   body: CaseSynthesisRequest;
@@ -12402,9 +12991,21 @@ export type InvestigationCaseSynthesisData = {
 
 export type InvestigationCaseSynthesisErrors = {
   /**
-   * Validation Error
+   * Response 422 Investigation Case Synthesis
+   *
+   * The input does not match the route, or the model's answer did not pass its checks
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut | AiOutputRejectedOut;
+  /**
+   * Response 502 Investigation Case Synthesis
+   *
+   * The AI provider failed (the details are logged on the server), or its answer could not be used at all
+   */
+  502: ErrorOut | AiModelFailedOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type InvestigationCaseSynthesisError =
@@ -12414,8 +13015,15 @@ export type InvestigationCaseSynthesisResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AiReasoningRunOut;
+  /**
+   * Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})
+   */
+  202: AiReasoningRunOut;
 };
+
+export type InvestigationCaseSynthesisResponse =
+  InvestigationCaseSynthesisResponses[keyof InvestigationCaseSynthesisResponses];
 
 export type InvestigationQuestionContextData = {
   body: InvestigationQuestionContextRequest;
@@ -12431,9 +13039,13 @@ export type InvestigationQuestionContextData = {
 
 export type InvestigationQuestionContextErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type InvestigationQuestionContextError =
@@ -12443,8 +13055,11 @@ export type InvestigationQuestionContextResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: QuestionContextOut;
 };
+
+export type InvestigationQuestionContextResponse =
+  InvestigationQuestionContextResponses[keyof InvestigationQuestionContextResponses];
 
 export type InvestigationHypothesisTestData = {
   body: HypothesisTestRequest;
@@ -12460,9 +13075,21 @@ export type InvestigationHypothesisTestData = {
 
 export type InvestigationHypothesisTestErrors = {
   /**
-   * Validation Error
+   * Response 422 Investigation Hypothesis Test
+   *
+   * The input does not match the route, or the model's answer did not pass its checks
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut | AiOutputRejectedOut;
+  /**
+   * Response 502 Investigation Hypothesis Test
+   *
+   * The AI provider failed (the details are logged on the server), or its answer could not be used at all
+   */
+  502: ErrorOut | AiModelFailedOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type InvestigationHypothesisTestError =
@@ -12472,8 +13099,15 @@ export type InvestigationHypothesisTestResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AiReasoningRunOut;
+  /**
+   * Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})
+   */
+  202: AiReasoningRunOut;
 };
+
+export type InvestigationHypothesisTestResponse =
+  InvestigationHypothesisTestResponses[keyof InvestigationHypothesisTestResponses];
 
 export type InvestigationPresentationDraftData = {
   body: PresentationDraftRequest;
@@ -12489,9 +13123,21 @@ export type InvestigationPresentationDraftData = {
 
 export type InvestigationPresentationDraftErrors = {
   /**
-   * Validation Error
+   * Response 422 Investigation Presentation Draft
+   *
+   * The input does not match the route, or the model's answer did not pass its checks
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut | AiOutputRejectedOut;
+  /**
+   * Response 502 Investigation Presentation Draft
+   *
+   * The AI provider failed (the details are logged on the server), or its answer could not be used at all
+   */
+  502: ErrorOut | AiModelFailedOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type InvestigationPresentationDraftError =
@@ -12501,8 +13147,15 @@ export type InvestigationPresentationDraftResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AiReasoningRunOut;
+  /**
+   * Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})
+   */
+  202: AiReasoningRunOut;
 };
+
+export type InvestigationPresentationDraftResponse =
+  InvestigationPresentationDraftResponses[keyof InvestigationPresentationDraftResponses];
 
 export type ListClaimsData = {
   body?: never;
@@ -12527,9 +13180,13 @@ export type ListClaimsData = {
 
 export type ListClaimsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListClaimsError = ListClaimsErrors[keyof ListClaimsErrors];
@@ -12568,9 +13225,13 @@ export type ListConnectorFindingsData = {
 
 export type ListConnectorFindingsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListConnectorFindingsError =
@@ -12611,9 +13272,13 @@ export type ListConnectorRunsData = {
 
 export type ListConnectorRunsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListConnectorRunsError =
@@ -12645,9 +13310,13 @@ export type GetOpenalephCorpusBindingData = {
 
 export type GetOpenalephCorpusBindingErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetOpenalephCorpusBindingError =
@@ -12657,8 +13326,11 @@ export type GetOpenalephCorpusBindingResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: OpenAlephCorpusBindingOut;
 };
+
+export type GetOpenalephCorpusBindingResponse =
+  GetOpenalephCorpusBindingResponses[keyof GetOpenalephCorpusBindingResponses];
 
 export type EnsureOpenalephCorpusBindingData = {
   body?: never;
@@ -12674,9 +13346,21 @@ export type EnsureOpenalephCorpusBindingData = {
 
 export type EnsureOpenalephCorpusBindingErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * OpenAleph failed; the details are logged on the server
+   */
+  502: ErrorOut;
+  /**
+   * OpenAleph is not available here: switched off, or its client is not installed
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type EnsureOpenalephCorpusBindingError =
@@ -12686,8 +13370,11 @@ export type EnsureOpenalephCorpusBindingResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: OpenAlephCorpusBindingOut;
 };
+
+export type EnsureOpenalephCorpusBindingResponse =
+  EnsureOpenalephCorpusBindingResponses[keyof EnsureOpenalephCorpusBindingResponses];
 
 export type ListOpenalephCorpusFailuresData = {
   body?: never;
@@ -12703,9 +13390,13 @@ export type ListOpenalephCorpusFailuresData = {
 
 export type ListOpenalephCorpusFailuresErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListOpenalephCorpusFailuresError =
@@ -12713,10 +13404,85 @@ export type ListOpenalephCorpusFailuresError =
 
 export type ListOpenalephCorpusFailuresResponses = {
   /**
+   * Response List Openaleph Corpus Failures
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<OpenAlephOperationFailureOut>;
 };
+
+export type ListOpenalephCorpusFailuresResponse =
+  ListOpenalephCorpusFailuresResponses[keyof ListOpenalephCorpusFailuresResponses];
+
+export type GetCorpusSyncData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/corpus/sync';
+};
+
+export type GetCorpusSyncErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCorpusSyncError = GetCorpusSyncErrors[keyof GetCorpusSyncErrors];
+
+export type GetCorpusSyncResponses = {
+  /**
+   * Successful Response
+   */
+  200: CorpusSyncOut;
+};
+
+export type GetCorpusSyncResponse =
+  GetCorpusSyncResponses[keyof GetCorpusSyncResponses];
+
+export type SyncCorpusNowData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/corpus/sync';
+};
+
+export type SyncCorpusNowErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SyncCorpusNowError = SyncCorpusNowErrors[keyof SyncCorpusNowErrors];
+
+export type SyncCorpusNowResponses = {
+  /**
+   * Successful Response
+   */
+  200: CorpusSyncNowOut;
+};
+
+export type SyncCorpusNowResponse =
+  SyncCorpusNowResponses[keyof SyncCorpusNowResponses];
 
 export type ListDecksEndpointData = {
   body?: never;
@@ -12732,9 +13498,13 @@ export type ListDecksEndpointData = {
 
 export type ListDecksEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListDecksEndpointError =
@@ -12744,8 +13514,11 @@ export type ListDecksEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: DecksOut;
 };
+
+export type ListDecksEndpointResponse =
+  ListDecksEndpointResponses[keyof ListDecksEndpointResponses];
 
 export type InvestigationDeletionPreviewData = {
   body?: never;
@@ -12761,9 +13534,13 @@ export type InvestigationDeletionPreviewData = {
 
 export type InvestigationDeletionPreviewErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type InvestigationDeletionPreviewError =
@@ -12802,9 +13579,13 @@ export type ListDocumentsData = {
 
 export type ListDocumentsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListDocumentsError = ListDocumentsErrors[keyof ListDocumentsErrors];
@@ -12848,9 +13629,13 @@ export type ListEntitiesData = {
 
 export type ListEntitiesErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListEntitiesError = ListEntitiesErrors[keyof ListEntitiesErrors];
@@ -12890,9 +13675,13 @@ export type ListInvestigationEvidenceData = {
 
 export type ListInvestigationEvidenceErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListInvestigationEvidenceError =
@@ -12929,9 +13718,13 @@ export type ExportInvestigationData = {
 
 export type ExportInvestigationErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ExportInvestigationError =
@@ -12939,10 +13732,13 @@ export type ExportInvestigationError =
 
 export type ExportInvestigationResponses = {
   /**
-   * Successful Response
+   * A portable backup of the investigation (.jwbackup.zip)
    */
-  200: unknown;
+  200: Blob | File;
 };
+
+export type ExportInvestigationResponse =
+  ExportInvestigationResponses[keyof ExportInvestigationResponses];
 
 export type GetInvestigationFinancialFlowsData = {
   body?: never;
@@ -12958,9 +13754,13 @@ export type GetInvestigationFinancialFlowsData = {
 
 export type GetInvestigationFinancialFlowsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetInvestigationFinancialFlowsError =
@@ -12999,9 +13799,13 @@ export type GetInvestigationGraphData = {
 
 export type GetInvestigationGraphErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetInvestigationGraphError =
@@ -13040,9 +13844,13 @@ export type ListLeadsData = {
 
 export type ListLeadsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListLeadsError = ListLeadsErrors[keyof ListLeadsErrors];
@@ -13097,9 +13905,13 @@ export type LeadQueueData = {
 
 export type LeadQueueErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type LeadQueueError = LeadQueueErrors[keyof LeadQueueErrors];
@@ -13140,9 +13952,13 @@ export type ListInvestigationRelationshipsData = {
 
 export type ListInvestigationRelationshipsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListInvestigationRelationshipsError =
@@ -13183,9 +13999,13 @@ export type ListReportingTasksData = {
 
 export type ListReportingTasksErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListReportingTasksError =
@@ -13226,9 +14046,13 @@ export type ListSourcesData = {
 
 export type ListSourcesErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListSourcesError = ListSourcesErrors[keyof ListSourcesErrors];
@@ -13280,9 +14104,13 @@ export type GetInvestigationTimelineData = {
 
 export type GetInvestigationTimelineErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetInvestigationTimelineError =
@@ -13312,9 +14140,13 @@ export type InvestigationVisualCatalogData = {
 
 export type InvestigationVisualCatalogErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type InvestigationVisualCatalogError =
@@ -13344,9 +14176,15 @@ export type InvestigationVisualPreviewData = {
 
 export type InvestigationVisualPreviewErrors = {
   /**
-   * Validation Error
+   * Response 422 Investigation Visual Preview
+   *
+   * The input does not match the route, or the chart kind cannot be drawn
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type InvestigationVisualPreviewError =
@@ -13381,9 +14219,13 @@ export type ListWriteupsEndpointData = {
 
 export type ListWriteupsEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListWriteupsEndpointError =
@@ -13393,8 +14235,11 @@ export type ListWriteupsEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: WriteupsOut;
 };
+
+export type ListWriteupsEndpointResponse =
+  ListWriteupsEndpointResponses[keyof ListWriteupsEndpointResponses];
 
 export type ListJobsEndpointData = {
   body?: never;
@@ -13422,9 +14267,15 @@ export type ListJobsEndpointData = {
 
 export type ListJobsEndpointErrors = {
   /**
-   * Validation Error
+   * Response 422 List Jobs Endpoint
+   *
+   * The input does not match the route, or the status is not a job status
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListJobsEndpointError =
@@ -13456,9 +14307,13 @@ export type GetJobEndpointData = {
 
 export type GetJobEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetJobEndpointError =
@@ -13488,9 +14343,13 @@ export type CancelJobEndpointData = {
 
 export type CancelJobEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type CancelJobEndpointError =
@@ -13520,9 +14379,13 @@ export type RetryJobEndpointData = {
 
 export type RetryJobEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type RetryJobEndpointError =
@@ -13547,9 +14410,13 @@ export type CreateLeadEndpointData = {
 
 export type CreateLeadEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type CreateLeadEndpointError =
@@ -13579,9 +14446,13 @@ export type GetLeadData = {
 
 export type GetLeadErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetLeadError = GetLeadErrors[keyof GetLeadErrors];
@@ -13609,9 +14480,13 @@ export type UpdateLeadEndpointData = {
 
 export type UpdateLeadEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type UpdateLeadEndpointError =
@@ -13641,9 +14516,13 @@ export type ConvertLeadEndpointData = {
 
 export type ConvertLeadEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ConvertLeadEndpointError =
@@ -13681,9 +14560,13 @@ export type ListLeadLinksEndpointData = {
 
 export type ListLeadLinksEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListLeadLinksEndpointError =
@@ -13715,9 +14598,13 @@ export type LinkLeadData = {
 
 export type LinkLeadErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type LinkLeadError = LinkLeadErrors[keyof LinkLeadErrors];
@@ -13738,12 +14625,29 @@ export type PresentationStylesData = {
   url: '/api/presentation-styles';
 };
 
+export type PresentationStylesErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PresentationStylesError =
+  PresentationStylesErrors[keyof PresentationStylesErrors];
+
 export type PresentationStylesResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: PresentationStyleCatalogOut;
 };
+
+export type PresentationStylesResponse =
+  PresentationStylesResponses[keyof PresentationStylesResponses];
 
 export type FindExtractionLineageEndpointData = {
   body?: never;
@@ -13763,9 +14667,13 @@ export type FindExtractionLineageEndpointData = {
 
 export type FindExtractionLineageEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type FindExtractionLineageEndpointError =
@@ -13799,9 +14707,13 @@ export type GetRecordProvenanceTraceData = {
 
 export type GetRecordProvenanceTraceErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetRecordProvenanceTraceError =
@@ -13824,12 +14736,29 @@ export type RelationshipSchemasData = {
   url: '/api/relationship-schemas';
 };
 
+export type RelationshipSchemasErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RelationshipSchemasError =
+  RelationshipSchemasErrors[keyof RelationshipSchemasErrors];
+
 export type RelationshipSchemasResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: RelationshipSchemasOut;
 };
+
+export type RelationshipSchemasResponse =
+  RelationshipSchemasResponses[keyof RelationshipSchemasResponses];
 
 export type CreateCanonicalRelationshipData = {
   body: RelationshipCreate;
@@ -13840,9 +14769,13 @@ export type CreateCanonicalRelationshipData = {
 
 export type CreateCanonicalRelationshipErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type CreateCanonicalRelationshipError =
@@ -13872,9 +14805,13 @@ export type AttachRelationshipEvidenceEndpointData = {
 
 export type AttachRelationshipEvidenceEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type AttachRelationshipEvidenceEndpointError =
@@ -13904,9 +14841,13 @@ export type ListRelationshipEvidenceReviewsData = {
 
 export type ListRelationshipEvidenceReviewsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListRelationshipEvidenceReviewsError =
@@ -13940,9 +14881,13 @@ export type ReviewRelationshipEvidenceEndpointData = {
 
 export type ReviewRelationshipEvidenceEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ReviewRelationshipEvidenceEndpointError =
@@ -13972,9 +14917,13 @@ export type CreateLeadFromRelationshipContextData = {
 
 export type CreateLeadFromRelationshipContextErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type CreateLeadFromRelationshipContextError =
@@ -13999,9 +14948,13 @@ export type CreateReportingTaskEndpointData = {
 
 export type CreateReportingTaskEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type CreateReportingTaskEndpointError =
@@ -14031,9 +14984,13 @@ export type UpdateReportingTaskEndpointData = {
 
 export type UpdateReportingTaskEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type UpdateReportingTaskEndpointError =
@@ -14075,9 +15032,13 @@ export type SearchWorkbenchData = {
 
 export type SearchWorkbenchErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type SearchWorkbenchError =
@@ -14107,9 +15068,13 @@ export type DeleteConnectorCredentialData = {
 
 export type DeleteConnectorCredentialErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type DeleteConnectorCredentialError =
@@ -14126,12 +15091,7 @@ export type DeleteConnectorCredentialResponse =
   DeleteConnectorCredentialResponses[keyof DeleteConnectorCredentialResponses];
 
 export type SaveConnectorCredentialData = {
-  /**
-   * Body
-   */
-  body: {
-    [key: string]: unknown;
-  };
+  body: ConnectorCredentialPut;
   path: {
     /**
      * Provider
@@ -14144,9 +15104,13 @@ export type SaveConnectorCredentialData = {
 
 export type SaveConnectorCredentialErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type SaveConnectorCredentialError =
@@ -14180,9 +15144,13 @@ export type GetSecurityAlertsData = {
 
 export type GetSecurityAlertsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetSecurityAlertsError =
@@ -14228,9 +15196,13 @@ export type GetSecurityAuditData = {
 
 export type GetSecurityAuditErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetSecurityAuditError =
@@ -14247,12 +15219,7 @@ export type GetSecurityAuditResponse =
   GetSecurityAuditResponses[keyof GetSecurityAuditResponses];
 
 export type PruneSecurityAuditData = {
-  /**
-   * Body
-   */
-  body: {
-    [key: string]: unknown;
-  };
+  body: SecurityAuditRetentionRequest;
   path?: never;
   query?: never;
   url: '/api/settings/security/audit/retention';
@@ -14260,9 +15227,13 @@ export type PruneSecurityAuditData = {
 
 export type PruneSecurityAuditErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type PruneSecurityAuditError =
@@ -14296,9 +15267,13 @@ export type GetSecurityAuditRetentionPreviewData = {
 
 export type GetSecurityAuditRetentionPreviewErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetSecurityAuditRetentionPreviewError =
@@ -14321,6 +15296,20 @@ export type GetSecurityAuditSummaryData = {
   url: '/api/settings/security/audit/summary';
 };
 
+export type GetSecurityAuditSummaryErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSecurityAuditSummaryError =
+  GetSecurityAuditSummaryErrors[keyof GetSecurityAuditSummaryErrors];
+
 export type GetSecurityAuditSummaryResponses = {
   /**
    * Successful Response
@@ -14338,12 +15327,30 @@ export type ListAppUsersData = {
   url: '/api/settings/security/users';
 };
 
+export type ListAppUsersErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListAppUsersError = ListAppUsersErrors[keyof ListAppUsersErrors];
+
 export type ListAppUsersResponses = {
   /**
+   * Response List App Users
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<AppUserOut>;
 };
+
+export type ListAppUsersResponse =
+  ListAppUsersResponses[keyof ListAppUsersResponses];
 
 export type CreateAppUserData = {
   body: AppUserCreate;
@@ -14354,9 +15361,13 @@ export type CreateAppUserData = {
 
 export type CreateAppUserErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type CreateAppUserError = CreateAppUserErrors[keyof CreateAppUserErrors];
@@ -14365,8 +15376,11 @@ export type CreateAppUserResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AppUserCreatedOut;
 };
+
+export type CreateAppUserResponse =
+  CreateAppUserResponses[keyof CreateAppUserResponses];
 
 export type UpdateAppUserData = {
   body: AppUserUpdate;
@@ -14382,9 +15396,13 @@ export type UpdateAppUserData = {
 
 export type UpdateAppUserErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type UpdateAppUserError = UpdateAppUserErrors[keyof UpdateAppUserErrors];
@@ -14393,8 +15411,11 @@ export type UpdateAppUserResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AppUserUpdatedOut;
 };
+
+export type UpdateAppUserResponse =
+  UpdateAppUserResponses[keyof UpdateAppUserResponses];
 
 export type DeleteInvestigationMembershipData = {
   body?: never;
@@ -14414,9 +15435,13 @@ export type DeleteInvestigationMembershipData = {
 
 export type DeleteInvestigationMembershipErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type DeleteInvestigationMembershipError =
@@ -14450,9 +15475,13 @@ export type PutInvestigationMembershipData = {
 
 export type PutInvestigationMembershipErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type PutInvestigationMembershipError =
@@ -14462,8 +15491,11 @@ export type PutInvestigationMembershipResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: InvestigationMembershipOut;
 };
+
+export type PutInvestigationMembershipResponse =
+  PutInvestigationMembershipResponses[keyof PutInvestigationMembershipResponses];
 
 export type RevokeAppUserTokenData = {
   body?: never;
@@ -14479,9 +15511,13 @@ export type RevokeAppUserTokenData = {
 
 export type RevokeAppUserTokenErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type RevokeAppUserTokenError =
@@ -14491,8 +15527,11 @@ export type RevokeAppUserTokenResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AppUserTokenRevokedOut;
 };
+
+export type RevokeAppUserTokenResponse =
+  RevokeAppUserTokenResponses[keyof RevokeAppUserTokenResponses];
 
 export type RotateAppUserTokenData = {
   body?: never;
@@ -14508,9 +15547,13 @@ export type RotateAppUserTokenData = {
 
 export type RotateAppUserTokenErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type RotateAppUserTokenError =
@@ -14520,8 +15563,11 @@ export type RotateAppUserTokenResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AppUserTokenRotatedOut;
 };
+
+export type RotateAppUserTokenResponse =
+  RotateAppUserTokenResponses[keyof RotateAppUserTokenResponses];
 
 export type SettingsStatusData = {
   body?: never;
@@ -14529,6 +15575,20 @@ export type SettingsStatusData = {
   query?: never;
   url: '/api/settings/status';
 };
+
+export type SettingsStatusErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SettingsStatusError =
+  SettingsStatusErrors[keyof SettingsStatusErrors];
 
 export type SettingsStatusResponses = {
   /**
@@ -14546,6 +15606,20 @@ export type GetOrphanStoragePreviewData = {
   query?: never;
   url: '/api/settings/storage/orphans';
 };
+
+export type GetOrphanStoragePreviewErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetOrphanStoragePreviewError =
+  GetOrphanStoragePreviewErrors[keyof GetOrphanStoragePreviewErrors];
 
 export type GetOrphanStoragePreviewResponses = {
   /**
@@ -14566,9 +15640,13 @@ export type CreateSourceEndpointData = {
 
 export type CreateSourceEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type CreateSourceEndpointError =
@@ -14598,9 +15676,13 @@ export type ListSourceEvidenceEndpointData = {
 
 export type ListSourceEvidenceEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ListSourceEvidenceEndpointError =
@@ -14632,9 +15714,13 @@ export type PromoteStatementAssessmentData = {
 
 export type PromoteStatementAssessmentErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type PromoteStatementAssessmentError =
@@ -14659,9 +15745,13 @@ export type CreateTimelineEventEndpointData = {
 
 export type CreateTimelineEventEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type CreateTimelineEventEndpointError =
@@ -14686,9 +15776,13 @@ export type CreateWriteupEndpointData = {
 
 export type CreateWriteupEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type CreateWriteupEndpointError =
@@ -14698,8 +15792,11 @@ export type CreateWriteupEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: WriteupOut;
 };
+
+export type CreateWriteupEndpointResponse =
+  CreateWriteupEndpointResponses[keyof CreateWriteupEndpointResponses];
 
 export type DeleteWriteupEndpointData = {
   body?: never;
@@ -14715,9 +15812,13 @@ export type DeleteWriteupEndpointData = {
 
 export type DeleteWriteupEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type DeleteWriteupEndpointError =
@@ -14727,8 +15828,11 @@ export type DeleteWriteupEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: DeletedOut;
 };
+
+export type DeleteWriteupEndpointResponse =
+  DeleteWriteupEndpointResponses[keyof DeleteWriteupEndpointResponses];
 
 export type GetWriteupEndpointData = {
   body?: never;
@@ -14744,9 +15848,13 @@ export type GetWriteupEndpointData = {
 
 export type GetWriteupEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetWriteupEndpointError =
@@ -14756,8 +15864,11 @@ export type GetWriteupEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: WriteupOut;
 };
+
+export type GetWriteupEndpointResponse =
+  GetWriteupEndpointResponses[keyof GetWriteupEndpointResponses];
 
 export type UpdateWriteupEndpointData = {
   body: WriteupUpdate;
@@ -14773,9 +15884,13 @@ export type UpdateWriteupEndpointData = {
 
 export type UpdateWriteupEndpointErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type UpdateWriteupEndpointError =
@@ -14785,8 +15900,11 @@ export type UpdateWriteupEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: WriteupOut;
 };
+
+export type UpdateWriteupEndpointResponse =
+  UpdateWriteupEndpointResponses[keyof UpdateWriteupEndpointResponses];
 
 export type ExportWriteupDocxData = {
   body?: never;
@@ -14802,9 +15920,13 @@ export type ExportWriteupDocxData = {
 
 export type ExportWriteupDocxErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type ExportWriteupDocxError =
@@ -14812,7 +15934,10 @@ export type ExportWriteupDocxError =
 
 export type ExportWriteupDocxResponses = {
   /**
-   * Successful Response
+   * The write-up as a Word document
    */
-  200: unknown;
+  200: Blob | File;
 };
+
+export type ExportWriteupDocxResponse =
+  ExportWriteupDocxResponses[keyof ExportWriteupDocxResponses];

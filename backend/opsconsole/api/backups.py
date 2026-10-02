@@ -6,10 +6,11 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Query, Request, Response
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
+from opsconsole import schemas as s
 from opsconsole.context import ConsoleContext, ConsoleError
 from opsconsole.protocols import BackupProvider
 
@@ -34,7 +35,7 @@ def router(ctx: ConsoleContext) -> APIRouter:
             raise ConsoleError(404, "unknown_kind", f"no backup provider {kind!r}")
         return p
 
-    @r.get("/backups", response_model=None)
+    @r.get("/backups", response_model=s.ConsoleBackupsOut)
     def list_backups(request: Request) -> Any:
         ctx.read(request)
         out = []
@@ -47,7 +48,7 @@ def router(ctx: ConsoleContext) -> APIRouter:
             out.append({"kind": kind, "items": items, "error": error})
         return {"providers": out, "running": {k: ctx.supervisor.is_running(k) for k in ("backup", "restore")}}
 
-    @r.post("/backups", response_model=None)
+    @r.post("/backups", response_model=s.ConsoleRunStatusOut)
     def create(request: Request, body: CreateIn) -> Any:
         principal = ctx.write(request)
         provider = _provider(body.kind)
@@ -63,7 +64,8 @@ def router(ctx: ConsoleContext) -> APIRouter:
         ctx.audit(principal, request, section="backups", action="backup.create", note=body.kind, run_id=result["id"])
         return result
 
-    @r.get("/backups/{kind}/{bid}/download", response_model=None)
+    @r.get("/backups/{kind}/{bid}/download", response_class=Response,
+           responses=s.file_response({"*/*": s.BINARY}, "The backup file, as its provider wrote it"))
     def download(request: Request, kind: str, bid: str) -> Any:
         principal = ctx.read(request)
         path = _provider(kind).path_for_download(bid)
@@ -72,7 +74,7 @@ def router(ctx: ConsoleContext) -> APIRouter:
         ctx.audit(principal, request, section="backups", action="backup.download", note=f"{kind}:{bid}")
         return FileResponse(path, filename=Path(path).name)
 
-    @r.post("/backups/{bid}/restore/plan", response_model=None)
+    @r.post("/backups/{bid}/restore/plan", response_model=s.ConsoleRestorePlanOut)
     def plan(request: Request, bid: str, kind: str = Query(max_length=64)) -> Any:
         ctx.read(request)
         try:
@@ -80,7 +82,7 @@ def router(ctx: ConsoleContext) -> APIRouter:
         except LookupError as exc:
             raise ConsoleError(404, "unknown_backup", str(exc)) from exc
 
-    @r.post("/backups/{bid}/restore", response_model=None)
+    @r.post("/backups/{bid}/restore", response_model=s.ConsoleRunStatusOut)
     def restore(request: Request, bid: str, body: RestoreIn) -> Any:
         principal = ctx.write(request)
         ctx.confirm(body.confirm, bid)
@@ -101,7 +103,7 @@ def router(ctx: ConsoleContext) -> APIRouter:
         ctx.audit(principal, request, section="backups", action="backup.restore", note=f"{body.kind}:{bid}", run_id=result["id"])
         return result
 
-    @r.get("/backups/runs", response_model=None)
+    @r.get("/backups/runs", response_model=s.ConsoleRunsOut)
     def runs(request: Request, limit: int = Query(20, ge=1, le=200)) -> Any:
         ctx.read(request)
         return {"items": [x for x in ctx.store.runs_list(kind=None, limit=limit * 2) if x["kind"] in ("backup", "restore")][:limit]}

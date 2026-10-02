@@ -13,18 +13,32 @@ from app.models.domain import ExtractionCandidate
 from app.schemas.api import ExtractionCandidateReviewRequest
 from app.services.documents import preview_entity_candidate_matches, review_candidate, serialize_extraction_lineage
 from app.services.extraction_explanations import explain_extraction_candidate
-from app.schemas.responses import ExtractionExplanationOut, ExtractionLineageOut, ExtractionReviewOut
+from app.schemas.responses import EntityMatchPreviewOut, ExtractionExplanationOut, ExtractionLineageOut, ExtractionReviewOut, IdentifierTargetsOut
+from app.services.identifier_proposals import identifier_targets
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.get("/extraction-candidates/{candidate_id}/entity-matches", response_model=None)
+@router.get("/extraction-candidates/{candidate_id}/entity-matches", response_model=EntityMatchPreviewOut)
 def get_extraction_entity_matches(candidate_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(ExtractionCandidate, candidate_id)
     if row is None:
         raise HTTPException(404, "Extraction candidate not found")
     try:
         return preview_entity_candidate_matches(db, row)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+
+
+@router.get("/extraction-candidates/{candidate_id}/identifier-targets", response_model=IdentifierTargetsOut)
+def get_identifier_targets(candidate_id: str, db: Session = Depends(get_db)) -> Any:
+    """The entities an email or phone proposal can belong to, this
+    document's own first (ADR-0006). Accepting it needs one of them."""
+    row = db.get(ExtractionCandidate, candidate_id)
+    if row is None:
+        raise HTTPException(404, "Extraction candidate not found")
+    try:
+        return identifier_targets(db, row)
     except ValueError as exc:
         raise HTTPException(400, str(exc))
 

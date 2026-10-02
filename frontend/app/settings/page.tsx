@@ -1,12 +1,15 @@
 'use client';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import type {ReactElement} from 'react';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import Link from 'next/link';
 import {api, API} from '../../lib/api-instance';
 import {ApiHttpError, errorMessage} from '../../lib/api-client';
-import {isSettingsStatus, parseInvestigationList, isInvestigationDeletionPreview, isInvestigationDeletionResult} from '../../lib/api-validate';
-import type {SettingsStatus, Investigation, InvestigationDeletionPreview} from '../../lib/api-types';
+import {listInvestigationsOptions, settingsStatusOptions, settingsStatusQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
+import {investigationDeletionPreview, removeInvestigation, seedDemo as seedDemoInvestigation} from '../../lib/generated/sdk.gen';
+import type {InvestigationDeletionPreview, SettingsStatusOut} from '../../lib/generated/types.gen';
 import {isDemoHidden, setDemoHidden} from '../../lib/demo-preference';
+import {QueryProvider} from '../../lib/query-client';
 import {describeAiStatus, whereModelRuns} from '../../components/ai-reasoning-panel';
 
 // Phase 1 scope: the bearer-token API access card only, reusing the shared
@@ -15,14 +18,55 @@ import {describeAiStatus, whereModelRuns} from '../../components/ai-reasoning-pa
 // the security audit log stay on the main workbench for now -- they read
 // investigation-scoped state the workbench already tracks, and moving them
 // here is a later extraction phase, not this one.
+//
+// On the generated API client (Foundation Fixes fix 2), with its own data
+// cache (fix 3): the settings status and the investigation list are
+// queries, and every reply is checked against the API schema.
 
 type AccessState = 'checking' | 'local' | 'authenticated' | 'needs_token' | 'remote_disabled' | 'error';
 
+type Access = {state: AccessState; message: string; status: SettingsStatusOut | null};
+
+/** What the settings status query says about API access from this browser. */
+function accessOf(query: {isFetching: boolean; isError: boolean; error: unknown; data: SettingsStatusOut | undefined}): Access {
+  // A recheck keeps the last status on screen until the server answers, as
+  // it did before; a status that last failed stays blank.
+  if (query.isFetching || (!query.isError && !query.data)) {
+    return {state: 'checking', message: 'Checking API access…', status: query.isError ? null : query.data ?? null};
+  }
+  if (query.isError) {
+    const error = query.error;
+    if (error instanceof ApiHttpError && error.status === 401) {
+      return {state: 'needs_token', message: 'This API requires a bearer token for non-local access. Enter it below.', status: null};
+    }
+    if (error instanceof ApiHttpError && error.status === 403) {
+      return {state: 'remote_disabled', message: 'Remote API access is disabled on the backend.', status: null};
+    }
+    return {state: 'error', message: errorMessage(error, 'Could not connect to the API'), status: null};
+  }
+  const status = query.data ?? null;
+  if (api.hasAuthToken()) {
+    return {state: 'authenticated', message: 'Authenticated for this browser session. The token is held only in memory and is not written to storage.', status};
+  }
+  return {
+    state: 'local',
+    message: status?.access.mode === 'local_only'
+      ? 'Local-only API access. No bearer token is required on loopback.'
+      : 'Connected from a trusted local address; remote clients require the configured bearer token.',
+    status,
+  };
+}
+
+// The page provides the data cache its queries use, as the workbench page does.
 export default function SettingsPage(): ReactElement {
+  return <QueryProvider><Settings/></QueryProvider>;
+}
+
+function Settings(): ReactElement {
+  const queryClient = useQueryClient();
   const [tokenInput, setTokenInput] = useState('');
-  const [state, setState] = useState<AccessState>('checking');
-  const [message, setMessage] = useState('Checking API access…');
-  const [status, setStatus] = useState<SettingsStatus | null>(null);
+  const statusQuery = useQuery(settingsStatusOptions());
+  const {state, message, status} = accessOf(statusQuery);
 
   // Demo mode: one dedicated "Demo Investigation" seeded through the real
   // backend service layer (see backend/app/services/demo_seed.py), so every
@@ -32,33 +76,48 @@ export default function SettingsPage(): ReactElement {
   // touch the data) and a separate "Delete demo data" action that reuses
   // the same preview-then-type-to-confirm deletion flow the main workbench
   // uses for any investigation.
-  const [demoInv, setDemoInv] = useState<Investigation | null>(null);
-  const [demoChecked, setDemoChecked] = useState(false);
+  const investigationsQuery = useQuery(listInvestigationsOptions());
+  const demoInv = investigationsQuery.data?.find(inv => inv.is_demo) ?? null;
+  // Shown once the list has answered (or failed to), as before.
+  const demoChecked = !investigationsQuery.isPending;
   const [demoStatus, setDemoStatus] = useState('');
   const [hideDemo, setHideDemo] = useState(false);
   const [demoDeletePreview, setDemoDeletePreview] = useState<InvestigationDeletionPreview | null>(null);
   const [demoDeleteConfirmation, setDemoDeleteConfirmation] = useState('');
 
+  const listFailure = (error: unknown) => errorMessage(error, 'Could not check demo investigation status');
+
+  // The first answer of the list: a failure is shown in the demo status line.
+  const firstListAnswer = useRef(false);
+  useEffect(() => {
+    if (firstListAnswer.current || investigationsQuery.isPending) return;
+    firstListAnswer.current = true;
+    if (investigationsQuery.isError) setDemoStatus(listFailure(investigationsQuery.error));
+  }, [investigationsQuery.isPending, investigationsQuery.isError, investigationsQuery.error]);
+
+  // Reads the list again; a failure is shown, and the demo case last seen stays.
   const refreshDemoState = async () => {
-    try {
-      const rows = await api.parsed('/api/investigations', parseInvestigationList);
-      setDemoInv(rows.find(inv => inv.is_demo) || null);
-    } catch (error) {
-      setDemoStatus(errorMessage(error, 'Could not check demo investigation status'));
-    } finally {
-      setDemoChecked(true);
-    }
+    const {error} = await investigationsQuery.refetch();
+    if (error) setDemoStatus(listFailure(error));
   };
 
   useEffect(() => {
     setHideDemo(isDemoHidden());
-    void refreshDemoState();
   }, []);
+
+  const seedMutation = useMutation({mutationFn: async () => (await seedDemoInvestigation({throwOnError: true})).data});
+  const previewMutation = useMutation({
+    mutationFn: async (id: string) => (await investigationDeletionPreview({path: {investigation_id: id}, throwOnError: true})).data,
+  });
+  const deleteMutation = useMutation({
+    mutationFn: async (input: {id: string; confirmation: string}) =>
+      (await removeInvestigation({path: {investigation_id: input.id}, query: {confirmation: input.confirmation}, throwOnError: true})).data,
+  });
 
   const seedDemo = async () => {
     setDemoStatus('Seeding demo investigation…');
     try {
-      await api.unknown('/api/demo/seed', {method: 'POST'});
+      await seedMutation.mutateAsync();
       await refreshDemoState();
       setDemoStatus('Demo investigation is ready.');
     } catch (error) {
@@ -77,7 +136,7 @@ export default function SettingsPage(): ReactElement {
     setDemoStatus('Calculating deletion impact…');
     setDemoDeleteConfirmation('');
     try {
-      const value = await api.object(`/api/investigations/${demoInv.id}/deletion-preview`, 'deletion preview', isInvestigationDeletionPreview);
+      const value = await previewMutation.mutateAsync(demoInv.id);
       setDemoDeletePreview(value);
       setDemoStatus(value.can_delete ? 'Preview ready. Type the exact investigation ID to enable deletion.' : 'Deletion is blocked by an unsafe document path.');
     } catch (error) {
@@ -90,8 +149,7 @@ export default function SettingsPage(): ReactElement {
     if (!demoDeletePreview || demoDeleteConfirmation !== demoDeletePreview.requires_confirmation) return;
     setDemoStatus('Deleting demo investigation…');
     try {
-      const params = new URLSearchParams({confirmation: demoDeleteConfirmation});
-      const result = await api.object(`/api/investigations/${demoDeletePreview.investigation_id}?${params.toString()}`, 'deletion result', isInvestigationDeletionResult, {method: 'DELETE'});
+      const result = await deleteMutation.mutateAsync({id: demoDeletePreview.investigation_id, confirmation: demoDeleteConfirmation});
       setDemoDeletePreview(null);
       setDemoDeleteConfirmation('');
       setDemoStatus(`Deleted ${result.deleted_record_total} record(s) and ${result.document_files_deleted} document file(s).`);
@@ -101,41 +159,8 @@ export default function SettingsPage(): ReactElement {
     }
   };
 
-  const check = async () => {
-    setState('checking');
-    setMessage('Checking API access…');
-    try {
-      const value = await api.object('/api/settings/status', 'settings status', isSettingsStatus);
-      setStatus(value);
-      setState(api.hasAuthToken() ? 'authenticated' : 'local');
-      setMessage(
-        api.hasAuthToken()
-          ? 'Authenticated for this browser session. The token is held only in memory and is not written to storage.'
-          : value.access.mode === 'local_only'
-            ? 'Local-only API access. No bearer token is required on loopback.'
-            : 'Connected from a trusted local address; remote clients require the configured bearer token.'
-      );
-    } catch (error) {
-      setStatus(null);
-      if (error instanceof ApiHttpError && error.status === 401) {
-        setState('needs_token');
-        setMessage('This API requires a bearer token for non-local access. Enter it below.');
-        return;
-      }
-      if (error instanceof ApiHttpError && error.status === 403) {
-        setState('remote_disabled');
-        setMessage('Remote API access is disabled on the backend.');
-        return;
-      }
-      setState('error');
-      setMessage(errorMessage(error, 'Could not connect to the API'));
-    }
-  };
-
-  useEffect(() => {
-    void check();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Asks for the status again (with the token now held, or without it).
+  const check = () => queryClient.refetchQueries({queryKey: settingsStatusQueryKey()});
 
   const authenticate = async () => {
     const token = tokenInput.trim();
@@ -148,10 +173,8 @@ export default function SettingsPage(): ReactElement {
   const clearSession = async () => {
     api.clearAuthToken();
     setTokenInput('');
-    setMessage('Session token cleared. Rechecking API access…');
     await check();
   };
-
   const stateTone: Record<AccessState, string> = {
     checking: 'border-border bg-card text-muted-foreground',
     local: 'border-accent/40 bg-accent/15 text-accent-foreground',

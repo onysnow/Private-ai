@@ -1,5 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from app.jobs.corpus import request_corpus_sync
 from app.models.domain import (
     ConnectorFinding, Entity, ResolutionDecision, Statement, StatementAssessment, StatementPromotion,
 )
@@ -84,4 +85,7 @@ def promote_assessment(db: Session, assessment: StatementAssessment, note: str |
     db.add(promotion)
     db.commit()
     db.refresh(promotion)
+    # The promoted value changed a confirmed entity: re-send it to the
+    # OpenAleph collection (ADR-0006, Wave B).
+    request_corpus_sync(db, promotion.investigation_id)
     return promotion

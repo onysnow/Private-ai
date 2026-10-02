@@ -81,6 +81,6 @@ character positions; or OpenAleph's project slows or changes licence.
 - [x] Upload returns at once; Workbench jobs on Procrastinate (`app/jobs`)
 - [x] Upload hands documents to OpenAleph first (`app/services/openaleph_reader.py`)
 - [x] Own parser becomes the fallback when OpenAleph cannot read a file
-- [ ] Pattern name-finder becomes a fallback only: in the live run OpenAleph's ftm-analyze queued no analysis for the test files, so the name-finder still runs beside it (`ENABLE_LOCAL_ENTITY_SUGGESTIONS`, default true)
+- [x] Pattern name-finder becomes a fallback only (2026-10-02, ADR-0006): it runs only for a document OpenAleph's ftm-analyze did not analyse, or one read by the Workbench's own reader (`ENABLE_LOCAL_ENTITY_SUGGESTIONS` still switches it off). Live on the sandbox stack (`tests/test_openaleph_live.py`): a memo and a two-page PDF were read by OpenAleph, ftm-analyze's names became proposals at their places in the text, and the pattern finder made none
 - [x] Ollama adapter and quote check; AI runs are background jobs (live on 2026-10-01 against a local Ollama with qwen2.5:0.5b: a presentation draft in 80 s, 3 quotes verified)
 - [ ] Response models, generated client, panel split

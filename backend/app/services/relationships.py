@@ -6,6 +6,7 @@ from typing import Any
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
+from app.jobs.corpus import request_corpus_sync
 from app.models.domain import Entity, RelationshipEdge, Statement, Evidence, Source, ClaimEvidenceLink, Claim, RelationshipEvidenceReviewEvent, RelationshipEvidenceAttachment
 from app.services.ftm import make_ftm_entity
 
@@ -178,6 +179,10 @@ def create_relationship(
     if commit:
         db.commit()
         db.refresh(edge)
+        # The relationship goes to the OpenAleph collection (ADR-0006, Wave B).
+        # A caller that commits for itself (commit=False) queues the push after
+        # its own commit.
+        request_corpus_sync(db, investigation_id)
     else:
         db.flush()
     return edge

@@ -21,12 +21,15 @@ async function renderSettings(ai: Record<string, unknown>) {
   const Page = mod.default;
   render(<Page/>);
   await screen.findByText('Private AI');
+  // The status has arrived once the access line shows it (the page reads it
+  // through TanStack Query, which answers a moment after the render).
+  await screen.findByText(/Access mode:/);
 }
 
 describe('Settings: Private AI', () => {
   it('names the local model and says it runs on this computer', async () => {
     await renderSettings({enabled: true, provider: 'ollama', provider_key_configured: true, endpoints_callable: true, model: 'qwen2.5:7b', runs_on_this_computer: true,
-      tas_spec: {present: true, version: '1.9', modules: {presentation_draft: {spec_file: 'PRESENTATION_DRAFT.md', available: true}}, control_surface: {spec_file: 'x', available: true, flags: {}}}});
+      tas_spec: {present: true, version: '1.9', modules: {presentation_draft: {spec_file: 'PRESENTATION_DRAFT.md', available: true, vendored_tas: false}}, control_surface: {spec_file: 'x', available: true, flags: {}}}});
     expect(screen.getByText('qwen2.5:7b')).toBeInTheDocument();
     expect(screen.getAllByText(/runs on this computer/).length).toBeGreaterThan(0);
     expect(screen.queryByText(/remote endpoints allowed/)).not.toBeInTheDocument();

@@ -79,6 +79,10 @@ from app.models.identity import (
 from app.models.jobs import (
     BackgroundJob,
 )
+from app.models.corpus import (
+    OpenAlephEntityLink,
+    CorpusSyncState,
+)
 
 __all__ = [
     "uid",
@@ -127,4 +131,6 @@ __all__ = [
     "AppUser",
     "InvestigationMembership",
     "BackgroundJob",
+    "OpenAlephEntityLink",
+    "CorpusSyncState",
 ]

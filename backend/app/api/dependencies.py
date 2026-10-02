@@ -14,6 +14,12 @@ from sqlalchemy.orm import Session
 from app.core.authorization import authorize_routed_resource
 from app.db.session import get_db
 
+# The furthest into a list a page may start. The database takes OFFSET as a
+# 64-bit integer (SQLite INTEGER, PostgreSQL bigint), and a larger one failed
+# with a server error instead of a refusal (tests/test_api_contract.py found
+# it); no list here comes near this many rows.
+MAX_OFFSET = 2**31 - 1
+
 
 def authorize_request_resource(request: Request, db: Session = Depends(get_db)) -> Any:
     return authorize_routed_resource(request, db)
