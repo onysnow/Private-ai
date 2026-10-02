@@ -82,5 +82,5 @@ character positions; or OpenAleph's project slows or changes licence.
 - [x] Upload hands documents to OpenAleph first (`app/services/openaleph_reader.py`)
 - [x] Own parser becomes the fallback when OpenAleph cannot read a file
 - [ ] Pattern name-finder becomes a fallback only: in the live run OpenAleph's ftm-analyze queued no analysis for the test files, so the name-finder still runs beside it (`ENABLE_LOCAL_ENTITY_SUGGESTIONS`, default true)
-- [ ] Ollama adapter and quote check
+- [x] Ollama adapter and quote check; AI runs are background jobs (live on 2026-10-01 against a local Ollama with qwen2.5:0.5b: a presentation draft in 80 s, 3 quotes verified)
 - [ ] Response models, generated client, panel split

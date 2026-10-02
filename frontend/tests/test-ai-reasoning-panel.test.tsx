@@ -85,6 +85,10 @@ describe('describeAiStatus', () => {
     expect(describeAiStatus({...readyStatus, tas_spec: {...readyStatus.tas_spec, present: false}})).toMatch(/not checked out/);
     expect(describeAiStatus({...readyStatus, tas_spec: {...readyStatus.tas_spec, modules: {...readyStatus.tas_spec.modules, hypothesis_test: {spec_file: 'x', available: false}}}})).toMatch(/hypothesis_test/);
     expect(describeAiStatus(readyStatus)).toMatch(/Ready: provider anthropic, TAS spec v1.8/);
+    expect(describeAiStatus({...readyStatus, provider: 'ollama', model: 'llama3.2', runs_on_this_computer: true}))
+      .toMatch(/Ready: provider ollama, model llama3.2 \(runs on this computer\), TAS spec v1.8/);
+    expect(describeAiStatus({...readyStatus, model: 'claude-x', runs_on_this_computer: false})).toMatch(/runs on the provider's servers/);
+    expect(describeAiStatus({...readyStatus, provider: 'ollama', provider_key_configured: false})).toMatch(/no model is chosen/);
   });
 });
 
@@ -151,6 +155,48 @@ describe('AiReasoningPanel', () => {
     // Once reviewed, the accept/reject controls are gone.
     expect(screen.queryByRole('button', {name: 'Accept as trusted analysis'})).not.toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledTimes(7);
+  });
+
+  it('follows a queued run in the background and opens its candidate when the job finishes', async () => {
+    const user = userEvent.setup();
+    const job = {id: 'job-7', kind: 'ai_reasoning', investigation_id: 'inv-1', subject_type: 'ai_run', subject_id: null,
+      status: 'queued', finished: false, progress: null, message: 'Waiting for the model', error: null, attempts: 0, runner: 'procrastinate', result: null};
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(jsonResponse({candidates: []})) // initial queue
+      .mockResolvedValueOnce(jsonResponse({candidate_id: null, job}, 202)) // POST case-synthesis: queued
+      .mockResolvedValueOnce(jsonResponse({...job, status: 'succeeded', finished: true, progress: 100, message: 'Proposed for review',
+        result: {candidate_id: 'cand-1', review_status: 'proposed', payload: {}}})) // GET job
+      .mockResolvedValueOnce(jsonResponse({candidates: [summary()]})) // queue reload
+      .mockResolvedValueOnce(jsonResponse(fullCandidate())); // GET candidate
+    vi.stubGlobal('fetch', fetchMock);
+    render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} />);
+
+    await screen.findByText('No AI analysis candidates yet for this investigation.');
+    await user.type(screen.getByLabelText('Question'), 'What did Ada North sign?');
+    await user.click(screen.getByRole('button', {name: 'Run module'}));
+
+    await screen.findByTestId('ai-candidate-detail');
+    expect(screen.getByTestId('ai-run-status')).toHaveTextContent('Proposed for review (candidate cand-1).');
+    expect(requestUrl(fetchMock.mock.calls[2])).toBe('http://api.test/api/jobs/job-7');
+  });
+
+  it('shows the error a queued run finished with', async () => {
+    const user = userEvent.setup();
+    const job = {id: 'job-8', kind: 'ai_reasoning', investigation_id: 'inv-1', subject_type: 'ai_run', subject_id: null,
+      status: 'failed', finished: true, progress: 0, message: 'Stopped with an error', error: 'Model output rejected', attempts: 1, runner: 'procrastinate',
+      result: {status_code: 422, detail: {message: 'Model output rejected: none of its quotes could be found in the records it cites.', removed: []}}};
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(jsonResponse({candidates: []}))
+      .mockResolvedValueOnce(jsonResponse({candidate_id: null, job: {...job, status: 'queued', finished: false, result: null}}, 202))
+      .mockResolvedValueOnce(jsonResponse(job))
+      .mockResolvedValueOnce(jsonResponse({candidates: []}));
+    vi.stubGlobal('fetch', fetchMock);
+    render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} />);
+
+    await screen.findByText('No AI analysis candidates yet for this investigation.');
+    await user.type(screen.getByLabelText('Question'), 'Who signed?');
+    await user.click(screen.getByRole('button', {name: 'Run module'}));
+    await waitFor(() => expect(screen.getByTestId('ai-run-status')).toHaveTextContent(/none of its quotes could be found.*422/));
   });
 
   it('surfaces a citation rejection from the backend instead of a proposed candidate', async () => {

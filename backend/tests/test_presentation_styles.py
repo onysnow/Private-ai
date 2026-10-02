@@ -46,19 +46,19 @@ def _accepted_candidate(monkeypatch) -> dict:
     claim = client.post("/api/claims", json={"investigation_id": inv["id"], "text": "Meridian paid Bellcastle a fee."}).json()
     source = client.post("/api/sources", json={"investigation_id": inv["id"], "title": "Wire log", "source_type": "filing"}).json()
     evidence = client.post("/api/evidence", json={"source_id": source["id"], "quote": "$2.4M wired to Bellcastle.", "locator": "row 41"}).json()
-    ev = [{"record_type": "evidence", "record_id": evidence["id"]}]
+    ev = [{"record_type": "evidence", "record_id": evidence["id"], "quote": "$2.4M wired to Bellcastle."}]
     payload = {
         "title": "The Bellcastle fee",
         "goal_restated": "Explain the fee.",
         "executive_takeaway": "Bellcastle got the largest fee.",
         "sections": [
-            {"heading": "Headline", "body": "The fee was $2.4M.", "key_points": ["$2.4M"], "evidence": ev,
+            {"heading": "Headline", "body": "The fee was $2.4M.", "key_points": [{"text": "$2.4M", "evidence": ev}], "evidence": ev,
              "visual": {"type": "figures", "items": [{"value": "$2.4M", "label": "to Bellcastle", "evidence": ev},
                                                      {"value": "11 days", "label": "after signing", "evidence": ev}]}},
-            {"heading": "Sequence", "body": "Signed, then wired.", "key_points": ["Signed, then wired"], "evidence": ev,
+            {"heading": "Sequence", "body": "Signed, then wired.", "key_points": [{"text": "Signed, then wired", "evidence": ev}], "evidence": ev,
              "visual": {"type": "timeline", "items": [{"date": "2023-11-03", "label": "Signed", "evidence": ev},
                                                       {"date": "2023-11-14", "label": "Wired", "evidence": ev}]}},
-            {"heading": "Compared", "body": "Largest of three.", "key_points": ["Largest fee"], "evidence": ev,
+            {"heading": "Compared", "body": "Largest of three.", "key_points": [{"text": "Largest fee", "evidence": ev}], "evidence": ev,
              "visual": {"type": "bar", "title": "Consulting fees", "unit": "USD", "items": [
                  {"label": "Arden", "value": 285000, "evidence": ev},
                  {"label": "Bellcastle", "value": 2400000, "evidence": ev},

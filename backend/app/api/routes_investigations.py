@@ -16,21 +16,20 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from sqlalchemy.orm import Session
 
-from app.ai.governor import ReasoningThrottled
-from app.ai.llm_client import LLMProviderError
 from app.ai.reasoning import (
-    CitationValidationError,
-    ModelOutputError,
+    TAS_MODULES,
     ReasoningInputError,
-    SchemaValidationError,
     list_ai_analysis_candidates,
-    run_reasoning_module,
+    validate_reasoning_request,
 )
 from app.api.dependencies import authorize_request_resource
-from app.core.authorization import require_scope_investigation_admin, scope_for_request
+from app.core.authorization import current_authorization_scope, require_scope_investigation_admin, scope_for_request
 from app.core.config import settings
 from app.db.session import get_db
-from app.models.domain import Investigation
+from app.jobs.handlers import AI_REASONING
+from app.jobs.records import create_job, serialize_job
+from app.jobs.runner import job_runner
+from app.models.domain import BackgroundJob, Investigation
 from app.schemas.api import (
     CaseSynthesisRequest, HypothesisTestRequest, InvestigationCreate,
     InvestigationQuestionContextRequest, PresentationDraftRequest,
@@ -123,62 +122,75 @@ def investigation_question_context(
         raise HTTPException(404, str(exc))
 
 
-def _run_reasoning_endpoint(db: Session, *, investigation_id: str, module: str, question: str, max_results: int = 30, include_external_leads: bool = True, working_theory: str | None = None, control_flags: dict | None = None, record_refs: list[dict] | None = None) -> dict[str, Any]:
+async def _run_reasoning_endpoint(request: Request, response: Response, db: Session, *, investigation_id: str, module: str, question: str, max_results: int = 30, include_external_leads: bool = True, working_theory: str | None = None, control_flags: dict | None = None, record_refs: list[dict] | None = None) -> dict[str, Any]:
+    """Validate, then run as a background job (Foundation Fixes fix 4).
+
+    In the Docker stack the run is queued and this answers 202 with the job
+    to follow (GET /api/jobs/{id}; its `result` holds what this endpoint
+    used to return). In developer mode the job runs first and the answer is
+    the same as it always was, including the error statuses.
+    """
     if not settings.enable_ai_features or not (settings.ai_provider or "").strip():
         raise HTTPException(400, "AI reasoning endpoints are not enabled on this deployment (enable_ai_features and ai_provider must both be set)")
     try:
-        candidate = run_reasoning_module(
-            db, investigation_id=investigation_id, module=module, question=question,
-            working_theory=working_theory, max_results=max_results, include_external_leads=include_external_leads,
+        resolved_flags = validate_reasoning_request(
+            investigation_id=investigation_id, module=module, working_theory=working_theory,
             control_flags=control_flags, record_refs=record_refs,
         )
-        return {"candidate_id": candidate.id, "review_status": candidate.review_status, "payload": candidate.payload}
     except ReasoningInputError as exc:
         raise HTTPException(400, str(exc))
-    except ReasoningThrottled as exc:
-        raise HTTPException(429, str(exc), headers={"Retry-After": str(exc.retry_after_seconds)})
-    except LLMProviderError as exc:
-        # STRUCT-0028: no raw vendor error text in the response; the exception message
-        # is what the server log/audit gets.
-        raise HTTPException(502, "The AI provider request failed (network, authentication, or provider error). Check the server log for details.")
-    except ModelOutputError as exc:
-        # Provider/model failure, persisted as a rejected candidate for the audit trail;
-        # 502 because nothing about the reporter's request was wrong.
-        raise HTTPException(502, {"message": f"Model output unusable: {exc}", "rejection_reason": exc.reason})
-    except CitationValidationError as exc:
-        raise HTTPException(422, {"message": "Model output rejected: referenced evidence not present in the retrieval packet.", "invalid_citations": exc.bad_refs})
-    except SchemaValidationError as exc:
-        raise HTTPException(422, {"message": "Model output rejected: did not match the required output schema.", "schema_errors": exc.errors})
-    except ValueError as exc:
-        raise HTTPException(404, str(exc))
+    scope = current_authorization_scope()
+    runner = job_runner(request)
+    job = create_job(
+        db, kind=AI_REASONING, investigation_id=investigation_id, subject_type="ai_run", runner=runner.mode,
+        payload={
+            "module": module, "question": question, "working_theory": working_theory, "max_results": max_results,
+            "include_external_leads": include_external_leads, "record_refs": record_refs,
+            "control_flags": control_flags if module in TAS_MODULES else None, "resolved_control_flags": resolved_flags,
+            "actor_id": scope.actor_id if scope is not None else "local-owner",
+        },
+        message="Waiting for the model",
+    )
+    await runner.submit(job, db)
+    db.expire_all()
+    row = db.get(BackgroundJob, job.id)
+    if row is None:
+        raise HTTPException(404, "Investigation not found")
+    result = (row.payload or {}).get("result") or {}
+    if row.status == "succeeded":
+        return {**result, "job": serialize_job(row)}
+    if row.status == "failed":
+        raise HTTPException(result.get("status_code", 500), result.get("detail", row.error or "AI run failed"), headers=result.get("headers"))
+    response.status_code = 202
+    return {"candidate_id": None, "job": serialize_job(row)}
 
 
 @router.post("/investigations/{investigation_id}/assistant/case-synthesis", response_model=None)
-def investigation_case_synthesis(
-    investigation_id: str, body: CaseSynthesisRequest, db: Session = Depends(get_db),
+async def investigation_case_synthesis(
+    investigation_id: str, body: CaseSynthesisRequest, request: Request, response: Response, db: Session = Depends(get_db),
 ) -> Any:
     """TAS Module 08 (Case Synthesis) as a real, citation-validated LLM call.
 
     Never writes to canonical records — the result is persisted as a
     review_status="proposed" AIAnalysisCandidate. See app/ai/reasoning.py.
     """
-    return _run_reasoning_endpoint(
-        db, investigation_id=investigation_id, module="case_synthesis", question=body.question,
+    return await _run_reasoning_endpoint(
+        request, response, db, investigation_id=investigation_id, module="case_synthesis", question=body.question,
         max_results=body.max_results, include_external_leads=body.include_external_leads,
         control_flags={"severity_floor": body.severity_floor, "source_tier_floor": body.source_tier_floor},
     )
 
 
 @router.post("/investigations/{investigation_id}/assistant/hypothesis-test", response_model=None)
-def investigation_hypothesis_test(
-    investigation_id: str, body: HypothesisTestRequest, db: Session = Depends(get_db),
+async def investigation_hypothesis_test(
+    investigation_id: str, body: HypothesisTestRequest, request: Request, response: Response, db: Session = Depends(get_db),
 ) -> Any:
     """TAS Module 06 (Hypothesis and Contradiction Testing) as a real,
     citation-validated LLM call. Same non-canonical-write guarantee as
     /assistant/case-synthesis above.
     """
-    return _run_reasoning_endpoint(
-        db, investigation_id=investigation_id, module="hypothesis_test", question=body.question,
+    return await _run_reasoning_endpoint(
+        request, response, db, investigation_id=investigation_id, module="hypothesis_test", question=body.question,
         max_results=body.max_results, include_external_leads=body.include_external_leads,
         working_theory=body.working_theory,
         control_flags={"severity_floor": body.severity_floor, "source_tier_floor": body.source_tier_floor},
@@ -186,8 +198,8 @@ def investigation_hypothesis_test(
 
 
 @router.post("/investigations/{investigation_id}/assistant/presentation-draft", response_model=None)
-def investigation_presentation_draft(
-    investigation_id: str, body: PresentationDraftRequest, db: Session = Depends(get_db),
+async def investigation_presentation_draft(
+    investigation_id: str, body: PresentationDraftRequest, request: Request, response: Response, db: Session = Depends(get_db),
 ) -> Any:
     """Draft a brief/deck from a reporter-selected evidence set and a goal.
 
@@ -198,8 +210,8 @@ def investigation_presentation_draft(
     result is a review_status="proposed" AIAnalysisCandidate, promoted to
     a Writeup and/or Deck only by a separate, human action.
     """
-    return _run_reasoning_endpoint(
-        db, investigation_id=investigation_id, module="presentation_draft", question=body.goal,
+    return await _run_reasoning_endpoint(
+        request, response, db, investigation_id=investigation_id, module="presentation_draft", question=body.goal,
         record_refs=[ref.model_dump() for ref in body.record_refs],
     )
 

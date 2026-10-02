@@ -92,6 +92,19 @@ describe('DraftPreview', () => {
     expect(within(brief).getAllByTitle('Evidence: Ex. 14, p. 3').length).toBeGreaterThan(0);
   });
 
+  it('lists each key point with the words the quote check found in its record', async () => {
+    const user = userEvent.setup();
+    const checked: JsonObject = {...payload, sections: [{...(payload.sections as JsonObject[])[0],
+      key_point_evidence: [[{...EV, quote: '$2,400,000.00 WIRE OUT', matched_text: '$2,400,000.00 WIRE OUT', locator: 'p. 3', start_char: 0, end_char: 22}]]}]};
+    render(<DraftPreview payload={checked} slides={slides} citationDetails={[detail()]}/>);
+    await user.click(screen.getByRole('tab', {name: 'Brief'}));
+    const quotes = screen.getByTestId('checked-quotes');
+    expect(quotes).toHaveTextContent('Quotes found in the records (1 key point)');
+    expect(quotes).toHaveTextContent('Agreement then wire');
+    expect(within(quotes).getByText('“$2,400,000.00 WIRE OUT”').tagName).toBe('MARK');
+    expect(quotes).toHaveTextContent('— Ex. 14, p. 3, p. 3');
+  });
+
   it('marks a deleted record instead of tracing it', async () => {
     const user = userEvent.setup();
     const onTrace = vi.fn();

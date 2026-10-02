@@ -36,9 +36,10 @@ forms for every section, every time.
     close to as-is.
   - `key_points`: the same content as `body`, compressed into terse
     bullet form suitable for a slide. Not a copy-paste truncation of
-    `body` -- genuinely rewritten for the bullet format.
-  - `evidence`: every `{"record_type": ..., "record_id": ...}` this
-    section's claims actually rest on, drawn only from the retrieval
+    `body` -- genuinely rewritten for the bullet format. Each key point is
+    `{"text": ..., "evidence": [...]}`, citing the record(s) it rests on.
+  - `evidence`: every `{"record_type": ..., "record_id": ..., "quote": ...}`
+    this section's claims actually rest on, drawn only from the retrieval
     packet's own `citations` list.
   - `visual`: `null` for most sections. Set it only when a picture of the
     evidence would carry the point better than prose, AND the cited
@@ -83,3 +84,11 @@ of these, not instead of them)
    are read off a slide at a glance.
 5. Visuals follow rule 2 at the level of every single value: each figure,
    date, and bar is traceable to its own cited evidence, or it is left out.
+6. Bring the page. Every evidence reference -- in a key point, a
+   section's `evidence`, or a visual item -- carries a `quote`: at least
+   three consecutive words copied exactly from that record's text in the
+   packet's `record_texts`, showing the point it supports. Do not
+   paraphrase, fix spelling, or join words from different places. Each
+   quote is checked word for word against the record before a reporter
+   sees the draft; a key point, figure or reference whose quote is not
+   found there is removed.

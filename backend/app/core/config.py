@@ -41,13 +41,19 @@ class Settings(BaseSettings):
     enable_restore_api: bool = False
     app_environment: str = "development"
     enable_ai_features: bool = False
-    # "" disables regardless of enable_ai_features; "anthropic" / "openai" selects the adapter.
+    # "" disables regardless of enable_ai_features; "anthropic" / "openai" / "ollama" selects the adapter.
     ai_provider: str = ""
     anthropic_api_key: str = ""
     openai_api_key: str = ""
     # Model ids are configuration, not code: a provider deprecation must not need a release.
     anthropic_model: str = "claude-sonnet-4-5"
     openai_model: str = "gpt-4.1"
+    # "ollama": a model on the reporter's own computer (app/ai/llm_client.py).
+    ollama_base_url: str = "http://127.0.0.1:11434"
+    ollama_model: str = ""   # none by default: the reporter picks an installed model
+    # Off: the AI may only be a model on this computer (an Ollama address that
+    # is this machine, and not an Ollama cloud model).
+    ai_allow_remote_endpoint: bool = False
     # Guard rails on the one endpoint family that spends money and holds a worker
     # thread (POST /investigations/{id}/assistant/*). All per-process, best-effort,
     # like api_auth_failure_limit_per_minute; put a real limiter at the edge for

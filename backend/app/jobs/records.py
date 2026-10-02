@@ -22,7 +22,18 @@ logger = logging.getLogger("journalism.jobs")
 # row, and a ``report(progress, message)`` callback, and returns a short
 # plain-language result message (or None).
 Report = Callable[[int | None, str | None], None]
-Handler = Callable[[Session, BackgroundJob, Report], "str | None"]
+# A handler returns a short result message, or {"message": ..., "result": {...}}
+# when the caller needs data back (kept in the job's payload["result"]).
+Handler = Callable[[Session, BackgroundJob, Report], "str | dict | None"]
+
+
+class JobFailed(Exception):
+    """A handler's way to fail with data the caller needs (kept in
+    payload["result"]), e.g. the HTTP status an inline run should answer."""
+
+    def __init__(self, message: str, result: dict | None = None):
+        super().__init__(message)
+        self.result = result or {}
 
 
 def create_job(
@@ -54,6 +65,7 @@ def serialize_job(job: BackgroundJob) -> dict[str, Any]:
         "error": job.error,
         "attempts": job.attempts,
         "runner": job.runner,
+        "result": (job.payload or {}).get("result"),
         "created_at": job.created_at,
         "started_at": job.started_at,
         "finished_at": job.finished_at,
@@ -133,6 +145,8 @@ def execute_job(
             failed.status = "failed"
             failed.error = str(exc) or type(exc).__name__
             failed.message = "Stopped with an error"
+            if isinstance(exc, JobFailed) and exc.result:
+                failed.payload = {**(failed.payload or {}), "result": exc.result}
             failed.finished_at = utcnow_naive()
             db.commit()
             return "failed"
@@ -142,6 +156,9 @@ def execute_job(
             return None
         done.status = "succeeded"
         done.progress = 100
+        if isinstance(result, dict):
+            done.payload = {**(done.payload or {}), "result": result.get("result")}
+            result = result.get("message")
         done.message = result or "Done"
         done.finished_at = utcnow_naive()
         db.commit()

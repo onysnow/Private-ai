@@ -11,9 +11,10 @@
 import {useCallback,useEffect,useRef,useState} from 'react';
 import type {ChangeEvent,ReactElement} from 'react';
 
-import type {AiAnalysisCandidate,AiAnalysisCandidateSummary,AiModuleName,AiReasoningStatus,DeckStyle,JsonObject,JsonValue,PresentationStyleCatalog,VisualStyle} from '../lib/api-types';
-import {isAiAnalysisCandidate,isAiAnalysisCandidateReview,isAiReasoningRunResult,isDeck,isPresentationStyleCatalog,isWriteup,parseAiAnalysisCandidateList} from '../lib/api-validate';
-import {ApiClient,errorMessage} from '../lib/api-client';
+import type {AiAnalysisCandidate,AiAnalysisCandidateSummary,AiModuleName,AiReasoningStatus,BackgroundJob,DeckStyle,JsonObject,JsonValue,PresentationStyleCatalog,VisualStyle} from '../lib/api-types';
+import {ApiPayloadError,isAiAnalysisCandidate,isAiAnalysisCandidateReview,isAiReasoningRunResult,isBackgroundJob,isDeck,isPresentationStyleCatalog,isWriteup,parseAiAnalysisCandidateList} from '../lib/api-validate';
+import {ApiClient,ApiHttpError,errorMessage} from '../lib/api-client';
+import {describeJob,waitForJob} from '../lib/jobs';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
@@ -50,16 +51,19 @@ const asArr=(v:JsonValue|undefined):JsonValue[]=>Array.isArray(v)?v:[];
 const asStr=(v:JsonValue|undefined):string=>typeof v==='string'?v:(v===undefined||v===null?'':JSON.stringify(v));
 const refLabel=(v:JsonValue):string=>{const o=asObj(v);return o?`${asStr(o.record_type)}:${asStr(o.record_id)}`:asStr(v)};
 
+// Which computer reads the evidence the model is sent (Foundation Fixes fix 4).
+const whereItRuns=(status:AiReasoningStatus):string=>status.runs_on_this_computer===true?' (runs on this computer)':status.runs_on_this_computer===false?' (runs on the provider\'s servers)':'';
+
 export function describeAiStatus(status:AiReasoningStatus|null|undefined):string{
   if(!status)return 'AI reasoning status unavailable from this backend.';
   if(!status.enabled)return 'AI reasoning is disabled on this deployment (ENABLE_AI_FEATURES is off). The core workbench does not need it.';
-  if(!status.provider)return 'AI reasoning is enabled but no provider is selected (AI_PROVIDER must be anthropic or openai).';
-  if(!status.provider_key_configured)return `AI provider "${status.provider}" is selected but its API key is not configured.`;
+  if(!status.provider)return 'AI reasoning is enabled but no provider is selected (AI_PROVIDER must be anthropic, openai or ollama).';
+  if(!status.provider_key_configured)return status.provider==='ollama'?'Ollama is selected but no model is chosen (OLLAMA_MODEL must name a model installed in Ollama).':`AI provider "${status.provider}" is selected but its API key is not configured.`;
   const draftAvailable=status.tas_spec.modules.presentation_draft?.available===true;
   if(!status.tas_spec.present)return draftAvailable?'The vendored TAS spec (backend/app/ai/tas_spec) is not checked out, so case synthesis and hypothesis tests cannot run. Presentation drafts do not use it and are available.':'The vendored TAS spec (backend/app/ai/tas_spec) is not checked out, so prompts cannot be built.';
   const missing=Object.entries(status.tas_spec.modules).filter(([,m])=>!m.available).map(([name])=>name);
   if(missing.length)return `TAS module file(s) missing from the vendored spec: ${missing.join(', ')}.`;
-  return `Ready: provider ${status.provider}, TAS spec v${status.tas_spec.version||'?'} vendored.`;
+  return `Ready: provider ${status.provider}${status.model?`, model ${status.model}`:''}${whereItRuns(status)}, TAS spec v${status.tas_spec.version||'?'} vendored.`;
 }
 
 export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Props):ReactElement{
@@ -123,6 +127,23 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
     catch(error){setSelected(null);setReviewStatus(errorMessage(error,'Could not load the candidate'))}
   };
 
+  // A run is a background job (Foundation Fixes fix 4). In developer mode the
+  // answer already holds the result; in the Docker stack it is 202 with the
+  // job, and the result (or the error the endpoint would have given) arrives
+  // on the finished job.
+  const startRun=async(endpoint:string,body:unknown)=>{
+    const raw=await api.unknown(endpoint,{method:'POST',body});
+    if(isAiReasoningRunResult(raw))return raw;
+    const job=typeof raw==='object'&&raw!==null&&'job' in raw&&isBackgroundJob((raw as {job:unknown}).job)?(raw as {job:BackgroundJob}).job:null;
+    if(!job)throw new ApiPayloadError(endpoint,'reasoning result has an unexpected shape');
+    setRunStatus('Queued. The model runs in the background; you can keep working.');
+    const done=await waitForJob(api,job.id,j=>setRunStatus(`Running in the background: ${describeJob(j)}`),{intervalMs:2000});
+    if(done.status==='succeeded'&&isAiReasoningRunResult(done.result))return done.result;
+    const failure=(typeof done.result==='object'&&done.result!==null?done.result:{}) as {status_code?:number,detail?:unknown};
+    const detail=typeof failure.detail==='string'?failure.detail:failure.detail!==undefined?JSON.stringify(failure.detail):describeJob(done);
+    throw new ApiHttpError(endpoint,failure.status_code??500,detail);
+  };
+
   const run=async()=>{
     if(!investigationId)return;
     if(module==='presentation_draft'){
@@ -130,7 +151,7 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
       setRunning(true);setRunStatus('Running… the model output is validated against the picked evidence before it can be reviewed.');
       try{
         const body={goal:goal.trim(),record_refs:selectedRefs.map(({record_type,record_id})=>({record_type,record_id}))};
-        const result=await api.object(`/api/investigations/${investigationId}/assistant/presentation-draft`,'reasoning result',isAiReasoningRunResult,{method:'POST',body});
+        const result=await startRun(`/api/investigations/${investigationId}/assistant/presentation-draft`,body);
         setRunStatus(`Proposed for review (candidate ${result.candidate_id}). Nothing has been written to the investigation.`);
         await loadQueue();
         await open(result.candidate_id);
@@ -145,7 +166,7 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
       const body:Record<string,unknown>={question:question.trim(),max_results:maxResults,include_external_leads:includeLeads};
       if(module==='hypothesis_test')body.working_theory=theory.trim();
       const path=module==='case_synthesis'?'case-synthesis':'hypothesis-test';
-      const result=await api.object(`/api/investigations/${investigationId}/assistant/${path}`,'reasoning result',isAiReasoningRunResult,{method:'POST',body});
+      const result=await startRun(`/api/investigations/${investigationId}/assistant/${path}`,body);
       setRunStatus(`Proposed for review (candidate ${result.candidate_id}). Nothing has been written to the investigation.`);
       await loadQueue();
       await open(result.candidate_id);

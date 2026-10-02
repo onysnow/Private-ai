@@ -213,3 +213,44 @@ def test_runner_choice(tmp_path):
         resolve_runner("procrastinate", sqlite)
     with pytest.raises(ValueError, match="must be one of"):
         resolve_runner("celery", sqlite)
+
+
+def test_ai_runs_are_jobs_that_keep_the_endpoints_answers(client, monkeypatch):
+    """Foundation Fixes fix 4: an AI run is a background job. In-process, the
+    endpoint still answers with the candidate, or with the same error status."""
+    import json as _json
+
+    import app.ai.reasoning as reasoning_module
+    from app.ai.governor import governor
+    from app.core.config import settings as app_settings
+
+    monkeypatch.setattr(app_settings, "enable_ai_features", True)
+    monkeypatch.setattr(app_settings, "ai_provider", "anthropic")
+    governor.reset()
+    inv = _investigation(client, "AI jobs")
+    claim = client.post("/api/claims", json={"investigation_id": inv, "text": "Meridian paid Bellcastle a consulting fee in November 2023."}).json()
+    ref = {"record_type": "claim", "record_id": claim["id"], "quote": "Meridian paid Bellcastle"}
+    draft = {"title": "t", "goal_restated": "g", "executive_takeaway": "e", "open_questions": [],
+             "sections": [{"heading": "h", "body": "b", "key_points": [{"text": "Paid", "evidence": [ref]}], "evidence": [ref]}]}
+
+    class Fake:
+        def __init__(self, text):
+            self.text = text
+
+        def generate(self, system_prompt, user_prompt, *, max_tokens=4096):
+            return self.text
+
+    body = {"goal": "Summarize.", "record_refs": [{"record_type": "claim", "record_id": claim["id"]}]}
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: Fake(_json.dumps(draft)))
+    ok = client.post(f"/api/investigations/{inv}/assistant/presentation-draft", json=body)
+    assert ok.status_code == 200, ok.text
+    job = ok.json()["job"]
+    assert job["kind"] == "ai_reasoning" and job["status"] == "succeeded" and job["result"]["candidate_id"] == ok.json()["candidate_id"]
+    assert ok.json()["review_status"] == "proposed"
+
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: Fake("not json at all"))
+    bad = client.post(f"/api/investigations/{inv}/assistant/presentation-draft", json=body)
+    assert bad.status_code == 502 and bad.json()["detail"]["rejection_reason"] == "not_json"
+    failed = client.get("/api/jobs", params={"investigation_id": inv, "status": "failed"}).json()
+    assert failed[0]["kind"] == "ai_reasoning" and failed[0]["result"]["status_code"] == 502
+    governor.reset()

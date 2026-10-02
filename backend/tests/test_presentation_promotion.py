@@ -53,10 +53,13 @@ def _draft_response(claim_id: str, evidence_id: str) -> str:
         "sections": [{
             "heading": "The payment",
             "body": "Meridian paid Bellcastle Holdings a $2.4M consulting fee in November 2023.",
-            "key_points": ["$2.4M paid to Bellcastle", "Dated November 2023"],
+            "key_points": [
+                {"text": "$2.4M paid to Bellcastle", "evidence": [{"record_type": "evidence", "record_id": evidence_id, "quote": "$2.4M wired to Bellcastle Holdings"}]},
+                {"text": "Dated November 2023", "evidence": [{"record_type": "claim", "record_id": claim_id, "quote": "consulting fee in  November 2023"}]},
+            ],
             "evidence": [
-                {"record_type": "claim", "record_id": claim_id},
-                {"record_type": "evidence", "record_id": evidence_id},
+                {"record_type": "claim", "record_id": claim_id, "quote": "Meridian paid Bellcastle a consulting fee"},
+                {"record_type": "evidence", "record_id": evidence_id, "quote": "$2.4M wired to Bellcastle"},
             ],
         }],
         "open_questions": ["Whether the fee was disclosed to the board."],
@@ -226,17 +229,17 @@ def _run_draft(monkeypatch, seeded: dict, payload: dict):
 
 def _payload_with_visuals(claim_id: str, evidence_id: str, **section_overrides) -> dict:
     payload = json.loads(_draft_response(claim_id, evidence_id))
-    ev = [{"record_type": "evidence", "record_id": evidence_id}]
+    ev = [{"record_type": "evidence", "record_id": evidence_id, "quote": "$2.4M wired to Bellcastle"}]
     payload["sections"][0]["visual"] = {"type": "figures", "items": [{"value": "$2.4M", "label": "wired 14 Nov 2023", "evidence": ev}]}
     payload["sections"].append({
-        "heading": "Sequence", "body": "The wire followed the agreement.", "key_points": ["Agreement, then wire"], "evidence": ev,
+        "heading": "Sequence", "body": "The wire followed the agreement.", "key_points": [{"text": "Agreement, then wire", "evidence": ev}], "evidence": ev,
         "visual": {"type": "timeline", "items": [
             {"date": "2023-11-03", "label": "Agreement signed", "evidence": ev},
             {"date": "2023-11-14", "label": "$2.4M wired", "evidence": ev},
         ]},
     })
     payload["sections"].append({
-        "heading": "Compared", "body": "The fee dwarfs the others.", "key_points": ["Largest fee"], "evidence": ev,
+        "heading": "Compared", "body": "The fee dwarfs the others.", "key_points": [{"text": "Largest fee", "evidence": ev}], "evidence": ev,
         "visual": {"type": "bar", "title": "Consulting fees", "unit": "USD", "items": [
             {"label": "Bellcastle", "value": 2400000, "evidence": ev},
             {"label": "Arden", "value": 285000, "evidence": ev},

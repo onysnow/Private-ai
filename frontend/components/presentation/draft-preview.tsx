@@ -9,7 +9,7 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 import type {KeyboardEvent, ReactElement} from 'react';
 import {ChevronLeft, ChevronRight} from 'lucide-react';
 
-import type {AiCitationRef, CitationDetail, DeckSlide, DeckStyle, JsonObject, JsonValue, PresentationDraftPayload, PresentationSection, PresentationStyleCatalog, PresentationVisual, VisualStyle} from '../../lib/api-types';
+import type {AiCitationRef, CitationDetail, DeckSlide, DeckStyle, JsonObject, JsonValue, PresentationDraftPayload, PresentationSection, PresentationStyleCatalog, PresentationVisual, QuotedRef, VisualStyle} from '../../lib/api-types';
 import {Button} from '@/components/ui/button';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {DECK, SlideCanvas, SlideStyleProvider, SourcesCanvas, buildCitationLookup, displayDate, formatValue, refKey, resolveTheme} from './slide-canvas';
@@ -21,6 +21,11 @@ export type TraceHandler = (detail: CitationDetail) => void;
 const isObj = (v: JsonValue | undefined): v is JsonObject => typeof v === 'object' && v !== null && !Array.isArray(v);
 const str = (v: JsonValue | undefined) => (typeof v === 'string' ? v : '');
 const refs = (v: JsonValue | undefined): AiCitationRef[] => (Array.isArray(v) ? v.filter(isObj).filter(r => typeof r.record_type === 'string' && typeof r.record_id === 'string').map(r => ({record_type: r.record_type as string, record_id: r.record_id as string})) : []);
+
+const quotedRefs = (v: JsonValue | undefined): QuotedRef[] => (Array.isArray(v) ? v.filter(isObj)
+  .filter(r => typeof r.record_type === 'string' && typeof r.record_id === 'string' && typeof r.matched_text === 'string')
+  .map(r => ({record_type: r.record_type as string, record_id: r.record_id as string, matched_text: r.matched_text as string,
+    locator: typeof r.locator === 'string' ? r.locator : null})) : []);
 
 function asVisual(v: JsonValue | undefined): PresentationVisual | null {
   if (!isObj(v) || !Array.isArray(v.items)) return null;
@@ -37,6 +42,7 @@ export function asDraft(payload: JsonObject | null | undefined): PresentationDra
   const sections: PresentationSection[] = (Array.isArray(p.sections) ? p.sections : []).filter(isObj).map(s => ({
     heading: str(s.heading), body: str(s.body),
     key_points: Array.isArray(s.key_points) ? s.key_points.map(k => str(k)).filter(Boolean) : [],
+    key_point_evidence: Array.isArray(s.key_point_evidence) ? s.key_point_evidence.map(quotedRefs) : [],
     evidence: refs(s.evidence), visual: asVisual(s.visual),
   }));
   return {
@@ -103,6 +109,22 @@ function BriefVisual({visual, lookup, onTrace}: {visual: PresentationVisual, loo
   </figure>;
 }
 
+/** Each key point with the words the quote check found in its cited record. */
+function CheckedQuotes({section, lookup}: {section: PresentationSection, lookup: CitationLookup}): ReactElement | null {
+  const rows = section.key_points.map((point, i) => ({point, quotes: section.key_point_evidence?.[i] || []})).filter(r => r.quotes.length);
+  if (!rows.length) return null;
+  return <details data-testid="checked-quotes" className="mt-3 text-[13px]" style={{fontFamily: 'Inter, sans-serif', color: DECK.taupe}}>
+    <summary className="cursor-pointer">Quotes found in the records ({rows.length} key point{rows.length === 1 ? '' : 's'})</summary>
+    <ul className="mt-2 space-y-2">{rows.map((row, i) => <li key={i}>
+      <div style={{color: DECK.ink}}>{row.point}</div>
+      {row.quotes.map((q, j) => <div key={j} className="pl-3">
+        <mark style={{background: DECK.panel, color: DECK.ink}}>“{q.matched_text}”</mark>
+        {' '}— {lookup.details.get(refKey(q))?.label || `${q.record_type}:${q.record_id}`}{q.locator ? `, ${q.locator}` : ''}
+      </div>)}
+    </li>)}</ul>
+  </details>;
+}
+
 function BriefView({draft, lookup, onTrace}: {draft: PresentationDraftPayload, lookup: CitationLookup, onTrace?: TraceHandler}): ReactElement {
   return <article data-testid="brief-preview" className="mx-auto max-w-[46rem] rounded-md px-8 py-9 shadow-lg sm:px-12" style={{background: DECK.paper, color: DECK.ink, fontFamily: 'Georgia, serif'}}>
     <div className="text-[11px] font-bold uppercase tracking-[0.22em]" style={{color: DECK.brassDeep, fontFamily: 'Inter, sans-serif'}}>Investigation brief</div>
@@ -117,6 +139,7 @@ function BriefView({draft, lookup, onTrace}: {draft: PresentationDraftPayload, l
       <h3 className="text-[20px]" style={{color: DECK.ink}}>{s.heading}</h3>
       {s.body.split(/\n\n+/).map((para, j, all) => <p key={j} className="mt-2 text-[15px] leading-[1.7]">{para}{j === all.length - 1 && <Cite items={s.evidence} lookup={lookup} onTrace={onTrace}/>}</p>)}
       {s.visual && <BriefVisual visual={s.visual} lookup={lookup} onTrace={onTrace}/>}
+      <CheckedQuotes section={s} lookup={lookup}/>
     </section>)}
     {draft.open_questions.length > 0 && <aside className="mt-7 rounded-sm px-5 py-4" style={{background: DECK.panel, borderLeft: `4px solid ${DECK.oxblood}`}}>
       <div className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{color: DECK.oxblood, fontFamily: 'Inter, sans-serif'}}>Open questions</div>

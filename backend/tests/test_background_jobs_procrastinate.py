@@ -112,3 +112,38 @@ def test_queue_schema_is_separate_and_restored_if_missing():
         assert ensure_queue_schema(engine) is False  # already there: nothing to do
     finally:
         engine.dispose()
+
+
+def test_ai_run_is_queued_and_its_result_is_on_the_job(client, monkeypatch):
+    import json as _json
+
+    import app.ai.reasoning as reasoning_module
+    from app.ai.governor import governor
+    from app.core.config import settings as app_settings
+
+    monkeypatch.setattr(app_settings, "enable_ai_features", True)
+    monkeypatch.setattr(app_settings, "ai_provider", "anthropic")
+    governor.reset()
+    inv = client.post("/api/investigations", json={"name": "Queued AI"}).json()["id"]
+    claim = client.post("/api/claims", json={"investigation_id": inv, "text": "Meridian paid Bellcastle a consulting fee in November 2023."}).json()
+    ref = {"record_type": "claim", "record_id": claim["id"], "quote": "paid Bellcastle a consulting fee"}
+    draft = {"title": "t", "goal_restated": "g", "executive_takeaway": "e", "open_questions": [],
+             "sections": [{"heading": "h", "body": "b", "key_points": [{"text": "Paid", "evidence": [ref]}], "evidence": [ref]}]}
+
+    class Slow:
+        def generate(self, system_prompt, user_prompt, *, max_tokens=4096):
+            time.sleep(1.5)
+            return _json.dumps(draft)
+
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: Slow())
+    started = time.monotonic()
+    response = client.post(f"/api/investigations/{inv}/assistant/presentation-draft",
+                           json={"goal": "Summarize.", "record_refs": [{"record_type": "claim", "record_id": claim["id"]}]})
+    assert response.status_code == 202, response.text
+    assert time.monotonic() - started < 1.0, "the request does not wait for the model"
+    assert response.json()["candidate_id"] is None
+    job = _wait_for(client, response.json()["job"]["id"])
+    assert job["status"] == "succeeded", job
+    candidate = client.get(f"/api/ai-analysis-candidates/{job['result']['candidate_id']}").json()
+    assert candidate["review_status"] == "proposed"
+    governor.reset()

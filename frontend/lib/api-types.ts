@@ -32,7 +32,7 @@ export type SearchResult={type:string,group:SearchGroup,id:string,investigation_
 export type DocumentChunk={id:string,document_id:string,ordinal:number,locator:string,page_number?:number|null,text:string,created_at?:string};
 // Slow work that runs after the request returns (ADR-0004): GET /api/jobs/{id}.
 export type BackgroundJobStatus='queued'|'running'|'succeeded'|'failed'|'cancelled';
-export type BackgroundJob={id:string,kind:string,investigation_id:string|null,subject_type:string|null,subject_id:string|null,status:BackgroundJobStatus,finished:boolean,progress:number|null,message:string|null,error:string|null,attempts:number,runner:string};
+export type BackgroundJob={id:string,kind:string,investigation_id:string|null,subject_type:string|null,subject_id:string|null,status:BackgroundJobStatus,finished:boolean,progress:number|null,message:string|null,error:string|null,attempts:number,runner:string,result?:unknown};
 export type DocItem={id:string,investigation_id?:string,filename:string,source_id:string,extraction_status:string,extraction_error?:string|null,extraction_issues?:string[],chunk_count:number,candidate_counts:Record<string,number>,chunks?:DocumentChunk[],job?:BackgroundJob|null};
 export type CorpusBinding={id:string,investigation_id:string,provider:string,collection_id:string,foreign_id?:string|null,collection_label?:string|null,status:string,created_at?:string,updated_at?:string};
 export type DocumentCorpusSync={id:string,document_id:string,investigation_id:string,provider:string,collection_id:string,provider_record_id?:string|null,status:string,error?:string|null,response_json?:JsonObject,synced_at?:string|null,created_at?:string,updated_at?:string};
@@ -97,7 +97,7 @@ export type DocumentExtractionStatus={pdf_ocr_enabled:boolean,pdf_ocr_language:s
 // commit still validates an older backend's settings payload; the panel treats absence as "unknown".
 export type AiModuleName='case_synthesis'|'hypothesis_test'|'presentation_draft';
 export type AiReviewStatus='proposed'|'accepted'|'rejected';
-export type AiReasoningStatus={enabled:boolean,provider:string|null,provider_key_configured:boolean,endpoints_callable:boolean,tas_spec:{present:boolean,version:string|null,modules:Record<string,{spec_file:string,available:boolean}>}};
+export type AiReasoningStatus={enabled:boolean,provider:string|null,provider_key_configured:boolean,endpoints_callable:boolean,model?:string|null,runs_on_this_computer?:boolean|null,tas_spec:{present:boolean,version:string|null,modules:Record<string,{spec_file:string,available:boolean}>}};
 // presentation_draft's request stores the goal in `question` (same field the
 // other two modules use) and the reporter-picked evidence in `record_refs`.
 export type AiAnalysisRequest={question?:string|null,working_theory?:string|null,max_results?:number,include_external_leads?:boolean,record_refs?:AiCitationRef[]|null};
@@ -114,7 +114,9 @@ export type VisualOptionValue=boolean|string|string[];
 export type VisualStyle={preset?:string,options?:Record<string,VisualOptionValue>};
 export type PresentationVisual=({type:'figures',items:FigureItem[]}|{type:'timeline',items:TimelineItem[]}|{type:'bar',title?:string,unit?:string,items:BarItem[]})&{style?:VisualStyle|null};
 export type VisualKind=PresentationVisual['type'];
-export type PresentationSection={heading:string,body:string,key_points:string[],evidence:AiCitationRef[],visual?:PresentationVisual|null};
+// A quote the backend found word for word in the cited record (app/ai/quote_check.py).
+export type QuotedRef=AiCitationRef&{matched_text:string,field?:string,locator?:string|null,start_char?:number,end_char?:number};
+export type PresentationSection={heading:string,body:string,key_points:string[],key_point_evidence?:QuotedRef[][],evidence:AiCitationRef[],visual?:PresentationVisual|null};
 export type PresentationDraftPayload={title:string,goal_restated:string,executive_takeaway:string,sections:PresentationSection[],open_questions:string[]};
 // Readable details for a cited record (backend describe_record_refs) -- what the
 // review panel shows instead of a UUID, and what an evidence chip traces.

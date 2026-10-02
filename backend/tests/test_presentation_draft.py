@@ -52,10 +52,13 @@ def _draft_response(claim_id: str, evidence_id: str) -> str:
         "sections": [{
             "heading": "The payment",
             "body": "Meridian paid Bellcastle Holdings a $2.4M consulting fee in November 2023.",
-            "key_points": ["$2.4M paid to Bellcastle", "Dated November 2023"],
+            "key_points": [
+                {"text": "$2.4M paid to Bellcastle", "evidence": [{"record_type": "evidence", "record_id": evidence_id, "quote": "$2.4M wired to Bellcastle Holdings"}]},
+                {"text": "Dated November 2023", "evidence": [{"record_type": "claim", "record_id": claim_id, "quote": "consulting fee in  November 2023"}]},
+            ],
             "evidence": [
-                {"record_type": "claim", "record_id": claim_id},
-                {"record_type": "evidence", "record_id": evidence_id},
+                {"record_type": "claim", "record_id": claim_id, "quote": "Meridian paid Bellcastle a consulting fee"},
+                {"record_type": "evidence", "record_id": evidence_id, "quote": "$2.4M wired to Bellcastle"},
             ],
         }],
         "open_questions": ["Whether the fee was disclosed to the board."],

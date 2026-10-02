@@ -71,6 +71,39 @@ def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str
     return message
 
 
+AI_REASONING = "ai_reasoning"
+
+
+def ai_reasoning_job(db: Session, job: BackgroundJob, report: Report) -> dict:
+    """One AI reasoning run (case synthesis, hypothesis test, presentation
+    draft). The request was validated before it was queued; the result is a
+    review-queue candidate, never a change to the investigation."""
+    from app.ai.reasoning import describe_reasoning_failure, run_reasoning_module
+    from app.jobs.records import JobFailed
+
+    request = dict(job.payload or {})
+    report(10, "The model is working on it")
+    try:
+        candidate = run_reasoning_module(
+            db, investigation_id=str(job.investigation_id), module=request["module"], question=request["question"],
+            working_theory=request.get("working_theory"), max_results=request.get("max_results", 30),
+            include_external_leads=request.get("include_external_leads", True), control_flags=request.get("control_flags"),
+            record_refs=request.get("record_refs"), actor_id=request.get("actor_id"),
+        )
+    except Exception as exc:
+        described = describe_reasoning_failure(exc)
+        if described is None:
+            raise
+        status, detail, headers = described
+        message = detail if isinstance(detail, str) else str(detail.get("message") or exc)
+        raise JobFailed(message, {"status_code": status, "detail": detail, "headers": headers}) from exc
+    return {
+        "message": "Proposed for review",
+        "result": {"candidate_id": candidate.id, "review_status": candidate.review_status, "payload": candidate.payload},
+    }
+
+
 HANDLERS: dict[str, Handler] = {
     EXTRACT_DOCUMENT: extract_document_job,
+    AI_REASONING: ai_reasoning_job,
 }
