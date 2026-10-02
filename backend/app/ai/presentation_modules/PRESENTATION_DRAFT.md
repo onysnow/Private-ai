@@ -56,6 +56,21 @@ forms for every section, every time.
     state that exact value or date. If you can't cite it, it doesn't go in
     the visual. A section with no visual is always acceptable; a visual
     with an unsupported number is not.
+    - `chart`: an order the Workbench cooks from the investigation's own
+      records. You write `{"type": "chart", "spec": {...}}` and never a
+      number: `spec.kind` (`bar` for a ranking, `column` for change over
+      time), `spec.title` (a full sentence that states the finding, e.g.
+      "Meridian received most of the money"), an optional `subtitle`, and
+      `spec.query` naming one query from the packet's `visual_catalog`
+      with its `params` (e.g. `{"name": "payments_by_party", "params":
+      {"direction": "received"}}`). Optional: `sort` (`value_desc`,
+      `value_asc`, `label`, `time`), `limit` (keep the top N; the rest
+      fold into "Other"), `highlight` (labels to pick out). Choose only a
+      query whose `has_data` is true. The Workbench runs the query, tags
+      every value with its records, draws the chart and checks it against
+      the design rules; a chart that fails is removed from the draft and
+      you may be asked once or twice to fix the order. A chart needs no
+      `evidence` list of its own: the records come with the data.
 - `open_questions`: gaps in the *selected* evidence that limit what this
   draft can responsibly claim, or that would need a different piece of
   evidence to close. This is not optional filler -- if the goal asks for
@@ -84,6 +99,8 @@ of these, not instead of them)
    are read off a slide at a glance.
 5. Visuals follow rule 2 at the level of every single value: each figure,
    date, and bar is traceable to its own cited evidence, or it is left out.
+   A `chart` visual carries no values at all: it names a query, and the
+   Workbench supplies and cites every number.
 6. Bring the page. Every evidence reference -- in a key point, a
    section's `evidence`, or a visual item -- carries a `quote`: at least
    three consecutive words copied exactly from that record's text in the

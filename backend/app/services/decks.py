@@ -4,11 +4,14 @@ the slides_json shape.
 A slide is a plain dict:
     {"kind": "title" | "statement" | "content" | "questions",
      "heading": str, "bullets": [str], "evidence": [{"record_type","record_id"}],
-     "notes": str, "visual": None | {"type": "figures"|"timeline"|"bar", ...}}
+     "notes": str, "visual": None | {"type": "figures"|"timeline"|"bar"|"chart", ...}}
 Only heading/bullets/evidence are required; a slide with no `kind` (decks
 saved before kinds existed) renders as "content". `visual` mirrors the
 presentation_draft module's per-section visual (app/ai/reasoning.py
-VISUAL_TYPES) -- every data point carries its own evidence refs.
+VISUAL_TYPES) -- every data point carries its own evidence refs. A "chart"
+visual is a resolved order slip (app/ai/chart_check.py): its spec, the data
+the Workbench cooked from the records (every row tagged with record refs),
+the check report and the chart's words; it is drawn as a native bar chart.
 
 Export draws every slide itself on a 16:9 canvas rather than relying on the
 stock python-pptx template: an editorial layout in the app's Dark Academia
@@ -30,12 +33,16 @@ from sqlalchemy.orm import Session
 from app.core.time import utcnow_naive
 from app.models.domain import Deck
 from app.services.presentation_style import (
-    Theme, normalize_deck_style, normalize_visual_style, resolved_theme, resolved_visual_style,
+    VISUAL_PRESETS, Theme, normalize_deck_style, normalize_visual_style, resolved_theme, resolved_visual_style,
 )
+from app.visuals.data_service import DataRow, VisualData
+from app.visuals.echarts import SINGLE_RECORD_MARK, prepare_rows, singular, source_line
+from app.visuals.spec import DRAWN_KINDS, ChartKind, VisualSpec, spec_errors
 
 MAX_BULLETS_PER_SLIDE = 8
 SLIDE_KINDS = {"title", "statement", "content", "questions"}
 VISUAL_LIMITS = {"figures": 4, "timeline": 8, "bar": 8}
+CHART_VISUAL = "chart"
 
 
 def _clean_refs(refs: Any) -> list[dict]:
@@ -46,9 +53,64 @@ def _clean_refs(refs: Any) -> list[dict]:
     ]
 
 
+def normalize_chart_visual(visual: Any) -> dict | None:
+    """A resolved chart (app/ai/chart_check.py): spec, data, report, text.
+    The data must be there -- a deck never runs a query at export time, so
+    a bare order slip with nothing cooked is dropped."""
+    if not isinstance(visual, dict) or visual.get("type") != CHART_VISUAL:
+        return None
+    if spec_errors(visual.get("spec")) or not isinstance(visual.get("data"), dict):
+        return None
+    data = VisualData.from_dict(visual["data"])
+    if not data.rows:
+        return None
+    report = visual.get("report") if isinstance(visual.get("report"), dict) else {"ok": True, "errors": [], "warnings": []}
+    text = visual.get("text") if isinstance(visual.get("text"), dict) else {}
+    return {"type": CHART_VISUAL, "spec": VisualSpec.model_validate(visual["spec"]).model_dump(mode="json"),
+            "data": data.as_dict(), "report": report, "text": text}
+
+
+def chart_record_refs(visual: dict) -> list[dict]:
+    """Every record a chart's rows rest on, in row order."""
+    refs: list[dict] = []
+    for row in ((visual.get("data") or {}).get("rows") or []):
+        refs.extend(_clean_refs(row.get("record_refs")))
+    return refs
+
+
+def chart_rows(visual: dict) -> tuple[VisualSpec, VisualData, list[DataRow]]:
+    """A stored chart's spec, data and rows in drawing order."""
+    spec = VisualSpec.model_validate(visual["spec"])
+    data = VisualData.from_dict(visual["data"])
+    return spec, data, prepare_rows(spec, data)
+
+
+def chart_row_labels(data: VisualData, rows: list[DataRow]) -> dict[str, str]:
+    """Each row's label with how many records sit behind it (design rule
+    16) and the mark for a value resting on one record (rule 20), for the
+    exports, which write both on the category label."""
+    labels: dict[str, str] = {}
+    for row in rows:
+        label = row.label
+        if data.unit_kind == "amount":
+            label += f" · {row.record_count} {data.record_noun if row.record_count != 1 else singular(data.record_noun)}"
+        if row.record_count == 1:
+            label += f" {SINGLE_RECORD_MARK}"
+        labels[row.label] = label
+    return labels
+
+
+def chart_bar_items(rows: list[DataRow], labels: dict[str, str] | None = None) -> list[dict]:
+    """Rows as the bar renderer's items: label, value and the records."""
+    return [{"label": (labels or {}).get(row.label, row.label), "value": row.value, "evidence": [r.as_dict() for r in row.record_refs]}
+            for row in rows]
+
+
 def normalize_visual(visual: Any) -> dict | None:
     """Keep a well-formed visual, drop anything else. A deck must always
     export, so a malformed visual is discarded rather than raised on."""
+    if isinstance(visual, dict) and visual.get("type") == CHART_VISUAL:
+        return normalize_chart_visual(visual)
     if not isinstance(visual, dict) or visual.get("type") not in VISUAL_LIMITS:
         return None
     kind = visual["type"]
@@ -100,8 +162,11 @@ def deck_citation_refs(slides: list[dict]) -> list[dict]:
     seen, refs = set(), []
     for slide in slides or []:
         candidates = list(slide.get("evidence") or [])
-        for item in ((slide.get("visual") or {}).get("items") or []):
+        visual = slide.get("visual") or {}
+        for item in (visual.get("items") or []):
             candidates.extend(item.get("evidence") or [])
+        if visual.get("type") == CHART_VISUAL:
+            candidates.extend(chart_record_refs(visual))
         for ref in candidates:
             key = (ref.get("record_type"), ref.get("record_id"))
             if key[0] and key[1] and key not in seen:
@@ -562,6 +627,29 @@ class _DeckRenderer:
         category_axis.tick_labels.font.size = Pt(12)
         category_axis.tick_labels.font.color.rgb = self._rgb(self.t.text)
 
+    def _chart(self, slide: Any, x: float, y: float, w: float, h: float, visual: dict) -> None:
+        """A resolved chart (app/ai/chart_check.py) as a native, editable
+        PowerPoint bar chart drawn from the rows the data service cooked,
+        with the record count and single-record mark on each label (design
+        rules 16 and 20) and the source line underneath (rule 15). No image
+        is needed for bars, so the render service is never involved here."""
+        spec, data, rows = chart_rows(visual)
+        if spec.kind not in DRAWN_KINDS or not rows:
+            self.text(slide, x, y, w, 0.6, f"Chart not available: {spec.kind.value} charts are not drawn yet.", size=13, color=self.t.muted, italic=True)
+            return
+        decorated = chart_row_labels(data, rows)
+        items = chart_bar_items(rows, decorated)
+        horizontal = spec.kind == ChartKind.bar
+        style = {
+            "preset": "ranked",
+            "layout": {"orientation": "horizontal" if horizontal else "vertical", "axis_line": True},
+            "options": {"sort": "as_given", "value_labels": True, "gridlines": not horizontal, "thickness": "regular",
+                        "highlight": [decorated[label] for label in spec.highlight if label in decorated]},
+        }
+        bar_visual = {"type": "bar", "title": spec.title, "unit": data.unit, "items": items}
+        self._bar_chart(slide, x, y, w, h - 0.36, bar_visual, style)
+        self.text(slide, x, y + h - 0.32, w, 0.3, source_line(data, rows), size=10, color=self.t.muted)
+
     def _timeline(self, slide: Any, x: float, y: float, w: float, h: float, items: list[dict], style: dict) -> None:
         opts, layout = style["options"], style["layout"]
         n = len(items)
@@ -609,7 +697,8 @@ class _DeckRenderer:
         refs = list(slide_data.get("evidence") or [])
         vis: dict = visual if isinstance(visual, dict) else {}
         kind = vis.get("type")
-        style: dict = resolved_visual_style(vis) if kind else {}
+        # A chart visual has no preset layer: its look comes from the theme and its own spec.
+        style: dict = resolved_visual_style(vis) if kind in VISUAL_PRESETS else {}
         if kind == "timeline":
             layout = style["layout"]
             if layout.get("direction") == "vertical":
@@ -626,6 +715,10 @@ class _DeckRenderer:
             if bullets:
                 self.bullets(slide, MARGIN_IN, 2.1, 5.3, 4.55, bullets, sizes=(22, 20, 18, 16, 15, 14))
             self._bar_chart(slide, 6.45 if bullets else MARGIN_IN, 2.0, 6.1 if bullets else 11.8, 4.7, vis, style)
+        elif kind == CHART_VISUAL:
+            if bullets:
+                self.bullets(slide, MARGIN_IN, 2.1, 5.3, 4.55, bullets, sizes=(22, 20, 18, 16, 15, 14))
+            self._chart(slide, 6.45 if bullets else MARGIN_IN, 2.0, 6.1 if bullets else 11.8, 4.7, vis)
         elif kind == "figures":
             if style["layout"].get("arrangement") == "row":
                 if bullets:
@@ -641,6 +734,8 @@ class _DeckRenderer:
             self._evidence_panel(slide, 8.15, 2.05, 4.45, 4.6, refs)
         for item in (visual or {}).get("items") or []:
             refs.extend(item.get("evidence") or [])
+        if kind == CHART_VISUAL:
+            refs.extend(chart_record_refs(vis))
         self.notes(slide, slide_data.get("notes") or "")
         self.footer(slide, refs, dark=False)
 

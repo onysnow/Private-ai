@@ -56,8 +56,15 @@ def extract_cited_refs(content_json: dict) -> list[dict]:
         elif node.get("type") == "evidenceVisual":
             # A figure/timeline/bar block cites per data point (see
             # app/services/presentation.py); those count as citations too.
-            for item in (((node.get("attrs") or {}).get("visual") or {}).get("items") or []):
+            visual = (node.get("attrs") or {}).get("visual") or {}
+            for item in visual.get("items") or []:
                 for ref in item.get("evidence") or []:
+                    if isinstance(ref, dict):
+                        add(ref.get("record_type"), ref.get("record_id"))
+            # A chart block cites per row: the records the data service
+            # cooked each value from (app/ai/chart_check.py).
+            for row in ((visual.get("data") or {}).get("rows") or []):
+                for ref in row.get("record_refs") or []:
                     if isinstance(ref, dict):
                         add(ref.get("record_type"), ref.get("record_id"))
     return refs
@@ -94,6 +101,12 @@ def extract_plain_text(content_json: dict) -> str:
             for item in visual.get("items") or []:
                 lead = item.get("date") or item.get("value")
                 lines.append(f"{lead} — {item.get('label', '')}" if lead not in (None, "") else str(item.get("label", "")))
+            if visual.get("type") == "chart":
+                title = (visual.get("spec") or {}).get("title")
+                if title:
+                    lines.append(str(title))
+                for row in ((visual.get("data") or {}).get("rows") or []):
+                    lines.append(f"{row.get('value')} — {row.get('label', '')}")
             return
         if node_type == "callout":
             flush()
@@ -351,11 +364,97 @@ def _set_widths(table: Any, widths_in: list[float]) -> None:
             cell.width = Inches(width)
 
 
+def _render_bar_table(docx: Any, items: list[dict], unit: str, citation_index: dict[tuple[str, str], int]) -> None:
+    """Bars drawn from block characters inside a table: today's Word
+    rendering of a bar visual, and the fallback for a chart image."""
+    top = max(abs(i.get("value") or 0) for i in items) or 1
+    table = docx.add_table(rows=0, cols=3)
+    _row_rules(table)
+    for item in items:
+        row = table.add_row().cells
+        p = row[0].paragraphs[0]
+        _set_run(p.add_run(item.get("label") or ""), size=10, color=DOCX_INK, font=DOCX_SANS)
+        marker = _refs_marker(item.get("evidence"), citation_index)
+        if marker:
+            _set_run(p.add_run(" " + marker), size=8, color=DOCX_BRASS, font=DOCX_SANS, superscript=True)
+        blocks = max(1, round(22 * abs(item.get("value") or 0) / top))
+        _set_run(row[1].paragraphs[0].add_run("█" * blocks), size=9, color="B98D34", font=DOCX_SANS)
+        _set_run(row[2].paragraphs[0].add_run(_format_bar_value(item.get("value") or 0, unit)), size=10, color=DOCX_INK, font=DOCX_SANS, bold=True)
+    _set_widths(table, [2.2, 3.3, 1.0])
+
+
+def _render_chart(docx: Any, visual: dict, citation_index: dict[tuple[str, str], int]) -> None:
+    """A resolved chart (app/ai/chart_check.py): the image from the export
+    bridge when the render service answers, otherwise the bar table with a
+    line saying the image was not available (ADR-0005, line 2). Either way
+    the data table follows, so every value keeps its record citations and
+    the chart has the data table design rule 13 asks for."""
+    from io import BytesIO
+
+    from docx.shared import Inches
+
+    from app.services.decks import chart_bar_items, chart_row_labels, chart_rows
+    from app.services.presentation_style import resolved_theme
+    from app.visuals.echarts import UnsupportedChartKind, build_chart, format_value, source_line
+    from app.visuals.render_client import RenderUnavailable, render_png
+
+    spec, data, rows = chart_rows(visual)
+    theme = resolved_theme(None)
+    p = _para(docx, space_before=6, space_after=2, keep_next=True)
+    _set_run(p.add_run(spec.title), size=10.5, color=DOCX_INK, font=DOCX_SANS, bold=True)
+    if spec.subtitle:
+        _set_run(p.add_run(f"  {spec.subtitle}"), size=9, color=DOCX_TAUPE, font=DOCX_SANS)
+
+    image: bytes | None = None
+    note: str | None = None
+    try:
+        built = build_chart(spec, data, theme)
+        image = render_png(built.option, built.width, built.height)
+    except UnsupportedChartKind as exc:
+        note = f"Chart not drawn: {exc}."
+    except RenderUnavailable as exc:
+        note = f"Chart image not available ({exc}); the values are shown as a table instead."
+    if image is not None:
+        docx.add_picture(BytesIO(image), width=Inches(6.5))
+        caption = _para(docx, space_after=4)
+        alt = (visual.get("text") or {}).get("alt_text") or ""
+        if alt:
+            _set_run(caption.add_run(alt), size=8.5, color=DOCX_TAUPE, font=DOCX_SANS, italic=True)
+    else:
+        warn = _para(docx, space_after=4)
+        _set_run(warn.add_run(note or "Chart image not available."), size=9, color=DOCX_OXBLOOD, font=DOCX_SANS, italic=True)
+
+    # The data behind the chart, every row with its records (rules 13, 15,
+    # 16 and 20), decorated with the record count and the single-record mark.
+    decorate = chart_row_labels(data, rows)
+    if image is not None:
+        table = docx.add_table(rows=0, cols=3)
+        _row_rules(table)
+        for row in rows:
+            cells = table.add_row().cells
+            p = cells[0].paragraphs[0]
+            _set_run(p.add_run(decorate.get(row.label, row.label)), size=9.5, color=DOCX_INK, font=DOCX_SANS)
+            marker = _refs_marker([r.as_dict() for r in row.record_refs], citation_index)
+            if marker:
+                _set_run(p.add_run(" " + marker), size=8, color=DOCX_BRASS, font=DOCX_SANS, superscript=True)
+            _set_run(cells[1].paragraphs[0].add_run(format_value(row.value, data)), size=9.5, color=DOCX_INK, font=DOCX_SANS, bold=True)
+            _set_run(cells[2].paragraphs[0].add_run(f"{row.record_count}"), size=9.5, color=DOCX_TAUPE, font=DOCX_SANS)
+        _set_widths(table, [4.3, 1.2, 1.0])
+    else:
+        _render_bar_table(docx, chart_bar_items(rows, decorate), data.unit, citation_index)
+    source = _para(docx, space_before=2, space_after=4)
+    _set_run(source.add_run(source_line(data, rows)), size=8.5, color=DOCX_TAUPE, font=DOCX_SANS)
+
+
 def _render_visual(docx: Any, visual: dict, citation_index: dict[tuple[str, str], int]) -> None:
     from docx.shared import Inches
     from app.services.decks import display_date
 
     kind = visual.get("type")
+    if kind == "chart":
+        _render_chart(docx, visual, citation_index)
+        _para(docx, space_after=4)
+        return
     items = visual.get("items") or []
     if not items:
         return
@@ -388,20 +487,7 @@ def _render_visual(docx: Any, visual: dict, citation_index: dict[tuple[str, str]
         if visual.get("title"):
             p = _para(docx, space_before=6, space_after=2, keep_next=True)
             _set_run(p.add_run(visual["title"]), size=9.5, color=DOCX_TAUPE, font=DOCX_SANS, bold=True)
-        top = max(abs(i.get("value") or 0) for i in items) or 1
-        table = docx.add_table(rows=0, cols=3)
-        _row_rules(table)
-        for item in items:
-            row = table.add_row().cells
-            p = row[0].paragraphs[0]
-            _set_run(p.add_run(item.get("label") or ""), size=10, color=DOCX_INK, font=DOCX_SANS)
-            marker = _refs_marker(item.get("evidence"), citation_index)
-            if marker:
-                _set_run(p.add_run(" " + marker), size=8, color=DOCX_BRASS, font=DOCX_SANS, superscript=True)
-            blocks = max(1, round(22 * abs(item.get("value") or 0) / top))
-            _set_run(row[1].paragraphs[0].add_run("█" * blocks), size=9, color="B98D34", font=DOCX_SANS)
-            _set_run(row[2].paragraphs[0].add_run(_format_bar_value(item.get("value") or 0, visual.get("unit") or "")), size=10, color=DOCX_INK, font=DOCX_SANS, bold=True)
-        _set_widths(table, [2.2, 3.3, 1.0])
+        _render_bar_table(docx, items, visual.get("unit") or "", citation_index)
     _para(docx, space_after=4)
 
 

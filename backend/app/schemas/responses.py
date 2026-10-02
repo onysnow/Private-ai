@@ -89,3 +89,102 @@ class InvestigationDeletionResult(ResponseModel):
     document_files_deleted: int
     shared_document_files_preserved: int
     missing_document_files: int
+
+
+# --- Investigation visuals (app/visuals) -----------------------------------------
+
+class VisualParamOut(ResponseModel):
+    description: str
+    choices: list[str] | None = None
+    default: str | None = None
+
+
+class VisualQueryOut(ResponseModel):
+    """One entry of the query catalogue the AI orders from."""
+    name: str
+    label: str
+    description: str
+    params: dict[str, VisualParamOut]
+    series_kind: str          # category | time
+    unit_kind: str            # amount | count
+    record_noun: str
+    has_data: bool
+    record_count: int
+    row_count: int
+    currencies: list[str]
+
+
+class VisualCatalogOut(ResponseModel):
+    investigation_id: str
+    queries: list[VisualQueryOut]
+    kinds: list[str]
+    drawn_kinds: list[str]
+
+
+class RecordRefOut(ResponseModel):
+    record_type: str
+    record_id: str
+
+
+class VisualDataRowOut(ResponseModel):
+    label: str
+    value: float
+    record_refs: list[RecordRefOut]
+    record_count: int
+    key: str
+
+
+class VisualDataOut(ResponseModel):
+    """What the data service cooked: every value tagged with its records."""
+    investigation_id: str
+    query: str
+    params: dict[str, str]
+    unit: str
+    unit_kind: str
+    series_kind: str
+    record_noun: str
+    rows: list[VisualDataRowOut]
+    currency: str | None = None
+    record_count: int
+    omitted: list[dict[str, Any]]
+
+
+class CheckItemOut(ResponseModel):
+    rule: int
+    message: str
+
+
+class CheckReportOut(ResponseModel):
+    ok: bool
+    errors: list[CheckItemOut]
+    warnings: list[CheckItemOut]
+    checked_rules: list[int]
+    not_checked: dict[str, str]
+
+
+class DataTableRowOut(ResponseModel):
+    label: str
+    value: float
+    formatted: str
+    record_count: int
+    record_refs: list[RecordRefOut]
+
+
+class DataTableOut(ResponseModel):
+    columns: list[str]
+    rows: list[DataTableRowOut]
+
+
+class VisualPreviewOut(ResponseModel):
+    """A chart cooked, drawn and checked for one order slip, as the preview
+    shows it; the AI is never involved."""
+    spec: dict[str, Any]
+    data: VisualDataOut
+    option: dict[str, Any]
+    report: CheckReportOut
+    alt_text: str
+    description: str
+    data_table: DataTableOut
+    source_line: str
+    width: int
+    height: int

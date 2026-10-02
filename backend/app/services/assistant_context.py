@@ -152,7 +152,7 @@ def _hit_for_selected_record(db: Session, *, investigation_id: str, record_type:
 
 _TYPE_LABELS = {
     "entity": "Entity", "claim": "Claim", "evidence": "Evidence", "relationship": "Relationship",
-    "source": "Source", "document": "Document", "lead": "Lead", "task": "Task",
+    "source": "Source", "document": "Document", "lead": "Lead", "task": "Task", "timeline_event": "Timeline event",
 }
 
 
@@ -172,11 +172,16 @@ def describe_record_refs(db: Session, *, investigation_id: str, refs: list[dict]
     the draft was written): it comes back with `missing=True` so an export
     still renders instead of failing outright.
 
+    A "timeline_event" ref is not something a reporter can pick for a
+    packet, but a chart of events over time (app/visuals/data_service.py)
+    rests on reporter-authored events, so its rows cite them; they are
+    described here by title and date.
+
     Returned keys: record_type (as given), record_id, trace_record_type
     (the provenance-trace spelling), type_label, label (one-line name),
     quote, locator, source_title, source_url, detail, missing.
     """
-    from app.models.domain import Claim, Evidence, Source
+    from app.models.domain import Claim, Evidence, Source, TimelineEvent
 
     out: list[dict] = []
     seen: set[tuple[str, str]] = set()
@@ -192,6 +197,14 @@ def describe_record_refs(db: Session, *, investigation_id: str, refs: list[dict]
             "label": "", "quote": None, "locator": None, "source_title": None, "source_url": None,
             "detail": None, "missing": False,
         }
+        if lookup_type == "timeline_event":
+            event = db.get(TimelineEvent, record_id)
+            if event is None or event.investigation_id != investigation_id:
+                item.update(label="Record no longer available", missing=True)
+            else:
+                item.update(label=_clip(event.title, 160), detail=f"Timeline event · {event.date_start}" + (f" · {event.verification_status}" if event.verification_status else ""))
+            out.append(item)
+            continue
         try:
             hit = _hit_for_selected_record(db, investigation_id=investigation_id, record_type=lookup_type, record_id=record_id)
         except ValueError:
