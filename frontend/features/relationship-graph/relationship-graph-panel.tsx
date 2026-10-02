@@ -79,8 +79,10 @@ export function RelationshipGraphPanel({investigationId}: Props): ReactElement {
   const reconciliation = graph?.reconciliation ?? NO_RECONCILIATION;
   const evidencePool = evidenceQuery.data ?? [];
 
-  // A new case starts with nothing opened and no ledger asked for.
-  useEffect(() => { setEdge(null); setLedgerWanted(false); }, [investigationId]);
+  // A new case starts with nothing opened, no ledger asked for, and its own
+  // schema filter (set from its graph below; it used to keep the last case's,
+  // which could hide every relationship of the new one).
+  useEffect(() => { setEdge(null); setLedgerWanted(false); setGraphSchemas(new Set()); }, [investigationId]);
 
   // The form's endpoints follow the entity list: the first two entities
   // unless the chosen ones are still listed.
@@ -91,7 +93,7 @@ export function RelationshipGraphPanel({investigationId}: Props): ReactElement {
     setRelTarget(current => (rows.some(x => x.id === current) ? current : rows[1]?.id || rows[0]?.id || ''));
   }, [entitiesQuery.data]);
 
-  // The schema filter starts with every schema the first loaded graph shows.
+  // The schema filter starts with every schema the case's first loaded graph shows.
   useEffect(() => {
     if (!graph) return;
     setGraphSchemas(current => (current.size ? current : new Set(graph.edges.map(x => x.schema))));

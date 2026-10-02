@@ -94,6 +94,17 @@ def consolidate_findings(findings: list[ConnectorFinding], threshold: float=0.60
     return sorted(out,key=lambda x:x["score"],reverse=True)
 
 
+def serialize_enrichment_session_run(row: EnrichmentSessionRun) -> dict:
+    """One provider's part of an enrichment session, the same whether the
+    session has just run (POST /entities/{id}/enrich) or is read back later
+    (GET /enrichment-sessions/{id}). `error` is null unless it failed."""
+    return {
+        "id": row.id, "session_id": row.session_id, "run_id": row.run_id, "provider": row.provider,
+        "status": row.status, "result_count": row.result_count, "error": row.error,
+        "started_at": row.started_at, "finished_at": row.finished_at,
+    }
+
+
 def get_enrichment_session_detail(db: Session, session_id: str) -> dict:
     """Return an enrichment session with its per-provider runs. Raises
     LookupError if the session doesn't exist (the caller maps that to 404)."""
@@ -106,7 +117,8 @@ def get_enrichment_session_detail(db: Session, session_id: str) -> dict:
     return {
         "id": session.id, "entity_id": session.entity_id, "investigation_id": session.investigation_id,
         "status": session.status, "providers": session.providers, "total_results": session.total_results,
-        "started_at": session.started_at, "finished_at": session.finished_at, "runs": runs,
+        "started_at": session.started_at, "finished_at": session.finished_at,
+        "runs": [serialize_enrichment_session_run(row) for row in runs],
     }
 
 

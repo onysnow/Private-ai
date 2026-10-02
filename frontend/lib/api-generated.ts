@@ -27,11 +27,11 @@ export function connectGeneratedClient(api:ApiClient):void{
   });
 }
 
-/** The reply check for a call that cannot go through the generated client:
- * a file upload, whose FormData must reach fetch as it is (the bridge above
- * re-reads a request's body as text, which a zip or a PDF does not survive).
- * The call goes through ApiClient.parsed with the same generated Zod schema
- * the client would run, and fails the same way. */
+/** The reply check for a call made through ApiClient.parsed instead of the
+ * generated client: the file uploads, written when the bridge above read a
+ * request's body as text, which a zip or a PDF does not survive (it now passes
+ * the bytes on, ApiClient.fetchForGenerated). The check is the same generated
+ * Zod schema the client would run, and fails the same way. */
 export function checkedReply<T>(schema: ZodType<T>): (value: unknown, endpoint: string) => T {
   return (value, endpoint) => {
     const parsed = schema.safeParse(value);

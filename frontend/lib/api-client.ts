@@ -64,8 +64,11 @@ export class ApiClient {
   fetchForGenerated=async(input:Request):Promise<Response>=>{
     const url=new URL(input.url);
     const method=input.method.toUpperCase();
-    const body=method==='GET'||method==='HEAD'?undefined:await input.text();
-    return this.request(`${url.pathname}${url.search}`,{method,headers:new Headers(input.headers),rawBody:body||undefined,signal:input.signal});
+    // The body goes on as the bytes it is (a FormData's too, with the boundary
+    // its content-type names). It used to be read as text, which changes the
+    // bytes of a zip or a PDF. An empty one is left out, as before.
+    const bytes=method==='GET'||method==='HEAD'?undefined:await input.blob();
+    return this.request(`${url.pathname}${url.search}`,{method,headers:new Headers(input.headers),rawBody:bytes&&bytes.size?bytes:undefined,signal:input.signal});
   };
 
   async blob(endpoint:string,options:RequestOptions={}):Promise<Blob>{

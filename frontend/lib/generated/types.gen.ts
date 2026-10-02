@@ -3578,37 +3578,10 @@ export type EnrichmentClusterOut = {
 };
 
 /**
- * EnrichmentRunResultOut
- *
- * One provider's part of an enrichment session; `error` is sent only when it failed.
- */
-export type EnrichmentRunResultOut = {
-  /**
-   * Error
-   */
-  error?: string | null;
-  /**
-   * Provider
-   */
-  provider: string;
-  /**
-   * Result Count
-   */
-  result_count: number;
-  /**
-   * Run Id
-   */
-  run_id: string;
-  /**
-   * Status
-   */
-  status: string;
-};
-
-/**
  * EnrichmentSessionDetailOut
  *
- * A stored session with its per-provider runs.
+ * A session with its per-provider runs: the reply to running every chosen
+ * connector against one entity, and to reading that session back.
  */
 export type EnrichmentSessionDetailOut = {
   /**
@@ -3680,52 +3653,6 @@ export type EnrichmentSessionFindingOut = {
 };
 
 /**
- * EnrichmentSessionOut
- *
- * The reply to running every chosen connector against one entity.
- */
-export type EnrichmentSessionOut = {
-  /**
-   * Entity Id
-   */
-  entity_id: string;
-  /**
-   * Finished At
-   */
-  finished_at?: string | null;
-  /**
-   * Id
-   */
-  id: string;
-  /**
-   * Investigation Id
-   */
-  investigation_id: string;
-  /**
-   * Providers
-   */
-  providers: Array<string>;
-  /**
-   * Runs
-   */
-  runs: Array<EnrichmentRunResultOut>;
-  /**
-   * Started At
-   *
-   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
-   */
-  started_at: string;
-  /**
-   * Status
-   */
-  status: string;
-  /**
-   * Total Results
-   */
-  total_results: number;
-};
-
-/**
  * EnrichmentSessionRowOut
  *
  * An enrichment session as stored.
@@ -3769,6 +3696,8 @@ export type EnrichmentSessionRowOut = {
 
 /**
  * EnrichmentSessionRunOut
+ *
+ * One provider's part of an enrichment session (serialize_enrichment_session_run).
  */
 export type EnrichmentSessionRunOut = {
   /**
@@ -11964,7 +11893,7 @@ export type EnrichEntityMultiResponses = {
   /**
    * Successful Response
    */
-  200: EnrichmentSessionOut;
+  200: EnrichmentSessionDetailOut;
 };
 
 export type EnrichEntityMultiResponse =

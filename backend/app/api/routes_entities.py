@@ -32,7 +32,7 @@ from app.services.relationships import entity_relationships
 from app.services.resolution import canonical_duplicate_candidates, record_canonical_resolution
 from app.schemas.responses import (
     CanonicalDuplicateCandidateOut, CanonicalEntityMergeAuditOut, CanonicalMergeExecuteOut, CanonicalMergePreviewOut,
-    CanonicalResolutionDecisionOut, ConnectorFindingOut, CrossProviderDecisionOut, EnrichmentSessionOut,
+    CanonicalResolutionDecisionOut, ConnectorFindingOut, CrossProviderDecisionOut, EnrichmentSessionDetailOut,
     EnrichmentSessionRowOut, EntityDossierOut, EntityOut, EntityRelationshipOut, EntityStatementOut,
     ExternalRelationshipPromotionOut, PostMergeReconciliationOut, PropertyConflictDecisionOut,
     ReconciliationDecisionOut, StatementHistoryRowOut, StatementPromotionOut, upstream,
@@ -143,7 +143,7 @@ async def enrich_entity(entity_id: str, provider: str, db: Session = Depends(get
     return await _enrich_entity_single(provider, entity, db)
 
 
-@router.post("/entities/{entity_id}/enrich", response_model=EnrichmentSessionOut)
+@router.post("/entities/{entity_id}/enrich", response_model=EnrichmentSessionDetailOut)
 async def enrich_entity_multi(entity_id: str, body: MultiEnrichmentRequest, db: Session = Depends(get_db)) -> Any:
     entity = db.get(Entity, entity_id)
     if entity is None:

@@ -1313,19 +1313,6 @@ export const zEnrichmentClusterOut = z.object({
 });
 
 /**
- * EnrichmentRunResultOut
- *
- * One provider's part of an enrichment session; `error` is sent only when it failed.
- */
-export const zEnrichmentRunResultOut = z.object({
-  error: z.string().nullish(),
-  provider: z.string(),
-  result_count: z.number().int(),
-  run_id: z.string(),
-  status: z.string(),
-});
-
-/**
  * EnrichmentSessionFindingOut
  */
 export const zEnrichmentSessionFindingOut = z.object({
@@ -1338,32 +1325,6 @@ export const zEnrichmentSessionFindingOut = z.object({
   id: z.string(),
   provider: z.string(),
   session_id: z.string(),
-});
-
-/**
- * EnrichmentSessionOut
- *
- * The reply to running every chosen connector against one entity.
- */
-export const zEnrichmentSessionOut = z.object({
-  entity_id: z.string(),
-  finished_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    )
-    .nullish(),
-  id: z.string(),
-  investigation_id: z.string(),
-  providers: z.array(z.string()),
-  runs: z.array(zEnrichmentRunResultOut),
-  started_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    ),
-  status: z.string(),
-  total_results: z.number().int(),
 });
 
 /**
@@ -1393,6 +1354,8 @@ export const zEnrichmentSessionRowOut = z.object({
 
 /**
  * EnrichmentSessionRunOut
+ *
+ * One provider's part of an enrichment session (serialize_enrichment_session_run).
  */
 export const zEnrichmentSessionRunOut = z.object({
   error: z.string().nullish(),
@@ -1419,7 +1382,8 @@ export const zEnrichmentSessionRunOut = z.object({
 /**
  * EnrichmentSessionDetailOut
  *
- * A stored session with its per-provider runs.
+ * A session with its per-provider runs: the reply to running every chosen
+ * connector against one entity, and to reading that session back.
  */
 export const zEnrichmentSessionDetailOut = z.object({
   entity_id: z.string(),
@@ -5268,7 +5232,7 @@ export const zEnrichEntityMultiPath = z.object({
 /**
  * Successful Response
  */
-export const zEnrichEntityMultiResponse = zEnrichmentSessionOut;
+export const zEnrichEntityMultiResponse = zEnrichmentSessionDetailOut;
 
 export const zEnrichEntityPath = z.object({
   entity_id: z.string(),

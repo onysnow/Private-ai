@@ -14,6 +14,7 @@ from app.models.domain import (
 )
 from app.schemas.api import EntityCreate, EntityUpdate, PropertyConflictDecisionRequest
 from app.services.connectors import persist_connector_findings
+from app.services.consolidation import get_enrichment_session_detail
 from app.services.ftm import make_ftm_entity
 from app.services.provenance import entity_statement_history
 from app.services.timeline import _normalize_date
@@ -161,7 +162,6 @@ async def run_multi_enrichment(db: Session, entity: Entity, providers: list[str]
     db.commit()
     db.refresh(session)
 
-    provider_results = []
     total_results = 0
     failures = 0
     for provider in providers:
@@ -198,24 +198,19 @@ async def run_multi_enrichment(db: Session, entity: Entity, providers: list[str]
             session_run.result_count = len(rows)
             session_run.finished_at = utcnow_naive()
             total_results += len(rows)
-            provider_results.append({"provider": provider, "status": "completed", "result_count": len(rows), "run_id": run.id})
         except Exception as exc:
             failures += 1
             run.status = "failed"; run.error = str(exc); run.finished_at = utcnow_naive()
             session_run.status = "failed"; session_run.error = str(exc); session_run.finished_at = utcnow_naive()
-            provider_results.append({"provider": provider, "status": "failed", "result_count": 0, "run_id": run.id, "error": str(exc)})
         db.commit()
 
     session.total_results = total_results
     session.status = "failed" if providers and failures == len(providers) else ("partial" if failures else "completed")
     session.finished_at = utcnow_naive()
     db.commit()
-    db.refresh(session)
-    return {
-        "id": session.id, "entity_id": session.entity_id, "investigation_id": session.investigation_id,
-        "status": session.status, "providers": providers, "total_results": total_results,
-        "started_at": session.started_at, "finished_at": session.finished_at, "runs": provider_results,
-    }
+    # The session as GET /enrichment-sessions/{id} reports it: one shape for
+    # its runs (they used to differ between the run and a later read).
+    return get_enrichment_session_detail(db, session.id)
 
 
 def list_entity_enrichment_sessions(db: Session, entity_id: str) -> list[EnrichmentSession]:

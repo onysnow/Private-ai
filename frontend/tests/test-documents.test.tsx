@@ -121,7 +121,24 @@ describe('DocumentsPanel upload and review', () => {
     expect(url.searchParams.get('status')).toBe('proposed');
     expect(url.searchParams.get('explain')).toBe('true');
     expect(screen.getByPlaceholderText('Document title')).toHaveValue('');
+    // The upload's line stays once the proposals are in (it used to be cleared by them).
+    expect(screen.getByText('Extracted 4 chunk(s). Review proposals before canonicalizing.')).toBeInTheDocument();
     expect(api.unmatched()).toEqual([]);
+  });
+
+  it('keeps the upload\'s line and adds why its proposals could not be loaded', async () => {
+    const api = await renderWithDocuments();
+    const uploaded = {...docFixture({id: 'doc-2', filename: 'contract.pdf', chunk_count: 4, candidate_counts: {}}), job: null, openaleph_sync: null};
+    api.add({
+      [UPLOAD]: uploaded,
+      [DOCUMENTS]: [docFixture(), uploaded],
+      'GET /api/documents/doc-2/candidates': {status: 500, body: {detail: 'Proposals unavailable'}},
+    });
+    const user = userEvent.setup();
+    await user.upload(fileInput(), new File(['pdf-bytes'], 'contract.pdf', {type: 'application/pdf'}));
+    await user.click(screen.getByRole('button', {name: 'Upload & extract'}));
+
+    await screen.findByText(/^Extracted 4 chunk\(s\)\. Review proposals before canonicalizing\. Proposals unavailable/);
   });
 
   it('shows the server\'s reason when an upload is refused', async () => {

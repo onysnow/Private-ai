@@ -618,8 +618,10 @@ def test_connector_and_review_replies(demo, fake_connectors):
     # Enrichment: one provider, then every provider in one session (one of them down).
     _same_through_model(list[r.ConnectorFindingOut], _run(enrich_entity("fake-a", meridian, db)))
     session = _run(run_multi_enrichment(db, meridian, ["fake-a", "fake-b", "fake-down"]))
-    assert session["status"] == "partial" and any("error" in run for run in session["runs"])
-    _same_through_model(r.EnrichmentSessionOut, session)
+    assert session["status"] == "partial" and [run["provider"] for run in session["runs"] if run["error"]] == ["fake-down"]
+    # One shape for a session's runs: the reply to the run is the session as it reads back.
+    assert session == get_enrichment_session_detail(db, session["id"])
+    _same_through_model(r.EnrichmentSessionDetailOut, session)
     _same_through_model(r.EnrichmentSessionDetailOut, get_enrichment_session_detail(db, session["id"]))
     _same_through_model(list[r.EnrichmentSessionRowOut], list_entity_enrichment_sessions(db, meridian.id))
     clusters = get_enrichment_session_clusters(db, session["id"])

@@ -153,13 +153,12 @@ describe('Home document ingestion & extraction', () => {
     await user.upload(fileInput(), new File(['pdf-bytes'], 'contract.pdf', {type: 'application/pdf'}));
     await user.click(screen.getByRole('button', {name: 'Upload & extract'}));
 
-    // uploadDocument() sets "Extracted N chunk(s)..." then immediately calls
-    // loadDocCandidates(d.id) with the default status='proposed', which
-    // itself clears docStatus back to '' on success -- so the transient
-    // upload message never actually persists to be asserted on. What does
-    // persist: the reloaded documents list and the newly loaded proposals.
+    // uploadDocument() sets "Extracted N chunk(s)..." and keeps it once the
+    // proposals are in (loading them used to clear it). What persists: that
+    // line, the reloaded documents list and the newly loaded proposals.
     await screen.findByText('contract.pdf');
     expect(screen.getByText('Kestrelwood Holdings Ltd')).toBeInTheDocument();
+    expect(screen.getByText('Extracted 4 chunk(s). Review proposals before canonicalizing.')).toBeInTheDocument();
 
     expect(api.calls(UPLOAD)).toHaveLength(1);
     const body = uploadForm(api.calls(UPLOAD)[0]);

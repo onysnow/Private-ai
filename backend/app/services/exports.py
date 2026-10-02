@@ -436,7 +436,10 @@ def preview_investigation_restore(
                 "message": f"Document destination already exists: {dest}",
             })
 
-    missing_documents = list(manifest.get("missing_documents", []))
+    # build_investigation_export lists the files it could not include as
+    # "missing_document_files"; this read "missing_documents", which no backup
+    # has, so the preview always said none were missing.
+    missing_documents = list(manifest.get("missing_document_files", []))
     warnings: list[str] = []
     if missing_documents:
         warnings.append(
