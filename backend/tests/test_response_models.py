@@ -336,6 +336,22 @@ def test_openaleph_corpus_replies(demo, monkeypatch):
     _same_through_model(list[r.ExtractionCandidateOut], explained)
 
 
+def test_document_email_replies(demo):
+    from app.models.domain import DocumentCorpusSync, Source
+    from app.services.documents import serialize_document
+    from app.services.email_documents import document_email
+
+    db, _inv, doc, _candidates, _accepted = demo
+    source = db.get(Source, doc.source_id)
+    source.metadata_json = {**(source.metadata_json or {}), "email": {"from": ["Jane Doe <jane@meridian.example>"], "subject": ["Transfer"]}}
+    db.add(DocumentCorpusSync(document_id=doc.id, investigation_id=doc.investigation_id, provider="openaleph", collection_id="7",
+                              provider_record_id="e1", status="synced", response_json={"schema": "Email"}))
+    db.commit()
+    thread = {"total": 1, "results": [{"id": "e1", "schema": "Email", "properties": {"subject": ["Transfer"], "date": ["2026-09-01"]}}]}
+    _same_through_model(r.DocumentEmailOut, document_email(db, doc.id, fetch_thread=lambda _id: thread))
+    _same_through_model(r.DocumentOut, serialize_document(db, doc))
+
+
 def test_document_formats_replies(monkeypatch):
     from app.core.config import settings
     from app.services.document_formats import accepted_formats

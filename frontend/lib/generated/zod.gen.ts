@@ -1234,6 +1234,8 @@ export const zDocumentDetailOut = z.object({
   investigation_id: z.string(),
   mime_type: z.string().nullish(),
   openaleph_document_id: z.string().nullish(),
+  openaleph_schema: z.string().nullish(),
+  parent_document_id: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
 });
@@ -1272,6 +1274,8 @@ export const zDocumentOut = z.object({
   investigation_id: z.string(),
   mime_type: z.string().nullish(),
   openaleph_document_id: z.string().nullish(),
+  openaleph_schema: z.string().nullish(),
+  parent_document_id: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
 });
@@ -1349,6 +1353,49 @@ export const zDossierSummaryOut = z.object({
   task_count: z.number().int(),
   timeline_event_count: z.number().int(),
   unresolved_external_count: z.number().int(),
+});
+
+/**
+ * EmailHeadersOut
+ *
+ * An email's headers as OpenAleph read them.
+ */
+export const zEmailHeadersOut = z.object({
+  bcc: z.array(z.string()),
+  cc: z.array(z.string()),
+  date: z.string().nullable(),
+  from: z.array(z.string()),
+  in_reply_to: z.array(z.string()),
+  message_id: z.string().nullable(),
+  subject: z.string().nullable(),
+  to: z.array(z.string()),
+});
+
+/**
+ * EmailThreadMessageOut
+ *
+ * One message of the thread, oldest first; ``document_id`` when the
+ * Workbench holds it too.
+ */
+export const zEmailThreadMessageOut = z.object({
+  current: z.boolean(),
+  date: z.string().nullable(),
+  document_id: z.string().nullable(),
+  openaleph_entity_id: z.string(),
+  sender: z.string().nullable(),
+  subject: z.string().nullable(),
+});
+
+/**
+ * DocumentEmailOut
+ *
+ * An email document's headers and thread (app/services/email_documents.py).
+ */
+export const zDocumentEmailOut = z.object({
+  document_id: z.string(),
+  headers: zEmailHeadersOut,
+  thread: z.array(zEmailThreadMessageOut),
+  thread_note: z.string().nullable(),
 });
 
 /**
@@ -2838,7 +2885,9 @@ export const zDocumentUploadOut = z.object({
   job: zBackgroundJobOut.nullish(),
   mime_type: z.string().nullish(),
   openaleph_document_id: z.string().nullish(),
+  openaleph_schema: z.string().nullish(),
   openaleph_sync: zOpenAlephSyncOut.nullish(),
+  parent_document_id: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
 });
@@ -5212,6 +5261,15 @@ export const zSyncOpenalephDocumentPath = z.object({
  */
 export const zSyncOpenalephDocumentResponse = zOpenAlephDocumentSyncOut;
 
+export const zGetDocumentEmailPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetDocumentEmailResponse = zDocumentEmailOut;
+
 export const zAnalyzeOpenalephDocumentPath = z.object({
   document_id: z.string(),
 });
@@ -5220,6 +5278,15 @@ export const zAnalyzeOpenalephDocumentPath = z.object({
  * Successful Response
  */
 export const zAnalyzeOpenalephDocumentResponse = zBackgroundJobOut;
+
+export const zFindOpenalephChildrenPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zFindOpenalephChildrenResponse = zBackgroundJobOut;
 
 export const zEnrichmentSessionDetailPath = z.object({
   session_id: z.string(),

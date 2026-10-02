@@ -15,6 +15,7 @@ may also pass its own transport.
 from __future__ import annotations
 
 from typing import Any, Mapping, Sequence
+from urllib.parse import urlsplit
 
 import httpx
 
@@ -65,6 +66,28 @@ def get_json(path: str, params: Params = None, *, transport: httpx.BaseTransport
 def post(path: str, json: Any = None, *, transport: httpx.BaseTransport | None = None) -> httpx.Response:
     with _client(transport) as client:
         return client.post(f"{base_url()}{path}", json=json, headers=_headers(transport))
+
+
+def download(url: str, *, max_bytes: int, transport: httpx.BaseTransport | None = None) -> bytes | None:
+    """The bytes at a signed archive URL, or None when there are more than
+    ``max_bytes`` (reading stops there). A link to OpenAleph's own
+    ``/api/2/archive`` is followed on the base URL the Workbench reaches
+    OpenAleph at, since OpenAleph builds it on its public address. The
+    signature in the URL is the authorization, so no other credentials go
+    with it (a signed storage URL refuses a request that carries some)."""
+    target = urlsplit(url)
+    if target.path.startswith("/api/2/archive"):
+        url = f"{base_url()}{target.path}" + (f"?{target.query}" if target.query else "")
+    chunks: list[bytes] = []
+    total = 0
+    with _client(transport) as client, client.stream("GET", url, headers={"User-Agent": USER_AGENT}) as response:
+        response.raise_for_status()
+        for chunk in response.iter_bytes():
+            total += len(chunk)
+            if total > max_bytes:
+                return None
+            chunks.append(chunk)
+    return b"".join(chunks)
 
 
 def get_entity(entity_id: str) -> dict[str, Any] | None:

@@ -193,6 +193,9 @@ def _lineage_integrity(records: dict[str, list[dict[str, Any]]]) -> dict[str, An
         source_id = doc.get("source_id")
         if source_id not in sources:
             errors.append(f"document {doc_id} references missing source {source_id}")
+        parent_id = doc.get("parent_document_id")
+        if parent_id is not None and parent_id not in documents:
+            errors.append(f"document {doc_id} references missing parent document {parent_id}")
 
     for chunk_id, chunk in chunks.items():
         if not chunk_id:
@@ -242,6 +245,27 @@ def _lineage_integrity(records: dict[str, list[dict[str, Any]]]) -> dict[str, An
         "errors": errors,
     }
     return summary
+
+
+def _parents_first(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Documents ordered so an archive or email comes before the files found
+    in it (parent_document_id, ADR-0006): PostgreSQL checks the foreign key
+    as each row goes in. Rows keep their order otherwise."""
+    placed: set[Any] = set()
+    ordered: list[dict[str, Any]] = []
+    waiting = list(rows)
+    ids = {row.get("id") for row in rows}
+    while waiting:
+        ready = [row for row in waiting if row.get("parent_document_id") in placed
+                 or row.get("parent_document_id") is None or row.get("parent_document_id") not in ids]
+        if not ready:          # a cycle cannot be restored in any order; the insert will say so
+            ordered.extend(waiting)
+            break
+        for row in ready:
+            placed.add(row.get("id"))
+        ordered.extend(ready)
+        waiting = [row for row in waiting if row.get("id") not in placed]
+    return ordered
 
 
 def _require_lineage_integrity(records: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
@@ -530,6 +554,8 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
             for table in RESTORE_ORDER:
                 model = MODEL_BY_TABLE[table]
                 rows = records.get(table, [])
+                if table == "documents":
+                    rows = _parents_first(rows)
                 for raw_row in rows:
                     row = dict(raw_row)
                     if table == "documents" and row["id"] in raw_locations:

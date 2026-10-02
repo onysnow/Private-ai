@@ -29,6 +29,9 @@ class Document(Base):
     # stored as JSON; empty/None means nothing to flag.
     extraction_issues: Mapped[list | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
+    # The archive or email this file was found in (ADR-0006, Wave A):
+    # OpenAleph read the container and the file is one of its children.
+    parent_document_id: Mapped[str | None] = mapped_column(ForeignKey("documents.id"), nullable=True, index=True)
 
 
 class InvestigationCorpusBinding(Base):

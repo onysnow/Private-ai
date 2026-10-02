@@ -153,6 +153,9 @@ import type {
   FindingCandidatesData,
   FindingCandidatesErrors,
   FindingCandidatesResponses,
+  FindOpenalephChildrenData,
+  FindOpenalephChildrenErrors,
+  FindOpenalephChildrenResponses,
   GetAiAnalysisCandidateEndpointData,
   GetAiAnalysisCandidateEndpointErrors,
   GetAiAnalysisCandidateEndpointResponses,
@@ -169,6 +172,9 @@ import type {
   GetDeckEndpointErrors,
   GetDeckEndpointResponses,
   GetDocumentData,
+  GetDocumentEmailData,
+  GetDocumentEmailErrors,
+  GetDocumentEmailResponses,
   GetDocumentErrors,
   GetDocumentFormatsData,
   GetDocumentFormatsErrors,
@@ -588,6 +594,8 @@ import {
   zFindExtractionLineageEndpointResponse,
   zFindingCandidatesPath,
   zFindingCandidatesResponse,
+  zFindOpenalephChildrenPath,
+  zFindOpenalephChildrenResponse,
   zGetAiAnalysisCandidateEndpointPath,
   zGetAiAnalysisCandidateEndpointResponse,
   zGetClaimReviewWorkspacePath,
@@ -598,6 +606,8 @@ import {
   zGetCorpusSyncResponse,
   zGetDeckEndpointPath,
   zGetDeckEndpointResponse,
+  zGetDocumentEmailPath,
+  zGetDocumentEmailResponse,
   zGetDocumentFormatsResponse,
   zGetDocumentPath,
   zGetDocumentResponse,
@@ -2149,6 +2159,39 @@ export const syncOpenalephDocument = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Document Email
+ *
+ * An email document's headers (as OpenAleph read them) and its thread
+ * from OpenAleph, each message linked to its Workbench document when the
+ * Workbench holds it. 404 for a document that is not an email.
+ */
+export const getDocumentEmail = <ThrowOnError extends boolean = false>(
+  options: Options<GetDocumentEmailData, ThrowOnError>,
+): RequestResult<
+  GetDocumentEmailResponses,
+  GetDocumentEmailErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetDocumentEmailResponses,
+    GetDocumentEmailErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetDocumentEmailPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDocumentEmailResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/email',
+    ...options,
+  });
+
+/**
  * Analyze Openaleph Document
  *
  * "Find names again": OpenAleph analyses the document again
@@ -2179,6 +2222,40 @@ export const analyzeOpenalephDocument = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zAnalyzeOpenalephDocumentResponse.parseAsync(data),
     url: '/api/documents/{document_id}/openaleph/analyze',
+    ...options,
+  });
+
+/**
+ * Find Openaleph Children
+ *
+ * "Look for files inside again": list an archive's or an email's files
+ * in OpenAleph once more and add, as documents under it, those the
+ * Workbench does not hold yet (ADR-0006, Wave A). A background job, like
+ * "Find names again".
+ */
+export const findOpenalephChildren = <ThrowOnError extends boolean = false>(
+  options: Options<FindOpenalephChildrenData, ThrowOnError>,
+): RequestResult<
+  FindOpenalephChildrenResponses,
+  FindOpenalephChildrenErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    FindOpenalephChildrenResponses,
+    FindOpenalephChildrenErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zFindOpenalephChildrenPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zFindOpenalephChildrenResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/openaleph/children',
     ...options,
   });
 

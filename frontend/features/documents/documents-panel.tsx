@@ -25,7 +25,7 @@ import {
   listEntitiesQueryKey, listInvestigationEvidenceQueryKey, listSourcesQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {
-  analyzeOpenalephDocument, createExtractedRelationshipProposal, getDocument, getOpenalephDocumentReviewStatus, listDocumentCandidatesEndpoint,
+  analyzeOpenalephDocument, createExtractedRelationshipProposal, findOpenalephChildren, getDocument, getOpenalephDocumentReviewStatus, listDocumentCandidatesEndpoint,
   listJobsEndpoint, refreshOpenalephDocumentReview, retryJobEndpoint, reviewExtractionCandidate, syncOpenalephDocument,
 } from '../../lib/generated/sdk.gen';
 import type {
@@ -36,6 +36,8 @@ import type {BackgroundJob} from '../../lib/api-types';
 import {describeJob, waitForJob} from '../../lib/jobs';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {CorpusStatus} from './corpus-status';
+import {CONTAINER_SCHEMATA, nestDocuments} from './document-tree';
+import {EmailView} from './email-view';
 import {IdentifierOwner} from './identifier-owner';
 import {SchemaQuestion} from './schema-question';
 
@@ -85,6 +87,8 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
   const [bulkImporting, setBulkImporting] = useState(false);
   const [bulkProgress, setBulkProgress] = useState<{done: number, total: number, currentName: string} | null>(null);
   const [bulkStatus, setBulkStatus] = useState('');
+  // The email whose headers and thread are open.
+  const [emailOpen, setEmailOpen] = useState<string | null>(null);
 
   // Proposals belong to the case they were loaded for: a late reply for
   // another case is dropped, and a new case starts with none.
@@ -306,6 +310,20 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
     }
   };
 
+  // "Look for files inside again" (ADR-0006, Wave A): OpenAleph lists an
+  // archive's or email's files once more; those not held yet become documents.
+  const findChildrenAgain = async (d: DocumentOut) => {
+    setDocStatus(`${d.filename}: looking for the files inside again…`);
+    try {
+      let job: BackgroundJob = (await findOpenalephChildren({path: {document_id: d.id}, throwOnError: true})).data;
+      if (!job.finished) job = await waitForJob(api, job.id, j => setDocStatus(`${d.filename}: ${describeJob(j)}`));
+      setDocStatus(`${d.filename}: ${describeJob(job)}`);
+      await reloadDocuments();
+    } catch (error) {
+      setDocStatus(errorMessage(error, 'Could not look for the files inside again'));
+    }
+  };
+
   const loadOpenAlephStatus = async (documentId: string): Promise<OpenAlephReviewStatusOut | null> => {
     try {
       const status = (await getOpenalephDocumentReviewStatus({path: {document_id: documentId}, throwOnError: true})).data;
@@ -371,9 +389,11 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
       {bulkImporting && bulkProgress && <p className="muted">Importing {Math.min(bulkProgress.done + 1, bulkProgress.total)} of {bulkProgress.total}: {bulkProgress.currentName}</p>}
       {bulkStatus && <p className="muted">{bulkStatus}</p>}
       {investigationId && <p className="muted"><Link href={`/review?inv=${encodeURIComponent(investigationId)}`}>Open review queue for this investigation</Link> -- resumes reviewing every document here that still has unreviewed proposals, not only a just-imported batch.</p>}
-      {documents.map(d => {
+      {nestDocuments(documents).map(({document: d, depth, parent}) => {
         const oa = openAleph[d.id];
-        return <div className="candidate" key={d.id}>
+        const container = Boolean(d.openaleph_schema && CONTAINER_SCHEMATA.includes(d.openaleph_schema));
+        return <div className="candidate" key={d.id} data-testid={`document-${d.id}`} style={depth ? {marginLeft: `${depth * 1.5}rem`} : undefined}>
+          {parent && <div><small>Inside {parent.filename}</small></div>}
           <b>{d.filename}</b> <small>{d.extraction_status} · {d.chunk_count} chunks · {Object.entries(d.candidate_counts || {}).map(([k, v]) => `${k}: ${v}`).join(' · ')}</small>
           {oa && <div>
             <small>OpenAleph: {oa.sync?.status || 'not synchronized'}{oa.sync?.provider_record_id ? ` · provider document ${oa.sync.provider_record_id}` : ''} · {oa.provider_candidate_pending_review} awaiting review · {oa.provider_candidate_accepted} accepted · {oa.provider_candidate_rejected} rejected</small>
@@ -386,10 +406,13 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
             <Button onClick={() => syncOpenAleph(d.id)}>Sync to OpenAleph</Button>
             <Button onClick={() => refreshOpenAleph(d.id)} disabled={Boolean(oa && !oa.ready_for_import)}>Refresh OpenAleph review</Button>
             {d.openaleph_document_id && d.extraction_status === 'complete' && <Button onClick={() => findNamesAgain(d)}>Find names again</Button>}
+            {container && d.extraction_status === 'complete' && <Button onClick={() => findChildrenAgain(d)}>Look for files inside again</Button>}
+            {d.openaleph_schema === 'Email' && <Button aria-expanded={emailOpen === d.id} onClick={() => setEmailOpen(cur => (cur === d.id ? null : d.id))}>Headers & thread</Button>}
             <Button onClick={() => openProvenance({title: d.filename, kind: 'document', sourceId: d.source_id, documentId: d.id})}>Trace document</Button>
             {d.extraction_status === 'failed' && <Button onClick={() => retryDocumentRead(d)}>Retry reading</Button>}
             {(d.extraction_status === 'queued' || d.extraction_status === 'extracting') && <Button onClick={() => retryDocumentRead(d)}>Check reading progress</Button>}
           </div>
+          {emailOpen === d.id && <EmailView documentId={d.id} onOpenDocument={documentId => loadCandidates(documentId)}/>}
         </div>;
       })}
       {candidates.map(c => <div className="candidate" key={c.id}>

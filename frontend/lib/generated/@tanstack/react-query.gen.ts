@@ -56,12 +56,14 @@ import {
   externalRelationshipCandidates,
   findExtractionLineageEndpoint,
   findingCandidates,
+  findOpenalephChildren,
   getAiAnalysisCandidateEndpoint,
   getClaimReviewWorkspace,
   getCorpusStatus,
   getCorpusSync,
   getDeckEndpoint,
   getDocument,
+  getDocumentEmail,
   getDocumentFormats,
   getEntityDossier,
   getExtractionCandidateExplanation,
@@ -309,6 +311,9 @@ import type {
   FindingCandidatesData,
   FindingCandidatesError,
   FindingCandidatesResponse,
+  FindOpenalephChildrenData,
+  FindOpenalephChildrenError,
+  FindOpenalephChildrenResponse,
   GetAiAnalysisCandidateEndpointData,
   GetAiAnalysisCandidateEndpointError,
   GetAiAnalysisCandidateEndpointResponse,
@@ -325,6 +330,9 @@ import type {
   GetDeckEndpointError,
   GetDeckEndpointResponse,
   GetDocumentData,
+  GetDocumentEmailData,
+  GetDocumentEmailError,
+  GetDocumentEmailResponse,
   GetDocumentError,
   GetDocumentFormatsData,
   GetDocumentFormatsError,
@@ -1821,6 +1829,38 @@ export const syncOpenalephDocumentMutation = (
   return mutationOptions;
 };
 
+export const getDocumentEmailQueryKey = (
+  options: Options<GetDocumentEmailData>,
+) => createQueryKey('getDocumentEmail', options);
+
+/**
+ * Get Document Email
+ *
+ * An email document's headers (as OpenAleph read them) and its thread
+ * from OpenAleph, each message linked to its Workbench document when the
+ * Workbench holds it. 404 for a document that is not an email.
+ */
+export const getDocumentEmailOptions = (
+  options: Options<GetDocumentEmailData>,
+) =>
+  queryOptions<
+    GetDocumentEmailResponse,
+    GetDocumentEmailError,
+    GetDocumentEmailResponse,
+    ReturnType<typeof getDocumentEmailQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDocumentEmail({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDocumentEmailQueryKey(options),
+  });
+
 /**
  * Analyze Openaleph Document
  *
@@ -1843,6 +1883,38 @@ export const analyzeOpenalephDocumentMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await analyzeOpenalephDocument({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Find Openaleph Children
+ *
+ * "Look for files inside again": list an archive's or an email's files
+ * in OpenAleph once more and add, as documents under it, those the
+ * Workbench does not hold yet (ADR-0006, Wave A). A background job, like
+ * "Find names again".
+ */
+export const findOpenalephChildrenMutation = (
+  options?: Partial<Options<FindOpenalephChildrenData>>,
+): UseMutationOptions<
+  FindOpenalephChildrenResponse,
+  FindOpenalephChildrenError,
+  Options<FindOpenalephChildrenData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    FindOpenalephChildrenResponse,
+    FindOpenalephChildrenError,
+    Options<FindOpenalephChildrenData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await findOpenalephChildren({
         ...options,
         ...fnOptions,
         throwOnError: true,

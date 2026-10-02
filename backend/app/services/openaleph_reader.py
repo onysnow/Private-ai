@@ -58,6 +58,8 @@ class OpenAlephText:
     collection_id: str = ""
     provider_document_id: str = ""
     schema: str = "Document"              # the FtM schema OpenAleph gave the document
+    # An email's headers as OpenAleph read them (email_headers), else empty.
+    headers: dict[str, list[str]] = field(default_factory=dict)
 
 
 def reading_with_openaleph() -> bool:
@@ -188,5 +190,26 @@ def read_with_openaleph(
         if not allow_empty:
             raise OpenAlephUnavailable("OpenAleph returned no text for this file", kind="no_text")
         issues.append(NO_TEXT_ISSUE)
+    schema = str((entity or {}).get("schema") or "Document")
     return OpenAlephText(chunks=chunks, issues=issues, collection_id=collection_id, provider_document_id=record_id,
-                         schema=str((entity or {}).get("schema") or "Document"))
+                         schema=schema, headers=email_headers(entity) if schema == "Email" else {})
+
+
+# The Email properties ingest-file fills from a message's headers
+# (ingestors/support/email.py), under the names the Workbench shows.
+EMAIL_HEADERS = {"from": "from", "to": "to", "cc": "cc", "bcc": "bcc", "date": "date", "subject": "subject",
+                 "messageId": "message_id", "inReplyTo": "in_reply_to"}
+
+
+def email_headers(entity: dict | None) -> dict[str, list[str]]:
+    """An Email entity's headers, each as the list of values OpenAleph keeps."""
+    raw = entity.get("properties") if isinstance(entity, dict) else None
+    properties: dict = raw if isinstance(raw, dict) else {}
+    headers: dict[str, list[str]] = {}
+    for prop, name in EMAIL_HEADERS.items():
+        values = properties.get(prop)
+        found = [str(value).strip() for value in (values if isinstance(values, list) else [values])
+                 if isinstance(value, (str, int, float)) and str(value).strip()]
+        if found:
+            headers[name] = found
+    return headers

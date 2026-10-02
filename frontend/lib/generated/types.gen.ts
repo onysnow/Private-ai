@@ -3120,6 +3120,14 @@ export type DocumentDetailOut = {
    */
   openaleph_document_id?: string | null;
   /**
+   * Openaleph Schema
+   */
+  openaleph_schema?: string | null;
+  /**
+   * Parent Document Id
+   */
+  parent_document_id?: string | null;
+  /**
    * Sha256
    */
   sha256: string;
@@ -3127,6 +3135,27 @@ export type DocumentDetailOut = {
    * Source Id
    */
   source_id: string;
+};
+
+/**
+ * DocumentEmailOut
+ *
+ * An email document's headers and thread (app/services/email_documents.py).
+ */
+export type DocumentEmailOut = {
+  /**
+   * Document Id
+   */
+  document_id: string;
+  headers: EmailHeadersOut;
+  /**
+   * Thread
+   */
+  thread: Array<EmailThreadMessageOut>;
+  /**
+   * Thread Note
+   */
+  thread_note: string | null;
 };
 
 /**
@@ -3249,6 +3278,14 @@ export type DocumentOut = {
    */
   openaleph_document_id?: string | null;
   /**
+   * Openaleph Schema
+   */
+  openaleph_schema?: string | null;
+  /**
+   * Parent Document Id
+   */
+  parent_document_id?: string | null;
+  /**
    * Sha256
    */
   sha256: string;
@@ -3340,7 +3377,15 @@ export type DocumentUploadOut = {
    * Openaleph Document Id
    */
   openaleph_document_id?: string | null;
+  /**
+   * Openaleph Schema
+   */
+  openaleph_schema?: string | null;
   openaleph_sync?: OpenAlephSyncOut | null;
+  /**
+   * Parent Document Id
+   */
+  parent_document_id?: string | null;
   /**
    * Sha256
    */
@@ -3653,6 +3698,79 @@ export type DossierSummaryOut = {
    * Unresolved External Count
    */
   unresolved_external_count: number;
+};
+
+/**
+ * EmailHeadersOut
+ *
+ * An email's headers as OpenAleph read them.
+ */
+export type EmailHeadersOut = {
+  /**
+   * Bcc
+   */
+  bcc: Array<string>;
+  /**
+   * Cc
+   */
+  cc: Array<string>;
+  /**
+   * Date
+   */
+  date: string | null;
+  /**
+   * From
+   */
+  from: Array<string>;
+  /**
+   * In Reply To
+   */
+  in_reply_to: Array<string>;
+  /**
+   * Message Id
+   */
+  message_id: string | null;
+  /**
+   * Subject
+   */
+  subject: string | null;
+  /**
+   * To
+   */
+  to: Array<string>;
+};
+
+/**
+ * EmailThreadMessageOut
+ *
+ * One message of the thread, oldest first; ``document_id`` when the
+ * Workbench holds it too.
+ */
+export type EmailThreadMessageOut = {
+  /**
+   * Current
+   */
+  current: boolean;
+  /**
+   * Date
+   */
+  date: string | null;
+  /**
+   * Document Id
+   */
+  document_id: string | null;
+  /**
+   * Openaleph Entity Id
+   */
+  openaleph_entity_id: string;
+  /**
+   * Sender
+   */
+  sender: string | null;
+  /**
+   * Subject
+   */
+  subject: string | null;
 };
 
 /**
@@ -11722,6 +11840,42 @@ export type SyncOpenalephDocumentResponses = {
 export type SyncOpenalephDocumentResponse =
   SyncOpenalephDocumentResponses[keyof SyncOpenalephDocumentResponses];
 
+export type GetDocumentEmailData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/email';
+};
+
+export type GetDocumentEmailErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetDocumentEmailError =
+  GetDocumentEmailErrors[keyof GetDocumentEmailErrors];
+
+export type GetDocumentEmailResponses = {
+  /**
+   * Successful Response
+   */
+  200: DocumentEmailOut;
+};
+
+export type GetDocumentEmailResponse =
+  GetDocumentEmailResponses[keyof GetDocumentEmailResponses];
+
 export type AnalyzeOpenalephDocumentData = {
   body?: never;
   path: {
@@ -11757,6 +11911,42 @@ export type AnalyzeOpenalephDocumentResponses = {
 
 export type AnalyzeOpenalephDocumentResponse =
   AnalyzeOpenalephDocumentResponses[keyof AnalyzeOpenalephDocumentResponses];
+
+export type FindOpenalephChildrenData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/openaleph/children';
+};
+
+export type FindOpenalephChildrenErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type FindOpenalephChildrenError =
+  FindOpenalephChildrenErrors[keyof FindOpenalephChildrenErrors];
+
+export type FindOpenalephChildrenResponses = {
+  /**
+   * Successful Response
+   */
+  200: BackgroundJobOut;
+};
+
+export type FindOpenalephChildrenResponse =
+  FindOpenalephChildrenResponses[keyof FindOpenalephChildrenResponses];
 
 export type EnrichmentSessionDetailData = {
   body?: never;

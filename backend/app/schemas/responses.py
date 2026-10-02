@@ -766,6 +766,10 @@ class DocumentOut(ResponseModel):
     candidate_counts: dict[str, int]
     # OpenAleph's id for the document when OpenAleph holds it (ADR-0006).
     openaleph_document_id: str | None = None
+    # What OpenAleph read it as (an Email, a Package...), once read.
+    openaleph_schema: str | None = None
+    # The archive or email the file was found in (ADR-0006, Wave A).
+    parent_document_id: str | None = None
 
 
 class DocumentChunkOut(ResponseModel):
@@ -1045,6 +1049,40 @@ class OpenAlephReviewRefreshOut(ResponseModel):
     evidence: OpenAlephEvidenceImportOut
     entities: OpenAlephEntityImportOut
     status: OpenAlephReviewStatusOut
+
+
+class EmailHeadersOut(ResponseModel):
+    """An email's headers as OpenAleph read them."""
+    from_: list[str] = Field(alias="from")
+    to: list[str]
+    cc: list[str]
+    bcc: list[str]
+    date: str | None
+    subject: str | None
+    message_id: str | None
+    in_reply_to: list[str]
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class EmailThreadMessageOut(ResponseModel):
+    """One message of the thread, oldest first; ``document_id`` when the
+    Workbench holds it too."""
+    openaleph_entity_id: str
+    subject: str | None
+    sender: str | None
+    date: str | None
+    document_id: str | None
+    current: bool
+
+
+class DocumentEmailOut(ResponseModel):
+    """An email document's headers and thread (app/services/email_documents.py)."""
+    document_id: str
+    headers: EmailHeadersOut
+    thread: list[EmailThreadMessageOut]
+    # Why the thread is missing or cut short, in a sentence.
+    thread_note: str | None
 
 
 class DocumentFormatsOut(ResponseModel):

@@ -9310,6 +9310,28 @@
             ],
             "title": "Openaleph Document Id"
           },
+          "openaleph_schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Openaleph Schema"
+          },
+          "parent_document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Document Id"
+          },
           "sha256": {
             "title": "Sha256",
             "type": "string"
@@ -9333,6 +9355,44 @@
           "chunks"
         ],
         "title": "DocumentDetailOut",
+        "type": "object"
+      },
+      "DocumentEmailOut": {
+        "description": "An email document's headers and thread (app/services/email_documents.py).",
+        "properties": {
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "headers": {
+            "$ref": "#/components/schemas/EmailHeadersOut"
+          },
+          "thread": {
+            "items": {
+              "$ref": "#/components/schemas/EmailThreadMessageOut"
+            },
+            "title": "Thread",
+            "type": "array"
+          },
+          "thread_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Note"
+          }
+        },
+        "required": [
+          "document_id",
+          "headers",
+          "thread",
+          "thread_note"
+        ],
+        "title": "DocumentEmailOut",
         "type": "object"
       },
       "DocumentExtractionSettingsOut": {
@@ -9519,6 +9579,28 @@
             ],
             "title": "Openaleph Document Id"
           },
+          "openaleph_schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Openaleph Schema"
+          },
+          "parent_document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Document Id"
+          },
           "sha256": {
             "title": "Sha256",
             "type": "string"
@@ -9682,6 +9764,17 @@
             ],
             "title": "Openaleph Document Id"
           },
+          "openaleph_schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Openaleph Schema"
+          },
           "openaleph_sync": {
             "anyOf": [
               {
@@ -9691,6 +9784,17 @@
                 "type": "null"
               }
             ]
+          },
+          "parent_document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Document Id"
           },
           "sha256": {
             "title": "Sha256",
@@ -10205,6 +10309,158 @@
           "unresolved_external_count"
         ],
         "title": "DossierSummaryOut",
+        "type": "object"
+      },
+      "EmailHeadersOut": {
+        "description": "An email's headers as OpenAleph read them.",
+        "properties": {
+          "bcc": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Bcc",
+            "type": "array"
+          },
+          "cc": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Cc",
+            "type": "array"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "from": {
+            "items": {
+              "type": "string"
+            },
+            "title": "From",
+            "type": "array"
+          },
+          "in_reply_to": {
+            "items": {
+              "type": "string"
+            },
+            "title": "In Reply To",
+            "type": "array"
+          },
+          "message_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message Id"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          },
+          "to": {
+            "items": {
+              "type": "string"
+            },
+            "title": "To",
+            "type": "array"
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "cc",
+          "bcc",
+          "date",
+          "subject",
+          "message_id",
+          "in_reply_to"
+        ],
+        "title": "EmailHeadersOut",
+        "type": "object"
+      },
+      "EmailThreadMessageOut": {
+        "description": "One message of the thread, oldest first; ``document_id`` when the\nWorkbench holds it too.",
+        "properties": {
+          "current": {
+            "title": "Current",
+            "type": "boolean"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "openaleph_entity_id": {
+            "title": "Openaleph Entity Id",
+            "type": "string"
+          },
+          "sender": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sender"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          }
+        },
+        "required": [
+          "openaleph_entity_id",
+          "subject",
+          "sender",
+          "date",
+          "document_id",
+          "current"
+        ],
+        "title": "EmailThreadMessageOut",
         "type": "object"
       },
       "EnrichmentClusterOut": {
@@ -30918,6 +31174,56 @@
         "summary": "Sync Openaleph Document"
       }
     },
+    "/api/documents/{document_id}/email": {
+      "get": {
+        "description": "An email document's headers (as OpenAleph read them) and its thread\nfrom OpenAleph, each message linked to its Workbench document when the\nWorkbench holds it. 404 for a document that is not an email.",
+        "operationId": "get_document_email",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentEmailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Document Email"
+      }
+    },
     "/api/documents/{document_id}/openaleph/analyze": {
       "post": {
         "description": "\"Find names again\": OpenAleph analyses the document again\n(POST /api/2/entities/{id}/analyze) and what it finds becomes proposals,\nas a background job (ADR-0006). Answers 202 with the job while it runs;\nin developer mode (SQLite) the job has finished when this answers.",
@@ -30966,6 +31272,56 @@
           }
         },
         "summary": "Analyze Openaleph Document"
+      }
+    },
+    "/api/documents/{document_id}/openaleph/children": {
+      "post": {
+        "description": "\"Look for files inside again\": list an archive's or an email's files\nin OpenAleph once more and add, as documents under it, those the\nWorkbench does not hold yet (ADR-0006, Wave A). A background job, like\n\"Find names again\".",
+        "operationId": "find_openaleph_children",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackgroundJobOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Find Openaleph Children"
       }
     },
     "/api/enrichment-sessions/{session_id}": {

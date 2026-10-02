@@ -19,16 +19,18 @@ from starlette.concurrency import run_in_threadpool
 from app.api.dependencies import authorize_request_resource, read_upload_limited
 from app.core.config import settings
 from app.db.session import get_db
-from app.jobs.handlers import ANALYZE_DOCUMENT, EXTRACT_DOCUMENT
+from app.jobs.handlers import ANALYZE_DOCUMENT, EXTRACT_DOCUMENT, FIND_CHILDREN
 from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Document, Investigation
 from app.schemas.responses import (
-    BackgroundJobOut, DocumentDetailOut, DocumentFormatsOut, DocumentReadFailedOut, DocumentUploadOut, ErrorOut,
+    BackgroundJobOut, DocumentDetailOut, DocumentEmailOut, DocumentFormatsOut, DocumentReadFailedOut, DocumentUploadOut, ErrorOut,
     ExtractionCandidateOut, OpenAlephDocumentSyncOut, OpenAlephEntityImportOut, OpenAlephEvidenceImportOut,
     OpenAlephReviewRefreshOut, OpenAlephReviewStatusOut, ValidationErrorOut, upstream,
 )
 from app.services.document_formats import UnsupportedFormat, accepted_formats, check_upload
+from app.services.email_documents import document_email
+from app.services.openaleph_children import is_container
 from app.services.documents import (
     get_document_detail, list_document_candidates, serialize_document, store_document,
 )
@@ -161,6 +163,47 @@ async def analyze_openaleph_document(document_id: str, request: Request, respons
     if not job_out["finished"]:
         response.status_code = 202
     return job_out
+
+
+@router.post("/documents/{document_id}/openaleph/children", response_model=BackgroundJobOut)
+async def find_openaleph_children(document_id: str, request: Request, response: Response, db: Session = Depends(get_db)) -> Any:
+    """"Look for files inside again": list an archive's or an email's files
+    in OpenAleph once more and add, as documents under it, those the
+    Workbench does not hold yet (ADR-0006, Wave A). A background job, like
+    "Find names again"."""
+    doc = db.get(Document, document_id)
+    if doc is None:
+        raise HTTPException(404, "Document not found")
+    sync = get_document_sync(db, document_id)
+    if sync is None or sync.status != "synced" or not sync.provider_record_id:
+        raise HTTPException(409, "This document is not in OpenAleph, so OpenAleph holds no files inside it")
+    if not is_container(str((sync.response_json or {}).get("schema") or "")):
+        raise HTTPException(409, "Only an archive or an email has files inside")
+    runner = job_runner(request)
+    job = create_job(
+        db, kind=FIND_CHILDREN, investigation_id=doc.investigation_id,
+        subject_type="document", subject_id=doc.id, runner=runner.mode,
+    )
+    await _submit_or_record_failure(request, job, db)
+    db.expire_all()
+    row = db.get(BackgroundJob, job.id)
+    if row is None:  # its investigation was deleted meanwhile
+        raise HTTPException(404, "Document not found")
+    job_out = serialize_job(row)
+    if not job_out["finished"]:
+        response.status_code = 202
+    return job_out
+
+
+@router.get("/documents/{document_id}/email", response_model=DocumentEmailOut)
+def get_document_email(document_id: str, db: Session = Depends(get_db)) -> Any:
+    """An email document's headers (as OpenAleph read them) and its thread
+    from OpenAleph, each message linked to its Workbench document when the
+    Workbench holds it. 404 for a document that is not an email."""
+    try:
+        return document_email(db, document_id)
+    except ValueError as exc:   # NotAnEmail is one
+        raise HTTPException(404, str(exc))
 
 
 async def _submit_or_record_failure(request: Request, job: BackgroundJob, db: Session) -> None:

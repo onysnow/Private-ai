@@ -206,6 +206,19 @@ def _email(*, attachment: bool = True) -> bytes:
     return message.as_bytes()
 
 
+def _reply() -> bytes:
+    message = EmailMessage()
+    message["From"] = "Audit Desk <audit@kestrelwood.example>"
+    message["To"] = "Jane Doe <jane.doe@meridian.example>"
+    message["Subject"] = "Re: Transfer to Meridian"
+    message["Date"] = "Wed, 02 Sep 2026 09:00:00 +0000"
+    message["Message-ID"] = "<reply@kestrelwood.example>"
+    message["In-Reply-To"] = "<transfer@meridian.example>"
+    message["References"] = "<transfer@meridian.example>"
+    message.set_content("Thanks Jane, Rebecca Thornton will review the ledger.")
+    return message.as_bytes()
+
+
 def _zip(**files: str) -> bytes:
     bundle = io.BytesIO()
     with zipfile.ZipFile(bundle, "w") as archive:
@@ -228,6 +241,37 @@ def test_formats_only_openaleph_reads_are_accepted_and_read_by_it(live):
     refused = client.post("/api/documents/upload", data={"investigation_id": inv, "title": "setup"},
                           files={"file": ("setup.exe", b"MZ\x90\x00", "application/octet-stream")})
     assert refused.status_code == 415, refused.text
+
+
+def test_an_archives_files_and_an_emails_attachment_become_documents_under_them(live):
+    client, _created = live
+    inv = _investigation(live, "Wave A children")
+    bundle = _upload(live, inv, "bundle.zip", _zip(
+        letters__first="Jane Doe wrote to Meridian Holdings Ltd about the transfer.",
+        second="Angela Merkel met Emmanuel Macron to discuss the audit."), "application/zip")
+    assert bundle["job"]["message"] == "Read by OpenAleph (no text); 2 file(s) inside added as documents", bundle["job"]
+    email = _upload(live, inv, "transfer.eml", _email(), "message/rfc822")
+    assert email["job"]["message"].endswith("; 1 file(s) inside added as documents"), email["job"]["message"]
+
+    documents = {row["filename"]: row for row in client.get(f"/api/investigations/{inv}/documents").json()}
+    assert documents["bundle.zip"]["openaleph_schema"] == "Package" and documents["transfer.eml"]["openaleph_schema"] == "Email"
+    expected = {"letters/first": (bundle["id"], "Jane Doe"), "second": (bundle["id"], "Angela Merkel"),
+                "ledger.txt": (email["id"], "Meridian Holdings Ltd")}
+    for name, (parent_id, caption) in expected.items():
+        child = documents[name]
+        assert child["parent_document_id"] == parent_id and child["extraction_status"] == "complete", child
+        assert caption in [row.payload["caption"] for row in _proposals(child["id"], "entity")], name
+
+    # OpenAleph answers no thread for a message nothing replies to (5.3.1).
+    alone = client.get(f"/api/documents/{email['id']}/email").json()
+    assert alone["thread"] == [] and alone["thread_note"] == "OpenAleph found no other message in this email's thread"
+    reply = _upload(live, inv, "reply.eml", _reply(), "message/rfc822")
+    shown = client.get(f"/api/documents/{email['id']}/email").json()
+    assert shown["headers"]["subject"] == "Transfer to Meridian"
+    assert shown["headers"]["from"] == ["Jane Doe <jane.doe@meridian.example>"]
+    assert shown["headers"]["cc"] == ["Maria Fernandez <maria@kestrelwood.example>"]
+    assert [(m["subject"], m["document_id"], m["current"]) for m in shown["thread"]] == [
+        ("Transfer to Meridian", email["id"], True), ("Re: Transfer to Meridian", reply["id"], False)]
 
 
 def test_a_pdf_gets_its_names_on_their_pages(live):

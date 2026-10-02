@@ -1,7 +1,7 @@
 from __future__ import annotations
 import hashlib, re, uuid
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, NamedTuple
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.core.time import utcnow_naive
@@ -143,7 +143,8 @@ def ingest_document(db: Session, *, investigation_id: str, title: str, filename:
     return extract_document(db, doc.id) or doc
 
 
-def store_document(db: Session, *, investigation_id: str, title: str, filename: str, mime_type: str | None, data: bytes, storage_dir: Path) -> Document:
+def store_document(db: Session, *, investigation_id: str, title: str, filename: str, mime_type: str | None, data: bytes, storage_dir: Path,
+                   parent_document_id: str | None = None, source_metadata: dict | None = None) -> Document:
     """Persist one uploaded document without racing investigation deletion.
 
     Saves the file, its Source and a Document row with
@@ -155,6 +156,9 @@ def store_document(db: Session, *, investigation_id: str, title: str, filename: 
     the canonical document path after the database rows have been prepared. If the
     database commit fails, a newly promoted file is removed so a failed upload does
     not leave reporter data orphaned on disk.
+
+    ``parent_document_id`` is the archive or email a file was found in, and
+    ``source_metadata`` is added to its Source's metadata (openaleph_children.py).
     """
     storage_dir = resolve_storage_root(storage_dir)
     storage_dir.mkdir(parents=True, exist_ok=True)
@@ -174,9 +178,9 @@ def store_document(db: Session, *, investigation_id: str, title: str, filename: 
     created_final = False
 
     try:
-        source = Source(investigation_id=investigation_id, title=title or filename, source_type='document', metadata_json={'filename': filename, 'mime_type': mime_type, 'sha256': digest})
+        source = Source(investigation_id=investigation_id, title=title or filename, source_type='document', metadata_json={**(source_metadata or {}), 'filename': filename, 'mime_type': mime_type, 'sha256': digest})
         db.add(source); db.flush()
-        doc = Document(investigation_id=investigation_id, source_id=source.id, filename=filename, mime_type=mime_type, sha256=digest, storage_path=str(stored), extraction_status='queued')
+        doc = Document(investigation_id=investigation_id, source_id=source.id, filename=filename, mime_type=mime_type, sha256=digest, storage_path=str(stored), extraction_status='queued', parent_document_id=parent_document_id)
         db.add(doc); db.flush()
 
         # Promote the staged bytes only after relational state has been prepared.
@@ -260,29 +264,44 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
     return doc
 
 
-def openaleph_document_ids(db: Session, document_ids: Iterable[str]) -> dict[str, str]:
-    """OpenAleph's id for each of these documents that OpenAleph holds, in one query."""
+class OpenAlephRef(NamedTuple):
+    """How OpenAleph holds a document: its id there, and the schema it gave
+    the document once read (an Email, a Package...)."""
+    entity_id: str
+    schema: str | None
+
+
+def openaleph_document_ids(db: Session, document_ids: Iterable[str]) -> dict[str, OpenAlephRef]:
+    """OpenAleph's id (and schema) for each of these documents that OpenAleph holds, in one query."""
     ids = list(document_ids)
     if not ids:
         return {}
     rows = db.scalars(select(DocumentCorpusSync).where(
         DocumentCorpusSync.document_id.in_(ids), DocumentCorpusSync.provider == 'openaleph',
         DocumentCorpusSync.status == 'synced', DocumentCorpusSync.provider_record_id.is_not(None))).all()
-    return {row.document_id: str(row.provider_record_id) for row in rows}
+    refs: dict[str, OpenAlephRef] = {}
+    for row in rows:
+        schema = (row.response_json or {}).get('schema') if isinstance(row.response_json, dict) else None
+        refs[row.document_id] = OpenAlephRef(str(row.provider_record_id), schema if isinstance(schema, str) else None)
+    return refs
 
 
-def serialize_document(db: Session, doc: Document, *, openaleph_ids: dict[str, str] | None = None) -> dict:
+def serialize_document(db: Session, doc: Document, *, openaleph_ids: dict[str, OpenAlephRef] | None = None) -> dict:
     """``openaleph_document_id`` is OpenAleph's id for the document when
     OpenAleph holds it (ADR-0006: names, similar documents and threads come
-    from there). A list passes ``openaleph_ids``, looked up for all its rows
-    at once (openaleph_document_ids)."""
+    from there), and ``openaleph_schema`` what OpenAleph read it as.
+    ``parent_document_id`` is the archive or email it was found in. A list
+    passes ``openaleph_ids``, looked up for all its rows at once
+    (openaleph_document_ids)."""
     chunks = db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == doc.id).order_by(DocumentChunk.ordinal)).all()
     candidates = db.scalars(select(ExtractionCandidate).where(ExtractionCandidate.document_id == doc.id).order_by(ExtractionCandidate.created_at)).all()
     counts: dict[str, int] = {}
     for c in candidates: counts[c.candidate_type] = counts.get(c.candidate_type,0)+1
     known = openaleph_ids if openaleph_ids is not None else openaleph_document_ids(db, [doc.id])
+    ref = known.get(doc.id)
     return {'id':doc.id,'investigation_id':doc.investigation_id,'source_id':doc.source_id,'filename':doc.filename,'mime_type':doc.mime_type,'sha256':doc.sha256,'extraction_status':doc.extraction_status,'extraction_error':doc.extraction_error,'extraction_issues':doc.extraction_issues or [],'created_at':doc.created_at,'chunk_count':len(chunks),'candidate_counts':counts,
-            'openaleph_document_id':known.get(doc.id)}
+            'openaleph_document_id':ref.entity_id if ref else None, 'openaleph_schema':ref.schema if ref else None,
+            'parent_document_id':doc.parent_document_id}
 
 
 def serialize_chunk(chunk: DocumentChunk) -> dict:

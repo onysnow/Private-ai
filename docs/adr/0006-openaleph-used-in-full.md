@@ -97,6 +97,23 @@ Workbench's search for `Mention` entities could never find anything.
   `ingestors/packages/rar.py` is `['application/rarapplication/x-rar']`: a
   missing comma joins the two types into one that matches nothing, so only
   `.rar` selects it.
+- **Files inside a container are its children.** A zip becomes a
+  `Package`; a directory in it a `Folder` (no file of its own); each file a
+  document whose `parent` is that folder or the package; an email's
+  attachments have the `Email` as parent. They are listed with
+  `GET /search?filter:properties.parent=<id>` and their bytes come from
+  `GET /archive/resolve?entity=<id>&redirect=false`, which answers a signed
+  link to `/api/2/archive` built on OpenAleph's public address; the
+  Workbench follows that path on the address it reaches OpenAleph at. A
+  container's status turns `success` before its files are read (each is a
+  job of its own), so the Workbench waits until the collection has no
+  reading, name-finding or indexing work left. Each file becomes a
+  Workbench document with `parent_document_id`, read by a job of its own
+  so it can be retried alone; a workbook's sheets (`Table` entities, no
+  file of their own) are not included.
+- **A message nothing replies to has no thread.** `GET /entities/{id}/thread`
+  answers no results for it (its docstring says the source is included);
+  the Workbench says "no other message in this email's thread".
 - **A file only OpenAleph reads waits for OpenAleph.** When OpenAleph
   cannot be reached, a PDF, Word file or text file falls back to the
   Workbench's own reader as before; an email, archive, spreadsheet or image
