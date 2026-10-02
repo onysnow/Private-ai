@@ -962,6 +962,62 @@ class OpenAlephReviewRefreshOut(ResponseModel):
     status: OpenAlephReviewStatusOut
 
 
+# --- The corpus copy of confirmed records (ADR-0006, Wave B) -----------------------
+# Every key is always sent (null when unknown), as for BackgroundJobOut.
+
+class OpenAlephOperationFailureOut(ResponseModel):
+    """A failed OpenAleph operation, kept for the reporter and the operator."""
+    id: str
+    investigation_id: str
+    document_id: str | None
+    operation: str
+    error: str
+    created_at: datetime
+
+
+class CorpusPendingOut(ResponseModel):
+    """What the next push would change, and the records it cannot send (with why)."""
+    to_send: int
+    to_remove: int
+    cannot_send: list[str]
+
+
+class CorpusPushOut(ResponseModel):
+    """The last push of confirmed records to the investigation's collection."""
+    status: Literal["never", "running", "succeeded", "waiting", "failed"]
+    started_at: datetime | None
+    finished_at: datetime | None
+    message: str | None
+    error: str | None
+    sent: int
+    removed: int
+    unchanged: int
+    removals_waiting: int
+
+
+class CorpusSyncOut(ResponseModel):
+    """The "Corpus sync" line: is OpenAleph in step with what reporters confirmed?"""
+    investigation_id: str
+    enabled: bool
+    # True when a background worker sends changes by itself; otherwise only
+    # "Sync now" does (developer mode).
+    background: bool
+    collection_id: str | None
+    collection_label: str | None
+    pushed_records: int
+    pending: CorpusPendingOut
+    push: CorpusPushOut
+    consecutive_failures: int
+    failures: list[OpenAlephOperationFailureOut]
+
+
+class CorpusSyncNowOut(ResponseModel):
+    """The answer to "Sync now": queued for the worker, or run here and finished."""
+    queued: bool
+    ran: bool
+    sync: CorpusSyncOut
+
+
 # --- Portable backups --------------------------------------------------------------
 
 class BackupInvestigationOut(ResponseModel):

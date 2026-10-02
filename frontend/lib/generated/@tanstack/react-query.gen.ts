@@ -123,6 +123,7 @@ import {
   findingCandidates,
   getAiAnalysisCandidateEndpoint,
   getClaimReviewWorkspace,
+  getCorpusSync,
   getDeckEndpoint,
   getDocument,
   getEntityDossier,
@@ -217,6 +218,7 @@ import {
   searchWorkbench,
   seedDemo,
   settingsStatus,
+  syncCorpusNow,
   syncOpenalephDocument,
   updateAppUser,
   updateClaimEndpoint,
@@ -473,6 +475,9 @@ import type {
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceError,
   GetClaimReviewWorkspaceResponse,
+  GetCorpusSyncData,
+  GetCorpusSyncError,
+  GetCorpusSyncResponse,
   GetDeckEndpointData,
   GetDeckEndpointError,
   GetDocumentData,
@@ -717,6 +722,9 @@ import type {
   SeedDemoData,
   SettingsStatusData,
   SettingsStatusResponse,
+  SyncCorpusNowData,
+  SyncCorpusNowError,
+  SyncCorpusNowResponse,
   SyncOpenalephDocumentData,
   SyncOpenalephDocumentError,
   SyncOpenalephDocumentResponse,
@@ -5264,6 +5272,58 @@ export const listOpenalephCorpusFailuresOptions = (
     },
     queryKey: listOpenalephCorpusFailuresQueryKey(options),
   });
+
+export const getCorpusSyncQueryKey = (options: Options<GetCorpusSyncData>) =>
+  createQueryKey('getCorpusSync', options);
+
+/**
+ * Get Corpus Sync
+ */
+export const getCorpusSyncOptions = (options: Options<GetCorpusSyncData>) =>
+  queryOptions<
+    GetCorpusSyncResponse,
+    GetCorpusSyncError,
+    GetCorpusSyncResponse,
+    ReturnType<typeof getCorpusSyncQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCorpusSync({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCorpusSyncQueryKey(options),
+  });
+
+/**
+ * Sync Corpus Now
+ */
+export const syncCorpusNowMutation = (
+  options?: Partial<Options<SyncCorpusNowData>>,
+): UseMutationOptions<
+  SyncCorpusNowResponse,
+  SyncCorpusNowError,
+  Options<SyncCorpusNowData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SyncCorpusNowResponse,
+    SyncCorpusNowError,
+    Options<SyncCorpusNowData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await syncCorpusNow({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const listDecksEndpointQueryKey = (
   options: Options<ListDecksEndpointData>,

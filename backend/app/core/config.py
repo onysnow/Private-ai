@@ -19,6 +19,25 @@ class Settings(BaseSettings):
     document_reader: str = "auto"
     openaleph_read_timeout_seconds: float = 900.0
     openaleph_read_poll_seconds: float = 3.0
+    # Reporter-confirmed entities and relationships are written to the
+    # investigation's OpenAleph collection by a background job (ADR-0006,
+    # Wave B; app/jobs/corpus.py). A burst of changes is sent once, this many
+    # seconds after the first of them.
+    openaleph_corpus_push_delay_seconds: float = 5.0
+    # How often the corpus jobs look at OpenAleph's queue while they wait for
+    # it to finish indexing or cross-referencing, and how long they wait for
+    # one cross-referencing run before giving up.
+    openaleph_corpus_poll_seconds: float = 5.0
+    openaleph_xref_timeout_seconds: float = 1800.0
+    # A failed corpus job is tried again after 30 seconds, then after twice
+    # as long each time up to this ceiling, at most this many times in a row;
+    # after that the next change, or "Sync now", tries again.
+    openaleph_corpus_retry_max_seconds: float = 900.0
+    openaleph_corpus_max_retries: int = 10
+    # Neighbours asked of OpenAleph per property when a reporter expands an
+    # entity in the corpus (OpenAleph caps it at ALEPH_MAX_EXPAND_ENTITIES,
+    # 200 by default, aleph/settings.py).
+    openaleph_expand_limit: int = 50
     enable_local_entity_suggestions: bool = True
     opensanctions_base_url: str = "https://api.opensanctions.org"
     opensanctions_api_key: str = ""

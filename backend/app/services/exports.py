@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 from app.core.time import utcnow_iso
 from app.core.config import settings
 from app.db.locking import investigation_export_snapshot, lock_investigation_transaction
+from app.jobs.corpus import request_corpus_sync
 from app.services.security import contained_path, resolve_storage_root
 from app.models.domain import (
     Investigation, Entity, Statement, Source, Evidence, ClaimEvidenceLink, Claim, ClaimReviewEvent, RelationshipEvidenceReviewEvent, RelationshipEvidenceAttachment,
@@ -559,5 +560,9 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
                         pass
             raise
 
+    # The restored entities and relationships go to the OpenAleph collection
+    # like any other confirmed records (ADR-0006, Wave B); what this
+    # deployment's OpenAleph held for them is not in a backup, so all are sent.
+    request_corpus_sync(db, investigation_id)
     return {"investigation_id": investigation_id, "restored_counts": restored_counts, "manifest": manifest}
 

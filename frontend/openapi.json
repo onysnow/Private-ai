@@ -2468,6 +2468,221 @@
         "title": "ConnectorsOut",
         "type": "object"
       },
+      "CorpusPendingOut": {
+        "description": "What the next push would change, and the records it cannot send (with why).",
+        "properties": {
+          "cannot_send": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Cannot Send",
+            "type": "array"
+          },
+          "to_remove": {
+            "title": "To Remove",
+            "type": "integer"
+          },
+          "to_send": {
+            "title": "To Send",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "to_send",
+          "to_remove",
+          "cannot_send"
+        ],
+        "title": "CorpusPendingOut",
+        "type": "object"
+      },
+      "CorpusPushOut": {
+        "description": "The last push of confirmed records to the investigation's collection.",
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "removals_waiting": {
+            "title": "Removals Waiting",
+            "type": "integer"
+          },
+          "removed": {
+            "title": "Removed",
+            "type": "integer"
+          },
+          "sent": {
+            "title": "Sent",
+            "type": "integer"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "enum": [
+              "never",
+              "running",
+              "succeeded",
+              "waiting",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "unchanged": {
+            "title": "Unchanged",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "status",
+          "started_at",
+          "finished_at",
+          "message",
+          "error",
+          "sent",
+          "removed",
+          "unchanged",
+          "removals_waiting"
+        ],
+        "title": "CorpusPushOut",
+        "type": "object"
+      },
+      "CorpusSyncNowOut": {
+        "description": "The answer to \"Sync now\": queued for the worker, or run here and finished.",
+        "properties": {
+          "queued": {
+            "title": "Queued",
+            "type": "boolean"
+          },
+          "ran": {
+            "title": "Ran",
+            "type": "boolean"
+          },
+          "sync": {
+            "$ref": "#/components/schemas/CorpusSyncOut"
+          }
+        },
+        "required": [
+          "queued",
+          "ran",
+          "sync"
+        ],
+        "title": "CorpusSyncNowOut",
+        "type": "object"
+      },
+      "CorpusSyncOut": {
+        "description": "The \"Corpus sync\" line: is OpenAleph in step with what reporters confirmed?",
+        "properties": {
+          "background": {
+            "title": "Background",
+            "type": "boolean"
+          },
+          "collection_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collection Id"
+          },
+          "collection_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collection Label"
+          },
+          "consecutive_failures": {
+            "title": "Consecutive Failures",
+            "type": "integer"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "failures": {
+            "items": {
+              "$ref": "#/components/schemas/OpenAlephOperationFailureOut"
+            },
+            "title": "Failures",
+            "type": "array"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "pending": {
+            "$ref": "#/components/schemas/CorpusPendingOut"
+          },
+          "push": {
+            "$ref": "#/components/schemas/CorpusPushOut"
+          },
+          "pushed_records": {
+            "title": "Pushed Records",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "enabled",
+          "background",
+          "collection_id",
+          "collection_label",
+          "pushed_records",
+          "pending",
+          "push",
+          "consecutive_failures",
+          "failures"
+        ],
+        "title": "CorpusSyncOut",
+        "type": "object"
+      },
       "CreateIn": {
         "properties": {
           "kind": {
@@ -8776,6 +8991,53 @@
           "review_required"
         ],
         "title": "OpenAlephEvidenceImportOut",
+        "type": "object"
+      },
+      "OpenAlephOperationFailureOut": {
+        "description": "A failed OpenAleph operation, kept for the reporter and the operator.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "error": {
+            "title": "Error",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "operation": {
+            "title": "Operation",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "document_id",
+          "operation",
+          "error",
+          "created_at"
+        ],
+        "title": "OpenAlephOperationFailureOut",
         "type": "object"
       },
       "OpenAlephReviewRefreshOut": {
@@ -19977,6 +20239,82 @@
           }
         },
         "summary": "List Openaleph Corpus Failures"
+      }
+    },
+    "/api/investigations/{investigation_id}/corpus/sync": {
+      "get": {
+        "operationId": "get_corpus_sync",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorpusSyncOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Corpus Sync"
+      },
+      "post": {
+        "operationId": "sync_corpus_now",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorpusSyncNowOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Sync Corpus Now"
       }
     },
     "/api/investigations/{investigation_id}/decks": {

@@ -332,6 +332,9 @@ import type {
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceErrors,
   GetClaimReviewWorkspaceResponses,
+  GetCorpusSyncData,
+  GetCorpusSyncErrors,
+  GetCorpusSyncResponses,
   GetDeckEndpointData,
   GetDeckEndpointErrors,
   GetDeckEndpointResponses,
@@ -601,6 +604,9 @@ import type {
   SeedDemoResponses,
   SettingsStatusData,
   SettingsStatusResponses,
+  SyncCorpusNowData,
+  SyncCorpusNowErrors,
+  SyncCorpusNowResponses,
   SyncOpenalephDocumentData,
   SyncOpenalephDocumentErrors,
   SyncOpenalephDocumentResponses,
@@ -790,6 +796,8 @@ import {
   zGetAiAnalysisCandidateEndpointPath,
   zGetClaimReviewWorkspacePath,
   zGetClaimReviewWorkspaceResponse,
+  zGetCorpusSyncPath,
+  zGetCorpusSyncResponse,
   zGetDeckEndpointPath,
   zGetDocumentPath,
   zGetDocumentResponse,
@@ -976,6 +984,8 @@ import {
   zSearchWorkbenchQuery,
   zSearchWorkbenchResponse,
   zSettingsStatusResponse,
+  zSyncCorpusNowPath,
+  zSyncCorpusNowResponse,
   zSyncOpenalephDocumentPath,
   zSyncOpenalephDocumentResponse,
   zUpdateAppUserBody,
@@ -5428,6 +5438,56 @@ export const listOpenalephCorpusFailures = <
         })
         .parseAsync(data),
     url: '/api/investigations/{investigation_id}/corpus/openaleph/failures',
+    ...options,
+  });
+
+/**
+ * Get Corpus Sync
+ */
+export const getCorpusSync = <ThrowOnError extends boolean = false>(
+  options: Options<GetCorpusSyncData, ThrowOnError>,
+): RequestResult<GetCorpusSyncResponses, GetCorpusSyncErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetCorpusSyncResponses,
+    GetCorpusSyncErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCorpusSyncPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCorpusSyncResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/corpus/sync',
+    ...options,
+  });
+
+/**
+ * Sync Corpus Now
+ */
+export const syncCorpusNow = <ThrowOnError extends boolean = false>(
+  options: Options<SyncCorpusNowData, ThrowOnError>,
+): RequestResult<SyncCorpusNowResponses, SyncCorpusNowErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    SyncCorpusNowResponses,
+    SyncCorpusNowErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zSyncCorpusNowPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSyncCorpusNowResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/corpus/sync',
     ...options,
   });
 
