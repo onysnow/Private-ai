@@ -11,11 +11,11 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
 from app.models.domain import Investigation
-from app.schemas.responses import VisualCatalogOut, VisualPreviewOut
+from app.schemas.responses import ErrorOut, ValidationErrorOut, VisualCatalogOut, VisualPreviewOut
 from app.services.presentation_style import theme as theme_for
 from app.visuals.checker import check_visual
 from app.visuals.data_service import QueryError, describe_catalog, run_query
-from app.visuals.echarts import UnsupportedChartKind, build_chart
+from app.visuals.echarts import ChartDoesNotFit, UnsupportedChartKind, build_chart
 from app.visuals.spec import VisualSpec
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -33,7 +33,9 @@ def investigation_visual_catalog(investigation_id: str, db: Session = Depends(ge
         raise HTTPException(404, str(exc))
 
 
-@router.post("/investigations/{investigation_id}/visuals/preview", response_model=VisualPreviewOut)
+@router.post("/investigations/{investigation_id}/visuals/preview", response_model=VisualPreviewOut, responses={
+    422: {"model": ValidationErrorOut | ErrorOut, "description": "The input does not match the route, or the chart kind cannot be drawn"},
+})
 def investigation_visual_preview(investigation_id: str, body: VisualSpec, db: Session = Depends(get_db)) -> Any:
     """Cook, draw and check one order slip. The reply carries the data
     (every value with its records), the ECharts option, the check report
@@ -47,7 +49,9 @@ def investigation_visual_preview(investigation_id: str, body: VisualSpec, db: Se
         built = build_chart(body, data, theme)
     except QueryError as exc:
         raise HTTPException(404, str(exc))
-    except UnsupportedChartKind as exc:
+    except (UnsupportedChartKind, ChartDoesNotFit) as exc:
+        # Not drawn yet, or a kind that cannot draw this query's rows at all
+        # (a scatter plot of one number): no chart exists to check.
         raise HTTPException(422, str(exc))
     report = check_visual(body, data, theme, built)
     return {

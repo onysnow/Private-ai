@@ -406,6 +406,12 @@ def test_query_workbench_read_write_explain_saved_history(host: Any) -> None:
     assert client.get("/api/console/query/saved").json()["items"][0]["name"] == "cheap"
     client.put(f"/api/console/query/saved/{saved['id']}", json={"name": "cheap books", "sql": saved["sql"], "pinned": False})
     assert client.get("/api/console/query/saved").json()["items"][0]["name"] == "cheap books"
+    # Renaming one saved query to another's name is refused (names are unique; it used to be a 500).
+    other = client.post("/api/console/query/saved", json={"name": "all", "sql": "SELECT * FROM books"}).json()
+    taken = client.put(f"/api/console/query/saved/{other['id']}", json={"name": "cheap books", "sql": other["sql"]})
+    assert taken.status_code == 409 and taken.json()["error"]["code"] == "name_taken"
+    assert sorted(q["name"] for q in client.get("/api/console/query/saved").json()["items"]) == ["all", "cheap books"]
+    assert client.delete(f"/api/console/query/saved/{other['id']}").json()["deleted"] == other["id"]
     assert client.delete(f"/api/console/query/saved/{saved['id']}").json()["deleted"] == saved["id"]
     history = client.get("/api/console/query/history").json()["items"]
     assert history[0]["mode"] == "write" and any(h["error"] for h in history)

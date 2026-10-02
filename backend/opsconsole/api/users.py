@@ -8,6 +8,7 @@ from typing import Any
 from fastapi import APIRouter, Request
 from pydantic import BaseModel, Field
 
+from opsconsole import schemas as s
 from opsconsole.context import ConsoleContext, ConsoleError
 
 
@@ -42,17 +43,17 @@ def router(ctx: ConsoleContext) -> APIRouter:
         except (ValueError, PermissionError) as exc:
             raise ConsoleError(400, "refused", str(exc)) from exc
 
-    @r.get("/users", response_model=None)
+    @r.get("/users", response_model=s.ConsoleUsersOut)
     def list_users(request: Request) -> Any:
         ctx.read(request)
         return {"items": [asdict(u) for u in users.list()]}
 
-    @r.get("/users/roles", response_model=None)
+    @r.get("/users/roles", response_model=s.ConsoleRolesOut)
     def roles(request: Request) -> Any:
         ctx.read(request)
         return {"items": [asdict(x) for x in users.roles()]}
 
-    @r.post("/users/{uid}/roles", response_model=None)
+    @r.post("/users/{uid}/roles", response_model=s.ConsoleUserRolesOut)
     def set_roles(request: Request, uid: str, body: RolesIn) -> Any:
         principal = ctx.write(request)
         ctx.confirm(body.confirm, uid)
@@ -61,7 +62,7 @@ def router(ctx: ConsoleContext) -> APIRouter:
         ctx.audit(principal, request, section="users", action="roles.set", target_pk={"user": uid}, before=(before or {}).get("roles"), after=body.roles)
         return {"user": uid, "roles": body.roles}
 
-    @r.post("/users/{uid}/disabled", response_model=None)
+    @r.post("/users/{uid}/disabled", response_model=s.ConsoleUserDisabledOut)
     def set_disabled(request: Request, uid: str, body: DisabledIn) -> Any:
         principal = ctx.write(request)
         ctx.confirm(body.confirm, uid)
@@ -69,7 +70,7 @@ def router(ctx: ConsoleContext) -> APIRouter:
         ctx.audit(principal, request, section="users", action="user.disable" if body.disabled else "user.enable", target_pk={"user": uid})
         return {"user": uid, "disabled": body.disabled}
 
-    @r.post("/users/tokens/{tid}/revoke", response_model=None)
+    @r.post("/users/tokens/{tid}/revoke", response_model=s.ConsoleTokenRevokedOut)
     def revoke(request: Request, tid: str, body: ConfirmIn) -> Any:
         principal = ctx.write(request)
         ctx.confirm(body.confirm, tid)
@@ -79,7 +80,7 @@ def router(ctx: ConsoleContext) -> APIRouter:
 
     if hasattr(users, "issue_token"):
 
-        @r.post("/users/{uid}/tokens", response_model=None)
+        @r.post("/users/{uid}/tokens", response_model=s.ConsoleTokenIssuedOut)
         def issue(request: Request, uid: str, body: IssueIn) -> Any:
             principal = ctx.write(request)
             ctx.confirm(body.confirm, uid)

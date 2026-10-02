@@ -13,14 +13,14 @@ from app.api.dependencies import authorize_request_resource, read_upload_limited
 from app.core.authorization import require_scope_global_admin, scope_for_request
 from app.core.config import settings
 from app.db.session import get_db
-from app.schemas.responses import BackupPreviewOut, BackupRestoreResultOut
+from app.schemas.responses import BackupInspectOut, BackupPreviewOut, BackupRestoreResultOut
 from app.services.exports import inspect_export, preview_investigation_restore, restore_investigation_export
 from app.services.security import resolve_storage_root
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.post("/backups/inspect", response_model=None)
+@router.post("/backups/inspect", response_model=BackupInspectOut)
 async def inspect_backup(file: UploadFile = File(...)) -> dict[str, Any]:
     data = await read_upload_limited(file, settings.max_backup_bytes)
     try:

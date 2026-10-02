@@ -13,13 +13,13 @@ from app.models.domain import ExtractionCandidate
 from app.schemas.api import ExtractionCandidateReviewRequest
 from app.services.documents import preview_entity_candidate_matches, review_candidate, serialize_extraction_lineage
 from app.services.extraction_explanations import explain_extraction_candidate
+from app.schemas.responses import EntityMatchPreviewOut, ExtractionExplanationOut, ExtractionLineageOut, ExtractionReviewOut, IdentifierTargetsOut
 from app.services.identifier_proposals import identifier_targets
-from app.schemas.responses import ExtractionExplanationOut, ExtractionLineageOut, ExtractionReviewOut, IdentifierTargetsOut
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.get("/extraction-candidates/{candidate_id}/entity-matches", response_model=None)
+@router.get("/extraction-candidates/{candidate_id}/entity-matches", response_model=EntityMatchPreviewOut)
 def get_extraction_entity_matches(candidate_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(ExtractionCandidate, candidate_id)
     if row is None:

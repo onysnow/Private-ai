@@ -1,27 +1,35 @@
 'use client';
-import type {ReactElement} from 'react';
-import {useEffect, useState} from 'react';
-import Link from 'next/link';
-import {errorMessage} from '../../lib/api-client';
-import {api} from '../../lib/api-instance';
-import {parseInvestigationList, parseLeadQueue, parseEntityList, parseTimelineBody, isClaim} from '../../lib/api-validate';
-import type {Investigation, LeadItem, CanonicalEntity, TimelineEvent, Claim} from '../../lib/api-types';
-import {filterHiddenDemo} from '../../lib/demo-preference';
-
 // Quick-look overview for whoever opens the app first thing: which
 // investigation is active, and the state of its leads/claims/entities/timeline
 // without having to open the full workbench. Deliberately self-contained --
-// its own state, its own fetches, reusing the same api-client/validators the
-// workbench already relies on. Does not touch app/page.tsx.
+// its own selection and its own data cache -- on the generated API client
+// (Foundation Fixes fix 2): every reply is checked against the API schema.
+// Does not touch app/page.tsx.
+import {useQueries, useQuery} from '@tanstack/react-query';
+import type {ReactElement} from 'react';
+import {useEffect, useState} from 'react';
+import Link from 'next/link';
+
+import {errorMessage} from '../../lib/api-client';
+// Connects the generated client to the shared ApiClient (the API's address
+// and this session's login token), as every page that calls the API does.
+import '../../lib/api-instance';
+import {filterHiddenDemo} from '../../lib/demo-preference';
+import {
+  getInvestigationTimelineOptions, leadQueueOptions, listClaimsOptions, listEntitiesOptions, listInvestigationsOptions,
+} from '../../lib/generated/@tanstack/react-query.gen';
+import type {ClaimOut, EntityOut, InvestigationOut, LeadOut, TimelineEventOut} from '../../lib/generated/types.gen';
+import {QueryProvider} from '../../lib/query-client';
 
 type Stats = {
-  leads: LeadItem[];
-  claims: Claim[];
-  entities: CanonicalEntity[];
-  timeline: TimelineEvent[];
+  leads: LeadOut[];
+  claims: ClaimOut[];
+  entities: EntityOut[];
+  timeline: TimelineEventOut[];
 };
 
 const EMPTY_STATS: Stats = {leads: [], claims: [], entities: [], timeline: []};
+const NO_INVESTIGATIONS: InvestigationOut[] = [];
 
 function StatusBadge({status, tone}: {status: string; tone: 'primary' | 'secondary' | 'accent' | 'destructive'}): ReactElement {
   const toneClass = {
@@ -40,55 +48,53 @@ function claimTone(status: string): 'primary' | 'secondary' | 'accent' | 'destru
   return 'primary';
 }
 
+// The page provides the data cache its queries use, as the workbench page does.
 export default function DashboardPage(): ReactElement {
-  const [investigations, setInvestigations] = useState<Investigation[]>([]);
+  return <QueryProvider><Dashboard/></QueryProvider>;
+}
+
+function Dashboard(): ReactElement {
   const [selected, setSelected] = useState('');
+  const investigationsQuery = useQuery({...listInvestigationsOptions(), select: filterHiddenDemo});
+  const investigations = investigationsQuery.data ?? NO_INVESTIGATIONS;
+
+  // The first listed investigation is shown until another is picked.
+  useEffect(() => {
+    const first = investigationsQuery.data?.[0]?.id;
+    if (first) setSelected(current => current || first);
+  }, [investigationsQuery.data]);
+
+  // The four reads of the shown investigation run side by side.
+  const path = {investigation_id: selected};
+  const enabled = Boolean(selected);
+  const [leadsQuery, claimsQuery, entitiesQuery, timelineQuery] = useQueries({
+    queries: [
+      {...leadQueueOptions({path, query: {unresolved_only: false}}), enabled},
+      {...listClaimsOptions({path}), enabled},
+      {...listEntitiesOptions({path}), enabled},
+      {...getInvestigationTimelineOptions({path}), enabled},
+    ],
+  });
+  const statsQueries = [leadsQuery, claimsQuery, entitiesQuery, timelineQuery];
+
+  // The numbers on screen change once all four reads of the picked
+  // investigation are in. Until then, and if one of them fails, those of the
+  // investigation shown before stay (with the failure above them), as they did
+  // when the page fetched them itself.
   const [stats, setStats] = useState<Stats>(EMPTY_STATS);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
+  const leads = leadsQuery.data;
+  const claims = claimsQuery.data;
+  const entities = entitiesQuery.data;
+  const timeline = timelineQuery.data;
   useEffect(() => {
-    const controller = new AbortController();
-    (async () => {
-      try {
-        const list = filterHiddenDemo(await api.parsed('/api/investigations', parseInvestigationList, {signal: controller.signal}));
-        setInvestigations(list);
-        setSelected(current => current || list[0]?.id || '');
-      } catch (err) {
-        if ((err as {name?: string}).name !== 'AbortError') setError(errorMessage(err, 'Could not load investigations'));
-      } finally {
-        setLoading(false);
-      }
-    })();
-    return () => controller.abort();
-  }, []);
+    if (leads && claims && entities && timeline) setStats({leads: leads.items, claims, entities, timeline: timeline.events});
+  }, [leads, claims, entities, timeline]);
 
-  useEffect(() => {
-    if (!selected) {
-      setStats(EMPTY_STATS);
-      return;
-    }
-    const controller = new AbortController();
-    const {signal} = controller;
-    setLoading(true);
-    setError('');
-    (async () => {
-      try {
-        const [leads, claims, entities, timelineBody] = await Promise.all([
-          api.parsed(`/api/investigations/${selected}/leads/queue?unresolved_only=false`, parseLeadQueue, {signal}),
-          api.array(`/api/investigations/${selected}/claims`, 'claims', isClaim, {signal}),
-          api.parsed(`/api/investigations/${selected}/entities`, parseEntityList, {signal}),
-          api.parsed(`/api/investigations/${selected}/timeline`, parseTimelineBody, {signal})
-        ]);
-        setStats({leads, claims, entities, timeline: timelineBody.events});
-      } catch (err) {
-        if ((err as {name?: string}).name !== 'AbortError') setError(errorMessage(err, 'Could not load investigation stats'));
-      } finally {
-        if (!signal.aborted) setLoading(false);
-      }
-    })();
-    return () => controller.abort();
-  }, [selected]);
+  const loading = investigationsQuery.isPending || (enabled && statsQueries.some(q => q.isPending));
+  // One line, as before: the list's failure, or the first of the case's reads to fail.
+  const statsError = statsQueries.find(q => q.isError)?.error;
+  const error = investigationsQuery.isError ? errorMessage(investigationsQuery.error, 'Could not load investigations')
+    : statsError ? errorMessage(statsError, 'Could not load investigation stats') : '';
 
   const unresolvedLeads = stats.leads.filter(l => l.status !== 'resolved' && l.status !== 'dismissed');
   const needsAttention = stats.leads.filter(l => l.triage.needs_attention);

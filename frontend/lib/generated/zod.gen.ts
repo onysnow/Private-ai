@@ -29,6 +29,66 @@ export const zAggregateClaimDependencyOut = z.object({
 });
 
 /**
+ * AiAnalysisCandidateReviewOut
+ *
+ * The reply to a review decision on a proposal.
+ */
+export const zAiAnalysisCandidateReviewOut = z.object({
+  id: z.string(),
+  module: z.string(),
+  review_status: z.string(),
+  reviewed_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  reviewer_note: z.string().nullable(),
+});
+
+/**
+ * AiAnalysisCandidateSummaryOut
+ *
+ * A reasoning run's proposal as the review queue lists it, without its
+ * payload. `request` is what the reporter asked, as recorded when the run
+ * was made; its keys depend on the version that recorded it (record_refs
+ * arrived with presentation drafts, for one), so it stays open.
+ * `rejection_reason` is one of the automatic rejection reasons, "reviewer"
+ * for a human rejection, or null when not rejected.
+ */
+export const zAiAnalysisCandidateSummaryOut = z.object({
+  accepted_record_id: z.string().nullable(),
+  accepted_record_type: z.string().nullable(),
+  checked_citation_count: z.number().int(),
+  confidence: z.number(),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  id: z.string(),
+  investigation_id: z.string(),
+  module: z.string(),
+  rejection_reason: z.string().nullable(),
+  request: z.record(z.unknown()),
+  review_status: z.string(),
+  reviewed_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  reviewer_note: z.string().nullable(),
+});
+
+/**
+ * AiAnalysisCandidatesOut
+ */
+export const zAiAnalysisCandidatesOut = z.object({
+  candidates: z.array(zAiAnalysisCandidateSummaryOut),
+});
+
+/**
  * AiControlFlagOut
  */
 export const zAiControlFlagOut = z.object({
@@ -62,6 +122,49 @@ export const zAiModuleStatusOut = z.object({
   available: z.boolean(),
   spec_file: z.string(),
   vendored_tas: z.boolean(),
+});
+
+/**
+ * AiOutputRejectionOut
+ *
+ * Why a model's answer was kept only as a rejected proposal, with what the
+ * check found: references to records the run was not given, missing parts,
+ * or quotes not found in the records they cite (app/ai/reasoning.py
+ * describe_reasoning_failure). The findings are pieces of the model's own
+ * answer, so their keys are the model's.
+ */
+export const zAiOutputRejectionOut = z.object({
+  invalid_citations: z.array(z.record(z.unknown())).nullish(),
+  message: z.string(),
+  removed: z.array(z.record(z.unknown())).nullish(),
+  schema_errors: z.array(z.string()).nullish(),
+});
+
+/**
+ * AiOutputRejectedOut
+ *
+ * A reasoning run whose answer did not pass its checks (422).
+ */
+export const zAiOutputRejectedOut = z.object({
+  detail: zAiOutputRejectionOut,
+});
+
+/**
+ * AiOutputUnusableOut
+ */
+export const zAiOutputUnusableOut = z.object({
+  message: z.string(),
+  rejection_reason: z.string(),
+});
+
+/**
+ * AiModelFailedOut
+ *
+ * A reasoning run whose answer could not be used at all (502): cut off,
+ * or not JSON. Kept as a rejected proposal; `rejection_reason` says which.
+ */
+export const zAiModelFailedOut = z.object({
+  detail: zAiOutputUnusableOut,
 });
 
 /**
@@ -122,6 +225,104 @@ export const zAppUserCreate = z.object({
 });
 
 /**
+ * AppUserCreatedOut
+ *
+ * A new identity and its token, shown this once: only the token's digest is kept.
+ */
+export const zAppUserCreatedOut = z.object({
+  display_name: z.string(),
+  global_role: z.string(),
+  id: z.string(),
+  token: z.string(),
+  token_notice: z.string(),
+});
+
+/**
+ * AppUserMembershipOut
+ */
+export const zAppUserMembershipOut = z.object({
+  investigation_id: z.string(),
+  role: z.string(),
+});
+
+/**
+ * AppUserOut
+ *
+ * A persisted API identity: its token's history, never the token or its digest.
+ */
+export const zAppUserOut = z.object({
+  disabled: z.boolean(),
+  disabled_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  display_name: z.string(),
+  global_role: z.string(),
+  id: z.string(),
+  memberships: z.array(zAppUserMembershipOut),
+  token_created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  token_last_used_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  token_revoked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  token_rotated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  token_status: z.enum(['active', 'disabled', 'revoked']),
+});
+
+/**
+ * AppUserTokenRevokedOut
+ */
+export const zAppUserTokenRevokedOut = z.object({
+  id: z.string(),
+  token_revoked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  token_status: z.literal('revoked'),
+});
+
+/**
+ * AppUserTokenRotatedOut
+ *
+ * The replacement token, shown this once.
+ */
+export const zAppUserTokenRotatedOut = z.object({
+  id: z.string(),
+  token: z.string(),
+  token_created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  token_notice: z.string(),
+  token_rotated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+});
+
+/**
  * AppUserUpdate
  */
 export const zAppUserUpdate = z.object({
@@ -131,10 +332,20 @@ export const zAppUserUpdate = z.object({
 });
 
 /**
- * ApplyIn
+ * AppUserUpdatedOut
  */
-export const zApplyIn = z.object({
-  confirm: z.string().max(64),
+export const zAppUserUpdatedOut = z.object({
+  disabled: z.boolean(),
+  disabled_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  display_name: z.string(),
+  global_role: z.string(),
+  id: z.string(),
+  token_status: z.enum(['active', 'disabled', 'revoked']),
 });
 
 /**
@@ -147,10 +358,19 @@ export const zApplyIn = z.object({
  */
 export const zBackgroundJobOut = z.object({
   attempts: z.number().int(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   error: z.string().nullable(),
   finished: z.boolean(),
-  finished_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
   id: z.string(),
   investigation_id: z.string().nullable(),
   kind: z.string(),
@@ -158,11 +378,47 @@ export const zBackgroundJobOut = z.object({
   progress: z.number().int().nullable(),
   result: z.unknown().optional(),
   runner: z.string(),
-  started_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
   status: z.enum(['queued', 'running', 'succeeded', 'failed', 'cancelled']),
   subject_id: z.string().nullable(),
   subject_type: z.string().nullable(),
-  updated_at: z.string().datetime({ offset: true, local: true }),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+});
+
+/**
+ * AiReasoningRunOut
+ *
+ * The reply to a reasoning run. Run in the request (developer mode): the
+ * proposal it made for review, with the finished job. Queued (the Docker
+ * stack, HTTP 202): no proposal yet, and the job to follow; its `result`
+ * holds this same proposal when it is done.
+ */
+export const zAiReasoningRunOut = z.object({
+  candidate_id: z.string().nullable(),
+  job: zBackgroundJobOut,
+  payload: z.record(z.unknown()).nullish(),
+  review_status: z.string().nullish(),
+});
+
+/**
+ * BackupInspectOut
+ *
+ * A checked archive's own manifest.json, echoed back as read (only its
+ * format, version, checksums and lineage are verified), and how many rows
+ * of each table it holds.
+ */
+export const zBackupInspectOut = z.object({
+  manifest: z.record(z.unknown()),
+  record_counts: z.record(z.number().int()),
 });
 
 /**
@@ -214,17 +470,6 @@ export const zBodyUploadDocument = z.object({
 });
 
 /**
- * BulkIn
- */
-export const zBulkIn = z.object({
-  filters: z.record(z.string()).nullish(),
-  op: z.string().regex(/^(update|delete)$/),
-  pks: z.array(z.record(z.unknown())).max(10000).nullish(),
-  q: z.string().max(200).nullish(),
-  set: z.record(z.unknown()).nullish(),
-});
-
-/**
  * CanonicalDecisionSummaryOut
  *
  * The latest reporter decision on a duplicate pair (`created_at` as the
@@ -255,7 +500,11 @@ export const zCanonicalDuplicateCandidateOut = z.object({
  * The record of a merge: the preview it was executed from and what moved.
  */
 export const zCanonicalEntityMergeAuditOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   id: z.string(),
   investigation_id: z.string(),
   moved_counts_json: z.record(z.number().int()),
@@ -292,7 +541,11 @@ export const zCanonicalMergeExecuteRequest = z.object({
  */
 export const zCanonicalResolutionDecisionOut = z.object({
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   entity_a_id: z.string(),
   entity_b_id: z.string(),
@@ -335,14 +588,6 @@ export const zCaseSynthesisRequest = z.object({
 });
 
 /**
- * ChangeSetIn
- */
-export const zChangeSetIn = z.object({
-  ops: z.array(z.record(z.unknown())).min(1).max(10000),
-  table: z.string().max(255),
-});
-
-/**
  * ChartKind
  */
 export const zChartKind = z.enum([
@@ -373,9 +618,30 @@ export const zCheckItemOut = z.object({
 export const zCheckReportOut = z.object({
   checked_rules: z.array(z.number().int()),
   errors: z.array(zCheckItemOut),
+  not_applicable: z.record(z.string()).optional(),
   not_checked: z.record(z.string()),
   ok: z.boolean(),
   warnings: z.array(zCheckItemOut),
+});
+
+/**
+ * CitationDetailOut
+ *
+ * A cited record in words, for the review panel's evidence chips and an
+ * export's source list; `missing` when the record no longer resolves.
+ */
+export const zCitationDetailOut = z.object({
+  detail: z.string().nullable(),
+  label: z.string(),
+  locator: z.string().nullable(),
+  missing: z.boolean(),
+  quote: z.string().nullable(),
+  record_id: z.string(),
+  record_type: z.string(),
+  source_title: z.string().nullable(),
+  source_url: z.string().nullable(),
+  trace_record_type: z.string(),
+  type_label: z.string(),
 });
 
 /**
@@ -431,7 +697,11 @@ export const zClaimEvidenceLinkCreate = z.object({
  */
 export const zClaimEvidenceLinkOut = z.object({
   claim_id: z.string(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   evidence_id: z.string(),
   id: z.string(),
   note: z.string().nullish(),
@@ -443,7 +713,11 @@ export const zClaimEvidenceLinkOut = z.object({
  */
 export const zClaimOut = z.object({
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   id: z.string(),
   investigation_id: z.string(),
   status: z.string(),
@@ -455,7 +729,11 @@ export const zClaimOut = z.object({
  */
 export const zClaimReviewEventOut = z.object({
   claim_id: z.string(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   from_confidence: z.number(),
   from_status: z.string(),
   id: z.string(),
@@ -487,7 +765,11 @@ export const zClaimUpdate = z.object({
  */
 export const zClusterDecisionOut = z.object({
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   id: z.string(),
   rationale: z.string().nullish(),
@@ -525,18 +807,14 @@ export const zClusterPairOut = z.object({
 });
 
 /**
- * CollectionIn
+ * ConnectorCredentialPut
+ *
+ * A connector's secret (PUT /settings/connectors/{provider}/credential).
+ * Optional here so a missing secret gets the same 400 a blank one does
+ * (app/services/settings.py save_connector_credential).
  */
-export const zCollectionIn = z.object({
-  name: z.string().min(1).max(255),
-  requests: z.array(z.record(z.unknown())).max(200).optional(),
-});
-
-/**
- * ConfirmIn
- */
-export const zConfirmIn = z.object({
-  confirm: z.string().max(255),
+export const zConnectorCredentialPut = z.object({
+  credential: z.string().nullish(),
 });
 
 /**
@@ -585,7 +863,11 @@ export const zConnectorCredentialStatusOut = z.object({
  */
 export const zConnectorFindingOut = z.object({
   caption: z.string(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   id: z.string(),
   investigation_id: z.string(),
   properties: z.record(z.unknown()),
@@ -603,13 +885,22 @@ export const zConnectorFindingOut = z.object({
  */
 export const zConnectorRunOut = z.object({
   error: z.string().nullish(),
-  finished_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   id: z.string(),
   investigation_id: z.string(),
   provider: z.string(),
   query: z.string(),
   result_count: z.number().int(),
-  started_at: z.string().datetime({ offset: true, local: true }),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   status: z.string(),
 });
 
@@ -639,6 +930,99 @@ export const zConnectorsOut = z.object({
 });
 
 /**
+ * ContextCitationOut
+ *
+ * A record the model may cite, with where to trace it.
+ */
+export const zContextCitationOut = z.object({
+  locator: z.string().nullable(),
+  record_id: z.string(),
+  record_type: z.string(),
+  source_id: z.string().nullable(),
+  source_url: z.string().nullable(),
+  title: z.string(),
+  trace_record_id: z.string().nullable(),
+  trace_record_type: z.string().nullable(),
+});
+
+/**
+ * ContextItemOut
+ *
+ * One search hit in the retrieval packet. `provenance` and `metadata`
+ * are the search hit's own (each record type adds its own keys).
+ */
+export const zContextItemOut = z.object({
+  citation: zContextCitationOut,
+  metadata: z.record(z.unknown()),
+  provenance: z.record(z.unknown()),
+  record_id: z.string(),
+  record_type: z.string(),
+  score: z.number(),
+  snippet: z.string(),
+  title: z.string(),
+});
+
+/**
+ * ContextGroupsOut
+ */
+export const zContextGroupsOut = z.object({
+  canonical: z.array(zContextItemOut),
+  evidence: z.array(zContextItemOut),
+  reporting: z.array(zContextItemOut),
+  review: z.array(zContextItemOut),
+  workflow: z.array(zContextItemOut),
+});
+
+/**
+ * CoreCapabilitiesOut
+ *
+ * The parts of the core workbench this server runs; every one runs without AI.
+ */
+export const zCoreCapabilitiesOut = z.object({
+  backup_restore: z.boolean(),
+  claims: z.boolean(),
+  connectors: z.boolean(),
+  documents: z.boolean(),
+  dossiers: z.boolean(),
+  evidence: z.boolean(),
+  investigations: z.boolean(),
+  leads_and_tasks: z.boolean(),
+  provenance: z.boolean(),
+  relationships: z.boolean(),
+  search: z.boolean(),
+  sources: z.boolean(),
+  timeline: z.boolean(),
+});
+
+/**
+ * CorpusPendingOut
+ *
+ * What the next push would change, and the records it cannot send (with why).
+ */
+export const zCorpusPendingOut = z.object({
+  cannot_send: z.array(z.string()),
+  to_remove: z.number().int(),
+  to_send: z.number().int(),
+});
+
+/**
+ * CorpusPushOut
+ *
+ * The last push of confirmed records to the investigation's collection.
+ */
+export const zCorpusPushOut = z.object({
+  error: z.string().nullable(),
+  finished_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  message: z.string().nullable(),
+  removals_waiting: z.number().int(),
+  removed: z.number().int(),
+  sent: z.number().int(),
+  started_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  status: z.enum(['never', 'running', 'succeeded', 'waiting', 'failed']),
+  unchanged: z.number().int(),
+});
+
+/**
  * CorpusStageOut
  *
  * One of OpenAleph's queues for the collection, jobs counted across its
@@ -660,7 +1044,11 @@ export const zCorpusStageOut = z.object({
  */
 export const zCorpusStatusOut = z.object({
   active: z.boolean(),
-  checked_at: z.string().datetime({ offset: true, local: true }),
+  checked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   collection_id: z.string().nullish(),
   detail: z.string().nullish(),
   investigation_id: z.string(),
@@ -675,14 +1063,6 @@ export const zCorpusStatusOut = z.object({
 });
 
 /**
- * CreateIn
- */
-export const zCreateIn = z.object({
-  kind: z.string().max(64),
-  selection: z.string().max(500).nullish(),
-});
-
-/**
  * CrossProviderDecisionOut
  *
  * A reporter's decision that findings from different providers are, or
@@ -691,7 +1071,11 @@ export const zCreateIn = z.object({
 export const zCrossProviderDecisionOut = z.object({
   cluster_key: z.string(),
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   entity_id: z.string(),
   finding_ids: z.array(z.string()),
@@ -720,12 +1104,57 @@ export const zDeckStyle = z.object({
 });
 
 /**
+ * DeckStyleOut
+ *
+ * A deck's look: a theme id and a font-pair id from the style catalogue.
+ */
+export const zDeckStyleOut = z.object({
+  fonts: z.string(),
+  theme: z.string(),
+});
+
+/**
+ * DeckThemeOut
+ *
+ * One deck theme: colours as six hex digits without '#', and its own fonts.
+ */
+export const zDeckThemeOut = z.object({
+  accent: z.string(),
+  accent_text: z.string(),
+  alert: z.string(),
+  bar_muted: z.string(),
+  body_font: z.string(),
+  cover_accent: z.string(),
+  cover_bg: z.string(),
+  cover_line: z.string(),
+  cover_muted: z.string(),
+  cover_text: z.string(),
+  description: z.string(),
+  heading_font: z.string(),
+  id: z.string(),
+  label: z.string(),
+  muted: z.string(),
+  page: z.string(),
+  palette: z.array(z.string()),
+  panel: z.string(),
+  rule: z.string(),
+  text: z.string(),
+});
+
+/**
  * DeckUpdate
  */
 export const zDeckUpdate = z.object({
   slides_json: z.array(z.record(z.unknown())).nullish(),
   style_json: z.record(z.unknown()).nullish(),
   title: z.string().nullish(),
+});
+
+/**
+ * DeletedOut
+ */
+export const zDeletedOut = z.object({
+  deleted: z.boolean(),
 });
 
 /**
@@ -759,18 +1188,22 @@ export const zDeletionUnsafePath = z.object({
 });
 
 /**
- * DisabledIn
+ * DemoSeedOut
  */
-export const zDisabledIn = z.object({
-  confirm: z.string().max(255),
-  disabled: z.boolean(),
+export const zDemoSeedOut = z.object({
+  created: z.boolean(),
+  investigation_id: z.string(),
 });
 
 /**
  * DocumentChunkOut
  */
 export const zDocumentChunkOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   document_id: z.string(),
   id: z.string(),
   locator: z.string(),
@@ -788,7 +1221,11 @@ export const zDocumentDetailOut = z.object({
   candidate_counts: z.record(z.number().int()),
   chunk_count: z.number().int(),
   chunks: z.array(zDocumentChunkOut),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   extraction_error: z.string().nullish(),
   extraction_issues: z.array(z.string()),
   extraction_status: z.string(),
@@ -807,7 +1244,11 @@ export const zDocumentDetailOut = z.object({
 export const zDocumentOut = z.object({
   candidate_counts: z.record(z.number().int()),
   chunk_count: z.number().int(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   extraction_error: z.string().nullish(),
   extraction_issues: z.array(z.string()),
   extraction_status: z.string(),
@@ -818,6 +1259,26 @@ export const zDocumentOut = z.object({
   openaleph_document_id: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
+});
+
+/**
+ * DocumentReadFailureOut
+ */
+export const zDocumentReadFailureOut = z.object({
+  document: zDocumentOut,
+  error: z.string().nullable(),
+  job: zBackgroundJobOut.nullable(),
+  message: z.string(),
+});
+
+/**
+ * DocumentReadFailedOut
+ *
+ * An upload whose file was saved but could not be read (422): the saved
+ * document, why it failed, and the job that tried (routes_documents.py).
+ */
+export const zDocumentReadFailedOut = z.object({
+  detail: zDocumentReadFailureOut,
 });
 
 /**
@@ -908,7 +1369,11 @@ export const zEnrichmentRunResultOut = z.object({
  * EnrichmentSessionFindingOut
  */
 export const zEnrichmentSessionFindingOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   finding_id: z.string(),
   id: z.string(),
   provider: z.string(),
@@ -922,12 +1387,21 @@ export const zEnrichmentSessionFindingOut = z.object({
  */
 export const zEnrichmentSessionOut = z.object({
   entity_id: z.string(),
-  finished_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   id: z.string(),
   investigation_id: z.string(),
   providers: z.array(z.string()),
   runs: z.array(zEnrichmentRunResultOut),
-  started_at: z.string().datetime({ offset: true, local: true }),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   status: z.string(),
   total_results: z.number().int(),
 });
@@ -939,11 +1413,20 @@ export const zEnrichmentSessionOut = z.object({
  */
 export const zEnrichmentSessionRowOut = z.object({
   entity_id: z.string(),
-  finished_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   id: z.string(),
   investigation_id: z.string(),
   providers: z.array(z.string()),
-  started_at: z.string().datetime({ offset: true, local: true }),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   status: z.string(),
   total_results: z.number().int(),
 });
@@ -953,13 +1436,23 @@ export const zEnrichmentSessionRowOut = z.object({
  */
 export const zEnrichmentSessionRunOut = z.object({
   error: z.string().nullish(),
-  finished_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   id: z.string(),
   provider: z.string(),
   result_count: z.number().int(),
   run_id: z.string().nullish(),
   session_id: z.string(),
-  started_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   status: z.string(),
 });
 
@@ -970,12 +1463,21 @@ export const zEnrichmentSessionRunOut = z.object({
  */
 export const zEnrichmentSessionDetailOut = z.object({
   entity_id: z.string(),
-  finished_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   id: z.string(),
   investigation_id: z.string(),
   providers: z.array(z.string()),
   runs: z.array(zEnrichmentSessionRunOut),
-  started_at: z.string().datetime({ offset: true, local: true }),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   status: z.string(),
   total_results: z.number().int(),
 });
@@ -1036,7 +1538,11 @@ export const zEntityCreate = z.object({
 export const zEntityOut = z.object({
   canonical_id: z.string().nullish(),
   caption: z.string(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   ftm_id: z.string(),
   id: z.string(),
   investigation_id: z.string(),
@@ -1053,9 +1559,19 @@ export const zEntityOut = z.object({
 export const zEntityStatementOut = z.object({
   dataset: z.string(),
   entity_id: z.string(),
-  first_seen: z.string().datetime({ offset: true, local: true }).nullish(),
+  first_seen: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   id: z.string(),
-  last_seen: z.string().datetime({ offset: true, local: true }).nullish(),
+  last_seen: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   origin: z.string().nullish(),
   original_value: z.string().nullish(),
   prop: z.string(),
@@ -1079,6 +1595,17 @@ export const zEntityUpdate = z.object({
   dataset: z.string().optional().default('reporter'),
   origin: z.string().nullish(),
   properties: z.record(z.array(z.string())).optional(),
+});
+
+/**
+ * ErrorOut
+ *
+ * Why a request was refused, in a sentence: the detail of an
+ * HTTPException, or of one of the checks every request passes first (access,
+ * request size; app/main.py api_access_guard, app/core/access.py).
+ */
+export const zErrorOut = z.object({
+  detail: z.string(),
 });
 
 /**
@@ -1138,15 +1665,6 @@ export const zAggregateProvenanceOut = z.object({
   statement_sources: z.array(z.string()),
   underlying_relationship_count: z.number().int(),
   underlying_relationship_ids: z.array(z.string()),
-});
-
-/**
- * ExplainIn
- */
-export const zExplainIn = z.object({
-  analyze: z.boolean().optional().default(false),
-  params: z.record(z.unknown()).nullish(),
-  sql: z.string().min(1).max(20000),
 });
 
 /**
@@ -1359,7 +1877,11 @@ export const zExternalRelationshipPromotionOut = z.object({
   finding_id: z.string(),
   id: z.string(),
   investigation_id: z.string(),
-  promoted_at: z.string().datetime({ offset: true, local: true }),
+  promoted_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   provider: z.string(),
   relationship_edge_id: z.string(),
   relationship_entity_id: z.string(),
@@ -1371,7 +1893,11 @@ export const zExternalRelationshipPromotionOut = z.object({
  * ExternalRelationshipReviewOut
  */
 export const zExternalRelationshipReviewOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   finding_id: z.string(),
   id: z.string(),
@@ -1466,14 +1992,23 @@ export const zExtractionCandidateOut = z.object({
   candidate_type: z.string(),
   chunk_id: z.string().nullish(),
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   document_id: z.string(),
   explanation: zExtractionExplanationOut.nullish(),
   id: z.string(),
   investigation_id: z.string(),
   payload: z.record(z.unknown()),
   review_status: z.string(),
-  reviewed_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  reviewed_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   reviewer_note: z.string().nullish(),
 });
 
@@ -1523,11 +2058,15 @@ export const zFindingReviewRequest = z.object({
 });
 
 /**
- * FlagIn
+ * FontPairOut
+ *
+ * A heading and body font; empty names mean "keep the theme's own".
  */
-export const zFlagIn = z.object({
-  confirm: z.string().max(128),
-  value: z.unknown(),
+export const zFontPairOut = z.object({
+  body: z.string(),
+  heading: z.string(),
+  id: z.string(),
+  label: z.string(),
 });
 
 /**
@@ -1553,6 +2092,13 @@ export const zGraphReconciliationOut = z.object({
   suppressed_duplicate_count: z.number().int(),
   underlying_edge_count: z.number().int(),
   visible_edge_count: z.number().int(),
+});
+
+/**
+ * HealthOut
+ */
+export const zHealthOut = z.object({
+  status: z.literal('ok'),
 });
 
 /**
@@ -1619,7 +2165,11 @@ export const zIdentityAliasOut = z.object({
  * IdentityMergeAuditOut
  */
 export const zIdentityMergeAuditOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   id: z.string(),
   moved_counts: z.record(z.number().int()),
   rationale: z.string().nullish(),
@@ -1703,6 +2253,15 @@ export const zInvestigationDeletionResult = z.object({
 });
 
 /**
+ * InvestigationMembershipOut
+ */
+export const zInvestigationMembershipOut = z.object({
+  investigation_id: z.string(),
+  role: z.string(),
+  user_id: z.string(),
+});
+
+/**
  * InvestigationMembershipPut
  */
 export const zInvestigationMembershipPut = z.object({
@@ -1713,7 +2272,11 @@ export const zInvestigationMembershipPut = z.object({
  * InvestigationOut
  */
 export const zInvestigationOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   description: z.string().nullish(),
   id: z.string(),
   is_demo: z.boolean(),
@@ -1728,20 +2291,6 @@ export const zInvestigationQuestionContextRequest = z.object({
   include_reconciled_duplicates: z.boolean().optional().default(false),
   max_results: z.number().int().gte(1).lte(100).optional().default(30),
   question: z.string().min(1).max(4000),
-});
-
-/**
- * IssueIn
- */
-export const zIssueIn = z.object({
-  confirm: z.string().max(255),
-  ttl_seconds: z
-    .number()
-    .int()
-    .gte(60)
-    .lte(31536000)
-    .optional()
-    .default(2592000),
 });
 
 /**
@@ -1788,7 +2337,11 @@ export const zLeadLinkCreate = z.object({
  * What a lead points at: exactly one record, named by its kind.
  */
 export const zLeadLinkOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   id: z.string(),
   label: z.string().nullish(),
   lead_id: z.string(),
@@ -1805,7 +2358,11 @@ export const zLeadLinkOut = z.object({
  * A lead as stored (without its profile, links and history).
  */
 export const zLeadRowOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   detail: z.string().nullish(),
   id: z.string(),
   investigation_id: z.string(),
@@ -1840,7 +2397,11 @@ export const zLeadUpdate = z.object({
  * LeadWorkflowEventOut
  */
 export const zLeadWorkflowEventOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   from_status: z.string().nullish(),
   id: z.string(),
   lead_id: z.string(),
@@ -1857,13 +2418,22 @@ export const zLineageCandidateOut = z.object({
   candidate_type: z.string(),
   chunk_id: z.string().nullish(),
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   document_id: z.string(),
   id: z.string(),
   investigation_id: z.string(),
   payload: z.record(z.unknown()),
   review_status: z.string(),
-  reviewed_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  reviewed_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   reviewer_note: z.string().nullish(),
 });
 
@@ -1885,7 +2455,11 @@ export const zLineageChunkOut = z.object({
  * LineageDocumentOut
  */
 export const zLineageDocumentOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   extraction_status: z.string(),
   filename: z.string(),
   id: z.string(),
@@ -1966,7 +2540,11 @@ export const zMergeEntityOut = z.object({
  */
 export const zIdentityDecisionOut = z.object({
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   id: z.string(),
   other_entity: zMergeEntityOut.nullish(),
@@ -2061,13 +2639,30 @@ export const zDocumentExtractionSettingsOut = z.object({
 export const zOpenAlephBindingOut = z.object({
   collection_id: z.string(),
   collection_label: z.string().nullish(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   foreign_id: z.string().nullish(),
   id: z.string(),
   investigation_id: z.string(),
   provider: z.string(),
   status: z.string(),
-  updated_at: z.string().datetime({ offset: true, local: true }),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+});
+
+/**
+ * OpenAlephCorpusBindingOut
+ *
+ * The investigation's OpenAleph collection, or null before one is set up.
+ */
+export const zOpenAlephCorpusBindingOut = z.object({
+  binding: zOpenAlephBindingOut.nullable(),
 });
 
 /**
@@ -2101,13 +2696,89 @@ export const zOpenAlephEvidenceImportOut = z.object({
 });
 
 /**
+ * OpenAlephOperationFailureOut
+ *
+ * A failed OpenAleph operation, kept for the reporter and the operator
+ * (and so a 502 can be explained later).
+ */
+export const zOpenAlephOperationFailureOut = z.object({
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  document_id: z.string().nullable(),
+  error: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  operation: z.string(),
+});
+
+/**
+ * CorpusSyncOut
+ *
+ * The "Corpus sync" line: is OpenAleph in step with what reporters confirmed?
+ */
+export const zCorpusSyncOut = z.object({
+  background: z.boolean(),
+  collection_id: z.string().nullable(),
+  collection_label: z.string().nullable(),
+  consecutive_failures: z.number().int(),
+  enabled: z.boolean(),
+  failures: z.array(zOpenAlephOperationFailureOut),
+  investigation_id: z.string(),
+  pending: zCorpusPendingOut,
+  push: zCorpusPushOut,
+  pushed_records: z.number().int(),
+});
+
+/**
+ * CorpusSyncNowOut
+ *
+ * The answer to "Sync now": queued for the worker, or run here and finished.
+ */
+export const zCorpusSyncNowOut = z.object({
+  queued: z.boolean(),
+  ran: z.boolean(),
+  sync: zCorpusSyncOut,
+});
+
+/**
+ * OpenAlephPlatformOut
+ */
+export const zOpenAlephPlatformOut = z.object({
+  enabled: z.boolean(),
+  role: z.string(),
+});
+
+/**
+ * OpenAlephStatusOut
+ *
+ * Whether the local OpenAleph corpus platform answers its search API.
+ * Every key is always sent, so the nullable one has no default.
+ */
+export const zOpenAlephStatusOut = z.object({
+  api_usable: z.boolean(),
+  base_url: z.string(),
+  configured: z.boolean(),
+  detail: z.string(),
+  http_status: z.number().int().nullable(),
+  reachable: z.boolean(),
+  ui_url: z.string(),
+});
+
+/**
  * OpenAlephSyncOut
  *
  * How one document stands in the OpenAleph corpus.
  */
 export const zOpenAlephSyncOut = z.object({
   collection_id: z.string(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   document_id: z.string(),
   error: z.string().nullish(),
   id: z.string(),
@@ -2116,8 +2787,17 @@ export const zOpenAlephSyncOut = z.object({
   provider_record_id: z.string().nullish(),
   response_json: z.record(z.unknown()),
   status: z.string(),
-  synced_at: z.string().datetime({ offset: true, local: true }).nullish(),
-  updated_at: z.string().datetime({ offset: true, local: true }),
+  synced_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
 });
 
 /**
@@ -2129,7 +2809,11 @@ export const zOpenAlephSyncOut = z.object({
 export const zDocumentUploadOut = z.object({
   candidate_counts: z.record(z.number().int()),
   chunk_count: z.number().int(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   extraction_error: z.string().nullish(),
   extraction_issues: z.array(z.string()),
   extraction_status: z.string(),
@@ -2193,15 +2877,22 @@ export const zOrphanFileOut = z.object({
 });
 
 /**
- * PlanIn
+ * PlatformsOut
  */
-export const zPlanIn = z.object({
-  target: z
-    .string()
-    .max(64)
-    .regex(/^[A-Za-z0-9_\-+@:^~]+$/)
-    .optional()
-    .default('head'),
+export const zPlatformsOut = z.object({
+  openaleph: zOpenAlephPlatformOut,
+});
+
+/**
+ * CapabilitiesOut
+ */
+export const zCapabilitiesOut = z.object({
+  ai_features_enabled: z.boolean(),
+  core: zCoreCapabilitiesOut,
+  mode: z.enum(['integrated_preview', 'core_preview']),
+  note: z.string(),
+  platforms: zPlatformsOut,
+  product: z.string(),
 });
 
 /**
@@ -2264,7 +2955,11 @@ export const zPropertyTemporalIntervalOut = z.object({
  * A property-conflict decision as the dossier shows it.
  */
 export const zDossierConflictDecisionOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   id: z.string(),
   preferred_value: z.string().nullish(),
@@ -2295,7 +2990,11 @@ export const zDossierPropertyConflictOut = z.object({
  * A reporter's decision on a property with several values, as stored.
  */
 export const zPropertyConflictDecisionOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   entity_id: z.string(),
   id: z.string(),
@@ -2305,6 +3004,32 @@ export const zPropertyConflictDecisionOut = z.object({
   rationale: z.string().nullish(),
   temporal_intervals_json: z.array(zPropertyTemporalIntervalOut),
   values_json: z.array(z.string()),
+});
+
+/**
+ * ProviderLeadOut
+ *
+ * What an outside provider said the name resolves to: a lead only, never a choice.
+ */
+export const zProviderLeadOut = z.object({
+  provider: z.string().nullable(),
+  provider_entity_id: z.string().nullable(),
+  provider_resolved_entity_id: z.string().nullable(),
+});
+
+/**
+ * EntityMatchPreviewOut
+ *
+ * Canonical entities an entity proposal may be, before the reporter decides.
+ */
+export const zEntityMatchPreviewOut = z.object({
+  candidate_id: z.string(),
+  caption: z.string(),
+  identity_rule: z.string(),
+  matches: z.array(zEntityCandidateOut),
+  provider_lead: zProviderLeadOut,
+  schema: z.string(),
+  strong_match: zEntityCandidateOut.nullable(),
 });
 
 /**
@@ -2323,7 +3048,11 @@ export const zQueryRef = z.object({
  * A reporter's decision on one duplicate pair after a merge.
  */
 export const zReconciliationDecisionOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   entity_id: z.string(),
   id: z.string(),
@@ -2369,6 +3098,15 @@ export const zRecordRefOut = z.object({
 });
 
 /**
+ * BarItemOut
+ */
+export const zBarItemOut = z.object({
+  evidence: z.array(zRecordRefOut),
+  label: z.string(),
+  value: z.union([z.number().int(), z.number()]),
+});
+
+/**
  * DataTableRowOut
  */
 export const zDataTableRowOut = z.object({
@@ -2376,7 +3114,10 @@ export const zDataTableRowOut = z.object({
   label: z.string(),
   record_count: z.number().int(),
   record_refs: z.array(zRecordRefOut),
+  share: z.number().nullish(),
   value: z.number(),
+  x: z.number().nullish(),
+  x_formatted: z.string().nullish(),
 });
 
 /**
@@ -2385,6 +3126,15 @@ export const zDataTableRowOut = z.object({
 export const zDataTableOut = z.object({
   columns: z.array(z.string()),
   rows: z.array(zDataTableRowOut),
+});
+
+/**
+ * FigureItemOut
+ */
+export const zFigureItemOut = z.object({
+  evidence: z.array(zRecordRefOut),
+  label: z.string(),
+  value: z.string(),
 });
 
 /**
@@ -2443,7 +3193,11 @@ export const zRelationshipEvidenceAttachRequest = z.object({
  * RelationshipEvidenceReviewOut
  */
 export const zRelationshipEvidenceReviewOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   evidence_id: z.string(),
   id: z.string(),
   rationale: z.string().nullish(),
@@ -2479,7 +3233,11 @@ export const zRelationshipAdvisoryOut = z.object({
 export const zRelationshipEvidenceAttachmentOut = z.object({
   attached_by: z.string().nullish(),
   attachment_id: z.string(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   evidence: zEvidenceWithSourceOut.nullish(),
   latest_review: zRelationshipEvidenceReviewOut.nullish(),
   note: z.string().nullish(),
@@ -2538,6 +3296,26 @@ export const zRelationshipReconciliationOut = z.object({
 });
 
 /**
+ * RelationshipSchemaOut
+ *
+ * How the workbench draws one FollowTheMoney relationship schema: its two ends' properties and labels.
+ */
+export const zRelationshipSchemaOut = z.object({
+  label: z.string(),
+  source_label: z.string(),
+  source_prop: z.string(),
+  target_label: z.string(),
+  target_prop: z.string(),
+});
+
+/**
+ * RelationshipSchemasOut
+ */
+export const zRelationshipSchemasOut = z.object({
+  schemas: z.record(zRelationshipSchemaOut),
+});
+
+/**
  * ReportingTaskCreate
  */
 export const zReportingTaskCreate = z.object({
@@ -2571,7 +3349,11 @@ export const zReportingTaskUpdate = z.object({
  */
 export const zResolutionDecisionOut = z.object({
   confidence: z.number(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   decision: z.string(),
   entity_id: z.string().nullish(),
   finding_id: z.string(),
@@ -2618,29 +3400,32 @@ export const zBackupPreviewOut = z.object({
 });
 
 /**
- * RestoreIn
+ * RetrievalSummaryOut
  */
-export const zRestoreIn = z.object({
-  confirm: z.string().max(255),
-  kind: z.string().max(64),
+export const zRetrievalSummaryOut = z.object({
+  counts: z.record(z.number().int()),
+  group_counts: z.record(z.number().int()),
+  query: z.string().nullable(),
+  returned_matches: z.number().int(),
+  total_matches: z.number().int(),
 });
 
 /**
- * RolesIn
+ * QuestionContextOut
+ *
+ * The provenance-bearing packet a reasoning model would be given for a
+ * question. External connector results are a separate, unverified bucket
+ * and never among the citations.
  */
-export const zRolesIn = z.object({
-  confirm: z.string().max(255),
-  roles: z.array(z.string()).max(50),
-});
-
-/**
- * SavedIn
- */
-export const zSavedIn = z.object({
-  name: z.string().min(1).max(255),
-  params: z.array(z.record(z.unknown())).optional(),
-  pinned: z.boolean().optional().default(false),
-  sql: z.string().min(1).max(20000),
+export const zQuestionContextOut = z.object({
+  citations: z.array(zContextCitationOut),
+  context: zContextGroupsOut,
+  external_leads: z.array(zContextItemOut),
+  investigation_id: z.string(),
+  question: z.string(),
+  reasoning_contract: z.record(z.boolean()),
+  retrieval: zRetrievalSummaryOut,
+  warnings: z.array(z.string()),
 });
 
 /**
@@ -2706,6 +3491,22 @@ export const zSecurityAuditRetentionPreviewOut = z.object({
   valid_records: z.number().int(),
   would_keep: z.number().int(),
   would_remove: z.number().int(),
+});
+
+/**
+ * SecurityAuditRetentionRequest
+ *
+ * Prune the security audit log (POST /settings/security/audit/retention).
+ *
+ * Strict, so `true` or "90" is refused rather than converted: the route
+ * refused anything but a whole number and text before this body was typed.
+ * The ranges and the confirmation text are checked by the audit log itself
+ * (app/core/audit_log.py), which answers 400 with the reason.
+ */
+export const zSecurityAuditRetentionRequest = z.object({
+  confirmation: z.string().optional().default(''),
+  keep_days: z.number().int().optional().default(90),
+  max_records: z.number().int().optional().default(5000),
 });
 
 /**
@@ -2784,19 +3585,6 @@ export const zSecurityAlertsOut = z.object({
 });
 
 /**
- * SendIn
- */
-export const zSendIn = z.object({
-  act_as: z.string().max(255).nullish(),
-  body: z.unknown().optional(),
-  headers: z.record(z.string()).nullish(),
-  method: z.string().regex(/^(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)$/),
-  path: z.string().min(1).max(2000),
-  query: z.record(z.string()).nullish(),
-  timeout_seconds: z.number().gte(0.5).lte(60).optional().default(10),
-});
-
-/**
  * SettingsLimitsOut
  */
 export const zSettingsLimitsOut = z.object({
@@ -2846,7 +3634,11 @@ export const zSourceCreate = z.object({
  * SourceOut
  */
 export const zSourceOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   id: z.string(),
   investigation_id: z.string(),
   metadata_json: z.record(z.unknown()).nullish(),
@@ -2862,7 +3654,11 @@ export const zSourceOut = z.object({
  * claim's evidence list and review workspace show it.
  */
 export const zClaimEvidenceRowOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   evidence: zEvidenceOut.nullish(),
   id: z.string(),
   note: z.string().nullish(),
@@ -2946,7 +3742,11 @@ export const zLeadTriageOut = z.object({
  * A reporter's assessment of one value a finding asserts, as stored.
  */
 export const zStatementAssessmentOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   entity_id: z.string().nullish(),
   finding_id: z.string(),
   id: z.string(),
@@ -2990,9 +3790,19 @@ export const zStatementHistoryRowOut = z.object({
  */
 export const zStatementOut = z.object({
   dataset: z.string(),
-  first_seen: z.string().datetime({ offset: true, local: true }).nullish(),
+  first_seen: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   id: z.string(),
-  last_seen: z.string().datetime({ offset: true, local: true }).nullish(),
+  last_seen: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   origin: z.string().nullish(),
   original_value: z.string().nullish(),
   prop: z.string(),
@@ -3012,7 +3822,11 @@ export const zEntityRelationshipOut = z.object({
   ]),
   aggregate_provenance: zAggregateProvenanceOut.nullish(),
   caption: z.string().nullish(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   direction: z.enum(['outgoing', 'incoming']),
   ftm_id: z.string().nullish(),
   id: z.string(),
@@ -3045,7 +3859,11 @@ export const zRelationshipOut = z.object({
   ]),
   aggregate_provenance: zAggregateProvenanceOut.nullish(),
   caption: z.string().nullish(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   ftm_id: z.string().nullish(),
   id: z.string(),
   investigation_id: z.string(),
@@ -3125,7 +3943,11 @@ export const zStatementPromotionOut = z.object({
   id: z.string(),
   investigation_id: z.string(),
   original_value: z.string(),
-  promoted_at: z.string().datetime({ offset: true, local: true }),
+  promoted_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   provider: z.string(),
   reviewer_note: z.string().nullish(),
   source_url: z.string().nullish(),
@@ -3158,7 +3980,11 @@ export const zStatementPromotionRequest = z.object({
  * TaskWorkflowEventOut
  */
 export const zTaskWorkflowEventOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   from_status: z.string().nullish(),
   id: z.string(),
   lead_provenance: z.record(z.unknown()).nullish(),
@@ -3170,7 +3996,11 @@ export const zTaskWorkflowEventOut = z.object({
  * ReportingTaskOut
  */
 export const zReportingTaskOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   detail: z.string().nullish(),
   due_date: z.string().nullish(),
   history: z.array(zTaskWorkflowEventOut),
@@ -3182,14 +4012,22 @@ export const zReportingTaskOut = z.object({
   status: z.string(),
   task_context: z.record(z.unknown()).nullish(),
   title: z.string(),
-  updated_at: z.string().datetime({ offset: true, local: true }),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
 });
 
 /**
  * LeadOut
  */
 export const zLeadOut = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   detail: z.string().nullish(),
   history: z.array(zLeadWorkflowEventOut),
   id: z.string(),
@@ -3345,7 +4183,11 @@ export const zEntityDossierOut = z.object({
  */
 export const zTimelineEventRowOut = z.object({
   claim_id: z.string().nullish(),
-  created_at: z.string().datetime({ offset: true, local: true }),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
   dataset: z.string(),
   date_end: z.string().nullish(),
   date_start: z.string(),
@@ -3361,6 +4203,15 @@ export const zTimelineEventRowOut = z.object({
   source_id: z.string().nullish(),
   title: z.string(),
   verification_status: z.string(),
+});
+
+/**
+ * TimelineItemOut
+ */
+export const zTimelineItemOut = z.object({
+  date: z.string(),
+  evidence: z.array(zRecordRefOut),
+  label: z.string(),
 });
 
 /**
@@ -3482,23 +4333,14 @@ export const zOrphanStoragePreviewOut = z.object({
 });
 
 /**
- * UpgradeIn
+ * ValidationIssueOut
+ *
+ * One problem with a request's input: where it is (`loc`), what is wrong
+ * (`msg`) and the error type. FastAPI's own shape for it
+ * (fastapi/openapi/utils.py validation_error_definition).
  */
-export const zUpgradeIn = z.object({
-  confirm: z.string().max(64),
-  target: z
-    .string()
-    .max(64)
-    .regex(/^[A-Za-z0-9_\-+@:^~]+$/)
-    .optional()
-    .default('head'),
-});
-
-/**
- * ValidationError
- */
-export const zValidationError = z.object({
-  ctx: z.record(z.unknown()).optional(),
+export const zValidationIssueOut = z.object({
+  ctx: z.record(z.unknown()).nullish(),
   input: z.unknown().optional(),
   loc: z.array(z.union([z.string(), z.number().int()])),
   msg: z.string(),
@@ -3506,10 +4348,13 @@ export const zValidationError = z.object({
 });
 
 /**
- * HTTPValidationError
+ * ValidationErrorOut
+ *
+ * FastAPI's answer (422) when a request's input does not match what the
+ * route declares (fastapi.exception_handlers.request_validation_exception_handler).
  */
-export const zHttpValidationError = z.object({
-  detail: z.array(zValidationError).optional(),
+export const zValidationErrorOut = z.object({
+  detail: z.array(zValidationIssueOut),
 });
 
 /**
@@ -3521,6 +4366,7 @@ export const zVisualDataRowOut = z.object({
   record_count: z.number().int(),
   record_refs: z.array(zRecordRefOut),
   value: z.number(),
+  x: z.number().nullish(),
 });
 
 /**
@@ -3531,6 +4377,7 @@ export const zVisualDataRowOut = z.object({
 export const zVisualDataOut = z.object({
   currency: z.string().nullish(),
   investigation_id: z.string(),
+  measure_labels: z.record(z.string()).nullish(),
   omitted: z.array(z.record(z.unknown())),
   params: z.record(z.string()),
   query: z.string(),
@@ -3540,6 +4387,48 @@ export const zVisualDataOut = z.object({
   series_kind: z.string(),
   unit: z.string(),
   unit_kind: z.string(),
+  x_unit: z.string().nullish(),
+  x_unit_kind: z.string().nullish(),
+});
+
+/**
+ * ChartVisualOut
+ *
+ * A checked chart (app/ai/chart_check.py) as a deck keeps it: the order
+ * slip, the data the Workbench cooked from the records (every value with
+ * its records), the check report and the chart's words, as the draft or
+ * the deck editor stored them; and the drawing that passed, when the deck
+ * came from a checked draft. The deck insists only on a valid order slip
+ * and its data (app/services/decks.py normalize_chart_visual), so the
+ * report and the words are passed on as stored.
+ */
+export const zChartVisualOut = z.object({
+  data: zVisualDataOut,
+  option: z.record(z.unknown()).nullish(),
+  report: z.record(z.unknown()),
+  spec: z.record(z.unknown()),
+  text: z.record(z.unknown()),
+  type: z.literal('chart'),
+});
+
+/**
+ * VisualOptionSpecOut
+ *
+ * What one option accepts. `values` lists the choices and is sent only for a choice.
+ */
+export const zVisualOptionSpecOut = z.object({
+  label: z.string(),
+  type: z.enum(['bool', 'choice', 'labels']),
+  values: z.array(z.string()).nullish(),
+});
+
+/**
+ * VisualOptionsOut
+ */
+export const zVisualOptionsOut = z.object({
+  bar: z.record(zVisualOptionSpecOut),
+  figures: z.record(zVisualOptionSpecOut),
+  timeline: z.record(zVisualOptionSpecOut),
 });
 
 /**
@@ -3549,6 +4438,42 @@ export const zVisualParamOut = z.object({
   choices: z.array(z.string()).nullish(),
   default: z.string().nullish(),
   description: z.string(),
+});
+
+/**
+ * VisualPresetOut
+ *
+ * A named layout for one visual type, with its option defaults.
+ */
+export const zVisualPresetOut = z.object({
+  description: z.string(),
+  id: z.string(),
+  label: z.string(),
+  layout: z.record(z.union([z.string(), z.boolean()])),
+  options: z.record(z.union([z.boolean(), z.string(), z.array(z.string())])),
+});
+
+/**
+ * VisualPresetsOut
+ */
+export const zVisualPresetsOut = z.object({
+  bar: z.array(zVisualPresetOut),
+  figures: z.array(zVisualPresetOut),
+  timeline: z.array(zVisualPresetOut),
+});
+
+/**
+ * PresentationStyleCatalogOut
+ *
+ * Everything the deck style panel and the in-app preview need; the .pptx
+ * export reads the same catalogue, so the two cannot drift apart.
+ */
+export const zPresentationStyleCatalogOut = z.object({
+  defaults: zDeckStyleOut,
+  font_pairs: z.array(zFontPairOut),
+  themes: z.array(zDeckThemeOut),
+  visual_options: zVisualOptionsOut,
+  visual_presets: zVisualPresetsOut,
 });
 
 /**
@@ -3573,20 +4498,37 @@ export const zVisualPreviewOut = z.object({
 /**
  * VisualQueryOut
  *
- * One entry of the query catalogue the AI orders from.
+ * One entry of the query catalogue the AI and the chart builder order from.
  */
 export const zVisualQueryOut = z.object({
   currencies: z.array(z.string()),
   description: z.string(),
   has_data: z.boolean(),
+  kinds: z.array(z.string()),
   label: z.string(),
   name: z.string(),
   params: z.record(zVisualParamOut),
+  questions: z.array(z.string()),
   record_count: z.number().int(),
   record_noun: z.string(),
   row_count: z.number().int(),
   series_kind: z.string(),
   unit_kind: z.string(),
+});
+
+/**
+ * VisualQuestionOut
+ *
+ * A question a chart answers (FT Visual Vocabulary): the kinds that
+ * answer it, best first, and the queries that hold its relationship.
+ */
+export const zVisualQuestionOut = z.object({
+  description: z.string(),
+  drawn_kinds: z.array(z.string()),
+  id: z.string(),
+  kinds: z.array(z.string()),
+  label: z.string(),
+  queries: z.array(z.string()),
 });
 
 /**
@@ -3597,6 +4539,7 @@ export const zVisualCatalogOut = z.object({
   investigation_id: z.string(),
   kinds: z.array(z.string()),
   queries: z.array(zVisualQueryOut),
+  questions: z.array(zVisualQuestionOut),
 });
 
 /**
@@ -3638,6 +4581,139 @@ export const zPromoteToDeckRequest = z.object({
 });
 
 /**
+ * VisualStyleOut
+ *
+ * A visual's chosen preset and the options it overrides.
+ */
+export const zVisualStyleOut = z.object({
+  options: z.record(z.union([z.boolean(), z.string(), z.array(z.string())])),
+  preset: z.string(),
+});
+
+/**
+ * BarVisualOut
+ */
+export const zBarVisualOut = z.object({
+  items: z.array(zBarItemOut),
+  style: zVisualStyleOut.nullish(),
+  title: z.string(),
+  type: z.literal('bar'),
+  unit: z.string(),
+});
+
+/**
+ * FiguresVisualOut
+ */
+export const zFiguresVisualOut = z.object({
+  items: z.array(zFigureItemOut),
+  style: zVisualStyleOut.nullish(),
+  type: z.literal('figures'),
+});
+
+/**
+ * TimelineVisualOut
+ */
+export const zTimelineVisualOut = z.object({
+  items: z.array(zTimelineItemOut),
+  style: zVisualStyleOut.nullish(),
+  type: z.literal('timeline'),
+});
+
+/**
+ * DeckSlideOut
+ *
+ * One slide as a deck stores it (app/services/decks.py _normalize_slides).
+ */
+export const zDeckSlideOut = z.object({
+  bullets: z.array(z.string()),
+  evidence: z.array(zRecordRefOut),
+  heading: z.string(),
+  kind: z.enum(['title', 'statement', 'content', 'questions']),
+  notes: z.string(),
+  visual: z
+    .discriminatedUnion('type', [
+      zFiguresVisualOut,
+      zTimelineVisualOut,
+      zBarVisualOut,
+      zChartVisualOut,
+    ])
+    .nullable(),
+});
+
+/**
+ * AiAnalysisCandidateOut
+ *
+ * One proposal in full. `payload` is the model's output in its module's
+ * own schema (app/ai/reasoning.py OUTPUT_SCHEMAS), or the raw text of a run
+ * whose output could not be used; `trace` is what the model was sent
+ * (rows from before the trace was kept have none). A presentation draft
+ * also carries readable details for every record it cites and the slides
+ * a promotion would make; other modules leave both keys out.
+ */
+export const zAiAnalysisCandidateOut = z.object({
+  accepted_record_id: z.string().nullable(),
+  accepted_record_type: z.string().nullable(),
+  checked_citation_count: z.number().int(),
+  checked_citation_ids: z.array(zRecordRefOut),
+  citation_details: z.array(zCitationDetailOut).nullish(),
+  confidence: z.number(),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  deck_preview: z.array(zDeckSlideOut).nullish(),
+  id: z.string(),
+  investigation_id: z.string(),
+  module: z.string(),
+  payload: z.record(z.unknown()),
+  rejection_reason: z.string().nullable(),
+  request: z.record(z.unknown()),
+  review_status: z.string(),
+  reviewed_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  reviewer_note: z.string().nullable(),
+  trace: z.record(z.unknown()).nullable(),
+});
+
+/**
+ * DeckOut
+ *
+ * A presentation deck. Every key is always sent, so the nullable ones have no default.
+ */
+export const zDeckOut = z.object({
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  created_by: z.string().nullable(),
+  id: z.string(),
+  investigation_id: z.string(),
+  slide_count: z.number().int(),
+  slides: z.array(zDeckSlideOut),
+  source_ai_candidate_id: z.string().nullable(),
+  style: zDeckStyleOut,
+  title: z.string(),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+});
+
+/**
+ * DecksOut
+ */
+export const zDecksOut = z.object({
+  decks: z.array(zDeckOut),
+});
+
+/**
  * WriteupCreate
  */
 export const zWriteupCreate = z.object({
@@ -3645,6 +4721,60 @@ export const zWriteupCreate = z.object({
   investigation_id: z.string(),
   status: z.string().optional().default('draft'),
   title: z.string().optional().default('Untitled write-up'),
+});
+
+/**
+ * WriteupOut
+ *
+ * A write-up with its document: TipTap/ProseMirror JSON, as the editor saved it.
+ */
+export const zWriteupOut = z.object({
+  cited_record_refs: z.array(zRecordRefOut),
+  content_json: z.record(z.unknown()),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  created_by: z.string().nullable(),
+  id: z.string(),
+  investigation_id: z.string(),
+  source_ai_candidate_id: z.string().nullable(),
+  status: z.string(),
+  title: z.string(),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  word_count: z.number().int(),
+});
+
+/**
+ * WriteupSummaryOut
+ *
+ * A write-up as the list shows it: the first 280 characters of its text instead of the document.
+ */
+export const zWriteupSummaryOut = z.object({
+  cited_record_refs: z.array(zRecordRefOut),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  created_by: z.string().nullable(),
+  id: z.string(),
+  investigation_id: z.string(),
+  preview: z.string(),
+  source_ai_candidate_id: z.string().nullable(),
+  status: z.string(),
+  title: z.string(),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  word_count: z.number().int(),
 });
 
 /**
@@ -3657,37 +4787,20 @@ export const zWriteupUpdate = z.object({
 });
 
 /**
- * RunIn
+ * WriteupsOut
  */
-export const zOpsconsoleApiChecksRunIn = z.object({
-  only: z.array(z.string()).max(200).nullish(),
-});
-
-/**
- * RunIn
- */
-export const zOpsconsoleApiQueryRunIn = z.object({
-  confirm: z.string().max(16).nullish(),
-  max_rows: z.number().int().gte(1).lte(10000).nullish(),
-  mode: z
-    .string()
-    .regex(/^(read|write)$/)
-    .optional()
-    .default('read'),
-  params: z.record(z.unknown()).nullish(),
-  sql: z.string().min(1).max(20000),
-});
-
-/**
- * RunIn
- */
-export const zOpsconsoleApiTestsRunIn = z.object({
-  selection: z.string().max(500).nullish(),
+export const zWriteupsOut = z.object({
+  writeups: z.array(zWriteupSummaryOut),
 });
 
 export const zGetAiAnalysisCandidateEndpointPath = z.object({
   candidate_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zGetAiAnalysisCandidateEndpointResponse = zAiAnalysisCandidateOut;
 
 export const zPromoteAiAnalysisCandidateToDeckEndpointBody =
   zPromoteToDeckRequest;
@@ -3696,12 +4809,22 @@ export const zPromoteAiAnalysisCandidateToDeckEndpointPath = z.object({
   candidate_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zPromoteAiAnalysisCandidateToDeckEndpointResponse = zDeckOut;
+
 export const zPromoteAiAnalysisCandidateToWriteupEndpointBody =
   zPromoteToWriteupRequest;
 
 export const zPromoteAiAnalysisCandidateToWriteupEndpointPath = z.object({
   candidate_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zPromoteAiAnalysisCandidateToWriteupEndpointResponse = zWriteupOut;
 
 export const zReviewAiAnalysisCandidateEndpointBody =
   zAiAnalysisCandidateReviewRequest;
@@ -3710,7 +4833,18 @@ export const zReviewAiAnalysisCandidateEndpointPath = z.object({
   candidate_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zReviewAiAnalysisCandidateEndpointResponse =
+  zAiAnalysisCandidateReviewOut;
+
 export const zInspectBackupBody = zBodyInspectBackup;
+
+/**
+ * Successful Response
+ */
+export const zInspectBackupResponse = zBackupInspectOut;
 
 export const zPreviewBackupRestoreBody = zBodyPreviewBackupRestore;
 
@@ -3725,6 +4859,11 @@ export const zRestoreBackupBody = zBodyRestoreBackup;
  * Successful Response
  */
 export const zRestoreBackupResponse = zBackupRestoreResultOut;
+
+/**
+ * Successful Response
+ */
+export const zCapabilitiesResponse = zCapabilitiesOut;
 
 export const zCreateClaimEndpointBody = zClaimCreate;
 
@@ -3917,257 +5056,23 @@ export const zConnectorSearchPath = z.object({
  */
 export const zConnectorSearchResponse = z.array(zConnectorFindingOut);
 
-export const zConsoleActivityActivityQuery = z.object({
-  limit: z.number().int().gte(1).lte(1000).optional().default(100),
-  principal: z.string().max(255).nullish(),
-  section: z.string().max(32).nullish(),
-  table: z.string().max(255).nullish(),
-  since: z.string().max(40).nullish(),
-  changeset_id: z.string().max(32).nullish(),
-});
-
-export const zConsoleActivityActivityDetailPath = z.object({
-  aid: z.string(),
-});
-
-export const zConsoleActivityUndoPath = z.object({
-  aid: z.string(),
-});
-
-export const zConsoleApiplaySaveCollectionBody = zCollectionIn;
-
-export const zConsoleApiplayDeleteCollectionPath = z.object({
-  cid: z.string(),
-});
-
-export const zConsoleApiplaySendBody = zSendIn;
-
-export const zConsoleApiplayTrafficQuery = z.object({
-  since_seconds: z.number().int().gte(1).lte(86400).nullish(),
-});
-
-export const zConsoleApiplayRecentQuery = z.object({
-  limit: z.number().int().gte(1).lte(2000).optional().default(100),
-  route: z.string().max(512).nullish(),
-});
-
-export const zConsoleBackupsCreateBody = zCreateIn;
-
-export const zConsoleBackupsRunsQuery = z.object({
-  limit: z.number().int().gte(1).lte(200).optional().default(20),
-});
-
-export const zConsoleBackupsRestoreBody = zRestoreIn;
-
-export const zConsoleBackupsRestorePath = z.object({
-  bid: z.string(),
-});
-
-export const zConsoleBackupsPlanPath = z.object({
-  bid: z.string(),
-});
-
-export const zConsoleBackupsPlanQuery = z.object({
-  kind: z.string().max(64),
-});
-
-export const zConsoleBackupsDownloadPath = z.object({
-  kind: z.string(),
-  bid: z.string(),
-});
-
-/**
- * Body
- */
-export const zConsoleChecksRunBody = zOpsconsoleApiChecksRunIn.nullable();
-
-export const zConsoleChecksRunsQuery = z.object({
-  limit: z.number().int().gte(1).lte(200).optional().default(20),
-});
-
-export const zConsoleChecksRunDetailPath = z.object({
-  rid: z.string(),
-});
-
-export const zConsoleConfigSectionFlagBody = zFlagIn;
-
-export const zConsoleConfigSectionFlagPath = z.object({
-  name: z.string(),
-});
-
-export const zConsoleDataListChangesetsQuery = z.object({
-  status: z.string().max(16).nullish(),
-  limit: z.number().int().gte(1).lte(500).optional().default(50),
-});
-
-export const zConsoleDataCreateChangesetBody = zChangeSetIn;
-
-export const zConsoleDataGetChangesetPath = z.object({
-  cid: z.string(),
-});
-
-export const zConsoleDataApplyChangesetBody = zApplyIn;
-
-export const zConsoleDataApplyChangesetPath = z.object({
-  cid: z.string(),
-});
-
-export const zConsoleDataDiscardChangesetPath = z.object({
-  cid: z.string(),
-});
-
-export const zConsoleDataTableDetailPath = z.object({
-  name: z.string(),
-});
-
-export const zConsoleDataBulkBody = zBulkIn;
-
-export const zConsoleDataBulkPath = z.object({
-  name: z.string(),
-});
-
-export const zConsoleDataExportPath = z.object({
-  name: z.string(),
-});
-
-export const zConsoleDataExportQuery = z.object({
-  fmt: z
-    .string()
-    .regex(/^(csv|json)$/)
-    .optional()
-    .default('csv'),
-  q: z.string().max(200).nullish(),
-});
-
-export const zConsoleDataRowsPath = z.object({
-  name: z.string(),
-});
-
-export const zConsoleDataRowsQuery = z.object({
-  limit: z.number().int().gte(1).lte(10000).optional(),
-  cursor: z.string().max(2000).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
-  sort: z.string().max(128).nullish(),
-  order: z
-    .string()
-    .regex(/^(asc|desc)$/)
-    .optional()
-    .default('desc'),
-  q: z.string().max(200).nullish(),
-  with_count: z.boolean().optional().default(true),
-});
-
-export const zConsoleDataRowPath = z.object({
-  name: z.string(),
-  pk: z.string(),
-});
-
-export const zConsoleOverviewEventsQuery = z.object({
-  topics: z.string().max(500).optional().default('*'),
-});
-
-export const zConsoleOverviewHealthQuery = z.object({
-  tiles: z.string().max(500).nullish(),
-});
-
-export const zConsoleLogsTailPath = z.object({
-  source: z.string(),
-});
-
-export const zConsoleLogsTailQuery = z.object({
-  limit: z.number().int().gte(1).lte(5000).optional().default(200),
-  level: z.string().max(16).nullish(),
-  request_id: z.string().max(64).nullish(),
-  logger: z.string().max(128).nullish(),
-  contains: z.string().max(200).nullish(),
-  since: z.string().max(40).nullish(),
-  follow: z.boolean().optional().default(false),
-});
-
-export const zConsoleQueryExplainBody = zExplainIn;
-
-export const zConsoleQueryHistoryQuery = z.object({
-  limit: z.number().int().gte(1).lte(500).optional().default(50),
-});
-
-export const zConsoleQueryRunBody = zOpsconsoleApiQueryRunIn;
-
-export const zConsoleQuerySaveBody = zSavedIn;
-
-export const zConsoleQueryDeleteSavedPath = z.object({
-  qid: z.string(),
-});
-
-export const zConsoleQueryUpdateSavedBody = zSavedIn;
-
-export const zConsoleQueryUpdateSavedPath = z.object({
-  qid: z.string(),
-});
-
-export const zConsoleSchemaPlanBody = zPlanIn;
-
-export const zConsoleSchemaUpgradeBody = zUpgradeIn;
-
-/**
- * Body
- */
-export const zConsoleTestsRunBody = zOpsconsoleApiTestsRunIn.nullable();
-
-export const zConsoleTestsRunsQuery = z.object({
-  limit: z.number().int().gte(1).lte(200).optional().default(20),
-});
-
-export const zConsoleTestsRunStatusPath = z.object({
-  rid: z.string(),
-});
-
-export const zConsoleTestsRunStatusQuery = z.object({
-  tail: z.number().int().gte(1).lte(2000).optional().default(60),
-});
-
-export const zConsoleTestsCancelPath = z.object({
-  rid: z.string(),
-});
-
-export const zConsoleTestsRunLogPath = z.object({
-  rid: z.string(),
-});
-
-export const zConsoleTestsTreeQuery = z.object({
-  refresh: z.boolean().optional().default(false),
-});
-
-export const zConsoleUsersRevokeBody = zConfirmIn;
-
-export const zConsoleUsersRevokePath = z.object({
-  tid: z.string(),
-});
-
-export const zConsoleUsersSetDisabledBody = zDisabledIn;
-
-export const zConsoleUsersSetDisabledPath = z.object({
-  uid: z.string(),
-});
-
-export const zConsoleUsersSetRolesBody = zRolesIn;
-
-export const zConsoleUsersSetRolesPath = z.object({
-  uid: z.string(),
-});
-
-export const zConsoleUsersIssueBody = zIssueIn;
-
-export const zConsoleUsersIssuePath = z.object({
-  uid: z.string(),
-});
-
 export const zDeleteDeckEndpointPath = z.object({
   deck_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zDeleteDeckEndpointResponse = zDeletedOut;
+
 export const zGetDeckEndpointPath = z.object({
   deck_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zGetDeckEndpointResponse = zDeckOut;
 
 export const zUpdateDeckEndpointBody = zDeckUpdate;
 
@@ -4175,9 +5080,24 @@ export const zUpdateDeckEndpointPath = z.object({
   deck_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zUpdateDeckEndpointResponse = zDeckOut;
+
 export const zExportDeckPptxPath = z.object({
   deck_id: z.string(),
 });
+
+/**
+ * The deck as an editable PowerPoint file
+ */
+export const zExportDeckPptxResponse = z.string();
+
+/**
+ * Successful Response
+ */
+export const zSeedDemoResponse = zDemoSeedOut;
 
 export const zUploadDocumentBody = zBodyUploadDocument;
 
@@ -4581,6 +5501,11 @@ export const zGetExtractionEntityMatchesPath = z.object({
   candidate_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zGetExtractionEntityMatchesResponse = zEntityMatchPreviewOut;
+
 export const zGetExtractionCandidateExplanationPath = z.object({
   candidate_id: z.string(),
 });
@@ -4621,6 +5546,16 @@ export const zReviewExtractionCandidatePath = z.object({
 export const zReviewExtractionCandidateResponse = zExtractionReviewOut;
 
 /**
+ * Successful Response
+ */
+export const zHealthResponse = zHealthOut;
+
+/**
+ * Successful Response
+ */
+export const zOpenalephIntegrationStatusResponse = zOpenAlephStatusOut;
+
+/**
  * Response List Investigations
  *
  * Successful Response
@@ -4655,14 +5590,25 @@ export const zListInvestigationAiAnalysisCandidatesQuery = z.object({
   review_status: z.string().nullish(),
   module: z.string().nullish(),
   limit: z.number().int().gte(1).lte(500).optional().default(100),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
+
+/**
+ * Successful Response
+ */
+export const zListInvestigationAiAnalysisCandidatesResponse =
+  zAiAnalysisCandidatesOut;
 
 export const zInvestigationCaseSynthesisBody = zCaseSynthesisRequest;
 
 export const zInvestigationCaseSynthesisPath = z.object({
   investigation_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zInvestigationCaseSynthesisResponse = zAiReasoningRunOut;
 
 export const zInvestigationQuestionContextBody =
   zInvestigationQuestionContextRequest;
@@ -4671,11 +5617,21 @@ export const zInvestigationQuestionContextPath = z.object({
   investigation_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zInvestigationQuestionContextResponse = zQuestionContextOut;
+
 export const zInvestigationHypothesisTestBody = zHypothesisTestRequest;
 
 export const zInvestigationHypothesisTestPath = z.object({
   investigation_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zInvestigationHypothesisTestResponse = zAiReasoningRunOut;
 
 export const zInvestigationPresentationDraftBody = zPresentationDraftRequest;
 
@@ -4683,13 +5639,18 @@ export const zInvestigationPresentationDraftPath = z.object({
   investigation_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zInvestigationPresentationDraftResponse = zAiReasoningRunOut;
+
 export const zListClaimsPath = z.object({
   investigation_id: z.string(),
 });
 
 export const zListClaimsQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -4705,7 +5666,7 @@ export const zListConnectorFindingsPath = z.object({
 
 export const zListConnectorFindingsQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -4721,7 +5682,7 @@ export const zListConnectorRunsPath = z.object({
 
 export const zListConnectorRunsQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -4735,13 +5696,32 @@ export const zGetOpenalephCorpusBindingPath = z.object({
   investigation_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zGetOpenalephCorpusBindingResponse = zOpenAlephCorpusBindingOut;
+
 export const zEnsureOpenalephCorpusBindingPath = z.object({
   investigation_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zEnsureOpenalephCorpusBindingResponse = zOpenAlephCorpusBindingOut;
+
 export const zListOpenalephCorpusFailuresPath = z.object({
   investigation_id: z.string(),
 });
+
+/**
+ * Response List Openaleph Corpus Failures
+ *
+ * Successful Response
+ */
+export const zListOpenalephCorpusFailuresResponse = z.array(
+  zOpenAlephOperationFailureOut,
+);
 
 export const zGetCorpusStatusPath = z.object({
   investigation_id: z.string(),
@@ -4752,9 +5732,32 @@ export const zGetCorpusStatusPath = z.object({
  */
 export const zGetCorpusStatusResponse = zCorpusStatusOut;
 
+export const zGetCorpusSyncPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetCorpusSyncResponse = zCorpusSyncOut;
+
+export const zSyncCorpusNowPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zSyncCorpusNowResponse = zCorpusSyncNowOut;
+
 export const zListDecksEndpointPath = z.object({
   investigation_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zListDecksEndpointResponse = zDecksOut;
 
 export const zInvestigationDeletionPreviewPath = z.object({
   investigation_id: z.string(),
@@ -4772,7 +5775,7 @@ export const zListDocumentsPath = z.object({
 
 export const zListDocumentsQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -4789,7 +5792,7 @@ export const zListEntitiesPath = z.object({
 export const zListEntitiesQuery = z.object({
   include_relationships: z.boolean().optional().default(false),
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -4805,7 +5808,7 @@ export const zListInvestigationEvidencePath = z.object({
 
 export const zListInvestigationEvidenceQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -4822,6 +5825,11 @@ export const zExportInvestigationPath = z.object({
 export const zExportInvestigationQuery = z.object({
   include_documents: z.boolean().optional().default(true),
 });
+
+/**
+ * A portable backup of the investigation (.jwbackup.zip)
+ */
+export const zExportInvestigationResponse = z.string();
 
 export const zGetInvestigationFinancialFlowsPath = z.object({
   investigation_id: z.string(),
@@ -4852,7 +5860,7 @@ export const zListLeadsPath = z.object({
 
 export const zListLeadsQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -4872,7 +5880,7 @@ export const zLeadQueueQuery = z.object({
   owner: z.string().nullish(),
   unresolved_only: z.boolean().optional().default(true),
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -4887,7 +5895,7 @@ export const zListInvestigationRelationshipsPath = z.object({
 export const zListInvestigationRelationshipsQuery = z.object({
   include_reconciled_duplicates: z.boolean().optional().default(true),
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -4904,7 +5912,7 @@ export const zListReportingTasksPath = z.object({
 
 export const zListReportingTasksQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -4920,7 +5928,7 @@ export const zListSourcesPath = z.object({
 
 export const zListSourcesQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -4939,7 +5947,7 @@ export const zGetInvestigationTimelineQuery = z.object({
   verification_status: z.array(z.string()).nullish(),
   include_record_activity: z.boolean().optional().default(false),
   limit: z.number().int().gte(1).lte(500).nullish(),
-  offset: z.number().int().gte(0).optional().default(0),
+  offset: z.number().int().gte(0).lte(2147483647).optional().default(0),
 });
 
 /**
@@ -4974,6 +5982,11 @@ export const zListWriteupsEndpointPath = z.object({
 export const zListWriteupsEndpointQuery = z.object({
   status: z.string().nullish(),
 });
+
+/**
+ * Successful Response
+ */
+export const zListWriteupsEndpointResponse = zWriteupsOut;
 
 export const zListJobsEndpointQuery = z.object({
   investigation_id: z.string().nullish(),
@@ -5081,6 +6094,11 @@ export const zLinkLeadPath = z.object({
  */
 export const zLinkLeadResponse = zLeadLinkOut;
 
+/**
+ * Successful Response
+ */
+export const zPresentationStylesResponse = zPresentationStyleCatalogOut;
+
 export const zFindExtractionLineageEndpointQuery = z.object({
   record_type: z.string(),
   record_id: z.string(),
@@ -5101,6 +6119,11 @@ export const zGetRecordProvenanceTraceQuery = z.object({
  * Successful Response
  */
 export const zGetRecordProvenanceTraceResponse = zProvenanceTraceOut;
+
+/**
+ * Successful Response
+ */
+export const zRelationshipSchemasResponse = zRelationshipSchemasOut;
 
 export const zCreateCanonicalRelationshipBody = zRelationshipCreate;
 
@@ -5193,10 +6216,7 @@ export const zDeleteConnectorCredentialPath = z.object({
 export const zDeleteConnectorCredentialResponse =
   zConnectorCredentialRemovedOut;
 
-/**
- * Body
- */
-export const zSaveConnectorCredentialBody = z.record(z.unknown());
+export const zSaveConnectorCredentialBody = zConnectorCredentialPut;
 
 export const zSaveConnectorCredentialPath = z.object({
   provider: z.string(),
@@ -5230,10 +6250,7 @@ export const zGetSecurityAuditQuery = z.object({
  */
 export const zGetSecurityAuditResponse = zSecurityAuditViewOut;
 
-/**
- * Body
- */
-export const zPruneSecurityAuditBody = z.record(z.unknown());
+export const zPruneSecurityAuditBody = zSecurityAuditRetentionRequest;
 
 /**
  * Successful Response
@@ -5256,13 +6273,30 @@ export const zGetSecurityAuditRetentionPreviewResponse =
  */
 export const zGetSecurityAuditSummaryResponse = zSecurityAuditSummaryOut;
 
+/**
+ * Response List App Users
+ *
+ * Successful Response
+ */
+export const zListAppUsersResponse = z.array(zAppUserOut);
+
 export const zCreateAppUserBody = zAppUserCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateAppUserResponse = zAppUserCreatedOut;
 
 export const zUpdateAppUserBody = zAppUserUpdate;
 
 export const zUpdateAppUserPath = z.object({
   user_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zUpdateAppUserResponse = zAppUserUpdatedOut;
 
 export const zDeleteInvestigationMembershipPath = z.object({
   user_id: z.string(),
@@ -5281,13 +6315,28 @@ export const zPutInvestigationMembershipPath = z.object({
   investigation_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zPutInvestigationMembershipResponse = zInvestigationMembershipOut;
+
 export const zRevokeAppUserTokenPath = z.object({
   user_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zRevokeAppUserTokenResponse = zAppUserTokenRevokedOut;
+
 export const zRotateAppUserTokenPath = z.object({
   user_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zRotateAppUserTokenResponse = zAppUserTokenRotatedOut;
 
 /**
  * Successful Response
@@ -5337,13 +6386,28 @@ export const zCreateTimelineEventEndpointResponse = zTimelineEventRowOut;
 
 export const zCreateWriteupEndpointBody = zWriteupCreate;
 
+/**
+ * Successful Response
+ */
+export const zCreateWriteupEndpointResponse = zWriteupOut;
+
 export const zDeleteWriteupEndpointPath = z.object({
   writeup_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zDeleteWriteupEndpointResponse = zDeletedOut;
+
 export const zGetWriteupEndpointPath = z.object({
   writeup_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zGetWriteupEndpointResponse = zWriteupOut;
 
 export const zUpdateWriteupEndpointBody = zWriteupUpdate;
 
@@ -5351,6 +6415,16 @@ export const zUpdateWriteupEndpointPath = z.object({
   writeup_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zUpdateWriteupEndpointResponse = zWriteupOut;
+
 export const zExportWriteupDocxPath = z.object({
   writeup_id: z.string(),
 });
+
+/**
+ * The write-up as a Word document
+ */
+export const zExportWriteupDocxResponse = z.string();

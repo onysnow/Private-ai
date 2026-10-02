@@ -12,9 +12,17 @@ refuse an unknown query name or a bad parameter with a plain message
 before anything touches the database. The code that runs each query lives
 in data_service.py and must cover every entry in QUERY_CATALOG.
 
-Pass 2 draws bar and column charts end to end. The other kinds are accepted
-by the spec, the data service and the checker already, so pass 3 adds
-drawing, not plumbing; DRAWN_KINDS says which kinds can be drawn today.
+Pass 2 drew bar and column charts end to end; pass 3 draws the statistical
+kinds (line, area, 100% bar, donut, treemap, histogram, scatter).
+DRAWN_KINDS says which kinds can be drawn today: timeline and sankey wait
+for the money-flow and network pass (ADR-0005, line 6).
+
+QUESTIONS is the chart chooser: the question a chart answers, after the
+FT Visual Vocabulary (https://ft-interactive.github.io/visual-vocabulary/),
+which sorts chart forms by the relationship in the data they show. A
+question names the kinds that answer it and the query shapes (`series_kind`)
+that hold that relationship, so the AI and the chart builder pick the chart
+by the question first, as the design doc's chooser does.
 """
 
 from __future__ import annotations
@@ -43,8 +51,12 @@ class ChartKind(str, Enum):
     sankey = "sankey"
 
 
-# What pass 2 can draw (app/visuals/echarts.py). The rest wait for pass 3.
-DRAWN_KINDS: frozenset[ChartKind] = frozenset({ChartKind.bar, ChartKind.column})
+# What app/visuals/echarts.py draws. Timeline and sankey wait for the
+# money-flow and network pass.
+DRAWN_KINDS: frozenset[ChartKind] = frozenset({
+    ChartKind.bar, ChartKind.column, ChartKind.line, ChartKind.area, ChartKind.stacked_bar_100, ChartKind.donut,
+    ChartKind.treemap, ChartKind.histogram, ChartKind.scatter,
+})
 
 # Kinds that show a value as a length (rule 9: the easiest to read) ...
 LENGTH_KINDS: frozenset[ChartKind] = frozenset({ChartKind.bar, ChartKind.column, ChartKind.histogram})
@@ -54,8 +66,36 @@ SIZE_KINDS: frozenset[ChartKind] = frozenset({ChartKind.donut, ChartKind.treemap
 LINE_KINDS: frozenset[ChartKind] = frozenset({ChartKind.line, ChartKind.area})
 # Kinds whose categories each get their own colour (rule 10 counts them).
 COLOUR_PER_CATEGORY_KINDS: frozenset[ChartKind] = frozenset({ChartKind.donut, ChartKind.treemap, ChartKind.stacked_bar_100})
+# Kinds that show parts of one whole: the parts must not overlap (rule 4)
+# and their shares must add up to 100% (rule 5).
+PART_OF_WHOLE_KINDS: frozenset[ChartKind] = COLOUR_PER_CATEGORY_KINDS
 # Kinds that may be stacked (rule 4).
 STACKABLE_KINDS: frozenset[ChartKind] = frozenset({ChartKind.bar, ChartKind.column, ChartKind.area, ChartKind.stacked_bar_100})
+# Kinds whose zero baseline is part of the picture (rule 1: bars and areas).
+ZERO_BASELINE_KINDS: frozenset[ChartKind] = frozenset({ChartKind.bar, ChartKind.column, ChartKind.histogram, ChartKind.area, ChartKind.stacked_bar_100})
+# Kinds drawn as marks along axes (points), where values are not written on
+# every mark: record counts go in each point's tooltip and the data table.
+POINT_KINDS: frozenset[ChartKind] = frozenset({ChartKind.line, ChartKind.area, ChartKind.scatter})
+
+# What a query's rows are, and which kinds can draw them. "category": one
+# row per group (ranked or compared); "time": one row per period, in
+# order; "distribution": one row per record, whose values a histogram bins;
+# "pairs": one row per group with two numbers, x and y, for a scatter plot.
+SERIES_KINDS = ("category", "time", "distribution", "pairs")
+KINDS_FOR_SERIES: dict[str, tuple[ChartKind, ...]] = {
+    "category": (ChartKind.bar, ChartKind.column, ChartKind.stacked_bar_100, ChartKind.donut, ChartKind.treemap),
+    "time": (ChartKind.line, ChartKind.column, ChartKind.area, ChartKind.bar),
+    "distribution": (ChartKind.histogram, ChartKind.bar, ChartKind.column),
+    "pairs": (ChartKind.scatter,),
+}
+# The shapes a kind needs; any other shape cannot be drawn by it at all (a
+# histogram of periods, a scatter plot of one number). A line over
+# categories CAN be drawn, which is why rule 8 exists: that is the
+# checker's call, not this table's.
+SERIES_FOR_KIND: dict[ChartKind, tuple[str, ...]] = {
+    ChartKind.histogram: ("distribution",),
+    ChartKind.scatter: ("pairs",),
+}
 
 
 class SortOrder(str, Enum):
@@ -84,9 +124,19 @@ class QuerySpec:
     label: str            # the generic title a lazy order would reuse (rule 13 warns on it)
     description: str
     params: dict[str, ParamSpec]
-    series_kind: str      # "category" (parts ranked or compared) | "time" (periods in order)
+    series_kind: str      # one of SERIES_KINDS
     unit_kind: str        # "amount" (a sum in a currency) | "count" (records counted)
     record_noun: str      # what one record is, in plain words, for labels and the source line
+
+    @property
+    def kinds(self) -> tuple[ChartKind, ...]:
+        """The chart kinds that can draw this query's rows, best first."""
+        return KINDS_FOR_SERIES[self.series_kind]
+
+    @property
+    def questions(self) -> tuple[str, ...]:
+        """The questions (QUESTIONS) this query can answer."""
+        return tuple(q.id for q in QUESTIONS.values() if self.series_kind in q.series_kinds)
 
 
 _CURRENCY = ParamSpec("ISO 4217 currency code, e.g. USD. Each currency is its own series; omit it to get the currency with the most payments.",
@@ -143,6 +193,49 @@ QUERY_CATALOG: dict[str, QuerySpec] = {q.name: q for q in (
         "How many leads are unreviewed, active, blocked, resolved or rejected.",
         {}, series_kind="category", unit_kind="count", record_noun="leads",
     ),
+    QuerySpec(
+        "payment_amounts", "Payment amounts",
+        "The amount of every payment, one row per Payment record: what a histogram bins to show how the amounts are spread.",
+        {"currency": _CURRENCY},
+        series_kind="distribution", unit_kind="amount", record_noun="payments",
+    ),
+    QuerySpec(
+        "payments_count_and_total_by_party", "Number and total of payments by party",
+        "For each person or company, how many payments it received (or made) and their total: two numbers per party, for a scatter plot.",
+        {"direction": ParamSpec("Count and total what each party received, or what it paid.", choices=("received", "paid"), default="received"),
+         "currency": _CURRENCY},
+        series_kind="pairs", unit_kind="amount", record_noun="payments",
+    ),
+)}
+
+
+@dataclass(frozen=True)
+class Question:
+    """One question a chart can answer (FT Visual Vocabulary category)."""
+    id: str
+    label: str
+    description: str
+    kinds: tuple[ChartKind, ...]     # the kinds that answer it, best first
+    series_kinds: tuple[str, ...]     # the query shapes that hold the relationship
+
+
+# The FT Visual Vocabulary's categories this pass can answer from the
+# records, in its own words where they fit. "Flow" is listed so the chooser
+# is complete; its sankey waits for the money-flow pass and no query holds
+# flows yet.
+QUESTIONS: dict[str, Question] = {q.id: q for q in (
+    Question("ranking", "Ranking", "Where an item sits in an ordered list: who received the most, which status holds the most claims.",
+             (ChartKind.bar, ChartKind.column), ("category", "distribution")),
+    Question("change_over_time", "Change over time", "How a value rises and falls across periods: payments by month, events by year.",
+             (ChartKind.line, ChartKind.column, ChartKind.area), ("time",)),
+    Question("part_of_whole", "Part of a whole", "How a total splits into parts that do not overlap: each recipient's share of the money.",
+             (ChartKind.stacked_bar_100, ChartKind.donut, ChartKind.treemap), ("category",)),
+    Question("distribution", "Distribution", "How the values are spread: how many payments are small, middling or very large.",
+             (ChartKind.histogram,), ("distribution",)),
+    Question("correlation", "Correlation", "How two numbers about the same party move together: how many payments against how much money.",
+             (ChartKind.scatter,), ("pairs",)),
+    Question("flow", "Flow", "Where money moves from and to. Drawn in the money-flow pass; no query holds flows yet.",
+             (ChartKind.sankey,), ()),
 )}
 
 

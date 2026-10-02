@@ -13,7 +13,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from app.api.dependencies import authorize_request_resource
+from app.api.dependencies import MAX_OFFSET, authorize_request_resource
 from app.db.session import get_db
 from app.models.domain import Entity
 from app.schemas.api import (
@@ -35,7 +35,7 @@ from app.schemas.responses import (
     CanonicalResolutionDecisionOut, ConnectorFindingOut, CrossProviderDecisionOut, EnrichmentSessionOut,
     EnrichmentSessionRowOut, EntityDossierOut, EntityOut, EntityRelationshipOut, EntityStatementOut,
     ExternalRelationshipPromotionOut, PostMergeReconciliationOut, PropertyConflictDecisionOut,
-    ReconciliationDecisionOut, StatementHistoryRowOut, StatementPromotionOut,
+    ReconciliationDecisionOut, StatementHistoryRowOut, StatementPromotionOut, upstream,
 )
 from app.services.entities import (
     create_entity as _create_entity,
@@ -81,7 +81,7 @@ def list_entities(
     investigation_id: str,
     include_relationships: bool = False,
     limit: int | None = Query(default=None, ge=1, le=500),
-    offset: int = Query(default=0, ge=0),
+    offset: int = Query(default=0, ge=0, le=MAX_OFFSET),
     db: Session = Depends(get_db),
 ) -> Any:
     return _list_entities(db, investigation_id, include_relationships, limit=limit, offset=offset)
@@ -135,7 +135,7 @@ def list_entity_relationships(entity_id: str, db: Session = Depends(get_db)) -> 
     return entity_relationships(db, entity_id)
 
 
-@router.post("/entities/{entity_id}/enrich/{provider}", response_model=list[ConnectorFindingOut])
+@router.post("/entities/{entity_id}/enrich/{provider}", response_model=list[ConnectorFindingOut], responses=upstream("The connector", 502))
 async def enrich_entity(entity_id: str, provider: str, db: Session = Depends(get_db)) -> Any:
     entity = db.get(Entity, entity_id)
     if entity is None:

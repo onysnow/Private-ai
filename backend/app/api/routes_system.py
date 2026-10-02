@@ -22,7 +22,11 @@ from app.core.authorization import scope_for_request
 from app.core.config import settings
 from app.db.session import get_db
 from app.models.domain import AIAnalysisCandidate, Investigation, Source, StatementAssessment
-from app.schemas.responses import EvidenceOut, SearchOut, StatementPromotionOut, TimelineEventRowOut
+from app.schemas.responses import (
+    AiAnalysisCandidateOut, AiAnalysisCandidateReviewOut, CapabilitiesOut, DeckOut, EvidenceOut, HealthOut,
+    OpenAlephStatusOut, PresentationStyleCatalogOut, RelationshipSchemasOut, SearchOut, StatementPromotionOut,
+    TimelineEventRowOut, WriteupOut,
+)
 from app.schemas.api import (
     AIAnalysisCandidateReviewRequest,
     EvidenceCreate,
@@ -47,12 +51,12 @@ from app.services.writeups import serialize_writeup
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.get("/health", response_model=None)
+@router.get("/health", response_model=HealthOut)
 def health() -> dict[str, Any]:
     return {"status": "ok"}
 
 
-@router.get("/capabilities", response_model=None)
+@router.get("/capabilities", response_model=CapabilitiesOut)
 def capabilities() -> dict[str, Any]:
     """Describe the runnable core preview without making AI a startup dependency."""
     return {
@@ -84,7 +88,7 @@ def capabilities() -> dict[str, Any]:
     }
 
 
-@router.get("/integrations/openaleph/status", response_model=None)
+@router.get("/integrations/openaleph/status", response_model=OpenAlephStatusOut)
 async def openaleph_integration_status() -> Any:
     """Report whether the local OpenAleph corpus platform is actually reachable."""
     return (await probe_openaleph()).to_dict()
@@ -121,19 +125,19 @@ def create_timeline_event_endpoint(body: TimelineEventCreate, db: Session = Depe
         raise HTTPException(400, str(exc))
 
 
-@router.get("/presentation-styles", response_model=None)
+@router.get("/presentation-styles", response_model=PresentationStyleCatalogOut)
 def presentation_styles() -> dict[str, Any]:
     """Themes, font pairings and per-visual presets/options for decks --
     the one catalogue both the .pptx export and the in-app preview read."""
     return presentation_style_catalog()
 
 
-@router.get("/relationship-schemas", response_model=None)
+@router.get("/relationship-schemas", response_model=RelationshipSchemasOut)
 def relationship_schemas() -> dict[str, Any]:
     return {"schemas": RELATIONSHIP_SCHEMAS}
 
 
-@router.get("/ai-analysis-candidates/{candidate_id}", response_model=None)
+@router.get("/ai-analysis-candidates/{candidate_id}", response_model=AiAnalysisCandidateOut)
 def get_ai_analysis_candidate_endpoint(candidate_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(AIAnalysisCandidate, candidate_id)
     if row is None:
@@ -148,7 +152,7 @@ def get_ai_analysis_candidate_endpoint(candidate_id: str, db: Session = Depends(
     return data
 
 
-@router.post("/ai-analysis-candidates/{candidate_id}/review", response_model=None)
+@router.post("/ai-analysis-candidates/{candidate_id}/review", response_model=AiAnalysisCandidateReviewOut)
 def review_ai_analysis_candidate_endpoint(candidate_id: str, body: AIAnalysisCandidateReviewRequest, db: Session = Depends(get_db)) -> Any:
     row = db.get(AIAnalysisCandidate, candidate_id)
     if row is None:
@@ -159,7 +163,7 @@ def review_ai_analysis_candidate_endpoint(candidate_id: str, body: AIAnalysisCan
         raise HTTPException(400, str(exc))
 
 
-@router.post("/ai-analysis-candidates/{candidate_id}/promote-to-writeup", response_model=None)
+@router.post("/ai-analysis-candidates/{candidate_id}/promote-to-writeup", response_model=WriteupOut)
 def promote_ai_analysis_candidate_to_writeup_endpoint(candidate_id: str, body: PromoteToWriteupRequest, db: Session = Depends(get_db)) -> Any:
     """Turn an accepted presentation_draft candidate into a reporter-editable
     Writeup (see app/services/presentation.py). Not idempotent -- each call
@@ -175,7 +179,7 @@ def promote_ai_analysis_candidate_to_writeup_endpoint(candidate_id: str, body: P
     return serialize_writeup(writeup)
 
 
-@router.post("/ai-analysis-candidates/{candidate_id}/promote-to-deck", response_model=None)
+@router.post("/ai-analysis-candidates/{candidate_id}/promote-to-deck", response_model=DeckOut)
 def promote_ai_analysis_candidate_to_deck_endpoint(candidate_id: str, body: PromoteToDeckRequest, db: Session = Depends(get_db)) -> Any:
     """Turn an accepted presentation_draft candidate into a reporter-editable
     Deck (see app/services/presentation.py). Not idempotent, for the same
