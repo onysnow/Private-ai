@@ -41,7 +41,11 @@ function asChart(v: JsonObject): ChartVisual | null {
   const rows = data.rows.filter(isObj).filter(r => typeof r.label === 'string' && typeof r.value === 'number')
     .map(r => ({...r, label: r.label as string, value: r.value as number, record_refs: refs(r.record_refs), record_count: typeof r.record_count === 'number' ? r.record_count : 0}));
   const tableRows = table.rows.filter(isObj).filter(r => typeof r.label === 'string' && typeof r.value === 'number')
-    .map(r => ({label: r.label as string, value: r.value as number, formatted: str(r.formatted), record_count: typeof r.record_count === 'number' ? r.record_count : 0, record_refs: refs(r.record_refs)}));
+    .map(r => ({label: r.label as string, value: r.value as number, formatted: str(r.formatted), record_count: typeof r.record_count === 'number' ? r.record_count : 0, record_refs: refs(r.record_refs),
+      // Only the kinds that write them: a part's share, a scatter plot's second number.
+      ...(typeof r.share === 'number' ? {share: r.share} : {}),
+      ...(typeof r.x === 'number' ? {x: r.x} : {}),
+      ...(typeof r.x_formatted === 'string' ? {x_formatted: r.x_formatted} : {})}));
   return {
     type: 'chart', spec, option, data: {...data, rows},
     width: typeof v.width === 'number' ? v.width : undefined, height: typeof v.height === 'number' ? v.height : undefined,

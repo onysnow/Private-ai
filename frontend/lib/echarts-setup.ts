@@ -27,8 +27,9 @@
 // literal below now traces to the real current Dark Academia tokens.
 
 import * as echarts from 'echarts/core';
-import {BarChart, CustomChart, LineChart, SankeyChart} from 'echarts/charts';
+import {BarChart, CustomChart, LineChart, PieChart, SankeyChart, ScatterChart, TreemapChart} from 'echarts/charts';
 import {AriaComponent, DataZoomComponent, GridComponent, LegendComponent, TitleComponent, TooltipComponent} from 'echarts/components';
+import {LabelLayout, LegacyGridContainLabel} from 'echarts/features';
 import {CanvasRenderer} from 'echarts/renderers';
 
 echarts.use([
@@ -44,6 +45,22 @@ echarts.use([
   GridComponent,
   DataZoomComponent,
   LegendComponent,
+  // The statistical kinds (visuals pass 3): a donut is a pie series with
+  // an inner radius, the treemap and the scatter plot their own series;
+  // line, area, histogram and the 100% bar reuse the line and bar series.
+  PieChart,
+  TreemapChart,
+  ScatterChart,
+  // The backend's options lay out axis labels with `grid.containLabel` and
+  // move overlapping scatter labels with `labelLayout`. ECharts 6 moved both
+  // out of its core: without these two features registered, the app laid
+  // out axis labels with its newer outer-bounds algorithm while the render
+  // service (which imports the whole `echarts` package, where index.js
+  // registers both) used the legacy one, so the preview and the export of
+  // the same option could differ (echarts/lib/coord/cartesian/Grid.js warns:
+  // "Specified `grid.containLabel` but no `use(LegacyGridContainLabel)`").
+  LegacyGridContainLabel,
+  LabelLayout,
   CanvasRenderer,
 ]);
 

@@ -60,6 +60,21 @@ export function ScaledChart({visual, fill = false}: {visual: ChartVisual, fill?:
   </div>;
 }
 
+type TableRow = ChartVisual['text']['data_table']['rows'][number];
+
+/** A data-table row's cells in the order the backend lists its columns
+ * (backend/app/visuals/echarts.py): the label, a scatter plot's second
+ * number when the chart has one, the value, a part's share when the chart
+ * shows parts of a whole, and the number of records behind the value. */
+export function tableCells(rows: TableRow[], row: TableRow): {key: string, text: string, numeric: boolean}[] {
+  const cells = [];
+  if (rows.some(r => r.x_formatted !== undefined)) cells.push({key: 'x', text: row.x_formatted ?? '', numeric: true});
+  cells.push({key: 'value', text: row.formatted, numeric: true});
+  if (rows.some(r => r.share !== undefined)) cells.push({key: 'share', text: row.share === undefined ? '' : `${row.share.toFixed(1)}%`, numeric: true});
+  cells.push({key: 'records', text: String(row.record_count), numeric: true});
+  return cells;
+}
+
 /** The chart with the words rule 13 asks for: its description, its source
  * line, and a data table where each value names how many records hold it up
  * (rule 16) and flags values that rest on a single record (rule 20). */
@@ -78,8 +93,7 @@ export function ChartFigure({visual, renderCitations}: {visual: ChartVisual, ren
         </tr></thead>
         <tbody>{table.rows.map(row => <tr key={row.label}>
           <td className="border-b py-1 pr-3">{row.label}{row.record_count === 1 ? <span title="Rests on a single record"> †</span> : null}</td>
-          <td className="border-b py-1 pr-3 tabular-nums">{row.formatted}</td>
-          <td className="border-b py-1 pr-3 tabular-nums">{row.record_count}</td>
+          {tableCells(table.rows, row).map(cell => <td key={cell.key} className="border-b py-1 pr-3 tabular-nums">{cell.text}</td>)}
           {renderCitations ? <td className="border-b py-1">{renderCitations(row.record_refs)}</td> : null}
         </tr>)}</tbody>
       </table>

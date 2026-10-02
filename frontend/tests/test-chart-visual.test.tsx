@@ -23,10 +23,11 @@ vi.mock('next/dynamic', () => ({
   },
 }));
 
-import {ChartFigure, fitScale} from '../components/presentation/chart-visual';
+import {ChartFigure, fitScale, tableCells} from '../components/presentation/chart-visual';
 import {DraftPreview, asDraft} from '../components/presentation/draft-preview';
 import {SlideCanvas, SlideStyleProvider, DEFAULT_THEME, buildCitationLookup, visualRefs} from '../components/presentation/slide-canvas';
 import type {ChartVisual, DeckSlide, JsonObject} from '../lib/api-types';
+import kinds from '../test-support/chart-kinds.json';
 
 afterEach(() => { cleanup(); reactEChartsCoreSpy.mockClear(); });
 
@@ -98,6 +99,57 @@ describe('ChartFigure', () => {
     expect(fitScale({width: 960, height: 540}, {width: 480, height: 135})).toBe(0.25);
     expect(fitScale({width: 960, height: 540}, {width: 1920})).toBe(1);
     expect(fitScale({width: 960, height: 540}, {width: 0})).toBe(1);
+  });
+});
+
+describe('every chart kind in the preview (visuals pass 3)', () => {
+  // The backend's own stored charts, one per kind (test-support/chart-kinds.json).
+  const stored = (kind: string): JsonObject => {
+    const fixture = (kinds as unknown as Record<string, JsonObject>)[kind];
+    return {type: 'chart', spec: fixture.spec, data: fixture.data, report: {ok: true, errors: [], warnings: []}, text: fixture.text,
+      option: fixture.option, width: fixture.width, height: fixture.height};
+  };
+  const draftWith = (visual: JsonObject): JsonObject => ({...payload, sections: [{...(payload.sections as JsonObject[])[0], visual}]});
+
+  it.each(['line', 'area', 'stacked_bar_100', 'donut', 'treemap', 'histogram', 'scatter'])('draws a stored %s from its checked option', async kind => {
+    const visual = asDraft(draftWith(stored(kind))).sections[0].visual as ChartVisual;
+    expect(visual?.type).toBe('chart');
+    render(<ChartFigure visual={visual}/>);
+    const props = reactEChartsCoreSpy.mock.calls[0][0] as Record<string, unknown>;
+    expect(props.option).toEqual(stored(kind).option);   // exactly what passed the check
+    expect(props.theme).toBeUndefined();
+    expect(screen.getByRole('img', {name: visual.text.alt_text})).toBeInTheDocument();
+    await userEvent.setup().click(screen.getByText('Description and data table'));
+    const table = screen.getByRole('table');
+    const headers = within(table).getAllByRole('columnheader').map(h => h.textContent);
+    expect(headers).toEqual(visual.text.data_table.columns);
+    expect(within(table).getAllByRole('row')).toHaveLength(visual.text.data_table.rows.length + 1);
+  });
+
+  it('writes a part\'s share and a scatter plot\'s second number in the data table', async () => {
+    const donut = asDraft(draftWith(stored('donut'))).sections[0].visual as ChartVisual;
+    render(<ChartFigure visual={donut}/>);
+    await userEvent.setup().click(screen.getByText('Description and data table'));
+    const firstRow = within(screen.getByRole('table')).getAllByRole('row')[1];
+    // 2,400,000 of 2,707,000 is 88.66%: one decimal, as on the chart.
+    expect(within(firstRow).getAllByRole('cell').map(c => c.textContent)).toEqual(['Meridian Holdings Ltd †', '$2.4M', '88.7%', '1']);
+    cleanup();
+
+    const scatter = asDraft(draftWith(stored('scatter'))).sections[0].visual as ChartVisual;
+    render(<ChartFigure visual={scatter}/>);
+    await userEvent.setup().click(screen.getByText('Description and data table'));
+    const rows = within(screen.getByRole('table')).getAllByRole('row').slice(1).map(r => within(r).getAllByRole('cell').map(c => c.textContent));
+    expect(rows).toContainEqual(['Alaric Voss', '2', '$295K', '2']);
+    expect(tableCells(scatter.text.data_table.rows, scatter.text.data_table.rows[0]).map(c => c.key)).toEqual(['x', 'value', 'records']);
+  });
+
+  it('shows each kind on its slide', async () => {
+    const visual = asDraft(draftWith(stored('treemap'))).sections[0].visual!;
+    const slides: DeckSlide[] = [{kind: 'content', heading: 'Who got paid', bullets: [], evidence: [], visual}];
+    render(<SlideStyleProvider theme={DEFAULT_THEME}><SlideCanvas slide={slides[0]} page={1} contentIndex={1} contentTotal={1} deckTitle="Money" lookup={buildCitationLookup(slides)} sourceCount={5}/></SlideStyleProvider>);
+    expect(await screen.findByTestId('slide-chart')).toBeInTheDocument();
+    expect(await screen.findByTestId('echarts-canvas')).toBeInTheDocument();
+    expect((reactEChartsCoreSpy.mock.calls[0][0] as {option: unknown}).option).toEqual(stored('treemap').option);
   });
 });
 

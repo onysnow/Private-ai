@@ -157,6 +157,20 @@ order slip  →  kitchen  →  checker  →  drawing  →  review
   /api/investigations/{id}/visuals/catalog` is the menu. Both routes are
   scoped to the investigation like the rest of the API, and both have
   declared response models (`app/schemas/responses.py`).
+- **In the app** (`frontend/components/presentation/chart-visual.tsx`): the
+  presentation preview draws the stored option itself for every kind, at
+  its design size scaled to fit, without the app's dark chart theme. The
+  ECharts parts the kinds need are registered in
+  `frontend/lib/echarts-setup.ts`, tree-shaken: the pie series (a donut),
+  treemap and scatter series, and two features the backend's options rely
+  on that ECharts 6 moved out of its core, `LegacyGridContainLabel` (the
+  axis-label layout the render service uses, so preview and export lay out
+  alike) and `LabelLayout` (a scatter plot's overlapping names). ECharts is
+  loaded on demand (`next/dynamic`), so it stays out of the page's first
+  load. The data table shows a part's share and a scatter plot's second
+  number. `frontend/tests/test-echarts-kinds.test.ts` draws every kind's
+  option with the app's own registered parts, because ECharts skips a
+  series whose chart type was never registered without a word.
 - The citation layer sees the chart's records because they are ordinary
   `{record_type, record_id}` pairs inside the stored data: the candidate's
   `citation_details`, the deck's source numbering and the write-up's
