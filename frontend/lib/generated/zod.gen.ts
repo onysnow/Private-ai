@@ -122,6 +122,42 @@ export const zChangeSetIn = z.object({
 });
 
 /**
+ * ChartKind
+ */
+export const zChartKind = z.enum([
+  'bar',
+  'column',
+  'line',
+  'area',
+  'stacked_bar_100',
+  'donut',
+  'treemap',
+  'histogram',
+  'scatter',
+  'timeline',
+  'sankey',
+]);
+
+/**
+ * CheckItemOut
+ */
+export const zCheckItemOut = z.object({
+  message: z.string(),
+  rule: z.number().int(),
+});
+
+/**
+ * CheckReportOut
+ */
+export const zCheckReportOut = z.object({
+  checked_rules: z.array(z.number().int()),
+  errors: z.array(zCheckItemOut),
+  not_checked: z.record(z.string()),
+  ok: z.boolean(),
+  warnings: z.array(zCheckItemOut),
+});
+
+/**
  * ClaimCreate
  */
 export const zClaimCreate = z.object({
@@ -557,6 +593,16 @@ export const zPropertyConflictDecisionRequest = z.object({
 });
 
 /**
+ * QueryRef
+ *
+ * One catalogued query and its parameters, as the AI writes them.
+ */
+export const zQueryRef = z.object({
+  name: z.string(),
+  params: z.record(z.string()).optional(),
+});
+
+/**
  * RecordRef
  */
 export const zRecordRef = z.object({
@@ -570,6 +616,33 @@ export const zRecordRef = z.object({
 export const zPresentationDraftRequest = z.object({
   goal: z.string().min(1).max(4000),
   record_refs: z.array(zRecordRef).min(1).max(200),
+});
+
+/**
+ * RecordRefOut
+ */
+export const zRecordRefOut = z.object({
+  record_id: z.string(),
+  record_type: z.string(),
+});
+
+/**
+ * DataTableRowOut
+ */
+export const zDataTableRowOut = z.object({
+  formatted: z.string(),
+  label: z.string(),
+  record_count: z.number().int(),
+  record_refs: z.array(zRecordRefOut),
+  value: z.number(),
+});
+
+/**
+ * DataTableOut
+ */
+export const zDataTableOut = z.object({
+  columns: z.array(z.string()),
+  rows: z.array(zDataTableRowOut),
 });
 
 /**
@@ -666,6 +739,11 @@ export const zSavedIn = z.object({
 });
 
 /**
+ * Scale
+ */
+export const zScale = z.enum(['linear', 'log']);
+
+/**
  * SendIn
  */
 export const zSendIn = z.object({
@@ -677,6 +755,11 @@ export const zSendIn = z.object({
   query: z.record(z.string()).nullish(),
   timeout_seconds: z.number().gte(0.5).lte(60).optional().default(10),
 });
+
+/**
+ * SortOrder
+ */
+export const zSortOrder = z.enum(['value_desc', 'value_asc', 'label', 'time']);
 
 /**
  * SourceCreate
@@ -780,6 +863,114 @@ export const zValidationError = z.object({
  */
 export const zHttpValidationError = z.object({
   detail: z.array(zValidationError).optional(),
+});
+
+/**
+ * VisualDataRowOut
+ */
+export const zVisualDataRowOut = z.object({
+  key: z.string(),
+  label: z.string(),
+  record_count: z.number().int(),
+  record_refs: z.array(zRecordRefOut),
+  value: z.number(),
+});
+
+/**
+ * VisualDataOut
+ *
+ * What the data service cooked: every value tagged with its records.
+ */
+export const zVisualDataOut = z.object({
+  currency: z.string().nullish(),
+  investigation_id: z.string(),
+  omitted: z.array(z.record(z.unknown())),
+  params: z.record(z.string()),
+  query: z.string(),
+  record_count: z.number().int(),
+  record_noun: z.string(),
+  rows: z.array(zVisualDataRowOut),
+  series_kind: z.string(),
+  unit: z.string(),
+  unit_kind: z.string(),
+});
+
+/**
+ * VisualParamOut
+ */
+export const zVisualParamOut = z.object({
+  choices: z.array(z.string()).nullish(),
+  default: z.string().nullish(),
+  description: z.string(),
+});
+
+/**
+ * VisualPreviewOut
+ *
+ * A chart cooked, drawn and checked for one order slip, as the preview
+ * shows it; the AI is never involved.
+ */
+export const zVisualPreviewOut = z.object({
+  alt_text: z.string(),
+  data: zVisualDataOut,
+  data_table: zDataTableOut,
+  description: z.string(),
+  height: z.number().int(),
+  option: z.record(z.unknown()),
+  report: zCheckReportOut,
+  source_line: z.string(),
+  spec: z.record(z.unknown()),
+  width: z.number().int(),
+});
+
+/**
+ * VisualQueryOut
+ *
+ * One entry of the query catalogue the AI orders from.
+ */
+export const zVisualQueryOut = z.object({
+  currencies: z.array(z.string()),
+  description: z.string(),
+  has_data: z.boolean(),
+  label: z.string(),
+  name: z.string(),
+  params: z.record(zVisualParamOut),
+  record_count: z.number().int(),
+  record_noun: z.string(),
+  row_count: z.number().int(),
+  series_kind: z.string(),
+  unit_kind: z.string(),
+});
+
+/**
+ * VisualCatalogOut
+ */
+export const zVisualCatalogOut = z.object({
+  drawn_kinds: z.array(z.string()),
+  investigation_id: z.string(),
+  kinds: z.array(z.string()),
+  queries: z.array(zVisualQueryOut),
+});
+
+/**
+ * VisualSpec
+ *
+ * The order slip. `extra="forbid"` is what keeps numbers out: a model
+ * that tries to add `values` or `items` is refused, not silently
+ * tolerated.
+ */
+export const zVisualSpec = z.object({
+  highlight: z.array(z.string()).max(8).optional(),
+  kind: zChartKind,
+  limit: z.number().int().gte(1).lte(50).nullish(),
+  query: zQueryRef,
+  scale: zScale.optional().default('linear'),
+  sort: zSortOrder.nullish(),
+  stack: z.boolean().optional().default(false),
+  subtitle: z.string().max(300).nullish(),
+  theme: z.string().optional().default('dark_academia'),
+  title: z.string().min(1).max(200),
+  unit: z.string().max(40).nullish(),
 });
 
 /**
@@ -1637,6 +1828,26 @@ export const zGetInvestigationTimelineQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
   offset: z.number().int().gte(0).optional().default(0),
 });
+
+export const zInvestigationVisualCatalogPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zInvestigationVisualCatalogResponse = zVisualCatalogOut;
+
+export const zInvestigationVisualPreviewBody = zVisualSpec;
+
+export const zInvestigationVisualPreviewPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zInvestigationVisualPreviewResponse = zVisualPreviewOut;
 
 export const zListWriteupsEndpointPath = z.object({
   investigation_id: z.string(),

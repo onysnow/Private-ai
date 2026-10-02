@@ -419,6 +419,12 @@ import type {
   InvestigationQuestionContextData,
   InvestigationQuestionContextErrors,
   InvestigationQuestionContextResponses,
+  InvestigationVisualCatalogData,
+  InvestigationVisualCatalogErrors,
+  InvestigationVisualCatalogResponses,
+  InvestigationVisualPreviewData,
+  InvestigationVisualPreviewErrors,
+  InvestigationVisualPreviewResponses,
   LeadQueueData,
   LeadQueueErrors,
   LeadQueueResponses,
@@ -783,6 +789,11 @@ import {
   zInvestigationPresentationDraftPath,
   zInvestigationQuestionContextBody,
   zInvestigationQuestionContextPath,
+  zInvestigationVisualCatalogPath,
+  zInvestigationVisualCatalogResponse,
+  zInvestigationVisualPreviewBody,
+  zInvestigationVisualPreviewPath,
+  zInvestigationVisualPreviewResponse,
   zLeadQueuePath,
   zLeadQueueQuery,
   zLinkClaimEvidenceEndpointBody,
@@ -5564,6 +5575,80 @@ export const getInvestigationTimeline = <ThrowOnError extends boolean = false>(
         .parseAsync(data),
     url: '/api/investigations/{investigation_id}/timeline',
     ...options,
+  });
+
+/**
+ * Investigation Visual Catalog
+ *
+ * The menu: every chart query, its parameters, and whether this
+ * investigation has data for it.
+ */
+export const investigationVisualCatalog = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<InvestigationVisualCatalogData, ThrowOnError>,
+): RequestResult<
+  InvestigationVisualCatalogResponses,
+  InvestigationVisualCatalogErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    InvestigationVisualCatalogResponses,
+    InvestigationVisualCatalogErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zInvestigationVisualCatalogPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zInvestigationVisualCatalogResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/visuals/catalog',
+    ...options,
+  });
+
+/**
+ * Investigation Visual Preview
+ *
+ * Cook, draw and check one order slip. The reply carries the data
+ * (every value with its records), the ECharts option, the check report
+ * and the chart's words. A failing chart is still returned, with
+ * `report.ok` false, so the screen can show what is wrong.
+ */
+export const investigationVisualPreview = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<InvestigationVisualPreviewData, ThrowOnError>,
+): RequestResult<
+  InvestigationVisualPreviewResponses,
+  InvestigationVisualPreviewErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    InvestigationVisualPreviewResponses,
+    InvestigationVisualPreviewErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zInvestigationVisualPreviewBody,
+          path: zInvestigationVisualPreviewPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zInvestigationVisualPreviewResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/visuals/preview',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

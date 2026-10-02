@@ -237,6 +237,64 @@ export type ChangeSetIn = {
 };
 
 /**
+ * ChartKind
+ */
+export type ChartKind =
+  | 'bar'
+  | 'column'
+  | 'line'
+  | 'area'
+  | 'stacked_bar_100'
+  | 'donut'
+  | 'treemap'
+  | 'histogram'
+  | 'scatter'
+  | 'timeline'
+  | 'sankey';
+
+/**
+ * CheckItemOut
+ */
+export type CheckItemOut = {
+  /**
+   * Message
+   */
+  message: string;
+  /**
+   * Rule
+   */
+  rule: number;
+};
+
+/**
+ * CheckReportOut
+ */
+export type CheckReportOut = {
+  /**
+   * Checked Rules
+   */
+  checked_rules: Array<number>;
+  /**
+   * Errors
+   */
+  errors: Array<CheckItemOut>;
+  /**
+   * Not Checked
+   */
+  not_checked: {
+    [key: string]: string;
+  };
+  /**
+   * Ok
+   */
+  ok: boolean;
+  /**
+   * Warnings
+   */
+  warnings: Array<CheckItemOut>;
+};
+
+/**
  * ClaimCreate
  */
 export type ClaimCreate = {
@@ -386,6 +444,46 @@ export type CrossProviderDecisionRequest = {
    * Rationale
    */
   rationale?: string | null;
+};
+
+/**
+ * DataTableOut
+ */
+export type DataTableOut = {
+  /**
+   * Columns
+   */
+  columns: Array<string>;
+  /**
+   * Rows
+   */
+  rows: Array<DataTableRowOut>;
+};
+
+/**
+ * DataTableRowOut
+ */
+export type DataTableRowOut = {
+  /**
+   * Formatted
+   */
+  formatted: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Record Count
+   */
+  record_count: number;
+  /**
+   * Record Refs
+   */
+  record_refs: Array<RecordRefOut>;
+  /**
+   * Value
+   */
+  value: number;
 };
 
 /**
@@ -1216,9 +1314,41 @@ export type PropertyTemporalInterval = {
 };
 
 /**
+ * QueryRef
+ *
+ * One catalogued query and its parameters, as the AI writes them.
+ */
+export type QueryRef = {
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Params
+   */
+  params?: {
+    [key: string]: string;
+  };
+};
+
+/**
  * RecordRef
  */
 export type RecordRef = {
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type: string;
+};
+
+/**
+ * RecordRefOut
+ */
+export type RecordRefOut = {
   /**
    * Record Id
    */
@@ -1444,6 +1574,11 @@ export type SavedIn = {
 };
 
 /**
+ * Scale
+ */
+export type Scale = 'linear' | 'log';
+
+/**
  * SendIn
  */
 export type SendIn = {
@@ -1480,6 +1615,11 @@ export type SendIn = {
    */
   timeout_seconds?: number;
 };
+
+/**
+ * SortOrder
+ */
+export type SortOrder = 'value_desc' | 'value_asc' | 'label' | 'time';
 
 /**
  * SourceCreate
@@ -1687,6 +1827,276 @@ export type ValidationError = {
    * Error Type
    */
   type: string;
+};
+
+/**
+ * VisualCatalogOut
+ */
+export type VisualCatalogOut = {
+  /**
+   * Drawn Kinds
+   */
+  drawn_kinds: Array<string>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Kinds
+   */
+  kinds: Array<string>;
+  /**
+   * Queries
+   */
+  queries: Array<VisualQueryOut>;
+};
+
+/**
+ * VisualDataOut
+ *
+ * What the data service cooked: every value tagged with its records.
+ */
+export type VisualDataOut = {
+  /**
+   * Currency
+   */
+  currency?: string | null;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Omitted
+   */
+  omitted: Array<{
+    [key: string]: unknown;
+  }>;
+  /**
+   * Params
+   */
+  params: {
+    [key: string]: string;
+  };
+  /**
+   * Query
+   */
+  query: string;
+  /**
+   * Record Count
+   */
+  record_count: number;
+  /**
+   * Record Noun
+   */
+  record_noun: string;
+  /**
+   * Rows
+   */
+  rows: Array<VisualDataRowOut>;
+  /**
+   * Series Kind
+   */
+  series_kind: string;
+  /**
+   * Unit
+   */
+  unit: string;
+  /**
+   * Unit Kind
+   */
+  unit_kind: string;
+};
+
+/**
+ * VisualDataRowOut
+ */
+export type VisualDataRowOut = {
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Record Count
+   */
+  record_count: number;
+  /**
+   * Record Refs
+   */
+  record_refs: Array<RecordRefOut>;
+  /**
+   * Value
+   */
+  value: number;
+};
+
+/**
+ * VisualParamOut
+ */
+export type VisualParamOut = {
+  /**
+   * Choices
+   */
+  choices?: Array<string> | null;
+  /**
+   * Default
+   */
+  default?: string | null;
+  /**
+   * Description
+   */
+  description: string;
+};
+
+/**
+ * VisualPreviewOut
+ *
+ * A chart cooked, drawn and checked for one order slip, as the preview
+ * shows it; the AI is never involved.
+ */
+export type VisualPreviewOut = {
+  /**
+   * Alt Text
+   */
+  alt_text: string;
+  data: VisualDataOut;
+  data_table: DataTableOut;
+  /**
+   * Description
+   */
+  description: string;
+  /**
+   * Height
+   */
+  height: number;
+  /**
+   * Option
+   */
+  option: {
+    [key: string]: unknown;
+  };
+  report: CheckReportOut;
+  /**
+   * Source Line
+   */
+  source_line: string;
+  /**
+   * Spec
+   */
+  spec: {
+    [key: string]: unknown;
+  };
+  /**
+   * Width
+   */
+  width: number;
+};
+
+/**
+ * VisualQueryOut
+ *
+ * One entry of the query catalogue the AI orders from.
+ */
+export type VisualQueryOut = {
+  /**
+   * Currencies
+   */
+  currencies: Array<string>;
+  /**
+   * Description
+   */
+  description: string;
+  /**
+   * Has Data
+   */
+  has_data: boolean;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Params
+   */
+  params: {
+    [key: string]: VisualParamOut;
+  };
+  /**
+   * Record Count
+   */
+  record_count: number;
+  /**
+   * Record Noun
+   */
+  record_noun: string;
+  /**
+   * Row Count
+   */
+  row_count: number;
+  /**
+   * Series Kind
+   */
+  series_kind: string;
+  /**
+   * Unit Kind
+   */
+  unit_kind: string;
+};
+
+/**
+ * VisualSpec
+ *
+ * The order slip. `extra="forbid"` is what keeps numbers out: a model
+ * that tries to add `values` or `items` is refused, not silently
+ * tolerated.
+ */
+export type VisualSpec = {
+  /**
+   * Highlight
+   *
+   * Labels to pick out; the others turn grey.
+   */
+  highlight?: Array<string>;
+  kind: ChartKind;
+  /**
+   * Limit
+   *
+   * Keep the top N; the rest are folded into 'Other'.
+   */
+  limit?: number | null;
+  query: QueryRef;
+  scale?: Scale;
+  sort?: SortOrder | null;
+  /**
+   * Stack
+   */
+  stack?: boolean;
+  /**
+   * Subtitle
+   */
+  subtitle?: string | null;
+  /**
+   * Theme
+   */
+  theme?: string;
+  /**
+   * Title
+   *
+   * States the finding, e.g. 'Meridian received most of the money'.
+   */
+  title: string;
+  /**
+   * Unit
+   *
+   * Optional unit label; the data's own unit always wins.
+   */
+  unit?: string | null;
 };
 
 /**
@@ -6470,6 +6880,70 @@ export type GetInvestigationTimelineResponses = {
    */
   200: unknown;
 };
+
+export type InvestigationVisualCatalogData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/visuals/catalog';
+};
+
+export type InvestigationVisualCatalogErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type InvestigationVisualCatalogError =
+  InvestigationVisualCatalogErrors[keyof InvestigationVisualCatalogErrors];
+
+export type InvestigationVisualCatalogResponses = {
+  /**
+   * Successful Response
+   */
+  200: VisualCatalogOut;
+};
+
+export type InvestigationVisualCatalogResponse =
+  InvestigationVisualCatalogResponses[keyof InvestigationVisualCatalogResponses];
+
+export type InvestigationVisualPreviewData = {
+  body: VisualSpec;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/visuals/preview';
+};
+
+export type InvestigationVisualPreviewErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type InvestigationVisualPreviewError =
+  InvestigationVisualPreviewErrors[keyof InvestigationVisualPreviewErrors];
+
+export type InvestigationVisualPreviewResponses = {
+  /**
+   * Successful Response
+   */
+  200: VisualPreviewOut;
+};
+
+export type InvestigationVisualPreviewResponse =
+  InvestigationVisualPreviewResponses[keyof InvestigationVisualPreviewResponses];
 
 export type ListWriteupsEndpointData = {
   body?: never;

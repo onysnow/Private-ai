@@ -153,6 +153,8 @@ import {
   investigationHypothesisTest,
   investigationPresentationDraft,
   investigationQuestionContext,
+  investigationVisualCatalog,
+  investigationVisualPreview,
   leadQueue,
   linkClaimEvidenceEndpoint,
   linkLead,
@@ -494,6 +496,12 @@ import type {
   InvestigationPresentationDraftError,
   InvestigationQuestionContextData,
   InvestigationQuestionContextError,
+  InvestigationVisualCatalogData,
+  InvestigationVisualCatalogError,
+  InvestigationVisualCatalogResponse,
+  InvestigationVisualPreviewData,
+  InvestigationVisualPreviewError,
+  InvestigationVisualPreviewResponse,
   LeadQueueData,
   LeadQueueError,
   LinkClaimEvidenceEndpointData,
@@ -5992,6 +6000,69 @@ export const getInvestigationTimelineInfiniteOptions = (
     },
   );
   return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const investigationVisualCatalogQueryKey = (
+  options: Options<InvestigationVisualCatalogData>,
+) => createQueryKey('investigationVisualCatalog', options);
+
+/**
+ * Investigation Visual Catalog
+ *
+ * The menu: every chart query, its parameters, and whether this
+ * investigation has data for it.
+ */
+export const investigationVisualCatalogOptions = (
+  options: Options<InvestigationVisualCatalogData>,
+) =>
+  queryOptions<
+    InvestigationVisualCatalogResponse,
+    InvestigationVisualCatalogError,
+    InvestigationVisualCatalogResponse,
+    ReturnType<typeof investigationVisualCatalogQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await investigationVisualCatalog({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: investigationVisualCatalogQueryKey(options),
+  });
+
+/**
+ * Investigation Visual Preview
+ *
+ * Cook, draw and check one order slip. The reply carries the data
+ * (every value with its records), the ECharts option, the check report
+ * and the chart's words. A failing chart is still returned, with
+ * `report.ok` false, so the screen can show what is wrong.
+ */
+export const investigationVisualPreviewMutation = (
+  options?: Partial<Options<InvestigationVisualPreviewData>>,
+): UseMutationOptions<
+  InvestigationVisualPreviewResponse,
+  InvestigationVisualPreviewError,
+  Options<InvestigationVisualPreviewData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    InvestigationVisualPreviewResponse,
+    InvestigationVisualPreviewError,
+    Options<InvestigationVisualPreviewData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await investigationVisualPreview({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
 };
 
 export const listWriteupsEndpointQueryKey = (

@@ -398,6 +398,86 @@
         "title": "ChangeSetIn",
         "type": "object"
       },
+      "ChartKind": {
+        "enum": [
+          "bar",
+          "column",
+          "line",
+          "area",
+          "stacked_bar_100",
+          "donut",
+          "treemap",
+          "histogram",
+          "scatter",
+          "timeline",
+          "sankey"
+        ],
+        "title": "ChartKind",
+        "type": "string"
+      },
+      "CheckItemOut": {
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rule",
+          "message"
+        ],
+        "title": "CheckItemOut",
+        "type": "object"
+      },
+      "CheckReportOut": {
+        "properties": {
+          "checked_rules": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Checked Rules",
+            "type": "array"
+          },
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/CheckItemOut"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "not_checked": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Not Checked",
+            "type": "object"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/CheckItemOut"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "ok",
+          "errors",
+          "warnings",
+          "checked_rules",
+          "not_checked"
+        ],
+        "title": "CheckReportOut",
+        "type": "object"
+      },
       "ClaimCreate": {
         "properties": {
           "confidence": {
@@ -633,6 +713,66 @@
           "decision"
         ],
         "title": "CrossProviderDecisionRequest",
+        "type": "object"
+      },
+      "DataTableOut": {
+        "properties": {
+          "columns": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Columns",
+            "type": "array"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/DataTableRowOut"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "columns",
+          "rows"
+        ],
+        "title": "DataTableOut",
+        "type": "object"
+      },
+      "DataTableRowOut": {
+        "properties": {
+          "formatted": {
+            "title": "Formatted",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "record_count": {
+            "title": "Record Count",
+            "type": "integer"
+          },
+          "record_refs": {
+            "items": {
+              "$ref": "#/components/schemas/RecordRefOut"
+            },
+            "title": "Record Refs",
+            "type": "array"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "label",
+          "value",
+          "formatted",
+          "record_count",
+          "record_refs"
+        ],
+        "title": "DataTableRowOut",
         "type": "object"
       },
       "DeckStyle": {
@@ -2102,6 +2242,28 @@
         "title": "PropertyTemporalInterval",
         "type": "object"
       },
+      "QueryRef": {
+        "additionalProperties": false,
+        "description": "One catalogued query and its parameters, as the AI writes them.",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Params",
+            "type": "object"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "QueryRef",
+        "type": "object"
+      },
       "RecordRef": {
         "properties": {
           "record_id": {
@@ -2118,6 +2280,24 @@
           "record_id"
         ],
         "title": "RecordRef",
+        "type": "object"
+      },
+      "RecordRefOut": {
+        "properties": {
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_type": {
+            "title": "Record Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_type",
+          "record_id"
+        ],
+        "title": "RecordRefOut",
         "type": "object"
       },
       "RelationshipCreate": {
@@ -2500,6 +2680,14 @@
         "title": "SavedIn",
         "type": "object"
       },
+      "Scale": {
+        "enum": [
+          "linear",
+          "log"
+        ],
+        "title": "Scale",
+        "type": "string"
+      },
       "SendIn": {
         "properties": {
           "act_as": {
@@ -2570,6 +2758,16 @@
         ],
         "title": "SendIn",
         "type": "object"
+      },
+      "SortOrder": {
+        "enum": [
+          "value_desc",
+          "value_asc",
+          "label",
+          "time"
+        ],
+        "title": "SortOrder",
+        "type": "string"
       },
       "SourceCreate": {
         "properties": {
@@ -2925,6 +3123,423 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "VisualCatalogOut": {
+        "properties": {
+          "drawn_kinds": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Drawn Kinds",
+            "type": "array"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "kinds": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Kinds",
+            "type": "array"
+          },
+          "queries": {
+            "items": {
+              "$ref": "#/components/schemas/VisualQueryOut"
+            },
+            "title": "Queries",
+            "type": "array"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "queries",
+          "kinds",
+          "drawn_kinds"
+        ],
+        "title": "VisualCatalogOut",
+        "type": "object"
+      },
+      "VisualDataOut": {
+        "description": "What the data service cooked: every value tagged with its records.",
+        "properties": {
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "omitted": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Omitted",
+            "type": "array"
+          },
+          "params": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Params",
+            "type": "object"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "record_count": {
+            "title": "Record Count",
+            "type": "integer"
+          },
+          "record_noun": {
+            "title": "Record Noun",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/VisualDataRowOut"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "series_kind": {
+            "title": "Series Kind",
+            "type": "string"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          },
+          "unit_kind": {
+            "title": "Unit Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "query",
+          "params",
+          "unit",
+          "unit_kind",
+          "series_kind",
+          "record_noun",
+          "rows",
+          "record_count",
+          "omitted"
+        ],
+        "title": "VisualDataOut",
+        "type": "object"
+      },
+      "VisualDataRowOut": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "record_count": {
+            "title": "Record Count",
+            "type": "integer"
+          },
+          "record_refs": {
+            "items": {
+              "$ref": "#/components/schemas/RecordRefOut"
+            },
+            "title": "Record Refs",
+            "type": "array"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "label",
+          "value",
+          "record_refs",
+          "record_count",
+          "key"
+        ],
+        "title": "VisualDataRowOut",
+        "type": "object"
+      },
+      "VisualParamOut": {
+        "properties": {
+          "choices": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Choices"
+          },
+          "default": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          }
+        },
+        "required": [
+          "description"
+        ],
+        "title": "VisualParamOut",
+        "type": "object"
+      },
+      "VisualPreviewOut": {
+        "description": "A chart cooked, drawn and checked for one order slip, as the preview\nshows it; the AI is never involved.",
+        "properties": {
+          "alt_text": {
+            "title": "Alt Text",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/VisualDataOut"
+          },
+          "data_table": {
+            "$ref": "#/components/schemas/DataTableOut"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "height": {
+            "title": "Height",
+            "type": "integer"
+          },
+          "option": {
+            "additionalProperties": true,
+            "title": "Option",
+            "type": "object"
+          },
+          "report": {
+            "$ref": "#/components/schemas/CheckReportOut"
+          },
+          "source_line": {
+            "title": "Source Line",
+            "type": "string"
+          },
+          "spec": {
+            "additionalProperties": true,
+            "title": "Spec",
+            "type": "object"
+          },
+          "width": {
+            "title": "Width",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "spec",
+          "data",
+          "option",
+          "report",
+          "alt_text",
+          "description",
+          "data_table",
+          "source_line",
+          "width",
+          "height"
+        ],
+        "title": "VisualPreviewOut",
+        "type": "object"
+      },
+      "VisualQueryOut": {
+        "description": "One entry of the query catalogue the AI orders from.",
+        "properties": {
+          "currencies": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Currencies",
+            "type": "array"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "has_data": {
+            "title": "Has Data",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/VisualParamOut"
+            },
+            "title": "Params",
+            "type": "object"
+          },
+          "record_count": {
+            "title": "Record Count",
+            "type": "integer"
+          },
+          "record_noun": {
+            "title": "Record Noun",
+            "type": "string"
+          },
+          "row_count": {
+            "title": "Row Count",
+            "type": "integer"
+          },
+          "series_kind": {
+            "title": "Series Kind",
+            "type": "string"
+          },
+          "unit_kind": {
+            "title": "Unit Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "label",
+          "description",
+          "params",
+          "series_kind",
+          "unit_kind",
+          "record_noun",
+          "has_data",
+          "record_count",
+          "row_count",
+          "currencies"
+        ],
+        "title": "VisualQueryOut",
+        "type": "object"
+      },
+      "VisualSpec": {
+        "additionalProperties": false,
+        "description": "The order slip. `extra=\"forbid\"` is what keeps numbers out: a model\nthat tries to add `values` or `items` is refused, not silently\ntolerated.",
+        "properties": {
+          "highlight": {
+            "description": "Labels to pick out; the others turn grey.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 8,
+            "title": "Highlight",
+            "type": "array"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ChartKind"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 50.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Keep the top N; the rest are folded into 'Other'.",
+            "title": "Limit"
+          },
+          "query": {
+            "$ref": "#/components/schemas/QueryRef"
+          },
+          "scale": {
+            "$ref": "#/components/schemas/Scale",
+            "default": "linear"
+          },
+          "sort": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SortOrder"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stack": {
+            "default": false,
+            "title": "Stack",
+            "type": "boolean"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
+          },
+          "theme": {
+            "default": "dark_academia",
+            "title": "Theme",
+            "type": "string"
+          },
+          "title": {
+            "description": "States the finding, e.g. 'Meridian received most of the money'.",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional unit label; the data's own unit always wins.",
+            "title": "Unit"
+          }
+        },
+        "required": [
+          "kind",
+          "title",
+          "query"
+        ],
+        "title": "VisualSpec",
         "type": "object"
       },
       "VisualStyle": {
@@ -10183,6 +10798,96 @@
           }
         },
         "summary": "Get Investigation Timeline"
+      }
+    },
+    "/api/investigations/{investigation_id}/visuals/catalog": {
+      "get": {
+        "description": "The menu: every chart query, its parameters, and whether this\ninvestigation has data for it.",
+        "operationId": "investigation_visual_catalog",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VisualCatalogOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Investigation Visual Catalog"
+      }
+    },
+    "/api/investigations/{investigation_id}/visuals/preview": {
+      "post": {
+        "description": "Cook, draw and check one order slip. The reply carries the data\n(every value with its records), the ECharts option, the check report\nand the chart's words. A failing chart is still returned, with\n`report.ok` false, so the screen can show what is wrong.",
+        "operationId": "investigation_visual_preview",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VisualSpec"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VisualPreviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Investigation Visual Preview"
       }
     },
     "/api/investigations/{investigation_id}/writeups": {
