@@ -324,6 +324,14 @@ def _lead_triage_batch(db: Session, links_by_lead: dict[str, list[LeadLink]]) ->
     return results
 
 
+def serialize_lead_workflow_event(event: LeadWorkflowEvent) -> dict:
+    """A lead's status change as the API sends it. Rows used to be returned
+    as ORM objects and relied on FastAPI's encoder reading their columns;
+    with a declared response model that leaks, so the shape is explicit."""
+    return {"id": event.id, "lead_id": event.lead_id, "from_status": event.from_status, "to_status": event.to_status,
+            "note": event.note, "created_at": event.created_at}
+
+
 def serialize_lead(db: Session, lead: Lead) -> dict:
     profile = get_profile(db, lead.id, create=False)
     links = db.scalars(select(LeadLink).where(LeadLink.lead_id == lead.id).order_by(LeadLink.created_at)).all()
@@ -344,7 +352,7 @@ def serialize_lead(db: Session, lead: Lead) -> dict:
         "created_at": lead.created_at,
         "links": [serialize_link(db, link) for link in links],
         "tasks": [serialize_task(db, task) for task in tasks],
-        "history": history,
+        "history": [serialize_lead_workflow_event(event) for event in history],
         "triage": _lead_triage(db, list(links)),
     }
 
@@ -404,7 +412,7 @@ def list_leads_serialized(db: Session, leads: list[Lead]) -> list[dict]:
             "created_at": lead.created_at,
             "links": [serialized_links[link.id] for link in links_by_lead.get(lead.id, [])],
             "tasks": [serialized_tasks[task.id] for task in tasks_by_lead.get(lead.id, [])],
-            "history": history_by_lead.get(lead.id, []),
+            "history": [serialize_lead_workflow_event(event) for event in history_by_lead.get(lead.id, [])],
             "triage": triage_by_lead[lead.id],
         })
     return results

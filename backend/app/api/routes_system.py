@@ -22,7 +22,7 @@ from app.core.authorization import scope_for_request
 from app.core.config import settings
 from app.db.session import get_db
 from app.models.domain import AIAnalysisCandidate, Investigation, Source, StatementAssessment
-from app.schemas.responses import EvidenceOut
+from app.schemas.responses import EvidenceOut, SearchOut, TimelineEventRowOut
 from app.schemas.api import (
     AIAnalysisCandidateReviewRequest,
     EvidenceCreate,
@@ -90,7 +90,7 @@ async def openaleph_integration_status() -> Any:
     return (await probe_openaleph()).to_dict()
 
 
-@router.get("/search", response_model=None)
+@router.get("/search", response_model=SearchOut)
 def search_workbench(
     request: Request,
     q: str = Query(..., min_length=1),
@@ -111,7 +111,7 @@ def search_workbench(
         raise HTTPException(404, str(exc))
 
 
-@router.post("/timeline-events", response_model=None)
+@router.post("/timeline-events", response_model=TimelineEventRowOut)
 def create_timeline_event_endpoint(body: TimelineEventCreate, db: Session = Depends(get_db)) -> Any:
     if db.get(Investigation, body.investigation_id) is None:
         raise HTTPException(404, "Investigation not found")

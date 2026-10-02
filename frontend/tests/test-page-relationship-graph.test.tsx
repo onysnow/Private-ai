@@ -2,20 +2,20 @@
 // STRUCT-0015 remainder, cycle 10: the "FollowTheMoney relationship graph"
 // flow on app/page.tsx (createRelationship, the schema-filter checkboxes,
 // openGraphEdge, attachEvidenceToRelationship, reviewRelationshipEvidence).
-// Like cycles 4/6/7, these all need `inv` set, so the full 9-call
-// selectInvestigation() cascade plus AiReasoningPanel's post-select fetch is
-// driven via loadAppBootstrap()'s auto-select (see
-// test-page-leads.test.tsx's module docstring for the exact call order and
-// why each cascade slot's shape matters).
+// Like cycles 4/6/7, these all need `inv` set, so an investigation is opened
+// by loadAppBootstrap()'s auto-select, which starts every per-investigation
+// load (test-support/page-routes.ts lists the routes; replies are keyed by
+// route, not by call order -- ADR-0005, line 15). The entities and graph
+// edges are the two records this section's tests actually vary.
 //
 // One thing this section's own loadEntities() does that no earlier cycle's
 // target function did: whenever the loaded entities list doesn't already
 // contain the current relSource/relTarget, it auto-fills them to
 // entities[0]/entities[1] (see app/page.tsx's loadEntities). Seeding the
-// cascade's entities response with two (or, for the disabled-guard test,
-// one) canonical entities therefore pre-selects the relationship form's
-// source/target selects without any user interaction -- no need to drive
-// the <select> elements by hand.
+// entities route with two (or, for the disabled-guard test, one) canonical
+// entities therefore pre-selects the relationship form's source/target
+// selects without any user interaction -- no need to drive the <select>
+// elements by hand.
 //
 // The <Graph> component now renders the vis-network <EntityGraph> (issue
 // #39 wiring). vis-network needs a real canvas 2D context, which jsdom does
@@ -29,16 +29,18 @@
 // Also because of that same loadEntities() auto-fill, `entityId` is
 // non-empty by the time attachEvidenceToRelationship/reviewRelationshipEvidence
 // succeed, so their trailing `if(entityId)void loadDossier(entityId)`
-// fire-and-forget call actually fires. It's never mocked here (loadDossier
-// itself chains three more fetches), so it fails and is caught by
-// loadDossier's own try/catch, which alerts -- jsdom logs a harmless "Not
-// implemented: window.alert()" notice to stderr for that. It doesn't
-// consume any of this file's queued mock responses (there's nothing queued
-// for it to consume) and doesn't affect any assertion below.
-import {cleanup, render, screen} from '@testing-library/react';
+// fire-and-forget call actually fires. No dossier route is configured here,
+// so the stub answers it 404 and loadDossier's own try/catch reports that
+// (a console error and a toast) -- it doesn't affect any assertion below,
+// and api.unmatched() is deliberately not checked in those two tests.
+import {cleanup, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+import {mockApi} from '../test-support/mock-api';
+import type {MockApi} from '../test-support/mock-api';
+import {emptyGraph, pageRoutes} from '../test-support/page-routes';
 
 const {sankeySpy} = vi.hoisted(() => ({sankeySpy: vi.fn()}));
 vi.mock('../components/charts/financial-flow-sankey', () => ({
@@ -82,42 +84,6 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const validSettingsStatus = {
-  environment: 'test',
-  database: 'sqlite',
-  document_storage_dir: '/tmp/docs',
-  limits: {},
-  restore_api_enabled: true,
-  document_extraction: {
-    pdf_ocr_enabled: false,
-    pdf_ocr_language: 'eng',
-    pdf_ocr_dpi: 300,
-    pdf_ocr_min_native_chars: 200,
-    local_entity_suggestions_enabled: false,
-    entity_extraction_owner: 'workbench_local',
-    ocr_runtime: {
-      available: false,
-      requested_languages: [],
-      missing_languages: [],
-      detail: 'not checked',
-    },
-  },
-  access: {
-    remote_api_enabled: false,
-    mode: 'local_only',
-    token_configured: false,
-  },
-  cors_allowed_origins: [],
-  connectors: {},
-};
-
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {'content-type': 'application/json'},
-  });
-}
-
 async function importHome(): Promise<() => ReactElement> {
   vi.resetModules();
   const mod = await import('../app/page');
@@ -129,19 +95,10 @@ const investigation = {id: 'inv-1', name: 'Kestrelwood filings'};
 const entityA = {id: 'ent-1', caption: 'Kestrelwood Holdings Ltd', schema: 'Company', properties: {}};
 const entityB = {id: 'ent-2', caption: 'Jane Doe', schema: 'Person', properties: {}};
 
-function emptyGraph(edges: unknown[] = []) {
-  return {
-    nodes: [],
-    edges,
-    schemas: [],
-    reconciliation: {
-      collapsed_by_default: true,
-      suppressed_duplicate_count: 0,
-      underlying_edge_count: 0,
-      visible_edge_count: 0,
-    },
-  };
-}
+const ENTITIES = 'GET /api/investigations/inv-1/entities';
+const GRAPH = 'GET /api/investigations/inv-1/graph';
+const RELATIONSHIPS = 'POST /api/relationships';
+const EVIDENCE_REVIEWS = 'GET /api/relationships/rel-1/evidence-reviews';
 
 function relationshipFixture(overrides: Record<string, unknown> = {}) {
   return {
@@ -165,47 +122,22 @@ function evidencePoolRow() {
   };
 }
 
-// The 9 selectInvestigation() cascade calls, in call order. entities and
-// graph edges are the two slots this section's tests actually vary.
-function cascadeResponses(entities: unknown[], edges: unknown[] = [], evidence: unknown[] = []): Response[] {
-  return [
-    jsonResponse([]), // GET connector-findings
-    jsonResponse(entities), // GET entities
-    jsonResponse(emptyGraph(edges)), // GET graph
-    jsonResponse({events: [], verification_counts: {}}), // GET timeline
-    jsonResponse({items: []}), // GET leads/queue
-    jsonResponse([]), // GET claims
-    jsonResponse(evidence), // GET evidence
-    jsonResponse([]), // GET sources
-    jsonResponse([]), // GET documents
-  ];
-}
-
 async function bootstrap(
   entities: unknown[],
   edges: unknown[] = [],
   evidence: unknown[] = [],
-): Promise<{fetchMock: ReturnType<typeof vi.fn>}> {
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce(jsonResponse(validSettingsStatus)) // GET settings/status
-    .mockResolvedValueOnce(jsonResponse([investigation])) // GET investigations
-    .mockResolvedValueOnce(jsonResponse({providers: ['aleph']})); // GET connectors
-  for (const response of cascadeResponses(entities, edges, evidence)) {
-    fetchMock.mockResolvedValueOnce(response);
-  }
-  fetchMock.mockResolvedValueOnce(jsonResponse({candidates: []})); // AiReasoningPanel
-  vi.stubGlobal('fetch', fetchMock);
+): Promise<MockApi> {
+  const api = mockApi(pageRoutes({investigations: [investigation], entities, graph: emptyGraph(edges), evidence}));
 
   const Home = await importHome();
   render(<Home />);
   await screen.findByText('Kestrelwood filings');
-  return {fetchMock};
+  return api;
 }
 
 describe('Home FollowTheMoney relationship graph', () => {
   it('pre-selects source/target from the loaded entities and creates a relationship', async () => {
-    const {fetchMock} = await bootstrap([entityA, entityB]);
+    const api = await bootstrap([entityA, entityB]);
 
     // loadEntities() auto-fills relSource/relTarget to entities[0]/[1] when
     // neither is already in the list -- no <select> interaction needed, and
@@ -213,10 +145,10 @@ describe('Home FollowTheMoney relationship graph', () => {
     const addButton = await screen.findByRole('button', {name: 'Add relationship'});
     expect(addButton).not.toBeDisabled();
 
-    fetchMock
-      .mockResolvedValueOnce(jsonResponse({})) // POST /api/relationships
-      .mockResolvedValueOnce(jsonResponse(emptyGraph([relationshipFixture()]))) // loadRelationships reload
-      .mockResolvedValueOnce(jsonResponse([entityA, entityB])); // loadEntities reload
+    api.add({
+      [RELATIONSHIPS]: {},
+      [GRAPH]: emptyGraph([relationshipFixture()]), // the graph the reload finds
+    });
 
     await userEvent.setup().click(addButton);
 
@@ -228,10 +160,8 @@ describe('Home FollowTheMoney relationship graph', () => {
     expect(screen.getByRole('button', {name: 'Jane Doe'})).toBeInTheDocument();
     expect(screen.queryByText('No canonical relationships yet.')).not.toBeInTheDocument();
 
-    const [postUrl, postInit] = fetchMock.mock.calls[13];
-    expect(postUrl).toContain('/api/relationships');
-    expect((postInit as RequestInit).method).toBe('POST');
-    expect(JSON.parse((postInit as RequestInit).body as string)).toMatchObject({
+    expect(api.calls(RELATIONSHIPS)).toHaveLength(1);
+    expect(api.lastBody(RELATIONSHIPS)).toMatchObject({
       investigation_id: 'inv-1',
       schema: 'Ownership',
       source_entity_id: 'ent-1',
@@ -240,6 +170,9 @@ describe('Home FollowTheMoney relationship graph', () => {
       dataset: 'reporter',
       evidence_id: null,
     });
+    expect(api.calls(GRAPH)).toHaveLength(2);
+    expect(api.calls(ENTITIES)).toHaveLength(2);
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('disables Add relationship when only one entity exists (source and target fall back to the same one)', async () => {
@@ -249,9 +182,9 @@ describe('Home FollowTheMoney relationship graph', () => {
   });
 
   it("opens a relationship edge and loads its evidence review history", async () => {
-    const {fetchMock} = await bootstrap([entityA, entityB], [relationshipFixture()]);
+    const api = await bootstrap([entityA, entityB], [relationshipFixture()]);
 
-    fetchMock.mockResolvedValueOnce(jsonResponse({reviews: []})); // GET evidence-reviews
+    api.add({[EVIDENCE_REVIEWS]: {reviews: []}});
 
     await userEvent.setup().click(screen.getByText('Ownership', {selector: '.relEdge'}));
 
@@ -262,14 +195,15 @@ describe('Home FollowTheMoney relationship graph', () => {
     // non-duplicate edge is the "attach evidence" form.
     expect(screen.getByText('Attach exact evidence')).toBeInTheDocument();
 
-    const [reviewsUrl] = fetchMock.mock.calls[13];
-    expect(reviewsUrl).toContain('/api/relationships/rel-1/evidence-reviews');
+    expect(api.calls(EVIDENCE_REVIEWS)).toHaveLength(1);
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('attaches evidence from the investigation pool to an opened relationship', async () => {
-    const {fetchMock} = await bootstrap([entityA, entityB], [relationshipFixture()], [evidencePoolRow()]);
+    const api = await bootstrap([entityA, entityB], [relationshipFixture()], [evidencePoolRow()]);
+    const attach = 'POST /api/relationships/rel-1/evidence';
 
-    fetchMock.mockResolvedValueOnce(jsonResponse({reviews: []})); // GET evidence-reviews
+    api.add({[EVIDENCE_REVIEWS]: {reviews: []}});
     await userEvent.setup().click(screen.getByText('Ownership', {selector: '.relEdge'}));
     await screen.findByText('Attach exact evidence');
 
@@ -305,7 +239,7 @@ describe('Home FollowTheMoney relationship graph', () => {
         ],
       },
     });
-    fetchMock.mockResolvedValueOnce(jsonResponse(attached)); // POST .../evidence
+    api.add({[attach]: attached});
 
     await user.click(attachButton);
 
@@ -315,9 +249,8 @@ describe('Home FollowTheMoney relationship graph', () => {
     // match on substring instead of the full leaf text.
     expect(screen.getByText('Approved 3/3, signed by CFO.', {exact: false})).toBeInTheDocument();
 
-    const [attachUrl, attachInit] = fetchMock.mock.calls[14];
-    expect(attachUrl).toContain('/api/relationships/rel-1/evidence');
-    expect(JSON.parse((attachInit as RequestInit).body as string)).toMatchObject({evidence_id: 'ev-1', note: null});
+    expect(api.calls(attach)).toHaveLength(1);
+    expect(api.lastBody(attach)).toMatchObject({evidence_id: 'ev-1', note: null});
   });
 
   it('requires a rationale before recording a relationship-evidence assessment', async () => {
@@ -337,9 +270,10 @@ describe('Home FollowTheMoney relationship graph', () => {
         ],
       },
     });
-    const {fetchMock} = await bootstrap([entityA, entityB], [attachedFixture], [evidencePoolRow()]);
+    const api = await bootstrap([entityA, entityB], [attachedFixture], [evidencePoolRow()]);
+    const review = 'POST /api/relationships/rel-1/evidence/ev-1/reviews';
 
-    fetchMock.mockResolvedValueOnce(jsonResponse({reviews: []})); // GET evidence-reviews
+    api.add({[EVIDENCE_REVIEWS]: {reviews: []}});
     await userEvent.setup().click(screen.getByText('Ownership', {selector: '.relEdge'}));
     await screen.findByText('Approved 3/3, signed by CFO.', {exact: false});
 
@@ -353,44 +287,47 @@ describe('Home FollowTheMoney relationship graph', () => {
     );
     expect(supportsButton).not.toBeDisabled();
 
-    fetchMock
-      .mockResolvedValueOnce(jsonResponse(attachedFixture)) // POST .../evidence/ev-1/reviews
-      .mockResolvedValueOnce(jsonResponse({reviews: [{id: 'rev-1', relationship_edge_id: 'rel-1', evidence_id: 'ev-1', stance: 'supports', rationale: 'Board minutes directly confirm the ownership stake.', created_at: '2026-09-23T00:00:00Z'}]})); // GET evidence-reviews reload
+    api.add({
+      [review]: attachedFixture,
+      // The history the reload finds now holds the assessment.
+      [EVIDENCE_REVIEWS]: {reviews: [{id: 'rev-1', relationship_edge_id: 'rel-1', evidence_id: 'ev-1', stance: 'supports', rationale: 'Board minutes directly confirm the ownership stake.', created_at: '2026-09-23T00:00:00Z'}]},
+    });
 
     await user.click(supportsButton);
 
     await screen.findByText('Recorded supports assessment. Canonical relationship preserved.');
     expect(screen.getByText('Board minutes directly confirm the ownership stake.', {selector: 'div'})).toBeInTheDocument();
 
-    const [reviewUrl, reviewInit] = fetchMock.mock.calls[14];
-    expect(reviewUrl).toContain('/api/relationships/rel-1/evidence/ev-1/reviews');
-    expect(JSON.parse((reviewInit as RequestInit).body as string)).toMatchObject({
+    expect(api.calls(review)).toHaveLength(1);
+    expect(api.lastBody(review)).toMatchObject({
       stance: 'supports',
       rationale: 'Board minutes directly confirm the ownership stake.',
     });
+    expect(api.calls(EVIDENCE_REVIEWS)).toHaveLength(2);
   });
 
   it('passes the shown relationships to the entity graph and opens an edge from it', async () => {
-    const {fetchMock} = await bootstrap([entityA, entityB], [relationshipFixture()]);
+    const api = await bootstrap([entityA, entityB], [relationshipFixture()]);
 
     expect(await screen.findByTestId('graph-node-ent-1')).toHaveTextContent('Kestrelwood Holdings Ltd (Company)');
     expect(screen.getByTestId('graph-node-ent-2')).toHaveTextContent('Jane Doe (Person)');
     expect(screen.getByTestId('graph-edge-rel-1')).toHaveTextContent('ent-1->ent-2:Ownership');
 
-    fetchMock.mockResolvedValueOnce(jsonResponse({reviews: []})); // GET evidence-reviews
+    api.add({[EVIDENCE_REVIEWS]: {reviews: []}});
     await userEvent.setup().click(screen.getByTestId('graph-edge-rel-1'));
 
     await screen.findByText('Kestrelwood Holdings Ltd → Jane Doe');
-    const [reviewsUrl] = fetchMock.mock.calls[13];
-    expect(reviewsUrl).toContain('/api/relationships/rel-1/evidence-reviews');
+    expect(api.calls(EVIDENCE_REVIEWS)).toHaveLength(1);
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('creates an entity from the manual entity form and reloads entities', async () => {
-    const {fetchMock} = await bootstrap([entityA, entityB]);
+    const api = await bootstrap([entityA, entityB]);
     const created = {id: 'ent-3', investigation_id: 'inv-1', caption: 'Harbor Trust', schema: 'Company', properties: {}};
-    fetchMock
-      .mockResolvedValueOnce(jsonResponse(created)) // POST /api/entities
-      .mockResolvedValueOnce(jsonResponse([entityA, entityB, created])); // loadEntities reload
+    api.add({
+      'POST /api/entities': created,
+      [ENTITIES]: [entityA, entityB, created], // the list the reload finds
+    });
 
     const user = userEvent.setup();
     await user.click(screen.getByText('Add an entity manually'));
@@ -398,22 +335,17 @@ describe('Home FollowTheMoney relationship graph', () => {
     await user.type(screen.getByLabelText('FollowTheMoney schema'), 'Company');
     await user.click(screen.getByRole('button', {name: /create entity/i}));
 
-    await vi.waitFor(() => expect(fetchMock.mock.calls.length).toBeGreaterThanOrEqual(15));
-    const [postUrl, postInit] = fetchMock.mock.calls[13];
-    expect(postUrl).toContain('/api/entities');
-    expect((postInit as RequestInit).method).toBe('POST');
-    expect(JSON.parse((postInit as RequestInit).body as string)).toEqual({
+    await waitFor(() => expect(api.calls(ENTITIES)).toHaveLength(2));
+    expect(api.calls('POST /api/entities')).toHaveLength(1);
+    expect(api.lastBody('POST /api/entities')).toEqual({
       investigation_id: 'inv-1', schema: 'Company', caption: 'Harbor Trust', properties: {},
     });
-    expect(String(fetchMock.mock.calls[14][0])).toContain('/api/investigations/inv-1/entities');
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('creates a Payment relationship with amount, currency, date and purpose', async () => {
-    const {fetchMock} = await bootstrap([entityA, entityB]);
-    fetchMock
-      .mockResolvedValueOnce(jsonResponse({})) // POST /api/relationships
-      .mockResolvedValueOnce(jsonResponse(emptyGraph([]))) // loadRelationships reload
-      .mockResolvedValueOnce(jsonResponse([entityA, entityB])); // loadEntities reload
+    const api = await bootstrap([entityA, entityB]);
+    api.add({[RELATIONSHIPS]: {}});
 
     const user = userEvent.setup();
     // Opened via focus + ArrowDown rather than a click on the trigger: this
@@ -433,33 +365,40 @@ describe('Home FollowTheMoney relationship graph', () => {
     await user.type(screen.getByLabelText('Payment purpose'), 'consulting');
     await user.click(screen.getByRole('button', {name: 'Add relationship'}));
 
-    await vi.waitFor(() => expect(fetchMock.mock.calls.length).toBeGreaterThanOrEqual(16));
-    const [postUrl, postInit] = fetchMock.mock.calls[13];
-    expect(postUrl).toContain('/api/relationships');
-    expect(JSON.parse((postInit as RequestInit).body as string)).toMatchObject({
+    // Saving reloads the graph and the entities.
+    await waitFor(() => {
+      expect(api.calls(GRAPH)).toHaveLength(2);
+      expect(api.calls(ENTITIES)).toHaveLength(2);
+    });
+    expect(api.calls(RELATIONSHIPS)).toHaveLength(1);
+    expect(api.lastBody(RELATIONSHIPS)).toMatchObject({
       schema: 'Payment',
       properties: {amount: ['1250.50'], currency: ['USD'], date: ['2024-03-02'], purpose: ['consulting']},
     });
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('loads the money-flow ledger on demand and charts complete payments only', async () => {
-    const {fetchMock} = await bootstrap([entityA, entityB]);
+    const api = await bootstrap([entityA, entityB]);
+    const ledger = 'GET /api/investigations/inv-1/financial-flows';
     const row = {
       id: 'rel-9', relationship_id: 'rel-9', dateTime: '2024-03-02', from: 'Kestrelwood Holdings Ltd', to: 'Jane Doe',
       from_entity_id: 'ent-1', to_entity_id: 'ent-2', amount: 1250.5, currency: 'USD', statedPurpose: 'consulting',
       transactionNumber: null, evidence: 'p.2 [supports]', evidence_count: 1, supporting_evidence_count: 1,
       status: 'no_claim_dependency', flowType: 'direct',
     };
-    fetchMock.mockResolvedValueOnce(jsonResponse({
-      investigation_id: 'inv-1', transactions: [row],
-      incomplete: [{...row, id: 'rel-10', relationship_id: 'rel-10', amount: null, flowType: 'inferred', problems: ['amount missing']}],
-      currencies: ['USD'], flow_type_rule: 'direct = supporting reviewed evidence', duplicate_rule: 'reviewed duplicates once',
-    }));
+    api.add({
+      [ledger]: {
+        investigation_id: 'inv-1', transactions: [row],
+        incomplete: [{...row, id: 'rel-10', relationship_id: 'rel-10', amount: null, flowType: 'inferred', problems: ['amount missing']}],
+        currencies: ['USD'], flow_type_rule: 'direct = supporting reviewed evidence', duplicate_rule: 'reviewed duplicates once',
+      },
+    });
 
     await userEvent.setup().click(screen.getByRole('button', {name: 'Load money flows'}));
 
     const panel = await screen.findByTestId('money-flows');
-    expect(String(fetchMock.mock.calls[13][0])).toContain('/api/investigations/inv-1/financial-flows');
+    expect(api.calls(ledger)).toHaveLength(1);
     expect(panel).toHaveTextContent('1,250.5 USD');
     expect(panel).toHaveTextContent('p.2 [supports]');
     expect(panel).toHaveTextContent('Not charted (1)');
@@ -468,5 +407,6 @@ describe('Home FollowTheMoney relationship graph', () => {
     const props = sankeySpy.mock.calls.at(-1)?.[0] as {transactions: Array<{id: string; amount: number; flowType: string}>};
     expect(props.transactions).toEqual([expect.objectContaining({id: 'rel-9', amount: 1250.5, currency: 'USD', flowType: 'direct'})]);
     expect(screen.getByRole('button', {name: 'Reload money flows'})).toBeInTheDocument();
+    expect(api.unmatched()).toEqual([]);
   });
 });

@@ -11,16 +11,21 @@
 // loadDossier() is reached by clicking "Open dossier", which needs
 // `entityId` set -- but loadEntities() (see cycle 10's docstring) already
 // auto-fills entityId to the first loaded entity once entities load, so no
-// <select> interaction is needed, same shortcut used there.
+// <select> interaction is needed, same shortcut used there. The stub
+// answers by route (test-support/page-routes.ts lists what opening a case
+// requests; the dossier adds its own three routes), not by call order --
+// ADR-0005, line 15.
 //
-// decidePropertyConflict() calls `window.prompt(...)` synchronously for a
-// rationale before making its POST -- jsdom's window.prompt returns null by
-// default (not an "not implemented" warning like alert/confirm), so it's
-// stubbed here with a fixed return value per test.
-import {cleanup, render, screen} from '@testing-library/react';
+// decidePropertyConflict() opens a confirmation dialog that asks for a
+// rationale before making its POST; each test types one there.
+import {cleanup, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+import {mockApi} from '../test-support/mock-api';
+import type {MockApi} from '../test-support/mock-api';
+import {pageRoutes} from '../test-support/page-routes';
 
 beforeEach(() => {
   if (!window.matchMedia) {
@@ -43,46 +48,6 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-const validSettingsStatus = {
-  environment: 'test',
-  database: 'sqlite',
-  document_storage_dir: '/tmp/docs',
-  limits: {},
-  restore_api_enabled: true,
-  document_extraction: {
-    pdf_ocr_enabled: false,
-    pdf_ocr_language: 'eng',
-    pdf_ocr_dpi: 300,
-    pdf_ocr_min_native_chars: 200,
-    local_entity_suggestions_enabled: false,
-    entity_extraction_owner: 'workbench_local',
-    ocr_runtime: {
-      available: false,
-      requested_languages: [],
-      missing_languages: [],
-      detail: 'not checked',
-    },
-  },
-  access: {
-    remote_api_enabled: false,
-    mode: 'local_only',
-    token_configured: false,
-  },
-  cors_allowed_origins: [],
-  connectors: {},
-};
-
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {'content-type': 'application/json'},
-  });
-}
-
-function okResponse(): Response {
-  return new Response(null, {status: 204});
-}
-
 async function importHome(): Promise<() => ReactElement> {
   vi.resetModules();
   const mod = await import('../app/page');
@@ -92,19 +57,9 @@ async function importHome(): Promise<() => ReactElement> {
 const investigation = {id: 'inv-1', name: 'Kestrelwood filings'};
 const entityA = {id: 'ent-1', caption: 'Kestrelwood Holdings Ltd', schema: 'Company', properties: {}};
 
-function emptyGraph() {
-  return {
-    nodes: [],
-    edges: [],
-    schemas: [],
-    reconciliation: {
-      collapsed_by_default: true,
-      suppressed_duplicate_count: 0,
-      underlying_edge_count: 0,
-      visible_edge_count: 0,
-    },
-  };
-}
+const DOSSIER = 'GET /api/entities/ent-1/dossier';
+const DUPLICATES = 'GET /api/entities/ent-1/duplicate-candidates';
+const RECONCILIATION = 'GET /api/entities/ent-1/post-merge-reconciliation';
 
 function emptyReconciliation() {
   return {
@@ -167,39 +122,13 @@ function propertyConflict(overrides: Record<string, unknown> = {}) {
   };
 }
 
-// The 9 selectInvestigation() cascade calls, in call order -- see
-// test-page-leads.test.tsx's module docstring.
-function cascadeResponses(entities: unknown[]): Response[] {
-  return [
-    jsonResponse([]), // GET connector-findings
-    jsonResponse(entities), // GET entities
-    jsonResponse(emptyGraph()), // GET graph
-    jsonResponse({events: [], verification_counts: {}}), // GET timeline
-    jsonResponse({items: []}), // GET leads/queue
-    jsonResponse([]), // GET claims
-    jsonResponse([]), // GET evidence
-    jsonResponse([]), // GET sources
-    jsonResponse([]), // GET documents
-  ];
-}
-
-async function bootstrapAndOpenDossier(dossier: unknown): Promise<{fetchMock: ReturnType<typeof vi.fn>}> {
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce(jsonResponse(validSettingsStatus)) // GET settings/status
-    .mockResolvedValueOnce(jsonResponse([investigation])) // GET investigations
-    .mockResolvedValueOnce(jsonResponse({providers: ['aleph']})); // GET connectors
-  for (const response of cascadeResponses([entityA])) {
-    fetchMock.mockResolvedValueOnce(response);
-  }
-  fetchMock.mockResolvedValueOnce(jsonResponse({candidates: []})); // AiReasoningPanel
-
-  fetchMock
-    .mockResolvedValueOnce(jsonResponse(dossier)) // GET dossier
-    .mockResolvedValueOnce(jsonResponse([])) // GET duplicate-candidates
-    .mockResolvedValueOnce(jsonResponse(emptyReconciliation())); // GET post-merge-reconciliation
-
-  vi.stubGlobal('fetch', fetchMock);
+async function bootstrapAndOpenDossier(dossier: unknown): Promise<MockApi> {
+  const api = mockApi({
+    ...pageRoutes({investigations: [investigation], entities: [entityA]}),
+    [DOSSIER]: dossier,
+    [DUPLICATES]: [],
+    [RECONCILIATION]: emptyReconciliation(),
+  });
 
   const Home = await importHome();
   render(<Home />);
@@ -210,12 +139,12 @@ async function bootstrapAndOpenDossier(dossier: unknown): Promise<{fetchMock: Re
   await userEvent.setup().click(screen.getByRole('button', {name: 'Open dossier'}));
   await screen.findByText('Kestrelwood Holdings Ltd dossier');
 
-  return {fetchMock};
+  return api;
 }
 
 describe('Home entity dossier: identity history & property conflicts', () => {
   it("renders the dossier's identity/merge history", async () => {
-    await bootstrapAndOpenDossier(dossierFixture());
+    const api = await bootstrapAndOpenDossier(dossierFixture());
 
     expect(screen.getByText('Identity / merge history')).toBeInTheDocument();
     expect(
@@ -224,29 +153,33 @@ describe('Home entity dossier: identity history & property conflicts', () => {
     expect(screen.getByText('Alias: Kestrelwood Holdings LLC', {exact: false})).toBeInTheDocument();
     expect(screen.getByText('same: Kestrelwood Holdings LLC', {exact: false})).toBeInTheDocument();
     expect(screen.getByText('Merge audit: ent-2 → ent-1', {exact: false})).toBeInTheDocument();
+
+    // Opening the dossier asks for it, its duplicate candidates and its
+    // post-merge reconciliation, once each.
+    expect(api.calls(DOSSIER)).toHaveLength(1);
+    expect(api.calls(DUPLICATES)).toHaveLength(1);
+    expect(api.calls(RECONCILIATION)).toHaveLength(1);
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('records a property-conflict decision with a rationale entered in the confirmation dialog', async () => {
-    const {fetchMock} = await bootstrapAndOpenDossier(dossierFixture({property_conflicts: [propertyConflict()]}));
+    const api = await bootstrapAndOpenDossier(dossierFixture({property_conflicts: [propertyConflict()]}));
+    const decision = 'POST /api/entities/ent-1/property-conflicts/incorporation_date/decisions';
 
     expect(screen.queryByText('No unresolved multi-value property conflicts detected.')).not.toBeInTheDocument();
 
-    fetchMock
-      .mockResolvedValueOnce(okResponse()) // POST decision
-      .mockResolvedValueOnce(
-        jsonResponse(
-          dossierFixture({
-            property_conflicts: [
-              propertyConflict({
-                status: 'resolved',
-                latest_decision: {id: 'pcd-1', decision: 'temporal_change', values: ['2015-03-01', '2016-07-14'], rationale: 'Confirmed via updated filing.', created_at: '2026-09-23T00:00:00Z'},
-              }),
-            ],
+    api.add({
+      [decision]: {status: 204},
+      // The dossier the reload finds carries the resolved conflict.
+      [DOSSIER]: dossierFixture({
+        property_conflicts: [
+          propertyConflict({
+            status: 'resolved',
+            latest_decision: {id: 'pcd-1', decision: 'temporal_change', values: ['2015-03-01', '2016-07-14'], rationale: 'Confirmed via updated filing.', created_at: '2026-09-23T00:00:00Z'},
           }),
-        ),
-      ) // GET dossier reload
-      .mockResolvedValueOnce(jsonResponse([])) // GET duplicate-candidates reload
-      .mockResolvedValueOnce(jsonResponse(emptyReconciliation())); // GET post-merge-reconciliation reload
+        ],
+      }),
+    });
 
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', {name: 'Temporal change'}));
@@ -257,32 +190,27 @@ describe('Home entity dossier: identity history & property conflicts', () => {
 
     await screen.findByText('Reporter rationale: Confirmed via updated filing.', {exact: false});
 
-    const [decisionUrl, decisionInit] = fetchMock.mock.calls[16];
-    expect(decisionUrl).toContain('/api/entities/ent-1/property-conflicts/incorporation_date/decisions');
-    expect((decisionInit as RequestInit).method).toBe('POST');
-    expect(JSON.parse((decisionInit as RequestInit).body as string)).toMatchObject({
+    expect(api.calls(decision)).toHaveLength(1);
+    expect(api.lastBody(decision)).toMatchObject({
       decision: 'temporal_change',
       values: ['2015-03-01', '2016-07-14'],
       rationale: 'Confirmed via updated filing.',
     });
 
-    const [dossierReloadUrl] = fetchMock.mock.calls[17];
-    const [duplicatesUrl] = fetchMock.mock.calls[18];
-    const [reconciliationUrl] = fetchMock.mock.calls[19];
-    expect(dossierReloadUrl).toContain('/api/entities/ent-1/dossier');
-    expect(duplicatesUrl).toContain('/api/entities/ent-1/duplicate-candidates');
-    expect(reconciliationUrl).toContain('/api/entities/ent-1/post-merge-reconciliation');
+    // The decision reloads the whole dossier: all three of its routes again.
+    expect(api.calls(DOSSIER)).toHaveLength(2);
+    expect(api.calls(DUPLICATES)).toHaveLength(2);
+    expect(api.calls(RECONCILIATION)).toHaveLength(2);
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('URL-encodes the property name and sends preferred_value for a "Prefer <value>" decision', async () => {
     const spacedConflict = propertyConflict({prop: 'registered address', values: [{value: '1 Main St', canonical: true, support_count: 1, conflict_count: 1, canonical_statements: [], external_assessments: []}, {value: '2 Main St', canonical: false, support_count: 1, conflict_count: 1, canonical_statements: [], external_assessments: []}]});
-    const {fetchMock} = await bootstrapAndOpenDossier(dossierFixture({property_conflicts: [spacedConflict]}));
+    const api = await bootstrapAndOpenDossier(dossierFixture({property_conflicts: [spacedConflict]}));
+    // The route the stub matches is the encoded path the page must request.
+    const decision = 'POST /api/entities/ent-1/property-conflicts/registered%20address/decisions';
 
-    fetchMock
-      .mockResolvedValueOnce(okResponse()) // POST decision
-      .mockResolvedValueOnce(jsonResponse(dossierFixture({property_conflicts: [spacedConflict]}))) // GET dossier reload
-      .mockResolvedValueOnce(jsonResponse([])) // GET duplicate-candidates reload
-      .mockResolvedValueOnce(jsonResponse(emptyReconciliation())); // GET post-merge-reconciliation reload
+    api.add({[decision]: {status: 204}});
 
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', {name: 'Prefer 1 Main St'}));
@@ -291,14 +219,14 @@ describe('Home entity dossier: identity history & property conflicts', () => {
     await user.type(rationaleInput, 'Confirmed by the latest filing.');
     await user.click(screen.getByRole('button', {name: 'Confirm'}));
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    const [decisionUrl, decisionInit] = fetchMock.mock.calls[16];
-    expect(decisionUrl).toContain('/api/entities/ent-1/property-conflicts/registered%20address/decisions');
-    expect(JSON.parse((decisionInit as RequestInit).body as string)).toMatchObject({
+    await waitFor(() => expect(api.calls(decision)).toHaveLength(1));
+    expect(api.lastUrl(decision).pathname).toBe('/api/entities/ent-1/property-conflicts/registered%20address/decisions');
+    expect(api.lastBody(decision)).toMatchObject({
       decision: 'preferred',
       preferred_value: '1 Main St',
       values: ['1 Main St', '2 Main St'],
     });
+    await waitFor(() => expect(api.calls(DOSSIER)).toHaveLength(2));
+    expect(api.unmatched()).toEqual([]);
   });
 });

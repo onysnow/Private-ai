@@ -4,20 +4,24 @@
 // 1-2), this one needs `inv` set, so an investigation must actually be
 // selected -- there is no way to reach createLead/setLeadStatus/convertLead
 // otherwise (each starts with `if(!inv...)return`). loadAppBootstrap()
-// auto-selects investigations[0] when the list is non-empty, which fires
-// selectInvestigation()'s full 9-endpoint Promise.all cascade (findings,
-// entities, graph, timeline, leads/queue, claims, evidence, sources,
-// documents, in that exact call order -- each loader is an async function
-// that runs synchronously up to its own fetch(), and Promise.all invokes
-// the array left-to-right, so the mocked fetch sequence below is positional,
-// not matched by URL). Every cascade endpoint except leads/queue is given an
-// empty-but-valid body since api.array()/api.parsed() never inspects items
-// in an empty array; only the lead fixture has to satisfy isLeadItem in
-// full.
+// auto-selects investigations[0] when the list is non-empty, which starts
+// every per-investigation load at once (findings, entities, graph, leads
+// queue, claims, evidence, sources, documents, plus the timeline, sources
+// and AI reasoning queue the panels load for themselves). The stub answers
+// by route, not by call order (ADR-0005, line 15; test-support/page-routes.ts
+// lists the routes), so a test says what the server holds and never in what
+// order the page asks. Every per-investigation route except the leads queue
+// answers with an empty-but-valid body, since api.array()/api.parsed() never
+// inspect items in an empty array; only the lead fixture has to satisfy
+// isLeadItem in full.
 import {cleanup, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+import {mockApi} from '../test-support/mock-api';
+import type {MockApi} from '../test-support/mock-api';
+import {pageRoutes} from '../test-support/page-routes';
 
 beforeEach(() => {
   if (!window.matchMedia) {
@@ -39,42 +43,6 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const validSettingsStatus = {
-  environment: 'test',
-  database: 'sqlite',
-  document_storage_dir: '/tmp/docs',
-  limits: {},
-  restore_api_enabled: true,
-  document_extraction: {
-    pdf_ocr_enabled: false,
-    pdf_ocr_language: 'eng',
-    pdf_ocr_dpi: 300,
-    pdf_ocr_min_native_chars: 200,
-    local_entity_suggestions_enabled: false,
-    entity_extraction_owner: 'workbench_local',
-    ocr_runtime: {
-      available: false,
-      requested_languages: [],
-      missing_languages: [],
-      detail: 'not checked',
-    },
-  },
-  access: {
-    remote_api_enabled: false,
-    mode: 'local_only',
-    token_configured: false,
-  },
-  cors_allowed_origins: [],
-  connectors: {},
-};
-
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {'content-type': 'application/json'},
-  });
-}
-
 async function importHome(): Promise<() => ReactElement> {
   vi.resetModules();
   const mod = await import('../app/page');
@@ -82,18 +50,7 @@ async function importHome(): Promise<() => ReactElement> {
 }
 
 const investigation = {id: 'inv-1', name: 'Kestrelwood filings'};
-
-const emptyGraph = {
-  nodes: [],
-  edges: [],
-  schemas: [],
-  reconciliation: {
-    collapsed_by_default: true,
-    suppressed_duplicate_count: 0,
-    underlying_edge_count: 0,
-    visible_edge_count: 0,
-  },
-};
+const LEADS_QUEUE = 'GET /api/investigations/inv-1/leads/queue';
 
 function leadFixture(overrides: Record<string, unknown> = {}) {
   return {
@@ -119,48 +76,18 @@ function leadFixture(overrides: Record<string, unknown> = {}) {
   };
 }
 
-// The 9 selectInvestigation() cascade calls, in call order, each an
-// empty-but-shape-valid body -- see module docstring.
-function cascadeResponses(leads: unknown[] = []) {
-  return [
-    jsonResponse([]), // GET connector-findings
-    jsonResponse([]), // GET entities (parseEntityList expects the raw array, not {entities:[]})
-    jsonResponse(emptyGraph), // GET graph
-    jsonResponse({events: [], verification_counts: {}}), // GET timeline
-    jsonResponse({items: leads}), // GET leads/queue
-    jsonResponse([]), // GET claims
-    jsonResponse([]), // GET evidence
-    jsonResponse([]), // GET sources
-    jsonResponse([]), // GET documents
-  ];
-}
-
-async function bootstrapWithOneLead(): Promise<{
-  fetchMock: ReturnType<typeof vi.fn>;
-}> {
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce(jsonResponse(validSettingsStatus)) // GET settings/status
-    .mockResolvedValueOnce(jsonResponse([investigation])) // GET investigations
-    .mockResolvedValueOnce(jsonResponse({providers: ['aleph']})); // GET connectors
-  for (const response of cascadeResponses([leadFixture()])) {
-    fetchMock.mockResolvedValueOnce(response);
-  }
-  // AiReasoningPanel (issue #36 UI) has its own effect keyed on investigationId
-  // and fires its own fetch once `inv` becomes non-empty, after the 9-call
-  // cascade above -- separate from selectInvestigation's Promise.all.
-  fetchMock.mockResolvedValueOnce(jsonResponse({candidates: []}));
-  vi.stubGlobal('fetch', fetchMock);
+async function bootstrapWithOneLead(): Promise<MockApi> {
+  const api = mockApi(pageRoutes({investigations: [investigation], leads: [leadFixture()]}));
 
   const Home = await importHome();
   render(<Home />);
   await screen.findByText('Who approved this contract?');
-  return {fetchMock};
+  return api;
 }
 
 describe('Home questions & reporting leads', () => {
   it('renders a queued lead with its triage state', async () => {
-    await bootstrapWithOneLead();
+    const api = await bootstrapWithOneLead();
 
     expect(screen.getByText('Who approved this contract?')).toBeInTheDocument();
     expect(screen.getByText('high')).toBeInTheDocument(); // priority badge
@@ -172,17 +99,21 @@ describe('Home questions & reporting leads', () => {
     expect(screen.getByText('Owner: A. Reporter')).toBeInTheDocument();
     // the card sits in its "Unreviewed" kanban column
     expect(screen.getByRole('combobox', {name: 'Move "Who approved this contract?"'})).toBeInTheDocument();
+    // The queue was asked for with resolved leads included, and nothing the
+    // page asked for went unanswered.
+    expect(api.lastUrl(LEADS_QUEUE).searchParams.get('unresolved_only')).toBe('false');
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('creates a lead (POST then PATCH priority/owner) and reloads the queue', async () => {
-    const {fetchMock} = await bootstrapWithOneLead();
+    const api = await bootstrapWithOneLead();
 
-    fetchMock
-      .mockResolvedValueOnce(jsonResponse({id: 'lead-2'})) // POST /api/leads
-      .mockResolvedValueOnce(jsonResponse({})) // PATCH /api/leads/lead-2
-      .mockResolvedValueOnce(
-        jsonResponse({items: [leadFixture(), leadFixture({id: 'lead-2', title: 'Second question', status: 'unreviewed', priority: 'urgent', owner: ''})]}),
-      ); // GET leads/queue reload
+    api.add({
+      'POST /api/leads': {id: 'lead-2'},
+      'PATCH /api/leads/lead-2': {},
+      // The queue the reload finds: both leads.
+      [LEADS_QUEUE]: {items: [leadFixture(), leadFixture({id: 'lead-2', title: 'Second question', status: 'unreviewed', priority: 'urgent', owner: ''})]},
+    });
 
     const user = userEvent.setup();
     await user.type(
@@ -195,28 +126,28 @@ describe('Home questions & reporting leads', () => {
 
     await screen.findByText('Second question');
 
-    expect(fetchMock).toHaveBeenCalledTimes(16);
-    const [postUrl, postInit] = fetchMock.mock.calls[13];
-    expect(postUrl).toContain('/api/leads');
-    expect(JSON.parse((postInit as RequestInit).body as string)).toMatchObject({
+    expect(api.calls('POST /api/leads')).toHaveLength(1);
+    expect(api.lastBody('POST /api/leads')).toMatchObject({
       investigation_id: 'inv-1',
       title: 'Second question',
       status: 'unreviewed',
     });
-    const [patchUrl, patchInit] = fetchMock.mock.calls[14];
-    expect(patchUrl).toContain('/api/leads/lead-2');
-    expect((patchInit as RequestInit).method).toBe('PATCH');
-    expect(JSON.parse((patchInit as RequestInit).body as string)).toMatchObject({priority: 'urgent'});
+    // The PATCH can only name lead-2 once the POST has answered with its id.
+    expect(api.calls('PATCH /api/leads/lead-2')).toHaveLength(1);
+    expect(api.lastBody('PATCH /api/leads/lead-2')).toMatchObject({priority: 'urgent'});
+    expect(api.calls(LEADS_QUEUE)).toHaveLength(2);
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('does not create a lead with a blank title', async () => {
-    const {fetchMock} = await bootstrapWithOneLead();
-    const callsBefore = fetchMock.mock.calls.length;
+    const api = await bootstrapWithOneLead();
+    const callsBefore = api.fetch.mock.calls.length;
 
     await userEvent.setup().click(screen.getByRole('button', {name: 'Add lead'}));
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(fetchMock).toHaveBeenCalledTimes(callsBefore);
+    expect(api.calls('POST /api/leads')).toHaveLength(0);
+    expect(api.fetch.mock.calls.length).toBe(callsBefore);
   });
 
   // The kanban status-select/drag-to-column interaction itself is covered at
@@ -231,18 +162,21 @@ describe('Home questions & reporting leads', () => {
   // is unchanged pre-existing code, not something this refactor touched.
 
   it('converts a lead to a claim and reloads both leads and claims', async () => {
-    const {fetchMock} = await bootstrapWithOneLead();
+    const api = await bootstrapWithOneLead();
 
-    fetchMock
-      .mockResolvedValueOnce(jsonResponse({claim_id: 'claim-1'})) // POST convert
-      .mockResolvedValueOnce(jsonResponse({items: [leadFixture({status: 'converted'})]})) // leads reload
-      .mockResolvedValueOnce(jsonResponse([])); // claims reload
+    api.add({
+      'POST /api/leads/lead-1/convert': {claim_id: 'claim-1'},
+      [LEADS_QUEUE]: {items: [leadFixture({status: 'converted'})]},
+    });
 
     await userEvent.setup().click(screen.getByRole('button', {name: 'Make claim'}));
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(16));
+    await waitFor(() => {
+      expect(api.calls(LEADS_QUEUE)).toHaveLength(2);
+      expect(api.calls('GET /api/investigations/inv-1/claims')).toHaveLength(2);
+    });
 
-    const [convertUrl, convertInit] = fetchMock.mock.calls[13];
-    expect(convertUrl).toContain('/api/leads/lead-1/convert');
-    expect(JSON.parse((convertInit as RequestInit).body as string)).toMatchObject({kind: 'claim'});
+    expect(api.calls('POST /api/leads/lead-1/convert')).toHaveLength(1);
+    expect(api.lastBody('POST /api/leads/lead-1/convert')).toMatchObject({kind: 'claim'});
+    expect(api.unmatched()).toEqual([]);
   });
 });

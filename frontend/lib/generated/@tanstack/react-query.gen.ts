@@ -385,6 +385,7 @@ import type {
   CreateSourceEndpointResponse,
   CreateTimelineEventEndpointData,
   CreateTimelineEventEndpointError,
+  CreateTimelineEventEndpointResponse,
   CreateWriteupEndpointData,
   CreateWriteupEndpointError,
   DecideCrossProviderClusterData,
@@ -432,6 +433,7 @@ import type {
   ExternalRelationshipCandidatesError,
   FindExtractionLineageEndpointData,
   FindExtractionLineageEndpointError,
+  FindExtractionLineageEndpointResponse,
   FindingCandidatesData,
   FindingCandidatesError,
   GetAiAnalysisCandidateEndpointData,
@@ -448,6 +450,7 @@ import type {
   GetExtractionCandidateExplanationError,
   GetExtractionCandidateLineageData,
   GetExtractionCandidateLineageError,
+  GetExtractionCandidateLineageResponse,
   GetExtractionEntityMatchesData,
   GetExtractionEntityMatchesError,
   GetInvestigationFinancialFlowsData,
@@ -456,6 +459,7 @@ import type {
   GetInvestigationGraphError,
   GetInvestigationTimelineData,
   GetInvestigationTimelineError,
+  GetInvestigationTimelineResponse,
   GetJobEndpointData,
   GetJobEndpointError,
   GetLeadData,
@@ -469,6 +473,7 @@ import type {
   GetOrphanStoragePreviewData,
   GetRecordProvenanceTraceData,
   GetRecordProvenanceTraceError,
+  GetRecordProvenanceTraceResponse,
   GetSecurityAlertsData,
   GetSecurityAlertsError,
   GetSecurityAuditData,
@@ -537,6 +542,7 @@ import type {
   ListEntityRelationshipsError,
   ListEntityStatementHistoryData,
   ListEntityStatementHistoryError,
+  ListEntityStatementHistoryResponse,
   ListEntityStatementsData,
   ListEntityStatementsError,
   ListExternalRelationshipPromotionsData,
@@ -619,6 +625,7 @@ import type {
   SaveConnectorCredentialError,
   SearchWorkbenchData,
   SearchWorkbenchError,
+  SearchWorkbenchResponse,
   SeedDemoData,
   SettingsStatusData,
   SyncOpenalephDocumentData,
@@ -4272,9 +4279,9 @@ export const listEntityStatementHistoryOptions = (
   options: Options<ListEntityStatementHistoryData>,
 ) =>
   queryOptions<
-    unknown,
+    ListEntityStatementHistoryResponse,
     ListEntityStatementHistoryError,
-    unknown,
+    ListEntityStatementHistoryResponse,
     ReturnType<typeof listEntityStatementHistoryQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -4440,9 +4447,9 @@ export const getExtractionCandidateLineageOptions = (
   options: Options<GetExtractionCandidateLineageData>,
 ) =>
   queryOptions<
-    unknown,
+    GetExtractionCandidateLineageResponse,
     GetExtractionCandidateLineageError,
-    unknown,
+    GetExtractionCandidateLineageResponse,
     ReturnType<typeof getExtractionCandidateLineageQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -5933,9 +5940,9 @@ export const getInvestigationTimelineOptions = (
   options: Options<GetInvestigationTimelineData>,
 ) =>
   queryOptions<
-    unknown,
+    GetInvestigationTimelineResponse,
     GetInvestigationTimelineError,
-    unknown,
+    GetInvestigationTimelineResponse,
     ReturnType<typeof getInvestigationTimelineQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -5962,9 +5969,9 @@ export const getInvestigationTimelineInfiniteOptions = (
   options: Options<GetInvestigationTimelineData>,
 ) => {
   const opts = infiniteQueryOptions<
-    unknown,
+    GetInvestigationTimelineResponse,
     GetInvestigationTimelineError,
-    InfiniteData<unknown>,
+    InfiniteData<GetInvestigationTimelineResponse>,
     QueryKey<Options<GetInvestigationTimelineData>>,
     | number
     | Pick<
@@ -6399,9 +6406,9 @@ export const findExtractionLineageEndpointOptions = (
   options: Options<FindExtractionLineageEndpointData>,
 ) =>
   queryOptions<
-    unknown,
+    FindExtractionLineageEndpointResponse,
     FindExtractionLineageEndpointError,
-    unknown,
+    FindExtractionLineageEndpointResponse,
     ReturnType<typeof findExtractionLineageEndpointQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -6427,9 +6434,9 @@ export const getRecordProvenanceTraceOptions = (
   options: Options<GetRecordProvenanceTraceData>,
 ) =>
   queryOptions<
-    unknown,
+    GetRecordProvenanceTraceResponse,
     GetRecordProvenanceTraceError,
-    unknown,
+    GetRecordProvenanceTraceResponse,
     ReturnType<typeof getRecordProvenanceTraceQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -6673,9 +6680,9 @@ export const searchWorkbenchQueryKey = (
  */
 export const searchWorkbenchOptions = (options: Options<SearchWorkbenchData>) =>
   queryOptions<
-    unknown,
+    SearchWorkbenchResponse,
     SearchWorkbenchError,
-    unknown,
+    SearchWorkbenchResponse,
     ReturnType<typeof searchWorkbenchQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -7275,12 +7282,12 @@ export const promoteStatementAssessmentMutation = (
 export const createTimelineEventEndpointMutation = (
   options?: Partial<Options<CreateTimelineEventEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  CreateTimelineEventEndpointResponse,
   CreateTimelineEventEndpointError,
   Options<CreateTimelineEventEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    CreateTimelineEventEndpointResponse,
     CreateTimelineEventEndpointError,
     Options<CreateTimelineEventEndpointData>
   > = {

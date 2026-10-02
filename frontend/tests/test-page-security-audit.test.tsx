@@ -4,14 +4,20 @@
 // (loadSecurityAudit, loadOlderSecurityAudit, previewAuditRetention,
 // applyAuditRetention). None of these four handlers depend on `inv`, so --
 // like the API-access and investigation-search flows (cycles 1-2) -- the
-// investigations list is kept empty and no selectInvestigation() cascade is
+// investigations list is kept empty and no per-investigation loads are
 // needed. What IS needed that those cycles didn't: the panel lives inside a
 // native <details>/<summary>, closed by default, so each test clicks the
-// summary text to open it before querying for anything inside.
+// summary text to open it before querying for anything inside. The stub
+// answers by route (ADR-0005, line 15): the audit log route answers by the
+// offset asked for, the way the API pages.
 import {cleanup, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+import {mockApi} from '../test-support/mock-api';
+import type {MockApi, RouteCall} from '../test-support/mock-api';
+import {pageRoutes} from '../test-support/page-routes';
 
 beforeEach(() => {
   if (!window.matchMedia) {
@@ -33,47 +39,16 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const validSettingsStatus = {
-  environment: 'test',
-  database: 'sqlite',
-  document_storage_dir: '/tmp/docs',
-  limits: {},
-  restore_api_enabled: true,
-  document_extraction: {
-    pdf_ocr_enabled: false,
-    pdf_ocr_language: 'eng',
-    pdf_ocr_dpi: 300,
-    pdf_ocr_min_native_chars: 200,
-    local_entity_suggestions_enabled: false,
-    entity_extraction_owner: 'workbench_local',
-    ocr_runtime: {
-      available: false,
-      requested_languages: [],
-      missing_languages: [],
-      detail: 'not checked',
-    },
-  },
-  access: {
-    remote_api_enabled: false,
-    mode: 'local_only',
-    token_configured: false,
-  },
-  cors_allowed_origins: [],
-  connectors: {},
-};
-
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {'content-type': 'application/json'},
-  });
-}
-
 async function importHome(): Promise<() => ReactElement> {
   vi.resetModules();
   const mod = await import('../app/page');
   return mod.default;
 }
+
+const AUDIT = 'GET /api/settings/security/audit';
+const SUMMARY = 'GET /api/settings/security/audit/summary';
+const RETENTION_PREVIEW = 'GET /api/settings/security/audit/retention-preview';
+const RETENTION = 'POST /api/settings/security/audit/retention';
 
 function auditRecord(overrides: Record<string, unknown> = {}) {
   return {
@@ -128,15 +103,9 @@ function retentionPreview(overrides: Record<string, unknown> = {}) {
   };
 }
 
-async function bootstrapAndOpenSecurityPanel(): Promise<{
-  fetchMock: ReturnType<typeof vi.fn>;
-}> {
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce(jsonResponse(validSettingsStatus)) // GET /api/settings/status
-    .mockResolvedValueOnce(jsonResponse([])) // GET /api/investigations
-    .mockResolvedValueOnce(jsonResponse({providers: ['aleph']})); // GET /api/connectors
-  vi.stubGlobal('fetch', fetchMock);
+async function bootstrapAndOpenSecurityPanel(): Promise<MockApi> {
+  // An empty investigation list: nothing beyond the three bootstrap routes.
+  const api = mockApi(pageRoutes());
 
   const Home = await importHome();
   render(<Home />);
@@ -145,16 +114,19 @@ async function bootstrapAndOpenSecurityPanel(): Promise<{
   await userEvent.setup().click(screen.getByText('Local security/settings status'));
   await screen.findByText('Load recent security events');
 
-  return {fetchMock};
+  return api;
+}
+
+/** The limit and offset an audit-log request asked for. */
+function page(call: {url: URL}): {limit: string | null; offset: string | null} {
+  return {limit: call.url.searchParams.get('limit'), offset: call.url.searchParams.get('offset')};
 }
 
 describe('Home security audit metadata', () => {
   it('loads recent security events and their summary', async () => {
-    const {fetchMock} = await bootstrapAndOpenSecurityPanel();
+    const api = await bootstrapAndOpenSecurityPanel();
 
-    fetchMock
-      .mockResolvedValueOnce(jsonResponse(auditView())) // GET .../security/audit
-      .mockResolvedValueOnce(jsonResponse(auditSummary)); // GET .../security/audit/summary
+    api.add({[AUDIT]: auditView(), [SUMMARY]: auditSummary});
 
     await userEvent.setup().click(screen.getByRole('button', {name: 'Load recent security events'}));
 
@@ -173,32 +145,28 @@ describe('Home security audit metadata', () => {
     expect(screen.getByText('Showing 1 of 150 matching event(s).')).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Load 100 older events'})).toBeInTheDocument();
 
-    const [auditUrl] = fetchMock.mock.calls[3];
-    const [summaryUrl] = fetchMock.mock.calls[4];
-    expect(auditUrl).toContain('/api/settings/security/audit?limit=100&offset=0');
-    expect(summaryUrl).toContain('/api/settings/security/audit/summary');
+    expect(api.calls(AUDIT).map(page)).toEqual([{limit: '100', offset: '0'}]);
+    expect(api.calls(SUMMARY)).toHaveLength(1);
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('loads older security events and appends them to the list', async () => {
-    const {fetchMock} = await bootstrapAndOpenSecurityPanel();
+    const api = await bootstrapAndOpenSecurityPanel();
 
-    fetchMock
-      .mockResolvedValueOnce(jsonResponse(auditView())) // initial load
-      .mockResolvedValueOnce(jsonResponse(auditSummary));
+    // The log answers by page: the first page, then the older one.
+    const olderPage = auditView({
+      records: [auditRecord({request_id: 'req-2', event: 'auth_rate_limited', local_request: false})],
+      returned: 1,
+      has_more: false,
+      next_offset: null,
+    });
+    api.add({
+      [AUDIT]: ({url}: RouteCall) => (url.searchParams.get('offset') === '100' ? olderPage : auditView()),
+      [SUMMARY]: auditSummary,
+    });
 
     await userEvent.setup().click(screen.getByRole('button', {name: 'Load recent security events'}));
     await screen.findByText('Showing 1 of 150 matching event(s).');
-
-    fetchMock.mockResolvedValueOnce(
-      jsonResponse(
-        auditView({
-          records: [auditRecord({request_id: 'req-2', event: 'auth_rate_limited', local_request: false})],
-          returned: 1,
-          has_more: false,
-          next_offset: null,
-        }),
-      ),
-    ); // GET older page
 
     await userEvent.setup().click(screen.getByRole('button', {name: 'Load 100 older events'}));
 
@@ -217,14 +185,14 @@ describe('Home security audit metadata', () => {
     // should be gone.
     expect(screen.queryByRole('button', {name: 'Load 100 older events'})).not.toBeInTheDocument();
 
-    const [olderUrl] = fetchMock.mock.calls[5];
-    expect(olderUrl).toContain('/api/settings/security/audit?limit=100&offset=100');
+    expect(api.calls(AUDIT).map(page)).toEqual([{limit: '100', offset: '0'}, {limit: '100', offset: '100'}]);
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('previews retention, requires the exact confirmation phrase, and applies it', async () => {
-    const {fetchMock} = await bootstrapAndOpenSecurityPanel();
+    const api = await bootstrapAndOpenSecurityPanel();
 
-    fetchMock.mockResolvedValueOnce(jsonResponse(retentionPreview())); // GET retention-preview
+    api.add({[RETENTION_PREVIEW]: retentionPreview()});
 
     await userEvent.setup().click(screen.getByRole('button', {name: 'Preview 90-day retention'}));
 
@@ -232,6 +200,9 @@ describe('Home security audit metadata', () => {
       (_, node) => node?.textContent === '200 line(s) · 195 valid · 5 malformed retained · 50 would remove',
     );
     expect(screen.getByText('Preview: 50 old/excess audit record(s) would be removed; malformed lines are retained.')).toBeInTheDocument();
+    expect(api.calls(RETENTION_PREVIEW)).toHaveLength(1);
+    expect(api.lastUrl(RETENTION_PREVIEW).searchParams.get('keep_days')).toBe('90');
+    expect(api.lastUrl(RETENTION_PREVIEW).searchParams.get('max_records')).toBe('5000');
 
     const pruneButton = screen.getByRole('button', {name: 'Prune old audit records'});
     expect(pruneButton).toBeDisabled();
@@ -240,15 +211,18 @@ describe('Home security audit metadata', () => {
     const user = userEvent.setup();
     await user.type(confirmationInput, 'prune security audit');
     expect(pruneButton).toBeDisabled();
+    expect(api.calls(RETENTION)).toHaveLength(0);
 
     await user.clear(confirmationInput);
     await user.type(confirmationInput, 'PRUNE SECURITY AUDIT');
     expect(pruneButton).not.toBeDisabled();
 
-    fetchMock
-      .mockResolvedValueOnce(jsonResponse({...retentionPreview(), removed: 50, applied: true})) // POST retention
-      .mockResolvedValueOnce(jsonResponse(auditView({records: [], returned: 0, total_matched: 100, has_more: false, next_offset: null}))) // loadSecurityAudit() reload
-      .mockResolvedValueOnce(jsonResponse({...auditSummary, total_records: 100, local_records: 90, remote_records: 10}));
+    // After the prune the log is shorter, and loadSecurityAudit() reloads it.
+    api.add({
+      [RETENTION]: {...retentionPreview(), removed: 50, applied: true},
+      [AUDIT]: auditView({records: [], returned: 0, total_matched: 100, has_more: false, next_offset: null}),
+      [SUMMARY]: {...auditSummary, total_records: 100, local_records: 90, remote_records: 10},
+    });
 
     await user.click(pruneButton);
 
@@ -260,10 +234,8 @@ describe('Home security audit metadata', () => {
     // message.
     await screen.findByText('Loaded 0 of 100 security event(s).');
 
-    const [pruneUrl, pruneInit] = fetchMock.mock.calls[4];
-    expect(pruneUrl).toContain('/api/settings/security/audit/retention');
-    expect((pruneInit as RequestInit).method).toBe('POST');
-    expect(JSON.parse((pruneInit as RequestInit).body as string)).toMatchObject({
+    expect(api.calls(RETENTION)).toHaveLength(1);
+    expect(api.lastBody(RETENTION)).toMatchObject({
       keep_days: 90,
       max_records: 5000,
       confirmation: 'PRUNE SECURITY AUDIT',
@@ -274,5 +246,8 @@ describe('Home security audit metadata', () => {
     expect(
       screen.getByText((_, node) => node?.textContent === '100 valid event(s) · 90 local · 10 remote · 0 malformed retained'),
     ).toBeInTheDocument();
+    expect(api.calls(AUDIT)).toHaveLength(1);
+    expect(api.calls(SUMMARY)).toHaveLength(1);
+    expect(api.unmatched()).toEqual([]);
   });
 });

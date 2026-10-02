@@ -311,6 +311,68 @@
         "title": "CanonicalResolutionRequest",
         "type": "object"
       },
+      "CanonicalStatementOut": {
+        "properties": {
+          "dataset": {
+            "title": "Dataset",
+            "type": "string"
+          },
+          "first_seen": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Seen"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "last_seen": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Seen"
+          },
+          "origin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Origin"
+          },
+          "original_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Value"
+          }
+        },
+        "required": [
+          "id",
+          "dataset"
+        ],
+        "title": "CanonicalStatementOut",
+        "type": "object"
+      },
       "CaseSynthesisRequest": {
         "properties": {
           "include_external_leads": {
@@ -504,6 +566,60 @@
           "text"
         ],
         "title": "ClaimCreate",
+        "type": "object"
+      },
+      "ClaimDependencyOut": {
+        "properties": {
+          "claim_id": {
+            "title": "Claim Id",
+            "type": "string"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "evidence_id": {
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "needs_review": {
+            "title": "Needs Review",
+            "type": "boolean"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "stance": {
+            "title": "Stance",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_id",
+          "evidence_id",
+          "text",
+          "status",
+          "confidence",
+          "stance",
+          "needs_review"
+        ],
+        "title": "ClaimDependencyOut",
         "type": "object"
       },
       "ClaimEvidenceLinkCreate": {
@@ -1163,6 +1279,102 @@
         "title": "EvidencePoolRow",
         "type": "object"
       },
+      "EvidenceSourceOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "source_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Type"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "id",
+          "title"
+        ],
+        "title": "EvidenceSourceOut",
+        "type": "object"
+      },
+      "EvidenceWithSourceOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "locator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locator"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "quote": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quote"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EvidenceSourceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "EvidenceWithSourceOut",
+        "type": "object"
+      },
       "ExplainIn": {
         "properties": {
           "analyze": {
@@ -1193,6 +1405,150 @@
           "sql"
         ],
         "title": "ExplainIn",
+        "type": "object"
+      },
+      "ExternalAssessmentOut": {
+        "properties": {
+          "assessment_id": {
+            "title": "Assessment Id",
+            "type": "string"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "dataset": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dataset"
+          },
+          "finding_caption": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finding Caption"
+          },
+          "finding_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finding Id"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "promoted": {
+            "title": "Promoted",
+            "type": "boolean"
+          },
+          "promoted_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promoted At"
+          },
+          "promotion_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promotion Id"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "provider_record_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Record Id"
+          },
+          "reviewer_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewer Note"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "assessment_id",
+          "status",
+          "promoted"
+        ],
+        "title": "ExternalAssessmentOut",
         "type": "object"
       },
       "ExternalRelationshipReviewRequest": {
@@ -1378,6 +1734,72 @@
           "decision"
         ],
         "title": "ExtractionCandidateReviewRequest",
+        "type": "object"
+      },
+      "ExtractionLineageLookupOut": {
+        "properties": {
+          "found": {
+            "title": "Found",
+            "type": "boolean"
+          },
+          "lineage": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExtractionLineageOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "found"
+        ],
+        "title": "ExtractionLineageLookupOut",
+        "type": "object"
+      },
+      "ExtractionLineageOut": {
+        "description": "The read-only trail document → chunk → proposal → review → accepted record.",
+        "properties": {
+          "candidate": {
+            "$ref": "#/components/schemas/LineageCandidateOut"
+          },
+          "chunk": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LineageChunkOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "document": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LineageDocumentOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LineageSourceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "candidate"
+        ],
+        "title": "ExtractionLineageOut",
         "type": "object"
       },
       "FindingReviewRequest": {
@@ -1989,6 +2411,279 @@
         "title": "LeadUpdate",
         "type": "object"
       },
+      "LineageCandidateOut": {
+        "properties": {
+          "accepted_record_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted Record Id"
+          },
+          "accepted_record_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted Record Type"
+          },
+          "candidate_type": {
+            "title": "Candidate Type",
+            "type": "string"
+          },
+          "chunk_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chunk Id"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          },
+          "review_status": {
+            "title": "Review Status",
+            "type": "string"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "reviewer_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewer Note"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "document_id",
+          "candidate_type",
+          "payload",
+          "confidence",
+          "review_status",
+          "created_at"
+        ],
+        "title": "LineageCandidateOut",
+        "type": "object"
+      },
+      "LineageChunkOut": {
+        "properties": {
+          "candidate_span": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Span"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "extraction_method": {
+            "title": "Extraction Method",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "locator": {
+            "title": "Locator",
+            "type": "string"
+          },
+          "ordinal": {
+            "title": "Ordinal",
+            "type": "integer"
+          },
+          "page_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Number"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "document_id",
+          "ordinal",
+          "locator",
+          "text",
+          "extraction_method"
+        ],
+        "title": "LineageChunkOut",
+        "type": "object"
+      },
+      "LineageDocumentOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "extraction_status": {
+            "title": "Extraction Status",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "mime_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mime Type"
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Id"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "filename",
+          "sha256",
+          "extraction_status",
+          "created_at"
+        ],
+        "title": "LineageDocumentOut",
+        "type": "object"
+      },
+      "LineageSourceOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "metadata_json": {
+            "additionalProperties": true,
+            "title": "Metadata Json",
+            "type": "object"
+          },
+          "source_type": {
+            "title": "Source Type",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "title",
+          "source_type",
+          "metadata_json"
+        ],
+        "title": "LineageSourceOut",
+        "type": "object"
+      },
       "MultiEnrichmentRequest": {
         "properties": {
           "providers": {
@@ -2242,6 +2937,96 @@
         "title": "PropertyTemporalInterval",
         "type": "object"
       },
+      "ProvenanceTraceOut": {
+        "description": "Everything connected to one record, followed back to its sources.\n`root` is the record itself and takes a different shape per record type.",
+        "properties": {
+          "claim_links": {
+            "items": {
+              "$ref": "#/components/schemas/TraceClaimLinkOut"
+            },
+            "title": "Claim Links",
+            "type": "array"
+          },
+          "evidence_links": {
+            "items": {
+              "$ref": "#/components/schemas/TraceEvidenceLinkOut"
+            },
+            "title": "Evidence Links",
+            "type": "array"
+          },
+          "extraction_lineage": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExtractionLineageOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "investigation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Investigation Id"
+          },
+          "lead_links": {
+            "items": {
+              "$ref": "#/components/schemas/TraceLeadLinkOut"
+            },
+            "title": "Lead Links",
+            "type": "array"
+          },
+          "reconciliation": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reconciliation"
+          },
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_type": {
+            "title": "Record Type",
+            "type": "string"
+          },
+          "relationships": {
+            "items": {
+              "$ref": "#/components/schemas/RelationshipOut"
+            },
+            "title": "Relationships",
+            "type": "array"
+          },
+          "root": {
+            "additionalProperties": true,
+            "title": "Root",
+            "type": "object"
+          }
+        },
+        "required": [
+          "record_type",
+          "record_id",
+          "root",
+          "evidence_links",
+          "claim_links",
+          "relationships",
+          "lead_links"
+        ],
+        "title": "ProvenanceTraceOut",
+        "type": "object"
+      },
       "QueryRef": {
         "additionalProperties": false,
         "description": "One catalogued query and its parameters, as the AI writes them.",
@@ -2298,6 +3083,85 @@
           "record_id"
         ],
         "title": "RecordRefOut",
+        "type": "object"
+      },
+      "RelationshipAdvisoryOut": {
+        "properties": {
+          "challenged_supporting_claim_count": {
+            "title": "Challenged Supporting Claim Count",
+            "type": "integer"
+          },
+          "claim_dependencies": {
+            "items": {
+              "$ref": "#/components/schemas/ClaimDependencyOut"
+            },
+            "title": "Claim Dependencies",
+            "type": "array"
+          },
+          "disputed_claim_count": {
+            "title": "Disputed Claim Count",
+            "type": "integer"
+          },
+          "has_independent_support": {
+            "title": "Has Independent Support",
+            "type": "boolean"
+          },
+          "healthy_supporting_claim_count": {
+            "title": "Healthy Supporting Claim Count",
+            "type": "integer"
+          },
+          "needs_review": {
+            "title": "Needs Review",
+            "type": "boolean"
+          },
+          "rejected_claim_count": {
+            "title": "Rejected Claim Count",
+            "type": "integer"
+          },
+          "relationship_evidence_attachment_count": {
+            "title": "Relationship Evidence Attachment Count",
+            "type": "integer"
+          },
+          "relationship_evidence_needs_review": {
+            "title": "Relationship Evidence Needs Review",
+            "type": "boolean"
+          },
+          "relationship_evidence_review": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RelationshipEvidenceReviewOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "relationship_evidence_review_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Relationship Evidence Review Counts",
+            "type": "object"
+          },
+          "support_state": {
+            "title": "Support State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "needs_review",
+          "support_state",
+          "has_independent_support",
+          "healthy_supporting_claim_count",
+          "challenged_supporting_claim_count",
+          "disputed_claim_count",
+          "rejected_claim_count",
+          "claim_dependencies",
+          "relationship_evidence_needs_review",
+          "relationship_evidence_attachment_count",
+          "relationship_evidence_review_counts"
+        ],
+        "title": "RelationshipAdvisoryOut",
         "type": "object"
       },
       "RelationshipCreate": {
@@ -2365,6 +3229,40 @@
         "title": "RelationshipCreate",
         "type": "object"
       },
+      "RelationshipEndpointOut": {
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "ftm_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftm Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "schema",
+          "caption"
+        ],
+        "title": "RelationshipEndpointOut",
+        "type": "object"
+      },
       "RelationshipEvidenceAttachRequest": {
         "properties": {
           "evidence_id": {
@@ -2389,6 +3287,112 @@
         "title": "RelationshipEvidenceAttachRequest",
         "type": "object"
       },
+      "RelationshipEvidenceAttachmentOut": {
+        "properties": {
+          "attached_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attached By"
+          },
+          "attachment_id": {
+            "title": "Attachment Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EvidenceWithSourceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "latest_review": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RelationshipEvidenceReviewOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "attachment_id",
+          "created_at"
+        ],
+        "title": "RelationshipEvidenceAttachmentOut",
+        "type": "object"
+      },
+      "RelationshipEvidenceReviewOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "evidence_id": {
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rationale"
+          },
+          "relationship_edge_id": {
+            "title": "Relationship Edge Id",
+            "type": "string"
+          },
+          "stance": {
+            "title": "Stance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "relationship_edge_id",
+          "evidence_id",
+          "stance",
+          "created_at"
+        ],
+        "title": "RelationshipEvidenceReviewOut",
+        "type": "object"
+      },
       "RelationshipEvidenceReviewRequest": {
         "properties": {
           "rationale": {
@@ -2405,6 +3409,171 @@
           "rationale"
         ],
         "title": "RelationshipEvidenceReviewRequest",
+        "type": "object"
+      },
+      "RelationshipOut": {
+        "additionalProperties": true,
+        "description": "One relationship edge with its FollowTheMoney statements, attached\nevidence and the advisory the review layer computes. The graph endpoint\nadds reconciliation and aggregate-provenance blocks for reviewed\nduplicates, so the model stays open to those.",
+        "properties": {
+          "advisory": {
+            "$ref": "#/components/schemas/RelationshipAdvisoryOut"
+          },
+          "caption": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caption"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "ftm_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftm Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "properties": {
+            "additionalProperties": true,
+            "title": "Properties",
+            "type": "object"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/RelationshipProvenanceOut"
+          },
+          "relationship_entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relationship Entity Id"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RelationshipEndpointOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_prop": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Prop"
+          },
+          "statements": {
+            "items": {
+              "$ref": "#/components/schemas/StatementOut"
+            },
+            "title": "Statements",
+            "type": "array"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RelationshipEndpointOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "target_prop": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Prop"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "schema",
+          "properties",
+          "statements",
+          "provenance",
+          "advisory",
+          "created_at"
+        ],
+        "title": "RelationshipOut",
+        "type": "object"
+      },
+      "RelationshipProvenanceOut": {
+        "properties": {
+          "evidence_attachments": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/RelationshipEvidenceAttachmentOut"
+            },
+            "title": "Evidence Attachments",
+            "type": "array"
+          },
+          "evidence_review_history": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/RelationshipEvidenceReviewOut"
+            },
+            "title": "Evidence Review History",
+            "type": "array"
+          },
+          "sources": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "statement_count": {
+            "title": "Statement Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "statement_count",
+          "sources"
+        ],
+        "title": "RelationshipProvenanceOut",
         "type": "object"
       },
       "ReportingTaskCreate": {
@@ -2688,6 +3857,119 @@
         "title": "Scale",
         "type": "string"
       },
+      "SearchHitOut": {
+        "properties": {
+          "group": {
+            "title": "Group",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          },
+          "provenance": {
+            "additionalProperties": true,
+            "title": "Provenance",
+            "type": "object"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          },
+          "snippet": {
+            "title": "Snippet",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "group",
+          "id",
+          "investigation_id",
+          "title",
+          "snippet",
+          "score",
+          "provenance",
+          "metadata"
+        ],
+        "title": "SearchHitOut",
+        "type": "object"
+      },
+      "SearchOut": {
+        "properties": {
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "group_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "default": {},
+            "title": "Group Counts",
+            "type": "object"
+          },
+          "investigation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Investigation Id"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/SearchHitOut"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "returned": {
+            "default": 0,
+            "title": "Returned",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query",
+          "total",
+          "counts",
+          "results"
+        ],
+        "title": "SearchOut",
+        "type": "object"
+      },
       "SendIn": {
         "properties": {
           "act_as": {
@@ -2910,6 +4192,141 @@
         "title": "StatementAssessmentRequest",
         "type": "object"
       },
+      "StatementHistoryRowOut": {
+        "description": "One property value of an entity: its canonical statements and every\noutside assessment of it, with support and conflict counts.",
+        "properties": {
+          "canonical": {
+            "title": "Canonical",
+            "type": "boolean"
+          },
+          "canonical_statements": {
+            "items": {
+              "$ref": "#/components/schemas/CanonicalStatementOut"
+            },
+            "title": "Canonical Statements",
+            "type": "array"
+          },
+          "conflict_count": {
+            "title": "Conflict Count",
+            "type": "integer"
+          },
+          "external_assessments": {
+            "items": {
+              "$ref": "#/components/schemas/ExternalAssessmentOut"
+            },
+            "title": "External Assessments",
+            "type": "array"
+          },
+          "latest_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Status"
+          },
+          "prop": {
+            "title": "Prop",
+            "type": "string"
+          },
+          "support_count": {
+            "title": "Support Count",
+            "type": "integer"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prop",
+          "value",
+          "canonical",
+          "canonical_statements",
+          "external_assessments",
+          "support_count",
+          "conflict_count"
+        ],
+        "title": "StatementHistoryRowOut",
+        "type": "object"
+      },
+      "StatementOut": {
+        "properties": {
+          "dataset": {
+            "title": "Dataset",
+            "type": "string"
+          },
+          "first_seen": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Seen"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "last_seen": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Seen"
+          },
+          "origin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Origin"
+          },
+          "original_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Value"
+          },
+          "prop": {
+            "title": "Prop",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "prop",
+          "value",
+          "dataset"
+        ],
+        "title": "StatementOut",
+        "type": "object"
+      },
       "StatementPromotionRequest": {
         "properties": {
           "note": {
@@ -2925,6 +4342,138 @@
           }
         },
         "title": "StatementPromotionRequest",
+        "type": "object"
+      },
+      "TimelineClaimAdvisoryOut": {
+        "properties": {
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "needs_review": {
+            "title": "Needs Review",
+            "type": "boolean"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "needs_review",
+          "status"
+        ],
+        "title": "TimelineClaimAdvisoryOut",
+        "type": "object"
+      },
+      "TimelineClaimContextOut": {
+        "properties": {
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "evidence_stances": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence Stances"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "status",
+          "confidence"
+        ],
+        "title": "TimelineClaimContextOut",
+        "type": "object"
+      },
+      "TimelineContextOut": {
+        "additionalProperties": true,
+        "description": "What a reporter-authored event points at, as it stands now. Each part\nis present only when the event links to that record.",
+        "properties": {
+          "claim": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TimelineClaimContextOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "claim_advisory": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TimelineClaimAdvisoryOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence"
+          },
+          "relationship_advisory": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RelationshipAdvisoryOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EvidenceSourceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "TimelineContextOut",
         "type": "object"
       },
       "TimelineEventCreate": {
@@ -3062,6 +4611,557 @@
           "date_start"
         ],
         "title": "TimelineEventCreate",
+        "type": "object"
+      },
+      "TimelineEventOut": {
+        "additionalProperties": true,
+        "description": "One timeline event: a reporter-authored row (which carries `context`),\nor one derived from a dated statement, source, relationship or record\nactivity (`synthetic`, with no context). Derived kinds add their own\nkeys, so the model stays open.",
+        "properties": {
+          "context": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TimelineContextOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "date_end": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date End"
+          },
+          "date_start": {
+            "title": "Date Start",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "precision": {
+            "title": "Precision",
+            "type": "string"
+          },
+          "provenance": {
+            "additionalProperties": true,
+            "title": "Provenance",
+            "type": "object"
+          },
+          "refs": {
+            "additionalProperties": true,
+            "title": "Refs",
+            "type": "object"
+          },
+          "sort_key": {
+            "title": "Sort Key",
+            "type": "string"
+          },
+          "synthetic": {
+            "title": "Synthetic",
+            "type": "boolean"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "verification_status": {
+            "title": "Verification Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "investigation_id",
+          "title",
+          "date_start",
+          "precision",
+          "verification_status",
+          "synthetic",
+          "refs",
+          "provenance",
+          "sort_key"
+        ],
+        "title": "TimelineEventOut",
+        "type": "object"
+      },
+      "TimelineEventRowOut": {
+        "description": "A reporter-authored event as stored (the reply to creating one).",
+        "properties": {
+          "claim_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Claim Id"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "dataset": {
+            "title": "Dataset",
+            "type": "string"
+          },
+          "date_end": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date End"
+          },
+          "date_start": {
+            "title": "Date Start",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entity Id"
+          },
+          "evidence_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "lead_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Id"
+          },
+          "origin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Origin"
+          },
+          "precision": {
+            "title": "Precision",
+            "type": "string"
+          },
+          "relationship_entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relationship Entity Id"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Id"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "verification_status": {
+            "title": "Verification Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "title",
+          "date_start",
+          "precision",
+          "verification_status",
+          "dataset",
+          "created_at"
+        ],
+        "title": "TimelineEventRowOut",
+        "type": "object"
+      },
+      "TimelineOut": {
+        "properties": {
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineEventOut"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "returned": {
+            "title": "Returned",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "verification_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Verification Counts",
+            "type": "object"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "events",
+          "counts",
+          "verification_counts",
+          "total",
+          "returned",
+          "offset"
+        ],
+        "title": "TimelineOut",
+        "type": "object"
+      },
+      "TraceClaimLinkOut": {
+        "properties": {
+          "claim": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TraceClaimOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "link_id": {
+            "title": "Link Id",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "stance": {
+            "title": "Stance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "link_id",
+          "stance"
+        ],
+        "title": "TraceClaimLinkOut",
+        "type": "object"
+      },
+      "TraceClaimOut": {
+        "properties": {
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "status",
+          "confidence"
+        ],
+        "title": "TraceClaimOut",
+        "type": "object"
+      },
+      "TraceEvidenceLinkOut": {
+        "properties": {
+          "evidence": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TraceEvidenceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "extraction_lineage": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExtractionLineageOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "link_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link Id"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EvidenceSourceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stance": {
+            "title": "Stance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stance"
+        ],
+        "title": "TraceEvidenceLinkOut",
+        "type": "object"
+      },
+      "TraceEvidenceOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "locator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locator"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "quote": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quote"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "TraceEvidenceOut",
+        "type": "object"
+      },
+      "TraceLeadLinkOut": {
+        "properties": {
+          "lead": {
+            "$ref": "#/components/schemas/TraceLeadOut"
+          },
+          "link_id": {
+            "title": "Link Id",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "link_id",
+          "lead"
+        ],
+        "title": "TraceLeadLinkOut",
+        "type": "object"
+      },
+      "TraceLeadOut": {
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "status"
+        ],
+        "title": "TraceLeadOut",
         "type": "object"
       },
       "UpgradeIn": {
@@ -8819,7 +10919,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StatementHistoryRowOut"
+                  },
+                  "title": "Response List Entity Statement History",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -9043,7 +11149,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ExtractionLineageOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -10781,7 +12889,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/TimelineOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -11431,7 +13541,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ExtractionLineageLookupOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -11477,7 +13589,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ProvenanceTraceOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -11866,7 +13980,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SearchOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -12674,7 +14790,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/TimelineEventRowOut"
+                }
               }
             },
             "description": "Successful Response"

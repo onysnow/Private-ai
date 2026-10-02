@@ -13,10 +13,17 @@
 // module-level `api` singleton (constructed once at import time in page.tsx)
 // starts with a clean, unauthenticated ApiClient instance every time, rather
 // than leaking a bearer token set by a previous test.
+//
+// The stub answers by route (ADR-0005, line 15): a server that needs a token
+// answers the settings status 401 until the request carries one.
 import {cleanup, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+import {mockApi} from '../test-support/mock-api';
+import type {RouteCall} from '../test-support/mock-api';
+import {pageRoutes, validSettingsStatus} from '../test-support/page-routes';
 
 // jsdom doesn't implement matchMedia; the `sonner` toast library (rendered
 // unconditionally via <Toaster/>) reads it during mount. Polyfill defensively
@@ -42,56 +49,28 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const validSettingsStatus = {
-  environment: 'test',
-  database: 'sqlite',
-  document_storage_dir: '/tmp/docs',
-  limits: {},
-  restore_api_enabled: true,
-  document_extraction: {
-    pdf_ocr_enabled: false,
-    pdf_ocr_language: 'eng',
-    pdf_ocr_dpi: 300,
-    pdf_ocr_min_native_chars: 200,
-    local_entity_suggestions_enabled: false,
-    entity_extraction_owner: 'workbench_local',
-    ocr_runtime: {
-      available: false,
-      requested_languages: [],
-      missing_languages: [],
-      detail: 'not checked',
-    },
-  },
-  access: {
-    remote_api_enabled: false,
-    mode: 'local_only',
-    token_configured: false,
-  },
-  cors_allowed_origins: [],
-  connectors: {},
-};
-
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {'content-type': 'application/json'},
-  });
-}
-
 async function importHome(): Promise<() => ReactElement> {
   vi.resetModules();
   const mod = await import('../app/page');
   return mod.default;
 }
 
+const SETTINGS = 'GET /api/settings/status';
+
+/** The bearer credential a request carried, if any. */
+function authorization(call: RouteCall): string | null {
+  return new Headers(call.init.headers).get('authorization');
+}
+
+/** A settings status that needs a token: 401 without one, the status with it. */
+function settingsBehindToken(call: RouteCall): unknown {
+  return authorization(call) ? validSettingsStatus : {status: 401, body: {detail: 'Missing bearer token'}};
+}
+
 describe('Home API-access bootstrap', () => {
   it('bootstraps successfully and shows the local-only access message with no token gate', async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse(validSettingsStatus)) // GET /api/settings/status
-      .mockResolvedValueOnce(jsonResponse([])) // GET /api/investigations (empty -> no cascade of per-investigation loads)
-      .mockResolvedValueOnce(jsonResponse({providers: ['aleph']})); // GET /api/connectors
-    vi.stubGlobal('fetch', fetchMock);
+    // An empty investigation list: no per-investigation loads follow.
+    const api = mockApi(pageRoutes());
 
     const Home = await importHome();
     render(<Home />);
@@ -102,21 +81,16 @@ describe('Home API-access bootstrap', () => {
     expect(
       screen.queryByPlaceholderText('Bearer token for this session'),
     ).not.toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    // Exactly the three bootstrap routes, once each, and nothing else.
+    expect(api.calls(SETTINGS)).toHaveLength(1);
+    expect(api.calls('GET /api/investigations')).toHaveLength(1);
+    expect(api.calls('GET /api/connectors')).toHaveLength(1);
+    expect(api.fetch).toHaveBeenCalledTimes(3);
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('shows the token gate on a 401, then authenticates successfully with a bearer token', async () => {
-    const fetchMock = vi
-      .fn()
-      // Round 1 (on mount, no token yet): settings/status rejects with 401.
-      .mockResolvedValueOnce(
-        jsonResponse({detail: 'Missing bearer token'}, 401),
-      )
-      // Round 2 (after authenticateApi() sets the token and re-bootstraps):
-      .mockResolvedValueOnce(jsonResponse(validSettingsStatus))
-      .mockResolvedValueOnce(jsonResponse([]))
-      .mockResolvedValueOnce(jsonResponse({providers: ['aleph']}));
-    vi.stubGlobal('fetch', fetchMock);
+    const api = mockApi({...pageRoutes(), [SETTINGS]: settingsBehindToken});
 
     const Home = await importHome();
     render(<Home />);
@@ -126,6 +100,9 @@ describe('Home API-access bootstrap', () => {
     );
     const connectButton = screen.getByRole('button', {name: 'Connect'});
     expect(connectButton).toBeDisabled();
+    // Round 1 (on mount, no token yet): the bootstrap stops at the 401.
+    expect(api.calls(SETTINGS)).toHaveLength(1);
+    expect(api.calls('GET /api/investigations')).toHaveLength(0);
 
     const user = userEvent.setup();
     await user.type(tokenInput, 'test-token-123');
@@ -142,36 +119,22 @@ describe('Home API-access bootstrap', () => {
       screen.getByRole('button', {name: 'Clear session token'}),
     ).toBeInTheDocument();
 
-    expect(fetchMock).toHaveBeenCalledTimes(4);
-    // The second settings/status call (index 1) is the one made with the
-    // freshly-entered token attached as a bearer credential.
-    const secondCallHeaders = fetchMock.mock.calls[1][1]?.headers as Headers;
-    expect(secondCallHeaders.get('authorization')).toBe(
-      'Bearer test-token-123',
-    );
-    // The first, pre-auth call must NOT have carried any credential.
-    const firstCallHeaders = fetchMock.mock.calls[0][1]?.headers as Headers;
-    expect(firstCallHeaders.get('authorization')).toBeNull();
+    // Round 2 (after authenticateApi() sets the token and re-bootstraps): the
+    // second settings/status call is the one made with the freshly-entered
+    // token attached as a bearer credential; the first, pre-auth call must
+    // NOT have carried any credential.
+    expect(api.calls(SETTINGS).map(authorization)).toEqual([null, 'Bearer test-token-123']);
+    expect(api.calls('GET /api/investigations')).toHaveLength(1);
+    expect(api.calls('GET /api/connectors')).toHaveLength(1);
+    expect(api.fetch).toHaveBeenCalledTimes(4);
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('clearApiSession drops the token and re-runs the bootstrap unauthenticated', async () => {
-    const fetchMock = vi
-      .fn()
-      // Initial mount: authenticate straight away by having settings/status
-      // succeed (local-only, no token needed yet) -- simplest path to reach
-      // the authenticated `Clear session token` control for this test's
-      // purpose is instead to drive it through the same 401 -> connect path.
-      .mockResolvedValueOnce(jsonResponse({detail: 'no token'}, 401))
-      .mockResolvedValueOnce(jsonResponse(validSettingsStatus))
-      .mockResolvedValueOnce(jsonResponse([]))
-      .mockResolvedValueOnce(jsonResponse({providers: ['aleph']}))
-      // After Clear session token: bootstrap re-runs with no token, and this
-      // fixture's settings/status has access.mode 'local_only', so it comes
-      // back authenticated-free (api.hasAuthToken() is false again).
-      .mockResolvedValueOnce(jsonResponse(validSettingsStatus))
-      .mockResolvedValueOnce(jsonResponse([]))
-      .mockResolvedValueOnce(jsonResponse({providers: ['aleph']}));
-    vi.stubGlobal('fetch', fetchMock);
+    // Initial mount: the simplest path to reach the authenticated `Clear
+    // session token` control is to drive it through the same 401 -> connect
+    // path.
+    const api = mockApi({...pageRoutes(), [SETTINGS]: settingsBehindToken});
 
     const Home = await importHome();
     render(<Home />);
@@ -184,6 +147,10 @@ describe('Home API-access bootstrap', () => {
     await user.click(screen.getByRole('button', {name: 'Connect'}));
     await screen.findByRole('button', {name: 'Clear session token'});
 
+    // After Clear session token: bootstrap re-runs with no token, and this
+    // fixture's settings/status has access.mode 'local_only', so it comes
+    // back authenticated-free (api.hasAuthToken() is false again).
+    api.add({[SETTINGS]: validSettingsStatus});
     await user.click(screen.getByRole('button', {name: 'Clear session token'}));
 
     await screen.findByText(
@@ -193,11 +160,13 @@ describe('Home API-access bootstrap', () => {
       screen.queryByRole('button', {name: 'Clear session token'}),
     ).not.toBeInTheDocument();
 
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(7));
-    // The post-clear settings/status call (index 4) must not carry the
-    // cleared token forward.
-    const postClearHeaders = fetchMock.mock.calls[4][1]?.headers as Headers;
-    expect(postClearHeaders.get('authorization')).toBeNull();
+    await waitFor(() => expect(api.fetch).toHaveBeenCalledTimes(7));
+    // The post-clear settings/status call must not carry the cleared token
+    // forward.
+    expect(api.calls(SETTINGS).map(authorization)).toEqual([null, 'Bearer another-token', null]);
+    expect(api.calls('GET /api/investigations')).toHaveLength(2);
+    expect(api.calls('GET /api/connectors')).toHaveLength(2);
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('unmounting the workbench page does not clear the shared API auth token', async () => {
@@ -207,13 +176,7 @@ describe('Home API-access bootstrap', () => {
     // mount effect must only abort its in-flight requests on unmount, not wipe
     // that shared token -- otherwise ordinary client-side navigation away from
     // `/` (e.g. to Settings) logs every other route out from under the user.
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse({detail: 'no token'}, 401))
-      .mockResolvedValueOnce(jsonResponse(validSettingsStatus))
-      .mockResolvedValueOnce(jsonResponse([]))
-      .mockResolvedValueOnce(jsonResponse({providers: ['aleph']}));
-    vi.stubGlobal('fetch', fetchMock);
+    mockApi({...pageRoutes(), [SETTINGS]: settingsBehindToken});
 
     vi.resetModules();
     const pageMod = await import('../app/page');

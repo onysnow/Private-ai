@@ -80,3 +80,98 @@ def test_operation_ids_are_unique_route_names():
     ids = Counter(op["operationId"] for path in schema["paths"].values() for op in path.values())
     assert [name for name, count in ids.items() if count > 1] == []
     assert schema["paths"]["/api/investigations/{investigation_id}/deletion-preview"]["get"]["operationId"] == "investigation_deletion_preview"
+
+
+# --- Search, timeline, relationships, provenance (slice 2) ---------------------
+
+@pytest.fixture()
+def demo(tmp_path):
+    """The demo investigation: entities, relationships, claims, evidence, leads,
+    tasks, timeline events, plus one read document so extraction lineage and
+    document traces have something to follow."""
+    from app.services.demo_seed import seed_demo_investigation
+    from app.services.documents import ingest_document, review_candidate
+    from app.models.domain import ExtractionCandidate
+
+    with SessionLocal() as db:
+        inv, _created = seed_demo_investigation(db)
+        doc = ingest_document(db, investigation_id=inv.id, title="Wire memo", filename="memo.txt", mime_type="text/plain",
+                              data=b"Meridian Holdings Ltd paid Bellcastle Trading Group. \"The $2.4M wire cleared on 3 March.\"\n",
+                              storage_dir=tmp_path)
+        candidates = db.query(ExtractionCandidate).filter(ExtractionCandidate.document_id == doc.id).all()
+        accepted = None
+        for row in candidates:
+            if row.candidate_type == "evidence":
+                review_candidate(db, row, decision="accept", note="checked")
+                db.refresh(row)
+                accepted = row
+                break
+        yield db, inv, doc, candidates, accepted
+
+
+def test_search_reply(demo):
+    from app.services.search import investigation_search
+
+    db, inv, _doc, _candidates, _accepted = demo
+    reply = investigation_search(db, "Meridian", investigation_id=inv.id, limit=50)
+    assert reply["results"], "the demo seed must give the search something to find"
+    _same_through_model(r.SearchOut, reply)
+    _same_through_model(r.SearchOut, investigation_search(db, "nothing-matches-this", investigation_id=inv.id))
+
+
+def test_timeline_replies(demo):
+    from app.schemas.api import TimelineEventCreate
+    from app.services.timeline import create_timeline_event, investigation_timeline
+
+    db, inv, _doc, _candidates, _accepted = demo
+    full = investigation_timeline(db, inv.id, include_record_activity=True)
+    kinds = {event["kind"] for event in full["events"]}
+    assert "reporter_event" in kinds and len(kinds) > 1, "the case must cover reporter-authored and derived events"
+    _same_through_model(r.TimelineOut, full)
+    _same_through_model(r.TimelineOut, investigation_timeline(db, inv.id, limit=2, offset=1))
+    row = create_timeline_event(db, TimelineEventCreate(investigation_id=inv.id, title="Filing", date_start="2024-03", precision="month"))
+    db.refresh(row)
+    _same_through_model(r.TimelineEventRowOut, row)
+
+
+def test_relationship_and_statement_history_replies(demo):
+    from app.services.provenance import entity_statement_history
+    from app.services.relationships import investigation_relationships
+
+    db, inv, _doc, _candidates, _accepted = demo
+    rows = investigation_relationships(db, inv.id)
+    assert rows
+    _same_through_model(list[r.RelationshipOut], rows)
+    entity_id = rows[0]["source"]["id"]
+    _same_through_model(list[r.StatementHistoryRowOut], entity_statement_history(db, entity_id))
+
+
+def test_provenance_replies(demo):
+    from app.models.domain import Claim, Evidence, Lead, ReportingTask, Source
+    from app.services.documents import serialize_extraction_lineage
+    from app.services.provenance import find_extraction_lineage, record_provenance_trace
+    from app.services.relationships import investigation_relationships
+
+    db, inv, doc, candidates, accepted = demo
+    assert candidates and accepted is not None
+    _same_through_model(r.ExtractionLineageOut, serialize_extraction_lineage(db, candidates[0]))
+    looked_up = find_extraction_lineage(db, accepted.accepted_record_type, accepted.accepted_record_id)
+    assert looked_up["found"]
+    _same_through_model(r.ExtractionLineageLookupOut, looked_up)
+    _same_through_model(r.ExtractionLineageLookupOut, find_extraction_lineage(db, "claim", "missing"))
+
+    relationship = investigation_relationships(db, inv.id)[0]
+    targets = [
+        ("entity", relationship["source"]["id"]),
+        ("relationship", relationship["id"]),
+        ("claim", db.query(Claim).filter(Claim.investigation_id == inv.id).first().id),
+        ("evidence", db.query(Evidence).join(Source, Source.id == Evidence.source_id).filter(Source.investigation_id == inv.id).first().id),
+        ("source", doc.source_id),
+        ("document", doc.id),
+        ("lead", db.query(Lead).filter(Lead.investigation_id == inv.id).first().id),
+        ("task", db.query(ReportingTask).filter(ReportingTask.investigation_id == inv.id).first().id),
+    ]
+    for record_type, record_id in targets:
+        trace = record_provenance_trace(db, record_type, record_id)
+        assert trace["record_type"] == record_type
+        _same_through_model(r.ProvenanceTraceOut, trace)

@@ -721,6 +721,7 @@ import {
   zCreateSourceEndpointBody,
   zCreateSourceEndpointResponse,
   zCreateTimelineEventEndpointBody,
+  zCreateTimelineEventEndpointResponse,
   zCreateWriteupEndpointBody,
   zDecideCrossProviderClusterBody,
   zDecideCrossProviderClusterPath,
@@ -752,6 +753,7 @@ import {
   zExportWriteupDocxPath,
   zExternalRelationshipCandidatesPath,
   zFindExtractionLineageEndpointQuery,
+  zFindExtractionLineageEndpointResponse,
   zFindingCandidatesPath,
   zGetAiAnalysisCandidateEndpointPath,
   zGetClaimReviewWorkspacePath,
@@ -760,18 +762,21 @@ import {
   zGetEntityDossierPath,
   zGetExtractionCandidateExplanationPath,
   zGetExtractionCandidateLineagePath,
+  zGetExtractionCandidateLineageResponse,
   zGetExtractionEntityMatchesPath,
   zGetInvestigationFinancialFlowsPath,
   zGetInvestigationGraphPath,
   zGetInvestigationGraphQuery,
   zGetInvestigationTimelinePath,
   zGetInvestigationTimelineQuery,
+  zGetInvestigationTimelineResponse,
   zGetJobEndpointPath,
   zGetLeadPath,
   zGetOpenalephCorpusBindingPath,
   zGetOpenalephDocumentReviewStatusPath,
   zGetOpenalephDocumentSyncPath,
   zGetRecordProvenanceTraceQuery,
+  zGetRecordProvenanceTraceResponse,
   zGetSecurityAlertsQuery,
   zGetSecurityAuditQuery,
   zGetSecurityAuditRetentionPreviewQuery,
@@ -820,6 +825,7 @@ import {
   zListEntityPromotionsPath,
   zListEntityRelationshipsPath,
   zListEntityStatementHistoryPath,
+  zListEntityStatementHistoryResponse,
   zListEntityStatementsPath,
   zListExternalRelationshipPromotionsPath,
   zListExternalRelationshipReviewsPath,
@@ -880,6 +886,7 @@ import {
   zSaveConnectorCredentialBody,
   zSaveConnectorCredentialPath,
   zSearchWorkbenchQuery,
+  zSearchWorkbenchResponse,
   zSyncOpenalephDocumentPath,
   zUpdateAppUserBody,
   zUpdateAppUserPath,
@@ -4511,6 +4518,8 @@ export const listEntityStatementHistory = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListEntityStatementHistoryResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/statement-history',
     ...options,
   });
@@ -4689,6 +4698,8 @@ export const getExtractionCandidateLineage = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetExtractionCandidateLineageResponse.parseAsync(data),
     url: '/api/extraction-candidates/{candidate_id}/lineage',
     ...options,
   });
@@ -5573,6 +5584,8 @@ export const getInvestigationTimeline = <ThrowOnError extends boolean = false>(
           query: zGetInvestigationTimelineQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetInvestigationTimelineResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/timeline',
     ...options,
   });
@@ -6001,6 +6014,8 @@ export const findExtractionLineageEndpoint = <
           query: zFindExtractionLineageEndpointQuery,
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zFindExtractionLineageEndpointResponse.parseAsync(data),
     url: '/api/provenance/extraction-lineage',
     ...options,
   });
@@ -6028,6 +6043,8 @@ export const getRecordProvenanceTrace = <ThrowOnError extends boolean = false>(
           query: zGetRecordProvenanceTraceQuery,
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetRecordProvenanceTraceResponse.parseAsync(data),
     url: '/api/provenance/trace',
     ...options,
   });
@@ -6303,6 +6320,8 @@ export const searchWorkbench = <ThrowOnError extends boolean = false>(
           query: zSearchWorkbenchQuery,
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSearchWorkbenchResponse.parseAsync(data),
     url: '/api/search',
     ...options,
   });
@@ -6875,6 +6894,8 @@ export const createTimelineEventEndpoint = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateTimelineEventEndpointResponse.parseAsync(data),
     url: '/api/timeline-events',
     ...options,
     headers: {

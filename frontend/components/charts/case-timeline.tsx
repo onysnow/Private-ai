@@ -2,10 +2,11 @@
 
 // STRUCT-0040 / issue #40: Case Timeline chart.
 //
-// Renders TimelineEvent records (lib/api-types.ts's `TimelineEvent`, which
-// already matches the TAS Timeline Reconstruction module's event shape --
-// see backend/app/ai/tas_spec/PROMPT_MODULES/03_TIMELINE_RECONSTRUCTION.md)
-// as a horizontal timeline, grouped into lanes by `kind`. An event with a
+// Renders timeline events (the API's timeline reply, whose event shape
+// matches the TAS Timeline Reconstruction module's -- see
+// backend/app/ai/tas_spec/PROMPT_MODULES/03_TIMELINE_RECONSTRUCTION.md)
+// as a horizontal timeline, grouped into lanes by `kind`. The chart asks
+// only for the six fields it draws, so any event record with them fits. An event with a
 // `date_end` after `date_start` draws as a bar spanning the range; an event
 // with no end (or an equal/earlier one) draws as a point. Color follows
 // `verification_status`, reusing the direct/verified/disputed/unresolved
@@ -28,10 +29,18 @@ import {useMemo} from 'react';
 import type {CustomSeriesRenderItem, EChartsOption} from 'echarts';
 
 import {Chart} from './chart';
-import type {TimelineEvent} from '@/lib/api-types';
+
+export type CaseTimelineEvent = {
+  id: string;
+  kind: string;
+  title: string;
+  date_start: string;
+  date_end?: string | null;
+  verification_status: string;
+};
 
 export type CaseTimelineProps = {
-  events: TimelineEvent[];
+  events: CaseTimelineEvent[];
   height?: number | string;
   className?: string;
 };

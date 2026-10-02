@@ -48,6 +48,18 @@ def _statement_row(row: Statement) -> dict:
     }
 
 
+def serialize_reconciliation_decision(row: PostMergeReconciliationDecision | None) -> dict[str, Any] | None:
+    """A reporter's decision on one duplicate pair, as the API sends it. The
+    row used to be returned as an ORM object and relied on FastAPI's encoder
+    reading its columns; with a declared response model that leaks, so the
+    shape is explicit."""
+    if row is None:
+        return None
+    return {"id": row.id, "investigation_id": row.investigation_id, "entity_id": row.entity_id, "record_type": row.record_type,
+            "record_a_id": row.record_a_id, "record_b_id": row.record_b_id, "decision": row.decision, "rationale": row.rationale,
+            "preferred_record_id": row.preferred_record_id, "created_at": row.created_at}
+
+
 def detect_post_merge_reconciliation(db: Session, entity: Entity) -> dict:
     if entity.merged_into_entity_id:
         raise ValueError("Reconciliation must be opened on the active canonical entity")
@@ -71,7 +83,7 @@ def detect_post_merge_reconciliation(db: Session, entity: Entity) -> dict:
                     "record_b": _statement_row(b),
                     "same_assertion": True,
                     "provenance_differs": (a.dataset, a.origin, a.original_value) != (b.dataset, b.origin, b.original_value),
-                    "latest_decision": decision,
+                    "latest_decision": serialize_reconciliation_decision(decision),
                 })
 
     rel_groups: dict[tuple[str, str, str, str, str], list[RelationshipEdge]] = defaultdict(list)
@@ -122,10 +134,10 @@ def detect_post_merge_reconciliation(db: Session, entity: Entity) -> dict:
                         or statement_sources_a != statement_sources_b
                         or edge_a.relationship_entity_id != edge_b.relationship_entity_id
                     ),
-                    "latest_decision": decision,
+                    "latest_decision": serialize_reconciliation_decision(decision),
                 })
 
-    unresolved = sum(1 for row in statement_pairs + relationship_pairs if row["latest_decision"] is None or row["latest_decision"].decision == "unsure")
+    unresolved = sum(1 for row in statement_pairs + relationship_pairs if row["latest_decision"] is None or row["latest_decision"]["decision"] == "unsure")
     return {
         "entity_id": entity.id,
         "statement_duplicates": statement_pairs,

@@ -13,6 +13,7 @@ from app.models.domain import ExtractionCandidate
 from app.schemas.api import ExtractionCandidateReviewRequest
 from app.services.documents import preview_entity_candidate_matches, review_candidate, serialize_extraction_lineage
 from app.services.extraction_explanations import explain_extraction_candidate
+from app.schemas.responses import ExtractionLineageOut
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
@@ -28,7 +29,7 @@ def get_extraction_entity_matches(candidate_id: str, db: Session = Depends(get_d
         raise HTTPException(400, str(exc))
 
 
-@router.get("/extraction-candidates/{candidate_id}/lineage", response_model=None)
+@router.get("/extraction-candidates/{candidate_id}/lineage", response_model=ExtractionLineageOut)
 def get_extraction_candidate_lineage(candidate_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(ExtractionCandidate, candidate_id)
     if row is None:

@@ -1,16 +1,20 @@
 // @vitest-environment jsdom
 // STRUCT-0015 remainder, cycle 6: the "Claim verification workspace" flow on
 // app/page.tsx. Like leads (cycle 4), every handler here needs `inv` set, so
-// the fixture drives selectInvestigation()'s full 9-call cascade plus
-// AiReasoningPanel's own post-select fetch (see test-page-leads.test.tsx's
-// docstring for the exact call order/count). The claims and evidence
-// cascade slots are seeded with one row each so createClaim/openClaim,
-// saveClaimReview, and attachEvidenceToClaim are all reachable without a
-// second bootstrap.
+// the fixture lets loadAppBootstrap() open the one investigation, which
+// starts every per-investigation load (see test-support/page-routes.ts for
+// the routes; replies are keyed by route, not by call order -- ADR-0005,
+// line 15). The claims and evidence routes are seeded with one row each so
+// createClaim/openClaim, saveClaimReview, and attachEvidenceToClaim are all
+// reachable without a second bootstrap.
 import {cleanup, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+import {mockApi} from '../test-support/mock-api';
+import type {MockApi} from '../test-support/mock-api';
+import {pageRoutes} from '../test-support/page-routes';
 
 beforeEach(() => {
   if (!window.matchMedia) {
@@ -32,42 +36,6 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const validSettingsStatus = {
-  environment: 'test',
-  database: 'sqlite',
-  document_storage_dir: '/tmp/docs',
-  limits: {},
-  restore_api_enabled: true,
-  document_extraction: {
-    pdf_ocr_enabled: false,
-    pdf_ocr_language: 'eng',
-    pdf_ocr_dpi: 300,
-    pdf_ocr_min_native_chars: 200,
-    local_entity_suggestions_enabled: false,
-    entity_extraction_owner: 'workbench_local',
-    ocr_runtime: {
-      available: false,
-      requested_languages: [],
-      missing_languages: [],
-      detail: 'not checked',
-    },
-  },
-  access: {
-    remote_api_enabled: false,
-    mode: 'local_only',
-    token_configured: false,
-  },
-  cors_allowed_origins: [],
-  connectors: {},
-};
-
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {'content-type': 'application/json'},
-  });
-}
-
 async function importHome(): Promise<() => ReactElement> {
   vi.resetModules();
   const mod = await import('../app/page');
@@ -75,18 +43,8 @@ async function importHome(): Promise<() => ReactElement> {
 }
 
 const investigation = {id: 'inv-1', name: 'Kestrelwood filings'};
-
-const emptyGraph = {
-  nodes: [],
-  edges: [],
-  schemas: [],
-  reconciliation: {
-    collapsed_by_default: true,
-    suppressed_duplicate_count: 0,
-    underlying_edge_count: 0,
-    visible_edge_count: 0,
-  },
-};
+const CLAIMS = 'GET /api/investigations/inv-1/claims';
+const WORKSPACE = 'GET /api/claims/claim-1/review-workspace';
 
 function claimFixture(overrides: Record<string, unknown> = {}) {
   return {
@@ -116,40 +74,13 @@ function emptyWorkspace(claim: ReturnType<typeof claimFixture>) {
   };
 }
 
-// The 9 selectInvestigation() cascade calls, in call order, plus the
-// AiReasoningPanel queue fetch that follows once `inv` is non-empty.
-function bootstrapCalls(claims: unknown[], evidence: unknown[]) {
-  return [
-    jsonResponse([]), // GET connector-findings
-    jsonResponse([]), // GET entities (parseEntityList expects the raw array, not {entities:[]})
-    jsonResponse(emptyGraph), // GET graph
-    jsonResponse({events: [], verification_counts: {}}), // GET timeline
-    jsonResponse({items: []}), // GET leads/queue
-    jsonResponse(claims), // GET claims
-    jsonResponse(evidence), // GET evidence
-    jsonResponse([]), // GET sources
-    jsonResponse([]), // GET documents
-    jsonResponse({candidates: []}), // AiReasoningPanel queue
-  ];
-}
-
-async function bootstrapWithClaimAndEvidence(): Promise<{
-  fetchMock: ReturnType<typeof vi.fn>;
-}> {
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce(jsonResponse(validSettingsStatus)) // GET settings/status
-    .mockResolvedValueOnce(jsonResponse([investigation])) // GET investigations
-    .mockResolvedValueOnce(jsonResponse({providers: ['aleph']})); // GET connectors
-  for (const response of bootstrapCalls([claimFixture()], [evidencePoolRow()])) {
-    fetchMock.mockResolvedValueOnce(response);
-  }
-  vi.stubGlobal('fetch', fetchMock);
+async function bootstrapWithClaimAndEvidence(): Promise<MockApi> {
+  const api = mockApi(pageRoutes({investigations: [investigation], claims: [claimFixture()], evidence: [evidencePoolRow()]}));
 
   const Home = await importHome();
   render(<Home />);
   await screen.findByText('The contract was approved on March 3.');
-  return {fetchMock};
+  return api;
 }
 
 describe('Home claim verification workspace', () => {
@@ -159,13 +90,14 @@ describe('Home claim verification workspace', () => {
   });
 
   it('creates a claim, reloads the list, and opens its review workspace', async () => {
-    const {fetchMock} = await bootstrapWithClaimAndEvidence();
+    const api = await bootstrapWithClaimAndEvidence();
     const created = claimFixture({id: 'claim-2', text: 'The vendor was paid twice.'});
 
-    fetchMock
-      .mockResolvedValueOnce(jsonResponse(created)) // POST /api/claims
-      .mockResolvedValueOnce(jsonResponse([claimFixture(), created])) // GET claims reload
-      .mockResolvedValueOnce(jsonResponse(emptyWorkspace(created))); // GET review-workspace
+    api.add({
+      'POST /api/claims': created,
+      [CLAIMS]: [claimFixture(), created], // the list the reload finds
+      'GET /api/claims/claim-2/review-workspace': emptyWorkspace(created),
+    });
 
     const user = userEvent.setup();
     await user.type(
@@ -177,27 +109,27 @@ describe('Home claim verification workspace', () => {
     await screen.findByRole('heading', {name: 'The vendor was paid twice.', level: 4});
     expect(screen.getByText('No evidence is linked to this claim yet.')).toBeInTheDocument();
 
-    const [postUrl, postInit] = fetchMock.mock.calls[13];
-    expect(postUrl).toContain('/api/claims');
-    expect(JSON.parse((postInit as RequestInit).body as string)).toMatchObject({
+    expect(api.calls('POST /api/claims')).toHaveLength(1);
+    expect(api.lastBody('POST /api/claims')).toMatchObject({
       investigation_id: 'inv-1',
       text: 'The vendor was paid twice.',
       status: 'unverified',
     });
+    expect(api.calls(CLAIMS)).toHaveLength(2);
+    expect(api.calls('GET /api/claims/claim-2/review-workspace')).toHaveLength(1);
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('requires a rationale before Record review is enabled, then saves the review', async () => {
-    const {fetchMock} = await bootstrapWithClaimAndEvidence();
+    const api = await bootstrapWithClaimAndEvidence();
 
-    fetchMock.mockResolvedValueOnce(jsonResponse(emptyWorkspace(claimFixture()))); // GET review-workspace
+    api.add({[WORKSPACE]: emptyWorkspace(claimFixture())});
     await userEvent.setup().click(screen.getByRole('button', {name: /The contract was approved/}));
     await screen.findByText("No canonical relationship currently depends on this claim's linked evidence.");
     expect(screen.getByRole('button', {name: 'Record review'})).toBeDisabled();
 
     const updated = claimFixture({status: 'confirmed', confidence: 0.9});
-    fetchMock.mockResolvedValueOnce(
-      jsonResponse({claim: updated, workspace: emptyWorkspace(updated)}),
-    ); // POST /api/claims/claim-1/reviews
+    api.add({'POST /api/claims/claim-1/reviews': {claim: updated, workspace: emptyWorkspace(updated)}});
 
     const user = userEvent.setup();
     await user.click(screen.getAllByRole('combobox').find(el => el.textContent === 'unverified')!);
@@ -210,45 +142,42 @@ describe('Home claim verification workspace', () => {
 
     await screen.findByText('Recorded immutable review: confirmed at 90% confidence.');
 
-    const [reviewUrl, reviewInit] = fetchMock.mock.calls[14];
-    expect(reviewUrl).toContain('/api/claims/claim-1/reviews');
-    expect(JSON.parse((reviewInit as RequestInit).body as string)).toMatchObject({
+    expect(api.calls('POST /api/claims/claim-1/reviews')).toHaveLength(1);
+    expect(api.lastBody('POST /api/claims/claim-1/reviews')).toMatchObject({
       status: 'confirmed',
       rationale: 'Board minutes confirm the date directly.',
     });
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('attaches pool evidence to the open claim as supporting', async () => {
-    const {fetchMock} = await bootstrapWithClaimAndEvidence();
+    const api = await bootstrapWithClaimAndEvidence();
 
-    fetchMock.mockResolvedValueOnce(jsonResponse(emptyWorkspace(claimFixture()))); // GET review-workspace
+    api.add({[WORKSPACE]: emptyWorkspace(claimFixture())});
     await userEvent.setup().click(screen.getByRole('button', {name: /The contract was approved/}));
     await screen.findByText('No evidence is linked to this claim yet.');
 
-    fetchMock
-      .mockResolvedValueOnce(jsonResponse({})) // POST /api/claims/claim-1/evidence
-      .mockResolvedValueOnce(
-        jsonResponse(
-          emptyWorkspace(claimFixture()).evidence
-            ? {
-                ...emptyWorkspace(claimFixture()),
-                evidence: [
-                  {id: 'link-1', stance: 'supports', evidence: evidencePoolRow().evidence, source: evidencePoolRow().source, note: null},
-                ],
-                stance_counts: {supports: 1, contradicts: 0, context: 0},
-              }
-            : emptyWorkspace(claimFixture()),
-        ),
-      ); // GET review-workspace reload (openClaim re-fetch)
+    api.add({
+      'POST /api/claims/claim-1/evidence': {},
+      // The workspace openClaim re-fetches afterwards now carries the link.
+      [WORKSPACE]: {
+        ...emptyWorkspace(claimFixture()),
+        evidence: [
+          {id: 'link-1', stance: 'supports', evidence: evidencePoolRow().evidence, source: evidencePoolRow().source, note: null},
+        ],
+        stance_counts: {supports: 1, contradicts: 0, context: 0},
+      },
+    });
 
     await userEvent.setup().click(screen.getByRole('button', {name: 'Supports'}));
 
     await waitFor(() => expect(screen.getByText('Linked evidence as supports.')).toBeInTheDocument());
-    const [attachUrl, attachInit] = fetchMock.mock.calls[14];
-    expect(attachUrl).toContain('/api/claims/claim-1/evidence');
-    expect(JSON.parse((attachInit as RequestInit).body as string)).toMatchObject({
+    expect(api.calls('POST /api/claims/claim-1/evidence')).toHaveLength(1);
+    expect(api.lastBody('POST /api/claims/claim-1/evidence')).toMatchObject({
       evidence_id: 'ev-1',
       stance: 'supports',
     });
+    expect(api.calls(WORKSPACE)).toHaveLength(2);
+    expect(api.unmatched()).toEqual([]);
   });
 });

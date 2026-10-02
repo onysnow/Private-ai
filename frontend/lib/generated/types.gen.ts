@@ -195,6 +195,36 @@ export type CanonicalResolutionRequest = {
 };
 
 /**
+ * CanonicalStatementOut
+ */
+export type CanonicalStatementOut = {
+  /**
+   * Dataset
+   */
+  dataset: string;
+  /**
+   * First Seen
+   */
+  first_seen?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Last Seen
+   */
+  last_seen?: string | null;
+  /**
+   * Origin
+   */
+  origin?: string | null;
+  /**
+   * Original Value
+   */
+  original_value?: string | null;
+};
+
+/**
  * CaseSynthesisRequest
  */
 export type CaseSynthesisRequest = {
@@ -310,6 +340,44 @@ export type ClaimCreate = {
    * Status
    */
   status?: string;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * ClaimDependencyOut
+ */
+export type ClaimDependencyOut = {
+  /**
+   * Claim Id
+   */
+  claim_id: string;
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Evidence Id
+   */
+  evidence_id: string;
+  /**
+   * Needs Review
+   */
+  needs_review: boolean;
+  /**
+   * Note
+   */
+  note?: string | null;
+  /**
+   * Stance
+   */
+  stance: string;
+  /**
+   * Status
+   */
+  status: string;
   /**
    * Text
    */
@@ -726,6 +794,51 @@ export type EvidencePoolRow = {
 };
 
 /**
+ * EvidenceSourceOut
+ */
+export type EvidenceSourceOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Source Type
+   */
+  source_type?: string | null;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Url
+   */
+  url?: string | null;
+};
+
+/**
+ * EvidenceWithSourceOut
+ */
+export type EvidenceWithSourceOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Locator
+   */
+  locator?: string | null;
+  /**
+   * Notes
+   */
+  notes?: string | null;
+  /**
+   * Quote
+   */
+  quote?: string | null;
+  source?: EvidenceSourceOut | null;
+};
+
+/**
  * ExplainIn
  */
 export type ExplainIn = {
@@ -743,6 +856,68 @@ export type ExplainIn = {
    * Sql
    */
   sql: string;
+};
+
+/**
+ * ExternalAssessmentOut
+ */
+export type ExternalAssessmentOut = {
+  /**
+   * Assessment Id
+   */
+  assessment_id: string;
+  /**
+   * Created At
+   */
+  created_at?: string | null;
+  /**
+   * Dataset
+   */
+  dataset?: string | null;
+  /**
+   * Finding Caption
+   */
+  finding_caption?: string | null;
+  /**
+   * Finding Id
+   */
+  finding_id?: string | null;
+  /**
+   * Note
+   */
+  note?: string | null;
+  /**
+   * Promoted
+   */
+  promoted: boolean;
+  /**
+   * Promoted At
+   */
+  promoted_at?: string | null;
+  /**
+   * Promotion Id
+   */
+  promotion_id?: string | null;
+  /**
+   * Provider
+   */
+  provider?: string | null;
+  /**
+   * Provider Record Id
+   */
+  provider_record_id?: string | null;
+  /**
+   * Reviewer Note
+   */
+  reviewer_note?: string | null;
+  /**
+   * Source Url
+   */
+  source_url?: string | null;
+  /**
+   * Status
+   */
+  status: string;
 };
 
 /**
@@ -835,6 +1010,29 @@ export type ExtractionCandidateReviewRequest = {
    * Note
    */
   note?: string | null;
+};
+
+/**
+ * ExtractionLineageLookupOut
+ */
+export type ExtractionLineageLookupOut = {
+  /**
+   * Found
+   */
+  found: boolean;
+  lineage?: ExtractionLineageOut | null;
+};
+
+/**
+ * ExtractionLineageOut
+ *
+ * The read-only trail document → chunk → proposal → review → accepted record.
+ */
+export type ExtractionLineageOut = {
+  candidate: LineageCandidateOut;
+  chunk?: LineageChunkOut | null;
+  document?: LineageDocumentOut | null;
+  source?: LineageSourceOut | null;
 };
 
 /**
@@ -1171,6 +1369,176 @@ export type LeadUpdate = {
 };
 
 /**
+ * LineageCandidateOut
+ */
+export type LineageCandidateOut = {
+  /**
+   * Accepted Record Id
+   */
+  accepted_record_id?: string | null;
+  /**
+   * Accepted Record Type
+   */
+  accepted_record_type?: string | null;
+  /**
+   * Candidate Type
+   */
+  candidate_type: string;
+  /**
+   * Chunk Id
+   */
+  chunk_id?: string | null;
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Payload
+   */
+  payload: {
+    [key: string]: unknown;
+  };
+  /**
+   * Review Status
+   */
+  review_status: string;
+  /**
+   * Reviewed At
+   */
+  reviewed_at?: string | null;
+  /**
+   * Reviewer Note
+   */
+  reviewer_note?: string | null;
+};
+
+/**
+ * LineageChunkOut
+ */
+export type LineageChunkOut = {
+  /**
+   * Candidate Span
+   */
+  candidate_span?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Extraction Method
+   */
+  extraction_method: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Locator
+   */
+  locator: string;
+  /**
+   * Ordinal
+   */
+  ordinal: number;
+  /**
+   * Page Number
+   */
+  page_number?: number | null;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * LineageDocumentOut
+ */
+export type LineageDocumentOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Extraction Status
+   */
+  extraction_status: string;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Mime Type
+   */
+  mime_type?: string | null;
+  /**
+   * Sha256
+   */
+  sha256: string;
+  /**
+   * Source Id
+   */
+  source_id?: string | null;
+};
+
+/**
+ * LineageSourceOut
+ */
+export type LineageSourceOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Metadata Json
+   */
+  metadata_json: {
+    [key: string]: unknown;
+  };
+  /**
+   * Source Type
+   */
+  source_type: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Url
+   */
+  url?: string | null;
+};
+
+/**
  * MultiEnrichmentRequest
  */
 export type MultiEnrichmentRequest = {
@@ -1314,6 +1682,56 @@ export type PropertyTemporalInterval = {
 };
 
 /**
+ * ProvenanceTraceOut
+ *
+ * Everything connected to one record, followed back to its sources.
+ * `root` is the record itself and takes a different shape per record type.
+ */
+export type ProvenanceTraceOut = {
+  /**
+   * Claim Links
+   */
+  claim_links: Array<TraceClaimLinkOut>;
+  /**
+   * Evidence Links
+   */
+  evidence_links: Array<TraceEvidenceLinkOut>;
+  extraction_lineage?: ExtractionLineageOut | null;
+  /**
+   * Investigation Id
+   */
+  investigation_id?: string | null;
+  /**
+   * Lead Links
+   */
+  lead_links: Array<TraceLeadLinkOut>;
+  /**
+   * Reconciliation
+   */
+  reconciliation?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type: string;
+  /**
+   * Relationships
+   */
+  relationships: Array<RelationshipOut>;
+  /**
+   * Root
+   */
+  root: {
+    [key: string]: unknown;
+  };
+};
+
+/**
  * QueryRef
  *
  * One catalogued query and its parameters, as the AI writes them.
@@ -1360,6 +1778,59 @@ export type RecordRefOut = {
 };
 
 /**
+ * RelationshipAdvisoryOut
+ */
+export type RelationshipAdvisoryOut = {
+  /**
+   * Challenged Supporting Claim Count
+   */
+  challenged_supporting_claim_count: number;
+  /**
+   * Claim Dependencies
+   */
+  claim_dependencies: Array<ClaimDependencyOut>;
+  /**
+   * Disputed Claim Count
+   */
+  disputed_claim_count: number;
+  /**
+   * Has Independent Support
+   */
+  has_independent_support: boolean;
+  /**
+   * Healthy Supporting Claim Count
+   */
+  healthy_supporting_claim_count: number;
+  /**
+   * Needs Review
+   */
+  needs_review: boolean;
+  /**
+   * Rejected Claim Count
+   */
+  rejected_claim_count: number;
+  /**
+   * Relationship Evidence Attachment Count
+   */
+  relationship_evidence_attachment_count: number;
+  /**
+   * Relationship Evidence Needs Review
+   */
+  relationship_evidence_needs_review: boolean;
+  relationship_evidence_review?: RelationshipEvidenceReviewOut | null;
+  /**
+   * Relationship Evidence Review Counts
+   */
+  relationship_evidence_review_counts: {
+    [key: string]: number;
+  };
+  /**
+   * Support State
+   */
+  support_state: string;
+};
+
+/**
  * RelationshipCreate
  */
 export type RelationshipCreate = {
@@ -1400,6 +1871,28 @@ export type RelationshipCreate = {
 };
 
 /**
+ * RelationshipEndpointOut
+ */
+export type RelationshipEndpointOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Ftm Id
+   */
+  ftm_id?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
  * RelationshipEvidenceAttachRequest
  */
 export type RelationshipEvidenceAttachRequest = {
@@ -1414,6 +1907,60 @@ export type RelationshipEvidenceAttachRequest = {
 };
 
 /**
+ * RelationshipEvidenceAttachmentOut
+ */
+export type RelationshipEvidenceAttachmentOut = {
+  /**
+   * Attached By
+   */
+  attached_by?: string | null;
+  /**
+   * Attachment Id
+   */
+  attachment_id: string;
+  /**
+   * Created At
+   */
+  created_at: string;
+  evidence?: EvidenceWithSourceOut | null;
+  latest_review?: RelationshipEvidenceReviewOut | null;
+  /**
+   * Note
+   */
+  note?: string | null;
+};
+
+/**
+ * RelationshipEvidenceReviewOut
+ */
+export type RelationshipEvidenceReviewOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Evidence Id
+   */
+  evidence_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Rationale
+   */
+  rationale?: string | null;
+  /**
+   * Relationship Edge Id
+   */
+  relationship_edge_id: string;
+  /**
+   * Stance
+   */
+  stance: string;
+};
+
+/**
  * RelationshipEvidenceReviewRequest
  */
 export type RelationshipEvidenceReviewRequest = {
@@ -1425,6 +1972,90 @@ export type RelationshipEvidenceReviewRequest = {
    * Stance
    */
   stance: string;
+};
+
+/**
+ * RelationshipOut
+ *
+ * One relationship edge with its FollowTheMoney statements, attached
+ * evidence and the advisory the review layer computes. The graph endpoint
+ * adds reconciliation and aggregate-provenance blocks for reviewed
+ * duplicates, so the model stays open to those.
+ */
+export type RelationshipOut = {
+  advisory: RelationshipAdvisoryOut;
+  /**
+   * Caption
+   */
+  caption?: string | null;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Ftm Id
+   */
+  ftm_id?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Properties
+   */
+  properties: {
+    [key: string]: unknown;
+  };
+  provenance: RelationshipProvenanceOut;
+  /**
+   * Relationship Entity Id
+   */
+  relationship_entity_id?: string | null;
+  /**
+   * Schema
+   */
+  schema: string;
+  source?: RelationshipEndpointOut | null;
+  /**
+   * Source Prop
+   */
+  source_prop?: string | null;
+  /**
+   * Statements
+   */
+  statements: Array<StatementOut>;
+  target?: RelationshipEndpointOut | null;
+  /**
+   * Target Prop
+   */
+  target_prop?: string | null;
+  [key: string]: unknown;
+};
+
+/**
+ * RelationshipProvenanceOut
+ */
+export type RelationshipProvenanceOut = {
+  /**
+   * Evidence Attachments
+   */
+  evidence_attachments?: Array<RelationshipEvidenceAttachmentOut>;
+  /**
+   * Evidence Review History
+   */
+  evidence_review_history?: Array<RelationshipEvidenceReviewOut>;
+  /**
+   * Sources
+   */
+  sources: Array<string>;
+  /**
+   * Statement Count
+   */
+  statement_count: number;
 };
 
 /**
@@ -1579,6 +2210,90 @@ export type SavedIn = {
 export type Scale = 'linear' | 'log';
 
 /**
+ * SearchHitOut
+ */
+export type SearchHitOut = {
+  /**
+   * Group
+   */
+  group: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Metadata
+   */
+  metadata: {
+    [key: string]: unknown;
+  };
+  /**
+   * Provenance
+   */
+  provenance: {
+    [key: string]: unknown;
+  };
+  /**
+   * Score
+   */
+  score: number;
+  /**
+   * Snippet
+   */
+  snippet: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Type
+   */
+  type: string;
+};
+
+/**
+ * SearchOut
+ */
+export type SearchOut = {
+  /**
+   * Counts
+   */
+  counts: {
+    [key: string]: number;
+  };
+  /**
+   * Group Counts
+   */
+  group_counts?: {
+    [key: string]: number;
+  };
+  /**
+   * Investigation Id
+   */
+  investigation_id?: string | null;
+  /**
+   * Query
+   */
+  query: string;
+  /**
+   * Results
+   */
+  results: Array<SearchHitOut>;
+  /**
+   * Returned
+   */
+  returned?: number;
+  /**
+   * Total
+   */
+  total: number;
+};
+
+/**
  * SendIn
  */
 export type SendIn = {
@@ -1712,6 +2427,85 @@ export type StatementAssessmentRequest = {
 };
 
 /**
+ * StatementHistoryRowOut
+ *
+ * One property value of an entity: its canonical statements and every
+ * outside assessment of it, with support and conflict counts.
+ */
+export type StatementHistoryRowOut = {
+  /**
+   * Canonical
+   */
+  canonical: boolean;
+  /**
+   * Canonical Statements
+   */
+  canonical_statements: Array<CanonicalStatementOut>;
+  /**
+   * Conflict Count
+   */
+  conflict_count: number;
+  /**
+   * External Assessments
+   */
+  external_assessments: Array<ExternalAssessmentOut>;
+  /**
+   * Latest Status
+   */
+  latest_status?: string | null;
+  /**
+   * Prop
+   */
+  prop: string;
+  /**
+   * Support Count
+   */
+  support_count: number;
+  /**
+   * Value
+   */
+  value: string;
+};
+
+/**
+ * StatementOut
+ */
+export type StatementOut = {
+  /**
+   * Dataset
+   */
+  dataset: string;
+  /**
+   * First Seen
+   */
+  first_seen?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Last Seen
+   */
+  last_seen?: string | null;
+  /**
+   * Origin
+   */
+  origin?: string | null;
+  /**
+   * Original Value
+   */
+  original_value?: string | null;
+  /**
+   * Prop
+   */
+  prop: string;
+  /**
+   * Value
+   */
+  value: string;
+};
+
+/**
  * StatementPromotionRequest
  */
 export type StatementPromotionRequest = {
@@ -1719,6 +2513,72 @@ export type StatementPromotionRequest = {
    * Note
    */
   note?: string | null;
+};
+
+/**
+ * TimelineClaimAdvisoryOut
+ */
+export type TimelineClaimAdvisoryOut = {
+  /**
+   * Message
+   */
+  message?: string | null;
+  /**
+   * Needs Review
+   */
+  needs_review: boolean;
+  /**
+   * Status
+   */
+  status: string;
+};
+
+/**
+ * TimelineClaimContextOut
+ */
+export type TimelineClaimContextOut = {
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Evidence Stances
+   */
+  evidence_stances?: Array<{
+    [key: string]: unknown;
+  }> | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * TimelineContextOut
+ *
+ * What a reporter-authored event points at, as it stands now. Each part
+ * is present only when the event links to that record.
+ */
+export type TimelineContextOut = {
+  claim?: TimelineClaimContextOut | null;
+  claim_advisory?: TimelineClaimAdvisoryOut | null;
+  /**
+   * Evidence
+   */
+  evidence?: {
+    [key: string]: unknown;
+  } | null;
+  relationship_advisory?: RelationshipAdvisoryOut | null;
+  source?: EvidenceSourceOut | null;
+  [key: string]: unknown;
 };
 
 /**
@@ -1785,6 +2645,314 @@ export type TimelineEventCreate = {
    * Verification Status
    */
   verification_status?: string;
+};
+
+/**
+ * TimelineEventOut
+ *
+ * One timeline event: a reporter-authored row (which carries `context`),
+ * or one derived from a dated statement, source, relationship or record
+ * activity (`synthetic`, with no context). Derived kinds add their own
+ * keys, so the model stays open.
+ */
+export type TimelineEventOut = {
+  context?: TimelineContextOut | null;
+  /**
+   * Date End
+   */
+  date_end?: string | null;
+  /**
+   * Date Start
+   */
+  date_start: string;
+  /**
+   * Description
+   */
+  description?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Precision
+   */
+  precision: string;
+  /**
+   * Provenance
+   */
+  provenance: {
+    [key: string]: unknown;
+  };
+  /**
+   * Refs
+   */
+  refs: {
+    [key: string]: unknown;
+  };
+  /**
+   * Sort Key
+   */
+  sort_key: string;
+  /**
+   * Synthetic
+   */
+  synthetic: boolean;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Verification Status
+   */
+  verification_status: string;
+  [key: string]: unknown;
+};
+
+/**
+ * TimelineEventRowOut
+ *
+ * A reporter-authored event as stored (the reply to creating one).
+ */
+export type TimelineEventRowOut = {
+  /**
+   * Claim Id
+   */
+  claim_id?: string | null;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Dataset
+   */
+  dataset: string;
+  /**
+   * Date End
+   */
+  date_end?: string | null;
+  /**
+   * Date Start
+   */
+  date_start: string;
+  /**
+   * Description
+   */
+  description?: string | null;
+  /**
+   * Entity Id
+   */
+  entity_id?: string | null;
+  /**
+   * Evidence Id
+   */
+  evidence_id?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Lead Id
+   */
+  lead_id?: string | null;
+  /**
+   * Origin
+   */
+  origin?: string | null;
+  /**
+   * Precision
+   */
+  precision: string;
+  /**
+   * Relationship Entity Id
+   */
+  relationship_entity_id?: string | null;
+  /**
+   * Source Id
+   */
+  source_id?: string | null;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Verification Status
+   */
+  verification_status: string;
+};
+
+/**
+ * TimelineOut
+ */
+export type TimelineOut = {
+  /**
+   * Counts
+   */
+  counts: {
+    [key: string]: number;
+  };
+  /**
+   * Events
+   */
+  events: Array<TimelineEventOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Offset
+   */
+  offset: number;
+  /**
+   * Returned
+   */
+  returned: number;
+  /**
+   * Total
+   */
+  total: number;
+  /**
+   * Verification Counts
+   */
+  verification_counts: {
+    [key: string]: number;
+  };
+};
+
+/**
+ * TraceClaimLinkOut
+ */
+export type TraceClaimLinkOut = {
+  claim?: TraceClaimOut | null;
+  /**
+   * Link Id
+   */
+  link_id: string;
+  /**
+   * Note
+   */
+  note?: string | null;
+  /**
+   * Stance
+   */
+  stance: string;
+};
+
+/**
+ * TraceClaimOut
+ */
+export type TraceClaimOut = {
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * TraceEvidenceLinkOut
+ */
+export type TraceEvidenceLinkOut = {
+  evidence?: TraceEvidenceOut | null;
+  extraction_lineage?: ExtractionLineageOut | null;
+  /**
+   * Link Id
+   */
+  link_id?: string | null;
+  /**
+   * Note
+   */
+  note?: string | null;
+  source?: EvidenceSourceOut | null;
+  /**
+   * Stance
+   */
+  stance: string;
+};
+
+/**
+ * TraceEvidenceOut
+ */
+export type TraceEvidenceOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Locator
+   */
+  locator?: string | null;
+  /**
+   * Notes
+   */
+  notes?: string | null;
+  /**
+   * Quote
+   */
+  quote?: string | null;
+};
+
+/**
+ * TraceLeadLinkOut
+ */
+export type TraceLeadLinkOut = {
+  lead: TraceLeadOut;
+  /**
+   * Link Id
+   */
+  link_id: string;
+  /**
+   * Note
+   */
+  note?: string | null;
+};
+
+/**
+ * TraceLeadOut
+ */
+export type TraceLeadOut = {
+  /**
+   * Detail
+   */
+  detail?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Provider
+   */
+  provider?: string | null;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Title
+   */
+  title: string;
 };
 
 /**
@@ -5665,10 +6833,15 @@ export type ListEntityStatementHistoryError =
 
 export type ListEntityStatementHistoryResponses = {
   /**
+   * Response List Entity Statement History
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<StatementHistoryRowOut>;
 };
+
+export type ListEntityStatementHistoryResponse =
+  ListEntityStatementHistoryResponses[keyof ListEntityStatementHistoryResponses];
 
 export type ListEntityStatementsData = {
   body?: never;
@@ -5839,8 +7012,11 @@ export type GetExtractionCandidateLineageResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ExtractionLineageOut;
 };
+
+export type GetExtractionCandidateLineageResponse =
+  GetExtractionCandidateLineageResponses[keyof GetExtractionCandidateLineageResponses];
 
 export type ReviewExtractionCandidateData = {
   body: ExtractionCandidateReviewRequest;
@@ -6878,8 +8054,11 @@ export type GetInvestigationTimelineResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: TimelineOut;
 };
+
+export type GetInvestigationTimelineResponse =
+  GetInvestigationTimelineResponses[keyof GetInvestigationTimelineResponses];
 
 export type InvestigationVisualCatalogData = {
   body?: never;
@@ -7318,8 +8497,11 @@ export type FindExtractionLineageEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ExtractionLineageLookupOut;
 };
+
+export type FindExtractionLineageEndpointResponse =
+  FindExtractionLineageEndpointResponses[keyof FindExtractionLineageEndpointResponses];
 
 export type GetRecordProvenanceTraceData = {
   body?: never;
@@ -7351,8 +8533,11 @@ export type GetRecordProvenanceTraceResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ProvenanceTraceOut;
 };
+
+export type GetRecordProvenanceTraceResponse =
+  GetRecordProvenanceTraceResponses[keyof GetRecordProvenanceTraceResponses];
 
 export type RelationshipSchemasData = {
   body?: never;
@@ -7603,8 +8788,11 @@ export type SearchWorkbenchResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: SearchOut;
 };
+
+export type SearchWorkbenchResponse =
+  SearchWorkbenchResponses[keyof SearchWorkbenchResponses];
 
 export type DeleteConnectorCredentialData = {
   body?: never;
@@ -8154,8 +9342,11 @@ export type CreateTimelineEventEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: TimelineEventRowOut;
 };
+
+export type CreateTimelineEventEndpointResponse =
+  CreateTimelineEventEndpointResponses[keyof CreateTimelineEventEndpointResponses];
 
 export type CreateWriteupEndpointData = {
   body: WriteupCreate;

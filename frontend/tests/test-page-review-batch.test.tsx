@@ -5,10 +5,15 @@
 // per-row Review action, and the "Start review (problems first)" action
 // that jumps into the one-document review queue starting at the first
 // flagged document while still handing it the whole batch to walk through.
+// The stub answers by route (ADR-0005, line 15): the page asks for every
+// document in the batch at once, so each test says what the server holds
+// for each id.
 import {cleanup, render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, describe, expect, it, vi} from 'vitest';
+
+import {mockApi} from '../test-support/mock-api';
 
 const {searchParamsRef, mockPush} = vi.hoisted(() => ({
   searchParamsRef: {current: new URLSearchParams()},
@@ -30,15 +35,13 @@ afterEach(() => {
   mockPush.mockClear();
 });
 
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {status, headers: {'content-type': 'application/json'}});
-}
-
 async function importBatchPage(): Promise<() => ReactElement> {
   vi.resetModules();
   const mod = await import('../app/review/batch/page');
   return mod.default;
 }
+
+const documentRoute = (id: string) => `GET /api/documents/${id}`;
 
 function docFixture(overrides: Record<string, unknown> = {}) {
   return {
@@ -52,16 +55,15 @@ function docFixture(overrides: Record<string, unknown> = {}) {
 describe('Batch triage table', () => {
   it('summarizes the batch and lets the reporter filter to rows with problems', async () => {
     setParams('inv=inv-1&docs=doc-a,doc-b,doc-c');
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse(docFixture({id: 'doc-a', filename: 'clean.txt'})))
-      .mockResolvedValueOnce(jsonResponse(docFixture({
+    const api = mockApi({
+      [documentRoute('doc-a')]: docFixture({id: 'doc-a', filename: 'clean.txt'}),
+      [documentRoute('doc-b')]: docFixture({
         id: 'doc-b', filename: 'partial.pdf', extraction_issues: ['1 of 2 page(s) produced no extractable text.'], candidate_counts: {evidence: 1, entity: 2},
-      })))
-      .mockResolvedValueOnce(jsonResponse(docFixture({
+      }),
+      [documentRoute('doc-c')]: docFixture({
         id: 'doc-c', filename: 'broken.docx', extraction_status: 'failed', extraction_error: 'Unsupported or corrupt file', candidate_counts: {},
-      })));
-    vi.stubGlobal('fetch', fetchMock);
+      }),
+    });
 
     const BatchTriagePage = await importBatchPage();
     render(<BatchTriagePage />);
@@ -71,6 +73,9 @@ describe('Batch triage table', () => {
     expect(screen.getByTestId('triage-row-doc-a')).toBeInTheDocument();
     expect(screen.getByTestId('triage-row-doc-b')).toBeInTheDocument();
     expect(screen.getByTestId('triage-row-doc-c')).toBeInTheDocument();
+    // Each document in the batch is asked for once.
+    for (const id of ['doc-a', 'doc-b', 'doc-c']) expect(api.calls(documentRoute(id)), id).toHaveLength(1);
+    expect(api.unmatched()).toEqual([]);
 
     const user = userEvent.setup();
     await user.click(screen.getByTestId('problems-only-toggle'));
@@ -85,11 +90,10 @@ describe('Batch triage table', () => {
 
   it('jumps a per-row Review click into the one-document queue starting at that document', async () => {
     setParams('inv=inv-1&docs=doc-a,doc-b');
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse(docFixture({id: 'doc-a', filename: 'first.txt'})))
-      .mockResolvedValueOnce(jsonResponse(docFixture({id: 'doc-b', filename: 'second.txt'})));
-    vi.stubGlobal('fetch', fetchMock);
+    mockApi({
+      [documentRoute('doc-a')]: docFixture({id: 'doc-a', filename: 'first.txt'}),
+      [documentRoute('doc-b')]: docFixture({id: 'doc-b', filename: 'second.txt'}),
+    });
 
     const BatchTriagePage = await importBatchPage();
     render(<BatchTriagePage />);
@@ -102,12 +106,11 @@ describe('Batch triage table', () => {
 
   it('"Start review" jumps to the first flagged document, keeping the rest of the batch queued behind it', async () => {
     setParams('inv=inv-1&docs=doc-a,doc-b,doc-c');
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse(docFixture({id: 'doc-a', filename: 'clean.txt'})))
-      .mockResolvedValueOnce(jsonResponse(docFixture({id: 'doc-b', filename: 'flagged.txt', extraction_issues: ['issue']})))
-      .mockResolvedValueOnce(jsonResponse(docFixture({id: 'doc-c', filename: 'clean2.txt'})));
-    vi.stubGlobal('fetch', fetchMock);
+    mockApi({
+      [documentRoute('doc-a')]: docFixture({id: 'doc-a', filename: 'clean.txt'}),
+      [documentRoute('doc-b')]: docFixture({id: 'doc-b', filename: 'flagged.txt', extraction_issues: ['issue']}),
+      [documentRoute('doc-c')]: docFixture({id: 'doc-c', filename: 'clean2.txt'}),
+    });
 
     const BatchTriagePage = await importBatchPage();
     render(<BatchTriagePage />);
@@ -121,9 +124,12 @@ describe('Batch triage table', () => {
 
   it('shows a clean empty state when the batch has no documents', async () => {
     setParams('inv=inv-1&docs=');
+    // Nothing is listed, so nothing is asked for.
+    const api = mockApi();
     const BatchTriagePage = await importBatchPage();
     render(<BatchTriagePage />);
 
     await screen.findByText(/Nothing was imported in this batch/);
+    expect(api.fetch).not.toHaveBeenCalled();
   });
 });

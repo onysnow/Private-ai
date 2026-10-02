@@ -5,8 +5,10 @@
 // needs an investigation selected AND jsdom object-URL/anchor-click
 // plumbing, a different kind of setup than fetch mocking alone). Unlike
 // previewBackup/restoreBackup, downloadBackup has an `if(!inv)return` guard,
-// so it needs the full selectInvestigation() cascade driven via
-// loadAppBootstrap()'s auto-select, same pattern as cycles 4/6/7.
+// so it needs an investigation opened by loadAppBootstrap()'s auto-select,
+// same pattern as cycles 4/6/7 (test-support/page-routes.ts holds the routes
+// that opening a case requests; replies are keyed by route, not by call
+// order -- ADR-0005, line 15).
 //
 // downloadBackup calls api.blob(), which resolves the raw Response and
 // calls .blob() on it -- jsdom's fetch/Response support that natively, no
@@ -23,6 +25,10 @@ import {cleanup, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+import {mockApi} from '../test-support/mock-api';
+import type {MockApi} from '../test-support/mock-api';
+import {pageRoutes} from '../test-support/page-routes';
 
 beforeEach(() => {
   if (!window.matchMedia) {
@@ -47,42 +53,6 @@ afterEach(() => {
   delete (URL as unknown as {revokeObjectURL?: unknown}).revokeObjectURL;
 });
 
-const validSettingsStatus = {
-  environment: 'test',
-  database: 'sqlite',
-  document_storage_dir: '/tmp/docs',
-  limits: {},
-  restore_api_enabled: true,
-  document_extraction: {
-    pdf_ocr_enabled: false,
-    pdf_ocr_language: 'eng',
-    pdf_ocr_dpi: 300,
-    pdf_ocr_min_native_chars: 200,
-    local_entity_suggestions_enabled: false,
-    entity_extraction_owner: 'workbench_local',
-    ocr_runtime: {
-      available: false,
-      requested_languages: [],
-      missing_languages: [],
-      detail: 'not checked',
-    },
-  },
-  access: {
-    remote_api_enabled: false,
-    mode: 'local_only',
-    token_configured: false,
-  },
-  cors_allowed_origins: [],
-  connectors: {},
-};
-
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {'content-type': 'application/json'},
-  });
-}
-
 function blobResponse(bytes: string, status = 200): Response {
   // A jsdom-environment `new Blob(...)` isn't the same class undici's
   // Response/`.blob()` expect (`object.stream is not a function`), so pass
@@ -102,78 +72,36 @@ async function importHome(): Promise<() => ReactElement> {
 }
 
 const investigation = {id: 'inv-1', name: 'Kestrelwood filings'};
+const EXPORT = 'GET /api/investigations/inv-1/export';
 
-const emptyGraph = {
-  nodes: [],
-  edges: [],
-  schemas: [],
-  reconciliation: {
-    collapsed_by_default: true,
-    suppressed_duplicate_count: 0,
-    underlying_edge_count: 0,
-    visible_edge_count: 0,
-  },
-};
-
-// The 9 selectInvestigation() cascade calls, in call order -- see
-// test-page-leads.test.tsx's module docstring for why the shapes below
-// (raw arrays for entities/claims/evidence/sources/documents, not
-// {entities: [...]}) and the 10th AiReasoningPanel call are required.
-function cascadeResponses(): Response[] {
-  return [
-    jsonResponse([]), // GET connector-findings
-    jsonResponse([]), // GET entities
-    jsonResponse(emptyGraph), // GET graph
-    jsonResponse({events: [], verification_counts: {}}), // GET timeline
-    jsonResponse({items: []}), // GET leads/queue
-    jsonResponse([]), // GET claims
-    jsonResponse([]), // GET evidence
-    jsonResponse([]), // GET sources
-    jsonResponse([]), // GET documents
-  ];
-}
-
-async function bootstrapWithSelectedInvestigation(): Promise<{
-  fetchMock: ReturnType<typeof vi.fn>;
-}> {
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce(jsonResponse(validSettingsStatus)) // GET settings/status
-    .mockResolvedValueOnce(jsonResponse([investigation])) // GET investigations
-    .mockResolvedValueOnce(jsonResponse({providers: ['aleph']})); // GET connectors
-  for (const response of cascadeResponses()) {
-    fetchMock.mockResolvedValueOnce(response);
-  }
-  fetchMock.mockResolvedValueOnce(jsonResponse({candidates: []})); // AiReasoningPanel
-  vi.stubGlobal('fetch', fetchMock);
+async function bootstrapWithSelectedInvestigation(): Promise<MockApi> {
+  const api = mockApi(pageRoutes({investigations: [investigation]}));
 
   const Home = await importHome();
   render(<Home />);
   await screen.findByText('Kestrelwood filings');
   await waitFor(() => expect(screen.getByRole('button', {name: 'Download backup'})).not.toBeDisabled());
-  return {fetchMock};
+  return api;
 }
 
 describe('Home portable backup download', () => {
   it('is disabled until an investigation is selected', async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse(validSettingsStatus)) // GET settings/status
-      .mockResolvedValueOnce(jsonResponse([])) // GET investigations (none)
-      .mockResolvedValueOnce(jsonResponse({providers: ['aleph']})); // GET connectors
-    vi.stubGlobal('fetch', fetchMock);
+    // No investigation: nothing beyond the three bootstrap routes is requested.
+    const api = mockApi(pageRoutes());
 
     const Home = await importHome();
     render(<Home />);
     await screen.findByText('Portable investigation backup & restore');
 
     expect(screen.getByRole('button', {name: 'Download backup'})).toBeDisabled();
+    expect(api.calls(EXPORT)).toHaveLength(0);
   });
 
   it('downloads the backup archive and triggers a browser save via an object URL', async () => {
-    const {fetchMock} = await bootstrapWithSelectedInvestigation();
+    const api = await bootstrapWithSelectedInvestigation();
 
-    fetchMock.mockResolvedValueOnce(blobResponse('zip-bytes')); // GET export
+    // A Response body can be read once, so the route makes a fresh one per request.
+    api.add({[EXPORT]: () => blobResponse('zip-bytes')});
 
     const createObjectURL = vi.fn((_blob: Blob) => 'blob:mock-url');
     const revokeObjectURL = vi.fn();
@@ -193,9 +121,8 @@ describe('Home portable backup download', () => {
 
     await screen.findByText('Backup downloaded.');
 
-    const [exportUrl] = fetchMock.mock.calls[13];
-    expect(exportUrl).toContain('/api/investigations/inv-1/export');
-    expect(exportUrl).toContain('include_documents=true');
+    expect(api.calls(EXPORT)).toHaveLength(1);
+    expect(api.lastUrl(EXPORT).searchParams.get('include_documents')).toBe('true');
 
     expect(createObjectURL).toHaveBeenCalledTimes(1);
     // The Blob passed to createObjectURL comes back from undici's
@@ -214,9 +141,10 @@ describe('Home portable backup download', () => {
   });
 
   it('shows an error status when the export request fails', async () => {
-    const {fetchMock} = await bootstrapWithSelectedInvestigation();
+    const api = await bootstrapWithSelectedInvestigation();
 
-    fetchMock.mockRejectedValueOnce(new Error('export endpoint unreachable'));
+    // The request itself fails (no reply at all), as when the API is unreachable.
+    api.add({[EXPORT]: () => { throw new Error('export endpoint unreachable'); }});
 
     const createObjectURL = vi.fn(() => 'blob:mock-url');
     (URL as unknown as {createObjectURL: typeof createObjectURL}).createObjectURL = createObjectURL;
@@ -225,6 +153,7 @@ describe('Home portable backup download', () => {
     await userEvent.setup().click(screen.getByRole('button', {name: 'Download backup'}));
 
     await screen.findByText('export endpoint unreachable');
+    expect(api.calls(EXPORT)).toHaveLength(1);
     expect(createObjectURL).not.toHaveBeenCalled();
   });
 });

@@ -5,11 +5,15 @@
 // accept/reject updating per-document and running totals, Next/Finish
 // pagination to the final summary, and the fallback mode that resolves its
 // own document list (via ?inv= with no ?docs=) by finding every document in
-// the investigation that still has proposed candidates.
+// the investigation that still has proposed candidates. The stub answers by
+// route (ADR-0005, line 15): each test says which documents and proposals
+// the server holds.
 import {cleanup, render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, describe, expect, it, vi} from 'vitest';
+
+import {mockApi} from '../test-support/mock-api';
 
 const {searchParamsRef, mockPush} = vi.hoisted(() => ({
   searchParamsRef: {current: new URLSearchParams()},
@@ -31,15 +35,14 @@ afterEach(() => {
   mockPush.mockClear();
 });
 
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {status, headers: {'content-type': 'application/json'}});
-}
-
 async function importReviewPage(): Promise<() => ReactElement> {
   vi.resetModules();
   const mod = await import('../app/review/page');
   return mod.default;
 }
+
+const documentRoute = (id: string) => `GET /api/documents/${id}`;
+const candidatesRoute = (id: string) => `GET /api/documents/${id}/candidates`;
 
 function docFixture(overrides: Record<string, unknown> = {}) {
   return {
@@ -85,11 +88,12 @@ function ambiguousEntityCandidate(overrides: Record<string, unknown> = {}) {
 describe('Document review queue: issues and clarifying questions', () => {
   it('shows the extraction-issues banner and lets the reporter accept a plain proposal', async () => {
     setParams('inv=inv-1&docs=doc-1');
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse(docFixture({extraction_issues: ['1 of 2 page(s) produced no extractable text.']})))
-      .mockResolvedValueOnce(jsonResponse([evidenceCandidate()]));
-    vi.stubGlobal('fetch', fetchMock);
+    const review = 'POST /api/extraction-candidates/cand-evidence/review';
+    const api = mockApi({
+      [documentRoute('doc-1')]: docFixture({extraction_issues: ['1 of 2 page(s) produced no extractable text.']}),
+      [candidatesRoute('doc-1')]: [evidenceCandidate()],
+      [review]: {candidate: {id: 'cand-evidence', review_status: 'accepted'}, record: {}},
+    });
 
     const ReviewPage = await importReviewPage();
     render(<ReviewPage />);
@@ -97,23 +101,26 @@ describe('Document review queue: issues and clarifying questions', () => {
     await screen.findByTestId('issue-banner');
     expect(screen.getByText(/1 of 2 page\(s\)/)).toBeInTheDocument();
     expect(screen.getByText('Document 1 of 1')).toBeInTheDocument();
+    // The queue asks for the proposals still open, with their explanations.
+    expect(api.lastUrl(candidatesRoute('doc-1')).searchParams.get('status')).toBe('proposed');
+    expect(api.lastUrl(candidatesRoute('doc-1')).searchParams.get('explain')).toBe('true');
 
-    fetchMock.mockResolvedValueOnce(jsonResponse({candidate: {id: 'cand-evidence', review_status: 'accepted'}, record: {}}));
     await userEvent.setup().click(screen.getByRole('button', {name: 'Accept'}));
 
     await screen.findByText('No proposals were generated from what could be parsed.');
-    const [reviewUrl, reviewInit] = fetchMock.mock.calls[2];
-    expect(String(reviewUrl)).toContain('/api/extraction-candidates/cand-evidence/review');
-    expect(JSON.parse((reviewInit as RequestInit).body as string)).toMatchObject({decision: 'accept'});
+    expect(api.calls(review)).toHaveLength(1);
+    expect(api.lastBody(review)).toMatchObject({decision: 'accept'});
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('gates Accept on an ambiguous entity until the clarifying question is answered, then sends the chosen schema', async () => {
     setParams('inv=inv-1&docs=doc-1');
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse(docFixture()))
-      .mockResolvedValueOnce(jsonResponse([ambiguousEntityCandidate()]));
-    vi.stubGlobal('fetch', fetchMock);
+    const review = 'POST /api/extraction-candidates/cand-entity/review';
+    const api = mockApi({
+      [documentRoute('doc-1')]: docFixture(),
+      [candidatesRoute('doc-1')]: [ambiguousEntityCandidate()],
+      [review]: {candidate: {}, record: {}},
+    });
 
     const ReviewPage = await importReviewPage();
     render(<ReviewPage />);
@@ -128,66 +135,73 @@ describe('Document review queue: issues and clarifying questions', () => {
     // matched) -- click it to confirm.
     await user.click(within(card).getByRole('button', {name: /^Person/}));
     expect(acceptButton).toBeEnabled();
+    expect(api.calls(review)).toHaveLength(0);
 
-    fetchMock.mockResolvedValueOnce(jsonResponse({candidate: {}, record: {}}));
     await user.click(acceptButton);
-    const [, reviewInit] = fetchMock.mock.calls[2];
-    expect(JSON.parse((reviewInit as RequestInit).body as string)).toMatchObject({
+    expect(api.calls(review)).toHaveLength(1);
+    expect(api.lastBody(review)).toMatchObject({
       decision: 'accept', caption: 'Alaric Voss', entity_schema: 'Person',
     });
   });
 
   it('paginates Next across documents and reaches a final summary with running totals', async () => {
     setParams('inv=inv-1&docs=doc-1,doc-2');
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse(docFixture()))
-      .mockResolvedValueOnce(jsonResponse([evidenceCandidate()]))
-      .mockResolvedValueOnce(jsonResponse(docFixture({id: 'doc-2', filename: 'second.txt'})))
-      .mockResolvedValueOnce(jsonResponse([]));
-    vi.stubGlobal('fetch', fetchMock);
+    const api = mockApi({
+      [documentRoute('doc-1')]: docFixture(),
+      [candidatesRoute('doc-1')]: [evidenceCandidate()],
+      [documentRoute('doc-2')]: docFixture({id: 'doc-2', filename: 'second.txt'}),
+      [candidatesRoute('doc-2')]: [],
+    });
 
     const ReviewPage = await importReviewPage();
     render(<ReviewPage />);
 
     await screen.findByText('Document 1 of 2');
+    // The second document is not loaded until the reporter moves on to it.
+    expect(api.calls(documentRoute('doc-2'))).toHaveLength(0);
     await userEvent.setup().click(screen.getByRole('button', {name: 'Next document'}));
 
     await screen.findByText('second.txt');
     expect(screen.getByText('Document 2 of 2')).toBeInTheDocument();
+    expect(api.calls(documentRoute('doc-2'))).toHaveLength(1);
+    expect(api.calls(candidatesRoute('doc-2'))).toHaveLength(1);
     await userEvent.setup().click(screen.getByRole('button', {name: 'Finish'}));
 
     await screen.findByTestId('review-summary');
     expect(screen.getByText(/2 document\(s\) reviewed this session/)).toBeInTheDocument();
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('falls back to every document in the investigation that still has proposed candidates when no ?docs= is given', async () => {
     setParams('inv=inv-1');
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse([docFixture({id: 'doc-a'}), docFixture({id: 'doc-b', filename: 'clean.txt'})])) // GET investigations/inv-1/documents
-      .mockResolvedValueOnce(jsonResponse([evidenceCandidate()])) // doc-a proposed candidates: has one
-      .mockResolvedValueOnce(jsonResponse([])) // doc-b proposed candidates: none, fully reviewed already
-      .mockResolvedValueOnce(jsonResponse(docFixture({id: 'doc-a'}))) // loadDoc(doc-a) detail
-      .mockResolvedValueOnce(jsonResponse([evidenceCandidate()])); // loadDoc(doc-a) candidates
-    vi.stubGlobal('fetch', fetchMock);
+    const api = mockApi({
+      'GET /api/investigations/inv-1/documents': [docFixture({id: 'doc-a'}), docFixture({id: 'doc-b', filename: 'clean.txt'})],
+      [candidatesRoute('doc-a')]: [evidenceCandidate()], // doc-a: one proposal still open
+      [candidatesRoute('doc-b')]: [], // doc-b: none, fully reviewed already
+      [documentRoute('doc-a')]: docFixture({id: 'doc-a'}),
+    });
 
     const ReviewPage = await importReviewPage();
     render(<ReviewPage />);
 
     await screen.findByText('Document 1 of 1');
     await screen.findByText('memo.txt');
+    // Every document was checked for open proposals; only doc-a was opened.
+    expect(api.calls(candidatesRoute('doc-b'))).toHaveLength(1);
+    expect(api.calls(documentRoute('doc-a'))).toHaveLength(1);
+    expect(api.calls(documentRoute('doc-b'))).toHaveLength(0);
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('shows a clean empty state when nothing needs review', async () => {
     setParams('inv=inv-1');
-    const fetchMock = vi.fn().mockResolvedValueOnce(jsonResponse([]));
-    vi.stubGlobal('fetch', fetchMock);
+    const api = mockApi({'GET /api/investigations/inv-1/documents': []});
 
     const ReviewPage = await importReviewPage();
     render(<ReviewPage />);
 
     await screen.findByText(/Nothing here needs review right now/);
+    expect(api.unmatched()).toEqual([]);
   });
 });
 
@@ -202,11 +216,10 @@ describe('Document review queue: split-pane source highlighting', () => {
       id: 'cand-evidence', chunk_id: 'chunk-2',
       payload: {quote: 'A second, unrelated paragraph.', locator: 'line 2', span: {start_char: 0, end_char: 30}},
     });
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse(docWithChunksFixture()))
-      .mockResolvedValueOnce(jsonResponse([entity, evidence]));
-    vi.stubGlobal('fetch', fetchMock);
+    mockApi({
+      [documentRoute('doc-1')]: docWithChunksFixture(),
+      [candidatesRoute('doc-1')]: [entity, evidence],
+    });
 
     const ReviewPage = await importReviewPage();
     render(<ReviewPage />);
@@ -237,11 +250,10 @@ describe('Document review queue: split-pane source highlighting', () => {
 
   it('renders plain chunk text with no crash when a document has no extracted chunks', async () => {
     setParams('inv=inv-1&docs=doc-1');
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse(docFixture())) // no chunks field at all
-      .mockResolvedValueOnce(jsonResponse([evidenceCandidate()]));
-    vi.stubGlobal('fetch', fetchMock);
+    mockApi({
+      [documentRoute('doc-1')]: docFixture(), // no chunks field at all
+      [candidatesRoute('doc-1')]: [evidenceCandidate()],
+    });
 
     const ReviewPage = await importReviewPage();
     render(<ReviewPage />);

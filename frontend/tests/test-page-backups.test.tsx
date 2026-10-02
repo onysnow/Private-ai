@@ -6,15 +6,19 @@
 // preview+restore together). previewBackup and restoreBackup deliberately
 // have no `if(!inv)` guard -- a restore creates a brand-new investigation --
 // so, like the API-access and investigation-search flows (cycles 1-2), these
-// are reachable with the investigations list kept empty; no need to drive
-// selectInvestigation()'s cascade for preview. restoreBackup does call
-// selectInvestigation() on success, so that one test mocks the full 9-call
-// cascade plus AiReasoningPanel's own post-select fetch (see
-// test-page-leads.test.tsx's docstring for why that 10th call exists).
+// are reachable with the investigations list kept empty; no per-investigation
+// loads are needed for preview. restoreBackup does call selectInvestigation()
+// on success, so that one test also gives the stub the restored case's
+// routes (test-support/page-routes.ts; replies are keyed by route, not by
+// call order -- ADR-0005, line 15).
 import {cleanup, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+import {mockApi} from '../test-support/mock-api';
+import type {MockApi} from '../test-support/mock-api';
+import {investigationRoutes, pageRoutes} from '../test-support/page-routes';
 
 beforeEach(() => {
   if (!window.matchMedia) {
@@ -36,47 +40,14 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const validSettingsStatus = {
-  environment: 'test',
-  database: 'sqlite',
-  document_storage_dir: '/tmp/docs',
-  limits: {},
-  restore_api_enabled: true,
-  document_extraction: {
-    pdf_ocr_enabled: false,
-    pdf_ocr_language: 'eng',
-    pdf_ocr_dpi: 300,
-    pdf_ocr_min_native_chars: 200,
-    local_entity_suggestions_enabled: false,
-    entity_extraction_owner: 'workbench_local',
-    ocr_runtime: {
-      available: false,
-      requested_languages: [],
-      missing_languages: [],
-      detail: 'not checked',
-    },
-  },
-  access: {
-    remote_api_enabled: false,
-    mode: 'local_only',
-    token_configured: false,
-  },
-  cors_allowed_origins: [],
-  connectors: {},
-};
-
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {'content-type': 'application/json'},
-  });
-}
-
 async function importHome(): Promise<() => ReactElement> {
   vi.resetModules();
   const mod = await import('../app/page');
   return mod.default;
 }
+
+const PREVIEW = 'POST /api/backups/preview';
+const RESTORE = 'POST /api/backups/restore';
 
 function backupFile(): File {
   return new File(['fake-zip-bytes'], 'investigation-inv-1.jwbackup.zip', {
@@ -101,22 +72,17 @@ function restorablePreview(overrides: Record<string, unknown> = {}) {
   };
 }
 
-async function bootstrapNoInvestigations(): Promise<{
-  fetchMock: ReturnType<typeof vi.fn>;
-}> {
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce(jsonResponse(validSettingsStatus)) // GET settings/status
-    .mockResolvedValueOnce(jsonResponse([])) // GET investigations (none -- no auto-select)
-    .mockResolvedValueOnce(jsonResponse({providers: ['aleph']})); // GET connectors
-  vi.stubGlobal('fetch', fetchMock);
+async function bootstrapNoInvestigations(): Promise<MockApi> {
+  // An empty investigation list: no case is opened, so nothing beyond the
+  // three bootstrap routes is requested.
+  const api = mockApi(pageRoutes());
 
   const Home = await importHome();
   render(<Home />);
   await screen.findByText(
     'API: local access',
   );
-  return {fetchMock};
+  return api;
 }
 
 function fileInput(): HTMLInputElement {
@@ -127,10 +93,8 @@ function fileInput(): HTMLInputElement {
 
 describe('Home portable investigation backup & restore', () => {
   it('previews a restorable backup and offers the confirmation checkbox', async () => {
-    const {fetchMock} = await bootstrapNoInvestigations();
-    fetchMock.mockResolvedValueOnce(
-      jsonResponse(restorablePreview({warnings: ['Backup is 3 days old.']})),
-    ); // POST /api/backups/preview
+    const api = await bootstrapNoInvestigations();
+    api.add({[PREVIEW]: restorablePreview({warnings: ['Backup is 3 days old.']})});
 
     const user = userEvent.setup();
     await user.upload(fileInput(), backupFile());
@@ -149,24 +113,23 @@ describe('Home portable investigation backup & restore', () => {
     // Restore stays disabled until the confirmation checkbox is checked.
     expect(screen.getByRole('button', {name: 'Restore investigation'})).toBeDisabled();
 
-    expect(fetchMock).toHaveBeenCalledTimes(4);
-    const [previewUrl, previewInit] = fetchMock.mock.calls[3];
-    expect(previewUrl).toContain('/api/backups/preview');
-    expect((previewInit as RequestInit).method).toBe('POST');
+    // One multipart POST carrying the chosen file, and nothing else requested.
+    expect(api.calls(PREVIEW)).toHaveLength(1);
+    expect(((api.lastBody(PREVIEW) as FormData).get('file') as File).name).toBe('investigation-inv-1.jwbackup.zip');
+    expect(api.calls(RESTORE)).toHaveLength(0);
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('blocks restore and reports conflicts when the preview cannot restore', async () => {
-    const {fetchMock} = await bootstrapNoInvestigations();
-    fetchMock.mockResolvedValueOnce(
-      jsonResponse(
-        restorablePreview({
-          can_restore: false,
-          conflicts: [
-            {kind: 'id_collision', table: 'entities', id: 'ent-9', message: 'Entity ent-9 already exists.'},
-          ],
-        }),
-      ),
-    );
+    const api = await bootstrapNoInvestigations();
+    api.add({
+      [PREVIEW]: restorablePreview({
+        can_restore: false,
+        conflicts: [
+          {kind: 'id_collision', table: 'entities', id: 'ent-9', message: 'Entity ent-9 already exists.'},
+        ],
+      }),
+    });
 
     await userEvent.setup().upload(fileInput(), backupFile());
     await userEvent.setup().click(screen.getByRole('button', {name: 'Preview restore'}));
@@ -181,11 +144,12 @@ describe('Home portable investigation backup & restore', () => {
         'I understand this creates a separate investigation and will not merge with existing records.',
       ),
     ).not.toBeInTheDocument();
+    expect(api.calls(RESTORE)).toHaveLength(0);
   });
 
   it('restores after confirmation, then selects the new investigation', async () => {
-    const {fetchMock} = await bootstrapNoInvestigations();
-    fetchMock.mockResolvedValueOnce(jsonResponse(restorablePreview())); // preview
+    const api = await bootstrapNoInvestigations();
+    api.add({[PREVIEW]: restorablePreview()});
 
     const user = userEvent.setup();
     await user.upload(fileInput(), backupFile());
@@ -199,45 +163,34 @@ describe('Home portable investigation backup & restore', () => {
     );
     expect(screen.getByRole('button', {name: 'Restore investigation'})).toBeEnabled();
 
-    fetchMock
-      .mockResolvedValueOnce(
-        jsonResponse({
-          investigation_id: 'inv-restored',
-          restored_counts: {entities: 4},
-          manifest: {format: 'jwbackup', version: 1},
-        }),
-      ) // POST /api/backups/restore
-      .mockResolvedValueOnce(jsonResponse([{id: 'inv-restored', name: 'Restored investigation'}])) // GET investigations reload
-      .mockResolvedValueOnce(jsonResponse([])) // findings
-      .mockResolvedValueOnce(jsonResponse([])) // entities (parseEntityList expects the raw array)
-      .mockResolvedValueOnce(
-        jsonResponse({
-          nodes: [],
-          edges: [],
-          schemas: [],
-          reconciliation: {
-            collapsed_by_default: true,
-            suppressed_duplicate_count: 0,
-            underlying_edge_count: 0,
-            visible_edge_count: 0,
-          },
-        }),
-      ) // graph
-      .mockResolvedValueOnce(jsonResponse({events: [], verification_counts: {}})) // timeline
-      .mockResolvedValueOnce(jsonResponse({items: []})) // leads/queue
-      .mockResolvedValueOnce(jsonResponse([])) // claims
-      .mockResolvedValueOnce(jsonResponse([])) // evidence
-      .mockResolvedValueOnce(jsonResponse([])) // sources
-      .mockResolvedValueOnce(jsonResponse([])) // documents
-      .mockResolvedValueOnce(jsonResponse({candidates: []})); // AiReasoningPanel queue
+    // After the restore the server lists the new investigation, and opening
+    // it loads its (empty) records.
+    const restored = {id: 'inv-restored', name: 'Restored investigation'};
+    api.add({
+      [RESTORE]: {
+        investigation_id: 'inv-restored',
+        restored_counts: {entities: 4},
+        manifest: {format: 'jwbackup', version: 1},
+      },
+      'GET /api/investigations': [restored],
+      ...investigationRoutes(restored.id),
+    });
 
     await user.click(screen.getByRole('button', {name: 'Restore investigation'}));
 
     await screen.findByText('Restored investigation inv-restored.');
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(16));
+    // The new case is opened: its name is selected and every one of its
+    // loads has been requested.
+    await screen.findByText('Restored investigation');
+    await waitFor(() => {
+      for (const route of Object.keys(investigationRoutes(restored.id))) {
+        expect(api.calls(route).length, route).toBeGreaterThan(0);
+      }
+    });
 
-    const [restoreUrl, restoreInit] = fetchMock.mock.calls[4];
-    expect(restoreUrl).toContain('/api/backups/restore');
-    expect((restoreInit as RequestInit).method).toBe('POST');
+    expect(api.calls(RESTORE)).toHaveLength(1);
+    expect(((api.lastBody(RESTORE) as FormData).get('file') as File).name).toBe('investigation-inv-1.jwbackup.zip');
+    expect(api.calls('GET /api/investigations')).toHaveLength(2);
+    expect(api.unmatched()).toEqual([]);
   });
 });

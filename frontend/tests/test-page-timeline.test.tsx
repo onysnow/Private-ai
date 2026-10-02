@@ -1,13 +1,19 @@
 // @vitest-environment jsdom
-// Issue #40 wiring: the "Investigation timeline" section renders the
-// reusable <CaseTimeline> chart above the existing event list whenever the
+// Issue #40 wiring: the "Investigation timeline" section (now the
+// TimelinePanel in features/timeline/timeline-panel.tsx, which loads its
+// own events through the generated client) renders the reusable
+// <CaseTimeline> chart above the existing event list whenever the
 // investigation has timeline events. The ECharts wrapper (<Chart>) is
-// stubbed -- jsdom has no canvas -- so this asserts the chart option the page
-// ends up building from the loaded events, matching
-// tests/test-case-timeline.test.tsx.
-import {cleanup, render, screen} from '@testing-library/react';
+// stubbed -- jsdom has no canvas -- so this asserts the chart option the
+// panel ends up building from the loaded events, matching
+// tests/test-case-timeline.test.tsx. The chart itself still arrives through
+// next/dynamic, as it does in the product.
+import {cleanup, render, screen, waitFor} from '@testing-library/react';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+import {mockApi} from '../test-support/mock-api';
+import {pageRoutes} from '../test-support/page-routes';
 
 const {chartSpy} = vi.hoisted(() => ({chartSpy: vi.fn()}));
 vi.mock('../components/charts/chart', () => ({
@@ -38,42 +44,6 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const validSettingsStatus = {
-  environment: 'test',
-  database: 'sqlite',
-  document_storage_dir: '/tmp/docs',
-  limits: {},
-  restore_api_enabled: true,
-  document_extraction: {
-    pdf_ocr_enabled: false,
-    pdf_ocr_language: 'eng',
-    pdf_ocr_dpi: 300,
-    pdf_ocr_min_native_chars: 200,
-    local_entity_suggestions_enabled: false,
-    entity_extraction_owner: 'workbench_local',
-    ocr_runtime: {
-      available: false,
-      requested_languages: [],
-      missing_languages: [],
-      detail: 'not checked',
-    },
-  },
-  access: {
-    remote_api_enabled: false,
-    mode: 'local_only',
-    token_configured: false,
-  },
-  cors_allowed_origins: [],
-  connectors: {},
-};
-
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {'content-type': 'application/json'},
-  });
-}
-
 async function importHome(): Promise<() => ReactElement> {
   vi.resetModules();
   const mod = await import('../app/page');
@@ -82,31 +52,21 @@ async function importHome(): Promise<() => ReactElement> {
 
 const investigation = {id: 'inv-1', name: 'Kestrelwood filings'};
 
+// A full TimelineEventOut: the panel's generated reply check needs every
+// field, not only the six the chart draws.
 const timelineEvent = {
-  id: 'ev-t1', kind: 'reporter_event', title: 'Board approves transfer', date_start: '2024-03-02',
-  precision: 'day', verification_status: 'verified', provenance: {}, refs: {},
+  id: 'ev-t1', kind: 'reporter_event', investigation_id: 'inv-1', title: 'Board approves transfer', description: null,
+  date_start: '2024-03-02', date_end: null, precision: 'day', verification_status: 'verified', synthetic: false,
+  provenance: {}, refs: {}, context: null, sort_key: '2024-03-02',
 };
 
 async function bootstrap(events: unknown[]): Promise<void> {
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce(jsonResponse(validSettingsStatus)) // GET settings/status
-    .mockResolvedValueOnce(jsonResponse([investigation])) // GET investigations
-    .mockResolvedValueOnce(jsonResponse({providers: ['aleph']})) // GET connectors
-    .mockResolvedValueOnce(jsonResponse([])) // GET connector-findings
-    .mockResolvedValueOnce(jsonResponse([])) // GET entities
-    .mockResolvedValueOnce(jsonResponse({nodes: [], edges: [], schemas: [], reconciliation: {collapsed_by_default: true, suppressed_duplicate_count: 0, underlying_edge_count: 0, visible_edge_count: 0}})) // GET graph
-    .mockResolvedValueOnce(jsonResponse({events, verification_counts: {verified: events.length}})) // GET timeline
-    .mockResolvedValueOnce(jsonResponse({items: []})) // GET leads/queue
-    .mockResolvedValueOnce(jsonResponse([])) // GET claims
-    .mockResolvedValueOnce(jsonResponse([])) // GET evidence
-    .mockResolvedValueOnce(jsonResponse([])) // GET sources
-    .mockResolvedValueOnce(jsonResponse([])) // GET documents
-    .mockResolvedValueOnce(jsonResponse({candidates: []})); // AiReasoningPanel
-  vi.stubGlobal('fetch', fetchMock);
+  const api = mockApi(pageRoutes({investigations: [investigation], events}));
   const Home = await importHome();
   render(<Home />);
   await screen.findByText('Kestrelwood filings');
+  // The panel loads the timeline on its own; wait until it has asked.
+  await waitFor(() => expect(api.calls('GET /api/investigations/inv-1/timeline')).toHaveLength(1));
 }
 
 describe('Home investigation timeline chart', () => {

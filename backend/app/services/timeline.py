@@ -52,13 +52,20 @@ def _sort_key(date_text: str | None, precision: str | None) -> str:
     return date_text[:10]
 
 
+def _empty_context() -> dict[str, Any]:
+    """Every part of an event's context is present, None when the event does
+    not link to that record, so one reply shape covers every event kind
+    (app/schemas/responses.py: TimelineContextOut)."""
+    return {"source": None, "evidence": None, "claim": None, "claim_advisory": None, "relationship_advisory": None}
+
+
 def _timeline_context(db: Session, row: TimelineEvent) -> dict:
     """Build a read-only, current provenance context for a reporter-authored event.
 
     The event keeps its own verification status; linked claim/evidence state is disclosed
     rather than used to silently promote or demote the event.
     """
-    context: dict[str, Any] = {}
+    context = _empty_context()
     source = db.get(Source, row.source_id) if row.source_id else None
     evidence = db.get(Evidence, row.evidence_id) if row.evidence_id else None
     claim = db.get(Claim, row.claim_id) if row.claim_id else None
@@ -169,7 +176,7 @@ def investigation_timeline(
                 "precision": precision, "verification_status": "reporter_reviewed", "synthetic": True,
                 "refs": {"entity_id": review.entity_id, "evidence_id": evidence.id if evidence else None, "source_id": source.id if source else None, "property_conflict_decision_id": review.id},
                 "provenance": {"decision": review.decision, "reviewed_values": review.values_json, "source_url": source.url if source else None, "locator": evidence.locator if evidence else None},
-                "context": {"evidence": {"id": evidence.id, "quote": evidence.quote, "locator": evidence.locator, "source_id": evidence.source_id} if evidence else None, "source": {"id": source.id, "title": source.title, "url": source.url} if source else None},
+                "context": {**_empty_context(), "evidence": {"id": evidence.id, "quote": evidence.quote, "locator": evidence.locator, "source_id": evidence.source_id} if evidence else None, "source": {"id": source.id, "title": source.title, "url": source.url} if source else None},
                 "sort_key": _sort_key(date_start, precision),
             })
 
@@ -231,7 +238,7 @@ def investigation_timeline(
                      "relationship_entity_id": stmt.entity_id if is_relationship else None},
             "provenance": {"dataset": stmt.dataset, "origin": stmt.origin, "original_value": stmt.original_value,
                            "first_seen": stmt.first_seen, "last_seen": stmt.last_seen},
-            "context": {"relationship_advisory": relationship_advisory} if is_relationship else {},
+            "context": {**_empty_context(), "relationship_advisory": relationship_advisory if is_relationship else None},
             "sort_key": _sort_key(date_text, precision),
         })
 
@@ -283,6 +290,9 @@ def investigation_timeline(
     counts: dict[str, int] = {}
     status_counts: dict[str, int] = {}
     for event in events:
+        # Only reporter-authored events point at records; every event still
+        # carries the key, so one reply shape covers every kind.
+        event.setdefault("context", None)
         counts[event["kind"]] = counts.get(event["kind"], 0) + 1
         status_counts[event["verification_status"]] = status_counts.get(event["verification_status"], 0) + 1
     total = len(events)

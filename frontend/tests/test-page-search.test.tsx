@@ -1,15 +1,21 @@
 // @vitest-environment jsdom
-// STRUCT-0015 remainder, cycle 2: the "Investigation search" flow on app/page.tsx
-// (the internalSearch() handler and its results list). Like
-// test-page-api-access.test.tsx, this targets one self-contained flow rather
-// than the whole 60+-hook component: internalSearch() only needs `internalQ`
-// (never `inv`) to fire, and setSelectInvestigation's 9-way fetch cascade is
-// avoided entirely by keeping the investigations list empty, exactly as the
-// API-access bootstrap tests already do.
+// STRUCT-0015 remainder, cycle 2: the "Investigation search" flow on
+// app/page.tsx, now the SearchPanel (features/search/search-panel.tsx) the
+// page renders. Like test-page-api-access.test.tsx, this targets one
+// self-contained flow rather than the whole 60+-hook component: the search
+// only needs a query (never `inv`) to run, and the per-investigation loads
+// are avoided entirely by keeping the investigations list empty, exactly as
+// the API-access bootstrap tests already do. The panel calls GET /api/search
+// through the generated client, so the reply must be a full SearchOut
+// (lib/generated/types.gen.ts) or its Zod check rejects it.
 import {cleanup, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+import {mockApi} from '../test-support/mock-api';
+import type {MockApi} from '../test-support/mock-api';
+import {pageRoutes} from '../test-support/page-routes';
 
 beforeEach(() => {
   if (!window.matchMedia) {
@@ -31,51 +37,17 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const validSettingsStatus = {
-  environment: 'test',
-  database: 'sqlite',
-  document_storage_dir: '/tmp/docs',
-  limits: {},
-  restore_api_enabled: true,
-  document_extraction: {
-    pdf_ocr_enabled: false,
-    pdf_ocr_language: 'eng',
-    pdf_ocr_dpi: 300,
-    pdf_ocr_min_native_chars: 200,
-    local_entity_suggestions_enabled: false,
-    entity_extraction_owner: 'workbench_local',
-    ocr_runtime: {
-      available: false,
-      requested_languages: [],
-      missing_languages: [],
-      detail: 'not checked',
-    },
-  },
-  access: {
-    remote_api_enabled: false,
-    mode: 'local_only',
-    token_configured: false,
-  },
-  cors_allowed_origins: [],
-  connectors: {},
-};
-
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {'content-type': 'application/json'},
-  });
-}
-
 async function importHome(): Promise<() => ReactElement> {
   vi.resetModules();
   const mod = await import('../app/page');
   return mod.default;
 }
 
-// Minimal fixtures satisfying isSearchResult: type, group (one of the fixed
-// literal set), id, investigation_id, title, snippet, score, provenance
-// (object), metadata (object).
+const SEARCH = 'GET /api/search';
+
+// Minimal fixtures satisfying SearchHitOut: type, group (one of the fixed
+// literal set the panel groups by), id, investigation_id, title, snippet,
+// score, provenance (object), metadata (object).
 const canonicalHit = {
   type: 'entity',
   group: 'canonical',
@@ -102,34 +74,30 @@ const externalLeadHit = {
 
 function searchBody(results: unknown[]) {
   return {
+    query: 'Kestrelwood',
+    investigation_id: null,
+    total: results.length,
+    returned: results.length,
     results,
     counts: {},
     group_counts: {},
   };
 }
 
-async function bootstrapAndFindSearchInput(): Promise<HTMLElement> {
+async function bootstrapAndFindSearchInput(results: unknown[]): Promise<{api: MockApi; input: HTMLElement}> {
+  // No investigation: nothing but the three bootstrap routes and the search.
+  const api = mockApi({...pageRoutes(), [SEARCH]: searchBody(results)});
   const Home = await importHome();
   render(<Home />);
   await screen.findByText(
     'API: local access',
   );
-  return screen.getByPlaceholderText('Search this investigation…');
+  return {api, input: screen.getByPlaceholderText('Search this investigation…')};
 }
 
 describe('Home investigation search', () => {
   it('runs a search on button click and renders grouped results', async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse(validSettingsStatus)) // GET /api/settings/status
-      .mockResolvedValueOnce(jsonResponse([])) // GET /api/investigations
-      .mockResolvedValueOnce(jsonResponse({providers: ['aleph']})) // GET /api/connectors
-      .mockResolvedValueOnce(
-        jsonResponse(searchBody([canonicalHit, externalLeadHit])),
-      ); // GET /api/search?...
-    vi.stubGlobal('fetch', fetchMock);
-
-    const input = await bootstrapAndFindSearchInput();
+    const {api, input} = await bootstrapAndFindSearchInput([canonicalHit, externalLeadHit]);
     const user = userEvent.setup();
     await user.type(input, 'Kestrelwood');
     await user.click(screen.getByRole('button', {name: 'Search records'}));
@@ -148,27 +116,19 @@ describe('Home investigation search', () => {
       ),
     ).toBeInTheDocument();
 
-    expect(fetchMock).toHaveBeenCalledTimes(4);
-    const searchUrl = fetchMock.mock.calls[3][0] as string;
-    expect(searchUrl).toContain('/api/search?');
-    expect(searchUrl).toContain('q=Kestrelwood');
-    expect(searchUrl).toContain('limit=75');
+    expect(api.calls(SEARCH)).toHaveLength(1);
+    const searchUrl = api.lastUrl(SEARCH);
+    expect(searchUrl.searchParams.get('q')).toBe('Kestrelwood');
+    expect(searchUrl.searchParams.get('limit')).toBe('75');
     // No investigation is selected in this test, so the request must not
     // scope to one.
-    expect(searchUrl).not.toContain('investigation_id=');
-    expect(searchUrl).not.toContain('include_reconciled_duplicates=');
+    expect(searchUrl.searchParams.has('investigation_id')).toBe(false);
+    expect(searchUrl.searchParams.has('include_reconciled_duplicates')).toBe(false);
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('runs a search on Enter and includes include_reconciled_duplicates when checked', async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse(validSettingsStatus))
-      .mockResolvedValueOnce(jsonResponse([]))
-      .mockResolvedValueOnce(jsonResponse({providers: ['aleph']}))
-      .mockResolvedValueOnce(jsonResponse(searchBody([canonicalHit])));
-    vi.stubGlobal('fetch', fetchMock);
-
-    const input = await bootstrapAndFindSearchInput();
+    const {api, input} = await bootstrapAndFindSearchInput([canonicalHit]);
     const user = userEvent.setup();
     await user.click(
       screen.getByLabelText('Include reviewed duplicate copies'),
@@ -176,26 +136,18 @@ describe('Home investigation search', () => {
     await user.type(input, 'Kestrelwood{Enter}');
 
     await screen.findByText('Kestrelwood Holdings');
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(4));
-    const searchUrl = fetchMock.mock.calls[3][0] as string;
-    expect(searchUrl).toContain('include_reconciled_duplicates=true');
+    await waitFor(() => expect(api.calls(SEARCH)).toHaveLength(1));
+    expect(api.lastUrl(SEARCH).searchParams.get('include_reconciled_duplicates')).toBe('true');
   });
 
   it('does not search on an empty query', async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse(validSettingsStatus))
-      .mockResolvedValueOnce(jsonResponse([]))
-      .mockResolvedValueOnce(jsonResponse({providers: ['aleph']}));
-    vi.stubGlobal('fetch', fetchMock);
-
-    await bootstrapAndFindSearchInput();
+    const {api} = await bootstrapAndFindSearchInput([]);
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', {name: 'Search records'}));
 
-    // internalSearch() returns immediately when internalQ.trim() is empty --
-    // no fourth call should ever be made.
+    // The panel ignores a blank query -- no search request should ever be
+    // made.
     await new Promise((resolve) => setTimeout(resolve, 0));
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(api.calls(SEARCH)).toHaveLength(0);
   });
 });

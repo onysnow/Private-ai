@@ -30,7 +30,7 @@ from app.jobs.handlers import AI_REASONING
 from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Investigation
-from app.schemas.responses import EvidencePoolRow, InvestigationDeletionPreview, InvestigationDeletionResult, SourceOut
+from app.schemas.responses import EvidencePoolRow, InvestigationDeletionPreview, InvestigationDeletionResult, SourceOut, TimelineOut
 from app.schemas.api import (
     CaseSynthesisRequest, HypothesisTestRequest, InvestigationCreate,
     InvestigationQuestionContextRequest, PresentationDraftRequest,
@@ -239,7 +239,7 @@ def list_investigation_ai_analysis_candidates(
         raise HTTPException(400, str(exc))
 
 
-@router.get("/investigations/{investigation_id}/timeline", response_model=None)
+@router.get("/investigations/{investigation_id}/timeline", response_model=TimelineOut)
 def get_investigation_timeline(
     investigation_id: str,
     kind: list[str] | None = Query(default=None),

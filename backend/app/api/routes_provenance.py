@@ -14,11 +14,12 @@ from app.api.dependencies import authorize_request_resource
 from app.core.authorization import require_scope_investigation, scope_for_request
 from app.db.session import get_db
 from app.services.provenance import find_extraction_lineage, record_provenance_trace
+from app.schemas.responses import ExtractionLineageLookupOut, ProvenanceTraceOut
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.get("/provenance/trace", response_model=None)
+@router.get("/provenance/trace", response_model=ProvenanceTraceOut)
 def get_record_provenance_trace(record_type: str, record_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
     try:
         trace = record_provenance_trace(db, record_type, record_id)
@@ -30,7 +31,7 @@ def get_record_provenance_trace(record_type: str, record_id: str, request: Reque
         raise HTTPException(400, str(exc))
 
 
-@router.get("/provenance/extraction-lineage", response_model=None)
+@router.get("/provenance/extraction-lineage", response_model=ExtractionLineageLookupOut)
 def find_extraction_lineage_endpoint(record_type: str, record_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
     try:
         result = find_extraction_lineage(db, record_type, record_id)

@@ -1,19 +1,24 @@
 // @vitest-environment jsdom
 // STRUCT-0015 remainder, cycle 7: the "Document ingestion & extraction" flow
-// on app/page.tsx. Same cascade-mocking approach as leads/claims (cycles 4,
-// 6): documents/uploadDocument/reviewDocCandidate all need `inv`, so the
-// fixture drives selectInvestigation()'s full 9-call cascade plus
-// AiReasoningPanel's own post-select fetch. Covers uploadDocument (multipart
-// POST, then reload documents + load proposal candidates) and
-// reviewDocCandidate's accept path (POST review, then the 5-way
-// Promise.all reload of entities/claims/evidence/sources/documents). Left
-// for a later cycle: OpenAleph sync/refresh and staging a relationship from
-// an accepted claim candidate -- both layer on top of what's covered here
-// rather than being core to the upload/review loop.
-import {cleanup, render, screen} from '@testing-library/react';
+// on app/page.tsx. Same approach as leads/claims (cycles 4, 6):
+// documents/uploadDocument/reviewDocCandidate all need `inv`, so the fixture
+// lets loadAppBootstrap() open the one investigation, which starts every
+// per-investigation load (test-support/page-routes.ts; replies are keyed by
+// route, not by call order -- ADR-0005, line 15). Covers uploadDocument
+// (multipart POST, then reload documents + load proposal candidates) and
+// reviewDocCandidate's accept path (POST review, then the reload of
+// entities/claims/evidence/sources/documents). Left for a later cycle:
+// OpenAleph sync/refresh and staging a relationship from an accepted claim
+// candidate -- both layer on top of what's covered here rather than being
+// core to the upload/review loop.
+import {cleanup, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+import {mockApi} from '../test-support/mock-api';
+import type {MockApi, RouteCall} from '../test-support/mock-api';
+import {pageRoutes} from '../test-support/page-routes';
 
 // Bulk import (2026-09-30) navigates to /review with useRouter().push() once
 // the whole batch is uploaded. vi.hoisted keeps one stable spy instance that
@@ -48,42 +53,6 @@ afterEach(() => {
   mockPush.mockClear();
 });
 
-const validSettingsStatus = {
-  environment: 'test',
-  database: 'sqlite',
-  document_storage_dir: '/tmp/docs',
-  limits: {},
-  restore_api_enabled: true,
-  document_extraction: {
-    pdf_ocr_enabled: false,
-    pdf_ocr_language: 'eng',
-    pdf_ocr_dpi: 300,
-    pdf_ocr_min_native_chars: 200,
-    local_entity_suggestions_enabled: false,
-    entity_extraction_owner: 'workbench_local',
-    ocr_runtime: {
-      available: false,
-      requested_languages: [],
-      missing_languages: [],
-      detail: 'not checked',
-    },
-  },
-  access: {
-    remote_api_enabled: false,
-    mode: 'local_only',
-    token_configured: false,
-  },
-  cors_allowed_origins: [],
-  connectors: {},
-};
-
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {'content-type': 'application/json'},
-  });
-}
-
 async function importHome(): Promise<() => ReactElement> {
   vi.resetModules();
   const mod = await import('../app/page');
@@ -92,17 +61,8 @@ async function importHome(): Promise<() => ReactElement> {
 
 const investigation = {id: 'inv-1', name: 'Kestrelwood filings'};
 
-const emptyGraph = {
-  nodes: [],
-  edges: [],
-  schemas: [],
-  reconciliation: {
-    collapsed_by_default: true,
-    suppressed_duplicate_count: 0,
-    underlying_edge_count: 0,
-    visible_edge_count: 0,
-  },
-};
+const DOCUMENTS = 'GET /api/investigations/inv-1/documents';
+const UPLOAD = 'POST /api/documents/upload';
 
 function docFixture(overrides: Record<string, unknown> = {}) {
   return {
@@ -127,40 +87,18 @@ function candidateFixture(overrides: Record<string, unknown> = {}) {
   };
 }
 
-// The 9 selectInvestigation() cascade calls, in call order, plus the
-// AiReasoningPanel queue fetch that follows once `inv` is non-empty.
-function bootstrapCalls(documents: unknown[] = []) {
-  return [
-    jsonResponse([]), // GET connector-findings
-    jsonResponse([]), // GET entities (raw array -- see test-page-leads.test.tsx's fix note)
-    jsonResponse(emptyGraph), // GET graph
-    jsonResponse({events: [], verification_counts: {}}), // GET timeline
-    jsonResponse({items: []}), // GET leads/queue
-    jsonResponse([]), // GET claims
-    jsonResponse([]), // GET evidence
-    jsonResponse([]), // GET sources
-    jsonResponse(documents), // GET documents
-    jsonResponse({candidates: []}), // AiReasoningPanel queue
-  ];
+/** The multipart body of an upload call. */
+function uploadForm(call: RouteCall): FormData {
+  return call.body as FormData;
 }
 
-async function bootstrapWithOneDocument(document: Record<string, unknown> = docFixture()): Promise<{
-  fetchMock: ReturnType<typeof vi.fn>;
-}> {
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce(jsonResponse(validSettingsStatus)) // GET settings/status
-    .mockResolvedValueOnce(jsonResponse([investigation])) // GET investigations
-    .mockResolvedValueOnce(jsonResponse({providers: ['aleph']})); // GET connectors
-  for (const response of bootstrapCalls([document])) {
-    fetchMock.mockResolvedValueOnce(response);
-  }
-  vi.stubGlobal('fetch', fetchMock);
+async function bootstrapWithOneDocument(document: Record<string, unknown> = docFixture()): Promise<MockApi> {
+  const api = mockApi(pageRoutes({investigations: [investigation], documents: [document]}));
 
   const Home = await importHome();
   render(<Home />);
   await screen.findByText(String(document.filename));
-  return {fetchMock};
+  return api;
 }
 
 function fileInput(): HTMLInputElement {
@@ -185,13 +123,14 @@ describe('Home document ingestion & extraction', () => {
   });
 
   it('uploads a document, reloads the list, and loads its proposal candidates', async () => {
-    const {fetchMock} = await bootstrapWithOneDocument();
+    const api = await bootstrapWithOneDocument();
     const uploaded = docFixture({id: 'doc-2', filename: 'contract.pdf', chunk_count: 4, candidate_counts: {}});
 
-    fetchMock
-      .mockResolvedValueOnce(jsonResponse(uploaded)) // POST /api/documents/upload
-      .mockResolvedValueOnce(jsonResponse([docFixture(), uploaded])) // GET documents reload
-      .mockResolvedValueOnce(jsonResponse([candidateFixture({id: 'cand-2'})])); // GET candidates?status=proposed
+    api.add({
+      [UPLOAD]: uploaded,
+      [DOCUMENTS]: [docFixture(), uploaded], // the list the reload finds
+      'GET /api/documents/doc-2/candidates': [candidateFixture({id: 'cand-2'})],
+    });
 
     const user = userEvent.setup();
     await user.type(screen.getByPlaceholderText('Document title'), 'Signed contract');
@@ -206,48 +145,51 @@ describe('Home document ingestion & extraction', () => {
     await screen.findByText('contract.pdf');
     expect(screen.getByText('Kestrelwood Holdings Ltd')).toBeInTheDocument();
 
-    const [uploadUrl, uploadInit] = fetchMock.mock.calls[13];
-    expect(uploadUrl).toContain('/api/documents/upload');
-    expect((uploadInit as RequestInit).method).toBe('POST');
-    const body = (uploadInit as RequestInit).body as FormData;
+    expect(api.calls(UPLOAD)).toHaveLength(1);
+    const body = uploadForm(api.calls(UPLOAD)[0]);
     expect(body.get('investigation_id')).toBe('inv-1');
     expect(body.get('title')).toBe('Signed contract');
     expect((body.get('file') as File).name).toBe('contract.pdf');
+    expect(api.calls(DOCUMENTS)).toHaveLength(2);
+    expect(api.lastUrl('GET /api/documents/doc-2/candidates').searchParams.get('status')).toBe('proposed');
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('accepts an entity extraction proposal and reloads dependent records', async () => {
-    const {fetchMock} = await bootstrapWithOneDocument();
+    const api = await bootstrapWithOneDocument();
+    const review = 'POST /api/extraction-candidates/cand-1/review';
 
-    fetchMock.mockResolvedValueOnce(
-      jsonResponse([candidateFixture()]),
-    ); // GET /api/documents/doc-1/candidates?status=proposed
+    api.add({'GET /api/documents/doc-1/candidates': [candidateFixture()]});
     await userEvent.setup().click(screen.getByRole('button', {name: 'Review proposals'}));
     await screen.findByText('Kestrelwood Holdings Ltd');
 
-    fetchMock
-      .mockResolvedValueOnce(jsonResponse({})) // POST /api/extraction-candidates/cand-1/review
-      .mockResolvedValueOnce(jsonResponse([])) // entities reload
-      .mockResolvedValueOnce(jsonResponse([])) // claims reload
-      .mockResolvedValueOnce(jsonResponse([])) // evidence reload
-      .mockResolvedValueOnce(jsonResponse([])) // sources reload
-      .mockResolvedValueOnce(jsonResponse([docFixture({candidate_counts: {}})])); // documents reload
+    api.add({
+      [review]: {},
+      [DOCUMENTS]: [docFixture({candidate_counts: {}})], // the list the reload finds
+    });
+    // Every record kind the proposal may have changed is loaded once more
+    // after the review (the sources are also loaded by the provenance panel
+    // on its own, so count from where each route stands now).
+    const reloaded = ['entities', 'claims', 'evidence', 'sources', 'documents'].map(kind => `GET /api/investigations/inv-1/${kind}`);
+    const before = reloaded.map(route => api.calls(route).length);
 
     await userEvent.setup().click(screen.getByRole('button', {name: 'Accept'}));
 
     await screen.findByText('entity proposal accepted. Its document/chunk/review lineage is retained for provenance tracing.', {exact: false});
     expect(screen.queryByText('Kestrelwood Holdings Ltd')).not.toBeInTheDocument();
 
-    const [reviewUrl, reviewInit] = fetchMock.mock.calls[14];
-    expect(reviewUrl).toContain('/api/extraction-candidates/cand-1/review');
-    expect(JSON.parse((reviewInit as RequestInit).body as string)).toMatchObject({
+    expect(api.calls(review)).toHaveLength(1);
+    expect(api.lastBody(review)).toMatchObject({
       decision: 'accept',
       caption: 'Kestrelwood Holdings Ltd',
       entity_schema: 'Company',
     });
+    reloaded.forEach((route, i) => expect(api.calls(route).length, route).toBe(before[i] + 1));
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('requests explanations with proposals and shows each proposal\'s reasoning panel (#190)', async () => {
-    const {fetchMock} = await bootstrapWithOneDocument();
+    const api = await bootstrapWithOneDocument();
     const explanation = {
       candidate_id: 'cand-1', candidate_type: 'entity', review_status: 'proposed',
       summary: 'Company named “Kestrelwood Holdings Ltd”',
@@ -259,12 +201,13 @@ describe('Home document ingestion & extraction', () => {
       caveats: [],
       review_rule: 'Nothing in this proposal is in the investigation until a reporter accepts it.',
     };
-    fetchMock.mockResolvedValueOnce(jsonResponse([candidateFixture({explanation})]));
+    api.add({'GET /api/documents/doc-1/candidates': [candidateFixture({explanation})]});
     await userEvent.setup().click(screen.getByRole('button', {name: 'Review proposals'}));
     await screen.findByText(/Why this was proposed: OpenAleph ftm-analyze mention/);
     expect(screen.getByText('OpenAleph returned this name as a mention.')).toBeInTheDocument();
-    const [url] = fetchMock.mock.calls[13];
-    expect(String(url)).toContain('/api/documents/doc-1/candidates?status=proposed&explain=true');
+    const url = api.lastUrl('GET /api/documents/doc-1/candidates');
+    expect(url.searchParams.get('status')).toBe('proposed');
+    expect(url.searchParams.get('explain')).toBe('true');
   });
 });
 
@@ -278,18 +221,22 @@ function jobFixture(overrides: Record<string, unknown> = {}) {
 
 describe('Home document reading runs as a background job (ADR-0004)', () => {
   it('follows a queued read until it finishes, then loads the proposals', async () => {
-    const {fetchMock} = await bootstrapWithOneDocument();
+    const api = await bootstrapWithOneDocument();
     const queued = docFixture({id: 'doc-2', filename: 'scan.pdf', extraction_status: 'queued', chunk_count: 0, candidate_counts: {}, job: jobFixture()});
     const read = docFixture({id: 'doc-2', filename: 'scan.pdf', extraction_status: 'complete', chunk_count: 3, candidate_counts: {entity: 1}});
 
-    fetchMock
-      .mockResolvedValueOnce(jsonResponse(queued, 202)) // POST /api/documents/upload
-      .mockResolvedValueOnce(jsonResponse([docFixture(), queued])) // GET documents (shows it as queued)
-      .mockResolvedValueOnce(jsonResponse(jobFixture({status: 'running', progress: 5, message: 'Reading the document'}))) // GET job
-      .mockResolvedValueOnce(jsonResponse(jobFixture({status: 'succeeded', finished: true, progress: 100, message: 'Document read', attempts: 1}))) // GET job
-      .mockResolvedValueOnce(jsonResponse(read)) // GET /api/documents/doc-2
-      .mockResolvedValueOnce(jsonResponse([docFixture(), read])) // GET documents reload
-      .mockResolvedValueOnce(jsonResponse([candidateFixture({id: 'cand-2'})])); // GET candidates
+    // The job advances with each poll: running on the first, done on the next.
+    let polls = 0;
+    api.add({
+      [UPLOAD]: {status: 202, body: queued},
+      // The document list shows the upload as queued until it has been read.
+      [DOCUMENTS]: () => [docFixture(), polls < 2 ? queued : read],
+      'GET /api/jobs/job-1': () => (++polls === 1
+        ? jobFixture({status: 'running', progress: 5, message: 'Reading the document'})
+        : jobFixture({status: 'succeeded', finished: true, progress: 100, message: 'Document read', attempts: 1})),
+      'GET /api/documents/doc-2': read,
+      'GET /api/documents/doc-2/candidates': [candidateFixture({id: 'cand-2'})],
+    });
 
     const user = userEvent.setup();
     await user.upload(fileInput(), new File(['pdf-bytes'], 'scan.pdf', {type: 'application/pdf'}));
@@ -297,31 +244,35 @@ describe('Home document reading runs as a background job (ADR-0004)', () => {
 
     await screen.findByText('Saved. Reading the document: Reading the document (5%)');
     await screen.findByText('Kestrelwood Holdings Ltd', {}, {timeout: 4000});
-    const urls = fetchMock.mock.calls.slice(13).map(([url]) => String(url));
-    expect(urls[2]).toContain('/api/jobs/job-1');
-    expect(urls[3]).toContain('/api/jobs/job-1');
-    expect(urls[4]).toContain('/api/documents/doc-2');
-    expect(urls[6]).toContain('/api/documents/doc-2/candidates');
+    // Two polls until the job finished, then the read document and its
+    // proposals; the list was reloaded on save and again when the read ended.
+    expect(api.calls('GET /api/jobs/job-1')).toHaveLength(2);
+    expect(api.calls('GET /api/documents/doc-2')).toHaveLength(1);
+    expect(api.calls('GET /api/documents/doc-2/candidates')).toHaveLength(1);
+    expect(api.calls(DOCUMENTS)).toHaveLength(3);
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('says when reading failed and retries it from the document row', async () => {
     const failedDoc = docFixture({id: 'doc-9', filename: 'broken.pdf', extraction_status: 'failed', chunk_count: 0, candidate_counts: {}});
-    const {fetchMock} = await bootstrapWithOneDocument(failedDoc);
+    const api = await bootstrapWithOneDocument(failedDoc);
     const failedJob = jobFixture({id: 'job-9', subject_id: 'doc-9', status: 'failed', finished: true, error: 'scan unreadable', attempts: 1});
+    const retry = 'POST /api/jobs/job-9/retry';
 
-    fetchMock
-      .mockResolvedValueOnce(jsonResponse([failedJob])) // GET /api/jobs?subject_id=doc-9
-      .mockResolvedValueOnce(jsonResponse(jobFixture({id: 'job-9', subject_id: 'doc-9', status: 'succeeded', finished: true, message: 'Document read', attempts: 2}))) // POST retry
-      .mockResolvedValueOnce(jsonResponse([docFixture({id: 'doc-9', filename: 'broken.pdf', extraction_status: 'complete'})])); // GET documents reload
+    api.add({
+      'GET /api/jobs': [failedJob],
+      [retry]: jobFixture({id: 'job-9', subject_id: 'doc-9', status: 'succeeded', finished: true, message: 'Document read', attempts: 2}),
+      [DOCUMENTS]: [docFixture({id: 'doc-9', filename: 'broken.pdf', extraction_status: 'complete'})], // the list the reload finds
+    });
 
     await userEvent.setup().click(screen.getByRole('button', {name: 'Retry reading'}));
     await screen.findByText('broken.pdf: Document read');
     expect(screen.queryByRole('button', {name: 'Retry reading'})).not.toBeInTheDocument();
-    const [listUrl] = fetchMock.mock.calls[13];
-    expect(String(listUrl)).toContain('/api/jobs?subject_id=doc-9');
-    const [retryUrl, retryInit] = fetchMock.mock.calls[14];
-    expect(String(retryUrl)).toContain('/api/jobs/job-9/retry');
-    expect((retryInit as RequestInit).method).toBe('POST');
+    expect(api.calls('GET /api/jobs')).toHaveLength(1);
+    expect(api.lastUrl('GET /api/jobs').searchParams.get('subject_id')).toBe('doc-9');
+    expect(api.calls(retry)).toHaveLength(1);
+    expect(api.calls(DOCUMENTS)).toHaveLength(2);
+    expect(api.unmatched()).toEqual([]);
   });
 });
 
@@ -329,16 +280,13 @@ describe('Home remembers the open investigation in the address bar (?inv=)', () 
   it('opens the investigation named in ?inv= and keeps it there', async () => {
     window.history.replaceState(null, '', '/?inv=inv-2');
     const second = {id: 'inv-2', name: 'Harbor contracts'};
-    const fetchMock = vi.fn()
-      .mockResolvedValueOnce(jsonResponse(validSettingsStatus))
-      .mockResolvedValueOnce(jsonResponse([investigation, second]))
-      .mockResolvedValueOnce(jsonResponse({providers: ['aleph']}));
-    for (const response of bootstrapCalls([docFixture({id: 'doc-9', filename: 'harbor.pdf'})])) fetchMock.mockResolvedValueOnce(response);
-    vi.stubGlobal('fetch', fetchMock);
+    // Both cases are on the server; only the one named in the address is opened.
+    const api = mockApi(pageRoutes({investigations: [investigation, second], documents: [docFixture({id: 'doc-9', filename: 'harbor.pdf'})]}));
     const Home = await importHome();
     render(<Home />);
     await screen.findByText('harbor.pdf');
-    expect(fetchMock.mock.calls.slice(3).map(([url]) => String(url)).some(url => url.includes('/api/investigations/inv-2/documents'))).toBe(true);
+    expect(api.calls('GET /api/investigations/inv-2/documents')).toHaveLength(1);
+    expect(api.calls(DOCUMENTS)).toHaveLength(0);
     expect(window.location.search).toBe('?inv=inv-2');
     window.history.replaceState(null, '', '/');
   });
@@ -353,16 +301,20 @@ describe('Home remembers the open investigation in the address bar (?inv=)', () 
 
 describe('Home bulk document import', () => {
   it('uploads every selected file sequentially, tolerates one failure, and navigates to the batch triage screen', async () => {
-    const {fetchMock} = await bootstrapWithOneDocument();
+    const api = await bootstrapWithOneDocument();
     const fileA = new File(['a'], 'memo-a.txt', {type: 'text/plain'});
     const fileB = new File(['b'], 'memo-b.txt', {type: 'text/plain'});
     const fileC = new File(['c'], 'memo-c.txt', {type: 'text/plain'});
 
-    fetchMock
-      .mockResolvedValueOnce(jsonResponse(docFixture({id: 'doc-a', filename: 'memo-a.txt'}))) // POST upload A
-      .mockResolvedValueOnce(jsonResponse({detail: 'Document is empty'}, 400)) // POST upload B fails
-      .mockResolvedValueOnce(jsonResponse(docFixture({id: 'doc-c', filename: 'memo-c.txt'}))) // POST upload C
-      .mockResolvedValueOnce(jsonResponse([docFixture(), docFixture({id: 'doc-a'}), docFixture({id: 'doc-c'})])); // documents reload
+    api.add({
+      // The server refuses the empty-looking second file and saves the others.
+      [UPLOAD]: (call: RouteCall) => {
+        const name = (uploadForm(call).get('file') as File).name;
+        if (name === 'memo-b.txt') return {status: 400, body: {detail: 'Document is empty'}};
+        return docFixture({id: name === 'memo-a.txt' ? 'doc-a' : 'doc-c', filename: name});
+      },
+      [DOCUMENTS]: [docFixture(), docFixture({id: 'doc-a'}), docFixture({id: 'doc-c'})], // the list the reload finds
+    });
 
     const user = userEvent.setup();
     await user.upload(bulkFileInput(), [fileA, fileB, fileC]);
@@ -371,16 +323,15 @@ describe('Home bulk document import', () => {
     await screen.findByText(/Imported 2 of 3 file\(s\)\. 1 failed and were skipped/, {exact: false});
     expect(mockPush).toHaveBeenCalledWith('/review/batch?inv=inv-1&docs=doc-a,doc-c');
 
-    // Three separate sequential POSTs, one per file, each with its own
-    // filename-derived title and no manual title field (unlike the
-    // single-file uploader).
-    const uploadCalls = fetchMock.mock.calls.slice(13, 16);
-    for (const [, init] of uploadCalls) {
-      expect((init as RequestInit).method).toBe('POST');
-    }
-    const bodyA = (uploadCalls[0][1] as RequestInit).body as FormData;
-    expect(bodyA.get('title')).toBe('memo-a');
-    expect((bodyA.get('file') as File).name).toBe('memo-a.txt');
+    // Three separate sequential POSTs, one per file in the order chosen,
+    // each with its own filename-derived title and no manual title field
+    // (unlike the single-file uploader).
+    const uploads = api.calls(UPLOAD);
+    expect(uploads.map(call => (uploadForm(call).get('file') as File).name)).toEqual(['memo-a.txt', 'memo-b.txt', 'memo-c.txt']);
+    expect(uploads.map(call => uploadForm(call).get('title'))).toEqual(['memo-a', 'memo-b', 'memo-c']);
+    expect(uploads.map(call => uploadForm(call).get('investigation_id'))).toEqual(['inv-1', 'inv-1', 'inv-1']);
+    await waitFor(() => expect(api.calls(DOCUMENTS)).toHaveLength(2));
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('disables the import button until at least one file is chosen', async () => {

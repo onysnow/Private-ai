@@ -30,6 +30,7 @@ from app.services.post_merge_reconciliation import (
 from app.services.provenance import entity_statement_history
 from app.services.relationships import entity_relationships
 from app.services.resolution import canonical_duplicate_candidates, record_canonical_resolution
+from app.schemas.responses import StatementHistoryRowOut
 from app.services.entities import (
     create_entity as _create_entity,
     decide_property_conflict as _decide_property_conflict,
@@ -113,7 +114,7 @@ def list_entity_statements(entity_id: str, db: Session = Depends(get_db)) -> Any
     return _list_entity_statements(db, entity_id)
 
 
-@router.get("/entities/{entity_id}/statement-history", response_model=None)
+@router.get("/entities/{entity_id}/statement-history", response_model=list[StatementHistoryRowOut])
 def list_entity_statement_history(entity_id: str, db: Session = Depends(get_db)) -> Any:
     try:
         return entity_statement_history(db, entity_id)
