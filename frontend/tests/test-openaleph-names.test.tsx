@@ -16,7 +16,7 @@ import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
-import {emptyGraph, entityFixture} from '../test-support/page-routes';
+import {corpusStatusBody, emptyGraph, entityFixture} from '../test-support/page-routes';
 
 const {searchParamsRef, mockPush} = vi.hoisted(() => ({searchParamsRef: {current: new URLSearchParams()}, mockPush: vi.fn()}));
 vi.mock('next/navigation', () => ({
@@ -164,7 +164,7 @@ describe('Which entity does this belong to?', () => {
 describe('DocumentsPanel and OpenAleph\'s names', () => {
   async function renderPanel(documents: unknown[] = [docFixture()]) {
     const api = mockApi({[DOCUMENTS]: documents, 'GET /api/investigations/inv-1/entities': [entityFixture('ent-jane', 'Jane Doe', 'Person')],
-      'GET /api/investigations/inv-1/graph': emptyGraph()});
+      'GET /api/investigations/inv-1/graph': emptyGraph(), 'GET /api/investigations/inv-1/corpus/status': corpusStatusBody('inv-1')});
     wrap(<DocumentsPanel investigationId="inv-1"/>);
     await screen.findByText('memo.txt');
     return api;

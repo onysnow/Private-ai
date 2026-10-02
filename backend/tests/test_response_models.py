@@ -335,6 +335,31 @@ def test_openaleph_corpus_replies(demo, monkeypatch):
     _same_through_model(list[r.ExtractionCandidateOut], explained)
 
 
+def test_corpus_status_replies(demo, monkeypatch):
+    import httpx
+
+    from app.core.config import settings
+    from app.services.openaleph_corpus import sync_document_to_openaleph
+    from app.services.openaleph_status import corpus_status
+    from openaleph_fake import IDLE, busy_status
+
+    db, inv, doc, _candidates, _accepted = demo
+    monkeypatch.setattr(settings, "openaleph_enabled", False)
+    _same_through_model(r.CorpusStatusOut, corpus_status(db, inv.id))
+    monkeypatch.setattr(settings, "openaleph_enabled", True)
+    _same_through_model(r.CorpusStatusOut, corpus_status(db, inv.id))
+    sync_document_to_openaleph(db, doc.id, client_factory=_FakeOpenAleph)
+    working = corpus_status(db, inv.id, fetch=lambda _collection: busy_status("ingest", "analyze"))
+    assert working["state"] == "working" and len(working["stages"]) == 2
+    _same_through_model(r.CorpusStatusOut, working)
+    _same_through_model(r.CorpusStatusOut, corpus_status(db, inv.id, fetch=lambda _collection: IDLE))
+
+    def down(_collection):
+        raise httpx.ConnectError("refused")
+
+    _same_through_model(r.CorpusStatusOut, corpus_status(db, inv.id, fetch=down))
+
+
 def test_backup_replies(demo, tmp_path):
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker

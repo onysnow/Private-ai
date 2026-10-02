@@ -154,6 +154,40 @@ def test_a_memo_read_by_openaleph_becomes_name_and_identifier_proposals(live):
     assert accepted["record"]["prop"] == "email" and accepted["record"]["origin"].startswith(f"document:{document['id']}#paragraph 4@chars:")
 
 
+def test_reading_progress_follows_openaleph_until_it_is_idle(live, tmp_path):
+    """Files go straight to OpenAleph here (not through a Workbench upload,
+    which in developer mode answers only once everything is read), so the
+    status route can be asked while OpenAleph works on them."""
+    client, _created = live
+    inv = _investigation(live, "Wave A progress")
+    assert client.get(f"/api/investigations/{inv}/corpus/status").json()["state"] == "no_collection"
+    ensured = client.post(f"/api/investigations/{inv}/corpus/openaleph/ensure")
+    assert ensured.status_code == 200, ensured.text
+    collection_id = _remember_collection(live, inv)
+    aleph = openaleph_corpus._client_factory()
+    for number in range(3):
+        memo = tmp_path / f"progress-{number}.txt"
+        memo.write_text(MEMO, encoding="utf-8")
+        aleph.ingest_upload(collection_id, memo, {"file_name": memo.name})
+
+    seen: list[dict] = []
+    deadline = time.monotonic() + 180
+    while time.monotonic() < deadline:
+        status = client.get(f"/api/investigations/{inv}/corpus/status").json()
+        seen.append(status)
+        if status["state"] == "idle" and any(row["state"] == "working" for row in seen):
+            break
+        time.sleep(0.25)
+    working = [row for row in seen if row["state"] == "working"]
+    assert working, [row["state"] for row in seen]
+    assert all(row["collection_id"] == collection_id and row["active"] for row in working)
+    labels = {stage["label"] for row in working for stage in row["stages"]}
+    assert "Reading files" in labels, labels
+    assert all(stage["pending"] + stage["running"] + stage["finished"] > 0 for row in working for stage in row["stages"])
+    final = seen[-1]
+    assert final["state"] == "idle" and final["stages"] == [] and final["active"] is False, final
+
+
 def test_a_pdf_gets_its_names_on_their_pages(live):
     inv = _investigation(live, "Wave A pdf")
     document = _upload(live, inv, "minutes.pdf", _pdf(

@@ -31,9 +31,9 @@ from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Investigation
 from app.schemas.responses import (
-    ClaimOut, ConnectorFindingOut, ConnectorRunOut, DocumentOut, EvidencePoolRow, FinancialLedgerOut, GraphOut,
-    InvestigationDeletionPreview, InvestigationDeletionResult, InvestigationOut, LeadOut, LeadQueueOut, RelationshipOut,
-    ReportingTaskOut, SourceOut, TimelineOut,
+    ClaimOut, ConnectorFindingOut, ConnectorRunOut, CorpusStatusOut, DocumentOut, EvidencePoolRow, FinancialLedgerOut,
+    GraphOut, InvestigationDeletionPreview, InvestigationDeletionResult, InvestigationOut, LeadOut, LeadQueueOut,
+    RelationshipOut, ReportingTaskOut, SourceOut, TimelineOut,
 )
 from app.schemas.api import (
     CaseSynthesisRequest, HypothesisTestRequest, InvestigationCreate,
@@ -64,6 +64,7 @@ from app.services.openaleph_corpus import (
     record_openaleph_operation_failure,
     serialize_binding,
 )
+from app.services.openaleph_status import corpus_status
 from app.services.relationships import (
     RELATIONSHIP_SCHEMAS,
     investigation_graph,
@@ -92,6 +93,19 @@ def list_openaleph_corpus_failures(investigation_id: str, db: Session = Depends(
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     return list_openaleph_operation_failures(db, investigation_id)
+
+
+@router.get("/investigations/{investigation_id}/corpus/status", response_model=CorpusStatusOut)
+def get_corpus_status(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    """How far OpenAleph has got with the investigation's files: jobs
+    waiting, running and finished per stage (reading, finding names,
+    indexing...). A deployment without OpenAleph, or one OpenAleph does not
+    answer, says so in ``state`` rather than failing, so the documents panel
+    can keep asking while files are being read."""
+    try:
+        return corpus_status(db, investigation_id)
+    except ValueError as exc:
+        raise HTTPException(404, str(exc))
 
 
 @router.post("/investigations/{investigation_id}/corpus/openaleph/ensure", response_model=None)

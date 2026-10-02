@@ -2468,6 +2468,112 @@
         "title": "ConnectorsOut",
         "type": "object"
       },
+      "CorpusStageOut": {
+        "description": "One of OpenAleph's queues for the collection, jobs counted across its\nbatches (app/services/openaleph_status.py).",
+        "properties": {
+          "failed": {
+            "title": "Failed",
+            "type": "integer"
+          },
+          "finished": {
+            "title": "Finished",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "pending": {
+            "title": "Pending",
+            "type": "integer"
+          },
+          "queue": {
+            "title": "Queue",
+            "type": "string"
+          },
+          "running": {
+            "title": "Running",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "queue",
+          "label",
+          "pending",
+          "running",
+          "finished",
+          "failed"
+        ],
+        "title": "CorpusStageOut",
+        "type": "object"
+      },
+      "CorpusStatusOut": {
+        "description": "How OpenAleph's reading of an investigation's corpus stands (ADR-0006).",
+        "properties": {
+          "active": {
+            "title": "Active",
+            "type": "boolean"
+          },
+          "checked_at": {
+            "format": "date-time",
+            "title": "Checked At",
+            "type": "string"
+          },
+          "collection_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collection Id"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/CorpusStageOut"
+            },
+            "title": "Stages",
+            "type": "array"
+          },
+          "state": {
+            "enum": [
+              "not_configured",
+              "no_collection",
+              "unreachable",
+              "working",
+              "idle"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "state",
+          "active",
+          "stages",
+          "checked_at"
+        ],
+        "title": "CorpusStatusOut",
+        "type": "object"
+      },
       "CreateIn": {
         "properties": {
           "kind": {
@@ -20210,6 +20316,46 @@
           }
         },
         "summary": "List Openaleph Corpus Failures"
+      }
+    },
+    "/api/investigations/{investigation_id}/corpus/status": {
+      "get": {
+        "description": "How far OpenAleph has got with the investigation's files: jobs\nwaiting, running and finished per stage (reading, finding names,\nindexing...). A deployment without OpenAleph, or one OpenAleph does not\nanswer, says so in ``state`` rather than failing, so the documents panel\ncan keep asking while files are being read.",
+        "operationId": "get_corpus_status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorpusStatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Corpus Status"
       }
     },
     "/api/investigations/{investigation_id}/decks": {

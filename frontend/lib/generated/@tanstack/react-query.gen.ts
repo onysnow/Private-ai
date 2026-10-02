@@ -124,6 +124,7 @@ import {
   findingCandidates,
   getAiAnalysisCandidateEndpoint,
   getClaimReviewWorkspace,
+  getCorpusStatus,
   getDeckEndpoint,
   getDocument,
   getEntityDossier,
@@ -478,6 +479,9 @@ import type {
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceError,
   GetClaimReviewWorkspaceResponse,
+  GetCorpusStatusData,
+  GetCorpusStatusError,
+  GetCorpusStatusResponse,
   GetDeckEndpointData,
   GetDeckEndpointError,
   GetDocumentData,
@@ -5336,6 +5340,38 @@ export const listOpenalephCorpusFailuresOptions = (
       return data;
     },
     queryKey: listOpenalephCorpusFailuresQueryKey(options),
+  });
+
+export const getCorpusStatusQueryKey = (
+  options: Options<GetCorpusStatusData>,
+) => createQueryKey('getCorpusStatus', options);
+
+/**
+ * Get Corpus Status
+ *
+ * How far OpenAleph has got with the investigation's files: jobs
+ * waiting, running and finished per stage (reading, finding names,
+ * indexing...). A deployment without OpenAleph, or one OpenAleph does not
+ * answer, says so in ``state`` rather than failing, so the documents panel
+ * can keep asking while files are being read.
+ */
+export const getCorpusStatusOptions = (options: Options<GetCorpusStatusData>) =>
+  queryOptions<
+    GetCorpusStatusResponse,
+    GetCorpusStatusError,
+    GetCorpusStatusResponse,
+    ReturnType<typeof getCorpusStatusQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCorpusStatus({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCorpusStatusQueryKey(options),
   });
 
 export const listDecksEndpointQueryKey = (

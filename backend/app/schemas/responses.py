@@ -994,6 +994,28 @@ class OpenAlephReviewRefreshOut(ResponseModel):
     status: OpenAlephReviewStatusOut
 
 
+class CorpusStageOut(ResponseModel):
+    """One of OpenAleph's queues for the collection, jobs counted across its
+    batches (app/services/openaleph_status.py)."""
+    queue: str
+    label: str
+    pending: int
+    running: int
+    finished: int
+    failed: int
+
+
+class CorpusStatusOut(ResponseModel):
+    """How OpenAleph's reading of an investigation's corpus stands (ADR-0006)."""
+    investigation_id: str
+    collection_id: str | None = None
+    state: Literal["not_configured", "no_collection", "unreachable", "working", "idle"]
+    active: bool
+    stages: list[CorpusStageOut]
+    detail: str | None = None
+    checked_at: datetime
+
+
 # --- Portable backups --------------------------------------------------------------
 
 class BackupInvestigationOut(ResponseModel):

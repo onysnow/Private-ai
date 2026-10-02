@@ -71,6 +71,15 @@ Workbench's search for `Mention` entities could never find anything.
 - **The image has fifteen spaCy models**, not only English (correcting the
   table below): `SpacyNerModels` lists one small model per language and all
   are installed in `ftm-analyze:5.3.1`.
+- **Collection status counts only a collection with work in hand.**
+  `GET /collections/{id}/status` returns openaleph-procrastinate's
+  `DatasetStatus`: job counts per batch and queue while any job of the
+  collection waits or runs (`STATUS_SUMMARY_ACTIVE` in
+  `manage/sql.py`), finished jobs included; an idle collection answers
+  zeros and no batches. The Workbench's reading progress
+  (`GET /api/investigations/{id}/corpus/status`) therefore lists stages
+  only while OpenAleph works, and asks again every three seconds until it
+  is idle.
 
 ## Decision: what each part of OpenAleph does for the Workbench
 

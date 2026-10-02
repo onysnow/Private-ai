@@ -1590,6 +1590,80 @@ export type ConnectorsOut = {
 };
 
 /**
+ * CorpusStageOut
+ *
+ * One of OpenAleph's queues for the collection, jobs counted across its
+ * batches (app/services/openaleph_status.py).
+ */
+export type CorpusStageOut = {
+  /**
+   * Failed
+   */
+  failed: number;
+  /**
+   * Finished
+   */
+  finished: number;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Pending
+   */
+  pending: number;
+  /**
+   * Queue
+   */
+  queue: string;
+  /**
+   * Running
+   */
+  running: number;
+};
+
+/**
+ * CorpusStatusOut
+ *
+ * How OpenAleph's reading of an investigation's corpus stands (ADR-0006).
+ */
+export type CorpusStatusOut = {
+  /**
+   * Active
+   */
+  active: boolean;
+  /**
+   * Checked At
+   */
+  checked_at: string;
+  /**
+   * Collection Id
+   */
+  collection_id?: string | null;
+  /**
+   * Detail
+   */
+  detail?: string | null;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Stages
+   */
+  stages: Array<CorpusStageOut>;
+  /**
+   * State
+   */
+  state:
+    | 'not_configured'
+    | 'no_collection'
+    | 'unreachable'
+    | 'working'
+    | 'idle';
+};
+
+/**
  * CreateIn
  */
 export type CreateIn = {
@@ -12797,6 +12871,38 @@ export type ListOpenalephCorpusFailuresResponses = {
    */
   200: unknown;
 };
+
+export type GetCorpusStatusData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/corpus/status';
+};
+
+export type GetCorpusStatusErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type GetCorpusStatusError =
+  GetCorpusStatusErrors[keyof GetCorpusStatusErrors];
+
+export type GetCorpusStatusResponses = {
+  /**
+   * Successful Response
+   */
+  200: CorpusStatusOut;
+};
+
+export type GetCorpusStatusResponse =
+  GetCorpusStatusResponses[keyof GetCorpusStatusResponses];
 
 export type ListDecksEndpointData = {
   body?: never;

@@ -639,6 +639,42 @@ export const zConnectorsOut = z.object({
 });
 
 /**
+ * CorpusStageOut
+ *
+ * One of OpenAleph's queues for the collection, jobs counted across its
+ * batches (app/services/openaleph_status.py).
+ */
+export const zCorpusStageOut = z.object({
+  failed: z.number().int(),
+  finished: z.number().int(),
+  label: z.string(),
+  pending: z.number().int(),
+  queue: z.string(),
+  running: z.number().int(),
+});
+
+/**
+ * CorpusStatusOut
+ *
+ * How OpenAleph's reading of an investigation's corpus stands (ADR-0006).
+ */
+export const zCorpusStatusOut = z.object({
+  active: z.boolean(),
+  checked_at: z.string().datetime({ offset: true, local: true }),
+  collection_id: z.string().nullish(),
+  detail: z.string().nullish(),
+  investigation_id: z.string(),
+  stages: z.array(zCorpusStageOut),
+  state: z.enum([
+    'not_configured',
+    'no_collection',
+    'unreachable',
+    'working',
+    'idle',
+  ]),
+});
+
+/**
  * CreateIn
  */
 export const zCreateIn = z.object({
@@ -4706,6 +4742,15 @@ export const zEnsureOpenalephCorpusBindingPath = z.object({
 export const zListOpenalephCorpusFailuresPath = z.object({
   investigation_id: z.string(),
 });
+
+export const zGetCorpusStatusPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetCorpusStatusResponse = zCorpusStatusOut;
 
 export const zListDecksEndpointPath = z.object({
   investigation_id: z.string(),

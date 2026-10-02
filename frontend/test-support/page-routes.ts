@@ -14,7 +14,7 @@
 //   const api = mockApi(pageRoutes({investigations: [investigation], leads: [leadFixture()]}));
 //   api.add({'POST /api/leads': {id: 'lead-2'}});           // a route the test's action needs
 //   api.add({...investigationRoutes('inv-restored')});       // a case opened later
-import type {DossierExternalOut, DossierSummaryOut, InvestigationOut, PostMergeReconciliationOut} from '../lib/generated/types.gen';
+import type {CorpusStatusOut, DossierExternalOut, DossierSummaryOut, InvestigationOut, PostMergeReconciliationOut} from '../lib/generated/types.gen';
 import type {Routes} from './mock-api';
 
 /** A reply as a test writes it: the generated shape, with whatever a test overrides. */
@@ -218,6 +218,15 @@ export function leadQueueBody(investigationId: string, leads: unknown[] = []): L
   return {investigation_id: investigationId, total: leads.length, counts: tally(leads, 'status'), items: leads};
 }
 
+/** How OpenAleph's work on the case stands, in the generated CorpusStatusOut
+ * shape: idle, with no stages, unless a test says otherwise. */
+export function corpusStatusBody(investigationId: string, overrides: Partial<CorpusStatusOut> = {}): CorpusStatusOut {
+  return {
+    investigation_id: investigationId, collection_id: null, state: 'idle', active: false, stages: [], detail: null,
+    checked_at: '2026-10-02T00:00:00', ...overrides,
+  };
+}
+
 /** What the server holds for one investigation. Anything left out is empty,
  * which every loader accepts without inspecting a row. */
 export type InvestigationRecords = {
@@ -249,6 +258,7 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/evidence`]: records.evidence ?? [],
     [`GET ${base}/sources`]: records.sources ?? [],
     [`GET ${base}/documents`]: records.documents ?? [],
+    [`GET ${base}/corpus/status`]: corpusStatusBody(id),
     [`GET ${base}/ai-analysis-candidates`]: {candidates: records.aiCandidates ?? []},
   };
 }

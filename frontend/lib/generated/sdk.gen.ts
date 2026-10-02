@@ -335,6 +335,9 @@ import type {
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceErrors,
   GetClaimReviewWorkspaceResponses,
+  GetCorpusStatusData,
+  GetCorpusStatusErrors,
+  GetCorpusStatusResponses,
   GetDeckEndpointData,
   GetDeckEndpointErrors,
   GetDeckEndpointResponses,
@@ -798,6 +801,8 @@ import {
   zGetAiAnalysisCandidateEndpointPath,
   zGetClaimReviewWorkspacePath,
   zGetClaimReviewWorkspaceResponse,
+  zGetCorpusStatusPath,
+  zGetCorpusStatusResponse,
   zGetDeckEndpointPath,
   zGetDocumentPath,
   zGetDocumentResponse,
@@ -5506,6 +5511,41 @@ export const listOpenalephCorpusFailures = <
         })
         .parseAsync(data),
     url: '/api/investigations/{investigation_id}/corpus/openaleph/failures',
+    ...options,
+  });
+
+/**
+ * Get Corpus Status
+ *
+ * How far OpenAleph has got with the investigation's files: jobs
+ * waiting, running and finished per stage (reading, finding names,
+ * indexing...). A deployment without OpenAleph, or one OpenAleph does not
+ * answer, says so in ``state`` rather than failing, so the documents panel
+ * can keep asking while files are being read.
+ */
+export const getCorpusStatus = <ThrowOnError extends boolean = false>(
+  options: Options<GetCorpusStatusData, ThrowOnError>,
+): RequestResult<
+  GetCorpusStatusResponses,
+  GetCorpusStatusErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetCorpusStatusResponses,
+    GetCorpusStatusErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCorpusStatusPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCorpusStatusResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/corpus/status',
     ...options,
   });
 

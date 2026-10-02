@@ -21,8 +21,8 @@ import {errorMessage, isAbortError} from '../../lib/api-client';
 import {checkedReply} from '../../lib/api-generated';
 import {api} from '../../lib/api-instance';
 import {
-  getInvestigationGraphQueryKey, listClaimsQueryKey, listDocumentsOptions, listDocumentsQueryKey, listEntitiesOptions, listEntitiesQueryKey,
-  listInvestigationEvidenceQueryKey, listSourcesQueryKey,
+  getCorpusStatusQueryKey, getInvestigationGraphQueryKey, listClaimsQueryKey, listDocumentsOptions, listDocumentsQueryKey, listEntitiesOptions,
+  listEntitiesQueryKey, listInvestigationEvidenceQueryKey, listSourcesQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {
   analyzeOpenalephDocument, createExtractedRelationshipProposal, getDocument, getOpenalephDocumentReviewStatus, listDocumentCandidatesEndpoint,
@@ -35,6 +35,7 @@ import {zDocumentUploadOut} from '../../lib/generated/zod.gen';
 import type {BackgroundJob} from '../../lib/api-types';
 import {describeJob, waitForJob} from '../../lib/jobs';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {CorpusStatus} from './corpus-status';
 import {IdentifierOwner} from './identifier-owner';
 import {SchemaQuestion} from './schema-question';
 
@@ -101,6 +102,10 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
   const entities = entitiesQuery.data ?? [];
   const documents: DocumentOut[] = documentsQuery.data ?? [];
   const reloadDocuments = () => queryClient.invalidateQueries({queryKey: listDocumentsQueryKey({path})});
+  // OpenAleph's progress is shown while a file is being read; asking for it
+  // again after an action starts the watch when OpenAleph has work.
+  const filesBeingRead = documents.some(d => d.extraction_status === 'queued' || d.extraction_status === 'extracting');
+  const recheckCorpus = () => queryClient.invalidateQueries({queryKey: getCorpusStatusQueryKey({path})});
 
   const loadCandidates = async (documentId: string, status: 'proposed' | 'all' = 'proposed') => {
     candidatesRequest.current?.abort();
@@ -126,6 +131,7 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
     if (!investigationId || !docFile) return;
     try {
       const uploaded = await upload(investigationId, docTitle, docFile);
+      void recheckCorpus();
       setDocFile(null);
       setDocTitle('');
       let saved: DocumentOut = uploaded;
@@ -158,7 +164,10 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
         setDocStatus(`${d.filename}: no reading job found.`);
         return;
       }
-      if (job.status === 'failed' || job.status === 'cancelled') job = (await retryJobEndpoint({path: {job_id: job.id}, throwOnError: true})).data;
+      if (job.status === 'failed' || job.status === 'cancelled') {
+        job = (await retryJobEndpoint({path: {job_id: job.id}, throwOnError: true})).data;
+        void recheckCorpus();
+      }
       if (!job.finished) job = await waitForJob(api, job.id, j => setDocStatus(`${d.filename}: ${describeJob(j)}`));
       setDocStatus(`${d.filename}: ${describeJob(job)}`);
       await reloadDocuments();
@@ -193,6 +202,7 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
         failed.push(`${file.name}: ${errorMessage(error, 'upload failed')}`);
       }
     }
+    if (ids.length) void recheckCorpus();
     // Uploads answer once each file is saved; wait for the reads before triage.
     if (reading.length) {
       setBulkProgress(null);
@@ -281,6 +291,7 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
     setDocStatus(`${d.filename}: asking OpenAleph to find names again…`);
     try {
       let job: BackgroundJob = (await analyzeOpenalephDocument({path: {document_id: d.id}, throwOnError: true})).data;
+      void recheckCorpus();
       if (!job.finished) job = await waitForJob(api, job.id, j => setDocStatus(`${d.filename}: ${describeJob(j)}`));
       setDocStatus(`${d.filename}: ${describeJob(job)}`);
       await reloadDocuments();
@@ -342,6 +353,7 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
       </div>
       {docStatus && <p className="muted">{docStatus}</p>}
       {documentsQuery.isError && <p className="muted">{errorMessage(documentsQuery.error, 'Could not load the documents')}</p>}
+      {investigationId && <CorpusStatus investigationId={investigationId} watch={filesBeingRead} onIdle={reloadDocuments}/>}
       <hr/>
       <h4>Bulk import</h4>
       <p className="muted">Select several files to import them one at a time with visible progress, then review every proposal, issue, and question document by document before anything is accepted.</p>
