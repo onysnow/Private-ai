@@ -1023,6 +1023,40 @@ export const zCorpusCrossReferenceRunOut = z.object({
 });
 
 /**
+ * CorpusExpandFindingOut
+ *
+ * One thing OpenAleph holds around the entity, proposed as an OpenAleph
+ * connector finding: a relationship (for the external-relationship review)
+ * or the entity at its far end.
+ */
+export const zCorpusExpandFindingOut = z.object({
+  caption: z.string(),
+  collection_label: z.string().nullable(),
+  id: z.string(),
+  kind: z.enum(['relationship', 'entity']),
+  provider_record_id: z.string(),
+  review_status: z.string(),
+  schema: z.string().nullable(),
+  source_url: z.string().nullable(),
+});
+
+/**
+ * CorpusExpandOut
+ *
+ * "Expand in the corpus" (ADR-0006, Wave B): what OpenAleph holds
+ * around a confirmed entity, now waiting for review.
+ */
+export const zCorpusExpandOut = z.object({
+  entity_id: z.string(),
+  findings: z.array(zCorpusExpandFindingOut),
+  identities: z.array(z.string()),
+  neighbours: z.number().int(),
+  relationships: z.number().int(),
+  run_id: z.string(),
+  skipped_own: z.number().int(),
+});
+
+/**
  * CorpusPendingOut
  *
  * What the next push would change -- records to send or remove, match
@@ -5385,6 +5419,15 @@ export const zCanonicalEntityResolutionPath = z.object({
  */
 export const zCanonicalEntityResolutionResponse =
   zCanonicalResolutionDecisionOut;
+
+export const zExpandEntityInCorpusPath = z.object({
+  entity_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zExpandEntityInCorpusResponse = zCorpusExpandOut;
 
 export const zListCrossProviderDecisionsPath = z.object({
   entity_id: z.string(),

@@ -25,12 +25,15 @@ from app.core.config import settings
 from app.db.session import SessionLocal
 from app.jobs import corpus as corpus_jobs
 from app.models.domain import (
-    CorpusSyncState, CrossReferenceDecision, CrossReferenceProposal, Entity, Investigation, InvestigationCorpusBinding,
+    ConnectorFinding, CorpusSyncState, CrossReferenceDecision, CrossReferenceProposal, Entity, Investigation, InvestigationCorpusBinding,
     OpenAlephEntityLink,
 )
 from app.schemas.api import EntityCreate
 from app.services import openaleph_corpus
+from app.services.corpus_expand import expand_in_corpus
 from app.services.cross_references import decide_cross_reference
+from app.services.external_relationships import relationship_endpoint_candidates
+from app.services.openaleph_gateway import CorpusGateway
 from app.services.entities import create_entity
 from app.services.entity_merge import execute_entity_merge, preview_entity_merge
 from app.services.relationships import create_relationship
@@ -146,6 +149,9 @@ def test_two_investigations_sharing_a_company_are_cross_referenced_and_judged(li
         port = _investigation(db, "xref port")
         ours = _entity(db, harbour, "Company", "Meridian Holdings Ltd", jurisdiction=["gb"], registrationNumber=[number])
         theirs = _entity(db, port, "Company", "Meridian Holdings Limited", jurisdiction=["gb"], registrationNumber=[number])
+        director = _entity(db, port, "Person", f"Peter Portman {number}")
+        directorship = create_relationship(db, investigation_id=port.id, schema="Directorship", source_entity_id=director.id,
+                                           target_entity_id=theirs.id, properties={"role": ["director"]})
         corpus_jobs.sync_now(SessionLocal, port.id)
         corpus_jobs.sync_now(SessionLocal, harbour.id)
         state = _state(db, harbour)
@@ -185,3 +191,16 @@ def test_two_investigations_sharing_a_company_are_cross_referenced_and_judged(li
 
         row = _wait(judged, "OpenAleph to show the reporter's judgement on the match")
         assert row["score"] == pytest.approx(proposal.score)
+
+        # "Expand in the corpus": through the OpenAleph entity the reporter
+        # decided is the same, the port's director of the company is proposed.
+        expanded = expand_in_corpus(db, db.get(Entity, ours.id), gateway=CorpusGateway())
+        print(f"live expand: {expanded['identities']} -> {[(f['kind'], f['schema'], f['caption']) for f in expanded['findings']]}")
+        assert expanded["identities"] == [ours_id, theirs_id]
+        directorship_id = _link(db, directorship.relationship_entity_id).openaleph_entity_id
+        director_id = _link(db, director.id).openaleph_entity_id
+        by_record = {item["provider_record_id"]: item for item in expanded["findings"]}
+        assert by_record[directorship_id]["kind"] == "relationship" and by_record[director_id]["kind"] == "entity"
+        candidates = relationship_endpoint_candidates(db, db.get(ConnectorFinding, by_record[directorship_id]["id"]))
+        assert candidates["target_candidates"][0]["entity_id"] == ours.id and candidates["target_candidates"][0]["score"] == 1.0
+        assert candidates["source_external_finding"]["provider_record_id"] == director_id

@@ -138,6 +138,9 @@ import type {
   EntityPostMergeReconciliationData,
   EntityPostMergeReconciliationErrors,
   EntityPostMergeReconciliationResponses,
+  ExpandEntityInCorpusData,
+  ExpandEntityInCorpusErrors,
+  ExpandEntityInCorpusResponses,
   ExportDeckPptxData,
   ExportDeckPptxErrors,
   ExportDeckPptxResponses,
@@ -578,6 +581,8 @@ import {
   zEntityMergePreviewResponse,
   zEntityPostMergeReconciliationPath,
   zEntityPostMergeReconciliationResponse,
+  zExpandEntityInCorpusPath,
+  zExpandEntityInCorpusResponse,
   zExportDeckPptxPath,
   zExportDeckPptxResponse,
   zExportInvestigationPath,
@@ -2369,6 +2374,35 @@ export const canonicalEntityResolution = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Expand Entity In Corpus
+ */
+export const expandEntityInCorpus = <ThrowOnError extends boolean = false>(
+  options: Options<ExpandEntityInCorpusData, ThrowOnError>,
+): RequestResult<
+  ExpandEntityInCorpusResponses,
+  ExpandEntityInCorpusErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ExpandEntityInCorpusResponses,
+    ExpandEntityInCorpusErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zExpandEntityInCorpusPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zExpandEntityInCorpusResponse.parseAsync(data),
+    url: '/api/entities/{entity_id}/corpus/expand',
+    ...options,
   });
 
 /**

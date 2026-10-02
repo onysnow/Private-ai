@@ -51,6 +51,7 @@ import {
   entityMergeHistory,
   entityMergePreview,
   entityPostMergeReconciliation,
+  expandEntityInCorpus,
   exportDeckPptx,
   exportInvestigation,
   exportWriteupDocx,
@@ -294,6 +295,9 @@ import type {
   EntityPostMergeReconciliationData,
   EntityPostMergeReconciliationError,
   EntityPostMergeReconciliationResponse,
+  ExpandEntityInCorpusData,
+  ExpandEntityInCorpusError,
+  ExpandEntityInCorpusResponse,
   ExportDeckPptxData,
   ExportDeckPptxError,
   ExportDeckPptxResponse,
@@ -2002,6 +2006,33 @@ export const canonicalEntityResolutionMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await canonicalEntityResolution({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Expand Entity In Corpus
+ */
+export const expandEntityInCorpusMutation = (
+  options?: Partial<Options<ExpandEntityInCorpusData>>,
+): UseMutationOptions<
+  ExpandEntityInCorpusResponse,
+  ExpandEntityInCorpusError,
+  Options<ExpandEntityInCorpusData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ExpandEntityInCorpusResponse,
+    ExpandEntityInCorpusError,
+    Options<ExpandEntityInCorpusData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await expandEntityInCorpus({
         ...options,
         ...fnOptions,
         throwOnError: true,

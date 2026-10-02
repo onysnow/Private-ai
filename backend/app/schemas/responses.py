@@ -1189,6 +1189,37 @@ class CrossReferenceOut(ResponseModel):
     last_seen_at: Timestamp
 
 
+class CorpusExpandFindingOut(ResponseModel):
+    """One thing OpenAleph holds around the entity, proposed as an OpenAleph
+    connector finding: a relationship (for the external-relationship review)
+    or the entity at its far end."""
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    id: str
+    kind: Literal["relationship", "entity"]
+    caption: str
+    schema_: str | None = Field(alias="schema")
+    provider_record_id: str
+    source_url: str | None
+    review_status: str
+    collection_label: str | None
+
+
+class CorpusExpandOut(ResponseModel):
+    """ "Expand in the corpus" (ADR-0006, Wave B): what OpenAleph holds
+    around a confirmed entity, now waiting for review."""
+    entity_id: str
+    run_id: str
+    # The OpenAleph entities asked about: the entity's own copy, and those a
+    # reporter decided are the same.
+    identities: list[str]
+    relationships: int
+    neighbours: int
+    # Linked records that are already the investigation's own.
+    skipped_own: int
+    findings: list[CorpusExpandFindingOut]
+
+
 # --- Portable backups --------------------------------------------------------------
 
 class BackupInvestigationOut(ResponseModel):

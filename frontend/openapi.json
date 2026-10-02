@@ -8198,6 +8198,130 @@
         "title": "CorpusCrossReferenceRunOut",
         "type": "object"
       },
+      "CorpusExpandFindingOut": {
+        "description": "One thing OpenAleph holds around the entity, proposed as an OpenAleph\nconnector finding: a relationship (for the external-relationship review)\nor the entity at its far end.",
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "collection_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collection Label"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "relationship",
+              "entity"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "provider_record_id": {
+            "title": "Provider Record Id",
+            "type": "string"
+          },
+          "review_status": {
+            "title": "Review Status",
+            "type": "string"
+          },
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schema"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "caption",
+          "schema",
+          "provider_record_id",
+          "source_url",
+          "review_status",
+          "collection_label"
+        ],
+        "title": "CorpusExpandFindingOut",
+        "type": "object"
+      },
+      "CorpusExpandOut": {
+        "description": "\"Expand in the corpus\" (ADR-0006, Wave B): what OpenAleph holds\naround a confirmed entity, now waiting for review.",
+        "properties": {
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/CorpusExpandFindingOut"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "identities": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Identities",
+            "type": "array"
+          },
+          "neighbours": {
+            "title": "Neighbours",
+            "type": "integer"
+          },
+          "relationships": {
+            "title": "Relationships",
+            "type": "integer"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "skipped_own": {
+            "title": "Skipped Own",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "entity_id",
+          "run_id",
+          "identities",
+          "relationships",
+          "neighbours",
+          "skipped_own",
+          "findings"
+        ],
+        "title": "CorpusExpandOut",
+        "type": "object"
+      },
       "CorpusPendingOut": {
         "description": "What the next push would change -- records to send or remove, match\njudgements to send -- and the records it cannot send (with why).",
         "properties": {
@@ -31611,6 +31735,55 @@
           }
         },
         "summary": "Canonical Entity Resolution"
+      }
+    },
+    "/api/entities/{entity_id}/corpus/expand": {
+      "post": {
+        "operationId": "expand_entity_in_corpus",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entity_id",
+            "required": true,
+            "schema": {
+              "title": "Entity Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorpusExpandOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Expand Entity In Corpus"
       }
     },
     "/api/entities/{entity_id}/cross-provider-decisions": {

@@ -2416,6 +2416,85 @@ export type CorpusCrossReferenceRunOut = {
 };
 
 /**
+ * CorpusExpandFindingOut
+ *
+ * One thing OpenAleph holds around the entity, proposed as an OpenAleph
+ * connector finding: a relationship (for the external-relationship review)
+ * or the entity at its far end.
+ */
+export type CorpusExpandFindingOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Collection Label
+   */
+  collection_label: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: 'relationship' | 'entity';
+  /**
+   * Provider Record Id
+   */
+  provider_record_id: string;
+  /**
+   * Review Status
+   */
+  review_status: string;
+  /**
+   * Schema
+   */
+  schema: string | null;
+  /**
+   * Source Url
+   */
+  source_url: string | null;
+};
+
+/**
+ * CorpusExpandOut
+ *
+ * "Expand in the corpus" (ADR-0006, Wave B): what OpenAleph holds
+ * around a confirmed entity, now waiting for review.
+ */
+export type CorpusExpandOut = {
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Findings
+   */
+  findings: Array<CorpusExpandFindingOut>;
+  /**
+   * Identities
+   */
+  identities: Array<string>;
+  /**
+   * Neighbours
+   */
+  neighbours: number;
+  /**
+   * Relationships
+   */
+  relationships: number;
+  /**
+   * Run Id
+   */
+  run_id: string;
+  /**
+   * Skipped Own
+   */
+  skipped_own: number;
+};
+
+/**
  * CorpusPendingOut
  *
  * What the next push would change -- records to send or remove, match
@@ -12125,6 +12204,42 @@ export type CanonicalEntityResolutionResponses = {
 
 export type CanonicalEntityResolutionResponse =
   CanonicalEntityResolutionResponses[keyof CanonicalEntityResolutionResponses];
+
+export type ExpandEntityInCorpusData = {
+  body?: never;
+  path: {
+    /**
+     * Entity Id
+     */
+    entity_id: string;
+  };
+  query?: never;
+  url: '/api/entities/{entity_id}/corpus/expand';
+};
+
+export type ExpandEntityInCorpusErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ExpandEntityInCorpusError =
+  ExpandEntityInCorpusErrors[keyof ExpandEntityInCorpusErrors];
+
+export type ExpandEntityInCorpusResponses = {
+  /**
+   * Successful Response
+   */
+  200: CorpusExpandOut;
+};
+
+export type ExpandEntityInCorpusResponse =
+  ExpandEntityInCorpusResponses[keyof ExpandEntityInCorpusResponses];
 
 export type ListCrossProviderDecisionsData = {
   body?: never;
