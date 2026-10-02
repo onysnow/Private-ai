@@ -80,6 +80,28 @@ Workbench's search for `Mention` entities could never find anything.
   (`GET /api/investigations/{id}/corpus/status`) therefore lists stages
   only while OpenAleph works, and asks again every three seconds until it
   is idle.
+- **What ingest-file reads is read from the image, not listed by hand.**
+  `tools/openaleph_ingest_formats.py` asks the ingestor registry inside
+  `ghcr.io/openaleph/ingest-file:<tag>` (servicelayer's
+  `get_extensions("ingestors")`, which `Manager.auction` uses) for each
+  ingestor's score and the MIME types and extensions it claims, normalised
+  as `Ingestor.match` normalises them, and writes
+  `backend/app/services/openaleph_formats.py`. The upload check runs the
+  same auction: the highest score among the ingestors claiming a file wins.
+  5.3.1 has 37 ingestors; a file whose auction `IgnoreIngestor` wins
+  (executables, fonts, keys, `.log` files, which it outbids plain text for)
+  is refused, since OpenAleph would store it without reading it. A test
+  fails when the compose files move to another ingest-file tag without the
+  list being generated again.
+- **RAR archives match by extension only.** `RARIngestor.MIME_TYPES` in
+  `ingestors/packages/rar.py` is `['application/rarapplication/x-rar']`: a
+  missing comma joins the two types into one that matches nothing, so only
+  `.rar` selects it.
+- **A file only OpenAleph reads waits for OpenAleph.** When OpenAleph
+  cannot be reached, a PDF, Word file or text file falls back to the
+  Workbench's own reader as before; an email, archive, spreadsheet or image
+  fails its read with "needs OpenAleph to read; retry when it is running",
+  and the read can be retried from the document row.
 
 ## Decision: what each part of OpenAleph does for the Workbench
 

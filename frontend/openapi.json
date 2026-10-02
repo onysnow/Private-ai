@@ -9381,6 +9381,69 @@
         "title": "DocumentExtractionSettingsOut",
         "type": "object"
       },
+      "DocumentFormatsOut": {
+        "description": "What an upload accepts now (app/services/document_formats.py).",
+        "properties": {
+          "accept": {
+            "title": "Accept",
+            "type": "string"
+          },
+          "extensions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Extensions",
+            "type": "array"
+          },
+          "ingest_file_image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ingest File Image"
+          },
+          "max_bytes": {
+            "title": "Max Bytes",
+            "type": "integer"
+          },
+          "mime_types": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Mime Types",
+            "type": "array"
+          },
+          "openaleph_only_extensions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Openaleph Only Extensions",
+            "type": "array"
+          },
+          "reader": {
+            "enum": [
+              "openaleph",
+              "workbench"
+            ],
+            "title": "Reader",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reader",
+          "extensions",
+          "mime_types",
+          "openaleph_only_extensions",
+          "accept",
+          "max_bytes"
+        ],
+        "title": "DocumentFormatsOut",
+        "type": "object"
+      },
       "DocumentOut": {
         "properties": {
           "candidate_counts": {
@@ -30257,6 +30320,45 @@
         "summary": "Seed Demo"
       }
     },
+    "/api/document-formats": {
+      "get": {
+        "description": "The kinds of file an upload accepts now: every format OpenAleph's\ningest-file reads while OpenAleph reads uploads, else the Workbench's\nown reader's list. ``accept`` is ready for a file picker.",
+        "operationId": "get_document_formats",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentFormatsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Document Formats"
+      }
+    },
     "/api/documents/upload": {
       "post": {
         "description": "Save the file, then read it as a background job.\n\nOn PostgreSQL (the product) this answers 202 as soon as the file is saved:\nthe document is ``queued`` and ``job`` says how to follow it\n(GET /api/jobs/{id}). In developer mode (SQLite) the job runs before the\nreply, off the event loop, so the answer is the read document as before.",
@@ -30291,6 +30393,16 @@
               }
             },
             "description": "Saved; the document is read by a background job (follow `job`)"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "The reader this deployment uses cannot read this kind of file (GET /api/document-formats)"
           },
           "422": {
             "content": {

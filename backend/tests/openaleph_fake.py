@@ -67,6 +67,8 @@ class FakeOpenAleph:
         self.analysis: dict[str, dict[str, list[str]]] = {}
         self.analyze_reply = 202
         self.fail: dict[str, int] = {}          # path -> HTTP status to answer instead
+        # Raised by ingest_upload instead of storing the file (OpenAleph down).
+        self.refuse_uploads: Exception | None = None
         self.requests: list[httpx.Request] = []
         self.uploads: list[tuple[str, Path, dict[str, Any]]] = []
         self._pending_analysis: list[str] = []
@@ -83,6 +85,8 @@ class FakeOpenAleph:
 
     def ingest_upload(self, *, collection_id: str, file_path: Path, metadata: dict[str, Any],
                       sync: bool = False, index: bool = True) -> dict[str, Any]:
+        if self.refuse_uploads is not None:
+            raise self.refuse_uploads
         entity_id = f"{len(self.uploads) + 1}.upload"
         self.uploads.append((collection_id, Path(file_path), metadata))
         if entity_id not in self.entities:

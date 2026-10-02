@@ -1239,6 +1239,21 @@ export const zDocumentDetailOut = z.object({
 });
 
 /**
+ * DocumentFormatsOut
+ *
+ * What an upload accepts now (app/services/document_formats.py).
+ */
+export const zDocumentFormatsOut = z.object({
+  accept: z.string(),
+  extensions: z.array(z.string()),
+  ingest_file_image: z.string().nullish(),
+  max_bytes: z.number().int(),
+  mime_types: z.array(z.string()),
+  openaleph_only_extensions: z.array(z.string()),
+  reader: z.enum(['openaleph', 'workbench']),
+});
+
+/**
  * DocumentOut
  */
 export const zDocumentOut = z.object({
@@ -5098,6 +5113,11 @@ export const zExportDeckPptxResponse = z.string();
  * Successful Response
  */
 export const zSeedDemoResponse = zDemoSeedOut;
+
+/**
+ * Successful Response
+ */
+export const zGetDocumentFormatsResponse = zDocumentFormatsOut;
 
 export const zUploadDocumentBody = zBodyUploadDocument;
 

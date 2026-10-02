@@ -15,8 +15,11 @@ touched.
 
 from __future__ import annotations
 
+import io
 import os
 import time
+import zipfile
+from email.message import EmailMessage
 
 import httpx
 import pymupdf
@@ -186,6 +189,45 @@ def test_reading_progress_follows_openaleph_until_it_is_idle(live, tmp_path):
     assert all(stage["pending"] + stage["running"] + stage["finished"] > 0 for row in working for stage in row["stages"])
     final = seen[-1]
     assert final["state"] == "idle" and final["stages"] == [] and final["active"] is False, final
+
+
+def _email(*, attachment: bool = True) -> bytes:
+    message = EmailMessage()
+    message["From"] = "Jane Doe <jane.doe@meridian.example>"
+    message["To"] = "Audit Desk <audit@kestrelwood.example>"
+    message["Cc"] = "Maria Fernandez <maria@kestrelwood.example>"
+    message["Subject"] = "Transfer to Meridian"
+    message["Date"] = "Tue, 01 Sep 2026 10:00:00 +0000"
+    message["Message-ID"] = "<transfer@meridian.example>"
+    message.set_content("Please find the ledger attached. Jonathan Whitaker approved the transfer.")
+    if attachment:
+        message.add_attachment(b"Ledger: GB82WEST12345698765432 paid 10,000 EUR to Meridian Holdings Ltd.",
+                               maintype="text", subtype="plain", filename="ledger.txt")
+    return message.as_bytes()
+
+
+def _zip(**files: str) -> bytes:
+    bundle = io.BytesIO()
+    with zipfile.ZipFile(bundle, "w") as archive:
+        for name, text in files.items():
+            archive.writestr(name.replace("__", "/"), text)
+    return bundle.getvalue()
+
+
+def test_formats_only_openaleph_reads_are_accepted_and_read_by_it(live):
+    client, _created = live
+    formats = client.get("/api/document-formats").json()
+    assert formats["reader"] == "openaleph" and {"eml", "zip"} <= set(formats["openaleph_only_extensions"])
+    inv = _investigation(live, "Wave A formats")
+    email = _upload(live, inv, "transfer.eml", _email(), "message/rfc822")
+    assert email["job"]["message"].startswith("Read by OpenAleph (1 paragraph(s))"), email["job"]["message"]
+    bundle = _upload(live, inv, "bundle.zip", _zip(first="Jane Doe wrote to Meridian.", second="Angela Merkel replied."),
+                     "application/zip")
+    assert bundle["job"]["message"].startswith("Read by OpenAleph (no text)"), bundle["job"]["message"]
+    assert bundle["chunk_count"] == 0
+    refused = client.post("/api/documents/upload", data={"investigation_id": inv, "title": "setup"},
+                          files={"file": ("setup.exe", b"MZ\x90\x00", "application/octet-stream")})
+    assert refused.status_code == 415, refused.text
 
 
 def test_a_pdf_gets_its_names_on_their_pages(live):

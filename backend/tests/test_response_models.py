@@ -336,6 +336,15 @@ def test_openaleph_corpus_replies(demo, monkeypatch):
     _same_through_model(list[r.ExtractionCandidateOut], explained)
 
 
+def test_document_formats_replies(monkeypatch):
+    from app.core.config import settings
+    from app.services.document_formats import accepted_formats
+
+    for reader in ("openaleph", "local"):
+        monkeypatch.setattr(settings, "document_reader", reader)
+        _same_through_model(r.DocumentFormatsOut, accepted_formats())
+
+
 def test_corpus_status_replies(demo, monkeypatch):
     import httpx
 

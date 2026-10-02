@@ -14,7 +14,7 @@
 //   const api = mockApi(pageRoutes({investigations: [investigation], leads: [leadFixture()]}));
 //   api.add({'POST /api/leads': {id: 'lead-2'}});           // a route the test's action needs
 //   api.add({...investigationRoutes('inv-restored')});       // a case opened later
-import type {CorpusStatusOut, DossierExternalOut, DossierSummaryOut, InvestigationOut, PostMergeReconciliationOut} from '../lib/generated/types.gen';
+import type {CorpusStatusOut, DocumentFormatsOut, DossierExternalOut, DossierSummaryOut, InvestigationOut, PostMergeReconciliationOut} from '../lib/generated/types.gen';
 import type {Routes} from './mock-api';
 
 /** A reply as a test writes it: the generated shape, with whatever a test overrides. */
@@ -218,6 +218,15 @@ export function leadQueueBody(investigationId: string, leads: unknown[] = []): L
   return {investigation_id: investigationId, total: leads.length, counts: tally(leads, 'status'), items: leads};
 }
 
+/** What uploads accept, in the generated DocumentFormatsOut shape: the
+ * Workbench's own reader's list unless a test says otherwise. */
+export function documentFormatsBody(overrides: Partial<DocumentFormatsOut> = {}): DocumentFormatsOut {
+  return {
+    reader: 'workbench', extensions: ['csv', 'docx', 'htm', 'html', 'md', 'pdf', 'txt'], mime_types: [], openaleph_only_extensions: [],
+    accept: '.csv,.docx,.htm,.html,.md,.pdf,.txt', max_bytes: 52428800, ingest_file_image: null, ...overrides,
+  };
+}
+
 /** How OpenAleph's work on the case stands, in the generated CorpusStatusOut
  * shape: idle, with no stages, unless a test says otherwise. */
 export function corpusStatusBody(investigationId: string, overrides: Partial<CorpusStatusOut> = {}): CorpusStatusOut {
@@ -277,6 +286,7 @@ export function pageRoutes(options: PageRoutesOptions = {}): Routes {
   const routes: Routes = {
     'GET /api/settings/status': settings,
     'GET /api/investigations': investigations.map(investigationRecord),
+    'GET /api/document-formats': documentFormatsBody(),
     'GET /api/connectors': {providers, status: Object.fromEntries(providers.map(p => [p, {configured: true}]))},
   };
   for (const investigation of investigations) Object.assign(routes, investigationRoutes(investigation.id, records));

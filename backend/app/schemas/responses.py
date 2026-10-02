@@ -1047,6 +1047,17 @@ class OpenAlephReviewRefreshOut(ResponseModel):
     status: OpenAlephReviewStatusOut
 
 
+class DocumentFormatsOut(ResponseModel):
+    """What an upload accepts now (app/services/document_formats.py)."""
+    reader: Literal["openaleph", "workbench"]
+    extensions: list[str]
+    mime_types: list[str]
+    openaleph_only_extensions: list[str]
+    accept: str
+    max_bytes: int
+    ingest_file_image: str | None = None
+
+
 class CorpusStageOut(ResponseModel):
     """One of OpenAleph's queues for the collection, jobs counted across its
     batches (app/services/openaleph_status.py)."""

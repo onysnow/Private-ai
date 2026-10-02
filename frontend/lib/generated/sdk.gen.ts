@@ -170,6 +170,9 @@ import type {
   GetDeckEndpointResponses,
   GetDocumentData,
   GetDocumentErrors,
+  GetDocumentFormatsData,
+  GetDocumentFormatsErrors,
+  GetDocumentFormatsResponses,
   GetDocumentResponses,
   GetEntityDossierData,
   GetEntityDossierErrors,
@@ -595,6 +598,7 @@ import {
   zGetCorpusSyncResponse,
   zGetDeckEndpointPath,
   zGetDeckEndpointResponse,
+  zGetDocumentFormatsResponse,
   zGetDocumentPath,
   zGetDocumentResponse,
   zGetEntityDossierPath,
@@ -1823,6 +1827,39 @@ export const seedDemo = <ThrowOnError extends boolean = false>(
         .parseAsync(data),
     responseValidator: async (data) => await zSeedDemoResponse.parseAsync(data),
     url: '/api/demo/seed',
+    ...options,
+  });
+
+/**
+ * Get Document Formats
+ *
+ * The kinds of file an upload accepts now: every format OpenAleph's
+ * ingest-file reads while OpenAleph reads uploads, else the Workbench's
+ * own reader's list. ``accept`` is ready for a file picker.
+ */
+export const getDocumentFormats = <ThrowOnError extends boolean = false>(
+  options?: Options<GetDocumentFormatsData, ThrowOnError>,
+): RequestResult<
+  GetDocumentFormatsResponses,
+  GetDocumentFormatsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetDocumentFormatsResponses,
+    GetDocumentFormatsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDocumentFormatsResponse.parseAsync(data),
+    url: '/api/document-formats',
     ...options,
   });
 

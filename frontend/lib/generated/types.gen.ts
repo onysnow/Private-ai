@@ -3161,6 +3161,42 @@ export type DocumentExtractionSettingsOut = {
 };
 
 /**
+ * DocumentFormatsOut
+ *
+ * What an upload accepts now (app/services/document_formats.py).
+ */
+export type DocumentFormatsOut = {
+  /**
+   * Accept
+   */
+  accept: string;
+  /**
+   * Extensions
+   */
+  extensions: Array<string>;
+  /**
+   * Ingest File Image
+   */
+  ingest_file_image?: string | null;
+  /**
+   * Max Bytes
+   */
+  max_bytes: number;
+  /**
+   * Mime Types
+   */
+  mime_types: Array<string>;
+  /**
+   * Openaleph Only Extensions
+   */
+  openaleph_only_extensions: Array<string>;
+  /**
+   * Reader
+   */
+  reader: 'openaleph' | 'workbench';
+};
+
+/**
  * DocumentOut
  */
 export type DocumentOut = {
@@ -11296,6 +11332,37 @@ export type SeedDemoResponses = {
 
 export type SeedDemoResponse = SeedDemoResponses[keyof SeedDemoResponses];
 
+export type GetDocumentFormatsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/document-formats';
+};
+
+export type GetDocumentFormatsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetDocumentFormatsError =
+  GetDocumentFormatsErrors[keyof GetDocumentFormatsErrors];
+
+export type GetDocumentFormatsResponses = {
+  /**
+   * Successful Response
+   */
+  200: DocumentFormatsOut;
+};
+
+export type GetDocumentFormatsResponse =
+  GetDocumentFormatsResponses[keyof GetDocumentFormatsResponses];
+
 export type UploadDocumentData = {
   body: BodyUploadDocument;
   path?: never;
@@ -11304,6 +11371,10 @@ export type UploadDocumentData = {
 };
 
 export type UploadDocumentErrors = {
+  /**
+   * The reader this deployment uses cannot read this kind of file (GET /api/document-formats)
+   */
+  415: ErrorOut;
   /**
    * Response 422 Upload Document
    *

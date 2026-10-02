@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NoReturn
 
 from sqlalchemy.orm import Session
 
@@ -11,7 +11,7 @@ from app.jobs.records import Handler, JobFailed, Report
 from app.models.jobs import BackgroundJob
 
 if TYPE_CHECKING:
-    from app.services.openaleph_reader import OpenAlephText
+    from app.services.openaleph_reader import OpenAlephText, OpenAlephUnavailable
 
 EXTRACT_DOCUMENT = "extract_document"
 ANALYZE_DOCUMENT = "openaleph_analyze"
@@ -29,23 +29,49 @@ def _finish_openaleph_read(db: Session, document_id: str, read: OpenAlephText, r
 
     analysis = find_names(read.collection_id, read.provider_document_id, read.schema, report)
     report(85, "Making proposals from OpenAleph's text")
-    issue = analysis.issue()
+    issue = analysis.issue() if read.chunks else None
     issues = [*read.issues, issue] if issue else list(read.issues)
     doc = extract_document(db, document_id, text=(read.chunks, issues), find_names=not analysis.analysed)
     if doc is None:
         return "The document was deleted before it was read"
     if doc.extraction_status == "failed":
         raise RuntimeError(doc.extraction_error or "The document could not be read")
-    unit = "page" if read.chunks[0]["page_number"] is not None else "paragraph"
-    message = f"Read by OpenAleph ({len(read.chunks)} {unit}(s))"
     report(92, "Staging the names OpenAleph found")
     made = describe_import(import_analysis_proposals(db, doc.id, analysis))
+    if not read.chunks:   # a file only OpenAleph reads, in which it found no text
+        return f"Read by OpenAleph (no text){'; ' + made if made else ''}"
+    unit = "page" if read.chunks[0]["page_number"] is not None else "paragraph"
+    message = f"Read by OpenAleph ({len(read.chunks)} {unit}(s))"
     if analysis.analysed:
         return f"{message}; {made or 'OpenAleph found no names'}"
     # Header names of an email can arrive without an analysis of its text.
     finder = ("so the Workbench's own name-finder looked for names" if settings.enable_local_entity_suggestions
               else "and the Workbench's own name-finder is switched off")
     return f"{message}; {made + '; ' if made else ''}OpenAleph gave no analysis, {finder}"
+
+
+def _fail_openaleph_only_read(db: Session, document_id: str, filename: str, exc: OpenAlephUnavailable) -> NoReturn:
+    """A file the Workbench's own reader cannot read (an email, an archive,
+    a spreadsheet...) and OpenAleph did not read: record why on the document
+    and fail the job, so the reporter can retry it from the document row
+    (ADR-0006, Wave A). Nothing else can read it, so there is no fallback."""
+    from app.models.domain import Document
+    from app.services.document_formats import kind_of
+
+    kind = exc.kind
+    if kind == "unreachable":
+        message = f"{filename} needs OpenAleph to read; retry when it is running ({exc})"
+    else:
+        extension = kind_of(filename, None).extension
+        named = f".{extension} files" if extension else "this kind of file"
+        message = f"{exc}; the Workbench's own reader cannot read {named}"
+    db.rollback()
+    doc = db.get(Document, document_id)
+    if doc is not None:
+        doc.extraction_status = "failed"
+        doc.extraction_error = message
+        db.commit()
+    raise JobFailed(message, {"reason": "needs_openaleph" if kind == "unreachable" else f"openaleph_{kind}"})
 
 
 def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str | None:
@@ -57,6 +83,8 @@ def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str
     and the job's message says which one read it and why. A failed read
     fails the job, with the reason the document also records.
     """
+    from app.models.domain import Document
+    from app.services.document_formats import needs_openaleph
     from app.services.documents import extract_document
     from app.services.openaleph_corpus import sync_document_to_openaleph
     from app.services.openaleph_reader import OpenAlephUnavailable, read_with_openaleph, reading_with_openaleph
@@ -67,9 +95,13 @@ def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str
 
     fallback_reason: str | None = None
     if reading_with_openaleph():
+        stored = db.get(Document, document_id)
+        openaleph_only = stored is not None and needs_openaleph(stored.filename)
         try:
-            read = read_with_openaleph(db, document_id, report)
+            read = read_with_openaleph(db, document_id, report, allow_empty=openaleph_only)
         except OpenAlephUnavailable as exc:
+            if stored is not None and openaleph_only:
+                _fail_openaleph_only_read(db, document_id, stored.filename, exc)
             fallback_reason = str(exc)
         else:
             return _finish_openaleph_read(db, document_id, read, report)

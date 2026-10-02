@@ -24,10 +24,11 @@ from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Document, Investigation
 from app.schemas.responses import (
-    BackgroundJobOut, DocumentDetailOut, DocumentReadFailedOut, DocumentUploadOut, ExtractionCandidateOut, OpenAlephDocumentSyncOut,
-    OpenAlephEntityImportOut, OpenAlephEvidenceImportOut, OpenAlephReviewRefreshOut, OpenAlephReviewStatusOut,
-    ValidationErrorOut, upstream,
+    BackgroundJobOut, DocumentDetailOut, DocumentFormatsOut, DocumentReadFailedOut, DocumentUploadOut, ErrorOut,
+    ExtractionCandidateOut, OpenAlephDocumentSyncOut, OpenAlephEntityImportOut, OpenAlephEvidenceImportOut,
+    OpenAlephReviewRefreshOut, OpenAlephReviewStatusOut, ValidationErrorOut, upstream,
 )
+from app.services.document_formats import UnsupportedFormat, accepted_formats, check_upload
 from app.services.documents import (
     get_document_detail, list_document_candidates, serialize_document, store_document,
 )
@@ -176,8 +177,17 @@ async def _submit_or_record_failure(request: Request, job: BackgroundJob, db: Se
             db.commit()
 
 
+@router.get("/document-formats", response_model=DocumentFormatsOut)
+def get_document_formats() -> Any:
+    """The kinds of file an upload accepts now: every format OpenAleph's
+    ingest-file reads while OpenAleph reads uploads, else the Workbench's
+    own reader's list. ``accept`` is ready for a file picker."""
+    return accepted_formats()
+
+
 @router.post("/documents/upload", response_model=DocumentUploadOut, responses={
     202: {"model": DocumentUploadOut, "description": "Saved; the document is read by a background job (follow `job`)"},
+    415: {"model": ErrorOut, "description": "The reader this deployment uses cannot read this kind of file (GET /api/document-formats)"},
     422: {"model": ValidationErrorOut | DocumentReadFailedOut,
           "description": "The input does not match the route, or the file was saved but could not be read"},
 })
@@ -198,6 +208,10 @@ async def upload_document(
     """
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
+    try:
+        check_upload(file.filename, file.content_type)
+    except UnsupportedFormat as exc:
+        raise HTTPException(415, str(exc))
     data = await read_upload_limited(file, settings.max_document_bytes)
     if not data:
         raise HTTPException(400, "Document is empty")

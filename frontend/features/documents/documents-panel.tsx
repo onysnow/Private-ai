@@ -21,7 +21,7 @@ import {errorMessage, isAbortError} from '../../lib/api-client';
 import {checkedReply} from '../../lib/api-generated';
 import {api} from '../../lib/api-instance';
 import {
-  getCorpusStatusQueryKey, getInvestigationGraphQueryKey, listClaimsQueryKey, listDocumentsOptions, listDocumentsQueryKey, listEntitiesOptions,
+  getCorpusStatusQueryKey, getDocumentFormatsOptions, getInvestigationGraphQueryKey, listClaimsQueryKey, listDocumentsOptions, listDocumentsQueryKey, listEntitiesOptions,
   listEntitiesQueryKey, listInvestigationEvidenceQueryKey, listSourcesQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {
@@ -41,7 +41,9 @@ import {SchemaQuestion} from './schema-question';
 
 type Props = {investigationId: string};
 
-const ACCEPTED_FILES = '.pdf,.docx,.txt,.md,.csv,.html,.htm';
+// What the Workbench's own reader reads; the pickers offer it until the
+// server says what uploads accept now (GET /api/document-formats).
+const WORKBENCH_FILES = '.csv,.docx,.htm,.html,.md,.pdf,.txt';
 const REVIEW_NOTE = 'Reviewed in Next.js workbench';
 
 function text(value: unknown): string | undefined {
@@ -100,6 +102,9 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
   // The canonical entities a staged relationship can join, from the shared cache.
   const entitiesQuery = useQuery({...listEntitiesOptions({path}), enabled: Boolean(investigationId)});
   const entities = entitiesQuery.data ?? [];
+  // The same list the upload route checks against (ADR-0006, Wave A).
+  const formats = useQuery({...getDocumentFormatsOptions(), enabled: Boolean(investigationId)}).data;
+  const accept = formats?.accept ?? WORKBENCH_FILES;
   const documents: DocumentOut[] = documentsQuery.data ?? [];
   const reloadDocuments = () => queryClient.invalidateQueries({queryKey: listDocumentsQueryKey({path})});
   // OpenAleph's progress is shown while a file is being read; asking for it
@@ -343,12 +348,14 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
   return <Card className="card" id="document-ingestion">
     <CardHeader className="pb-3">
       <CardTitle>Document ingestion & extraction</CardTitle>
-      <CardDescription>PDF, DOCX, text, Markdown, CSV and HTML are extracted into locator-preserving chunks. All entity/claim/evidence suggestions remain proposals until you accept them.</CardDescription>
+      <CardDescription>{formats?.reader === 'openaleph'
+        ? `OpenAleph reads every upload: PDFs and office documents, email, archives, spreadsheets, images and more (${formats.extensions.length} kinds of file). The Workbench's own reader takes over for PDF, DOCX, text, Markdown, CSV and HTML when OpenAleph cannot. `
+        : 'PDF, DOCX, text, Markdown, CSV and HTML are extracted into locator-preserving chunks. '}All entity/claim/evidence suggestions remain proposals until you accept them.</CardDescription>
     </CardHeader>
     <CardContent>
       <div className="searchrow">
         <Input value={docTitle} onChange={(e: ChangeEvent<HTMLInputElement>) => setDocTitle(e.target.value)} placeholder="Document title"/>
-        <Input type="file" accept={ACCEPTED_FILES} onChange={(e: ChangeEvent<HTMLInputElement>) => setDocFile(e.target.files?.[0] || null)}/>
+        <Input type="file" accept={accept} onChange={(e: ChangeEvent<HTMLInputElement>) => setDocFile(e.target.files?.[0] || null)}/>
         <Button onClick={uploadDocument} disabled={!docFile}>Upload & extract</Button>
       </div>
       {docStatus && <p className="muted">{docStatus}</p>}
@@ -358,7 +365,7 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
       <h4>Bulk import</h4>
       <p className="muted">Select several files to import them one at a time with visible progress, then review every proposal, issue, and question document by document before anything is accepted.</p>
       <div className="searchrow">
-        <Input type="file" accept={ACCEPTED_FILES} multiple onChange={(e: ChangeEvent<HTMLInputElement>) => setBulkFiles(Array.from(e.target.files || []))} disabled={bulkImporting}/>
+        <Input type="file" accept={accept} multiple onChange={(e: ChangeEvent<HTMLInputElement>) => setBulkFiles(Array.from(e.target.files || []))} disabled={bulkImporting}/>
         <Button onClick={uploadBulk} disabled={bulkFiles.length === 0 || bulkImporting}>{bulkImporting ? 'Importing…' : `Import ${bulkFiles.length} document(s)`}</Button>
       </div>
       {bulkImporting && bulkProgress && <p className="muted">Importing {Math.min(bulkProgress.done + 1, bulkProgress.total)} of {bulkProgress.total}: {bulkProgress.currentName}</p>}

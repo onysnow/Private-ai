@@ -62,6 +62,7 @@ import {
   getCorpusSync,
   getDeckEndpoint,
   getDocument,
+  getDocumentFormats,
   getEntityDossier,
   getExtractionCandidateExplanation,
   getExtractionCandidateLineage,
@@ -325,6 +326,9 @@ import type {
   GetDeckEndpointResponse,
   GetDocumentData,
   GetDocumentError,
+  GetDocumentFormatsData,
+  GetDocumentFormatsError,
+  GetDocumentFormatsResponse,
   GetDocumentResponse,
   GetEntityDossierData,
   GetEntityDossierError,
@@ -1523,6 +1527,38 @@ export const seedDemoMutation = (
   };
   return mutationOptions;
 };
+
+export const getDocumentFormatsQueryKey = (
+  options?: Options<GetDocumentFormatsData>,
+) => createQueryKey('getDocumentFormats', options);
+
+/**
+ * Get Document Formats
+ *
+ * The kinds of file an upload accepts now: every format OpenAleph's
+ * ingest-file reads while OpenAleph reads uploads, else the Workbench's
+ * own reader's list. ``accept`` is ready for a file picker.
+ */
+export const getDocumentFormatsOptions = (
+  options?: Options<GetDocumentFormatsData>,
+) =>
+  queryOptions<
+    GetDocumentFormatsResponse,
+    GetDocumentFormatsError,
+    GetDocumentFormatsResponse,
+    ReturnType<typeof getDocumentFormatsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDocumentFormats({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDocumentFormatsQueryKey(options),
+  });
 
 /**
  * Upload Document
