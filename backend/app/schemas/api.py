@@ -270,6 +270,8 @@ class ExtractionCandidateReviewRequest(BaseModel):
     confidence: float | None = None
     matched_entity_id: str | None = None
     entity_identity_decision: str | None = None
+    # Accepting an email or phone proposal: the entity it belongs to (ADR-0006).
+    target_entity_id: str | None = None
 
 
 # TAS CONTROL_SURFACE §4 flags. Literal types put the value tables in the OpenAPI
@@ -315,6 +317,25 @@ class AppUserUpdate(BaseModel):
 
 class InvestigationMembershipPut(BaseModel):
     role: str = "viewer"
+
+
+class SecurityAuditRetentionRequest(BaseModel):
+    """Prune the security audit log (POST /settings/security/audit/retention).
+
+    Strict, so `true` or "90" is refused rather than converted: the route
+    refused anything but a whole number and text before this body was typed.
+    The ranges and the confirmation text are checked by the audit log itself
+    (app/core/audit_log.py), which answers 400 with the reason."""
+    keep_days: int = Field(default=90, strict=True)
+    max_records: int = Field(default=5000, strict=True)
+    confirmation: str = Field(default="", strict=True)
+
+
+class ConnectorCredentialPut(BaseModel):
+    """A connector's secret (PUT /settings/connectors/{provider}/credential).
+    Optional here so a missing secret gets the same 400 a blank one does
+    (app/services/settings.py save_connector_credential)."""
+    credential: str | None = None
 
 class ClaimReviewRequest(BaseModel):
     status: str

@@ -47,6 +47,31 @@ OpenAleph 5.3 writes these as `*Mentioned` properties on the document. It
 creates no `Mention` entities unless juditha resolution is configured, so the
 Workbench's search for `Mention` entities could never find anything.
 
+### Checked while building Wave A (2026-10-02)
+
+- **Emails are never analysed by ingest-file.** Its `should_analyze` skips
+  every schema that is a `Folder`, and `Email` is one; it only writes the
+  sender's and recipients' names and addresses (`namesMentioned`,
+  `emailMentioned`) from the headers (`ingestors/support/email.py`).
+  ftm-analyze does analyse an email when asked (its `SKIP_NER` lists Folder,
+  Package, Table and Workbook by name), so the Workbench asks for it with
+  `POST /entities/{id}/analyze`.
+- **IBANs printed in groups are not detected.** ftm-analyze's `IBAN_REGEX`
+  (`analysis/patterns.py`) needs seven digits in a row after the bank code,
+  so `GB82WEST12345698765432` is found and `GB82 WEST 1234 5698 7654 32` is
+  not. Where both forms of one number occur, the Workbench finds both; an
+  IBAN that appears only in grouped form is not proposed (the Workbench adds
+  no detector of its own, decision 5 of ADR-0004). The live test pins this.
+- **Short names are dropped.** ftm-analyze keeps names of 8 to 100
+  characters (`extract/base.py`), so places such as "Paris" or "London" are
+  not reported as `locationMentioned`.
+- **Page entities are not analysed** (`Page` is not `Analyzable`); a PDF's
+  names are on its `Pages` document, and the Workbench locates each one on
+  its page.
+- **The image has fifteen spaCy models**, not only English (correcting the
+  table below): `SpacyNerModels` lists one small model per language and all
+  are installed in `ftm-analyze:5.3.1`.
+
 ## Decision: what each part of OpenAleph does for the Workbench
 
 Every capability goes through the review layer: nothing OpenAleph suggests
@@ -84,7 +109,7 @@ becomes a fact until a reporter accepts it (ADR-0004, decision 1).
 | Transcription (ftm-transcribe) | No published image (checked on ghcr.io, 2026-10-02). |
 | Geocoding (ftm-geocode) | No published image (checked on ghcr.io, 2026-10-02). |
 | Assets and vectors (ftm-assets, ftm-vectorize) | No published image (checked on ghcr.io, 2026-10-02). |
-| GLiNER and Flair name-finding engines | Supported by ftm-analyze, but the 5.3.1 image ships only spaCy and its small English model; `gliner`, `flair` and `transformers` are not installed. |
+| GLiNER and Flair name-finding engines | Supported by ftm-analyze, but the 5.3.1 image ships only spaCy and its small models (fifteen languages; see "Checked while building Wave A"); `gliner`, `flair` and `transformers` are not installed. |
 
 ## Configuration changes
 

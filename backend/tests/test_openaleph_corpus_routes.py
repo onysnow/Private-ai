@@ -17,7 +17,7 @@ from app.main import app, register_domain_routers
 from app.models.domain import Investigation
 from app.schemas.api import EntityCreate
 from app.services.entities import create_entity
-from tests.openaleph_fake import BASE_URL, FakeOpenAleph
+from tests.openaleph_corpus_fake import BASE_URL, FakeOpenAleph
 from tests.test_openaleph_corpus_push import RecordingQueue
 
 client = TestClient(app)

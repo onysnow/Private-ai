@@ -3,7 +3,7 @@ item 2): storing matches, the review decisions and their judgements in
 OpenAleph, matches between our own records as duplicate candidates, the
 cross-referencing job, and who may see a match.
 
-OpenAleph is faked at its HTTP surface (tests/openaleph_fake.py); match rows
+OpenAleph is faked at its HTTP surface (tests/openaleph_corpus_fake.py); match rows
 have the shape GET /api/2/collections/{id}/xref answered on the live stack.
 """
 
@@ -36,7 +36,7 @@ from app.services.cross_references import (
 )
 from app.services.entities import create_entity
 from app.services.resolution import canonical_duplicate_candidates
-from tests.openaleph_fake import BASE_URL, FakeOpenAleph
+from tests.openaleph_corpus_fake import BASE_URL, FakeOpenAleph
 from tests.test_openaleph_corpus_push import RecordingQueue, _merge
 
 client = TestClient(app)

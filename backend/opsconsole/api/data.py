@@ -4,10 +4,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, Body, Query, Request
+from fastapi import APIRouter, Body, Query, Request, Response
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
+from opsconsole import schemas as s
 from opsconsole.config import WritePolicy
 from opsconsole.context import ConsoleContext, ConsoleError
 from opsconsole.core import changesets
@@ -20,6 +21,11 @@ from opsconsole.core.paging import (
     parse_pk,
     related_counts,
 )
+
+# The furthest into a table a page may start: the database takes OFFSET as a
+# 64-bit integer, and a larger one failed with a server error instead of a
+# refusal. No table here comes near this many rows.
+MAX_OFFSET = 2**31 - 1
 
 
 class ChangeSetIn(BaseModel):
@@ -50,7 +56,7 @@ def router(ctx: ConsoleContext) -> APIRouter:
         except LookupError as exc:
             raise ConsoleError(404, "unknown_table", str(exc)) from exc
 
-    @r.get("/data/tables", response_model=None)
+    @r.get("/data/tables", response_model=s.ConsoleTablesOut)
     def tables(request: Request) -> Any:
         ctx.read(request)
         with ctx.config.engine.connect() as conn:
@@ -58,14 +64,14 @@ def router(ctx: ConsoleContext) -> APIRouter:
         drift = ctx.introspector.drift()
         return {"items": items, "extra_tables": drift["extra_tables"], "domains": sorted({i["domain"] for i in items if i["domain"]})}
 
-    @r.get("/data/tables/{name}", response_model=None)
+    @r.get("/data/tables/{name}", response_model=s.ConsoleTableDetailOut)
     def table_detail(request: Request, name: str) -> Any:
         ctx.read(request)
         return ctx.introspector.table_detail(_table(name))
 
-    @r.get("/data/tables/{name}/rows", response_model=None)
+    @r.get("/data/tables/{name}/rows", response_model=s.ConsoleRowsOut)
     def rows(request: Request, name: str, limit: int = Query(default=None, ge=1, le=10_000), cursor: str | None = Query(default=None, max_length=2000),
-             offset: int = Query(0, ge=0), sort: str | None = Query(default=None, max_length=128), order: str = Query("desc", pattern="^(asc|desc)$"),
+             offset: int = Query(0, ge=0, le=MAX_OFFSET), sort: str | None = Query(default=None, max_length=128), order: str = Query("desc", pattern="^(asc|desc)$"),
              q: str | None = Query(default=None, max_length=200), with_count: bool = Query(True)) -> Any:
         ctx.read(request)
         table = _table(name)
@@ -85,7 +91,7 @@ def router(ctx: ConsoleContext) -> APIRouter:
             raise ConsoleError(400, "bad_request", str(exc)) from exc
         return {"table": name, **page, "total": total, "estimated": estimated, "filters": [{"column": c, "op": o, "value": v} for c, o, v in filters], "q": q}
 
-    @r.get("/data/tables/{name}/rows/{pk}", response_model=None)
+    @r.get("/data/tables/{name}/rows/{pk}", response_model=s.ConsoleRowOut)
     def row(request: Request, name: str, pk: str) -> Any:
         ctx.read(request)
         table = _table(name)
@@ -101,7 +107,9 @@ def router(ctx: ConsoleContext) -> APIRouter:
         refs = {c.name: [{"table": fk.column.table.name, "column": fk.column.name} for fk in c.foreign_keys] for c in table.columns if c.foreign_keys}
         return {"table": name, "pk": pk_values, "row": found, "related": related, "references": refs}
 
-    @r.get("/data/tables/{name}/export", response_model=None)
+    @r.get("/data/tables/{name}/export", response_class=Response,
+           responses=s.file_response({"text/csv": s.TEXT, "application/json": {"type": "array", "items": {"type": "object"}}},
+                                     "The table's rows as CSV, or as a JSON array of rows (the host's columns)"))
     def export(request: Request, name: str, fmt: str = Query("csv", pattern="^(csv|json)$"), q: str | None = Query(default=None, max_length=200)) -> Any:
         principal = ctx.read(request)
         table = _table(name)
@@ -120,17 +128,17 @@ def router(ctx: ConsoleContext) -> APIRouter:
 
     # --- writes ---------------------------------------------------------------------------
 
-    @r.post("/data/changesets", response_model=None)
+    @r.post("/data/changesets", response_model=s.ConsoleChangeSetPreviewOut)
     def create_changeset(request: Request, body: ChangeSetIn) -> Any:
         principal = ctx.write(request)
         return changesets.preview(ctx, table_name=body.table, ops=body.ops, principal=principal)
 
-    @r.get("/data/changesets", response_model=None)
+    @r.get("/data/changesets", response_model=s.ConsoleChangeSetsOut)
     def list_changesets(request: Request, status: str | None = Query(default=None, max_length=16), limit: int = Query(50, ge=1, le=500)) -> Any:
         ctx.read(request)
         return {"items": ctx.store.changesets_list(status=status, limit=limit)}
 
-    @r.get("/data/changesets/{cid}", response_model=None)
+    @r.get("/data/changesets/{cid}", response_model=s.ConsoleChangeSetOut)
     def get_changeset(request: Request, cid: str) -> Any:
         ctx.read(request)
         row = ctx.store.changeset_get(cid)
@@ -138,18 +146,18 @@ def router(ctx: ConsoleContext) -> APIRouter:
             raise ConsoleError(404, "unknown_changeset", "no such change-set")
         return row
 
-    @r.post("/data/changesets/{cid}/apply", response_model=None)
+    @r.post("/data/changesets/{cid}/apply", response_model=s.ConsoleChangeSetAppliedOut)
     def apply_changeset(request: Request, cid: str, body: ApplyIn) -> Any:
         principal = ctx.write(request)
         ctx.confirm(body.confirm, cid)
         return changesets.apply(ctx, cid=cid, principal=principal, request=request)
 
-    @r.post("/data/changesets/{cid}/discard", response_model=None)
+    @r.post("/data/changesets/{cid}/discard", response_model=s.ConsoleChangeSetDiscardedOut)
     def discard_changeset(request: Request, cid: str) -> Any:
         ctx.write(request)
         return changesets.discard(ctx, cid=cid)
 
-    @r.post("/data/tables/{name}/bulk", response_model=None)
+    @r.post("/data/tables/{name}/bulk", response_model=s.ConsoleChangeSetPreviewOut)
     def bulk(request: Request, name: str, body: BulkIn = Body(...)) -> Any:
         principal = ctx.write(request, need=WritePolicy.CHANGESETS)
         filters = parse_filters([(f"filter[{k}]", v) for k, v in (body.filters or {}).items()])

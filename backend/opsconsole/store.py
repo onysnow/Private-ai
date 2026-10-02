@@ -37,6 +37,7 @@ from sqlalchemy import (
     text,
     update,
 )
+from sqlalchemy.exc import IntegrityError
 
 from opsconsole.core.ids import new_id, now_iso
 
@@ -167,6 +168,14 @@ def _loads(value: str | None) -> Any:
         return json.loads(value)
     except ValueError:
         return value
+
+
+class SavedQueryNameTaken(ValueError):
+    """Another saved query already has this name."""
+
+    def __init__(self, name: str) -> None:
+        super().__init__(f"a saved query named {name!r} already exists")
+        self.name = name
 
 
 class Store:
@@ -390,20 +399,25 @@ class Store:
         return [dict(r) | {"params": _loads(r["params"])} for r in rows]
 
     def saved_upsert(self, *, name: str, sql: str, params: list[dict[str, Any]], created_by: str, pinned: bool, qid: str | None = None) -> dict[str, Any]:
+        """Raises SavedQueryNameTaken when another saved query already has `name`
+        (names are unique), for instance when one is renamed to another's name."""
         t = self.t["saved_queries"]
-        with self.engine.begin() as conn:
-            existing = None
-            if qid:
-                existing = conn.execute(select(t.c.id).where(t.c.id == qid)).scalar_one_or_none()
-            else:
-                existing = conn.execute(select(t.c.id).where(t.c.name == name)).scalar_one_or_none()
-            values = {"name": name, "sql": sql, "params": _dumps(params), "updated_at": now_iso(), "pinned": pinned}
-            if existing:
-                conn.execute(update(t).where(t.c.id == existing).values(**values))
-                qid = existing
-            else:
-                qid = new_id()
-                conn.execute(insert(t).values(id=qid, created_by=created_by, **values))
+        try:
+            with self.engine.begin() as conn:
+                existing = None
+                if qid:
+                    existing = conn.execute(select(t.c.id).where(t.c.id == qid)).scalar_one_or_none()
+                else:
+                    existing = conn.execute(select(t.c.id).where(t.c.name == name)).scalar_one_or_none()
+                values = {"name": name, "sql": sql, "params": _dumps(params), "updated_at": now_iso(), "pinned": pinned}
+                if existing:
+                    conn.execute(update(t).where(t.c.id == existing).values(**values))
+                    qid = existing
+                else:
+                    qid = new_id()
+                    conn.execute(insert(t).values(id=qid, created_by=created_by, **values))
+        except IntegrityError as exc:
+            raise SavedQueryNameTaken(name) from exc
         return {"id": qid, **values, "params": params}
 
     def saved_delete(self, qid: str) -> bool:

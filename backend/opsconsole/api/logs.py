@@ -8,6 +8,7 @@ from typing import Any
 
 from fastapi import APIRouter, Query, Request
 
+from opsconsole import schemas as s
 from opsconsole.context import ConsoleContext, ConsoleError
 from opsconsole.protocols import LogFilter, LogLine, LogSource
 
@@ -57,7 +58,7 @@ def router(ctx: ConsoleContext, follower: LogFollower) -> APIRouter:
     r = APIRouter()
     sources = {s.id: s for s in ctx.config.log_sources}
 
-    @r.get("/logs/sources", response_model=None)
+    @r.get("/logs/sources", response_model=s.ConsoleLogSourcesOut)
     def list_sources(request: Request) -> Any:
         ctx.read(request)
         items = []
@@ -67,7 +68,7 @@ def router(ctx: ConsoleContext, follower: LogFollower) -> APIRouter:
         items.append({"id": "activity", "title": "Console activity", "available": True, "reason": None})
         return {"items": items}
 
-    @r.get("/logs/{source}", response_model=None)
+    @r.get("/logs/{source}", response_model=s.ConsoleLogTailOut)
     def tail(request: Request, source: str, limit: int = Query(200, ge=1, le=5000), level: str | None = Query(default=None, max_length=16),
              request_id: str | None = Query(default=None, max_length=64), logger: str | None = Query(default=None, max_length=128),
              contains: str | None = Query(default=None, max_length=200), since: str | None = Query(default=None, max_length=40), follow: bool = Query(False)) -> Any:

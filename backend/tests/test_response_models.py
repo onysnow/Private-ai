@@ -9,6 +9,7 @@ identical. Add a case here whenever a route gets a response model.
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
 import pytest
@@ -258,6 +259,31 @@ def test_extraction_candidate_replies(demo):
     _same_through_model(r.ExtractionCandidateOut, {**serialize_candidate(staged), "explanation": explanation})
 
 
+def test_openaleph_name_and_identifier_replies(demo):
+    """ADR-0006: proposals made from OpenAleph's analysis, their
+    explanations, the choice of owner for an email, and its acceptance."""
+    from app.models.domain import Entity, ExtractionCandidate
+    from app.services.documents import list_document_candidates, review_candidate
+    from app.services.identifier_proposals import identifier_targets
+    from app.services.openaleph_analysis import Analysis, import_analysis_proposals
+
+    db, inv, doc, _candidates, _accepted = demo
+    import_analysis_proposals(db, doc.id, Analysis(collection_id="7", entity_id="e1", schema="PlainText", properties={
+        "companiesMentioned": ["bellcastle trading group"], "namesMentioned": ["Audit Desk"],
+        "emailMentioned": ["desk@meridian.example"], "detectedLanguage": ["eng"]}))
+    explained = [row for row in list_document_candidates(db, doc.id, "proposed", None, explain=True)
+                 if row["payload"].get("provenance", {}).get("extraction_method") == "openaleph_ftm_analyze"]
+    assert {row["candidate_type"] for row in explained} == {"entity", "identifier"}
+    _same_through_model(list[r.ExtractionCandidateOut], explained)
+    email = db.query(ExtractionCandidate).filter(ExtractionCandidate.document_id == doc.id,
+                                                 ExtractionCandidate.candidate_type == "identifier").one()
+    targets = identifier_targets(db, email)
+    assert targets["other_entities"], "the demo seed has people and companies to choose from"
+    _same_through_model(r.IdentifierTargetsOut, targets)
+    owner = db.get(Entity, targets["other_entities"][0]["entity_id"])
+    _same_through_model(r.ExtractionReviewOut, review_candidate(db, email, decision="accept", target_entity_id=owner.id))
+
+
 class _FakeOpenAleph:
     """The two OpenAleph calls a sync makes, answered locally."""
 
@@ -290,14 +316,15 @@ def test_openaleph_corpus_replies(demo, monkeypatch):
     def pages(*, collection_id, document_record_id):
         return [{"id": "oa-page-1", "schema": "Page", "properties": {"index": ["1"], "bodyText": ["Provider page text."]}}]
 
-    def mentions(*, collection_id, document_record_id):
-        return [{"id": "oa-mention-1", "schema": "Mention", "properties": {"name": ["Example Person"], "detectedSchema": ["Person"]}}]
+    def analysed(entity_id):
+        # ftm-analyze's results, written on the document entity (ADR-0006).
+        return {"id": entity_id, "schema": "PlainText", "properties": {"peopleMentioned": ["example person"], "detectedLanguage": ["eng"]}}
 
-    refreshed = refresh_openaleph_review_candidates(db, doc.id, evidence_searcher=pages, entity_searcher=mentions)
+    refreshed = refresh_openaleph_review_candidates(db, doc.id, evidence_searcher=pages, entity_fetcher=analysed)
     assert refreshed["status"]["provider_candidate_total"] == 2
     _same_through_model(r.OpenAlephReviewRefreshOut, refreshed)
     _same_through_model(r.OpenAlephEvidenceImportOut, import_openaleph_evidence_candidates(db, doc.id, searcher=pages))
-    _same_through_model(r.OpenAlephEntityImportOut, import_openaleph_entity_candidates(db, doc.id, searcher=mentions))
+    _same_through_model(r.OpenAlephEntityImportOut, import_openaleph_entity_candidates(db, doc.id, fetch_entity=analysed))
     after = get_openaleph_review_status(db, doc.id)
     assert after["sync"] and after["binding"] and after["ready_for_import"]
     _same_through_model(r.OpenAlephReviewStatusOut, after)
@@ -318,7 +345,7 @@ def test_corpus_sync_replies(monkeypatch):
     from app.services.corpus_push import corpus_sync_status
     from app.services.entities import create_entity
     from app.services.relationships import create_relationship
-    from tests.openaleph_fake import BASE_URL, FakeOpenAleph
+    from tests.openaleph_corpus_fake import BASE_URL, FakeOpenAleph
 
     monkeypatch.setattr(settings, "openaleph_enabled", True)
     monkeypatch.setattr(settings, "openaleph_base_url", BASE_URL)
@@ -359,7 +386,7 @@ def test_cross_reference_replies(monkeypatch):
     from app.services.cross_references import decide_cross_reference, list_cross_references
     from app.services.entities import create_entity
     from app.services.resolution import canonical_duplicate_candidates
-    from tests.openaleph_fake import BASE_URL, FakeOpenAleph
+    from tests.openaleph_corpus_fake import BASE_URL, FakeOpenAleph
     from tests.test_openaleph_cross_references import _row, _served
 
     monkeypatch.setattr(settings, "openaleph_enabled", True)
@@ -853,3 +880,319 @@ def test_settings_and_security_replies(demo, tmp_path, monkeypatch):
     assert retention["would_remove"] == 1
     _same_through_model(r.SecurityAuditRetentionPreviewOut, retention)
     _same_through_model(r.SecurityAuditRetentionResultOut, apply_security_audit_retention(audit_file, keep_days=90, max_records=5000, confirmation="PRUNE SECURITY AUDIT", now=now))
+
+
+# --- The remaining routes: system, AI reasoning, write-ups, decks, identities -------------------
+#
+# Where a route builds its reply itself, the route function is called
+# directly: that is the reply FastAPI would have sent without a model.
+
+def test_system_replies(monkeypatch):
+    import httpx
+
+    from app.api.routes_system import capabilities, health, presentation_styles, relationship_schemas
+    from app.core.config import settings
+    from app.services.openaleph import probe_openaleph
+
+    def answers(status: int) -> httpx.MockTransport:
+        return httpx.MockTransport(lambda request: httpx.Response(status, json={"results": []}))
+
+    def down(request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectError("refused", request=request)
+
+    _same_through_model(r.HealthOut, health())
+    for enabled in (False, True):
+        monkeypatch.setattr(settings, "openaleph_enabled", enabled)
+        _same_through_model(r.CapabilitiesOut, capabilities())
+        _same_through_model(r.OpenAlephStatusOut, _run(probe_openaleph(transport=answers(200))).to_dict())
+    # Reachable but not usable, and not reachable at all (no HTTP status).
+    _same_through_model(r.OpenAlephStatusOut, _run(probe_openaleph(transport=answers(502))).to_dict())
+    unreachable = _run(probe_openaleph(transport=httpx.MockTransport(down))).to_dict()
+    assert unreachable["configured"] and unreachable["http_status"] is None
+    _same_through_model(r.OpenAlephStatusOut, unreachable)
+
+    catalog = presentation_styles()
+    assert {spec["type"] for specs in catalog["visual_options"].values() for spec in specs.values()} == {"bool", "choice", "labels"}
+    _same_through_model(r.PresentationStyleCatalogOut, catalog)
+    _same_through_model(r.RelationshipSchemasOut, relationship_schemas())
+
+
+class _DraftModel:
+    """Answers every reasoning call with one presentation draft (no network,
+    no key), as tests/test_visuals_draft.py does."""
+
+    def __init__(self, text: str):
+        self.text = text
+
+    def generate(self, system_prompt: str, user_prompt: str, *, max_tokens: int = 4096) -> str:
+        return self.text
+
+
+def _presentation_draft(claim_id: str, evidence_id: str) -> str:
+    """A draft with one section per kind of visual: a chart the Workbench
+    cooks, figures, a timeline and a bar of whole and fractional values.
+    Every quote is in the demo seed's own words, so the quote check keeps it."""
+    claim = {"record_type": "claim", "record_id": claim_id, "quote": "wholly owned by Bellcastle"}
+    evidence = {"record_type": "evidence", "record_id": evidence_id, "quote": "transfer of $2,400,000 from Bellcastle"}
+
+    def section(heading: str, visual: dict) -> dict:
+        return {"heading": heading, "body": f"{heading}: what the bank records show.",
+                "key_points": [{"text": "One transfer, to Meridian", "evidence": [evidence]}], "evidence": [claim, evidence], "visual": visual}
+
+    chart = {"type": "chart", "spec": {"kind": "bar", "title": "Meridian received all of the money",
+                                       "query": {"name": "payments_by_party", "params": {"direction": "received"}}}}
+    figures = {"type": "figures", "items": [{"value": "$2.4M", "label": "paid to Meridian", "evidence": [evidence]}]}
+    timeline = {"type": "timeline", "items": [{"date": "2023-11", "label": "The transfer", "evidence": [evidence]},
+                                              {"date": "2024-01", "label": "Ownership on file", "evidence": [claim]}]}
+    bar = {"type": "bar", "title": "Paid", "unit": "USD", "items": [{"value": 2400000, "label": "Meridian", "evidence": [evidence]},
+                                                                    {"value": 0.5, "label": "Others", "evidence": [claim]}]}
+    return json.dumps({
+        "title": "Where the Bellcastle money went", "goal_restated": "Show who received the money.",
+        "executive_takeaway": "Meridian received the whole $2.4M.",
+        "sections": [section("Who got paid", chart), section("The figure", figures), section("When", timeline), section("How much", bar)],
+        "open_questions": ["Whether other transfers exist."],
+    })
+
+
+class _QueuedRunner:
+    """A job runner that only queues, as the Docker stack's does."""
+    mode = "procrastinate"
+
+    async def submit(self, job: object, db: object = None) -> None:
+        return None
+
+
+@pytest.fixture()
+def ai_on(monkeypatch):
+    from app.ai.governor import governor
+    from app.core.config import settings
+
+    monkeypatch.setattr(settings, "enable_ai_features", True)
+    monkeypatch.setattr(settings, "ai_provider", "anthropic")
+    monkeypatch.setattr(settings, "ai_runs_per_minute", 100)
+    governor.reset()
+    yield
+    governor.reset()
+
+
+def test_ai_reasoning_replies(demo, ai_on, monkeypatch):
+    from types import SimpleNamespace
+
+    from fastapi import HTTPException, Response
+
+    import app.ai.reasoning as reasoning
+    from app.api.routes_investigations import investigation_presentation_draft, list_investigation_ai_analysis_candidates
+    from app.api.routes_system import (
+        get_ai_analysis_candidate_endpoint, promote_ai_analysis_candidate_to_deck_endpoint,
+        promote_ai_analysis_candidate_to_writeup_endpoint, review_ai_analysis_candidate_endpoint,
+    )
+    from app.main import app as workbench
+    from app.models.domain import AIAnalysisCandidate, Claim, Evidence
+    from app.schemas.api import AIAnalysisCandidateReviewRequest, PresentationDraftRequest, PromoteToDeckRequest, PromoteToWriteupRequest
+
+    db, inv, _doc, _candidates, _accepted = demo
+    claim = db.query(Claim).filter(Claim.investigation_id == inv.id, Claim.text.like("Meridian Holdings Ltd is wholly%")).one()
+    evidence = db.query(Evidence).filter(Evidence.quote.like("Bank records show%")).one()
+    body = PresentationDraftRequest(goal="Show who received the money.", record_refs=[
+        {"record_type": "claim", "record_id": claim.id}, {"record_type": "evidence", "record_id": evidence.id}])
+
+    # Run in the request (developer mode and this suite): the proposal and the finished job.
+    monkeypatch.setattr(reasoning, "get_llm_client", lambda *a, **k: _DraftModel(_presentation_draft(claim.id, evidence.id)))
+    ran = _run(investigation_presentation_draft(inv.id, body, SimpleNamespace(app=workbench), Response(), db))
+    assert ran["candidate_id"] and ran["job"]["status"] == "succeeded"
+    assert [s["visual"]["type"] for s in ran["payload"]["sections"]] == ["chart", "figures", "timeline", "bar"]
+    _same_through_model(r.AiReasoningRunOut, ran)
+
+    # Queued (the Docker stack): 202 with only the job to follow.
+    queued_response = Response()
+    queued = _run(investigation_presentation_draft(inv.id, body, SimpleNamespace(app=SimpleNamespace(state=SimpleNamespace(jobs=_QueuedRunner()))), queued_response, db))
+    assert queued_response.status_code == 202 and queued["candidate_id"] is None and not queued["job"]["finished"]
+    _same_through_model(r.AiReasoningRunOut, queued)
+
+    # A run whose answer is not JSON is kept as a rejected proposal with the raw text.
+    monkeypatch.setattr(reasoning, "get_llm_client", lambda *a, **k: _DraftModel("not json at all"))
+    with pytest.raises(HTTPException):
+        _run(investigation_presentation_draft(inv.id, body, SimpleNamespace(app=workbench), Response(), db))
+    db.expire_all()
+    rejected = db.query(AIAnalysisCandidate).filter(AIAnalysisCandidate.review_status == "rejected").one()
+
+    # The full proposal: a presentation draft carries its citations in words and the slides it would make.
+    full = get_ai_analysis_candidate_endpoint(ran["candidate_id"], db)
+    assert full["citation_details"] and [slide["kind"] for slide in full["deck_preview"]] == ["title", "statement", "content", "content", "content", "content", "questions"]
+    _same_through_model(r.AiAnalysisCandidateOut, full)
+    raw = get_ai_analysis_candidate_endpoint(rejected.id, db)
+    assert "raw_output" in raw["payload"] and raw["rejection_reason"]
+    _same_through_model(r.AiAnalysisCandidateOut, raw)
+    _same_through_model(r.AiAnalysisCandidatesOut, list_investigation_ai_analysis_candidates(inv.id, None, None, 100, 0, db))
+
+    # Review, then promotion to a write-up and to a styled deck.
+    review = review_ai_analysis_candidate_endpoint(ran["candidate_id"], AIAnalysisCandidateReviewRequest(decision="accept", note="checked"), db)
+    _same_through_model(r.AiAnalysisCandidateReviewOut, review)
+    writeup = promote_ai_analysis_candidate_to_writeup_endpoint(ran["candidate_id"], PromoteToWriteupRequest(title="The brief"), db)
+    assert writeup["cited_record_refs"]
+    _same_through_model(r.WriteupOut, writeup)
+    deck = promote_ai_analysis_candidate_to_deck_endpoint(ran["candidate_id"], PromoteToDeckRequest(
+        title="The deck", style={"theme": "ledger", "fonts": "modern"},
+        visual_styles={"3": {"preset": "ranked", "options": {"value_labels": False, "highlight": ["Meridian"]}}}), db)
+    visuals = {slide["visual"]["type"]: slide["visual"] for slide in deck["slides"] if slide["visual"]}
+    assert set(visuals) == {"chart", "figures", "timeline", "bar"} and visuals["bar"]["style"]["preset"] == "ranked"
+    assert "option" in visuals["chart"] and "style" not in visuals["figures"]
+    _same_through_model(r.DeckOut, deck)
+    _same_through_model(r.AiAnalysisCandidatesOut, list_investigation_ai_analysis_candidates(inv.id, "accepted", "presentation_draft", 100, 0, db))
+
+
+def test_writeup_and_deck_replies(demo):
+    from app.api.routes_decks import delete_deck_endpoint, get_deck_endpoint, list_decks_endpoint, update_deck_endpoint
+    from app.api.routes_writeups import (
+        create_writeup_endpoint, delete_writeup_endpoint, get_writeup_endpoint, list_writeups_endpoint, update_writeup_endpoint,
+    )
+    from app.models.domain import Claim
+    from app.schemas.api import DeckUpdate, WriteupCreate, WriteupUpdate
+    from app.services.decks import create_deck
+
+    db, inv, _doc, _candidates, _accepted = demo
+    claim = db.query(Claim).filter(Claim.investigation_id == inv.id).first()
+    # A citation whose id is not text points at nothing: it is not listed (and
+    # would otherwise break the declared shape of cited_record_refs).
+    doc = {"type": "doc", "content": [{"type": "paragraph", "content": [
+        {"type": "text", "text": "The fee was paid "},
+        {"type": "citation", "attrs": {"recordType": "claim", "recordId": claim.id, "label": "Claim"}},
+        {"type": "citation", "attrs": {"recordType": "claim", "recordId": 7, "label": "Not a record"}},
+    ]}]}
+    created = create_writeup_endpoint(WriteupCreate(investigation_id=inv.id, title="Draft brief", content_json=doc), db)
+    assert created["cited_record_refs"] == [{"record_type": "claim", "record_id": claim.id}]
+    _same_through_model(r.WriteupOut, created)
+    _same_through_model(r.WriteupOut, get_writeup_endpoint(created["id"], db))
+    _same_through_model(r.WriteupOut, update_writeup_endpoint(created["id"], WriteupUpdate(status="final"), db))
+    listed = list_writeups_endpoint(inv.id, None, db)
+    assert listed["writeups"] and "preview" in listed["writeups"][0] and "content_json" not in listed["writeups"][0]
+    _same_through_model(r.WriteupsOut, listed)
+    _same_through_model(r.DeletedOut, delete_writeup_endpoint(created["id"], db))
+
+    # A deck as the editor saves it: refs that are not text are dropped the same way.
+    deck = create_deck(db, investigation_id=inv.id, title="Reporter deck", slides=[
+        {"kind": "content", "heading": "Who", "bullets": ["Meridian"], "evidence": [{"record_type": "claim", "record_id": claim.id}, {"record_type": "claim", "record_id": 7}]},
+        {"heading": "No kind", "bullets": [], "visual": {"type": "figures", "items": [{"value": "$2.4M", "label": "paid", "evidence": []}]}},
+    ])
+    updated = update_deck_endpoint(deck.id, DeckUpdate(style_json={"theme": "newsprint", "fonts": "classic"}), db)
+    assert updated["slides"][0]["evidence"] == [{"record_type": "claim", "record_id": claim.id}] and updated["slides"][1]["kind"] == "content"
+    _same_through_model(r.DeckOut, updated)
+    _same_through_model(r.DeckOut, get_deck_endpoint(deck.id, db))
+    _same_through_model(r.DecksOut, list_decks_endpoint(inv.id, db))
+    _same_through_model(r.DeletedOut, delete_deck_endpoint(deck.id, db))
+
+
+def test_assistant_context_reply(demo, fake_connectors):
+    from app.schemas.api import ConnectorSearchRequest
+    from app.services.assistant_context import build_question_context
+    from app.services.connectors import run_connector
+
+    db, inv, _doc, _candidates, _accepted = demo
+    _run(run_connector("fake-a", ConnectorSearchRequest(investigation_id=inv.id, query="Meridian"), db))
+    packet = build_question_context(db, investigation_id=inv.id, question="Meridian Bellcastle", max_results=50)
+    assert packet["citations"] and packet["external_leads"] and packet["warnings"]
+    assert any(item["citation"]["locator"] for group in packet["context"].values() for item in group)
+    _same_through_model(r.QuestionContextOut, packet)
+    _same_through_model(r.QuestionContextOut, build_question_context(db, investigation_id=inv.id, question="Meridian", include_external_leads=False))
+
+
+def test_extraction_identity_preview_reply(demo, monkeypatch):
+    from app.api.routes_extraction_candidates import get_extraction_entity_matches
+    from app.core.config import settings
+    from app.models.domain import ExtractionCandidate
+    from app.services.openaleph_corpus import import_openaleph_entity_candidates, sync_document_to_openaleph
+
+    db, _inv, doc, candidates, _accepted = demo
+    local = next(row for row in candidates if row.candidate_type == "entity")
+    preview = get_extraction_entity_matches(local.id, db)
+    assert preview["matches"]
+    _same_through_model(r.EntityMatchPreviewOut, preview)
+
+    # A name OpenAleph found carries the provider's lead, which never selects a match.
+    monkeypatch.setattr(settings, "openaleph_enabled", True)
+    sync_document_to_openaleph(db, doc.id, client_factory=_FakeOpenAleph)
+
+    def analysed(entity_id):
+        # ftm-analyze's results on the document entity (ADR-0006): a company it found.
+        # (One the local finder did not propose, so the import adds it rather than
+        # folding it into the existing proposal.)
+        return {"id": entity_id, "schema": "PlainText", "properties": {"companiesMentioned": ["harbor trust ltd"], "detectedLanguage": ["eng"]}}
+
+    import_openaleph_entity_candidates(db, doc.id, fetch_entity=analysed)
+    provider_row = db.query(ExtractionCandidate).filter(ExtractionCandidate.document_id == doc.id, ExtractionCandidate.candidate_type == "entity",
+                                                        ExtractionCandidate.id != local.id).order_by(ExtractionCandidate.created_at.desc()).first()
+    lead = get_extraction_entity_matches(provider_row.id, db)
+    assert lead["provider_lead"]["provider"]
+    _same_through_model(r.EntityMatchPreviewOut, lead)
+
+
+def test_openaleph_binding_demo_and_backup_inspect_replies(demo, monkeypatch, tmp_path):
+    from io import BytesIO
+
+    from fastapi import UploadFile
+
+    from app.api.routes_backups import inspect_backup
+    from app.api.routes_investigations import get_openaleph_corpus_binding, list_openaleph_corpus_failures, seed_demo
+    from app.core.config import settings
+    from app.services.exports import build_investigation_export
+    from app.services.openaleph_corpus import ensure_openaleph_collection, record_openaleph_operation_failure
+
+    db, inv, doc, _candidates, _accepted = demo
+    before = get_openaleph_corpus_binding(inv.id, db)
+    assert before["binding"] is None
+    _same_through_model(r.OpenAlephCorpusBindingOut, before)
+    monkeypatch.setattr(settings, "openaleph_enabled", True)
+    ensure_openaleph_collection(db, inv.id, client_factory=_FakeOpenAleph)
+    after = get_openaleph_corpus_binding(inv.id, db)
+    assert after["binding"]
+    _same_through_model(r.OpenAlephCorpusBindingOut, after)
+
+    record_openaleph_operation_failure(db, investigation_id=inv.id, document_id=None, operation="ensure_collection", error="RuntimeError: down")
+    record_openaleph_operation_failure(db, investigation_id=inv.id, document_id=doc.id, operation="review_refresh", error="HTTPError: 502")
+    failures = list_openaleph_corpus_failures(inv.id, db)
+    assert len(failures) == 2
+    _same_through_model(list[r.OpenAlephOperationFailureOut], failures)
+
+    existing = seed_demo(db)
+    assert existing["created"] is False
+    _same_through_model(r.DemoSeedOut, existing)
+
+    package, _manifest = build_investigation_export(db, inv.id, include_documents=True)
+    inspected = _run(inspect_backup(file=UploadFile(file=BytesIO(package), filename="case.jwbackup.zip")))
+    assert inspected["manifest"]["format"] and inspected["record_counts"]["entities"]
+    _same_through_model(r.BackupInspectOut, inspected)
+
+
+def test_demo_seed_reply_when_created():
+    from app.api.routes_investigations import seed_demo
+
+    with SessionLocal() as db:
+        created = seed_demo(db)
+        assert created["created"] is True
+        _same_through_model(r.DemoSeedOut, created)
+
+
+def test_identity_replies(demo):
+    from starlette.requests import Request
+
+    from app.api.routes_settings import (
+        create_app_user, list_app_users, put_investigation_membership, revoke_app_user_token, rotate_app_user_token, update_app_user,
+    )
+    from app.schemas.api import AppUserCreate, AppUserUpdate, InvestigationMembershipPut
+
+    db, inv, _doc, _candidates, _accepted = demo
+    # These routes answer the local machine only.
+    local = Request({"type": "http", "method": "GET", "path": "/", "query_string": b"", "scheme": "http",
+                     "headers": [(b"host", b"127.0.0.1")], "client": ("127.0.0.1", 50000), "server": ("127.0.0.1", 8000)})
+    _same_through_model(list[r.AppUserOut], list_app_users(local, db))
+    created = create_app_user(AppUserCreate(display_name="Desk editor", global_role="member"), local, db)
+    _same_through_model(r.AppUserCreatedOut, created)
+    second = create_app_user(AppUserCreate(display_name="Night editor", global_role="admin"), local, db)
+    membership = put_investigation_membership(created["id"], inv.id, InvestigationMembershipPut(role="reporter"), local, db)
+    _same_through_model(r.InvestigationMembershipOut, membership)
+    _same_through_model(r.AppUserUpdatedOut, update_app_user(second["id"], AppUserUpdate(disabled=True), local, db))
+    _same_through_model(r.AppUserTokenRotatedOut, rotate_app_user_token(created["id"], local, db))
+    _same_through_model(r.AppUserTokenRevokedOut, revoke_app_user_token(created["id"], local, db))
+    users = list_app_users(local, db)
+    assert {u["token_status"] for u in users} == {"revoked", "disabled"} and any(u["memberships"] for u in users)
+    _same_through_model(list[r.AppUserOut], users)

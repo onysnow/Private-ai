@@ -12,12 +12,43 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, WithJsonSchema
 
 
 class ResponseModel(BaseModel):
     # Read from ORM rows as well as dicts.
     model_config = ConfigDict(from_attributes=True)
+
+
+# When something happened, as the API sends it: an ISO 8601 date and time in
+# UTC. The database keeps times without an offset (app/core/time.py
+# utcnow_naive), so most are sent without one; JSON Schema's "date-time"
+# format is RFC 3339's, which requires the offset, so the schema says what is
+# sent instead (tests/test_api_contract.py checks every reply against it).
+TIMESTAMP_PATTERN = r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$"
+Timestamp = Annotated[datetime, WithJsonSchema({
+    "type": "string", "pattern": TIMESTAMP_PATTERN,
+    "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+})]
+
+
+def file_response(media_type: str, description: str) -> dict[int | str, dict[str, Any]]:
+    """The OpenAPI entry for a route that sends a file: its bytes, as
+    `media_type`, instead of the JSON FastAPI assumes. Use it with
+    `response_class=Response` (FastAPI then adds no JSON entry of its own;
+    fastapi/openapi/utils.py get_openapi_path documents a response class
+    only when it names a media type)."""
+    return {200: {"description": description, "content": {media_type: {"schema": {"type": "string", "format": "binary"}}}}}
+
+
+def _absent_when_none(value: Any) -> bool:
+    """A key the service adds only in some replies is left out, not sent as null."""
+    return value is None
+
+
+def _absent_when_empty(value: Any) -> bool:
+    """A collection the service adds only when it holds something is left out, not sent empty."""
+    return value is None or value == {} or value == []
 
 
 # --- Sources and evidence ---------------------------------------------------
@@ -29,7 +60,7 @@ class SourceOut(ResponseModel):
     url: str | None = None
     source_type: str
     metadata_json: dict[str, Any] | None = None
-    created_at: datetime
+    created_at: Timestamp
 
 
 class EvidenceOut(ResponseModel):
@@ -100,23 +131,37 @@ class VisualParamOut(ResponseModel):
 
 
 class VisualQueryOut(ResponseModel):
-    """One entry of the query catalogue the AI orders from."""
+    """One entry of the query catalogue the AI and the chart builder order from."""
     name: str
     label: str
     description: str
     params: dict[str, VisualParamOut]
-    series_kind: str          # category | time
+    series_kind: str          # category | time | distribution | pairs
     unit_kind: str            # amount | count
     record_noun: str
     has_data: bool
     record_count: int
     row_count: int
     currencies: list[str]
+    kinds: list[str]          # the drawn kinds that can draw this query's rows, best first
+    questions: list[str]      # the questions (VisualQuestionOut.id) it can answer
+
+
+class VisualQuestionOut(ResponseModel):
+    """A question a chart answers (FT Visual Vocabulary): the kinds that
+    answer it, best first, and the queries that hold its relationship."""
+    id: str
+    label: str
+    description: str
+    kinds: list[str]
+    drawn_kinds: list[str]
+    queries: list[str]
 
 
 class VisualCatalogOut(ResponseModel):
     investigation_id: str
     queries: list[VisualQueryOut]
+    questions: list[VisualQuestionOut]
     kinds: list[str]
     drawn_kinds: list[str]
 
@@ -132,6 +177,8 @@ class VisualDataRowOut(ResponseModel):
     record_refs: list[RecordRefOut]
     record_count: int
     key: str
+    # A pairs row's second number (a scatter plot's x); `value` is its y.
+    x: float | None = Field(default=None, exclude_if=_absent_when_none)
 
 
 class VisualDataOut(ResponseModel):
@@ -147,6 +194,10 @@ class VisualDataOut(ResponseModel):
     currency: str | None = None
     record_count: int
     omitted: list[dict[str, Any]]
+    # A pairs query's second number: its unit, its kind, and both numbers' names ({"x", "y"}).
+    x_unit: str | None = Field(default=None, exclude_if=_absent_when_none)
+    x_unit_kind: str | None = Field(default=None, exclude_if=_absent_when_none)
+    measure_labels: dict[str, str] | None = Field(default=None, exclude_if=_absent_when_empty)
 
 
 class CheckItemOut(ResponseModel):
@@ -160,6 +211,8 @@ class CheckReportOut(ResponseModel):
     warnings: list[CheckItemOut]
     checked_rules: list[int]
     not_checked: dict[str, str]
+    # Rules about a different kind of chart, with the reason; never listed as checked.
+    not_applicable: dict[str, str] = Field(default_factory=dict)
 
 
 class DataTableRowOut(ResponseModel):
@@ -168,6 +221,11 @@ class DataTableRowOut(ResponseModel):
     formatted: str
     record_count: int
     record_refs: list[RecordRefOut]
+    # A part's share of the whole, in % (100% bar, donut, treemap).
+    share: float | None = Field(default=None, exclude_if=_absent_when_none)
+    # A scatter plot's x, and as written.
+    x: float | None = Field(default=None, exclude_if=_absent_when_none)
+    x_formatted: str | None = Field(default=None, exclude_if=_absent_when_none)
 
 
 class DataTableOut(ResponseModel):
@@ -233,8 +291,8 @@ class StatementOut(ResponseModel):
     dataset: str
     origin: str | None = None
     original_value: str | None = None
-    first_seen: datetime | None = None
-    last_seen: datetime | None = None
+    first_seen: Timestamp | None = None
+    last_seen: Timestamp | None = None
 
 
 class RelationshipEvidenceReviewOut(ResponseModel):
@@ -243,7 +301,7 @@ class RelationshipEvidenceReviewOut(ResponseModel):
     evidence_id: str
     stance: str
     rationale: str | None = None
-    created_at: datetime
+    created_at: Timestamp
 
 
 class EvidenceSourceOut(ResponseModel):
@@ -265,7 +323,7 @@ class RelationshipEvidenceAttachmentOut(ResponseModel):
     attachment_id: str
     attached_by: str | None = None
     note: str | None = None
-    created_at: datetime
+    created_at: Timestamp
     evidence: EvidenceWithSourceOut | None = None
     latest_review: RelationshipEvidenceReviewOut | None = None
 
@@ -356,11 +414,6 @@ class AggregateProvenanceOut(ResponseModel):
     evidence: list[EvidenceWithSourceOut]
 
 
-def _absent_when_none(value: Any) -> bool:
-    """A key the service adds only in some replies is left out, not sent as null."""
-    return value is None
-
-
 class RelationshipOut(ResponseModel):
     """One relationship edge with its FollowTheMoney statements, attached
     evidence and the advisory the review layer computes. The graph and the
@@ -384,7 +437,7 @@ class RelationshipOut(ResponseModel):
     statements: list[StatementOut]
     provenance: RelationshipProvenanceOut
     advisory: RelationshipAdvisoryOut | RelationshipAggregateAdvisoryOut
-    created_at: datetime
+    created_at: Timestamp
     reconciliation: RelationshipReconciliationOut | None = Field(default=None, exclude_if=_absent_when_none)
     aggregate_provenance: AggregateProvenanceOut | None = Field(default=None, exclude_if=_absent_when_none)
 
@@ -506,7 +559,7 @@ class TimelineEventRowOut(ResponseModel):
     lead_id: str | None = None
     dataset: str
     origin: str | None = None
-    created_at: datetime
+    created_at: Timestamp
 
 
 # --- Provenance ----------------------------------------------------------------
@@ -523,8 +576,8 @@ class LineageCandidateOut(ResponseModel):
     accepted_record_type: str | None = None
     accepted_record_id: str | None = None
     reviewer_note: str | None = None
-    created_at: datetime
-    reviewed_at: datetime | None = None
+    created_at: Timestamp
+    reviewed_at: Timestamp | None = None
 
 
 class LineageDocumentOut(ResponseModel):
@@ -535,7 +588,7 @@ class LineageDocumentOut(ResponseModel):
     mime_type: str | None = None
     sha256: str
     extraction_status: str
-    created_at: datetime
+    created_at: Timestamp
 
 
 class LineageSourceOut(ResponseModel):
@@ -690,10 +743,10 @@ class BackgroundJobOut(ResponseModel):
     runner: str
     # What the job produced, in the shape its handler chose.
     result: Any = None
-    created_at: datetime
-    started_at: datetime | None
-    finished_at: datetime | None
-    updated_at: datetime
+    created_at: Timestamp
+    started_at: Timestamp | None
+    finished_at: Timestamp | None
+    updated_at: Timestamp
 
 
 # --- Documents and extraction proposals ----------------------------------------
@@ -708,9 +761,11 @@ class DocumentOut(ResponseModel):
     extraction_status: str
     extraction_error: str | None = None
     extraction_issues: list[str]
-    created_at: datetime
+    created_at: Timestamp
     chunk_count: int
     candidate_counts: dict[str, int]
+    # OpenAleph's id for the document when OpenAleph holds it (ADR-0006).
+    openaleph_document_id: str | None = None
 
 
 class DocumentChunkOut(ResponseModel):
@@ -720,7 +775,7 @@ class DocumentChunkOut(ResponseModel):
     page_number: int | None = None
     ordinal: int
     text: str
-    created_at: datetime
+    created_at: Timestamp
 
 
 class DocumentDetailOut(DocumentOut):
@@ -739,9 +794,9 @@ class OpenAlephSyncOut(ResponseModel):
     status: str
     error: str | None = None
     response_json: dict[str, Any]
-    synced_at: datetime | None = None
-    created_at: datetime
-    updated_at: datetime
+    synced_at: Timestamp | None = None
+    created_at: Timestamp
+    updated_at: Timestamp
 
 
 class DocumentUploadOut(DocumentOut):
@@ -883,17 +938,47 @@ class ExtractionCandidateOut(ResponseModel):
     accepted_record_type: str | None = None
     accepted_record_id: str | None = None
     reviewer_note: str | None = None
-    created_at: datetime
-    reviewed_at: datetime | None = None
+    created_at: Timestamp
+    reviewed_at: Timestamp | None = None
     explanation: ExtractionExplanationOut | None = Field(default=None, exclude_if=lambda value: value is None)
 
 
 class ExtractionReviewOut(ResponseModel):
     """The reply to a review decision: the proposal as it now stands and, for
-    an acceptance, the record it made (an entity, claim, evidence record or
-    relationship, each in its own shape)."""
+    an acceptance, the record it made (an entity, claim, evidence record,
+    relationship, or for an email or phone proposal the statement added to
+    the chosen entity, each in its own shape)."""
     candidate: ExtractionCandidateOut
     record: dict[str, Any] | None = None
+
+
+class IdentifierTargetEntityOut(ResponseModel):
+    entity_id: str
+    caption: str
+    schema_: str = Field(alias="schema")
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class IdentifierTargetProposalOut(ResponseModel):
+    """An entity proposal of the same document, still waiting: accepting it
+    first makes it an entity the email or phone can be attached to."""
+    candidate_id: str
+    caption: str
+    suggested_schema: str
+    schema_question: bool
+
+
+class IdentifierTargetsOut(ResponseModel):
+    """Which entities an email or phone proposal can belong to (ADR-0006),
+    the document's own first. Only schemas with the property are listed."""
+    candidate_id: str
+    kind: Literal["email", "phone"]
+    property: str
+    value: str
+    document_entities: list[IdentifierTargetEntityOut]
+    document_proposals: list[IdentifierTargetProposalOut]
+    other_entities: list[IdentifierTargetEntityOut]
 
 
 # --- OpenAleph corpus ------------------------------------------------------------
@@ -906,8 +991,8 @@ class OpenAlephBindingOut(ResponseModel):
     foreign_id: str | None = None
     collection_label: str | None = None
     status: str
-    created_at: datetime
-    updated_at: datetime
+    created_at: Timestamp
+    updated_at: Timestamp
 
 
 class OpenAlephDocumentSyncOut(ResponseModel):
@@ -966,13 +1051,14 @@ class OpenAlephReviewRefreshOut(ResponseModel):
 # Every key is always sent (null when unknown), as for BackgroundJobOut.
 
 class OpenAlephOperationFailureOut(ResponseModel):
-    """A failed OpenAleph operation, kept for the reporter and the operator."""
+    """A failed OpenAleph operation, kept for the reporter and the operator
+    (and so a 502 can be explained later)."""
     id: str
     investigation_id: str
     document_id: str | None
     operation: str
     error: str
-    created_at: datetime
+    created_at: Timestamp
 
 
 class CorpusPendingOut(ResponseModel):
@@ -987,8 +1073,8 @@ class CorpusPendingOut(ResponseModel):
 class CorpusPushOut(ResponseModel):
     """The last push of confirmed records to the investigation's collection."""
     status: Literal["never", "running", "succeeded", "waiting", "failed"]
-    started_at: datetime | None
-    finished_at: datetime | None
+    started_at: Timestamp | None
+    finished_at: Timestamp | None
     message: str | None
     error: str | None
     sent: int
@@ -1002,8 +1088,8 @@ class CorpusPushOut(ResponseModel):
 class CorpusCrossReferenceRunOut(ResponseModel):
     """The last cross-referencing run of the collection and what it brought."""
     status: Literal["never", "waiting", "running", "succeeded", "failed"]
-    requested_at: datetime | None
-    finished_at: datetime | None
+    requested_at: Timestamp | None
+    finished_at: Timestamp | None
     error: str | None
     results: int
     new: int
@@ -1079,9 +1165,9 @@ class CrossReferenceDecisionOut(ResponseModel):
     note: str | None
     judgement: Literal["positive", "negative", "unsure"]
     judgement_status: Literal["pending", "sent", "failed", "superseded"]
-    judgement_sent_at: datetime | None
+    judgement_sent_at: Timestamp | None
     judgement_error: str | None
-    created_at: datetime
+    created_at: Timestamp
 
 
 class CrossReferenceOut(ResponseModel):
@@ -1099,8 +1185,8 @@ class CrossReferenceOut(ResponseModel):
     decision: CrossReferenceDecisionOut | None
     # The external-identity record "Same entity" made (a connector finding).
     identity_finding_id: str | None
-    first_seen_at: datetime
-    last_seen_at: datetime
+    first_seen_at: Timestamp
+    last_seen_at: Timestamp
 
 
 # --- Portable backups --------------------------------------------------------------
@@ -1159,7 +1245,7 @@ class ClaimOut(ResponseModel):
     text: str
     status: str  # lead | unverified | supported | confirmed | disputed | rejected
     confidence: float
-    created_at: datetime
+    created_at: Timestamp
 
 
 class StanceCountsOut(ResponseModel):
@@ -1176,7 +1262,7 @@ class ClaimEvidenceLinkOut(ResponseModel):
     evidence_id: str
     stance: str  # supports | contradicts | context
     note: str | None = None
-    created_at: datetime
+    created_at: Timestamp
 
 
 class ClaimEvidenceRowOut(ResponseModel):
@@ -1185,7 +1271,7 @@ class ClaimEvidenceRowOut(ResponseModel):
     id: str
     stance: str
     note: str | None = None
-    created_at: datetime
+    created_at: Timestamp
     evidence: EvidenceOut | None = None
     source: SourceOut | None = None
 
@@ -1207,7 +1293,7 @@ class ClaimReviewEventOut(ResponseModel):
     from_confidence: float
     to_confidence: float
     rationale: str
-    created_at: datetime
+    created_at: Timestamp
 
 
 class ClaimReviewWorkspaceOut(ResponseModel):
@@ -1236,7 +1322,7 @@ class LeadLinkOut(ResponseModel):
     target_id: str | None = None
     label: str | None = None
     note: str | None = None
-    created_at: datetime
+    created_at: Timestamp
 
 
 class TaskWorkflowEventOut(ResponseModel):
@@ -1244,7 +1330,7 @@ class TaskWorkflowEventOut(ResponseModel):
     from_status: str | None = None
     to_status: str
     note: str | None = None
-    created_at: datetime
+    created_at: Timestamp
     # The lead's context frozen when the event was recorded, in the shape
     # that version wrote; a later edit never rewrites it.
     lead_provenance: dict[str, Any] | None = None
@@ -1260,8 +1346,8 @@ class ReportingTaskOut(ResponseModel):
     priority: str  # low | normal | high | urgent
     owner: str | None = None
     due_date: str | None = None
-    created_at: datetime
-    updated_at: datetime
+    created_at: Timestamp
+    updated_at: Timestamp
     history: list[TaskWorkflowEventOut]
     # The newest frozen lead snapshot from the history, for the task list.
     task_context: dict[str, Any] | None = None
@@ -1273,7 +1359,7 @@ class LeadWorkflowEventOut(ResponseModel):
     from_status: str | None = None
     to_status: str
     note: str | None = None
-    created_at: datetime
+    created_at: Timestamp
 
 
 class LeadTriageOut(ResponseModel):
@@ -1300,7 +1386,7 @@ class LeadOut(ResponseModel):
     priority: str
     owner: str | None = None
     next_action: str | None = None
-    created_at: datetime
+    created_at: Timestamp
     links: list[LeadLinkOut]
     tasks: list[ReportingTaskOut]
     history: list[LeadWorkflowEventOut]
@@ -1338,7 +1424,7 @@ class InvestigationOut(ResponseModel):
     name: str
     description: str | None = None
     is_demo: bool
-    created_at: datetime
+    created_at: Timestamp
 
 
 class EntityOut(ResponseModel):
@@ -1354,7 +1440,7 @@ class EntityOut(ResponseModel):
     properties: dict[str, list[str]]
     canonical_id: str | None = None
     merged_into_entity_id: str | None = None
-    created_at: datetime
+    created_at: Timestamp
 
 
 class EntityStatementOut(StatementOut):
@@ -1382,7 +1468,7 @@ class PropertyConflictDecisionOut(ResponseModel):
     preferred_value: str | None = None
     rationale: str | None = None
     temporal_intervals_json: list[PropertyTemporalIntervalOut]
-    created_at: datetime
+    created_at: Timestamp
 
 
 # --- External connectors and their findings ------------------------------------------
@@ -1405,8 +1491,8 @@ class ConnectorRunOut(ResponseModel):
     status: str
     result_count: int
     error: str | None = None
-    started_at: datetime
-    finished_at: datetime | None = None
+    started_at: Timestamp
+    finished_at: Timestamp | None = None
 
 
 class ConnectorFindingOut(ResponseModel):
@@ -1425,7 +1511,7 @@ class ConnectorFindingOut(ResponseModel):
     source_url: str | None = None
     raw: dict[str, Any]
     review_status: str  # unreviewed | accepted | needs_followup | rejected
-    created_at: datetime
+    created_at: Timestamp
 
 
 class EntityCandidateOut(ResponseModel):
@@ -1447,7 +1533,7 @@ class ResolutionDecisionOut(ResponseModel):
     decision: str  # positive | negative | unsure
     confidence: float
     rationale: str | None = None
-    created_at: datetime
+    created_at: Timestamp
 
 
 class StatementAssessmentOut(ResponseModel):
@@ -1460,7 +1546,7 @@ class StatementAssessmentOut(ResponseModel):
     value: str
     status: str  # accepted | conflicting | outdated | superseded | unresolved
     note: str | None = None
-    created_at: datetime
+    created_at: Timestamp
 
 
 class StatementPromotionOut(ResponseModel):
@@ -1476,7 +1562,7 @@ class StatementPromotionOut(ResponseModel):
     source_url: str | None = None
     original_value: str
     reviewer_note: str | None = None
-    promoted_at: datetime
+    promoted_at: Timestamp
 
 
 class ExternalEndpointFindingOut(ResponseModel):
@@ -1518,7 +1604,7 @@ class ExternalRelationshipReviewOut(ResponseModel):
     target_entity_id: str | None = None
     decision: str  # supported | conflicting | unresolved | rejected
     note: str | None = None
-    created_at: datetime
+    created_at: Timestamp
 
 
 class ExternalRelationshipPromotionOut(ResponseModel):
@@ -1531,7 +1617,7 @@ class ExternalRelationshipPromotionOut(ResponseModel):
     relationship_entity_id: str
     provider: str
     source_url: str | None = None
-    promoted_at: datetime
+    promoted_at: Timestamp
 
 
 # --- Enrichment sessions and cross-provider clusters -----------------------------------
@@ -1553,8 +1639,8 @@ class EnrichmentSessionOut(ResponseModel):
     status: str  # completed | partial | failed
     providers: list[str]
     total_results: int
-    started_at: datetime
-    finished_at: datetime | None = None
+    started_at: Timestamp
+    finished_at: Timestamp | None = None
     runs: list[EnrichmentRunResultOut]
 
 
@@ -1566,8 +1652,8 @@ class EnrichmentSessionRowOut(ResponseModel):
     status: str
     providers: list[str]
     total_results: int
-    started_at: datetime
-    finished_at: datetime | None = None
+    started_at: Timestamp
+    finished_at: Timestamp | None = None
 
 
 class EnrichmentSessionRunOut(ResponseModel):
@@ -1578,8 +1664,8 @@ class EnrichmentSessionRunOut(ResponseModel):
     status: str
     result_count: int
     error: str | None = None
-    started_at: datetime | None = None
-    finished_at: datetime | None = None
+    started_at: Timestamp | None = None
+    finished_at: Timestamp | None = None
 
 
 class EnrichmentSessionDetailOut(EnrichmentSessionRowOut):
@@ -1592,7 +1678,7 @@ class EnrichmentSessionFindingOut(ResponseModel):
     session_id: str
     finding_id: str
     provider: str
-    created_at: datetime
+    created_at: Timestamp
 
 
 class CrossProviderDecisionOut(ResponseModel):
@@ -1607,7 +1693,7 @@ class CrossProviderDecisionOut(ResponseModel):
     decision: str  # positive | negative | unsure
     confidence: float
     rationale: str | None = None
-    created_at: datetime
+    created_at: Timestamp
 
 
 class ClusterReasonOut(ResponseModel):
@@ -1639,7 +1725,7 @@ class ClusterDecisionOut(ResponseModel):
     decision: str
     confidence: float
     rationale: str | None = None
-    created_at: datetime
+    created_at: Timestamp
 
 
 class EnrichmentClusterOut(ResponseModel):
@@ -1682,7 +1768,7 @@ class CanonicalResolutionDecisionOut(ResponseModel):
     decision: str  # same | different | unsure
     confidence: float
     rationale: str | None = None
-    created_at: datetime
+    created_at: Timestamp
 
 
 class MergeEntityOut(ResponseModel):
@@ -1737,7 +1823,7 @@ class CanonicalEntityMergeAuditOut(ResponseModel):
     preview_json: dict[str, Any]
     moved_counts_json: dict[str, int]
     rationale: str | None = None
-    created_at: datetime
+    created_at: Timestamp
 
 
 class CanonicalMergeExecuteOut(ResponseModel):
@@ -1757,7 +1843,7 @@ class ReconciliationDecisionOut(ResponseModel):
     decision: str  # duplicate | keep_separate | unsure
     rationale: str | None = None
     preferred_record_id: str | None = None
-    created_at: datetime
+    created_at: Timestamp
 
 
 class StatementDuplicatePairOut(ResponseModel):
@@ -1827,7 +1913,7 @@ class IdentityDecisionOut(ResponseModel):
     decision: str
     confidence: float
     rationale: str | None = None
-    created_at: datetime
+    created_at: Timestamp
     other_entity: MergeEntityOut | None = None
 
 
@@ -1838,7 +1924,7 @@ class IdentityMergeAuditOut(ResponseModel):
     resolution_decision_id: str | None = None
     rationale: str | None = None
     moved_counts: dict[str, int]
-    created_at: datetime
+    created_at: Timestamp
 
 
 class EntityIdentityHistoryOut(ResponseModel):
@@ -1883,7 +1969,7 @@ class DossierConflictDecisionOut(ResponseModel):
     preferred_value: str | None = None
     rationale: str | None = None
     temporal_intervals: list[PropertyTemporalIntervalOut]
-    created_at: datetime
+    created_at: Timestamp
 
 
 class DossierConflictValueOut(ResponseModel):
@@ -1943,7 +2029,7 @@ class LeadRowOut(ResponseModel):
     provider: str | None = None
     provider_record_id: str | None = None
     status: str
-    created_at: datetime
+    created_at: Timestamp
 
 
 class DossierLeadOut(ResponseModel):
@@ -2248,3 +2334,611 @@ class SecurityAuditRetentionPreviewOut(ResponseModel):
 class SecurityAuditRetentionResultOut(SecurityAuditRetentionPreviewOut):
     removed: int
     applied: bool
+
+
+# --- Server health, capabilities and catalogues (routes_system) -------------------------
+
+class HealthOut(ResponseModel):
+    status: Literal["ok"]
+
+
+class CoreCapabilitiesOut(ResponseModel):
+    """The parts of the core workbench this server runs; every one runs without AI."""
+    investigations: bool
+    documents: bool
+    sources: bool
+    evidence: bool
+    claims: bool
+    relationships: bool
+    search: bool
+    dossiers: bool
+    timeline: bool
+    leads_and_tasks: bool
+    provenance: bool
+    connectors: bool
+    backup_restore: bool
+
+
+class OpenAlephPlatformOut(ResponseModel):
+    enabled: bool
+    role: str
+
+
+class PlatformsOut(ResponseModel):
+    openaleph: OpenAlephPlatformOut
+
+
+class CapabilitiesOut(ResponseModel):
+    product: str
+    mode: Literal["integrated_preview", "core_preview"]
+    ai_features_enabled: bool
+    core: CoreCapabilitiesOut
+    platforms: PlatformsOut
+    note: str
+
+
+class OpenAlephStatusOut(ResponseModel):
+    """Whether the local OpenAleph corpus platform answers its search API.
+    Every key is always sent, so the nullable one has no default."""
+    configured: bool
+    base_url: str
+    ui_url: str
+    reachable: bool
+    api_usable: bool
+    http_status: int | None
+    detail: str
+
+
+class RelationshipSchemaOut(ResponseModel):
+    """How the workbench draws one FollowTheMoney relationship schema: its two ends' properties and labels."""
+    source_prop: str
+    target_prop: str
+    source_label: str
+    target_label: str
+    label: str
+
+
+class RelationshipSchemasOut(ResponseModel):
+    schemas: dict[str, RelationshipSchemaOut]
+
+
+# --- Presentation styles (app/services/presentation_style.py) -------------------------------
+
+class DeckStyleOut(ResponseModel):
+    """A deck's look: a theme id and a font-pair id from the style catalogue."""
+    theme: str
+    fonts: str
+
+
+class DeckThemeOut(ResponseModel):
+    """One deck theme: colours as six hex digits without '#', and its own fonts."""
+    id: str
+    label: str
+    description: str
+    cover_bg: str
+    cover_line: str
+    cover_text: str
+    cover_muted: str
+    cover_accent: str
+    accent: str
+    accent_text: str
+    alert: str
+    page: str
+    panel: str
+    rule: str
+    text: str
+    muted: str
+    bar_muted: str
+    heading_font: str
+    body_font: str
+    # The categorical colours (six hex digits) the charts that need several
+    # hues draw with, in order (app/services/presentation_style.py).
+    palette: list[str]
+
+
+class FontPairOut(ResponseModel):
+    """A heading and body font; empty names mean "keep the theme's own"."""
+    id: str
+    label: str
+    heading: str
+    body: str
+
+
+# A visual option's value: a switch, a choice, or a list of the visual's own labels.
+VisualOptionValueOut = bool | str | list[str]
+
+
+class VisualPresetOut(ResponseModel):
+    """A named layout for one visual type, with its option defaults."""
+    id: str
+    label: str
+    description: str
+    layout: dict[str, str | bool]
+    options: dict[str, VisualOptionValueOut]
+
+
+class VisualOptionSpecOut(ResponseModel):
+    """What one option accepts. `values` lists the choices and is sent only for a choice."""
+    type: Literal["bool", "choice", "labels"]
+    label: str
+    values: list[str] | None = Field(default=None, exclude_if=_absent_when_none)
+
+
+class VisualPresetsOut(ResponseModel):
+    bar: list[VisualPresetOut]
+    timeline: list[VisualPresetOut]
+    figures: list[VisualPresetOut]
+
+
+class VisualOptionsOut(ResponseModel):
+    bar: dict[str, VisualOptionSpecOut]
+    timeline: dict[str, VisualOptionSpecOut]
+    figures: dict[str, VisualOptionSpecOut]
+
+
+class PresentationStyleCatalogOut(ResponseModel):
+    """Everything the deck style panel and the in-app preview need; the .pptx
+    export reads the same catalogue, so the two cannot drift apart."""
+    defaults: DeckStyleOut
+    themes: list[DeckThemeOut]
+    font_pairs: list[FontPairOut]
+    visual_presets: VisualPresetsOut
+    visual_options: VisualOptionsOut
+
+
+# --- Decks and write-ups --------------------------------------------------------------
+
+class VisualStyleOut(ResponseModel):
+    """A visual's chosen preset and the options it overrides."""
+    preset: str
+    options: dict[str, VisualOptionValueOut]
+
+
+class FigureItemOut(ResponseModel):
+    label: str
+    evidence: list[RecordRefOut]
+    value: str
+
+
+class TimelineItemOut(ResponseModel):
+    label: str
+    evidence: list[RecordRefOut]
+    date: str
+
+
+class BarItemOut(ResponseModel):
+    label: str
+    evidence: list[RecordRefOut]
+    # Kept as the draft wrote it: a whole number stays a whole number.
+    value: int | float
+
+
+class FiguresVisualOut(ResponseModel):
+    type: Literal["figures"]
+    items: list[FigureItemOut]
+    style: VisualStyleOut | None = Field(default=None, exclude_if=_absent_when_none)
+
+
+class TimelineVisualOut(ResponseModel):
+    type: Literal["timeline"]
+    items: list[TimelineItemOut]
+    style: VisualStyleOut | None = Field(default=None, exclude_if=_absent_when_none)
+
+
+class BarVisualOut(ResponseModel):
+    type: Literal["bar"]
+    title: str
+    unit: str
+    items: list[BarItemOut]
+    style: VisualStyleOut | None = Field(default=None, exclude_if=_absent_when_none)
+
+
+class ChartVisualOut(ResponseModel):
+    """A checked chart (app/ai/chart_check.py) as a deck keeps it: the order
+    slip, the data the Workbench cooked from the records (every value with
+    its records), the check report and the chart's words, as the draft or
+    the deck editor stored them; and the drawing that passed, when the deck
+    came from a checked draft. The deck insists only on a valid order slip
+    and its data (app/services/decks.py normalize_chart_visual), so the
+    report and the words are passed on as stored."""
+    type: Literal["chart"]
+    spec: dict[str, Any]
+    data: VisualDataOut
+    report: dict[str, Any]
+    text: dict[str, Any]
+    option: dict[str, Any] | None = Field(default=None, exclude_if=_absent_when_none)
+
+
+# A slide's visual: `type` says which shape follows.
+DeckVisualOut = Annotated[
+    FiguresVisualOut | TimelineVisualOut | BarVisualOut | ChartVisualOut,
+    Field(discriminator="type"),
+]
+
+
+class DeckSlideOut(ResponseModel):
+    """One slide as a deck stores it (app/services/decks.py _normalize_slides)."""
+    kind: Literal["title", "statement", "content", "questions"]
+    heading: str
+    bullets: list[str]
+    evidence: list[RecordRefOut]
+    notes: str
+    visual: DeckVisualOut | None
+
+
+class DeckOut(ResponseModel):
+    """A presentation deck. Every key is always sent, so the nullable ones have no default."""
+    id: str
+    investigation_id: str
+    title: str
+    slides: list[DeckSlideOut]
+    slide_count: int
+    style: DeckStyleOut
+    source_ai_candidate_id: str | None
+    created_by: str | None
+    created_at: Timestamp
+    updated_at: Timestamp
+
+
+class DecksOut(ResponseModel):
+    decks: list[DeckOut]
+
+
+class WriteupBaseOut(ResponseModel):
+    id: str
+    investigation_id: str
+    title: str
+    status: str  # draft | final
+    # Every record a citation in the document points at, in first-appearance order.
+    cited_record_refs: list[RecordRefOut]
+    source_ai_candidate_id: str | None
+    created_by: str | None
+    created_at: Timestamp
+    updated_at: Timestamp
+    word_count: int
+
+
+class WriteupOut(WriteupBaseOut):
+    """A write-up with its document: TipTap/ProseMirror JSON, as the editor saved it."""
+    content_json: dict[str, Any]
+
+
+class WriteupSummaryOut(WriteupBaseOut):
+    """A write-up as the list shows it: the first 280 characters of its text instead of the document."""
+    preview: str
+
+
+class WriteupsOut(ResponseModel):
+    writeups: list[WriteupSummaryOut]
+
+
+class DeletedOut(ResponseModel):
+    deleted: bool
+
+
+# --- AI reasoning: the retrieval packet, runs and the review queue ------------------------
+
+class ContextCitationOut(ResponseModel):
+    """A record the model may cite, with where to trace it."""
+    record_type: str
+    record_id: str
+    title: str
+    locator: str | None
+    source_id: str | None
+    source_url: str | None
+    trace_record_type: str | None
+    trace_record_id: str | None
+
+
+class ContextItemOut(ResponseModel):
+    """One search hit in the retrieval packet. `provenance` and `metadata`
+    are the search hit's own (each record type adds its own keys)."""
+    record_type: str
+    record_id: str
+    title: str
+    snippet: str
+    score: float
+    provenance: dict[str, Any]
+    metadata: dict[str, Any]
+    citation: ContextCitationOut
+
+
+class ContextGroupsOut(ResponseModel):
+    canonical: list[ContextItemOut]
+    evidence: list[ContextItemOut]
+    reporting: list[ContextItemOut]
+    workflow: list[ContextItemOut]
+    review: list[ContextItemOut]
+
+
+class RetrievalSummaryOut(ResponseModel):
+    query: str | None
+    total_matches: int
+    returned_matches: int
+    counts: dict[str, int]
+    group_counts: dict[str, int]
+
+
+class QuestionContextOut(ResponseModel):
+    """The provenance-bearing packet a reasoning model would be given for a
+    question. External connector results are a separate, unverified bucket
+    and never among the citations."""
+    question: str
+    investigation_id: str
+    retrieval: RetrievalSummaryOut
+    context: ContextGroupsOut
+    external_leads: list[ContextItemOut]
+    citations: list[ContextCitationOut]
+    # The rules the packet carries to the model, each one a flag that is on.
+    reasoning_contract: dict[str, bool]
+    warnings: list[str]
+
+
+class AiAnalysisCandidateSummaryOut(ResponseModel):
+    """A reasoning run's proposal as the review queue lists it, without its
+    payload. `request` is what the reporter asked, as recorded when the run
+    was made; its keys depend on the version that recorded it (record_refs
+    arrived with presentation drafts, for one), so it stays open.
+    `rejection_reason` is one of the automatic rejection reasons, "reviewer"
+    for a human rejection, or null when not rejected."""
+    id: str
+    investigation_id: str
+    module: str  # case_synthesis | hypothesis_test | presentation_draft
+    request: dict[str, Any]
+    review_status: str  # proposed | accepted | rejected
+    confidence: float
+    reviewer_note: str | None
+    accepted_record_type: str | None
+    accepted_record_id: str | None
+    created_at: Timestamp
+    reviewed_at: Timestamp | None
+    checked_citation_count: int
+    rejection_reason: str | None
+
+
+class AiAnalysisCandidatesOut(ResponseModel):
+    candidates: list[AiAnalysisCandidateSummaryOut]
+
+
+class CitationDetailOut(ResponseModel):
+    """A cited record in words, for the review panel's evidence chips and an
+    export's source list; `missing` when the record no longer resolves."""
+    record_type: str
+    record_id: str
+    trace_record_type: str
+    type_label: str
+    label: str
+    quote: str | None
+    locator: str | None
+    source_title: str | None
+    source_url: str | None
+    detail: str | None
+    missing: bool
+
+
+class AiAnalysisCandidateOut(AiAnalysisCandidateSummaryOut):
+    """One proposal in full. `payload` is the model's output in its module's
+    own schema (app/ai/reasoning.py OUTPUT_SCHEMAS), or the raw text of a run
+    whose output could not be used; `trace` is what the model was sent
+    (rows from before the trace was kept have none). A presentation draft
+    also carries readable details for every record it cites and the slides
+    a promotion would make; other modules leave both keys out."""
+    payload: dict[str, Any]
+    checked_citation_ids: list[RecordRefOut]
+    trace: dict[str, Any] | None
+    citation_details: list[CitationDetailOut] | None = Field(default=None, exclude_if=_absent_when_none)
+    deck_preview: list[DeckSlideOut] | None = Field(default=None, exclude_if=_absent_when_none)
+
+
+class AiAnalysisCandidateReviewOut(ResponseModel):
+    """The reply to a review decision on a proposal."""
+    id: str
+    module: str
+    review_status: str
+    reviewer_note: str | None
+    reviewed_at: Timestamp | None
+
+
+class AiReasoningRunOut(ResponseModel):
+    """The reply to a reasoning run. Run in the request (developer mode): the
+    proposal it made for review, with the finished job. Queued (the Docker
+    stack, HTTP 202): no proposal yet, and the job to follow; its `result`
+    holds this same proposal when it is done."""
+    candidate_id: str | None
+    review_status: str | None = Field(default=None, exclude_if=_absent_when_none)
+    payload: dict[str, Any] | None = Field(default=None, exclude_if=_absent_when_none)
+    job: BackgroundJobOut
+
+
+# --- Extraction proposals: identity preview --------------------------------------------
+
+class ProviderLeadOut(ResponseModel):
+    """What an outside provider said the name resolves to: a lead only, never a choice."""
+    provider: str | None
+    provider_entity_id: str | None
+    provider_resolved_entity_id: str | None
+
+
+class EntityMatchPreviewOut(ResponseModel):
+    """Canonical entities an entity proposal may be, before the reporter decides."""
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    candidate_id: str
+    caption: str
+    schema_: str = Field(alias="schema")
+    matches: list[EntityCandidateOut]
+    strong_match: EntityCandidateOut | None
+    provider_lead: ProviderLeadOut
+    identity_rule: str
+
+
+# --- OpenAleph corpus binding, demo data, backups ---------------------------------------------
+
+class OpenAlephCorpusBindingOut(ResponseModel):
+    """The investigation's OpenAleph collection, or null before one is set up."""
+    binding: OpenAlephBindingOut | None
+
+
+class DemoSeedOut(ResponseModel):
+    investigation_id: str
+    created: bool
+
+
+class BackupInspectOut(ResponseModel):
+    """A checked archive's own manifest.json, echoed back as read (only its
+    format, version, checksums and lineage are verified), and how many rows
+    of each table it holds."""
+    manifest: dict[str, Any]
+    record_counts: dict[str, int]
+
+
+# --- Persisted API identities and investigation memberships ------------------------------
+
+class AppUserMembershipOut(ResponseModel):
+    investigation_id: str
+    role: str  # viewer | reporter | admin
+
+
+class AppUserOut(ResponseModel):
+    """A persisted API identity: its token's history, never the token or its digest."""
+    id: str
+    display_name: str
+    global_role: str  # member | admin
+    disabled: bool
+    disabled_at: Timestamp | None
+    token_created_at: Timestamp
+    token_last_used_at: Timestamp | None
+    token_rotated_at: Timestamp | None
+    token_revoked_at: Timestamp | None
+    token_status: Literal["active", "disabled", "revoked"]
+    memberships: list[AppUserMembershipOut]
+
+
+class AppUserCreatedOut(ResponseModel):
+    """A new identity and its token, shown this once: only the token's digest is kept."""
+    id: str
+    display_name: str
+    global_role: str
+    token: str
+    token_notice: str
+
+
+class AppUserUpdatedOut(ResponseModel):
+    id: str
+    display_name: str
+    global_role: str
+    disabled: bool
+    disabled_at: Timestamp | None
+    token_status: Literal["active", "disabled", "revoked"]
+
+
+class AppUserTokenRotatedOut(ResponseModel):
+    """The replacement token, shown this once."""
+    id: str
+    token: str
+    token_created_at: Timestamp
+    token_rotated_at: Timestamp
+    token_notice: str
+
+
+class AppUserTokenRevokedOut(ResponseModel):
+    id: str
+    token_revoked_at: Timestamp
+    token_status: Literal["revoked"]
+
+
+class InvestigationMembershipOut(ResponseModel):
+    user_id: str
+    investigation_id: str
+    role: str  # viewer | reporter | admin
+
+
+# --- Refusals ------------------------------------------------------------------
+#
+# What the API answers when it does not do what was asked. Declared for every
+# route (app/main.py), so the published schema says what a client gets back on
+# a 4xx and the contract test (tests/test_api_contract.py) checks each one.
+
+class ErrorOut(ResponseModel):
+    """Why a request was refused, in a sentence: the detail of an
+    HTTPException, or of one of the checks every request passes first (access,
+    request size; app/main.py api_access_guard, app/core/access.py)."""
+    detail: str
+
+
+class ValidationIssueOut(ResponseModel):
+    """One problem with a request's input: where it is (`loc`), what is wrong
+    (`msg`) and the error type. FastAPI's own shape for it
+    (fastapi/openapi/utils.py validation_error_definition)."""
+    loc: list[str | int]
+    msg: str
+    type: str
+    input: Any = None
+    ctx: dict[str, Any] | None = None
+
+
+class ValidationErrorOut(ResponseModel):
+    """FastAPI's answer (422) when a request's input does not match what the
+    route declares (fastapi.exception_handlers.request_validation_exception_handler)."""
+    detail: list[ValidationIssueOut]
+
+
+class DocumentReadFailureOut(ResponseModel):
+    message: str
+    document: DocumentOut
+    error: str | None
+    job: BackgroundJobOut | None
+
+
+class DocumentReadFailedOut(ResponseModel):
+    """An upload whose file was saved but could not be read (422): the saved
+    document, why it failed, and the job that tried (routes_documents.py)."""
+    detail: DocumentReadFailureOut
+
+
+class AiOutputRejectionOut(ResponseModel):
+    """Why a model's answer was kept only as a rejected proposal, with what the
+    check found: references to records the run was not given, missing parts,
+    or quotes not found in the records they cite (app/ai/reasoning.py
+    describe_reasoning_failure). The findings are pieces of the model's own
+    answer, so their keys are the model's."""
+    message: str
+    invalid_citations: list[dict[str, Any]] | None = Field(default=None, exclude_if=_absent_when_none)
+    schema_errors: list[str] | None = Field(default=None, exclude_if=_absent_when_none)
+    removed: list[dict[str, Any]] | None = Field(default=None, exclude_if=_absent_when_none)
+
+
+class AiOutputRejectedOut(ResponseModel):
+    """A reasoning run whose answer did not pass its checks (422)."""
+    detail: AiOutputRejectionOut
+
+
+class AiOutputUnusableOut(ResponseModel):
+    message: str
+    rejection_reason: str
+
+
+class AiModelFailedOut(ResponseModel):
+    """A reasoning run whose answer could not be used at all (502): cut off,
+    or not JSON. Kept as a rejected proposal; `rejection_reason` says which."""
+    detail: AiOutputUnusableOut
+
+
+def upstream(service: str, *statuses: int) -> dict[int | str, dict[str, Any]]:
+    """The answers of a route whose work depends on an outside service, which
+    are about that service, not the request: 502 when it failed (the details
+    are logged on the server), 503 when it is not available here at all
+    (switched off, or its client is not installed)."""
+    text = {502: f"{service} failed; the details are logged on the server",
+            503: f"{service} is not available here: switched off, or its client is not installed"}
+    return {status: {"model": ErrorOut, "description": text[status]} for status in statuses}
+
+
+# Every route's refusals: a sentence for any 4xx, and FastAPI's list of input
+# problems for 422. Declaring "4XX" stops FastAPI adding its own 422 entry
+# (fastapi/openapi/utils.py get_openapi_path), so 422 is declared here too.
+API_REFUSALS: dict[int | str, dict[str, Any]] = {
+    "4XX": {"model": ErrorOut, "description": "Refused: why, in a sentence"},
+    422: {"model": ValidationErrorOut, "description": "The request's input does not match what the route declares"},
+}
+

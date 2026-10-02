@@ -219,13 +219,19 @@ def test_openaleph_search_uses_exact_collection_and_parent_filters(monkeypatch):
     assert rows[0]["id"] == "page-1"
 
 
-def test_openaleph_mentions_are_staged_as_entity_candidates_without_auto_resolution(tmp_path, monkeypatch):
+def test_openaleph_analysis_is_staged_as_proposals_without_auto_resolution(tmp_path, monkeypatch):
+    """ftm-analyze's results are properties of the document entity
+    (ADR-0006); each becomes a proposal, nothing becomes an entity until a
+    reporter accepts it, and a re-import adds nothing."""
     from sqlalchemy import select
     from app.models.domain import ExtractionCandidate, Entity, Statement
     from app.services.openaleph_corpus import import_openaleph_entity_candidates
     from app.services.documents import review_candidate
 
     monkeypatch.setattr(settings, "openaleph_enabled", True)
+    # The Workbench's own name-finder would propose these names first, and a
+    # name already proposed for the document is not proposed again.
+    monkeypatch.setattr(settings, "enable_local_entity_suggestions", False)
     with SessionLocal() as db:
         inv = Investigation(name="Entity extraction bridge")
         db.add(inv); db.commit(); db.refresh(inv)
@@ -236,38 +242,23 @@ def test_openaleph_mentions_are_staged_as_entity_candidates_without_auto_resolut
             title="Investigative filing",
             filename="filing.txt",
             mime_type="text/plain",
-            data=b"Acme Holdings and Jordan Rivera are mentioned in this filing.",
+            data=b"Acme Holdings Inc. and Jordan Rivera are mentioned in this filing.",
             storage_dir=tmp_path / "documents",
         )
         sync_document_to_openaleph(db, doc.id, client_factory=lambda: client)
+        fetched: list[str] = []
 
-        def fake_searcher(*, collection_id, document_record_id):
-            assert collection_id == "oa-collection-1"
-            assert document_record_id == "oa-document-1"
-            return [
-                {
-                    "id": "oa-mention-1",
-                    "schema": "Mention",
-                    "properties": {
-                        "name": ["Jordan Rivera"],
-                        "document": ["oa-document-1"],
-                        "detectedSchema": ["Person"],
-                        "resolved": ["oa-person-777"],
-                    },
-                },
-                {
-                    "id": "oa-mention-2",
-                    "schema": "Mention",
-                    "properties": {
-                        "name": ["Acme Holdings Inc."],
-                        "document": ["oa-document-1"],
-                        "detectedSchema": ["ORG"],
-                    },
-                },
-            ]
+        def fake_fetch(entity_id):
+            fetched.append(entity_id)
+            return {"id": entity_id, "schema": "PlainText", "properties": {
+                "peopleMentioned": ["jordan rivera"], "companiesMentioned": ["acme holdings inc"],
+                "detectedLanguage": ["eng"], "bodyText": ["Acme Holdings Inc. and Jordan Rivera are mentioned in this filing."],
+            }}
 
         entity_count_before = db.query(Entity).count()
-        result = import_openaleph_entity_candidates(db, doc.id, searcher=fake_searcher)
+        result = import_openaleph_entity_candidates(db, doc.id, fetch_entity=fake_fetch)
+        assert fetched == ["oa-document-1"]
+        assert result["retrieved"] == 2
         assert result["created_candidates"] == 2
         assert result["review_required"] is True
         assert result["automatic_resolution"] is False
@@ -284,61 +275,27 @@ def test_openaleph_mentions_are_staged_as_entity_candidates_without_auto_resolut
         ]
         assert len(candidates) == 2
         person = next(c for c in candidates if c.payload["caption"] == "Jordan Rivera")
-        org = next(c for c in candidates if c.payload["caption"] == "Acme Holdings Inc.")
+        company = next(c for c in candidates if c.payload["caption"] == "Acme Holdings Inc")
         assert person.payload["suggested_schema"] == "Person"
-        assert org.payload["suggested_schema"] == "Organization"
-        assert person.payload["provenance"]["provider_resolved_entity_id"] == "oa-person-777"
+        assert company.payload["suggested_schema"] == "Company"
+        assert person.payload["provenance"]["provider_property"] == "peopleMentioned"
         assert person.review_status == "proposed"
 
-        # A provider-side resolved target is metadata only; reporter acceptance creates
-        # the Workbench entity but still does not create a canonical merge decision.
+        # Acceptance makes the entity; its name statement points at the exact
+        # place in the document where the name was found again.
         accepted = review_candidate(db, person, decision="accept", note="Reporter confirmed the name in the source")
         entity = db.get(Entity, accepted["record"]["id"])
         assert entity.schema == "Person"
         statements = db.scalars(select(Statement).where(Statement.entity_id == entity.id)).all()
         assert len(statements) == 1
         assert statements[0].dataset == "openaleph:oa-collection-1"
-        assert statements[0].origin == "openaleph:entity:oa-mention-1"
+        span = person.payload["span"]
+        assert statements[0].origin == f"document:{doc.id}#line 1@chars:{span['start_char']}-{span['end_char']}"
 
-        # Reimport does not create duplicate provider Mention candidates.
-        again = import_openaleph_entity_candidates(db, doc.id, searcher=fake_searcher)
+        # Reimport does not create duplicate proposals.
+        again = import_openaleph_entity_candidates(db, doc.id, fetch_entity=fake_fetch)
         assert again["created_candidates"] == 0
-
-
-def test_openaleph_mention_search_uses_exact_collection_and_document_filters(monkeypatch):
-    import httpx
-    from app.services.openaleph_corpus import _openaleph_mention_search
-
-    monkeypatch.setattr(settings, "openaleph_base_url", "http://openaleph.test")
-    monkeypatch.setattr(settings, "openaleph_api_key", "secret")
-
-    def handler(request: httpx.Request):
-        assert request.url.path == "/api/2/search"
-        params = request.url.params
-        assert params["q"] == "*"
-        assert params["filter:collection_id"] == "collection-7"
-        assert params["filter:schema"] == "Mention"
-        assert params["filter:properties.document"] == "document-9"
-        assert request.headers["authorization"] == "ApiKey secret"
-        return httpx.Response(
-            200,
-            json={
-                "results": [
-                    {
-                        "id": "mention-1",
-                        "schema": "Mention",
-                        "properties": {"name": ["Example Person"], "detectedSchema": ["Person"]},
-                    }
-                ]
-            },
-        )
-
-    rows = _openaleph_mention_search(
-        collection_id="collection-7",
-        document_record_id="document-9",
-        transport=httpx.MockTransport(handler),
-    )
-    assert rows[0]["id"] == "mention-1"
+        assert again["skipped"] == 2
 
 
 def test_openaleph_review_status_and_combined_refresh(tmp_path, monkeypatch):
@@ -351,6 +308,9 @@ def test_openaleph_review_status_and_combined_refresh(tmp_path, monkeypatch):
     from app.services.documents import review_candidate
 
     monkeypatch.setattr(settings, "openaleph_enabled", True)
+    # Only OpenAleph proposes names here (the Workbench's finder would find
+    # "Example Person" first, and a name is proposed once per document).
+    monkeypatch.setattr(settings, "enable_local_entity_suggestions", False)
     with SessionLocal() as db:
         inv = Investigation(name="Combined OpenAleph review")
         db.add(inv); db.commit(); db.refresh(inv)
@@ -381,28 +341,17 @@ def test_openaleph_review_status_and_combined_refresh(tmp_path, monkeypatch):
                 "properties": {"index": ["1"], "bodyText": ["Provider page text for review."]},
             }]
 
-        def mention_searcher(*, collection_id, document_record_id):
-            assert collection_id == "oa-collection-1"
-            assert document_record_id == "oa-document-1"
-            return [
-                {
-                    "id": "oa-mention-refresh-1",
-                    "schema": "Mention",
-                    "properties": {"name": ["Example Person"], "detectedSchema": ["Person"]},
-                },
-                # Duplicate provider rows must still stage only one review candidate.
-                {
-                    "id": "oa-mention-refresh-1",
-                    "schema": "Mention",
-                    "properties": {"name": ["Example Person"], "detectedSchema": ["Person"]},
-                },
-            ]
+        def entity_fetcher(entity_id):
+            assert entity_id == "oa-document-1"
+            # A value listed twice must still stage only one review candidate.
+            return {"id": entity_id, "schema": "PlainText",
+                    "properties": {"peopleMentioned": ["example person", "Example Person"], "detectedLanguage": ["eng"]}}
 
         refreshed = refresh_openaleph_review_candidates(
             db,
             doc.id,
             evidence_searcher=page_searcher,
-            entity_searcher=mention_searcher,
+            entity_fetcher=entity_fetcher,
         )
         assert refreshed["evidence"]["created_candidates"] == 1
         assert refreshed["entities"]["created_candidates"] == 1
@@ -427,12 +376,12 @@ def test_openaleph_review_status_and_combined_refresh(tmp_path, monkeypatch):
         assert after_review["provider_candidate_pending_review"] == 1
         assert after_review["provider_candidate_rejected"] == 1
 
-        # The combined refresh is idempotent across both Page and Mention imports.
+        # The combined refresh is idempotent across both the page and the name imports.
         again = refresh_openaleph_review_candidates(
             db,
             doc.id,
             evidence_searcher=page_searcher,
-            entity_searcher=mention_searcher,
+            entity_fetcher=entity_fetcher,
         )
         assert again["evidence"]["created_candidates"] == 0
         assert again["entities"]["created_candidates"] == 0

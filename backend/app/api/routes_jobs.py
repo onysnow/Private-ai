@@ -11,7 +11,7 @@ from app.db.session import get_db
 from app.jobs.records import cancel_queued, list_jobs, requeue_for_retry, serialize_job
 from app.jobs.runner import job_runner
 from app.models.jobs import JOB_STATUSES, BackgroundJob
-from app.schemas.responses import BackgroundJobOut
+from app.schemas.responses import BackgroundJobOut, ErrorOut, ValidationErrorOut
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
@@ -27,7 +27,9 @@ def _visible_job(db: Session, scope: AuthorizationScope, job_id: str) -> Backgro
     return job
 
 
-@router.get("/jobs", response_model=list[BackgroundJobOut])
+@router.get("/jobs", response_model=list[BackgroundJobOut], responses={
+    422: {"model": ValidationErrorOut | ErrorOut, "description": "The input does not match the route, or the status is not a job status"},
+})
 def list_jobs_endpoint(
     request: Request, investigation_id: str | None = None, status: str | None = None,
     subject_id: str | None = None, limit: int = 50, db: Session = Depends(get_db),

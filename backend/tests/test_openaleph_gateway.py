@@ -1,6 +1,6 @@
 """The corpus jobs' view of OpenAleph (app/services/openaleph_gateway.py):
 the client it builds, and how each reply OpenAleph can give is read, against
-the fake in tests/openaleph_fake.py."""
+the fake in tests/openaleph_corpus_fake.py."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ from app.core.config import settings
 from app.jobs import corpus as corpus_jobs
 from app.services import openaleph_corpus
 from app.services.openaleph_gateway import CorpusGateway, OpenAlephNotFound, active_tasks, corpus_client
-from tests.openaleph_fake import BASE_URL, FakeOpenAleph
+from tests.openaleph_corpus_fake import BASE_URL, FakeOpenAleph
 
 
 @pytest.fixture()

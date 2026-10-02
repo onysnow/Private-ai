@@ -7,6 +7,7 @@ from typing import Any
 from fastapi import APIRouter, Request
 from pydantic import BaseModel, Field
 
+from opsconsole import schemas as s
 from opsconsole.context import ConsoleContext, ConsoleError
 from opsconsole.core.configview import effective_config, set_flag
 
@@ -22,12 +23,12 @@ def router(ctx: ConsoleContext) -> APIRouter:
     assert settings is not None
     mutable = set(ctx.config.mutable_flags)
 
-    @r.get("/config", response_model=None)
+    @r.get("/config", response_model=s.ConsoleConfigOut)
     def config(request: Request) -> Any:
         ctx.read(request)
         return effective_config(settings, env_file=ctx.config.env_file, example_file=ctx.config.env_example_file, limits=ctx.config.limits, mutable=mutable)
 
-    @r.post("/config/flags/{name}", response_model=None)
+    @r.post("/config/flags/{name}", response_model=s.ConsoleFlagSetOut)
     def flag(request: Request, name: str, body: FlagIn) -> Any:
         principal = ctx.write(request)
         ctx.confirm(body.confirm, name)

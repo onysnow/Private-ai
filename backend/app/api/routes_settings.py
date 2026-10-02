@@ -22,11 +22,14 @@ from app.core.audit_log import (
 from app.core.config import settings
 from app.db.session import get_db
 from app.models.domain import AppUser
-from app.schemas.api import AppUserCreate, AppUserUpdate, InvestigationMembershipPut
+from app.schemas.api import (
+    AppUserCreate, AppUserUpdate, ConnectorCredentialPut, InvestigationMembershipPut, SecurityAuditRetentionRequest,
+)
 from app.schemas.responses import (
-    ConnectorCredentialRemovedOut, ConnectorCredentialSavedOut, OrphanStoragePreviewOut, SecurityAlertsOut,
-    SecurityAuditRetentionPreviewOut, SecurityAuditRetentionResultOut, SecurityAuditSummaryOut, SecurityAuditViewOut,
-    SettingsStatusOut,
+    AppUserCreatedOut, AppUserOut, AppUserTokenRevokedOut, AppUserTokenRotatedOut, AppUserUpdatedOut,
+    ConnectorCredentialRemovedOut, ConnectorCredentialSavedOut, InvestigationMembershipOut, OrphanStoragePreviewOut,
+    SecurityAlertsOut, SecurityAuditRetentionPreviewOut, SecurityAuditRetentionResultOut, SecurityAuditSummaryOut,
+    SecurityAuditViewOut, SettingsStatusOut,
 )
 from app.services.lifecycle import preview_orphan_document_files as _preview_orphan_document_files
 from app.services.settings import (
@@ -62,13 +65,13 @@ def settings_status(request: Request, db: Session = Depends(get_db)) -> Any:
     return get_settings_status(db, local=local)
 
 
-@router.get("/settings/security/users", response_model=None)
+@router.get("/settings/security/users", response_model=list[AppUserOut])
 def list_app_users(request: Request, db: Session = Depends(get_db)) -> Any:
     _require_local_request(request)
     return _list_app_users(db)
 
 
-@router.post("/settings/security/users", response_model=None)
+@router.post("/settings/security/users", response_model=AppUserCreatedOut)
 def create_app_user(payload: AppUserCreate, request: Request, db: Session = Depends(get_db)) -> Any:
     _require_local_request(request)
     try:
@@ -77,7 +80,7 @@ def create_app_user(payload: AppUserCreate, request: Request, db: Session = Depe
         raise HTTPException(400, str(exc))
 
 
-@router.patch("/settings/security/users/{user_id}", response_model=None)
+@router.patch("/settings/security/users/{user_id}", response_model=AppUserUpdatedOut)
 def update_app_user(user_id: str, payload: AppUserUpdate, request: Request, db: Session = Depends(get_db)) -> Any:
     _require_local_request(request)
     user = db.get(AppUser, user_id)
@@ -89,7 +92,7 @@ def update_app_user(user_id: str, payload: AppUserUpdate, request: Request, db: 
         raise HTTPException(400, str(exc))
 
 
-@router.post("/settings/security/users/{user_id}/token/rotate", response_model=None)
+@router.post("/settings/security/users/{user_id}/token/rotate", response_model=AppUserTokenRotatedOut)
 def rotate_app_user_token(user_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
     _require_local_request(request)
     user = db.get(AppUser, user_id)
@@ -98,7 +101,7 @@ def rotate_app_user_token(user_id: str, request: Request, db: Session = Depends(
     return _rotate_app_user_token(db, user)
 
 
-@router.post("/settings/security/users/{user_id}/token/revoke", response_model=None)
+@router.post("/settings/security/users/{user_id}/token/revoke", response_model=AppUserTokenRevokedOut)
 def revoke_app_user_token(user_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
     _require_local_request(request)
     user = db.get(AppUser, user_id)
@@ -107,7 +110,7 @@ def revoke_app_user_token(user_id: str, request: Request, db: Session = Depends(
     return _revoke_app_user_token(db, user)
 
 
-@router.put("/settings/security/users/{user_id}/investigations/{investigation_id}", response_model=None)
+@router.put("/settings/security/users/{user_id}/investigations/{investigation_id}", response_model=InvestigationMembershipOut)
 def put_investigation_membership(user_id: str, investigation_id: str, payload: InvestigationMembershipPut, request: Request, db: Session = Depends(get_db)) -> dict[str, Any]:
     _require_local_request(request)
     try:
@@ -191,34 +194,27 @@ def get_security_audit_retention_preview(
 
 
 @router.post("/settings/security/audit/retention", response_model=SecurityAuditRetentionResultOut)
-def prune_security_audit(body: dict, request: Request) -> Any:
+def prune_security_audit(body: SecurityAuditRetentionRequest, request: Request) -> Any:
+    # The body's types are checked by its model (a wrong type is a 422 now,
+    # where the hand-written checks here answered 400); the ranges and the
+    # confirmation text are still the audit log's to check.
     _require_local_request(request)
-    keep_days = body.get("keep_days", 90) if isinstance(body, dict) else 90
-    max_records = body.get("max_records", 5000) if isinstance(body, dict) else 5000
-    confirmation = body.get("confirmation", "") if isinstance(body, dict) else ""
-    if not isinstance(keep_days, int) or isinstance(keep_days, bool):
-        raise HTTPException(400, "keep_days must be an integer")
-    if not isinstance(max_records, int) or isinstance(max_records, bool):
-        raise HTTPException(400, "max_records must be an integer")
-    if not isinstance(confirmation, str):
-        raise HTTPException(400, "confirmation must be text")
     try:
         return apply_security_audit_retention(
             settings.audit_log_file,
-            keep_days=keep_days,
-            max_records=max_records,
-            confirmation=confirmation,
+            keep_days=body.keep_days,
+            max_records=body.max_records,
+            confirmation=body.confirmation,
         )
     except ValueError as exc:
         raise HTTPException(400, str(exc))
 
 
 @router.put("/settings/connectors/{provider}/credential", response_model=ConnectorCredentialSavedOut)
-def save_connector_credential(provider: str, body: dict, request: Request) -> Any:
+def save_connector_credential(provider: str, body: ConnectorCredentialPut, request: Request) -> Any:
     _require_local_request(request)
-    secret = body.get("credential") if isinstance(body, dict) else None
     try:
-        return _save_connector_credential(provider, secret)
+        return _save_connector_credential(provider, body.credential)
     except LookupError as exc:
         raise HTTPException(404, str(exc))
     except ValueError as exc:

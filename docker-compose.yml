@@ -110,7 +110,15 @@ services:
     image: ghcr.io/openaleph/ingest-file:${OPENALEPH_TAG:-5.3.1}
     platform: linux/amd64
     command: procrastinate worker -q ingest
-    environment: *openaleph-environment
+    environment:
+      <<: *openaleph-environment
+      # ADR-0006: without this, names are never found. ingest-file hands a
+      # document to ftm-analyze only when the entity it emits carries text
+      # (should_analyze in ingestors/tasks.py), but with the default (true,
+      # openaleph_procrastinate/settings.py) Manager.emit_entity emits a
+      # stripped file entity without its text, so no analysis job is ever
+      # queued. Job payloads carry the document text instead.
+      OPENALEPH_PROCRASTINATE_DEHYDRATE_ENTITIES: "false"
     tmpfs:
       - /tmp:mode=777
     volumes:

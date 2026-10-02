@@ -2,7 +2,7 @@
 
 Changes queue one push per investigation (queueing lock); "Sync now" jumps
 ahead of it with a lock of its own and runs on the worker inside the API
-process. OpenAleph is the fake from tests/openaleph_fake.py.
+process. OpenAleph is the fake from tests/openaleph_corpus_fake.py.
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ import app.main as main_module
 from app.core.config import Settings
 from app.core.config import settings as app_settings
 from app.jobs import corpus as corpus_jobs
-from tests.openaleph_fake import BASE_URL, FakeOpenAleph
+from tests.openaleph_corpus_fake import BASE_URL, FakeOpenAleph
 
 POSTGRES_URL = os.environ.get("POSTGRES_TEST_URL", "")
 pytestmark = pytest.mark.skipif(not POSTGRES_URL.startswith("postgresql"), reason="needs POSTGRES_TEST_URL")

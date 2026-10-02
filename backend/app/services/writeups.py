@@ -40,7 +40,9 @@ def extract_cited_refs(content_json: dict) -> list[dict]:
     refs: list[dict] = []
 
     def add(record_type: Any, record_id: Any) -> None:
-        if not record_type or not record_id:
+        # Record ids are text: a citation whose type or id is anything else
+        # (a client that saved a number there) points at nothing.
+        if not isinstance(record_type, str) or not isinstance(record_id, str) or not record_type or not record_id:
             return
         if record_type == "reporting_task":
             record_type = "task"
@@ -383,67 +385,97 @@ def _render_bar_table(docx: Any, items: list[dict], unit: str, citation_index: d
     _set_widths(table, [2.2, 3.3, 1.0])
 
 
+# Kinds whose rows the bar table can stand in for when the image is not
+# available: one value per row. The others (shares of a whole, two numbers
+# per party) fall back to the data table, which holds every number they draw.
+_BAR_TABLE_KINDS = {"bar", "column", "line", "area", "histogram"}
+
+
+def _render_data_table(docx: Any, built: Any, data: Any, citation_index: dict[tuple[str, str], int]) -> None:
+    """The data behind the chart, every row with its records (rules 13, 15,
+    16 and 20): its label with the record count and the single-record mark,
+    then the columns its kind writes (a scatter plot's x, a part's share),
+    the value and the number of records."""
+    from app.services.decks import chart_row_labels
+
+    decorate = chart_row_labels(data, built.rows)
+    table_rows = built.data_table.get("rows") or []
+    with_x = any("x_formatted" in r for r in table_rows)
+    with_share = any("share" in r for r in table_rows)
+    widths = [4.3, 1.2, 1.0] if not (with_x or with_share) else [3.4, 1.0, 1.2, 0.9]
+    table = docx.add_table(rows=0, cols=len(widths))
+    _row_rules(table)
+    for row, cells_in in zip(built.rows, table_rows):
+        cells = table.add_row().cells
+        p = cells[0].paragraphs[0]
+        _set_run(p.add_run(decorate.get(row.label, row.label)), size=9.5, color=DOCX_INK, font=DOCX_SANS)
+        marker = _refs_marker([r.as_dict() for r in row.record_refs], citation_index)
+        if marker:
+            _set_run(p.add_run(" " + marker), size=8, color=DOCX_BRASS, font=DOCX_SANS, superscript=True)
+        values = [cells_in.get("x_formatted", "")] if with_x else []
+        values.append(str(cells_in.get("formatted", "")))
+        if with_share:
+            values.append(f"{cells_in['share']:.1f}%" if isinstance(cells_in.get("share"), (int, float)) else "")
+        for cell, text in zip(cells[1:-1], values):
+            _set_run(cell.paragraphs[0].add_run(text), size=9.5, color=DOCX_INK, font=DOCX_SANS, bold=True)
+        _set_run(cells[-1].paragraphs[0].add_run(f"{row.record_count}"), size=9.5, color=DOCX_TAUPE, font=DOCX_SANS)
+    _set_widths(table, widths)
+
+
 def _render_chart(docx: Any, visual: dict, citation_index: dict[tuple[str, str], int]) -> None:
-    """A resolved chart (app/ai/chart_check.py): the image from the export
-    bridge when the render service answers, otherwise the bar table with a
-    line saying the image was not available (ADR-0005, line 2). Either way
-    the data table follows, so every value keeps its record citations and
-    the chart has the data table design rule 13 asks for."""
+    """A resolved chart (app/ai/chart_check.py), drawn again from its own
+    rows and checked once more (app/services/decks.py checked_chart): the
+    image from the export bridge for every kind when the render service
+    answers, otherwise a line saying the image was not available and the
+    values as a table (ADR-0005, line 2). The data table follows the image,
+    so every value keeps its record citations and the chart has the data
+    table design rule 13 asks for. A chart that now fails a hard rule is not
+    drawn; the brief says which rules failed and still lists its rows."""
     from io import BytesIO
 
     from docx.shared import Inches
 
-    from app.services.decks import chart_bar_items, chart_row_labels, chart_rows
+    from app.services.decks import chart_bar_items, chart_row_labels, chart_rows, checked_chart
     from app.services.presentation_style import resolved_theme
-    from app.visuals.echarts import UnsupportedChartKind, build_chart, format_value, source_line
     from app.visuals.render_client import RenderUnavailable, render_png
 
-    spec, data, rows = chart_rows(visual)
-    theme = resolved_theme(None)
+    checked = checked_chart(visual, resolved_theme(None))
+    spec, data = checked.spec, checked.data
     p = _para(docx, space_before=6, space_after=2, keep_next=True)
     _set_run(p.add_run(spec.title), size=10.5, color=DOCX_INK, font=DOCX_SANS, bold=True)
     if spec.subtitle:
         _set_run(p.add_run(f"  {spec.subtitle}"), size=9, color=DOCX_TAUPE, font=DOCX_SANS)
 
+    built = checked.built
+    if checked.problem or built is None:
+        warn = _para(docx, space_after=4)
+        _set_run(warn.add_run(checked.problem or "Chart not available."), size=9, color=DOCX_OXBLOOD, font=DOCX_SANS, italic=True)
+        _spec, _data, rows = chart_rows(visual)
+        _render_bar_table(docx, chart_bar_items(rows, chart_row_labels(data, rows)), data.unit, citation_index)
+        return
+
     image: bytes | None = None
     note: str | None = None
     try:
-        built = build_chart(spec, data, theme)
         image = render_png(built.option, built.width, built.height)
-    except UnsupportedChartKind as exc:
-        note = f"Chart not drawn: {exc}."
     except RenderUnavailable as exc:
         note = f"Chart image not available ({exc}); the values are shown as a table instead."
     if image is not None:
         docx.add_picture(BytesIO(image), width=Inches(6.5))
         caption = _para(docx, space_after=4)
-        alt = (visual.get("text") or {}).get("alt_text") or ""
-        if alt:
-            _set_run(caption.add_run(alt), size=8.5, color=DOCX_TAUPE, font=DOCX_SANS, italic=True)
+        _set_run(caption.add_run(built.alt_text), size=8.5, color=DOCX_TAUPE, font=DOCX_SANS, italic=True)
+        _render_data_table(docx, built, data, citation_index)
     else:
         warn = _para(docx, space_after=4)
         _set_run(warn.add_run(note or "Chart image not available."), size=9, color=DOCX_OXBLOOD, font=DOCX_SANS, italic=True)
-
-    # The data behind the chart, every row with its records (rules 13, 15,
-    # 16 and 20), decorated with the record count and the single-record mark.
-    decorate = chart_row_labels(data, rows)
-    if image is not None:
-        table = docx.add_table(rows=0, cols=3)
-        _row_rules(table)
-        for row in rows:
-            cells = table.add_row().cells
-            p = cells[0].paragraphs[0]
-            _set_run(p.add_run(decorate.get(row.label, row.label)), size=9.5, color=DOCX_INK, font=DOCX_SANS)
-            marker = _refs_marker([r.as_dict() for r in row.record_refs], citation_index)
-            if marker:
-                _set_run(p.add_run(" " + marker), size=8, color=DOCX_BRASS, font=DOCX_SANS, superscript=True)
-            _set_run(cells[1].paragraphs[0].add_run(format_value(row.value, data)), size=9.5, color=DOCX_INK, font=DOCX_SANS, bold=True)
-            _set_run(cells[2].paragraphs[0].add_run(f"{row.record_count}"), size=9.5, color=DOCX_TAUPE, font=DOCX_SANS)
-        _set_widths(table, [4.3, 1.2, 1.0])
-    else:
-        _render_bar_table(docx, chart_bar_items(rows, decorate), data.unit, citation_index)
+        if built.kind.value in _BAR_TABLE_KINDS:
+            # A histogram's bars count records, so its table writes counts, not amounts.
+            unit = data.record_noun if built.kind.value == "histogram" else data.unit
+            _render_bar_table(docx, chart_bar_items(built.rows, chart_row_labels(data, built.rows)), unit, citation_index)
+        else:
+            _render_data_table(docx, built, data, citation_index)
     source = _para(docx, space_before=2, space_after=4)
-    _set_run(source.add_run(source_line(data, rows)), size=8.5, color=DOCX_TAUPE, font=DOCX_SANS)
+    _set_run(source.add_run(built.source_line), size=8.5, color=DOCX_TAUPE, font=DOCX_SANS)
 
 
 def _render_visual(docx: Any, visual: dict, citation_index: dict[tuple[str, str], int]) -> None:

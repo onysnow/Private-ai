@@ -2,7 +2,7 @@
 (ADR-0006, Wave B, item 1): what is sent, under which ids, what is not sent
 again, what is removed and when, and how a failure is recorded and retried.
 
-OpenAleph is faked at its HTTP surface (tests/openaleph_fake.py), behind the
+OpenAleph is faked at its HTTP surface (tests/openaleph_corpus_fake.py), behind the
 real openaleph-client and httpx code paths.
 """
 
@@ -26,7 +26,7 @@ from app.services.entities import create_entity, update_entity
 from app.services.entity_merge import execute_entity_merge, preview_entity_merge
 from app.services.relationships import create_relationship
 from app.services.resolution import record_canonical_resolution
-from tests.openaleph_fake import BASE_URL, FakeOpenAleph
+from tests.openaleph_corpus_fake import BASE_URL, FakeOpenAleph
 
 
 @pytest.fixture()

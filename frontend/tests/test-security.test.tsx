@@ -65,11 +65,20 @@ describe('SecurityPanel', () => {
     });
     expect(screen.getByText('Environment: production')).toBeInTheDocument();
     expect(screen.getByText('Database: postgresql://***@db/journalism')).toBeInTheDocument();
-    expect(screen.getByText('Entity extraction owner: Workbench local fallback')).toBeInTheDocument();
+    expect(screen.getByText("Entity extraction owner: Workbench's own name-finder (switched off)")).toBeInTheDocument();
     expect(screen.getByText('Allowed browser origins: https://workbench.example')).toBeInTheDocument();
     expect(screen.getByText('Connector credentials: Aleph: configured (local_store) · Opensanctions: not configured (none)')).toBeInTheDocument();
     expect(screen.getByText('API access: local only · token configured: no')).toBeInTheDocument();
     expect(screen.getByTestId('security-alerts')).toHaveTextContent('⚠ Access denials in the last 24h: 25 · 2 lockout(s) · busiest remote host 203.0.113.9 (20) — worth a look at the audit log');
+  });
+
+  it('says OpenAleph finds names, with the Workbench finder only as the fallback, when OpenAleph reads uploads', async () => {
+    const extraction = {...status.document_extraction, entity_extraction_owner: 'openaleph_ftm_analyze' as const, local_entity_suggestions_enabled: true};
+    await renderOpen({}, {...status, document_extraction: extraction});
+    expect(screen.getByText("Entity extraction owner: OpenAleph / ftm-analyze (the Workbench's own name-finder only for documents OpenAleph did not analyse)")).toBeInTheDocument();
+    cleanup();
+    await renderOpen({}, {...status, document_extraction: {...extraction, local_entity_suggestions_enabled: false}});
+    expect(screen.getByText("Entity extraction owner: OpenAleph / ftm-analyze (the Workbench's own name-finder only for documents OpenAleph did not analyse; switched off)")).toBeInTheDocument();
   });
 
   it('saves a credential for the chosen connector, clears the field, and marks the settings status stale', async () => {

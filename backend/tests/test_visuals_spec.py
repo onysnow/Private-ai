@@ -4,7 +4,7 @@ it is refused with a plain message."""
 import pytest
 
 from app.visuals.spec import (
-    DRAWN_KINDS, QUERY_CATALOG, ChartKind, QueryRef, SortOrder, VisualSpec, parse_spec, spec_errors,
+    DRAWN_KINDS, QUERY_CATALOG, QUESTIONS, SERIES_KINDS, ChartKind, QueryRef, SortOrder, VisualSpec, parse_spec, spec_errors,
 )
 
 
@@ -32,12 +32,28 @@ def test_time_queries_default_to_time_order_and_currency_is_upper_cased():
     assert spec.query.resolved_params() == {"granularity": "month", "currency": "USD"}
 
 
-def test_every_chart_kind_is_accepted_but_only_bars_are_drawn():
+def test_every_chart_kind_is_accepted_and_the_statistical_kinds_are_drawn():
     for kind in ChartKind:
         query = {"name": "events_over_time"} if kind in (ChartKind.line, ChartKind.area) else {"name": "links_by_type"}
         spec = parse_spec({"kind": kind.value, "title": "Something happened over time", "query": query})
         assert spec.drawable == (kind in DRAWN_KINDS)
-    assert {k.value for k in DRAWN_KINDS} == {"bar", "column"}
+    # Pass 3 draws the statistical kinds; timeline and sankey wait for the money-flow pass.
+    assert {k.value for k in DRAWN_KINDS} == {"bar", "column", "line", "area", "stacked_bar_100", "donut", "treemap", "histogram", "scatter"}
+
+
+def test_each_question_names_the_kinds_and_query_shapes_that_answer_it():
+    # The FT Visual Vocabulary categories the chooser offers (design doc, "Picking the right chart").
+    assert list(QUESTIONS) == ["ranking", "change_over_time", "part_of_whole", "distribution", "correlation", "flow"]
+    assert QUESTIONS["distribution"].kinds == (ChartKind.histogram,)
+    assert QUESTIONS["correlation"].series_kinds == ("pairs",)
+    assert QUESTIONS["flow"].series_kinds == ()   # no query holds flows until the money-flow pass
+    for question in QUESTIONS.values():
+        assert all(shape in SERIES_KINDS for shape in question.series_kinds)
+    assert QUERY_CATALOG["payment_amounts"].questions == ("ranking", "distribution")
+    assert QUERY_CATALOG["payments_count_and_total_by_party"].questions == ("correlation",)
+    assert QUERY_CATALOG["events_over_time"].questions == ("change_over_time",)
+    assert QUERY_CATALOG["payment_amounts"].kinds[0] == ChartKind.histogram
+    assert QUERY_CATALOG["payments_count_and_total_by_party"].kinds == (ChartKind.scatter,)
 
 
 @pytest.mark.parametrize("raw, fragment", [
@@ -79,7 +95,7 @@ def test_query_params_must_be_text_values():
 def test_catalogue_entries_declare_what_the_data_service_needs():
     for name, entry in QUERY_CATALOG.items():
         assert entry.name == name
-        assert entry.series_kind in {"category", "time"}
+        assert entry.series_kind in SERIES_KINDS
         assert entry.unit_kind in {"amount", "count"}
         assert entry.record_noun and entry.description
     assert QueryRef(name="payments_by_party").resolved_params() == {"direction": "received"}

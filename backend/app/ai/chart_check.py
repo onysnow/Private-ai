@@ -30,7 +30,7 @@ from sqlalchemy.orm import Session
 from app.services.presentation_style import theme as theme_for
 from app.visuals.checker import check_visual
 from app.visuals.data_service import QueryError, describe_catalog, run_query
-from app.visuals.echarts import UnsupportedChartKind, build_chart
+from app.visuals.echarts import ChartDoesNotFit, UnsupportedChartKind, build_chart
 from app.visuals.spec import DRAWN_KINDS, VisualSpec, spec_errors
 
 CHART_VISUAL_TYPE = "chart"
@@ -70,7 +70,10 @@ def resolve_chart(db: Session, investigation_id: str, visual: dict) -> tuple[dic
     theme = theme_for(spec.theme)
     try:
         built = build_chart(spec, data, theme)
-    except UnsupportedChartKind as exc:
+    except (UnsupportedChartKind, ChartDoesNotFit) as exc:
+        # A kind that cannot draw this query (a histogram of periods) is the
+        # order's fault, like a failing rule: removed, and the model is told
+        # why so it can pick a kind that fits.
         return None, {"reason": str(exc), "errors": [{"rule": None, "message": str(exc)}]}
     report = check_visual(spec, data, theme, built)
     if not report.ok:

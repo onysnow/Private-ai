@@ -639,6 +639,12 @@ def update_reporting_task(db: Session, row: ReportingTask, body: ReportingTaskUp
     concern, not a validation one)."""
     data = body.model_dump(exclude_unset=True)
     workflow_note = data.pop("workflow_note", None)
+    # A task cannot be without a title, status or priority (NOT NULL), so a null
+    # for one of them leaves it as it is, as update_lead does for a lead's; it
+    # used to fail with a server error. The other fields are cleared by a null.
+    for field in ("title", "status", "priority"):
+        if field in data and data[field] is None:
+            del data[field]
     if data.get("status") is not None and data["status"] not in TASK_STATUSES:
         raise ValueError("Invalid task status")
     if data.get("priority") is not None and data["priority"] not in PRIORITIES:
@@ -692,7 +698,10 @@ def update_lead(db: Session, row: Lead, data: dict) -> Lead:
         if field in data and data[field] is not None:
             setattr(row, field, data[field])
     for field in ("priority", "owner", "next_action"):
-        if field in data:
+        # A lead always has a priority (NOT NULL): a null leaves it as it is,
+        # like a null status (it used to fail with a server error). A null
+        # owner or next action clears it.
+        if field in data and (data[field] is not None or field != "priority"):
             setattr(profile, field, data[field])
     if row.status != old_status:
         db.add(LeadWorkflowEvent(lead_id=row.id, from_status=old_status, to_status=row.status, note=data.get("note")))

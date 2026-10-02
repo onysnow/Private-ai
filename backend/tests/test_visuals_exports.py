@@ -3,6 +3,7 @@ deck; in a Word write-up the image from the export bridge, or the table
 and a line saying the image was not available (ADR-0005, line 2). Every
 value keeps its record citations either way."""
 
+import copy
 from io import BytesIO
 
 import pytest
@@ -163,6 +164,181 @@ def test_writeup_export_embeds_the_png_when_the_bridge_answers(demo, monkeypatch
     exported = client.get(f"/api/writeups/{row.id}/export.docx")
     assert exported.status_code == 200
     assert len(DocxDocument(BytesIO(exported.content)).inline_shapes) == 1
+
+
+# --- every statistical kind (pass 3) --------------------------------------------------
+
+EVERY_KIND = [
+    ("line", {"title": "Payments fell after the November transfer", "query": {"name": "payments_over_time"}}),
+    ("area", {"title": "Payments fell after the November transfer", "query": {"name": "payments_over_time"}}),
+    ("stacked_bar_100", {"title": "Meridian received most of the money", "query": {"name": "payments_by_party"}}),
+    ("donut", {"title": "Meridian received most of the money", "query": {"name": "payments_by_party"}, "limit": 3}),
+    # A treemap needs parts big enough to carry their names (rule 12): the
+    # payments are too lopsided for one, the kinds of link are not.
+    ("treemap", {"title": "Payments are most of the links", "query": {"name": "links_by_type"}}),
+    ("histogram", {"title": "Most payments were small", "query": {"name": "payment_amounts"}}),
+    ("scatter", {"title": "Meridian took one large payment", "query": {"name": "payments_count_and_total_by_party"}}),
+]
+
+
+@pytest.fixture()
+def every_kind(demo):
+    """One resolved chart of every statistical kind, cooked from the demo
+    investigation with more payments (amounts to bin, parties to plot)."""
+    from app.models.domain import Entity
+    from app.services.relationships import create_relationship
+
+    db, inv_id, _chart = demo
+    ids = {e.caption: e.id for e in db.query(Entity).filter_by(investigation_id=inv_id).all()}
+    for payer, payee, amount, date in (
+        ("Meridian Holdings Ltd", "Harborline Civic Trust", "5000", "2023-12-02"), ("Meridian Holdings Ltd", "Harborline Civic Trust", "7000", "2024-01-15"),
+        ("Meridian Holdings Ltd", "Alaric Voss", "45000", "2024-01-20"), ("Bellcastle Trading Group", "Alaric Voss", "250000", "2024-02-03"),
+        ("Meridian Holdings Ltd", "Priya Kavanagh", "12000", "2024-02-11"),
+    ):
+        create_relationship(db, investigation_id=inv_id, schema="Payment", source_entity_id=ids[payer], target_entity_id=ids[payee],
+                            properties={"amount": [amount], "currency": ["USD"], "date": [date]})
+    charts = {}
+    for kind, order in EVERY_KIND:
+        chart, record = resolve_chart(db, inv_id, {"type": "chart", "spec": {"kind": kind, **order}})
+        assert chart is not None, (kind, record)
+        charts[kind] = chart
+    return db, inv_id, charts
+
+
+def _deck(db, inv_id, charts) -> Deck:
+    row = Deck(investigation_id=inv_id, title="Every kind", slides_json=[
+        {"kind": "content", "heading": f"A {kind} chart", "bullets": [], "evidence": [], "notes": "Section prose.", "visual": chart}
+        for kind, chart in charts.items()
+    ])
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return row
+
+
+def _alt_text(shape) -> str:
+    return shape._element.xpath("./p:nvGraphicFramePr/p:cNvPr | ./p:nvPicPr/p:cNvPr")[0].get("descr")
+
+
+def test_deck_draws_every_kind_natively_and_the_treemap_as_the_rendered_picture(every_kind, monkeypatch):
+    from pptx.enum.chart import XL_CHART_TYPE
+    from pptx.enum.shapes import MSO_SHAPE_TYPE
+
+    db, inv_id, charts = every_kind
+    calls = []
+
+    def fake_render(option, width, height, **kwargs):
+        calls.append(option["series"][0]["type"])
+        return TINY_PNG
+
+    monkeypatch.setattr("app.visuals.render_client.render_png", fake_render)
+    row = _deck(db, inv_id, charts)
+    prs = render_deck_pptx(row, describe_record_refs(db, investigation_id=inv_id, refs=deck_citation_refs(row.slides_json)))
+    slides = list(prs.slides)
+    by_kind = dict(zip(charts, slides[1:1 + len(charts)]))
+    expected_types = {"line": XL_CHART_TYPE.LINE_MARKERS, "area": XL_CHART_TYPE.AREA, "stacked_bar_100": XL_CHART_TYPE.BAR_STACKED_100,
+                      "donut": XL_CHART_TYPE.DOUGHNUT, "histogram": XL_CHART_TYPE.COLUMN_CLUSTERED, "scatter": XL_CHART_TYPE.XY_SCATTER}
+    for kind, chart_type in expected_types.items():
+        frames = [shape for shape in by_kind[kind].shapes if shape.has_chart]
+        assert len(frames) == 1, kind
+        assert frames[0].chart.chart_type == chart_type, kind
+        assert _alt_text(frames[0]) == charts[kind]["text"]["alt_text"], kind
+    # The treemap is the picture the render service drew from the same option.
+    assert calls == ["treemap"]
+    pictures = [shape for shape in by_kind["treemap"].shapes if shape.shape_type == MSO_SHAPE_TYPE.PICTURE]
+    assert len(pictures) == 1 and _alt_text(pictures[0]) == charts["treemap"]["text"]["alt_text"]
+
+    # The values drawn are the rows the data service cooked.
+    line = next(s for s in by_kind["line"].shapes if s.has_chart).chart
+    assert list(line.plots[0].series[0].values) == [r["value"] for r in charts["line"]["data"]["rows"]]
+    whole = next(s for s in by_kind["stacked_bar_100"].shapes if s.has_chart).chart
+    assert [s.name for s in whole.plots[0].series][0] == "Meridian Holdings Ltd"
+    assert whole.plots[0].series[0].points[0].data_label.text_frame.text.startswith("Meridian Holdings Ltd")
+    histogram = next(s for s in by_kind["histogram"].shapes if s.has_chart).chart
+    assert histogram.plots[0].gap_width == 0   # touching bins
+    assert sum(histogram.plots[0].series[0].values) == len(charts["histogram"]["data"]["rows"])
+    scatter = next(s for s in by_kind["scatter"].shapes if s.has_chart).chart
+    series = scatter.plots[0].series[0]
+    xs = [float(v.text) for v in series._element.xpath("./c:xVal//c:pt/c:v")]
+    rows = {r["label"]: r for r in charts["scatter"]["data"]["rows"]}
+    assert sorted(zip(xs, series.values)) == sorted((r["x"], r["value"]) for r in rows.values())
+    assert scatter.category_axis.axis_title.text_frame.text == "Number of payments received"
+
+    # Under every chart its source line; in the notes its description; in the footer its records.
+    for kind, slide in by_kind.items():
+        text = "\n".join(shape.text_frame.text for shape in slide.shapes if shape.has_text_frame)
+        assert "Source: " in text and "Sources  [" in text, kind
+        assert slide.notes_slide.notes_text_frame.text.startswith("Section prose.\n\nChart: "), kind
+
+
+def test_a_treemap_falls_back_to_native_bars_when_the_render_service_is_down(every_kind, monkeypatch):
+    db, inv_id, charts = every_kind
+
+    def unreachable(*args, **kwargs):
+        raise RenderUnavailable("render service at http://render:8070 could not be reached: ConnectError")
+
+    monkeypatch.setattr("app.visuals.render_client.render_png", unreachable)
+    row = _deck(db, inv_id, {"treemap": charts["treemap"]})
+    slide = list(render_deck_pptx(row, []).slides)[1]
+    frames = [shape for shape in slide.shapes if shape.has_chart]
+    largest = max(charts["treemap"]["data"]["rows"], key=lambda r: r["value"])["label"]
+    # Largest first, read top-down (PowerPoint lists a bar chart's categories bottom-up).
+    assert len(frames) == 1 and list(frames[0].chart.plots[0].categories)[-1].startswith(largest)
+    text = "\n".join(shape.text_frame.text for shape in slide.shapes if shape.has_text_frame)
+    assert "Treemap image not available" in text and "the same parts are shown as bars" in text
+
+
+def test_a_stored_chart_that_now_fails_a_rule_is_not_drawn(every_kind):
+    db, inv_id, charts = every_kind
+    broken = copy.deepcopy(charts["donut"])
+    broken["spec"]["limit"] = None
+    # A fifth part (stored before a rule tightened, say): rule 5 refuses a donut past four slices.
+    broken["data"]["rows"].append({"label": "Orrin Ltd", "value": 1000.0, "record_count": 1, "key": "Orrin Ltd",
+                                   "record_refs": [{"record_type": "relationship", "record_id": "rel-orrin"}]})
+    row = _deck(db, inv_id, {"donut": broken})
+    slide = list(render_deck_pptx(row, []).slides)[1]
+    assert not any(shape.has_chart for shape in slide.shapes)
+    text = "\n".join(shape.text_frame.text for shape in slide.shapes if shape.has_text_frame)
+    assert "Chart not drawn: it fails the design checks (rule 5:" in text
+
+
+def test_writeup_has_the_png_and_a_data_table_for_every_kind(every_kind, monkeypatch):
+    db, inv_id, charts = every_kind
+    monkeypatch.setattr("app.visuals.render_client.render_png", lambda option, width, height, **kwargs: TINY_PNG)
+    content = {"type": "doc", "content": [{"type": "evidenceVisual", "attrs": {"visual": chart}} for chart in charts.values()]}
+    row = create_writeup(db, investigation_id=inv_id, title="Every kind", content_json=content)
+    docx = render_writeup_docx(row, describe_record_refs(db, investigation_id=inv_id, refs=row.cited_record_refs))
+    assert len(docx.inline_shapes) == len(charts)
+    tables = {len(t.columns): t for t in docx.tables}
+    assert set(tables) == {3, 4}   # three columns for one number, four for a share or a second number
+    wide_rows = [[c.text for c in r.cells] for t in docx.tables if len(t.columns) == 4 for r in t.rows]
+    assert any(cells[0].startswith("Alaric Voss") and cells[1] == "2" for cells in wide_rows)   # the scatter plot's x: two payments
+    assert any(cells[2].endswith("%") for cells in wide_rows)   # a part's share of the whole
+    assert all(cells[0] and cells[-1].isdigit() for cells in wide_rows)   # every row names its records' count
+    paragraphs = [p.text for p in docx.paragraphs]
+    for chart in charts.values():
+        assert chart["text"]["alt_text"] in paragraphs
+
+
+def test_writeup_tables_stand_in_for_every_kind_when_the_render_service_is_down(every_kind, monkeypatch):
+    db, inv_id, charts = every_kind
+
+    def unreachable(*args, **kwargs):
+        raise RenderUnavailable("render service could not be reached")
+
+    monkeypatch.setattr("app.visuals.render_client.render_png", unreachable)
+    content = {"type": "doc", "content": [{"type": "evidenceVisual", "attrs": {"visual": chart}} for chart in charts.values()]}
+    row = create_writeup(db, investigation_id=inv_id, title="Every kind", content_json=content)
+    docx = render_writeup_docx(row, [])
+    assert not docx.inline_shapes
+    paragraphs = [p.text for p in docx.paragraphs]
+    assert sum("Chart image not available" in p for p in paragraphs) == len(charts)
+    cells = [c.text for t in docx.tables for r in t.rows for c in r.cells]
+    # A histogram's bars count payments: its table writes the count, never money.
+    first_bin = charts["histogram"]["text"]["data_table"]["rows"][0]
+    assert f"{first_bin['formatted']} payments" in cells and f"${first_bin['formatted']}" not in cells
+    # The parts of a whole and the scatter plot keep every number in their data tables.
+    assert any(text.endswith("%") for text in cells)
 
 
 def test_the_old_three_visuals_still_export_as_before(demo):
