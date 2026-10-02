@@ -90,6 +90,9 @@ import type {
   DecideEntityPostMergeReconciliationData,
   DecideEntityPostMergeReconciliationErrors,
   DecideEntityPostMergeReconciliationResponses,
+  DecideInvestigationCrossReferenceData,
+  DecideInvestigationCrossReferenceErrors,
+  DecideInvestigationCrossReferenceResponses,
   DecidePropertyConflictData,
   DecidePropertyConflictErrors,
   DecidePropertyConflictResponses,
@@ -135,6 +138,9 @@ import type {
   EntityPostMergeReconciliationData,
   EntityPostMergeReconciliationErrors,
   EntityPostMergeReconciliationResponses,
+  ExpandEntityInCorpusData,
+  ExpandEntityInCorpusErrors,
+  ExpandEntityInCorpusResponses,
   ExportDeckPptxData,
   ExportDeckPptxErrors,
   ExportDeckPptxResponses,
@@ -345,6 +351,9 @@ import type {
   ListInvestigationAiAnalysisCandidatesData,
   ListInvestigationAiAnalysisCandidatesErrors,
   ListInvestigationAiAnalysisCandidatesResponses,
+  ListInvestigationCrossReferencesData,
+  ListInvestigationCrossReferencesErrors,
+  ListInvestigationCrossReferencesResponses,
   ListInvestigationEvidenceData,
   ListInvestigationEvidenceErrors,
   ListInvestigationEvidenceResponses,
@@ -556,6 +565,9 @@ import {
   zDecideEntityPostMergeReconciliationBody,
   zDecideEntityPostMergeReconciliationPath,
   zDecideEntityPostMergeReconciliationResponse,
+  zDecideInvestigationCrossReferenceBody,
+  zDecideInvestigationCrossReferencePath,
+  zDecideInvestigationCrossReferenceResponse,
   zDecidePropertyConflictBody,
   zDecidePropertyConflictPath,
   zDecidePropertyConflictResponse,
@@ -590,6 +602,8 @@ import {
   zEntityMergePreviewResponse,
   zEntityPostMergeReconciliationPath,
   zEntityPostMergeReconciliationResponse,
+  zExpandEntityInCorpusPath,
+  zExpandEntityInCorpusResponse,
   zExportDeckPptxPath,
   zExportDeckPptxResponse,
   zExportInvestigationPath,
@@ -745,6 +759,9 @@ import {
   zListInvestigationAiAnalysisCandidatesPath,
   zListInvestigationAiAnalysisCandidatesQuery,
   zListInvestigationAiAnalysisCandidatesResponse,
+  zListInvestigationCrossReferencesPath,
+  zListInvestigationCrossReferencesQuery,
+  zListInvestigationCrossReferencesResponse,
   zListInvestigationEvidencePath,
   zListInvestigationEvidenceQuery,
   zListInvestigationEvidenceResponse,
@@ -1715,6 +1732,41 @@ export const connectorSearch = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Decide Investigation Cross Reference
+ */
+export const decideInvestigationCrossReference = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<DecideInvestigationCrossReferenceData, ThrowOnError>,
+): RequestResult<
+  DecideInvestigationCrossReferenceResponses,
+  DecideInvestigationCrossReferenceErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    DecideInvestigationCrossReferenceResponses,
+    DecideInvestigationCrossReferenceErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zDecideInvestigationCrossReferenceBody,
+          path: zDecideInvestigationCrossReferencePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDecideInvestigationCrossReferenceResponse.parseAsync(data),
+    url: '/api/cross-references/{cross_reference_id}/decision',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Delete Deck Endpoint
  */
 export const deleteDeckEndpoint = <ThrowOnError extends boolean = false>(
@@ -2493,6 +2545,35 @@ export const canonicalEntityResolution = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Expand Entity In Corpus
+ */
+export const expandEntityInCorpus = <ThrowOnError extends boolean = false>(
+  options: Options<ExpandEntityInCorpusData, ThrowOnError>,
+): RequestResult<
+  ExpandEntityInCorpusResponses,
+  ExpandEntityInCorpusErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ExpandEntityInCorpusResponses,
+    ExpandEntityInCorpusErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zExpandEntityInCorpusPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zExpandEntityInCorpusResponse.parseAsync(data),
+    url: '/api/entities/{entity_id}/corpus/expand',
+    ...options,
   });
 
 /**
@@ -3902,6 +3983,37 @@ export const syncCorpusNow = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zSyncCorpusNowResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/corpus/sync',
+    ...options,
+  });
+
+/**
+ * List Investigation Cross References
+ */
+export const listInvestigationCrossReferences = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ListInvestigationCrossReferencesData, ThrowOnError>,
+): RequestResult<
+  ListInvestigationCrossReferencesResponses,
+  ListInvestigationCrossReferencesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ListInvestigationCrossReferencesResponses,
+    ListInvestigationCrossReferencesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListInvestigationCrossReferencesPath,
+          query: zListInvestigationCrossReferencesQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListInvestigationCrossReferencesResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/cross-references',
     ...options,
   });
 

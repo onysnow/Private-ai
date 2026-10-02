@@ -28,7 +28,10 @@ def openaleph(monkeypatch):
     monkeypatch.setattr(settings, "openaleph_enabled", True)
     monkeypatch.setattr(settings, "openaleph_base_url", BASE_URL)
     monkeypatch.setattr(settings, "openaleph_api_key", "test-key")
-    fake = FakeOpenAleph()
+    # "Sync now" runs in the request here, cross-referencing included: no waits.
+    monkeypatch.setattr(settings, "openaleph_corpus_push_delay_seconds", 0.0)
+    monkeypatch.setattr(settings, "openaleph_corpus_poll_seconds", 0.0)
+    fake = FakeOpenAleph(auto_index=True)
     monkeypatch.setattr(corpus_jobs, "gateway_factory", fake.gateway)
     return fake
 
@@ -46,9 +49,11 @@ def test_the_sync_line_before_and_after_sync_now_in_developer_mode(openaleph):
     line = client.get(f"/api/investigations/{inv}/corpus/sync").json()
     assert line == {
         "investigation_id": inv, "enabled": True, "background": False, "collection_id": None, "collection_label": None,
-        "pushed_records": 0, "pending": {"to_send": 1, "to_remove": 0, "cannot_send": []},
+        "pushed_records": 0, "pending": {"to_send": 1, "to_remove": 0, "judgements": 0, "cannot_send": []},
         "push": {"status": "never", "started_at": None, "finished_at": None, "message": None, "error": None,
-                 "sent": 0, "removed": 0, "unchanged": 0, "removals_waiting": 0},
+                 "sent": 0, "removed": 0, "unchanged": 0, "removals_waiting": 0, "judgements_sent": 0, "judgements_failed": 0},
+        "cross_reference": {"status": "never", "requested_at": None, "finished_at": None, "error": None,
+                            "results": 0, "new": 0, "updated": 0, "duplicates": 0, "open": 0},
         "consecutive_failures": 0, "failures": [],
     }
     reply = client.post(f"/api/investigations/{inv}/corpus/sync")
@@ -58,6 +63,9 @@ def test_the_sync_line_before_and_after_sync_now_in_developer_mode(openaleph):
     assert body["sync"]["pushed_records"] == 1 and body["sync"]["pending"]["to_send"] == 0
     assert body["sync"]["push"]["status"] == "succeeded" and body["sync"]["push"]["message"] == "Sent 1 record(s)"
     assert body["sync"]["collection_id"] == "1" and body["sync"]["collection_label"] == "Harbour contracts"
+    # Cross-referencing ran too (OpenAleph found nothing to match).
+    assert openaleph.xref_requests == ["1"]
+    assert body["sync"]["cross_reference"]["status"] == "succeeded" and body["sync"]["cross_reference"]["finished_at"]
 
 
 def test_a_failed_sync_now_is_shown_on_the_line(openaleph):

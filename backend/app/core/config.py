@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     # one cross-referencing run before giving up.
     openaleph_corpus_poll_seconds: float = 5.0
     openaleph_xref_timeout_seconds: float = 1800.0
+    # Without a background worker (developer mode), "Sync now" runs the push
+    # and cross-referencing inside the request, waiting at most this long; a
+    # cross-referencing run still going then is picked up by the next "Sync now".
+    openaleph_sync_now_wait_seconds: float = 120.0
     # A failed corpus job is tried again after 30 seconds, then after twice
     # as long each time up to this ceiling, at most this many times in a row;
     # after that the next change, or "Sync now", tries again.

@@ -1834,6 +1834,13 @@
             "title": "Entity Id",
             "type": "string"
           },
+          "found_by": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Found By",
+            "type": "array"
+          },
           "latest_decision": {
             "anyOf": [
               {
@@ -8381,6 +8388,216 @@
         "title": "CoreCapabilitiesOut",
         "type": "object"
       },
+      "CorpusCrossReferenceRunOut": {
+        "description": "The last cross-referencing run of the collection and what it brought.",
+        "properties": {
+          "duplicates": {
+            "title": "Duplicates",
+            "type": "integer"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "new": {
+            "title": "New",
+            "type": "integer"
+          },
+          "open": {
+            "title": "Open",
+            "type": "integer"
+          },
+          "requested_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requested At"
+          },
+          "results": {
+            "title": "Results",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "never",
+              "waiting",
+              "running",
+              "succeeded",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "updated": {
+            "title": "Updated",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "status",
+          "requested_at",
+          "finished_at",
+          "error",
+          "results",
+          "new",
+          "updated",
+          "duplicates",
+          "open"
+        ],
+        "title": "CorpusCrossReferenceRunOut",
+        "type": "object"
+      },
+      "CorpusExpandFindingOut": {
+        "description": "One thing OpenAleph holds around the entity, proposed as an OpenAleph\nconnector finding: a relationship (for the external-relationship review)\nor the entity at its far end.",
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "collection_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collection Label"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "relationship",
+              "entity"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "provider_record_id": {
+            "title": "Provider Record Id",
+            "type": "string"
+          },
+          "review_status": {
+            "title": "Review Status",
+            "type": "string"
+          },
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schema"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "caption",
+          "schema",
+          "provider_record_id",
+          "source_url",
+          "review_status",
+          "collection_label"
+        ],
+        "title": "CorpusExpandFindingOut",
+        "type": "object"
+      },
+      "CorpusExpandOut": {
+        "description": "\"Expand in the corpus\" (ADR-0006, Wave B): what OpenAleph holds\naround a confirmed entity, now waiting for review.",
+        "properties": {
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/CorpusExpandFindingOut"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "identities": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Identities",
+            "type": "array"
+          },
+          "neighbours": {
+            "title": "Neighbours",
+            "type": "integer"
+          },
+          "relationships": {
+            "title": "Relationships",
+            "type": "integer"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "skipped_own": {
+            "title": "Skipped Own",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "entity_id",
+          "run_id",
+          "identities",
+          "relationships",
+          "neighbours",
+          "skipped_own",
+          "findings"
+        ],
+        "title": "CorpusExpandOut",
+        "type": "object"
+      },
       "CorpusHitOut": {
         "description": "A document (or a page of one) OpenAleph found, linked to its Workbench\ndocument when the Workbench holds it (app/services/openaleph_search.py).",
         "properties": {
@@ -8465,7 +8682,7 @@
         "type": "object"
       },
       "CorpusPendingOut": {
-        "description": "What the next push would change, and the records it cannot send (with why).",
+        "description": "What the next push would change -- records to send or remove, match\njudgements to send -- and the records it cannot send (with why).",
         "properties": {
           "cannot_send": {
             "items": {
@@ -8473,6 +8690,10 @@
             },
             "title": "Cannot Send",
             "type": "array"
+          },
+          "judgements": {
+            "title": "Judgements",
+            "type": "integer"
           },
           "to_remove": {
             "title": "To Remove",
@@ -8486,6 +8707,7 @@
         "required": [
           "to_send",
           "to_remove",
+          "judgements",
           "cannot_send"
         ],
         "title": "CorpusPendingOut",
@@ -8508,7 +8730,8 @@
           "finished_at": {
             "anyOf": [
               {
-                "format": "date-time",
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
                 "type": "string"
               },
               {
@@ -8516,6 +8739,14 @@
               }
             ],
             "title": "Finished At"
+          },
+          "judgements_failed": {
+            "title": "Judgements Failed",
+            "type": "integer"
+          },
+          "judgements_sent": {
+            "title": "Judgements Sent",
+            "type": "integer"
           },
           "message": {
             "anyOf": [
@@ -8543,7 +8774,8 @@
           "started_at": {
             "anyOf": [
               {
-                "format": "date-time",
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
                 "type": "string"
               },
               {
@@ -8577,7 +8809,9 @@
           "sent",
           "removed",
           "unchanged",
-          "removals_waiting"
+          "removals_waiting",
+          "judgements_sent",
+          "judgements_failed"
         ],
         "title": "CorpusPushOut",
         "type": "object"
@@ -8800,6 +9034,9 @@
             "title": "Consecutive Failures",
             "type": "integer"
           },
+          "cross_reference": {
+            "$ref": "#/components/schemas/CorpusCrossReferenceRunOut"
+          },
           "enabled": {
             "title": "Enabled",
             "type": "boolean"
@@ -8835,6 +9072,7 @@
           "pushed_records",
           "pending",
           "push",
+          "cross_reference",
           "consecutive_failures",
           "failures"
         ],
@@ -8977,6 +9215,330 @@
           "decision"
         ],
         "title": "CrossProviderDecisionRequest",
+        "type": "object"
+      },
+      "CrossReferenceDecisionOut": {
+        "description": "The latest reporter decision on a cross-reference, and its judgement in OpenAleph.",
+        "properties": {
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "same",
+              "different",
+              "unsure"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "judgement": {
+            "enum": [
+              "positive",
+              "negative",
+              "unsure"
+            ],
+            "title": "Judgement",
+            "type": "string"
+          },
+          "judgement_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Judgement Error"
+          },
+          "judgement_sent_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Judgement Sent At"
+          },
+          "judgement_status": {
+            "enum": [
+              "pending",
+              "sent",
+              "failed",
+              "superseded"
+            ],
+            "title": "Judgement Status",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "id",
+          "decision",
+          "note",
+          "judgement",
+          "judgement_status",
+          "judgement_sent_at",
+          "judgement_error",
+          "created_at"
+        ],
+        "title": "CrossReferenceDecisionOut",
+        "type": "object"
+      },
+      "CrossReferenceDecisionRequest": {
+        "description": "A reporter's decision on an OpenAleph cross-reference (ADR-0006, Wave B):\n\"same\" entity, \"different\", or \"unsure\" (the screen's \"Not sure\").",
+        "properties": {
+          "decision": {
+            "enum": [
+              "same",
+              "different",
+              "unsure"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "decision"
+        ],
+        "title": "CrossReferenceDecisionRequest",
+        "type": "object"
+      },
+      "CrossReferenceEntityOut": {
+        "description": "Our confirmed entity in a cross-reference.",
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "caption",
+          "schema"
+        ],
+        "title": "CrossReferenceEntityOut",
+        "type": "object"
+      },
+      "CrossReferenceMatchOut": {
+        "description": "The OpenAleph entity it was matched with, and where it is held.",
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "collection_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collection Id"
+          },
+          "collection_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collection Label"
+          },
+          "investigation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Investigation Id"
+          },
+          "openaleph_id": {
+            "title": "Openaleph Id",
+            "type": "string"
+          },
+          "properties": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Properties",
+            "type": "object"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "openaleph_id",
+          "collection_id",
+          "collection_label",
+          "investigation_id",
+          "schema",
+          "caption",
+          "properties",
+          "url"
+        ],
+        "title": "CrossReferenceMatchOut",
+        "type": "object"
+      },
+      "CrossReferenceOut": {
+        "description": "OpenAleph's cross-referencing says a confirmed entity may be the same as\nanother entity: a proposal until a reporter decides.",
+        "properties": {
+          "decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CrossReferenceDecisionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "entity": {
+            "$ref": "#/components/schemas/CrossReferenceEntityOut"
+          },
+          "first_seen_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "First Seen At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "identity_finding_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Identity Finding Id"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "last_seen_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Last Seen At",
+            "type": "string"
+          },
+          "match": {
+            "$ref": "#/components/schemas/CrossReferenceMatchOut"
+          },
+          "matched_properties": {
+            "items": {
+              "$ref": "#/components/schemas/MatchedPropertyOut"
+            },
+            "title": "Matched Properties",
+            "type": "array"
+          },
+          "method": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Method"
+          },
+          "openaleph_entity_id": {
+            "title": "Openaleph Entity Id",
+            "type": "string"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          },
+          "status": {
+            "enum": [
+              "open",
+              "decided"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "status",
+          "entity",
+          "openaleph_entity_id",
+          "match",
+          "matched_properties",
+          "score",
+          "method",
+          "decision",
+          "identity_finding_id",
+          "first_seen_at",
+          "last_seen_at"
+        ],
+        "title": "CrossReferenceOut",
         "type": "object"
       },
       "DataTableOut": {
@@ -15794,6 +16356,46 @@
           "metadata_json"
         ],
         "title": "LineageSourceOut",
+        "type": "object"
+      },
+      "MatchedPropertyOut": {
+        "description": "One kind of property both entities have, and how well it agrees\n(followthemoney's compare_scores).",
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "ours": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Ours",
+            "type": "array"
+          },
+          "property_type": {
+            "title": "Property Type",
+            "type": "string"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          },
+          "theirs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Theirs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "property_type",
+          "label",
+          "score",
+          "ours",
+          "theirs"
+        ],
+        "title": "MatchedPropertyOut",
         "type": "object"
       },
       "MergeBlockerOut": {
@@ -30835,6 +31437,65 @@
         "summary": "Issue"
       }
     },
+    "/api/cross-references/{cross_reference_id}/decision": {
+      "post": {
+        "operationId": "decide_investigation_cross_reference",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "cross_reference_id",
+            "required": true,
+            "schema": {
+              "title": "Cross Reference Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CrossReferenceDecisionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrossReferenceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Decide Investigation Cross Reference"
+      }
+    },
     "/api/decks/{deck_id}": {
       "delete": {
         "operationId": "delete_deck_endpoint",
@@ -32212,6 +32873,55 @@
           }
         },
         "summary": "Canonical Entity Resolution"
+      }
+    },
+    "/api/entities/{entity_id}/corpus/expand": {
+      "post": {
+        "operationId": "expand_entity_in_corpus",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entity_id",
+            "required": true,
+            "schema": {
+              "title": "Entity Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorpusExpandOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Expand Entity In Corpus"
       }
     },
     "/api/entities/{entity_id}/cross-provider-decisions": {
@@ -34903,6 +35613,74 @@
           }
         },
         "summary": "Sync Corpus Now"
+      }
+    },
+    "/api/investigations/{investigation_id}/cross-references": {
+      "get": {
+        "operationId": "list_investigation_cross_references",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "default": "open",
+              "enum": [
+                "open",
+                "decided",
+                "all"
+              ],
+              "title": "Status",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CrossReferenceOut"
+                  },
+                  "title": "Response List Investigation Cross References",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "List Investigation Cross References"
       }
     },
     "/api/investigations/{investigation_id}/decks": {

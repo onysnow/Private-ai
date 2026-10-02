@@ -27,6 +27,7 @@ export function DuplicateCandidates({candidates, previews, onDecide, onPreviewMe
       return <div className="statement" key={c.entity_id}>
         <div>
           <b>{c.caption}</b> · {c.schema} · {Math.round(c.score * 100)}%
+          {c.found_by?.includes('openaleph_xref') && <small> · found by OpenAleph cross-referencing{c.found_by.includes('name_overlap') ? ' and by name' : ''}</small>}
           {c.latest_decision && <div><small>Latest review: {c.latest_decision.decision} · {Math.round(c.latest_decision.confidence * 100)}%</small></div>}
         </div>
         <div className="actions">

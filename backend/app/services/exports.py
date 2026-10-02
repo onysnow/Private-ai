@@ -27,7 +27,7 @@ from app.models.domain import (
     EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
-    AIAnalysisCandidate, Writeup, Deck,
+    AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -42,7 +42,7 @@ MODEL_BY_TABLE = {
         EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
-        AIAnalysisCandidate, Writeup, Deck,
+        AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision,
     ]
 }
 
@@ -50,7 +50,12 @@ RESTORE_ORDER = [
     "investigations", "entities", "sources", "claims", "leads", "connector_runs",
     "documents", "investigation_corpus_bindings", "document_corpus_syncs", "statements", "evidence", "timeline_events", "reporting_tasks",
     "reporting_task_workflow_events", "lead_profiles", "lead_links", "lead_workflow_events", "claim_evidence_links", "claim_review_events",
-    "connector_findings", "resolution_decisions", "canonical_resolution_decisions", "canonical_entity_merge_audits", "post_merge_reconciliation_decisions", "property_conflict_decisions", "statement_assessments",
+    "connector_findings", "resolution_decisions",
+    # OpenAleph cross-references and reporters' decisions on them (ADR-0006,
+    # Wave B): review history. A decision may point at the resolution decision
+    # it added, so both restore after resolution_decisions.
+    "cross_reference_proposals", "cross_reference_decisions",
+    "canonical_resolution_decisions", "canonical_entity_merge_audits", "post_merge_reconciliation_decisions", "property_conflict_decisions", "statement_assessments",
     "statement_promotions", "enrichment_sessions", "enrichment_session_runs",
     "enrichment_session_findings", "cross_provider_decisions", "relationship_edges", "relationship_evidence_attachments", "relationship_evidence_review_events",
     "external_relationship_reviews", "external_relationship_promotions",
@@ -128,7 +133,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         ReportingTask, ReportingTaskWorkflowEvent, TimelineEvent, ResolutionDecision, CanonicalResolutionDecision, CanonicalEntityMergeAudit, PostMergeReconciliationDecision, PropertyConflictDecision, StatementAssessment,
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
-        Writeup, Deck,
+        Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -161,6 +166,8 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "extraction_candidates": direct["extraction_candidates"],
         "ai_analysis_candidates": direct["ai_analysis_candidates"],
         "writeups": direct["writeups"], "decks": direct["decks"],
+        "cross_reference_proposals": direct["cross_reference_proposals"],
+        "cross_reference_decisions": direct["cross_reference_decisions"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 

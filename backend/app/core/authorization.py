@@ -153,6 +153,7 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         BackgroundJob,
         Claim,
         ConnectorFinding,
+        CrossReferenceProposal,
         Document,
         Entity,
         EnrichmentSession,
@@ -177,6 +178,7 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         "session_id": (EnrichmentSession, "investigation_id"),
         "document_id": (Document, "investigation_id"),
         "job_id": (BackgroundJob, "investigation_id"),
+        "cross_reference_id": (CrossReferenceProposal, "investigation_id"),
     }
     if key in direct:
         model, attr = direct[key]

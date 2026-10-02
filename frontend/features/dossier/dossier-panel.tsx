@@ -32,6 +32,7 @@ import {invalidateInvestigationData} from '../../lib/investigation-queries';
 import {reportPayloadError} from '../../lib/report-error';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {leadQueueKey} from '../leads/leads-panel';
+import {CorpusExpand} from './corpus-expand';
 import {DuplicateCandidates} from './duplicate-candidates';
 import type {DuplicateDecision} from './duplicate-candidates';
 import {PropertyConflicts} from './property-conflicts';
@@ -266,6 +267,7 @@ export function DossierPanel({investigationId}: Props): ReactElement | null {
       <div><b>Reporting tasks</b>{dossier.tasks.slice(0, 8).map(t => <div key={t.id}>{t.status}: {t.title}{t.priority && <small> · {t.priority}</small>}{t.owner && <small> · {t.owner}</small>}</div>)}</div>
       <div><b>Timeline</b>{dossier.timeline.slice(0, 8).map(e => <div key={e.id}>{e.date_start}: {e.title}<small> · {e.verification_status}</small></div>)}</div>
       <div><b>External / Aleph leads</b>{dossier.external.findings.slice(0, 8).map(f => <div key={f.id}>{f.review_status || 'unreviewed'}: {f.caption || f.id}{f.provider && <small> · {f.provider}</small>}</div>)}</div>
+      <CorpusExpand key={entity.id} entityId={entity.id}/>
       <div>
         <b>Evidence</b>
         {dossier.evidence.slice(0, 8).map(x => <div key={x.evidence.id}>

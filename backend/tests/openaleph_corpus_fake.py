@@ -34,6 +34,9 @@ class FakeOpenAleph:
     # (collection id, entity id) written but not yet visible in the index
     pending: set[tuple[str, str]] = field(default_factory=set)
     index_busy: bool = False
+    # Writes show in search at once and never leave indexing busy, for tests
+    # that are not about waiting for OpenAleph's indexing.
+    auto_index: bool = False
     pruned: list[str] = field(default_factory=list)
     xref_running: bool = False
     xref_requests: list[str] = field(default_factory=list)
@@ -163,6 +166,9 @@ class FakeOpenAleph:
             stored["collection_id"] = int(collection["id"]) if str(collection["id"]).isdigit() else collection["id"]
             stored["id"] = str(proxy.id)
             self.entities[collection["id"]][str(proxy.id)] = stored
+            if self.auto_index:
+                self.index[collection["id"]][str(proxy.id)] = stored
+                continue
             self.pending.add((collection["id"], str(proxy.id)))
             self.index_busy = True
         return 204, None

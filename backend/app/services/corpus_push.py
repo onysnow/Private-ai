@@ -42,6 +42,7 @@ from followthemoney.types import registry
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.core.authorization import AuthorizationScope
 from app.core.config import settings
 from app.core.time import utcnow_naive
 from app.models.domain import (
@@ -81,6 +82,10 @@ class PushResult:
     unchanged: int = 0
     removals_waiting: int = 0
     skipped: list[str] = field(default_factory=list)
+    # Reporters' cross-reference decisions sent to OpenAleph as judgements
+    # in the same job (app/services/cross_references.py).
+    judgements_sent: int = 0
+    judgements_failed: int = 0
 
     @property
     def changed(self) -> bool:
@@ -88,7 +93,8 @@ class PushResult:
 
     def counts(self) -> dict[str, Any]:
         return {"sent": self.sent, "removed": self.removed, "unchanged": self.unchanged,
-                "removals_waiting": self.removals_waiting, "skipped": list(self.skipped)}
+                "removals_waiting": self.removals_waiting, "skipped": list(self.skipped),
+                "judgements_sent": self.judgements_sent, "judgements_failed": self.judgements_failed}
 
     def message(self) -> str:
         """The push in plain words, for the "Corpus sync" line."""
@@ -101,6 +107,10 @@ class PushResult:
             parts.append(f"{self.removals_waiting} removal(s) wait for OpenAleph to finish indexing")
         if self.skipped:
             parts.append(f"{len(self.skipped)} record(s) cannot be sent")
+        if self.judgements_sent:
+            parts.append(f"sent {self.judgements_sent} match judgement(s)")
+        if self.judgements_failed:
+            parts.append(f"OpenAleph refused {self.judgements_failed} match judgement(s)")
         if not parts:
             return "Nothing changed since the last push"
         text = "; ".join(parts)
@@ -316,11 +326,15 @@ CORPUS_OPERATIONS_PREFIX = "corpus_"
 DEMO_NOT_SENT = "The demo investigation is never sent to OpenAleph"
 
 
-def corpus_sync_status(db: Session, investigation_id: str, *, background: bool) -> dict[str, Any]:
+def corpus_sync_status(db: Session, investigation_id: str, *, background: bool,
+                       scope: AuthorizationScope | None = None) -> dict[str, Any]:
     """The "Corpus sync" line: is the corpus in step with what reporters
-    confirmed? The last push, what is still to send or remove, and recent
-    failures. ``background`` says whether a worker sends changes by itself
-    (otherwise only "Sync now" does)."""
+    confirmed? The last push, what is still to send or remove, the last
+    cross-referencing run, and recent failures. ``background`` says whether a
+    worker sends changes by itself (otherwise only "Sync now" does); ``scope``
+    limits the count of open cross-references to those the reader may see."""
+    from app.services.cross_references import open_cross_reference_count, pending_judgements
+
     investigation = db.get(Investigation, investigation_id)
     if investigation is None:
         raise LookupError("Investigation not found")
@@ -331,6 +345,7 @@ def corpus_sync_status(db: Session, investigation_id: str, *, background: bool) 
     else:
         pending = pending_changes(db, investigation_id)
     counts = (state.push_counts if state is not None else None) or {}
+    xref_counts = (state.xref_counts if state is not None else None) or {}
     failures = db.scalars(
         select(OpenAlephOperationFailure)
         .where(OpenAlephOperationFailure.investigation_id == investigation_id,
@@ -346,7 +361,7 @@ def corpus_sync_status(db: Session, investigation_id: str, *, background: bool) 
         "collection_label": binding.collection_label if binding else None,
         "pushed_records": int(pending["pushed"]),
         "pending": {"to_send": int(pending["to_send"]), "to_remove": int(pending["to_remove"]),
-                    "cannot_send": list(pending["cannot_send"])},
+                    "judgements": pending_judgements(db, investigation_id), "cannot_send": list(pending["cannot_send"])},
         "push": {
             "status": state.push_status if state is not None else "never",
             "started_at": state.push_started_at if state is not None else None,
@@ -357,6 +372,19 @@ def corpus_sync_status(db: Session, investigation_id: str, *, background: bool) 
             "removed": int(counts.get("removed") or 0),
             "unchanged": int(counts.get("unchanged") or 0),
             "removals_waiting": int(counts.get("removals_waiting") or 0),
+            "judgements_sent": int(counts.get("judgements_sent") or 0),
+            "judgements_failed": int(counts.get("judgements_failed") or 0),
+        },
+        "cross_reference": {
+            "status": state.xref_status if state is not None else "never",
+            "requested_at": state.xref_requested_at if state is not None else None,
+            "finished_at": state.xref_finished_at if state is not None else None,
+            "error": state.xref_error if state is not None else None,
+            "results": int(xref_counts.get("results") or 0),
+            "new": int(xref_counts.get("new") or 0),
+            "updated": int(xref_counts.get("updated") or 0),
+            "duplicates": int(xref_counts.get("duplicates") or 0),
+            "open": open_cross_reference_count(db, investigation_id, scope=scope),
         },
         "consecutive_failures": int(state.consecutive_failures or 0) if state is not None else 0,
         "failures": [serialize_operation_failure(row) for row in failures],

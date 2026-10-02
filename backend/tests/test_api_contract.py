@@ -260,6 +260,24 @@ def _email_document(document_id: str) -> str:
         return email.id
 
 
+def _cross_reference(investigation_id: str, entity_id: str) -> str:
+    """An OpenAleph cross-reference as the corpus job stores one
+    (app/services/cross_references.py import_cross_references); the demo
+    investigation is never sent to OpenAleph, so it is written directly."""
+    from app.db.session import SessionLocal
+    from app.models.domain import CrossReferenceProposal
+
+    with SessionLocal() as db:
+        row = CrossReferenceProposal(
+            investigation_id=investigation_id, entity_id=entity_id, openaleph_entity_id="ours.sig", match_kind="corpus",
+            match_openaleph_id="theirs.sig", match_collection_id="99", match_collection_label="Elsewhere",
+            match_schema="Company", match_caption="Meridian Holdings Limited", match_properties={"name": ["Meridian Holdings Limited"]},
+            matched_properties=[], score=0.9, method="regression-v1", status="open")
+        db.add(row)
+        db.commit()
+        return row.id
+
+
 def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, reasoning: Any) -> Seeded:
     """The demo investigation and one of everything else the API can read."""
     def ok(response: httpx.Response) -> Any:
@@ -339,7 +357,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             "source_id": payment["source"]["id"], "evidence_id": payment["evidence"]["id"], "document_id": document["id"],
             "job_id": document["job"]["id"], "finding_id": company["id"], "session_id": session["id"], "assessment_id": assessment["id"],
             "review_id": review["id"], "writeup_id": writeup["id"], "deck_id": deck["id"], "prop": "jurisdiction", "provider": "fake-a",
-            "task_id": task,
+            "task_id": task, "cross_reference_id": _cross_reference(inv, meridian),
             "user_id": user["id"], "aid": activity, "bid": backup["id"], "kind": "investigation_export", "qid": saved["id"],
             "name": "investigations", "pk": inv, "source": "app", "uid": user["id"], "tid": token["token_id"],
         },

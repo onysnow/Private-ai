@@ -489,6 +489,7 @@ export const zCanonicalDecisionSummaryOut = z.object({
 export const zCanonicalDuplicateCandidateOut = z.object({
   caption: z.string(),
   entity_id: z.string(),
+  found_by: z.array(z.string()).optional(),
   latest_decision: zCanonicalDecisionSummaryOut.nullish(),
   schema: z.string(),
   score: z.number(),
@@ -1024,12 +1025,75 @@ export const zCoreCapabilitiesOut = z.object({
 });
 
 /**
+ * CorpusCrossReferenceRunOut
+ *
+ * The last cross-referencing run of the collection and what it brought.
+ */
+export const zCorpusCrossReferenceRunOut = z.object({
+  duplicates: z.number().int(),
+  error: z.string().nullable(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  new: z.number().int(),
+  open: z.number().int(),
+  requested_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  results: z.number().int(),
+  status: z.enum(['never', 'waiting', 'running', 'succeeded', 'failed']),
+  updated: z.number().int(),
+});
+
+/**
+ * CorpusExpandFindingOut
+ *
+ * One thing OpenAleph holds around the entity, proposed as an OpenAleph
+ * connector finding: a relationship (for the external-relationship review)
+ * or the entity at its far end.
+ */
+export const zCorpusExpandFindingOut = z.object({
+  caption: z.string(),
+  collection_label: z.string().nullable(),
+  id: z.string(),
+  kind: z.enum(['relationship', 'entity']),
+  provider_record_id: z.string(),
+  review_status: z.string(),
+  schema: z.string().nullable(),
+  source_url: z.string().nullable(),
+});
+
+/**
+ * CorpusExpandOut
+ *
+ * "Expand in the corpus" (ADR-0006, Wave B): what OpenAleph holds
+ * around a confirmed entity, now waiting for review.
+ */
+export const zCorpusExpandOut = z.object({
+  entity_id: z.string(),
+  findings: z.array(zCorpusExpandFindingOut),
+  identities: z.array(z.string()),
+  neighbours: z.number().int(),
+  relationships: z.number().int(),
+  run_id: z.string(),
+  skipped_own: z.number().int(),
+});
+
+/**
  * CorpusPendingOut
  *
- * What the next push would change, and the records it cannot send (with why).
+ * What the next push would change -- records to send or remove, match
+ * judgements to send -- and the records it cannot send (with why).
  */
 export const zCorpusPendingOut = z.object({
   cannot_send: z.array(z.string()),
+  judgements: z.number().int(),
   to_remove: z.number().int(),
   to_send: z.number().int(),
 });
@@ -1041,12 +1105,24 @@ export const zCorpusPendingOut = z.object({
  */
 export const zCorpusPushOut = z.object({
   error: z.string().nullable(),
-  finished_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  judgements_failed: z.number().int(),
+  judgements_sent: z.number().int(),
   message: z.string().nullable(),
   removals_waiting: z.number().int(),
   removed: z.number().int(),
   sent: z.number().int(),
-  started_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
   status: z.enum(['never', 'running', 'succeeded', 'waiting', 'failed']),
   unchanged: z.number().int(),
 });
@@ -1122,6 +1198,69 @@ export const zCrossProviderDecisionRequest = z.object({
   decision: z.string(),
   finding_ids: z.array(z.string()).optional(),
   rationale: z.string().nullish(),
+});
+
+/**
+ * CrossReferenceDecisionOut
+ *
+ * The latest reporter decision on a cross-reference, and its judgement in OpenAleph.
+ */
+export const zCrossReferenceDecisionOut = z.object({
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  decision: z.enum(['same', 'different', 'unsure']),
+  id: z.string(),
+  judgement: z.enum(['positive', 'negative', 'unsure']),
+  judgement_error: z.string().nullable(),
+  judgement_sent_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  judgement_status: z.enum(['pending', 'sent', 'failed', 'superseded']),
+  note: z.string().nullable(),
+});
+
+/**
+ * CrossReferenceDecisionRequest
+ *
+ * A reporter's decision on an OpenAleph cross-reference (ADR-0006, Wave B):
+ * "same" entity, "different", or "unsure" (the screen's "Not sure").
+ */
+export const zCrossReferenceDecisionRequest = z.object({
+  decision: z.enum(['same', 'different', 'unsure']),
+  note: z.string().max(4000).nullish(),
+});
+
+/**
+ * CrossReferenceEntityOut
+ *
+ * Our confirmed entity in a cross-reference.
+ */
+export const zCrossReferenceEntityOut = z.object({
+  caption: z.string(),
+  id: z.string(),
+  schema: z.string(),
+});
+
+/**
+ * CrossReferenceMatchOut
+ *
+ * The OpenAleph entity it was matched with, and where it is held.
+ */
+export const zCrossReferenceMatchOut = z.object({
+  caption: z.string(),
+  collection_id: z.string().nullable(),
+  collection_label: z.string().nullable(),
+  investigation_id: z.string().nullable(),
+  openaleph_id: z.string(),
+  properties: z.record(z.array(z.string())),
+  schema: z.string(),
+  url: z.string(),
 });
 
 /**
@@ -2614,6 +2753,50 @@ export const zExtractionLineageLookupOut = z.object({
 });
 
 /**
+ * MatchedPropertyOut
+ *
+ * One kind of property both entities have, and how well it agrees
+ * (followthemoney's compare_scores).
+ */
+export const zMatchedPropertyOut = z.object({
+  label: z.string(),
+  ours: z.array(z.string()),
+  property_type: z.string(),
+  score: z.number(),
+  theirs: z.array(z.string()),
+});
+
+/**
+ * CrossReferenceOut
+ *
+ * OpenAleph's cross-referencing says a confirmed entity may be the same as
+ * another entity: a proposal until a reporter decides.
+ */
+export const zCrossReferenceOut = z.object({
+  decision: zCrossReferenceDecisionOut.nullable(),
+  entity: zCrossReferenceEntityOut,
+  first_seen_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  id: z.string(),
+  identity_finding_id: z.string().nullable(),
+  investigation_id: z.string(),
+  last_seen_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  match: zCrossReferenceMatchOut,
+  matched_properties: z.array(zMatchedPropertyOut),
+  method: z.string().nullable(),
+  openaleph_entity_id: z.string(),
+  score: z.number(),
+  status: z.enum(['open', 'decided']),
+});
+
+/**
  * MergeBlockerOut
  */
 export const zMergeBlockerOut = z.object({
@@ -2820,6 +3003,7 @@ export const zCorpusSyncOut = z.object({
   collection_id: z.string().nullable(),
   collection_label: z.string().nullable(),
   consecutive_failures: z.number().int(),
+  cross_reference: zCorpusCrossReferenceRunOut,
   enabled: z.boolean(),
   failures: z.array(zOpenAlephOperationFailureOut),
   investigation_id: z.string(),
@@ -5235,6 +5419,18 @@ export const zConnectorSearchPath = z.object({
  */
 export const zConnectorSearchResponse = z.array(zConnectorFindingOut);
 
+export const zDecideInvestigationCrossReferenceBody =
+  zCrossReferenceDecisionRequest;
+
+export const zDecideInvestigationCrossReferencePath = z.object({
+  cross_reference_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zDecideInvestigationCrossReferenceResponse = zCrossReferenceOut;
+
 export const zDeleteDeckEndpointPath = z.object({
   deck_id: z.string(),
 });
@@ -5478,6 +5674,15 @@ export const zCanonicalEntityResolutionPath = z.object({
  */
 export const zCanonicalEntityResolutionResponse =
   zCanonicalResolutionDecisionOut;
+
+export const zExpandEntityInCorpusPath = z.object({
+  entity_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zExpandEntityInCorpusResponse = zCorpusExpandOut;
 
 export const zListCrossProviderDecisionsPath = z.object({
   entity_id: z.string(),
@@ -5979,6 +6184,22 @@ export const zSyncCorpusNowPath = z.object({
  * Successful Response
  */
 export const zSyncCorpusNowResponse = zCorpusSyncNowOut;
+
+export const zListInvestigationCrossReferencesPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zListInvestigationCrossReferencesQuery = z.object({
+  status: z.enum(['open', 'decided', 'all']).optional().default('open'),
+});
+
+/**
+ * Response List Investigation Cross References
+ *
+ * Successful Response
+ */
+export const zListInvestigationCrossReferencesResponse =
+  z.array(zCrossReferenceOut);
 
 export const zListDecksEndpointPath = z.object({
   investigation_id: z.string(),

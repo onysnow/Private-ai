@@ -17,7 +17,7 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import TypeAdapter
 
 from app.db.session import SessionLocal
-from app.models.domain import Investigation
+from app.models.domain import CrossReferenceProposal, Investigation
 from app.schemas import responses as r
 from app.services.investigations import list_investigation_evidence, list_investigation_sources
 from app.services.lifecycle import delete_investigation, preview_investigation_deletion
@@ -442,6 +442,63 @@ def test_corpus_sync_replies(monkeypatch):
         failed = corpus_sync_status(db, inv.id, background=False)
         assert failed["failures"] and failed["push"]["error"]
         _same_through_model(r.CorpusSyncOut, failed)
+
+
+def test_cross_reference_replies(monkeypatch):
+    """OpenAleph's cross-references for review, before and after a decision,
+    the "Corpus sync" line after a run, and duplicate candidates OpenAleph
+    found (ADR-0006, Wave B)."""
+    from followthemoney.namespace import Namespace
+
+    from app.core.config import settings
+    from app.jobs import corpus as corpus_jobs
+    from app.schemas.api import EntityCreate
+    from app.services.corpus_push import corpus_sync_status, push_confirmed_records
+    from app.services.cross_references import decide_cross_reference, list_cross_references
+    from app.services.entities import create_entity
+    from app.services.resolution import canonical_duplicate_candidates
+    from tests.openaleph_corpus_fake import BASE_URL, FakeOpenAleph
+    from tests.test_openaleph_cross_references import _row, _served
+
+    monkeypatch.setattr(settings, "openaleph_enabled", True)
+    monkeypatch.setattr(settings, "openaleph_base_url", BASE_URL)
+    monkeypatch.setattr(settings, "openaleph_api_key", "test-key")
+    fake = FakeOpenAleph()
+    with SessionLocal() as db:
+        harbour = Investigation(name="Harbour replies")
+        port = Investigation(name="Port replies")
+        db.add_all([harbour, port]); db.commit()
+        ours = create_entity(db, EntityCreate(investigation_id=harbour.id, schema="Company", caption="Meridian Holdings Ltd",
+                                              properties={"registrationNumber": ["09876543"], "jurisdiction": ["gb"]}))
+        twin = create_entity(db, EntityCreate(investigation_id=harbour.id, schema="Company", caption="Meridian Holdings",
+                                              properties={"registrationNumber": ["09876543"]}))
+        theirs = create_entity(db, EntityCreate(investigation_id=port.id, schema="Company", caption="Meridian Holdings Limited",
+                                                properties={"registrationNumber": ["09876543"]}))
+        push_confirmed_records(db, harbour.id, gateway=fake.gateway())
+        push_confirmed_records(db, port.id, gateway=fake.gateway())
+        fake.finish_indexing()
+        first, second = Namespace("fake-ns-1"), Namespace("fake-ns-2")
+        ours_served, twin_served = _served(fake, "1", first.sign(ours.id)), _served(fake, "1", first.sign(twin.id))
+        theirs_served = _served(fake, "2", second.sign(theirs.id))
+        outside = {**theirs_served, "id": "outside.sig", "collection": {"id": "99", "label": "Sanctions list"}, "properties": {}}
+        fake.xref_rows["1"] = [_row(ours_served, theirs_served), _row(ours_served, outside, 0.61, method=""),
+                               _row(ours_served, twin_served, 0.9)]
+        corpus_jobs.xref_step(SessionLocal, harbour.id, "start", gateway=fake.gateway())
+        corpus_jobs.xref_step(SessionLocal, harbour.id, "collect", gateway=fake.gateway())
+
+        listed = list_cross_references(db, harbour.id, scope=None)
+        assert len(listed) == 2 and listed[1]["method"] is None and listed[1]["matched_properties"] == []
+        _same_through_model(list[r.CrossReferenceOut], listed)
+        proposal = db.get(CrossReferenceProposal, listed[0]["id"])
+        _same_through_model(r.CrossReferenceOut, decide_cross_reference(db, proposal, decision="same", note="Registry"))
+        corpus_jobs.push_step(SessionLocal, harbour.id, gateway=fake.gateway())
+        _same_through_model(list[r.CrossReferenceOut], list_cross_references(db, harbour.id, scope=None, status=None))
+        line = corpus_sync_status(db, harbour.id, background=False)
+        assert line["cross_reference"]["duplicates"] == 1 and line["push"]["judgements_sent"] == 1
+        _same_through_model(r.CorpusSyncOut, line)
+        candidates = canonical_duplicate_candidates(db, ours)
+        assert next(row for row in candidates if row["entity_id"] == twin.id)["found_by"] == ["name_overlap", "openaleph_xref"]
+        _same_through_model(list[r.CanonicalDuplicateCandidateOut], candidates)
 
 
 def test_backup_replies(demo, tmp_path):

@@ -24,11 +24,11 @@ def test_every_model_module_is_reexported_and_registers_on_the_shared_base():
                 assert getattr(domain, attr) is value, f"{attr} from app.models.{name} is not re-exported by app.models.domain"
                 assert attr in domain.__all__
                 assert mapped[attr] is value
-    assert len(domain.__all__) == len(set(domain.__all__)) == 48  # 47 models + uid
+    assert len(domain.__all__) == len(set(domain.__all__)) == 50  # 49 models + uid
 
 
 def test_table_set_matches_the_alembic_schema_and_no_model_was_lost():
     tables = set(Base.metadata.tables)
-    assert len(tables) == 47, sorted(tables)
+    assert len(tables) == 49, sorted(tables)
     for expected in ("investigations", "entities", "claims", "leads", "documents", "connector_findings", "relationship_edges", "ai_analysis_candidates", "app_users", "sources", "evidence"):
         assert expected in tables

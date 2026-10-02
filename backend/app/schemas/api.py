@@ -162,6 +162,12 @@ class ResolutionRequest(BaseModel):
     confidence: float = 0.0
     rationale: str | None = None
 
+class CrossReferenceDecisionRequest(BaseModel):
+    """A reporter's decision on an OpenAleph cross-reference (ADR-0006, Wave B):
+    "same" entity, "different", or "unsure" (the screen's "Not sure")."""
+    decision: Literal["same", "different", "unsure"]
+    note: str | None = Field(default=None, max_length=4000)
+
 class CanonicalResolutionRequest(BaseModel):
     other_entity_id: str
     decision: str

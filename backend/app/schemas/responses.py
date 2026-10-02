@@ -1184,23 +1184,41 @@ class OpenAlephOperationFailureOut(ResponseModel):
 
 
 class CorpusPendingOut(ResponseModel):
-    """What the next push would change, and the records it cannot send (with why)."""
+    """What the next push would change -- records to send or remove, match
+    judgements to send -- and the records it cannot send (with why)."""
     to_send: int
     to_remove: int
+    judgements: int
     cannot_send: list[str]
 
 
 class CorpusPushOut(ResponseModel):
     """The last push of confirmed records to the investigation's collection."""
     status: Literal["never", "running", "succeeded", "waiting", "failed"]
-    started_at: datetime | None
-    finished_at: datetime | None
+    started_at: Timestamp | None
+    finished_at: Timestamp | None
     message: str | None
     error: str | None
     sent: int
     removed: int
     unchanged: int
     removals_waiting: int
+    judgements_sent: int
+    judgements_failed: int
+
+
+class CorpusCrossReferenceRunOut(ResponseModel):
+    """The last cross-referencing run of the collection and what it brought."""
+    status: Literal["never", "waiting", "running", "succeeded", "failed"]
+    requested_at: Timestamp | None
+    finished_at: Timestamp | None
+    error: str | None
+    results: int
+    new: int
+    updated: int
+    duplicates: int
+    # Cross-references waiting for a reporter now, of those the reader may see.
+    open: int
 
 
 class CorpusSyncOut(ResponseModel):
@@ -1215,6 +1233,7 @@ class CorpusSyncOut(ResponseModel):
     pushed_records: int
     pending: CorpusPendingOut
     push: CorpusPushOut
+    cross_reference: CorpusCrossReferenceRunOut
     consecutive_failures: int
     failures: list[OpenAlephOperationFailureOut]
 
@@ -1224,6 +1243,103 @@ class CorpusSyncNowOut(ResponseModel):
     queued: bool
     ran: bool
     sync: CorpusSyncOut
+
+
+class CrossReferenceEntityOut(ResponseModel):
+    """Our confirmed entity in a cross-reference."""
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    id: str
+    caption: str
+    schema_: str = Field(alias="schema")
+
+
+class CrossReferenceMatchOut(ResponseModel):
+    """The OpenAleph entity it was matched with, and where it is held."""
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    openaleph_id: str
+    collection_id: str | None
+    collection_label: str | None
+    # The Workbench investigation whose collection holds it, when there is one
+    # (only shown to someone who may read that investigation).
+    investigation_id: str | None
+    schema_: str = Field(alias="schema")
+    caption: str
+    properties: dict[str, list[str]]
+    url: str
+
+
+class MatchedPropertyOut(ResponseModel):
+    """One kind of property both entities have, and how well it agrees
+    (followthemoney's compare_scores)."""
+    property_type: str
+    label: str
+    score: float
+    ours: list[str]
+    theirs: list[str]
+
+
+class CrossReferenceDecisionOut(ResponseModel):
+    """The latest reporter decision on a cross-reference, and its judgement in OpenAleph."""
+    id: str
+    decision: Literal["same", "different", "unsure"]
+    note: str | None
+    judgement: Literal["positive", "negative", "unsure"]
+    judgement_status: Literal["pending", "sent", "failed", "superseded"]
+    judgement_sent_at: Timestamp | None
+    judgement_error: str | None
+    created_at: Timestamp
+
+
+class CrossReferenceOut(ResponseModel):
+    """OpenAleph's cross-referencing says a confirmed entity may be the same as
+    another entity: a proposal until a reporter decides."""
+    id: str
+    investigation_id: str
+    status: Literal["open", "decided"]
+    entity: CrossReferenceEntityOut
+    openaleph_entity_id: str
+    match: CrossReferenceMatchOut
+    matched_properties: list[MatchedPropertyOut]
+    score: float
+    method: str | None
+    decision: CrossReferenceDecisionOut | None
+    # The external-identity record "Same entity" made (a connector finding).
+    identity_finding_id: str | None
+    first_seen_at: Timestamp
+    last_seen_at: Timestamp
+
+
+class CorpusExpandFindingOut(ResponseModel):
+    """One thing OpenAleph holds around the entity, proposed as an OpenAleph
+    connector finding: a relationship (for the external-relationship review)
+    or the entity at its far end."""
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    id: str
+    kind: Literal["relationship", "entity"]
+    caption: str
+    schema_: str | None = Field(alias="schema")
+    provider_record_id: str
+    source_url: str | None
+    review_status: str
+    collection_label: str | None
+
+
+class CorpusExpandOut(ResponseModel):
+    """ "Expand in the corpus" (ADR-0006, Wave B): what OpenAleph holds
+    around a confirmed entity, now waiting for review."""
+    entity_id: str
+    run_id: str
+    # The OpenAleph entities asked about: the entity's own copy, and those a
+    # reporter decided are the same.
+    identities: list[str]
+    relationships: int
+    neighbours: int
+    # Linked records that are already the investigation's own.
+    skipped_own: int
+    findings: list[CorpusExpandFindingOut]
 
 
 # --- Portable backups --------------------------------------------------------------
@@ -1771,6 +1887,9 @@ class CanonicalDecisionSummaryOut(ResponseModel):
 
 class CanonicalDuplicateCandidateOut(EntityCandidateOut):
     latest_decision: CanonicalDecisionSummaryOut | None = None
+    # How it was found: "name_overlap" (the Workbench's own name comparison),
+    # "openaleph_xref" (OpenAleph's cross-referencing; ADR-0006, Wave B), or both.
+    found_by: list[str] = Field(default_factory=list)
 
 
 class CanonicalResolutionDecisionOut(ResponseModel):

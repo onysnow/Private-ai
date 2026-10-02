@@ -203,6 +203,39 @@ def test_what_cannot_be_sent_is_named_and_the_demo_never_reaches_openaleph(opena
             push_confirmed_records(db, "no-such-investigation", gateway=openaleph.gateway())
 
 
+def test_records_without_a_known_type_a_usable_id_or_both_ends_are_named(openaleph):
+    with SessionLocal() as db:
+        inv = _investigation(db)
+        db.add(Entity(investigation_id=inv.id, ftm_id="odd-1", schema="NoSuchSchema", caption="Odd record", properties={}))
+        db.add(Entity(id="not a valid id!", investigation_id=inv.id, ftm_id="odd-2", schema="Person", caption="Bad id", properties={}))
+        db.commit()
+        jane = _entity(db, inv, "Person", "Jane Doe")
+        meridian = _entity(db, inv, "Company", "Meridian Holdings Ltd")
+        create_relationship(db, investigation_id=inv.id, schema="Directorship", source_entity_id=jane.id, target_entity_id=meridian.id)
+        # An end marked merged without its relationships moved (a merge moves them).
+        db.get(Entity, meridian.id).merged_into_entity_id = jane.id
+        db.commit()
+        records, skipped = build_corpus_records(db, inv.id)
+        assert set(records) == {jane.id}
+        assert skipped == ["Odd record: FollowTheMoney has no schema 'NoSuchSchema'",
+                           "Bad id: its id cannot be a FollowTheMoney entity id",
+                           "Jane Doe — Directorship → Meridian Holdings Ltd: one end of this relationship is no longer an active record"]
+
+
+def test_a_failure_that_cannot_be_logged_still_shows_on_the_line(openaleph, monkeypatch, caplog):
+    from app.services import openaleph_corpus
+
+    def unavailable(*_args: Any, **_kwargs: Any) -> None:
+        raise RuntimeError("failure log unavailable")
+
+    monkeypatch.setattr(openaleph_corpus, "record_openaleph_operation_failure", unavailable)
+    with SessionLocal() as db:
+        inv, *_ = _seeded(db)
+        openaleph.fail[("POST", "/api/2/collections")] = 503
+        assert [step.retry for step in corpus_jobs.push_step(SessionLocal, inv.id, gateway=openaleph.gateway())] == [True]
+        assert _state(db, inv).push_status == "failed" and "could not record a corpus failure" in caplog.text
+
+
 def test_the_binding_follows_the_collection_openaleph_holds(openaleph):
     with SessionLocal() as db:
         inv = _investigation(db)
@@ -230,17 +263,26 @@ def _state(db, inv) -> CorpusSyncState:
     return db.scalar(select(CorpusSyncState).where(CorpusSyncState.investigation_id == inv.id))
 
 
+def _cross_reference_after(inv) -> corpus_jobs.FollowUp:
+    """A push that changed the collection is followed by cross-referencing
+    (tests/test_openaleph_cross_references.py)."""
+    return corpus_jobs.FollowUp(corpus_jobs.XREF_TASK, settings.openaleph_corpus_push_delay_seconds,
+                                {"investigation_id": inv.id, "phase": "start"})
+
+
 def test_push_step_records_progress_for_the_corpus_sync_line(openaleph):
     with SessionLocal() as db:
         inv, *_ = _seeded(db)
         follow_ups = corpus_jobs.push_step(SessionLocal, inv.id, gateway=openaleph.gateway())
-        assert follow_ups == []
+        assert follow_ups == [_cross_reference_after(inv)]
         state = _state(db, inv)
         assert (state.push_status, state.push_message, state.consecutive_failures) == ("succeeded", "Sent 3 record(s)", 0)
-        assert state.push_counts == {"sent": 3, "removed": 0, "unchanged": 0, "removals_waiting": 0, "skipped": []}
+        assert state.push_counts == {"sent": 3, "removed": 0, "unchanged": 0, "removals_waiting": 0, "skipped": [],
+                                     "judgements_sent": 0, "judgements_failed": 0}
         assert state.changed_at is not None and state.push_finished_at is not None
         status = corpus_sync_status(db, inv.id, background=False)
-        assert status["pushed_records"] == 3 and status["pending"] == {"to_send": 0, "to_remove": 0, "cannot_send": []}
+        assert status["pushed_records"] == 3
+        assert status["pending"] == {"to_send": 0, "to_remove": 0, "judgements": 0, "cannot_send": []}
         assert status["push"]["status"] == "succeeded" and status["collection_label"] == "Harbour contracts"
 
         # Waiting removals ask for another push after the poll interval.
@@ -249,7 +291,8 @@ def test_push_step_records_progress_for_the_corpus_sync_line(openaleph):
         corpus_jobs.push_step(SessionLocal, inv.id, gateway=openaleph.gateway())
         _merge(db, db.get(Entity, other.id), db.get(Entity, jane.id))
         follow_ups = corpus_jobs.push_step(SessionLocal, inv.id, gateway=openaleph.gateway())
-        assert follow_ups == [corpus_jobs.FollowUp(corpus_jobs.PUSH_TASK, settings.openaleph_corpus_poll_seconds, {"investigation_id": inv.id})]
+        assert follow_ups == [corpus_jobs.FollowUp(corpus_jobs.PUSH_TASK, settings.openaleph_corpus_poll_seconds, {"investigation_id": inv.id}),
+                              _cross_reference_after(inv)]
         assert _state(db, inv).push_status == "waiting"
 
 
@@ -279,7 +322,7 @@ def test_a_temporary_failure_is_recorded_and_tried_again_later(openaleph, monkey
         assert _state(db, inv).consecutive_failures == 3
 
         del openaleph.fail[("POST", "/api/2/collections/1/_bulk")]
-        assert corpus_jobs.push_step(SessionLocal, inv.id, gateway=openaleph.gateway()) == []
+        assert corpus_jobs.push_step(SessionLocal, inv.id, gateway=openaleph.gateway()) == [_cross_reference_after(inv)]
         assert _state(db, inv).consecutive_failures == 0 and _state(db, inv).push_error is None
 
 
@@ -497,19 +540,27 @@ def test_registered_tasks_run_the_step_and_queue_what_follows(openaleph, monkeyp
         assert recording.deferred == [(corpus_jobs.FollowUp(corpus_jobs.PUSH_TASK, 30.0, {"investigation_id": inv.id}, retry=True), False)]
 
 
-def test_sync_now_runs_the_steps_and_waits_between_them(openaleph):
+def test_sync_now_runs_the_steps_and_waits_between_them(openaleph, monkeypatch):
+    monkeypatch.setattr(settings, "openaleph_corpus_push_delay_seconds", 2.0)
+    monkeypatch.setattr(settings, "openaleph_corpus_poll_seconds", 3.0)
+    openaleph.auto_index = True
     sleeps: list[float] = []
     clock = iter(range(0, 10_000, 10))
     with SessionLocal() as db:
         inv, meridian, jane, edge = _seeded(db)
         corpus_jobs.sync_now(SessionLocal, inv.id, gateway=openaleph.gateway(), sleep=sleeps.append, clock=lambda: next(clock))
-        assert len(_links(db, inv)) == 3 and sleeps == []
+        assert len(_links(db, inv)) == 3
+        # The push, then cross-referencing: asked for after the push delay,
+        # collected one poll later once OpenAleph's queue no longer holds it.
+        assert sleeps == [2.0, 3.0] and openaleph.xref_requests == ["1"]
+        assert _state(db, inv).xref_status == "succeeded"
 
         other = _entity(db, inv, "Person", "J. Doe")
         corpus_jobs.sync_now(SessionLocal, inv.id, gateway=openaleph.gateway(), sleep=sleeps.append, clock=lambda: next(clock))
+        assert sleeps == [2.0, 3.0, 2.0, 3.0] and len(openaleph.xref_requests) == 2
         _merge(db, db.get(Entity, other.id), db.get(Entity, jane.id))
 
-        polls = iter([True, False])
+        polls = iter([True])
 
         class Finishing:
             def __init__(self, gateway):
@@ -519,18 +570,17 @@ def test_sync_now_runs_the_steps_and_waits_between_them(openaleph):
                 return getattr(self.gateway, name)
 
             def index_busy(self, collection_id):
-                busy = next(polls)
-                if not busy:
-                    openaleph.finish_indexing()
-                return busy
+                return next(polls, False)
 
+        sleeps.clear()
         corpus_jobs.sync_now(SessionLocal, inv.id, gateway=Finishing(openaleph.gateway()), sleep=sleeps.append, clock=lambda: next(clock))
-        assert sleeps == [settings.openaleph_corpus_poll_seconds]
+        # The removal waited one poll for indexing; cross-referencing followed once.
+        assert sleeps == [3.0, 2.0, 3.0] and len(openaleph.xref_requests) == 3
         assert other.id not in _links(db, inv)
 
 
 def test_sync_now_stops_waiting_at_the_deadline(openaleph, monkeypatch):
-    monkeypatch.setattr(settings, "openaleph_xref_timeout_seconds", 3.0)
+    monkeypatch.setattr(settings, "openaleph_sync_now_wait_seconds", 3.0)
     with SessionLocal() as db:
         inv, meridian, jane, edge = _seeded(db)
         other = _entity(db, inv, "Person", "J. Doe")
