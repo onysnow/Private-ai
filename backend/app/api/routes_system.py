@@ -22,7 +22,7 @@ from app.core.authorization import scope_for_request
 from app.core.config import settings
 from app.db.session import get_db
 from app.models.domain import AIAnalysisCandidate, Investigation, Source, StatementAssessment
-from app.schemas.responses import EvidenceOut, SearchOut, TimelineEventRowOut
+from app.schemas.responses import EvidenceOut, SearchOut, StatementPromotionOut, TimelineEventRowOut
 from app.schemas.api import (
     AIAnalysisCandidateReviewRequest,
     EvidenceCreate,
@@ -205,7 +205,7 @@ def create_evidence_endpoint(body: EvidenceCreate, db: Session = Depends(get_db)
         raise HTTPException(400, str(exc))
 
 
-@router.post("/statement-assessments/{assessment_id}/promote", response_model=None)
+@router.post("/statement-assessments/{assessment_id}/promote", response_model=StatementPromotionOut)
 def promote_statement_assessment(assessment_id: str, body: StatementPromotionRequest, db: Session = Depends(get_db)) -> Any:
     assessment = db.get(StatementAssessment, assessment_id)
     if assessment is None:

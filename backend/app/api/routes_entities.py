@@ -30,7 +30,13 @@ from app.services.post_merge_reconciliation import (
 from app.services.provenance import entity_statement_history
 from app.services.relationships import entity_relationships
 from app.services.resolution import canonical_duplicate_candidates, record_canonical_resolution
-from app.schemas.responses import StatementHistoryRowOut
+from app.schemas.responses import (
+    CanonicalDuplicateCandidateOut, CanonicalEntityMergeAuditOut, CanonicalMergeExecuteOut, CanonicalMergePreviewOut,
+    CanonicalResolutionDecisionOut, ConnectorFindingOut, CrossProviderDecisionOut, EnrichmentSessionOut,
+    EnrichmentSessionRowOut, EntityDossierOut, EntityOut, EntityRelationshipOut, EntityStatementOut,
+    ExternalRelationshipPromotionOut, PostMergeReconciliationOut, PropertyConflictDecisionOut,
+    ReconciliationDecisionOut, StatementHistoryRowOut, StatementPromotionOut,
+)
 from app.services.entities import (
     create_entity as _create_entity,
     decide_property_conflict as _decide_property_conflict,
@@ -49,7 +55,7 @@ from app.services.entities import (
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.post("/entities", response_model=None)
+@router.post("/entities", response_model=EntityOut)
 def create_entity(body: EntityCreate, db: Session = Depends(get_db)) -> Any:
     try:
         return _create_entity(db, body)
@@ -59,7 +65,7 @@ def create_entity(body: EntityCreate, db: Session = Depends(get_db)) -> Any:
         raise HTTPException(400, str(exc))
 
 
-@router.patch("/entities/{entity_id}", response_model=None)
+@router.patch("/entities/{entity_id}", response_model=EntityOut)
 def update_entity(entity_id: str, body: EntityUpdate, db: Session = Depends(get_db)) -> Any:
     entity = db.get(Entity, entity_id)
     if entity is None:
@@ -70,7 +76,7 @@ def update_entity(entity_id: str, body: EntityUpdate, db: Session = Depends(get_
         raise HTTPException(400, str(exc))
 
 
-@router.get("/investigations/{investigation_id}/entities", response_model=None)
+@router.get("/investigations/{investigation_id}/entities", response_model=list[EntityOut])
 def list_entities(
     investigation_id: str,
     include_relationships: bool = False,
@@ -81,7 +87,7 @@ def list_entities(
     return _list_entities(db, investigation_id, include_relationships, limit=limit, offset=offset)
 
 
-@router.get("/entities/{entity_id}/dossier", response_model=None)
+@router.get("/entities/{entity_id}/dossier", response_model=EntityDossierOut)
 def get_entity_dossier(entity_id: str, db: Session = Depends(get_db)) -> Any:
     try:
         return entity_dossier(db, entity_id)
@@ -89,7 +95,7 @@ def get_entity_dossier(entity_id: str, db: Session = Depends(get_db)) -> Any:
         raise HTTPException(404, str(exc))
 
 
-@router.post("/entities/{entity_id}/property-conflicts/{prop}/decisions", response_model=None)
+@router.post("/entities/{entity_id}/property-conflicts/{prop}/decisions", response_model=PropertyConflictDecisionOut)
 def decide_property_conflict(entity_id: str, prop: str, body: PropertyConflictDecisionRequest, db: Session = Depends(get_db)) -> Any:
     entity = db.get(Entity, entity_id)
     if entity is None:
@@ -100,14 +106,14 @@ def decide_property_conflict(entity_id: str, prop: str, body: PropertyConflictDe
         raise HTTPException(400, str(exc))
 
 
-@router.get("/entities/{entity_id}/property-conflicts/{prop}/decisions", response_model=None)
+@router.get("/entities/{entity_id}/property-conflicts/{prop}/decisions", response_model=list[PropertyConflictDecisionOut])
 def list_property_conflict_decisions(entity_id: str, prop: str, db: Session = Depends(get_db)) -> Any:
     if db.get(Entity, entity_id) is None:
         raise HTTPException(404, "Entity not found")
     return _list_property_conflict_decisions(db, entity_id, prop)
 
 
-@router.get("/entities/{entity_id}/statements", response_model=None)
+@router.get("/entities/{entity_id}/statements", response_model=list[EntityStatementOut])
 def list_entity_statements(entity_id: str, db: Session = Depends(get_db)) -> Any:
     if db.get(Entity, entity_id) is None:
         raise HTTPException(404, "Entity not found")
@@ -122,14 +128,14 @@ def list_entity_statement_history(entity_id: str, db: Session = Depends(get_db))
         raise HTTPException(404, str(exc))
 
 
-@router.get("/entities/{entity_id}/relationships", response_model=None)
+@router.get("/entities/{entity_id}/relationships", response_model=list[EntityRelationshipOut])
 def list_entity_relationships(entity_id: str, db: Session = Depends(get_db)) -> Any:
     if db.get(Entity, entity_id) is None:
         raise HTTPException(404, "Entity not found")
     return entity_relationships(db, entity_id)
 
 
-@router.post("/entities/{entity_id}/enrich/{provider}", response_model=None)
+@router.post("/entities/{entity_id}/enrich/{provider}", response_model=list[ConnectorFindingOut])
 async def enrich_entity(entity_id: str, provider: str, db: Session = Depends(get_db)) -> Any:
     entity = db.get(Entity, entity_id)
     if entity is None:
@@ -137,7 +143,7 @@ async def enrich_entity(entity_id: str, provider: str, db: Session = Depends(get
     return await _enrich_entity_single(provider, entity, db)
 
 
-@router.post("/entities/{entity_id}/enrich", response_model=None)
+@router.post("/entities/{entity_id}/enrich", response_model=EnrichmentSessionOut)
 async def enrich_entity_multi(entity_id: str, body: MultiEnrichmentRequest, db: Session = Depends(get_db)) -> Any:
     entity = db.get(Entity, entity_id)
     if entity is None:
@@ -148,21 +154,21 @@ async def enrich_entity_multi(entity_id: str, body: MultiEnrichmentRequest, db: 
         raise HTTPException(400, str(exc))
 
 
-@router.get("/entities/{entity_id}/enrichment-sessions", response_model=None)
+@router.get("/entities/{entity_id}/enrichment-sessions", response_model=list[EnrichmentSessionRowOut])
 def list_entity_enrichment_sessions(entity_id: str, db: Session = Depends(get_db)) -> Any:
     if db.get(Entity, entity_id) is None:
         raise HTTPException(404, "Entity not found")
     return _list_entity_enrichment_sessions(db, entity_id)
 
 
-@router.get("/entities/{entity_id}/cross-provider-decisions", response_model=None)
+@router.get("/entities/{entity_id}/cross-provider-decisions", response_model=list[CrossProviderDecisionOut])
 def list_cross_provider_decisions(entity_id: str, db: Session = Depends(get_db)) -> Any:
     if db.get(Entity, entity_id) is None:
         raise HTTPException(404, "Entity not found")
     return _list_cross_provider_decisions(db, entity_id)
 
 
-@router.get("/entities/{entity_id}/external-relationship-promotions", response_model=None)
+@router.get("/entities/{entity_id}/external-relationship-promotions", response_model=list[ExternalRelationshipPromotionOut])
 def list_external_relationship_promotions(entity_id: str, db: Session = Depends(get_db)) -> Any:
     entity = db.get(Entity, entity_id)
     if entity is None:
@@ -170,7 +176,7 @@ def list_external_relationship_promotions(entity_id: str, db: Session = Depends(
     return _list_external_relationship_promotions(db, entity)
 
 
-@router.get("/entities/{entity_id}/duplicate-candidates", response_model=None)
+@router.get("/entities/{entity_id}/duplicate-candidates", response_model=list[CanonicalDuplicateCandidateOut])
 def entity_duplicate_candidates(entity_id: str, db: Session = Depends(get_db)) -> Any:
     entity = db.get(Entity, entity_id)
     if entity is None:
@@ -178,7 +184,7 @@ def entity_duplicate_candidates(entity_id: str, db: Session = Depends(get_db)) -
     return canonical_duplicate_candidates(db, entity)
 
 
-@router.post("/entities/{entity_id}/canonical-resolution", response_model=None)
+@router.post("/entities/{entity_id}/canonical-resolution", response_model=CanonicalResolutionDecisionOut)
 def canonical_entity_resolution(entity_id: str, body: CanonicalResolutionRequest, db: Session = Depends(get_db)) -> Any:
     if body.decision not in {"same", "different", "unsure"}:
         raise HTTPException(400, "Decision must be same, different, or unsure")
@@ -192,7 +198,7 @@ def canonical_entity_resolution(entity_id: str, body: CanonicalResolutionRequest
         raise HTTPException(409, str(exc))
 
 
-@router.get("/entities/{entity_id}/merge-preview", response_model=None)
+@router.get("/entities/{entity_id}/merge-preview", response_model=CanonicalMergePreviewOut)
 def entity_merge_preview(entity_id: str, target_entity_id: str = Query(...), db: Session = Depends(get_db)) -> Any:
     source = db.get(Entity, entity_id)
     target = db.get(Entity, target_entity_id)
@@ -204,7 +210,7 @@ def entity_merge_preview(entity_id: str, target_entity_id: str = Query(...), db:
         raise HTTPException(409, str(exc))
 
 
-@router.post("/entities/{entity_id}/merge", response_model=None)
+@router.post("/entities/{entity_id}/merge", response_model=CanonicalMergeExecuteOut)
 def entity_merge_execute(entity_id: str, body: CanonicalMergeExecuteRequest, db: Session = Depends(get_db)) -> dict[str, Any]:
     source = db.get(Entity, entity_id)
     target = db.get(Entity, body.target_entity_id)
@@ -217,7 +223,7 @@ def entity_merge_execute(entity_id: str, body: CanonicalMergeExecuteRequest, db:
         raise HTTPException(409, str(exc))
 
 
-@router.get("/entities/{entity_id}/merge-history", response_model=None)
+@router.get("/entities/{entity_id}/merge-history", response_model=list[CanonicalEntityMergeAuditOut])
 def entity_merge_history(entity_id: str, db: Session = Depends(get_db)) -> Any:
     entity = db.get(Entity, entity_id)
     if entity is None:
@@ -225,7 +231,7 @@ def entity_merge_history(entity_id: str, db: Session = Depends(get_db)) -> Any:
     return _entity_merge_history(db, entity)
 
 
-@router.get("/entities/{entity_id}/post-merge-reconciliation", response_model=None)
+@router.get("/entities/{entity_id}/post-merge-reconciliation", response_model=PostMergeReconciliationOut)
 def entity_post_merge_reconciliation(entity_id: str, db: Session = Depends(get_db)) -> Any:
     entity = db.get(Entity, entity_id)
     if entity is None:
@@ -236,7 +242,7 @@ def entity_post_merge_reconciliation(entity_id: str, db: Session = Depends(get_d
         raise HTTPException(409, str(exc))
 
 
-@router.post("/entities/{entity_id}/post-merge-reconciliation", response_model=None)
+@router.post("/entities/{entity_id}/post-merge-reconciliation", response_model=ReconciliationDecisionOut)
 def decide_entity_post_merge_reconciliation(entity_id: str, body: PostMergeReconciliationRequest, db: Session = Depends(get_db)) -> Any:
     entity = db.get(Entity, entity_id)
     if entity is None:
@@ -250,7 +256,7 @@ def decide_entity_post_merge_reconciliation(entity_id: str, body: PostMergeRecon
         raise HTTPException(409, str(exc))
 
 
-@router.get("/entities/{entity_id}/promotions", response_model=None)
+@router.get("/entities/{entity_id}/promotions", response_model=list[StatementPromotionOut])
 def list_entity_promotions(entity_id: str, db: Session = Depends(get_db)) -> Any:
     if db.get(Entity, entity_id) is None:
         raise HTTPException(404, "Entity not found")

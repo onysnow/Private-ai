@@ -25,6 +25,9 @@
 // asserting what the page passes down rather than third-party rendering.
 // Most tests still open edges through the always-visible `.relEdge` span in
 // the relationshipList, which fires the exact same openGraphEdge handler.
+// The list is awaited: the graph is read through the shared data cache now
+// (features/relationship-graph), whose results reach the screen a tick
+// after the case's name does.
 //
 // Also because of that same loadEntities() auto-fill, `entityId` is
 // non-empty by the time attachEvidenceToRelationship/reviewRelationshipEvidence
@@ -40,7 +43,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {mockApi} from '../test-support/mock-api';
 import type {MockApi} from '../test-support/mock-api';
-import {emptyGraph, pageRoutes} from '../test-support/page-routes';
+import {emptyGraph, entityFixture, pageRoutes, relationshipFixture} from '../test-support/page-routes';
 
 const {sankeySpy} = vi.hoisted(() => ({sankeySpy: vi.fn()}));
 vi.mock('../components/charts/financial-flow-sankey', () => ({
@@ -92,28 +95,13 @@ async function importHome(): Promise<() => ReactElement> {
 
 const investigation = {id: 'inv-1', name: 'Kestrelwood filings'};
 
-const entityA = {id: 'ent-1', caption: 'Kestrelwood Holdings Ltd', schema: 'Company', properties: {}};
-const entityB = {id: 'ent-2', caption: 'Jane Doe', schema: 'Person', properties: {}};
+const entityA = entityFixture('ent-1', 'Kestrelwood Holdings Ltd', 'Company');
+const entityB = entityFixture('ent-2', 'Jane Doe', 'Person');
 
 const ENTITIES = 'GET /api/investigations/inv-1/entities';
 const GRAPH = 'GET /api/investigations/inv-1/graph';
 const RELATIONSHIPS = 'POST /api/relationships';
 const EVIDENCE_REVIEWS = 'GET /api/relationships/rel-1/evidence-reviews';
-
-function relationshipFixture(overrides: Record<string, unknown> = {}) {
-  return {
-    id: 'rel-1',
-    relationship_entity_id: 'rel-entity-1',
-    ftm_id: 'ftm-1',
-    schema: 'Ownership',
-    caption: 'Ownership',
-    properties: {},
-    source: {id: 'ent-1', caption: 'Kestrelwood Holdings Ltd', schema: 'Company'},
-    target: {id: 'ent-2', caption: 'Jane Doe', schema: 'Person'},
-    provenance: {statement_count: 0, sources: [], evidence_attachments: []},
-    ...overrides,
-  };
-}
 
 // The evidence pool is read through the generated client now, which checks
 // the reply's full shape (lib/generated/types.gen.ts).
@@ -148,7 +136,7 @@ describe('Home FollowTheMoney relationship graph', () => {
     expect(addButton).not.toBeDisabled();
 
     api.add({
-      [RELATIONSHIPS]: {},
+      [RELATIONSHIPS]: relationshipFixture(),
       [GRAPH]: emptyGraph([relationshipFixture()]), // the graph the reload finds
     });
 
@@ -186,9 +174,9 @@ describe('Home FollowTheMoney relationship graph', () => {
   it("opens a relationship edge and loads its evidence review history", async () => {
     const api = await bootstrap([entityA, entityB], [relationshipFixture()]);
 
-    api.add({[EVIDENCE_REVIEWS]: {reviews: []}});
+    api.add({[EVIDENCE_REVIEWS]: {relationship_id: 'rel-1', reviews: []}});
 
-    await userEvent.setup().click(screen.getByText('Ownership', {selector: '.relEdge'}));
+    await userEvent.setup().click(await screen.findByText('Ownership', {selector: '.relEdge'}));
 
     await screen.findByText('Kestrelwood Holdings Ltd → Jane Doe');
     // The base fixture has no evidence attachments yet, so the
@@ -205,8 +193,8 @@ describe('Home FollowTheMoney relationship graph', () => {
     const api = await bootstrap([entityA, entityB], [relationshipFixture()], [evidencePoolRow()]);
     const attach = 'POST /api/relationships/rel-1/evidence';
 
-    api.add({[EVIDENCE_REVIEWS]: {reviews: []}});
-    await userEvent.setup().click(screen.getByText('Ownership', {selector: '.relEdge'}));
+    api.add({[EVIDENCE_REVIEWS]: {relationship_id: 'rel-1', reviews: []}});
+    await userEvent.setup().click(await screen.findByText('Ownership', {selector: '.relEdge'}));
     await screen.findByText('Attach exact evidence');
 
     const attachButton = screen.getByRole('button', {name: 'Attach evidence'});
@@ -229,6 +217,7 @@ describe('Home FollowTheMoney relationship graph', () => {
       provenance: {
         statement_count: 0,
         sources: [],
+        evidence_review_history: [],
         evidence_attachments: [
           {
             attachment_id: 'att-1',
@@ -260,6 +249,7 @@ describe('Home FollowTheMoney relationship graph', () => {
       provenance: {
         statement_count: 0,
         sources: [],
+        evidence_review_history: [],
         evidence_attachments: [
           {
             attachment_id: 'att-1',
@@ -275,8 +265,8 @@ describe('Home FollowTheMoney relationship graph', () => {
     const api = await bootstrap([entityA, entityB], [attachedFixture], [evidencePoolRow()]);
     const review = 'POST /api/relationships/rel-1/evidence/ev-1/reviews';
 
-    api.add({[EVIDENCE_REVIEWS]: {reviews: []}});
-    await userEvent.setup().click(screen.getByText('Ownership', {selector: '.relEdge'}));
+    api.add({[EVIDENCE_REVIEWS]: {relationship_id: 'rel-1', reviews: []}});
+    await userEvent.setup().click(await screen.findByText('Ownership', {selector: '.relEdge'}));
     await screen.findByText('Approved 3/3, signed by CFO.', {exact: false});
 
     const supportsButton = screen.getByRole('button', {name: 'Supports'});
@@ -292,7 +282,7 @@ describe('Home FollowTheMoney relationship graph', () => {
     api.add({
       [review]: attachedFixture,
       // The history the reload finds now holds the assessment.
-      [EVIDENCE_REVIEWS]: {reviews: [{id: 'rev-1', relationship_edge_id: 'rel-1', evidence_id: 'ev-1', stance: 'supports', rationale: 'Board minutes directly confirm the ownership stake.', created_at: '2026-09-23T00:00:00Z'}]},
+      [EVIDENCE_REVIEWS]: {relationship_id: 'rel-1', reviews: [{id: 'rev-1', relationship_edge_id: 'rel-1', evidence_id: 'ev-1', stance: 'supports', rationale: 'Board minutes directly confirm the ownership stake.', created_at: '2026-09-23T00:00:00Z'}]},
     });
 
     await user.click(supportsButton);
@@ -315,7 +305,7 @@ describe('Home FollowTheMoney relationship graph', () => {
     expect(screen.getByTestId('graph-node-ent-2')).toHaveTextContent('Jane Doe (Person)');
     expect(screen.getByTestId('graph-edge-rel-1')).toHaveTextContent('ent-1->ent-2:Ownership');
 
-    api.add({[EVIDENCE_REVIEWS]: {reviews: []}});
+    api.add({[EVIDENCE_REVIEWS]: {relationship_id: 'rel-1', reviews: []}});
     await userEvent.setup().click(screen.getByTestId('graph-edge-rel-1'));
 
     await screen.findByText('Kestrelwood Holdings Ltd → Jane Doe');
@@ -325,7 +315,7 @@ describe('Home FollowTheMoney relationship graph', () => {
 
   it('creates an entity from the manual entity form and reloads entities', async () => {
     const api = await bootstrap([entityA, entityB]);
-    const created = {id: 'ent-3', investigation_id: 'inv-1', caption: 'Harbor Trust', schema: 'Company', properties: {}};
+    const created = entityFixture('ent-3', 'Harbor Trust', 'Company');
     api.add({
       'POST /api/entities': created,
       [ENTITIES]: [entityA, entityB, created], // the list the reload finds
@@ -347,7 +337,7 @@ describe('Home FollowTheMoney relationship graph', () => {
 
   it('creates a Payment relationship with amount, currency, date and purpose', async () => {
     const api = await bootstrap([entityA, entityB]);
-    api.add({[RELATIONSHIPS]: {}});
+    api.add({[RELATIONSHIPS]: relationshipFixture({id: 'rel-2', schema: 'Payment'})});
 
     const user = userEvent.setup();
     // Opened via focus + ArrowDown rather than a click on the trigger: this

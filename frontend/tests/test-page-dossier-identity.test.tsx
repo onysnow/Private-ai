@@ -25,7 +25,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {mockApi} from '../test-support/mock-api';
 import type {MockApi} from '../test-support/mock-api';
-import {pageRoutes} from '../test-support/page-routes';
+import {dossierFixture as baseDossier, emptyReconciliation, entityFixture, pageRoutes} from '../test-support/page-routes';
 
 beforeEach(() => {
   if (!window.matchMedia) {
@@ -55,56 +55,37 @@ async function importHome(): Promise<() => ReactElement> {
 }
 
 const investigation = {id: 'inv-1', name: 'Kestrelwood filings'};
-const entityA = {id: 'ent-1', caption: 'Kestrelwood Holdings Ltd', schema: 'Company', properties: {}};
+const entityA = entityFixture('ent-1', 'Kestrelwood Holdings Ltd', 'Company');
 
 const DOSSIER = 'GET /api/entities/ent-1/dossier';
 const DUPLICATES = 'GET /api/entities/ent-1/duplicate-candidates';
 const RECONCILIATION = 'GET /api/entities/ent-1/post-merge-reconciliation';
 
-function emptyReconciliation() {
-  return {
-    entity_id: 'ent-1',
-    statement_duplicates: [],
-    relationship_duplicates: [],
-    summary: {statement_pairs: 0, relationship_pairs: 0, unresolved_pairs: 0},
-  };
-}
-
+// The dossier in the generated EntityDossierOut shape, with one merged alias
+// and the decision and audit that merged it.
 function dossierFixture(overrides: Record<string, unknown> = {}) {
-  return {
-    entity: entityA,
-    summary: {
-      statement_count: 5,
-      relationship_count: 0,
-      claim_count: 0,
-      evidence_count: 0,
-      lead_count: 0,
-      external_finding_count: 0,
-      unresolved_external_count: 0,
-    },
+  return baseDossier(entityA, {
+    summary: {...baseDossier(entityA).summary, statement_count: 5, identity_alias_count: 1, identity_decision_count: 1},
     identity_history: {
       canonical_entity_id: 'ent-1',
-      aliases: [{id: 'alias-1', caption: 'Kestrelwood Holdings LLC', schema: 'Company'}],
+      aliases: [{id: 'alias-1', caption: 'Kestrelwood Holdings LLC', schema: 'Company', merged_into_entity_id: 'ent-1'}],
       canonical_decisions: [
         {
           id: 'dec-1',
           decision: 'same',
           confidence: 0.95,
           rationale: 'Matched registration number.',
+          created_at: '2026-09-23T00:00:00',
           other_entity: {id: 'ent-2', caption: 'Kestrelwood Holdings LLC', schema: 'Company'},
         },
       ],
       merge_audits: [
-        {id: 'merge-1', source_entity_id: 'ent-2', target_entity_id: 'ent-1', rationale: 'Confirmed duplicate filing.'},
+        {id: 'merge-1', source_entity_id: 'ent-2', target_entity_id: 'ent-1', resolution_decision_id: 'dec-1', rationale: 'Confirmed duplicate filing.', moved_counts: {statements: 3}, created_at: '2026-09-23T00:00:00'},
       ],
       unresolved_decision_count: 0,
     },
-    property_conflicts: [],
-    relationships: [],
-    claims: [],
-    evidence: [],
     ...overrides,
-  };
+  });
 }
 
 function propertyConflict(overrides: Record<string, unknown> = {}) {
@@ -112,8 +93,9 @@ function propertyConflict(overrides: Record<string, unknown> = {}) {
     prop: 'incorporation_date',
     status: 'unresolved',
     preferred_value: null,
-    reason: 'Multiple conflicting values reported by different sources.',
+    reason: 'multiple_canonical_values',
     latest_decision: null,
+    decision_history: [],
     values: [
       {value: '2015-03-01', canonical: true, support_count: 2, conflict_count: 0, canonical_statements: [], external_assessments: []},
       {value: '2016-07-14', canonical: false, support_count: 1, conflict_count: 1, canonical_statements: [], external_assessments: []},
@@ -175,7 +157,7 @@ describe('Home entity dossier: identity history & property conflicts', () => {
         property_conflicts: [
           propertyConflict({
             status: 'resolved',
-            latest_decision: {id: 'pcd-1', decision: 'temporal_change', values: ['2015-03-01', '2016-07-14'], rationale: 'Confirmed via updated filing.', created_at: '2026-09-23T00:00:00Z'},
+            latest_decision: {id: 'pcd-1', decision: 'temporal_change', values: ['2015-03-01', '2016-07-14'], preferred_value: null, rationale: 'Confirmed via updated filing.', temporal_intervals: [], created_at: '2026-09-23T00:00:00Z'},
           }),
         ],
       }),

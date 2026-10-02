@@ -289,6 +289,9 @@ def serialize_relationship(db: Session, edge: RelationshipEdge) -> dict:
         "relationship_evidence_needs_review": any(item["latest_review"] is None or item["latest_review"]["stance"] in {"contradicts", "unresolved"} for item in attached_evidence),
         "relationship_evidence_attachment_count": len(attached_evidence),
         "relationship_evidence_review_counts": evidence_review_counts,
+        # A compact graph edge carries an aggregate advisory instead (see
+        # _apply_reconciliation_view); this key says which shape a reader holds.
+        "presentation_aggregate": False,
     }
     return {
         "id": edge.id,

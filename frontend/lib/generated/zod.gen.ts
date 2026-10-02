@@ -11,11 +11,106 @@ export const zAiAnalysisCandidateReviewRequest = z.object({
 });
 
 /**
+ * AggregateClaimDependencyOut
+ *
+ * A claim dependency collected across reviewed duplicate edges, naming
+ * the underlying edge it belongs to.
+ */
+export const zAggregateClaimDependencyOut = z.object({
+  claim_id: z.string(),
+  confidence: z.number(),
+  evidence_id: z.string(),
+  needs_review: z.boolean(),
+  note: z.string().nullish(),
+  relationship_id: z.string().nullish(),
+  stance: z.string(),
+  status: z.string(),
+  text: z.string(),
+});
+
+/**
+ * AiControlFlagOut
+ */
+export const zAiControlFlagOut = z.object({
+  allowed: z.array(z.string()),
+  default: z.string(),
+});
+
+/**
+ * AiControlSurfaceOut
+ */
+export const zAiControlSurfaceOut = z.object({
+  available: z.boolean(),
+  flags: z.record(zAiControlFlagOut),
+  spec_file: z.string(),
+});
+
+/**
+ * AiLimitsOut
+ */
+export const zAiLimitsOut = z.object({
+  max_concurrent_runs: z.number().int(),
+  max_output_tokens: z.number().int(),
+  request_timeout_seconds: z.number(),
+  runs_per_minute_per_actor: z.number().int(),
+});
+
+/**
+ * AiModuleStatusOut
+ */
+export const zAiModuleStatusOut = z.object({
+  available: z.boolean(),
+  spec_file: z.string(),
+  vendored_tas: z.boolean(),
+});
+
+/**
+ * AiTasSpecOut
+ */
+export const zAiTasSpecOut = z.object({
+  control_surface: zAiControlSurfaceOut,
+  modules: z.record(zAiModuleStatusOut),
+  present: z.boolean(),
+  version: z.string().nullable(),
+});
+
+/**
+ * AiReasoningStatusOut
+ *
+ * Whether the AI reasoning endpoints can be called, and what they would
+ * run on. Never carries key material. Every key is always sent (null when
+ * unknown), so the nullable ones have no default: the generated type then
+ * matches the AI panel's own status type (lib/api-types.ts).
+ */
+export const zAiReasoningStatusOut = z.object({
+  enabled: z.boolean(),
+  endpoints_callable: z.boolean(),
+  limits: zAiLimitsOut,
+  model: z.string().nullable(),
+  provider: z.string().nullable(),
+  provider_key_configured: z.boolean(),
+  remote_endpoint_allowed: z.boolean(),
+  runs_on_this_computer: z.boolean().nullable(),
+  tas_spec: zAiTasSpecOut,
+});
+
+/**
  * AlephSearchRequest
  */
 export const zAlephSearchRequest = z.object({
   investigation_id: z.string(),
   query: z.string(),
+});
+
+/**
+ * ApiAccessStatusOut
+ */
+export const zApiAccessStatusOut = z.object({
+  investigation_scope_configured: z.boolean(),
+  mode: z.enum(['local_only', 'shared_bearer', 'persisted_users']),
+  persisted_identity_count: z.number().int(),
+  remote_api_enabled: z.boolean(),
+  token_configured: z.boolean(),
 });
 
 /**
@@ -130,12 +225,80 @@ export const zBulkIn = z.object({
 });
 
 /**
+ * CanonicalDecisionSummaryOut
+ *
+ * The latest reporter decision on a duplicate pair (`created_at` as the
+ * service formats it, an ISO string).
+ */
+export const zCanonicalDecisionSummaryOut = z.object({
+  confidence: z.number(),
+  created_at: z.string(),
+  decision: z.string(),
+  id: z.string(),
+  rationale: z.string().nullish(),
+});
+
+/**
+ * CanonicalDuplicateCandidateOut
+ */
+export const zCanonicalDuplicateCandidateOut = z.object({
+  caption: z.string(),
+  entity_id: z.string(),
+  latest_decision: zCanonicalDecisionSummaryOut.nullish(),
+  schema: z.string(),
+  score: z.number(),
+});
+
+/**
+ * CanonicalEntityMergeAuditOut
+ *
+ * The record of a merge: the preview it was executed from and what moved.
+ */
+export const zCanonicalEntityMergeAuditOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  id: z.string(),
+  investigation_id: z.string(),
+  moved_counts_json: z.record(z.number().int()),
+  preview_digest: z.string(),
+  preview_json: z.record(z.unknown()),
+  rationale: z.string().nullish(),
+  resolution_decision_id: z.string().nullish(),
+  source_entity_id: z.string(),
+  target_entity_id: z.string(),
+});
+
+/**
+ * CanonicalMergeExecuteOut
+ */
+export const zCanonicalMergeExecuteOut = z.object({
+  audit: zCanonicalEntityMergeAuditOut,
+  source_entity_id: z.string(),
+  target_entity_id: z.string(),
+});
+
+/**
  * CanonicalMergeExecuteRequest
  */
 export const zCanonicalMergeExecuteRequest = z.object({
   preview_digest: z.string(),
   rationale: z.string().nullish(),
   target_entity_id: z.string(),
+});
+
+/**
+ * CanonicalResolutionDecisionOut
+ *
+ * A reporter's decision whether two canonical records are one entity, as stored.
+ */
+export const zCanonicalResolutionDecisionOut = z.object({
+  confidence: z.number(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  decision: z.string(),
+  entity_a_id: z.string(),
+  entity_b_id: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  rationale: z.string().nullish(),
 });
 
 /**
@@ -320,6 +483,48 @@ export const zClaimUpdate = z.object({
 });
 
 /**
+ * ClusterDecisionOut
+ */
+export const zClusterDecisionOut = z.object({
+  confidence: z.number(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  decision: z.string(),
+  id: z.string(),
+  rationale: z.string().nullish(),
+});
+
+/**
+ * ClusterFindingOut
+ */
+export const zClusterFindingOut = z.object({
+  caption: z.string(),
+  id: z.string(),
+  properties: z.record(z.unknown()),
+  provider: z.string(),
+  provider_record_id: z.string(),
+  schema: z.string().nullish(),
+  source_url: z.string().nullish(),
+});
+
+/**
+ * ClusterReasonOut
+ */
+export const zClusterReasonOut = z.object({
+  detail: z.string(),
+  kind: z.string(),
+  weight: z.number(),
+});
+
+/**
+ * ClusterPairOut
+ */
+export const zClusterPairOut = z.object({
+  finding_ids: z.array(z.string()),
+  reasons: z.array(zClusterReasonOut),
+  score: z.number(),
+});
+
+/**
  * CollectionIn
  */
 export const zCollectionIn = z.object({
@@ -335,6 +540,80 @@ export const zConfirmIn = z.object({
 });
 
 /**
+ * ConnectorCredentialRemovedOut
+ */
+export const zConnectorCredentialRemovedOut = z.object({
+  configured: z.boolean(),
+  local_store_present: z.boolean(),
+  permissions_restricted: z.boolean(),
+  provider: z.string(),
+  removed: z.boolean(),
+  source: z.string(),
+  storage_protection: z.string(),
+});
+
+/**
+ * ConnectorCredentialSavedOut
+ */
+export const zConnectorCredentialSavedOut = z.object({
+  configured: z.boolean(),
+  local_store_present: z.boolean(),
+  permissions_restricted: z.boolean(),
+  provider: z.string(),
+  source: z.string(),
+  storage_protection: z.string(),
+});
+
+/**
+ * ConnectorCredentialStatusOut
+ *
+ * Whether a connector has a credential and where it comes from; the secret itself is never sent.
+ */
+export const zConnectorCredentialStatusOut = z.object({
+  configured: z.boolean(),
+  local_store_present: z.boolean(),
+  permissions_restricted: z.boolean(),
+  source: z.string(),
+  storage_protection: z.string(),
+});
+
+/**
+ * ConnectorFindingOut
+ *
+ * What a connector found, kept as the provider sent it (`properties` and
+ * `raw` are the provider's own shapes) until a reporter decides what it means.
+ */
+export const zConnectorFindingOut = z.object({
+  caption: z.string(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  id: z.string(),
+  investigation_id: z.string(),
+  properties: z.record(z.unknown()),
+  provider: z.string(),
+  provider_record_id: z.string(),
+  raw: z.record(z.unknown()),
+  review_status: z.string(),
+  run_id: z.string().nullish(),
+  schema: z.string().nullish(),
+  source_url: z.string().nullish(),
+});
+
+/**
+ * ConnectorRunOut
+ */
+export const zConnectorRunOut = z.object({
+  error: z.string().nullish(),
+  finished_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  id: z.string(),
+  investigation_id: z.string(),
+  provider: z.string(),
+  query: z.string(),
+  result_count: z.number().int(),
+  started_at: z.string().datetime({ offset: true, local: true }),
+  status: z.string(),
+});
+
+/**
  * ConnectorSearchRequest
  */
 export const zConnectorSearchRequest = z.object({
@@ -343,11 +622,47 @@ export const zConnectorSearchRequest = z.object({
 });
 
 /**
+ * ConnectorStatusOut
+ */
+export const zConnectorStatusOut = z.object({
+  configured: z.boolean(),
+});
+
+/**
+ * ConnectorsOut
+ *
+ * The connectors this server knows, and whether each has what it needs.
+ */
+export const zConnectorsOut = z.object({
+  providers: z.array(z.string()),
+  status: z.record(zConnectorStatusOut),
+});
+
+/**
  * CreateIn
  */
 export const zCreateIn = z.object({
   kind: z.string().max(64),
   selection: z.string().max(500).nullish(),
+});
+
+/**
+ * CrossProviderDecisionOut
+ *
+ * A reporter's decision that findings from different providers are, or
+ * are not, the same outside entity.
+ */
+export const zCrossProviderDecisionOut = z.object({
+  cluster_key: z.string(),
+  confidence: z.number(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  decision: z.string(),
+  entity_id: z.string(),
+  finding_ids: z.array(z.string()),
+  id: z.string(),
+  investigation_id: z.string(),
+  rationale: z.string().nullish(),
+  session_id: z.string().nullish(),
 });
 
 /**
@@ -468,6 +783,201 @@ export const zDocumentOut = z.object({
 });
 
 /**
+ * DossierClaimLinkOut
+ */
+export const zDossierClaimLinkOut = z.object({
+  claim_id: z.string(),
+  note: z.string().nullish(),
+  stance: z.string(),
+});
+
+/**
+ * DossierMatchBasisOut
+ *
+ * Why a record is in the dossier: an explicit link, or (named as such) a
+ * text mention of the entity, with the matched terms.
+ */
+export const zDossierMatchBasisOut = z.object({
+  terms: z.array(z.string()).nullish(),
+  type: z.string(),
+});
+
+/**
+ * DossierClaimOut
+ */
+export const zDossierClaimOut = z.object({
+  claim: zClaimOut,
+  match_basis: zDossierMatchBasisOut,
+});
+
+/**
+ * DossierSummaryOut
+ */
+export const zDossierSummaryOut = z.object({
+  claim_count: z.number().int(),
+  claim_statuses: z.record(z.number().int()),
+  enrichment_session_count: z.number().int(),
+  evidence_count: z.number().int(),
+  external_finding_count: z.number().int(),
+  external_finding_statuses: z.record(z.number().int()),
+  identity_alias_count: z.number().int(),
+  identity_decision_count: z.number().int(),
+  identity_unresolved_count: z.number().int(),
+  lead_count: z.number().int(),
+  property_conflict_count: z.number().int(),
+  relationship_count: z.number().int(),
+  relationship_mixed_support_count: z.number().int(),
+  relationship_review_advisory_count: z.number().int(),
+  relationship_schemas: z.record(z.number().int()),
+  relationship_suppressed_duplicate_count: z.number().int(),
+  relationship_underlying_count: z.number().int(),
+  statement_count: z.number().int(),
+  task_count: z.number().int(),
+  timeline_event_count: z.number().int(),
+  unresolved_external_count: z.number().int(),
+});
+
+/**
+ * EnrichmentClusterOut
+ *
+ * Findings from different providers that may describe one outside
+ * entity, with the reasons for each pairing and the latest reporter decision.
+ */
+export const zEnrichmentClusterOut = z.object({
+  cluster_key: z.string(),
+  decision: zClusterDecisionOut.nullish(),
+  finding_ids: z.array(z.string()),
+  findings: z.array(zClusterFindingOut),
+  pairs: z.array(zClusterPairOut),
+  providers: z.array(z.string()),
+  score: z.number(),
+});
+
+/**
+ * EnrichmentRunResultOut
+ *
+ * One provider's part of an enrichment session; `error` is sent only when it failed.
+ */
+export const zEnrichmentRunResultOut = z.object({
+  error: z.string().nullish(),
+  provider: z.string(),
+  result_count: z.number().int(),
+  run_id: z.string(),
+  status: z.string(),
+});
+
+/**
+ * EnrichmentSessionFindingOut
+ */
+export const zEnrichmentSessionFindingOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  finding_id: z.string(),
+  id: z.string(),
+  provider: z.string(),
+  session_id: z.string(),
+});
+
+/**
+ * EnrichmentSessionOut
+ *
+ * The reply to running every chosen connector against one entity.
+ */
+export const zEnrichmentSessionOut = z.object({
+  entity_id: z.string(),
+  finished_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  id: z.string(),
+  investigation_id: z.string(),
+  providers: z.array(z.string()),
+  runs: z.array(zEnrichmentRunResultOut),
+  started_at: z.string().datetime({ offset: true, local: true }),
+  status: z.string(),
+  total_results: z.number().int(),
+});
+
+/**
+ * EnrichmentSessionRowOut
+ *
+ * An enrichment session as stored.
+ */
+export const zEnrichmentSessionRowOut = z.object({
+  entity_id: z.string(),
+  finished_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  id: z.string(),
+  investigation_id: z.string(),
+  providers: z.array(z.string()),
+  started_at: z.string().datetime({ offset: true, local: true }),
+  status: z.string(),
+  total_results: z.number().int(),
+});
+
+/**
+ * EnrichmentSessionRunOut
+ */
+export const zEnrichmentSessionRunOut = z.object({
+  error: z.string().nullish(),
+  finished_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  id: z.string(),
+  provider: z.string(),
+  result_count: z.number().int(),
+  run_id: z.string().nullish(),
+  session_id: z.string(),
+  started_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  status: z.string(),
+});
+
+/**
+ * EnrichmentSessionDetailOut
+ *
+ * A stored session with its per-provider runs.
+ */
+export const zEnrichmentSessionDetailOut = z.object({
+  entity_id: z.string(),
+  finished_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  id: z.string(),
+  investigation_id: z.string(),
+  providers: z.array(z.string()),
+  runs: z.array(zEnrichmentSessionRunOut),
+  started_at: z.string().datetime({ offset: true, local: true }),
+  status: z.string(),
+  total_results: z.number().int(),
+});
+
+/**
+ * EntityAliasLinkOut
+ */
+export const zEntityAliasLinkOut = z.object({
+  caption: z.string(),
+  id: z.string(),
+  merged_into_entity_id: z.string().nullish(),
+});
+
+/**
+ * EntityAliasResolutionOut
+ *
+ * Sent when the dossier was asked for by a merged alias: which record
+ * was asked for and which one answers.
+ */
+export const zEntityAliasResolutionOut = z.object({
+  active_caption: z.string(),
+  active_entity_id: z.string(),
+  alias_chain: z.array(zEntityAliasLinkOut),
+  requested_caption: z.string(),
+  requested_entity_id: z.string(),
+});
+
+/**
+ * EntityCandidateOut
+ *
+ * A canonical entity that may be what a finding describes, with a name-match score.
+ */
+export const zEntityCandidateOut = z.object({
+  caption: z.string(),
+  entity_id: z.string(),
+  schema: z.string(),
+  score: z.number(),
+});
+
+/**
  * EntityCreate
  */
 export const zEntityCreate = z.object({
@@ -477,6 +987,41 @@ export const zEntityCreate = z.object({
   origin: z.string().nullish(),
   properties: z.record(z.array(z.string())).optional(),
   schema: z.string(),
+});
+
+/**
+ * EntityOut
+ *
+ * A canonical FollowTheMoney entity as stored. `merged_into_entity_id`
+ * names the surviving record when this one was merged away.
+ */
+export const zEntityOut = z.object({
+  canonical_id: z.string().nullish(),
+  caption: z.string(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  ftm_id: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  merged_into_entity_id: z.string().nullish(),
+  properties: z.record(z.array(z.string())),
+  schema: z.string(),
+});
+
+/**
+ * EntityStatementOut
+ *
+ * A statement as stored, with the entity it belongs to.
+ */
+export const zEntityStatementOut = z.object({
+  dataset: z.string(),
+  entity_id: z.string(),
+  first_seen: z.string().datetime({ offset: true, local: true }).nullish(),
+  id: z.string(),
+  last_seen: z.string().datetime({ offset: true, local: true }).nullish(),
+  origin: z.string().nullish(),
+  original_value: z.string().nullish(),
+  prop: z.string(),
+  value: z.string(),
 });
 
 /**
@@ -538,6 +1083,23 @@ export const zEvidenceWithSourceOut = z.object({
   notes: z.string().nullish(),
   quote: z.string().nullish(),
   source: zEvidenceSourceOut.nullish(),
+});
+
+/**
+ * AggregateProvenanceOut
+ *
+ * The provenance inventory of a compact preferred edge: every statement
+ * source and evidence record beneath it and its reviewed duplicates.
+ * Presentation only; no records are merged.
+ */
+export const zAggregateProvenanceOut = z.object({
+  evidence: z.array(zEvidenceWithSourceOut),
+  evidence_count: z.number().int(),
+  presentation_only: z.literal(true),
+  statement_count: z.number().int(),
+  statement_sources: z.array(z.string()),
+  underlying_relationship_count: z.number().int(),
+  underlying_relationship_ids: z.array(z.string()),
 });
 
 /**
@@ -704,6 +1266,85 @@ export const zExternalAssessmentOut = z.object({
 });
 
 /**
+ * DossierConflictValueOut
+ *
+ * One value of a disputed property: where it is asserted and how it was assessed.
+ */
+export const zDossierConflictValueOut = z.object({
+  canonical: z.boolean(),
+  canonical_statements: z.array(zCanonicalStatementOut),
+  conflict_count: z.number().int(),
+  external_assessments: z.array(zExternalAssessmentOut),
+  latest_status: z.string().nullish(),
+  support_count: z.number().int(),
+  value: z.string(),
+});
+
+/**
+ * ExternalEndpointFindingOut
+ *
+ * The connector finding that describes one end of an external relationship.
+ */
+export const zExternalEndpointFindingOut = z.object({
+  caption: z.string(),
+  id: z.string(),
+  provider_record_id: z.string(),
+  schema: z.string().nullish(),
+  source_url: z.string().nullish(),
+});
+
+/**
+ * ExternalRelationshipCandidatesOut
+ *
+ * For a relationship a connector found: which canonical entities may be
+ * its two ends. An end's own finding is named only when the connector
+ * also returned it.
+ */
+export const zExternalRelationshipCandidatesOut = z.object({
+  schema: z.string(),
+  source_candidates: z.array(zEntityCandidateOut),
+  source_external_finding: zExternalEndpointFindingOut.nullish(),
+  source_external_id: z.string(),
+  source_prop: z.string(),
+  target_candidates: z.array(zEntityCandidateOut),
+  target_external_finding: zExternalEndpointFindingOut.nullish(),
+  target_external_id: z.string(),
+  target_prop: z.string(),
+});
+
+/**
+ * ExternalRelationshipPromotionOut
+ *
+ * A supported external relationship written into the canonical graph.
+ */
+export const zExternalRelationshipPromotionOut = z.object({
+  finding_id: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  promoted_at: z.string().datetime({ offset: true, local: true }),
+  provider: z.string(),
+  relationship_edge_id: z.string(),
+  relationship_entity_id: z.string(),
+  review_id: z.string(),
+  source_url: z.string().nullish(),
+});
+
+/**
+ * ExternalRelationshipReviewOut
+ */
+export const zExternalRelationshipReviewOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  decision: z.string(),
+  finding_id: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  note: z.string().nullish(),
+  schema: z.string(),
+  source_entity_id: z.string().nullish(),
+  target_entity_id: z.string().nullish(),
+});
+
+/**
  * ExternalRelationshipReviewRequest
  */
 export const zExternalRelationshipReviewRequest = z.object({
@@ -810,6 +1451,31 @@ export const zExtractionReviewOut = z.object({
 });
 
 /**
+ * FinancialTransactionOut
+ *
+ * One Payment edge the ledger could read in full. Keys follow the
+ * frontend's transaction type (lib/financial-flow-types.ts).
+ */
+export const zFinancialTransactionOut = z.object({
+  amount: z.number(),
+  currency: z.string(),
+  dateTime: z.string().nullish(),
+  evidence: z.string().nullish(),
+  evidence_count: z.number().int(),
+  flowType: z.enum(['direct', 'inferred']),
+  from: z.string(),
+  from_entity_id: z.string(),
+  id: z.string(),
+  relationship_id: z.string(),
+  statedPurpose: z.string().nullish(),
+  status: z.string().nullish(),
+  supporting_evidence_count: z.number().int(),
+  to: z.string(),
+  to_entity_id: z.string(),
+  transactionNumber: z.string().nullish(),
+});
+
+/**
  * FindingReviewRequest
  */
 export const zFindingReviewRequest = z.object({
@@ -825,6 +1491,31 @@ export const zFlagIn = z.object({
 });
 
 /**
+ * GraphNodeOut
+ *
+ * A canonical entity that is an endpoint of a shown edge.
+ */
+export const zGraphNodeOut = z.object({
+  caption: z.string(),
+  ftm_id: z.string(),
+  id: z.string(),
+  properties: z.record(z.array(z.string())),
+  schema: z.string(),
+});
+
+/**
+ * GraphReconciliationOut
+ *
+ * How many edges the duplicate view hid.
+ */
+export const zGraphReconciliationOut = z.object({
+  collapsed_by_default: z.boolean(),
+  suppressed_duplicate_count: z.number().int(),
+  underlying_edge_count: z.number().int(),
+  visible_edge_count: z.number().int(),
+});
+
+/**
  * HypothesisTestRequest
  */
 export const zHypothesisTestRequest = z.object({
@@ -834,6 +1525,67 @@ export const zHypothesisTestRequest = z.object({
   severity_floor: z.enum(['ALL', 'MATERIAL', 'BLOCKING']).nullish(),
   source_tier_floor: z.enum(['A', 'B', 'C', 'D', 'E', 'F']).nullish(),
   working_theory: z.string().min(1).max(2000),
+});
+
+/**
+ * IdentityAliasOut
+ */
+export const zIdentityAliasOut = z.object({
+  caption: z.string(),
+  id: z.string(),
+  merged_into_entity_id: z.string().nullish(),
+  schema: z.string(),
+});
+
+/**
+ * IdentityMergeAuditOut
+ */
+export const zIdentityMergeAuditOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  id: z.string(),
+  moved_counts: z.record(z.number().int()),
+  rationale: z.string().nullish(),
+  resolution_decision_id: z.string().nullish(),
+  source_entity_id: z.string(),
+  target_entity_id: z.string(),
+});
+
+/**
+ * IncompleteTransactionOut
+ *
+ * A Payment edge the ledger could not chart, with what is missing or
+ * ambiguous; nothing is guessed.
+ */
+export const zIncompleteTransactionOut = z.object({
+  amount: z.number().nullish(),
+  currency: z.string().nullish(),
+  dateTime: z.string().nullish(),
+  evidence: z.string().nullish(),
+  evidence_count: z.number().int(),
+  flowType: z.enum(['direct', 'inferred']),
+  from: z.string().nullish(),
+  from_entity_id: z.string().nullish(),
+  id: z.string(),
+  problems: z.array(z.string()),
+  relationship_id: z.string(),
+  statedPurpose: z.string().nullish(),
+  status: z.string().nullish(),
+  supporting_evidence_count: z.number().int(),
+  to: z.string().nullish(),
+  to_entity_id: z.string().nullish(),
+  transactionNumber: z.string().nullish(),
+});
+
+/**
+ * FinancialLedgerOut
+ */
+export const zFinancialLedgerOut = z.object({
+  currencies: z.array(z.string()),
+  duplicate_rule: z.string(),
+  flow_type_rule: z.string(),
+  incomplete: z.array(zIncompleteTransactionOut),
+  investigation_id: z.string(),
+  transactions: z.array(zFinancialTransactionOut),
 });
 
 /**
@@ -877,6 +1629,17 @@ export const zInvestigationDeletionResult = z.object({
  */
 export const zInvestigationMembershipPut = z.object({
   role: z.string().optional().default('viewer'),
+});
+
+/**
+ * InvestigationOut
+ */
+export const zInvestigationOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  description: z.string().nullish(),
+  id: z.string(),
+  is_demo: z.boolean(),
+  name: z.string(),
 });
 
 /**
@@ -956,6 +1719,30 @@ export const zLeadLinkOut = z.object({
   type: z
     .enum(['entity', 'source', 'claim', 'evidence', 'relationship'])
     .nullish(),
+});
+
+/**
+ * LeadRowOut
+ *
+ * A lead as stored (without its profile, links and history).
+ */
+export const zLeadRowOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  detail: z.string().nullish(),
+  id: z.string(),
+  investigation_id: z.string(),
+  provider: z.string().nullish(),
+  provider_record_id: z.string().nullish(),
+  status: z.string(),
+  title: z.string(),
+});
+
+/**
+ * DossierLeadOut
+ */
+export const zDossierLeadOut = z.object({
+  lead: zLeadRowOut,
+  match_basis: zDossierMatchBasisOut,
 });
 
 /**
@@ -1079,10 +1866,115 @@ export const zExtractionLineageLookupOut = z.object({
 });
 
 /**
+ * MergeBlockerOut
+ */
+export const zMergeBlockerOut = z.object({
+  code: z.string(),
+  message: z.string(),
+  record_ids: z.array(z.string()),
+});
+
+/**
+ * MergeEntityOut
+ */
+export const zMergeEntityOut = z.object({
+  caption: z.string(),
+  id: z.string(),
+  schema: z.string(),
+});
+
+/**
+ * IdentityDecisionOut
+ */
+export const zIdentityDecisionOut = z.object({
+  confidence: z.number(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  decision: z.string(),
+  id: z.string(),
+  other_entity: zMergeEntityOut.nullish(),
+  rationale: z.string().nullish(),
+});
+
+/**
+ * EntityIdentityHistoryOut
+ *
+ * Every identity judgement about the entity: merged aliases, reporter
+ * decisions, merge audits. Audit-oriented; nothing here is inferred.
+ */
+export const zEntityIdentityHistoryOut = z.object({
+  aliases: z.array(zIdentityAliasOut),
+  canonical_decisions: z.array(zIdentityDecisionOut),
+  canonical_entity_id: z.string(),
+  merge_audits: z.array(zIdentityMergeAuditOut),
+  unresolved_decision_count: z.number().int(),
+});
+
+/**
+ * MergeReferenceOut
+ *
+ * Records of one kind that would move to the surviving entity (the first hundred ids).
+ */
+export const zMergeReferenceOut = z.object({
+  count: z.number().int(),
+  record_ids: z.array(z.string()),
+});
+
+/**
+ * MergeResolutionOut
+ */
+export const zMergeResolutionOut = z.object({
+  confidence: z.number(),
+  decision: z.string(),
+  id: z.string(),
+  rationale: z.string().nullish(),
+});
+
+/**
+ * CanonicalMergePreviewOut
+ *
+ * What a merge would move, what blocks it, and the digest the execute
+ * call must repeat so a stale preview is never acted on.
+ */
+export const zCanonicalMergePreviewOut = z.object({
+  blockers: z.array(zMergeBlockerOut),
+  can_execute: z.boolean(),
+  preview_digest: z.string(),
+  references: z.record(zMergeReferenceOut),
+  resolution: zMergeResolutionOut.nullish(),
+  source: zMergeEntityOut,
+  target: zMergeEntityOut,
+  total_references: z.number().int(),
+});
+
+/**
  * MultiEnrichmentRequest
  */
 export const zMultiEnrichmentRequest = z.object({
   providers: z.array(z.string()).optional(),
+});
+
+/**
+ * OcrRuntimeStatusOut
+ */
+export const zOcrRuntimeStatusOut = z.object({
+  available: z.boolean(),
+  detail: z.string().nullish(),
+  missing_languages: z.array(z.string()),
+  requested_languages: z.array(z.string()),
+  tessdata: z.string().nullish(),
+});
+
+/**
+ * DocumentExtractionSettingsOut
+ */
+export const zDocumentExtractionSettingsOut = z.object({
+  entity_extraction_owner: z.enum(['workbench_local', 'openaleph_ftm_analyze']),
+  local_entity_suggestions_enabled: z.boolean(),
+  ocr_runtime: zOcrRuntimeStatusOut,
+  pdf_ocr_dpi: z.number().int(),
+  pdf_ocr_enabled: z.boolean(),
+  pdf_ocr_language: z.string(),
+  pdf_ocr_min_native_chars: z.number().int(),
 });
 
 /**
@@ -1212,6 +2104,16 @@ export const zOpenAlephReviewRefreshOut = z.object({
 });
 
 /**
+ * OrphanFileOut
+ */
+export const zOrphanFileOut = z.object({
+  action: z.string(),
+  modified_at: z.number(),
+  relative_path: z.string(),
+  size_bytes: z.number().int(),
+});
+
+/**
  * PlanIn
  */
 export const zPlanIn = z.object({
@@ -1265,6 +2167,68 @@ export const zPropertyConflictDecisionRequest = z.object({
 });
 
 /**
+ * PropertyTemporalIntervalOut
+ *
+ * When one value of a property held, as the reporter recorded it.
+ */
+export const zPropertyTemporalIntervalOut = z.object({
+  date_end: z.string().nullish(),
+  date_start: z.string().nullish(),
+  evidence_id: z.string().nullish(),
+  precision: z.string(),
+  value: z.string(),
+});
+
+/**
+ * DossierConflictDecisionOut
+ *
+ * A property-conflict decision as the dossier shows it.
+ */
+export const zDossierConflictDecisionOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  decision: z.string(),
+  id: z.string(),
+  preferred_value: z.string().nullish(),
+  rationale: z.string().nullish(),
+  temporal_intervals: z.array(zPropertyTemporalIntervalOut),
+  values: z.array(z.string()),
+});
+
+/**
+ * DossierPropertyConflictOut
+ *
+ * A property with several canonical values, or an outside conflict with
+ * its value. Diagnostic only: the dossier never picks a value itself.
+ */
+export const zDossierPropertyConflictOut = z.object({
+  decision_history: z.array(zDossierConflictDecisionOut),
+  latest_decision: zDossierConflictDecisionOut.nullish(),
+  preferred_value: z.string().nullish(),
+  prop: z.string(),
+  reason: z.string(),
+  status: z.string(),
+  values: z.array(zDossierConflictValueOut),
+});
+
+/**
+ * PropertyConflictDecisionOut
+ *
+ * A reporter's decision on a property with several values, as stored.
+ */
+export const zPropertyConflictDecisionOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  decision: z.string(),
+  entity_id: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  preferred_value: z.string().nullish(),
+  prop: z.string(),
+  rationale: z.string().nullish(),
+  temporal_intervals_json: z.array(zPropertyTemporalIntervalOut),
+  values_json: z.array(z.string()),
+});
+
+/**
  * QueryRef
  *
  * One catalogued query and its parameters, as the AI writes them.
@@ -1272,6 +2236,33 @@ export const zPropertyConflictDecisionRequest = z.object({
 export const zQueryRef = z.object({
   name: z.string(),
   params: z.record(z.string()).optional(),
+});
+
+/**
+ * ReconciliationDecisionOut
+ *
+ * A reporter's decision on one duplicate pair after a merge.
+ */
+export const zReconciliationDecisionOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  decision: z.string(),
+  entity_id: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  preferred_record_id: z.string().nullish(),
+  rationale: z.string().nullish(),
+  record_a_id: z.string(),
+  record_b_id: z.string(),
+  record_type: z.string(),
+});
+
+/**
+ * ReconciliationSummaryOut
+ */
+export const zReconciliationSummaryOut = z.object({
+  relationship_pairs: z.number().int(),
+  statement_pairs: z.number().int(),
+  unresolved_pairs: z.number().int(),
 });
 
 /**
@@ -1315,6 +2306,26 @@ export const zDataTableRowOut = z.object({
 export const zDataTableOut = z.object({
   columns: z.array(z.string()),
   rows: z.array(zDataTableRowOut),
+});
+
+/**
+ * RelationshipAggregateAdvisoryOut
+ *
+ * The advisory of a compact graph edge that stands in for several
+ * reviewed duplicate records: computed over every underlying edge's
+ * evidence, so one challenged claim does not colour an edge another
+ * reviewed evidence record supports. Presentation only; no record changes.
+ */
+export const zRelationshipAggregateAdvisoryOut = z.object({
+  challenged_supporting_evidence_count: z.number().int(),
+  claim_dependencies: z.array(zAggregateClaimDependencyOut),
+  disputed_claim_count: z.number().int(),
+  has_independent_support: z.boolean(),
+  healthy_supporting_evidence_count: z.number().int(),
+  needs_review: z.boolean(),
+  presentation_aggregate: z.literal(true),
+  rejected_claim_count: z.number().int(),
+  support_state: z.string(),
 });
 
 /**
@@ -1363,6 +2374,9 @@ export const zRelationshipEvidenceReviewOut = z.object({
 
 /**
  * RelationshipAdvisoryOut
+ *
+ * What the review layer says about one relationship record: the claims
+ * that rest on its attached evidence, and how its evidence was reviewed.
  */
 export const zRelationshipAdvisoryOut = z.object({
   challenged_supporting_claim_count: z.number().int(),
@@ -1371,6 +2385,7 @@ export const zRelationshipAdvisoryOut = z.object({
   has_independent_support: z.boolean(),
   healthy_supporting_claim_count: z.number().int(),
   needs_review: z.boolean(),
+  presentation_aggregate: z.literal(false),
   rejected_claim_count: z.number().int(),
   relationship_evidence_attachment_count: z.number().int(),
   relationship_evidence_needs_review: z.boolean(),
@@ -1400,6 +2415,16 @@ export const zRelationshipEvidenceReviewRequest = z.object({
 });
 
 /**
+ * RelationshipEvidenceReviewsOut
+ *
+ * Every reporter assessment of one relationship's attached evidence, oldest first.
+ */
+export const zRelationshipEvidenceReviewsOut = z.object({
+  relationship_id: z.string(),
+  reviews: z.array(zRelationshipEvidenceReviewOut),
+});
+
+/**
  * RelationshipProvenanceOut
  */
 export const zRelationshipProvenanceOut = z.object({
@@ -1413,6 +2438,24 @@ export const zRelationshipProvenanceOut = z.object({
     .default([]),
   sources: z.array(z.string()),
   statement_count: z.number().int(),
+});
+
+/**
+ * RelationshipReconciliationOut
+ *
+ * How a reporter's latest duplicate decision places this edge: the
+ * preferred record of its pair, or a suppressed copy of one.
+ */
+export const zRelationshipReconciliationOut = z.object({
+  decision: z.string(),
+  decision_id: z.string(),
+  is_preferred: z.boolean(),
+  preferred_record_id: z.string(),
+  rationale: z.string().nullish(),
+  secondary_record_id: z.string(),
+  suppressed_duplicate: z.boolean(),
+  suppressed_duplicate_count: z.number().int(),
+  suppressed_duplicate_ids: z.array(z.string()),
 });
 
 /**
@@ -1440,6 +2483,22 @@ export const zReportingTaskUpdate = z.object({
   status: z.string().nullish(),
   title: z.string().nullish(),
   workflow_note: z.string().nullish(),
+});
+
+/**
+ * ResolutionDecisionOut
+ *
+ * A reporter's identity decision on a finding, as stored.
+ */
+export const zResolutionDecisionOut = z.object({
+  confidence: z.number(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  decision: z.string(),
+  entity_id: z.string().nullish(),
+  finding_id: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  rationale: z.string().nullish(),
 });
 
 /**
@@ -1539,6 +2598,113 @@ export const zSearchOut = z.object({
 });
 
 /**
+ * SecurityAuditRecordOut
+ *
+ * One audit line's public fields: request metadata only, never a body.
+ */
+export const zSecurityAuditRecordOut = z.object({
+  client_host: z.string().nullish(),
+  event: z.string(),
+  local_request: z.boolean(),
+  method: z.string(),
+  path: z.string(),
+  request_id: z.string(),
+  status_code: z.number().int(),
+  timestamp: z.string(),
+});
+
+/**
+ * SecurityAuditRetentionPreviewOut
+ *
+ * What a retention run would keep and remove; malformed lines are always kept.
+ */
+export const zSecurityAuditRetentionPreviewOut = z.object({
+  file_bytes: z.number().int(),
+  keep_days: z.number().int(),
+  malformed_lines: z.number().int(),
+  max_records: z.number().int(),
+  total_lines: z.number().int(),
+  valid_records: z.number().int(),
+  would_keep: z.number().int(),
+  would_remove: z.number().int(),
+});
+
+/**
+ * SecurityAuditRetentionResultOut
+ */
+export const zSecurityAuditRetentionResultOut = z.object({
+  applied: z.boolean(),
+  file_bytes: z.number().int(),
+  keep_days: z.number().int(),
+  malformed_lines: z.number().int(),
+  max_records: z.number().int(),
+  removed: z.number().int(),
+  total_lines: z.number().int(),
+  valid_records: z.number().int(),
+  would_keep: z.number().int(),
+  would_remove: z.number().int(),
+});
+
+/**
+ * SecurityAuditSummaryOut
+ */
+export const zSecurityAuditSummaryOut = z.object({
+  by_event: z.record(z.number().int()),
+  by_method: z.record(z.number().int()),
+  by_status: z.record(z.number().int()),
+  file_bytes: z.number().int(),
+  local_records: z.number().int(),
+  malformed_lines: z.number().int(),
+  read_error: z.boolean().nullish(),
+  remote_records: z.number().int(),
+  total_records: z.number().int(),
+});
+
+/**
+ * SecurityAuditViewOut
+ *
+ * One page of the audit log, newest first. `read_error` is sent only when the file could not be read.
+ */
+export const zSecurityAuditViewOut = z.object({
+  file_bytes: z.number().int(),
+  has_more: z.boolean(),
+  malformed_lines: z.number().int(),
+  next_offset: z.number().int().nullish(),
+  offset: z.number().int(),
+  read_error: z.boolean().nullish(),
+  records: z.array(zSecurityAuditRecordOut),
+  returned: z.number().int(),
+  total_matched: z.number().int(),
+});
+
+/**
+ * SecurityRemoteHostOut
+ */
+export const zSecurityRemoteHostOut = z.object({
+  client_host: z.string(),
+  count: z.number().int(),
+});
+
+/**
+ * SecurityAlertsOut
+ *
+ * Denial events in a recent window, counted for an operator's glance.
+ */
+export const zSecurityAlertsOut = z.object({
+  attention_threshold: z.number().int(),
+  by_event: z.record(z.number().int()),
+  malformed_lines: z.number().int(),
+  needs_attention: z.boolean(),
+  read_error: z.boolean(),
+  recent: z.array(zSecurityAuditRecordOut),
+  records_scanned: z.number().int(),
+  remote_hosts: z.array(zSecurityRemoteHostOut),
+  since: z.string(),
+  total_denials: z.number().int(),
+  window_hours: z.number(),
+});
+
+/**
  * SendIn
  */
 export const zSendIn = z.object({
@@ -1549,6 +2715,36 @@ export const zSendIn = z.object({
   path: z.string().min(1).max(2000),
   query: z.record(z.string()).nullish(),
   timeout_seconds: z.number().gte(0.5).lte(60).optional().default(10),
+});
+
+/**
+ * SettingsLimitsOut
+ */
+export const zSettingsLimitsOut = z.object({
+  max_backup_bytes: z.number().int(),
+  max_backup_files: z.number().int(),
+  max_backup_uncompressed_bytes: z.number().int(),
+  max_document_bytes: z.number().int(),
+});
+
+/**
+ * SettingsStatusOut
+ *
+ * The server configuration the page reads on load. A remote caller
+ * without admin rights gets the same keys with the server-wide values blanked.
+ */
+export const zSettingsStatusOut = z.object({
+  access: zApiAccessStatusOut,
+  ai: zAiReasoningStatusOut,
+  connectors: z.record(zConnectorCredentialStatusOut),
+  cors_allowed_origins: z.array(z.string()),
+  database: z.string(),
+  document_extraction: zDocumentExtractionSettingsOut,
+  document_storage_dir: z.string(),
+  environment: z.string(),
+  limits: zSettingsLimitsOut,
+  restore_api_enabled: z.boolean(),
+  security: zSecurityAlertsOut,
 });
 
 /**
@@ -1593,6 +2789,16 @@ export const zClaimEvidenceRowOut = z.object({
   note: z.string().nullish(),
   source: zSourceOut.nullish(),
   stance: z.string(),
+});
+
+/**
+ * DossierEvidenceOut
+ */
+export const zDossierEvidenceOut = z.object({
+  claim_links: z.array(zDossierClaimLinkOut),
+  evidence: zEvidenceOut,
+  match_basis: zDossierMatchBasisOut,
+  source: zSourceOut.nullish(),
 });
 
 /**
@@ -1656,6 +2862,23 @@ export const zLeadTriageOut = z.object({
 });
 
 /**
+ * StatementAssessmentOut
+ *
+ * A reporter's assessment of one value a finding asserts, as stored.
+ */
+export const zStatementAssessmentOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  entity_id: z.string().nullish(),
+  finding_id: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  note: z.string().nullish(),
+  prop: z.string(),
+  status: z.string(),
+  value: z.string(),
+});
+
+/**
  * StatementAssessmentRequest
  */
 export const zStatementAssessmentRequest = z.object({
@@ -1698,22 +2921,26 @@ export const zStatementOut = z.object({
 });
 
 /**
- * RelationshipOut
+ * EntityRelationshipOut
  *
- * One relationship edge with its FollowTheMoney statements, attached
- * evidence and the advisory the review layer computes. The graph endpoint
- * adds reconciliation and aggregate-provenance blocks for reviewed
- * duplicates, so the model stays open to those.
+ * A relationship seen from one entity (its dossier, or its relationship
+ * list): whether the entity is the edge's source or its target.
  */
-export const zRelationshipOut = z.object({
-  advisory: zRelationshipAdvisoryOut,
+export const zEntityRelationshipOut = z.object({
+  advisory: z.union([
+    zRelationshipAdvisoryOut,
+    zRelationshipAggregateAdvisoryOut,
+  ]),
+  aggregate_provenance: zAggregateProvenanceOut.nullish(),
   caption: z.string().nullish(),
   created_at: z.string().datetime({ offset: true, local: true }),
+  direction: z.enum(['outgoing', 'incoming']),
   ftm_id: z.string().nullish(),
   id: z.string(),
   investigation_id: z.string(),
-  properties: z.record(z.unknown()),
+  properties: z.record(z.array(z.string())),
   provenance: zRelationshipProvenanceOut,
+  reconciliation: zRelationshipReconciliationOut.nullish(),
   relationship_entity_id: z.string().nullish(),
   schema: z.string(),
   source: zRelationshipEndpointOut.nullish(),
@@ -1721,6 +2948,124 @@ export const zRelationshipOut = z.object({
   statements: z.array(zStatementOut),
   target: zRelationshipEndpointOut.nullish(),
   target_prop: z.string().nullish(),
+});
+
+/**
+ * RelationshipOut
+ *
+ * One relationship edge with its FollowTheMoney statements, attached
+ * evidence and the advisory the review layer computes. The graph and the
+ * dossier add `reconciliation` to an edge a reporter reviewed as a
+ * duplicate, and `aggregate_provenance` (with an aggregate advisory) to the
+ * preferred edge of a collapsed pair; both keys are absent otherwise.
+ */
+export const zRelationshipOut = z.object({
+  advisory: z.union([
+    zRelationshipAdvisoryOut,
+    zRelationshipAggregateAdvisoryOut,
+  ]),
+  aggregate_provenance: zAggregateProvenanceOut.nullish(),
+  caption: z.string().nullish(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  ftm_id: z.string().nullish(),
+  id: z.string(),
+  investigation_id: z.string(),
+  properties: z.record(z.array(z.string())),
+  provenance: zRelationshipProvenanceOut,
+  reconciliation: zRelationshipReconciliationOut.nullish(),
+  relationship_entity_id: z.string().nullish(),
+  schema: z.string(),
+  source: zRelationshipEndpointOut.nullish(),
+  source_prop: z.string().nullish(),
+  statements: z.array(zStatementOut),
+  target: zRelationshipEndpointOut.nullish(),
+  target_prop: z.string().nullish(),
+});
+
+/**
+ * GraphOut
+ */
+export const zGraphOut = z.object({
+  edges: z.array(zRelationshipOut),
+  nodes: z.array(zGraphNodeOut),
+  reconciliation: zGraphReconciliationOut,
+  schemas: z.array(z.string()),
+});
+
+/**
+ * RelationshipDuplicatePairOut
+ *
+ * Two edges of the merged entity with the same schema and ends.
+ */
+export const zRelationshipDuplicatePairOut = z.object({
+  latest_decision: zReconciliationDecisionOut.nullish(),
+  provenance_differs: z.boolean(),
+  record_a: zRelationshipOut,
+  record_b: zRelationshipOut,
+  record_type: z.literal('relationship'),
+  same_assertion: z.boolean(),
+});
+
+/**
+ * StatementDuplicatePairOut
+ *
+ * Two statements of the merged entity that assert the same value.
+ */
+export const zStatementDuplicatePairOut = z.object({
+  latest_decision: zReconciliationDecisionOut.nullish(),
+  provenance_differs: z.boolean(),
+  record_a: zStatementOut,
+  record_b: zStatementOut,
+  record_type: z.literal('statement'),
+  same_assertion: z.boolean(),
+});
+
+/**
+ * PostMergeReconciliationOut
+ *
+ * The duplicate pairs a merge left behind, for the reporter to review.
+ * Nothing is deleted: a decision only records which record is preferred.
+ */
+export const zPostMergeReconciliationOut = z.object({
+  entity_id: z.string(),
+  relationship_duplicates: z.array(zRelationshipDuplicatePairOut),
+  statement_duplicates: z.array(zStatementDuplicatePairOut),
+  summary: zReconciliationSummaryOut,
+});
+
+/**
+ * StatementPromotionOut
+ *
+ * An accepted value written into the canonical graph, with its provenance.
+ */
+export const zStatementPromotionOut = z.object({
+  assessment_id: z.string(),
+  dataset: z.string(),
+  entity_id: z.string(),
+  finding_id: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  original_value: z.string(),
+  promoted_at: z.string().datetime({ offset: true, local: true }),
+  provider: z.string(),
+  reviewer_note: z.string().nullish(),
+  source_url: z.string().nullish(),
+  statement_id: z.string(),
+});
+
+/**
+ * DossierExternalOut
+ *
+ * Everything connectors found about the entity and every review of it.
+ */
+export const zDossierExternalOut = z.object({
+  cross_provider_decisions: z.array(zCrossProviderDecisionOut),
+  enrichment_links: z.array(zEnrichmentSessionFindingOut),
+  enrichment_sessions: z.array(zEnrichmentSessionRowOut),
+  findings: z.array(zConnectorFindingOut),
+  promotions: z.array(zStatementPromotionOut),
+  resolution_decisions: z.array(zResolutionDecisionOut),
+  statement_assessments: z.array(zStatementAssessmentOut),
 });
 
 /**
@@ -1894,6 +3239,27 @@ export const zTimelineEventOut = z.object({
 });
 
 /**
+ * EntityDossierOut
+ *
+ * Everything the workbench holds about one canonical entity.
+ */
+export const zEntityDossierOut = z.object({
+  alias_resolution: zEntityAliasResolutionOut.nullish(),
+  claims: z.array(zDossierClaimOut),
+  entity: zEntityOut,
+  evidence: z.array(zDossierEvidenceOut),
+  external: zDossierExternalOut,
+  identity_history: zEntityIdentityHistoryOut,
+  leads: z.array(zDossierLeadOut),
+  property_conflicts: z.array(zDossierPropertyConflictOut),
+  relationships: z.array(zEntityRelationshipOut),
+  statement_history: z.array(zStatementHistoryRowOut),
+  summary: zDossierSummaryOut,
+  tasks: z.array(zReportingTaskOut),
+  timeline: z.array(zTimelineEventOut),
+});
+
+/**
  * TimelineEventRowOut
  *
  * A reporter-authored event as stored (the reply to creating one).
@@ -2010,6 +3376,30 @@ export const zProvenanceTraceOut = z.object({
   record_type: z.string(),
   relationships: z.array(zRelationshipOut),
   root: z.record(z.unknown()),
+});
+
+/**
+ * UnsafeDocumentReferenceOut
+ */
+export const zUnsafeDocumentReferenceOut = z.object({
+  document_id: z.string(),
+  error: z.string(),
+  storage_path: z.string(),
+});
+
+/**
+ * OrphanStoragePreviewOut
+ *
+ * Files under document storage no document refers to. Read-only: they are kept until a reporter decides.
+ */
+export const zOrphanStoragePreviewOut = z.object({
+  cleanup_available: z.boolean(),
+  orphan_bytes: z.number().int(),
+  orphan_file_count: z.number().int(),
+  orphan_files: z.array(zOrphanFileOut),
+  policy: z.string(),
+  storage_root: z.string(),
+  unsafe_document_references: z.array(zUnsafeDocumentReferenceOut),
 });
 
 /**
@@ -2334,23 +3724,57 @@ export const zListAssessmentsPath = z.object({
   finding_id: z.string(),
 });
 
+/**
+ * Response List Assessments
+ *
+ * Successful Response
+ */
+export const zListAssessmentsResponse = z.array(zStatementAssessmentOut);
+
 export const zAssessStatementBody = zStatementAssessmentRequest;
 
 export const zAssessStatementPath = z.object({
   finding_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zAssessStatementResponse = zStatementAssessmentOut;
+
 export const zFindingCandidatesPath = z.object({
   finding_id: z.string(),
 });
+
+/**
+ * Response Finding Candidates
+ *
+ * Successful Response
+ */
+export const zFindingCandidatesResponse = z.array(zEntityCandidateOut);
 
 export const zExternalRelationshipCandidatesPath = z.object({
   finding_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zExternalRelationshipCandidatesResponse =
+  zExternalRelationshipCandidatesOut;
+
 export const zListExternalRelationshipReviewsPath = z.object({
   finding_id: z.string(),
 });
+
+/**
+ * Response List External Relationship Reviews
+ *
+ * Successful Response
+ */
+export const zListExternalRelationshipReviewsResponse = z.array(
+  zExternalRelationshipReviewOut,
+);
 
 export const zReviewExternalRelationshipBody =
   zExternalRelationshipReviewRequest;
@@ -2359,11 +3783,22 @@ export const zReviewExternalRelationshipPath = z.object({
   finding_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zReviewExternalRelationshipResponse =
+  zExternalRelationshipReviewOut;
+
 export const zResolveFindingBody = zResolutionRequest;
 
 export const zResolveFindingPath = z.object({
   finding_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zResolveFindingResponse = zResolutionDecisionOut;
 
 export const zReviewFindingBody = zFindingReviewRequest;
 
@@ -2371,13 +3806,37 @@ export const zReviewFindingPath = z.object({
   finding_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zReviewFindingResponse = zConnectorFindingOut;
+
+/**
+ * Successful Response
+ */
+export const zConnectorsResponse = zConnectorsOut;
+
 export const zAlephSearchBody = zAlephSearchRequest;
+
+/**
+ * Response Aleph Search
+ *
+ * Successful Response
+ */
+export const zAlephSearchResponse = z.array(zConnectorFindingOut);
 
 export const zConnectorSearchBody = zConnectorSearchRequest;
 
 export const zConnectorSearchPath = z.object({
   provider: z.string(),
 });
+
+/**
+ * Response Connector Search
+ *
+ * Successful Response
+ */
+export const zConnectorSearchResponse = z.array(zConnectorFindingOut);
 
 export const zConsoleActivityActivityQuery = z.object({
   limit: z.number().int().gte(1).lte(1000).optional().default(100),
@@ -2738,9 +4197,23 @@ export const zEnrichmentSessionDetailPath = z.object({
   session_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zEnrichmentSessionDetailResponse = zEnrichmentSessionDetailOut;
+
 export const zEnrichmentSessionClustersPath = z.object({
   session_id: z.string(),
 });
+
+/**
+ * Response Enrichment Session Clusters
+ *
+ * Successful Response
+ */
+export const zEnrichmentSessionClustersResponse = z.array(
+  zEnrichmentClusterOut,
+);
 
 export const zDecideCrossProviderClusterBody = zCrossProviderDecisionRequest;
 
@@ -2748,7 +4221,17 @@ export const zDecideCrossProviderClusterPath = z.object({
   session_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zDecideCrossProviderClusterResponse = zCrossProviderDecisionOut;
+
 export const zCreateEntityBody = zEntityCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateEntityResponse = zEntityOut;
 
 export const zUpdateEntityBody = zEntityUpdate;
 
@@ -2756,23 +4239,57 @@ export const zUpdateEntityPath = z.object({
   entity_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zUpdateEntityResponse = zEntityOut;
+
 export const zCanonicalEntityResolutionBody = zCanonicalResolutionRequest;
 
 export const zCanonicalEntityResolutionPath = z.object({
   entity_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zCanonicalEntityResolutionResponse =
+  zCanonicalResolutionDecisionOut;
+
 export const zListCrossProviderDecisionsPath = z.object({
   entity_id: z.string(),
 });
+
+/**
+ * Response List Cross Provider Decisions
+ *
+ * Successful Response
+ */
+export const zListCrossProviderDecisionsResponse = z.array(
+  zCrossProviderDecisionOut,
+);
 
 export const zGetEntityDossierPath = z.object({
   entity_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zGetEntityDossierResponse = zEntityDossierOut;
+
 export const zEntityDuplicateCandidatesPath = z.object({
   entity_id: z.string(),
 });
+
+/**
+ * Response Entity Duplicate Candidates
+ *
+ * Successful Response
+ */
+export const zEntityDuplicateCandidatesResponse = z.array(
+  zCanonicalDuplicateCandidateOut,
+);
 
 export const zEnrichEntityMultiBody = zMultiEnrichmentRequest;
 
@@ -2780,18 +4297,48 @@ export const zEnrichEntityMultiPath = z.object({
   entity_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zEnrichEntityMultiResponse = zEnrichmentSessionOut;
+
 export const zEnrichEntityPath = z.object({
   entity_id: z.string(),
   provider: z.string(),
 });
 
+/**
+ * Response Enrich Entity
+ *
+ * Successful Response
+ */
+export const zEnrichEntityResponse = z.array(zConnectorFindingOut);
+
 export const zListEntityEnrichmentSessionsPath = z.object({
   entity_id: z.string(),
 });
 
+/**
+ * Response List Entity Enrichment Sessions
+ *
+ * Successful Response
+ */
+export const zListEntityEnrichmentSessionsResponse = z.array(
+  zEnrichmentSessionRowOut,
+);
+
 export const zListExternalRelationshipPromotionsPath = z.object({
   entity_id: z.string(),
 });
+
+/**
+ * Response List External Relationship Promotions
+ *
+ * Successful Response
+ */
+export const zListExternalRelationshipPromotionsResponse = z.array(
+  zExternalRelationshipPromotionOut,
+);
 
 export const zEntityMergeExecuteBody = zCanonicalMergeExecuteRequest;
 
@@ -2799,9 +4346,23 @@ export const zEntityMergeExecutePath = z.object({
   entity_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zEntityMergeExecuteResponse = zCanonicalMergeExecuteOut;
+
 export const zEntityMergeHistoryPath = z.object({
   entity_id: z.string(),
 });
+
+/**
+ * Response Entity Merge History
+ *
+ * Successful Response
+ */
+export const zEntityMergeHistoryResponse = z.array(
+  zCanonicalEntityMergeAuditOut,
+);
 
 export const zEntityMergePreviewPath = z.object({
   entity_id: z.string(),
@@ -2811,9 +4372,20 @@ export const zEntityMergePreviewQuery = z.object({
   target_entity_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zEntityMergePreviewResponse = zCanonicalMergePreviewOut;
+
 export const zEntityPostMergeReconciliationPath = z.object({
   entity_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zEntityPostMergeReconciliationResponse =
+  zPostMergeReconciliationOut;
 
 export const zDecideEntityPostMergeReconciliationBody =
   zPostMergeReconciliationRequest;
@@ -2822,14 +4394,36 @@ export const zDecideEntityPostMergeReconciliationPath = z.object({
   entity_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zDecideEntityPostMergeReconciliationResponse =
+  zReconciliationDecisionOut;
+
 export const zListEntityPromotionsPath = z.object({
   entity_id: z.string(),
 });
+
+/**
+ * Response List Entity Promotions
+ *
+ * Successful Response
+ */
+export const zListEntityPromotionsResponse = z.array(zStatementPromotionOut);
 
 export const zListPropertyConflictDecisionsPath = z.object({
   entity_id: z.string(),
   prop: z.string(),
 });
+
+/**
+ * Response List Property Conflict Decisions
+ *
+ * Successful Response
+ */
+export const zListPropertyConflictDecisionsResponse = z.array(
+  zPropertyConflictDecisionOut,
+);
 
 export const zDecidePropertyConflictBody = zPropertyConflictDecisionRequest;
 
@@ -2838,9 +4432,21 @@ export const zDecidePropertyConflictPath = z.object({
   prop: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zDecidePropertyConflictResponse = zPropertyConflictDecisionOut;
+
 export const zListEntityRelationshipsPath = z.object({
   entity_id: z.string(),
 });
+
+/**
+ * Response List Entity Relationships
+ *
+ * Successful Response
+ */
+export const zListEntityRelationshipsResponse = z.array(zEntityRelationshipOut);
 
 export const zListEntityStatementHistoryPath = z.object({
   entity_id: z.string(),
@@ -2859,6 +4465,13 @@ export const zListEntityStatementsPath = z.object({
   entity_id: z.string(),
 });
 
+/**
+ * Response List Entity Statements
+ *
+ * Successful Response
+ */
+export const zListEntityStatementsResponse = z.array(zEntityStatementOut);
+
 export const zCreateEvidenceEndpointBody = zEvidenceCreate;
 
 /**
@@ -2869,6 +4482,12 @@ export const zCreateEvidenceEndpointResponse = zEvidenceOut;
 export const zPromoteExternalRelationshipPath = z.object({
   review_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zPromoteExternalRelationshipResponse =
+  zExternalRelationshipPromotionOut;
 
 export const zGetExtractionEntityMatchesPath = z.object({
   candidate_id: z.string(),
@@ -2904,7 +4523,19 @@ export const zReviewExtractionCandidatePath = z.object({
  */
 export const zReviewExtractionCandidateResponse = zExtractionReviewOut;
 
+/**
+ * Response List Investigations
+ *
+ * Successful Response
+ */
+export const zListInvestigationsResponse = z.array(zInvestigationOut);
+
 export const zCreateInvestigationBody = zInvestigationCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateInvestigationResponse = zInvestigationOut;
 
 export const zRemoveInvestigationPath = z.object({
   investigation_id: z.string(),
@@ -2980,6 +4611,13 @@ export const zListConnectorFindingsQuery = z.object({
   offset: z.number().int().gte(0).optional().default(0),
 });
 
+/**
+ * Response List Connector Findings
+ *
+ * Successful Response
+ */
+export const zListConnectorFindingsResponse = z.array(zConnectorFindingOut);
+
 export const zListConnectorRunsPath = z.object({
   investigation_id: z.string(),
 });
@@ -2988,6 +4626,13 @@ export const zListConnectorRunsQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
   offset: z.number().int().gte(0).optional().default(0),
 });
+
+/**
+ * Response List Connector Runs
+ *
+ * Successful Response
+ */
+export const zListConnectorRunsResponse = z.array(zConnectorRunOut);
 
 export const zGetOpenalephCorpusBindingPath = z.object({
   investigation_id: z.string(),
@@ -3041,6 +4686,13 @@ export const zListEntitiesQuery = z.object({
   offset: z.number().int().gte(0).optional().default(0),
 });
 
+/**
+ * Response List Entities
+ *
+ * Successful Response
+ */
+export const zListEntitiesResponse = z.array(zEntityOut);
+
 export const zListInvestigationEvidencePath = z.object({
   investigation_id: z.string(),
 });
@@ -3069,6 +4721,11 @@ export const zGetInvestigationFinancialFlowsPath = z.object({
   investigation_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zGetInvestigationFinancialFlowsResponse = zFinancialLedgerOut;
+
 export const zGetInvestigationGraphPath = z.object({
   investigation_id: z.string(),
 });
@@ -3077,6 +4734,11 @@ export const zGetInvestigationGraphQuery = z.object({
   schema: z.array(z.string()).nullish(),
   include_reconciled_duplicates: z.boolean().optional().default(false),
 });
+
+/**
+ * Successful Response
+ */
+export const zGetInvestigationGraphResponse = zGraphOut;
 
 export const zListLeadsPath = z.object({
   investigation_id: z.string(),
@@ -3121,6 +4783,14 @@ export const zListInvestigationRelationshipsQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
   offset: z.number().int().gte(0).optional().default(0),
 });
+
+/**
+ * Response List Investigation Relationships
+ *
+ * Successful Response
+ */
+export const zListInvestigationRelationshipsResponse =
+  z.array(zRelationshipOut);
 
 export const zListReportingTasksPath = z.object({
   investigation_id: z.string(),
@@ -3328,6 +4998,11 @@ export const zGetRecordProvenanceTraceResponse = zProvenanceTraceOut;
 
 export const zCreateCanonicalRelationshipBody = zRelationshipCreate;
 
+/**
+ * Successful Response
+ */
+export const zCreateCanonicalRelationshipResponse = zRelationshipOut;
+
 export const zAttachRelationshipEvidenceEndpointBody =
   zRelationshipEvidenceAttachRequest;
 
@@ -3335,9 +5010,20 @@ export const zAttachRelationshipEvidenceEndpointPath = z.object({
   relationship_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zAttachRelationshipEvidenceEndpointResponse = zRelationshipOut;
+
 export const zListRelationshipEvidenceReviewsPath = z.object({
   relationship_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zListRelationshipEvidenceReviewsResponse =
+  zRelationshipEvidenceReviewsOut;
 
 export const zReviewRelationshipEvidenceEndpointBody =
   zRelationshipEvidenceReviewRequest;
@@ -3346,6 +5032,11 @@ export const zReviewRelationshipEvidenceEndpointPath = z.object({
   relationship_id: z.string(),
   evidence_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zReviewRelationshipEvidenceEndpointResponse = zRelationshipOut;
 
 export const zCreateLeadFromRelationshipContextPath = z.object({
   relationship_id: z.string(),
@@ -3391,6 +5082,12 @@ export const zDeleteConnectorCredentialPath = z.object({
 });
 
 /**
+ * Successful Response
+ */
+export const zDeleteConnectorCredentialResponse =
+  zConnectorCredentialRemovedOut;
+
+/**
  * Body
  */
 export const zSaveConnectorCredentialBody = z.record(z.unknown());
@@ -3399,10 +5096,20 @@ export const zSaveConnectorCredentialPath = z.object({
   provider: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zSaveConnectorCredentialResponse = zConnectorCredentialSavedOut;
+
 export const zGetSecurityAlertsQuery = z.object({
   window_hours: z.number().gt(0).lte(720).optional().default(24),
   max_examples: z.number().int().gte(0).lte(100).optional().default(10),
 });
+
+/**
+ * Successful Response
+ */
+export const zGetSecurityAlertsResponse = zSecurityAlertsOut;
 
 export const zGetSecurityAuditQuery = z.object({
   limit: z.number().int().gte(1).lte(500).optional().default(100),
@@ -3413,14 +5120,35 @@ export const zGetSecurityAuditQuery = z.object({
 });
 
 /**
+ * Successful Response
+ */
+export const zGetSecurityAuditResponse = zSecurityAuditViewOut;
+
+/**
  * Body
  */
 export const zPruneSecurityAuditBody = z.record(z.unknown());
+
+/**
+ * Successful Response
+ */
+export const zPruneSecurityAuditResponse = zSecurityAuditRetentionResultOut;
 
 export const zGetSecurityAuditRetentionPreviewQuery = z.object({
   keep_days: z.number().int().gte(1).lte(3650).optional().default(90),
   max_records: z.number().int().gte(100).lte(1000000).optional().default(5000),
 });
+
+/**
+ * Successful Response
+ */
+export const zGetSecurityAuditRetentionPreviewResponse =
+  zSecurityAuditRetentionPreviewOut;
+
+/**
+ * Successful Response
+ */
+export const zGetSecurityAuditSummaryResponse = zSecurityAuditSummaryOut;
 
 export const zCreateAppUserBody = zAppUserCreate;
 
@@ -3455,6 +5183,16 @@ export const zRotateAppUserTokenPath = z.object({
   user_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zSettingsStatusResponse = zSettingsStatusOut;
+
+/**
+ * Successful Response
+ */
+export const zGetOrphanStoragePreviewResponse = zOrphanStoragePreviewOut;
+
 export const zCreateSourceEndpointBody = zSourceCreate;
 
 /**
@@ -3478,6 +5216,11 @@ export const zPromoteStatementAssessmentBody = zStatementPromotionRequest;
 export const zPromoteStatementAssessmentPath = z.object({
   assessment_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zPromoteStatementAssessmentResponse = zStatementPromotionOut;
 
 export const zCreateTimelineEventEndpointBody = zTimelineEventCreate;
 

@@ -23,6 +23,11 @@ from app.core.config import settings
 from app.db.session import get_db
 from app.models.domain import AppUser
 from app.schemas.api import AppUserCreate, AppUserUpdate, InvestigationMembershipPut
+from app.schemas.responses import (
+    ConnectorCredentialRemovedOut, ConnectorCredentialSavedOut, OrphanStoragePreviewOut, SecurityAlertsOut,
+    SecurityAuditRetentionPreviewOut, SecurityAuditRetentionResultOut, SecurityAuditSummaryOut, SecurityAuditViewOut,
+    SettingsStatusOut,
+)
 from app.services.lifecycle import preview_orphan_document_files as _preview_orphan_document_files
 from app.services.settings import (
     create_app_user as _create_app_user,
@@ -46,7 +51,7 @@ def _require_local_request(request: Request) -> None:
         raise HTTPException(403, "Connector credential changes are restricted to the local machine")
 
 
-@router.get("/settings/status", response_model=None)
+@router.get("/settings/status", response_model=SettingsStatusOut)
 def settings_status(request: Request, db: Session = Depends(get_db)) -> Any:
     # Polled by the frontend on every page load, so this stays reachable for
     # any authenticated caller -- but a remote, non-admin scope (the shared
@@ -121,7 +126,7 @@ def delete_investigation_membership(user_id: str, investigation_id: str, request
     return Response(status_code=204)
 
 
-@router.get("/settings/security/audit", response_model=None)
+@router.get("/settings/security/audit", response_model=SecurityAuditViewOut)
 def get_security_audit(
     request: Request,
     limit: int = Query(100, ge=1, le=500),
@@ -146,13 +151,13 @@ def get_security_audit(
     )
 
 
-@router.get("/settings/security/audit/summary", response_model=None)
+@router.get("/settings/security/audit/summary", response_model=SecurityAuditSummaryOut)
 def get_security_audit_summary(request: Request) -> Any:
     _require_local_request(request)
     return summarize_security_audit(settings.audit_log_file)
 
 
-@router.get("/settings/security/alerts", response_model=None)
+@router.get("/settings/security/alerts", response_model=SecurityAlertsOut)
 def get_security_alerts(
     request: Request,
     window_hours: float = Query(24.0, gt=0, le=24 * 30),
@@ -167,7 +172,7 @@ def get_security_alerts(
     return security_alerts(window_hours=window_hours, max_examples=max_examples)
 
 
-@router.get("/settings/security/audit/retention-preview", response_model=None)
+@router.get("/settings/security/audit/retention-preview", response_model=SecurityAuditRetentionPreviewOut)
 def get_security_audit_retention_preview(
     request: Request,
     keep_days: int = Query(90, ge=1, le=3650),
@@ -185,7 +190,7 @@ def get_security_audit_retention_preview(
     return preview
 
 
-@router.post("/settings/security/audit/retention", response_model=None)
+@router.post("/settings/security/audit/retention", response_model=SecurityAuditRetentionResultOut)
 def prune_security_audit(body: dict, request: Request) -> Any:
     _require_local_request(request)
     keep_days = body.get("keep_days", 90) if isinstance(body, dict) else 90
@@ -208,7 +213,7 @@ def prune_security_audit(body: dict, request: Request) -> Any:
         raise HTTPException(400, str(exc))
 
 
-@router.put("/settings/connectors/{provider}/credential", response_model=None)
+@router.put("/settings/connectors/{provider}/credential", response_model=ConnectorCredentialSavedOut)
 def save_connector_credential(provider: str, body: dict, request: Request) -> Any:
     _require_local_request(request)
     secret = body.get("credential") if isinstance(body, dict) else None
@@ -222,7 +227,7 @@ def save_connector_credential(provider: str, body: dict, request: Request) -> An
         raise HTTPException(500, str(exc))
 
 
-@router.delete("/settings/connectors/{provider}/credential", response_model=None)
+@router.delete("/settings/connectors/{provider}/credential", response_model=ConnectorCredentialRemovedOut)
 def delete_connector_credential(provider: str, request: Request) -> Any:
     _require_local_request(request)
     try:
@@ -233,7 +238,7 @@ def delete_connector_credential(provider: str, request: Request) -> Any:
         raise HTTPException(500, str(exc))
 
 
-@router.get("/settings/storage/orphans", response_model=None)
+@router.get("/settings/storage/orphans", response_model=OrphanStoragePreviewOut)
 def get_orphan_storage_preview(request: Request, db: Session = Depends(get_db)) -> Any:
     """Preview-only report of files under document storage that no Document row
     references (STRUCT area: lifecycle.preview_orphan_document_files was implemented

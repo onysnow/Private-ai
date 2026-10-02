@@ -31,7 +31,8 @@ from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Investigation
 from app.schemas.responses import (
-    ClaimOut, DocumentOut, EvidencePoolRow, InvestigationDeletionPreview, InvestigationDeletionResult, LeadOut, LeadQueueOut,
+    ClaimOut, ConnectorFindingOut, ConnectorRunOut, DocumentOut, EvidencePoolRow, FinancialLedgerOut, GraphOut,
+    InvestigationDeletionPreview, InvestigationDeletionResult, InvestigationOut, LeadOut, LeadQueueOut, RelationshipOut,
     ReportingTaskOut, SourceOut, TimelineOut,
 )
 from app.schemas.api import (
@@ -284,12 +285,12 @@ def export_investigation(
     )
 
 
-@router.post("/investigations", response_model=None)
+@router.post("/investigations", response_model=InvestigationOut)
 def create_investigation(body: InvestigationCreate, db: Session = Depends(get_db)) -> Any:
     return _create_investigation(db, body)
 
 
-@router.get("/investigations", response_model=None)
+@router.get("/investigations", response_model=list[InvestigationOut])
 def list_investigations(request: Request, db: Session = Depends(get_db)) -> Any:
     scope = scope_for_request(request)
     return _list_investigations(db, scope)
@@ -321,7 +322,7 @@ def remove_investigation(investigation_id: str, request: Request, confirmation: 
         raise HTTPException(404 if str(exc) == "Investigation not found" else 400, str(exc))
 
 
-@router.get("/investigations/{investigation_id}/relationships", response_model=None)
+@router.get("/investigations/{investigation_id}/relationships", response_model=list[RelationshipOut])
 def list_investigation_relationships(
     investigation_id: str,
     include_reconciled_duplicates: bool = Query(default=True),
@@ -336,7 +337,7 @@ def list_investigation_relationships(
     )
 
 
-@router.get("/investigations/{investigation_id}/graph", response_model=None)
+@router.get("/investigations/{investigation_id}/graph", response_model=GraphOut)
 def get_investigation_graph(
     investigation_id: str,
     schema: list[str] | None = Query(default=None),
@@ -355,7 +356,7 @@ def get_investigation_graph(
     )
 
 
-@router.get("/investigations/{investigation_id}/financial-flows", response_model=None)
+@router.get("/investigations/{investigation_id}/financial-flows", response_model=FinancialLedgerOut)
 def get_investigation_financial_flows(investigation_id: str, db: Session = Depends(get_db)) -> Any:
     """Transaction ledger built from canonical Payment relationships. Read-only."""
     if db.get(Investigation, investigation_id) is None:
@@ -454,7 +455,7 @@ def list_reporting_tasks(
     return _list_investigation_reporting_tasks(db, investigation_id, limit=limit, offset=offset)
 
 
-@router.get("/investigations/{investigation_id}/connector-runs", response_model=None)
+@router.get("/investigations/{investigation_id}/connector-runs", response_model=list[ConnectorRunOut])
 def list_connector_runs(
     investigation_id: str,
     limit: int | None = Query(default=None, ge=1, le=500),
@@ -466,7 +467,7 @@ def list_connector_runs(
     return _list_investigation_connector_runs(db, investigation_id, limit=limit, offset=offset)
 
 
-@router.get("/investigations/{investigation_id}/connector-findings", response_model=None)
+@router.get("/investigations/{investigation_id}/connector-findings", response_model=list[ConnectorFindingOut])
 def list_connector_findings(
     investigation_id: str,
     limit: int | None = Query(default=None, ge=1, le=500),

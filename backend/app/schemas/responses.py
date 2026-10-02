@@ -289,6 +289,8 @@ class ClaimDependencyOut(ResponseModel):
 
 
 class RelationshipAdvisoryOut(ResponseModel):
+    """What the review layer says about one relationship record: the claims
+    that rest on its attached evidence, and how its evidence was reviewed."""
     needs_review: bool
     support_state: str
     has_independent_support: bool
@@ -301,14 +303,71 @@ class RelationshipAdvisoryOut(ResponseModel):
     relationship_evidence_needs_review: bool
     relationship_evidence_attachment_count: int
     relationship_evidence_review_counts: dict[str, int]
+    # Says which advisory shape this is (see RelationshipAggregateAdvisoryOut).
+    presentation_aggregate: Literal[False]
+
+
+class AggregateClaimDependencyOut(ClaimDependencyOut):
+    """A claim dependency collected across reviewed duplicate edges, naming
+    the underlying edge it belongs to."""
+    relationship_id: str | None = None
+
+
+class RelationshipAggregateAdvisoryOut(ResponseModel):
+    """The advisory of a compact graph edge that stands in for several
+    reviewed duplicate records: computed over every underlying edge's
+    evidence, so one challenged claim does not colour an edge another
+    reviewed evidence record supports. Presentation only; no record changes."""
+    needs_review: bool
+    support_state: str
+    has_independent_support: bool
+    healthy_supporting_evidence_count: int
+    challenged_supporting_evidence_count: int
+    disputed_claim_count: int
+    rejected_claim_count: int
+    claim_dependencies: list[AggregateClaimDependencyOut]
+    presentation_aggregate: Literal[True]
+
+
+class RelationshipReconciliationOut(ResponseModel):
+    """How a reporter's latest duplicate decision places this edge: the
+    preferred record of its pair, or a suppressed copy of one."""
+    decision_id: str
+    decision: str
+    preferred_record_id: str
+    secondary_record_id: str
+    rationale: str | None = None
+    is_preferred: bool
+    suppressed_duplicate: bool
+    suppressed_duplicate_ids: list[str]
+    suppressed_duplicate_count: int
+
+
+class AggregateProvenanceOut(ResponseModel):
+    """The provenance inventory of a compact preferred edge: every statement
+    source and evidence record beneath it and its reviewed duplicates.
+    Presentation only; no records are merged."""
+    presentation_only: Literal[True]
+    underlying_relationship_ids: list[str]
+    underlying_relationship_count: int
+    statement_count: int
+    statement_sources: list[str]
+    evidence_count: int
+    evidence: list[EvidenceWithSourceOut]
+
+
+def _absent_when_none(value: Any) -> bool:
+    """A key the service adds only in some replies is left out, not sent as null."""
+    return value is None
 
 
 class RelationshipOut(ResponseModel):
     """One relationship edge with its FollowTheMoney statements, attached
-    evidence and the advisory the review layer computes. The graph endpoint
-    adds reconciliation and aggregate-provenance blocks for reviewed
-    duplicates, so the model stays open to those."""
-    model_config = ConfigDict(from_attributes=True, extra="allow", populate_by_name=True, serialize_by_alias=True)
+    evidence and the advisory the review layer computes. The graph and the
+    dossier add `reconciliation` to an edge a reporter reviewed as a
+    duplicate, and `aggregate_provenance` (with an aggregate advisory) to the
+    preferred edge of a collapsed pair; both keys are absent otherwise."""
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
 
     id: str
     investigation_id: str
@@ -320,11 +379,52 @@ class RelationshipOut(ResponseModel):
     source: RelationshipEndpointOut | None = None
     target: RelationshipEndpointOut | None = None
     caption: str | None = None
-    properties: dict[str, Any]
+    # FollowTheMoney property values: every value is a list of strings.
+    properties: dict[str, list[str]]
     statements: list[StatementOut]
     provenance: RelationshipProvenanceOut
-    advisory: RelationshipAdvisoryOut
+    advisory: RelationshipAdvisoryOut | RelationshipAggregateAdvisoryOut
     created_at: datetime
+    reconciliation: RelationshipReconciliationOut | None = Field(default=None, exclude_if=_absent_when_none)
+    aggregate_provenance: AggregateProvenanceOut | None = Field(default=None, exclude_if=_absent_when_none)
+
+
+class EntityRelationshipOut(RelationshipOut):
+    """A relationship seen from one entity (its dossier, or its relationship
+    list): whether the entity is the edge's source or its target."""
+    direction: Literal["outgoing", "incoming"]
+
+
+class GraphNodeOut(ResponseModel):
+    """A canonical entity that is an endpoint of a shown edge."""
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    id: str
+    ftm_id: str
+    caption: str
+    schema_: str = Field(alias="schema")
+    properties: dict[str, list[str]]
+
+
+class GraphReconciliationOut(ResponseModel):
+    """How many edges the duplicate view hid."""
+    collapsed_by_default: bool
+    suppressed_duplicate_count: int
+    underlying_edge_count: int
+    visible_edge_count: int
+
+
+class GraphOut(ResponseModel):
+    nodes: list[GraphNodeOut]
+    edges: list[RelationshipOut]
+    schemas: list[str]
+    reconciliation: GraphReconciliationOut
+
+
+class RelationshipEvidenceReviewsOut(ResponseModel):
+    """Every reporter assessment of one relationship's attached evidence, oldest first."""
+    relationship_id: str
+    reviews: list[RelationshipEvidenceReviewOut]
 
 
 # --- Timeline ----------------------------------------------------------------
@@ -1088,3 +1188,919 @@ class LeadTaskConversionOut(ResponseModel):
 
 # Converting a lead makes a claim or a task; `kind` says which record follows.
 LeadConversionOut = Annotated[LeadClaimConversionOut | LeadTaskConversionOut, Field(discriminator="kind")]
+
+
+# --- Investigations and canonical entities ---------------------------------------
+
+class InvestigationOut(ResponseModel):
+    id: str
+    name: str
+    description: str | None = None
+    is_demo: bool
+    created_at: datetime
+
+
+class EntityOut(ResponseModel):
+    """A canonical FollowTheMoney entity as stored. `merged_into_entity_id`
+    names the surviving record when this one was merged away."""
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    id: str
+    investigation_id: str
+    ftm_id: str
+    schema_: str = Field(alias="schema")
+    caption: str
+    properties: dict[str, list[str]]
+    canonical_id: str | None = None
+    merged_into_entity_id: str | None = None
+    created_at: datetime
+
+
+class EntityStatementOut(StatementOut):
+    """A statement as stored, with the entity it belongs to."""
+    entity_id: str
+
+
+class PropertyTemporalIntervalOut(ResponseModel):
+    """When one value of a property held, as the reporter recorded it."""
+    value: str
+    date_start: str | None = None
+    date_end: str | None = None
+    precision: str
+    evidence_id: str | None = None
+
+
+class PropertyConflictDecisionOut(ResponseModel):
+    """A reporter's decision on a property with several values, as stored."""
+    id: str
+    investigation_id: str
+    entity_id: str
+    prop: str
+    decision: str  # preferred | superseded | temporal_change | both_valid | unresolved
+    values_json: list[str]
+    preferred_value: str | None = None
+    rationale: str | None = None
+    temporal_intervals_json: list[PropertyTemporalIntervalOut]
+    created_at: datetime
+
+
+# --- External connectors and their findings ------------------------------------------
+
+class ConnectorStatusOut(ResponseModel):
+    configured: bool
+
+
+class ConnectorsOut(ResponseModel):
+    """The connectors this server knows, and whether each has what it needs."""
+    providers: list[str]
+    status: dict[str, ConnectorStatusOut]
+
+
+class ConnectorRunOut(ResponseModel):
+    id: str
+    investigation_id: str
+    provider: str
+    query: str
+    status: str
+    result_count: int
+    error: str | None = None
+    started_at: datetime
+    finished_at: datetime | None = None
+
+
+class ConnectorFindingOut(ResponseModel):
+    """What a connector found, kept as the provider sent it (`properties` and
+    `raw` are the provider's own shapes) until a reporter decides what it means."""
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    id: str
+    investigation_id: str
+    run_id: str | None = None
+    provider: str
+    provider_record_id: str
+    caption: str
+    schema_: str | None = Field(default=None, alias="schema")
+    properties: dict[str, Any]
+    source_url: str | None = None
+    raw: dict[str, Any]
+    review_status: str  # unreviewed | accepted | needs_followup | rejected
+    created_at: datetime
+
+
+class EntityCandidateOut(ResponseModel):
+    """A canonical entity that may be what a finding describes, with a name-match score."""
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    entity_id: str
+    caption: str
+    schema_: str = Field(alias="schema")
+    score: float
+
+
+class ResolutionDecisionOut(ResponseModel):
+    """A reporter's identity decision on a finding, as stored."""
+    id: str
+    investigation_id: str
+    finding_id: str
+    entity_id: str | None = None
+    decision: str  # positive | negative | unsure
+    confidence: float
+    rationale: str | None = None
+    created_at: datetime
+
+
+class StatementAssessmentOut(ResponseModel):
+    """A reporter's assessment of one value a finding asserts, as stored."""
+    id: str
+    investigation_id: str
+    finding_id: str
+    entity_id: str | None = None
+    prop: str
+    value: str
+    status: str  # accepted | conflicting | outdated | superseded | unresolved
+    note: str | None = None
+    created_at: datetime
+
+
+class StatementPromotionOut(ResponseModel):
+    """An accepted value written into the canonical graph, with its provenance."""
+    id: str
+    investigation_id: str
+    finding_id: str
+    assessment_id: str
+    entity_id: str
+    statement_id: str
+    provider: str
+    dataset: str
+    source_url: str | None = None
+    original_value: str
+    reviewer_note: str | None = None
+    promoted_at: datetime
+
+
+class ExternalEndpointFindingOut(ResponseModel):
+    """The connector finding that describes one end of an external relationship."""
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    id: str
+    caption: str
+    schema_: str | None = Field(default=None, alias="schema")
+    provider_record_id: str
+    source_url: str | None = None
+
+
+class ExternalRelationshipCandidatesOut(ResponseModel):
+    """For a relationship a connector found: which canonical entities may be
+    its two ends. An end's own finding is named only when the connector
+    also returned it."""
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    schema_: str = Field(alias="schema")
+    source_prop: str
+    target_prop: str
+    source_external_id: str
+    target_external_id: str
+    source_candidates: list[EntityCandidateOut]
+    target_candidates: list[EntityCandidateOut]
+    source_external_finding: ExternalEndpointFindingOut | None = Field(default=None, exclude_if=_absent_when_none)
+    target_external_finding: ExternalEndpointFindingOut | None = Field(default=None, exclude_if=_absent_when_none)
+
+
+class ExternalRelationshipReviewOut(ResponseModel):
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    id: str
+    investigation_id: str
+    finding_id: str
+    schema_: str = Field(alias="schema")
+    source_entity_id: str | None = None
+    target_entity_id: str | None = None
+    decision: str  # supported | conflicting | unresolved | rejected
+    note: str | None = None
+    created_at: datetime
+
+
+class ExternalRelationshipPromotionOut(ResponseModel):
+    """A supported external relationship written into the canonical graph."""
+    id: str
+    investigation_id: str
+    finding_id: str
+    review_id: str
+    relationship_edge_id: str
+    relationship_entity_id: str
+    provider: str
+    source_url: str | None = None
+    promoted_at: datetime
+
+
+# --- Enrichment sessions and cross-provider clusters -----------------------------------
+
+class EnrichmentRunResultOut(ResponseModel):
+    """One provider's part of an enrichment session; `error` is sent only when it failed."""
+    provider: str
+    status: str  # completed | failed
+    result_count: int
+    run_id: str
+    error: str | None = Field(default=None, exclude_if=_absent_when_none)
+
+
+class EnrichmentSessionOut(ResponseModel):
+    """The reply to running every chosen connector against one entity."""
+    id: str
+    entity_id: str
+    investigation_id: str
+    status: str  # completed | partial | failed
+    providers: list[str]
+    total_results: int
+    started_at: datetime
+    finished_at: datetime | None = None
+    runs: list[EnrichmentRunResultOut]
+
+
+class EnrichmentSessionRowOut(ResponseModel):
+    """An enrichment session as stored."""
+    id: str
+    investigation_id: str
+    entity_id: str
+    status: str
+    providers: list[str]
+    total_results: int
+    started_at: datetime
+    finished_at: datetime | None = None
+
+
+class EnrichmentSessionRunOut(ResponseModel):
+    id: str
+    session_id: str
+    run_id: str | None = None
+    provider: str
+    status: str
+    result_count: int
+    error: str | None = None
+    started_at: datetime | None = None
+    finished_at: datetime | None = None
+
+
+class EnrichmentSessionDetailOut(EnrichmentSessionRowOut):
+    """A stored session with its per-provider runs."""
+    runs: list[EnrichmentSessionRunOut]
+
+
+class EnrichmentSessionFindingOut(ResponseModel):
+    id: str
+    session_id: str
+    finding_id: str
+    provider: str
+    created_at: datetime
+
+
+class CrossProviderDecisionOut(ResponseModel):
+    """A reporter's decision that findings from different providers are, or
+    are not, the same outside entity."""
+    id: str
+    investigation_id: str
+    entity_id: str
+    session_id: str | None = None
+    cluster_key: str
+    finding_ids: list[str]
+    decision: str  # positive | negative | unsure
+    confidence: float
+    rationale: str | None = None
+    created_at: datetime
+
+
+class ClusterReasonOut(ResponseModel):
+    kind: str  # schema | identifier | name | context
+    detail: str
+    weight: float
+
+
+class ClusterPairOut(ResponseModel):
+    finding_ids: list[str]
+    score: float
+    reasons: list[ClusterReasonOut]
+
+
+class ClusterFindingOut(ResponseModel):
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    id: str
+    provider: str
+    provider_record_id: str
+    caption: str
+    schema_: str | None = Field(default=None, alias="schema")
+    properties: dict[str, Any]
+    source_url: str | None = None
+
+
+class ClusterDecisionOut(ResponseModel):
+    id: str
+    decision: str
+    confidence: float
+    rationale: str | None = None
+    created_at: datetime
+
+
+class EnrichmentClusterOut(ResponseModel):
+    """Findings from different providers that may describe one outside
+    entity, with the reasons for each pairing and the latest reporter decision."""
+    cluster_key: str
+    score: float
+    providers: list[str]
+    finding_ids: list[str]
+    findings: list[ClusterFindingOut]
+    pairs: list[ClusterPairOut]
+    decision: ClusterDecisionOut | None = None
+
+
+# --- Canonical duplicates, merges and post-merge reconciliation ----------------------------
+
+class CanonicalDecisionSummaryOut(ResponseModel):
+    """The latest reporter decision on a duplicate pair (`created_at` as the
+    service formats it, an ISO string)."""
+    id: str
+    decision: str  # same | different | unsure
+    confidence: float
+    rationale: str | None = None
+    created_at: str
+
+
+class CanonicalDuplicateCandidateOut(EntityCandidateOut):
+    latest_decision: CanonicalDecisionSummaryOut | None = None
+
+
+class CanonicalResolutionDecisionOut(ResponseModel):
+    """A reporter's decision whether two canonical records are one entity, as stored."""
+    id: str
+    investigation_id: str
+    entity_a_id: str
+    entity_b_id: str
+    decision: str  # same | different | unsure
+    confidence: float
+    rationale: str | None = None
+    created_at: datetime
+
+
+class MergeEntityOut(ResponseModel):
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    id: str
+    caption: str
+    schema_: str = Field(alias="schema")
+
+
+class MergeResolutionOut(ResponseModel):
+    id: str
+    decision: str
+    confidence: float
+    rationale: str | None = None
+
+
+class MergeReferenceOut(ResponseModel):
+    """Records of one kind that would move to the surviving entity (the first hundred ids)."""
+    count: int
+    record_ids: list[str]
+
+
+class MergeBlockerOut(ResponseModel):
+    code: str  # relationship_self_loop | external_review_self_loop
+    record_ids: list[str]
+    message: str
+
+
+class CanonicalMergePreviewOut(ResponseModel):
+    """What a merge would move, what blocks it, and the digest the execute
+    call must repeat so a stale preview is never acted on."""
+    source: MergeEntityOut
+    target: MergeEntityOut
+    resolution: MergeResolutionOut | None = None
+    references: dict[str, MergeReferenceOut]
+    total_references: int
+    blockers: list[MergeBlockerOut]
+    can_execute: bool
+    preview_digest: str
+
+
+class CanonicalEntityMergeAuditOut(ResponseModel):
+    """The record of a merge: the preview it was executed from and what moved."""
+    id: str
+    investigation_id: str
+    source_entity_id: str
+    target_entity_id: str
+    resolution_decision_id: str | None = None
+    preview_digest: str
+    # The preview the merge was executed from, stored as it was shown.
+    preview_json: dict[str, Any]
+    moved_counts_json: dict[str, int]
+    rationale: str | None = None
+    created_at: datetime
+
+
+class CanonicalMergeExecuteOut(ResponseModel):
+    audit: CanonicalEntityMergeAuditOut
+    source_entity_id: str
+    target_entity_id: str
+
+
+class ReconciliationDecisionOut(ResponseModel):
+    """A reporter's decision on one duplicate pair after a merge."""
+    id: str
+    investigation_id: str
+    entity_id: str
+    record_type: str  # statement | relationship
+    record_a_id: str
+    record_b_id: str
+    decision: str  # duplicate | keep_separate | unsure
+    rationale: str | None = None
+    preferred_record_id: str | None = None
+    created_at: datetime
+
+
+class StatementDuplicatePairOut(ResponseModel):
+    """Two statements of the merged entity that assert the same value."""
+    record_type: Literal["statement"]
+    record_a: StatementOut
+    record_b: StatementOut
+    same_assertion: bool
+    provenance_differs: bool
+    latest_decision: ReconciliationDecisionOut | None = None
+
+
+class RelationshipDuplicatePairOut(ResponseModel):
+    """Two edges of the merged entity with the same schema and ends."""
+    record_type: Literal["relationship"]
+    record_a: RelationshipOut
+    record_b: RelationshipOut
+    same_assertion: bool
+    provenance_differs: bool
+    latest_decision: ReconciliationDecisionOut | None = None
+
+
+class ReconciliationSummaryOut(ResponseModel):
+    statement_pairs: int
+    relationship_pairs: int
+    unresolved_pairs: int
+
+
+class PostMergeReconciliationOut(ResponseModel):
+    """The duplicate pairs a merge left behind, for the reporter to review.
+    Nothing is deleted: a decision only records which record is preferred."""
+    entity_id: str
+    statement_duplicates: list[StatementDuplicatePairOut]
+    relationship_duplicates: list[RelationshipDuplicatePairOut]
+    summary: ReconciliationSummaryOut
+
+
+# --- Entity dossier ------------------------------------------------------------------
+
+class EntityAliasLinkOut(ResponseModel):
+    id: str
+    caption: str
+    merged_into_entity_id: str | None = None
+
+
+class EntityAliasResolutionOut(ResponseModel):
+    """Sent when the dossier was asked for by a merged alias: which record
+    was asked for and which one answers."""
+    requested_entity_id: str
+    requested_caption: str
+    active_entity_id: str
+    active_caption: str
+    alias_chain: list[EntityAliasLinkOut]
+
+
+class IdentityAliasOut(ResponseModel):
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    id: str
+    caption: str
+    schema_: str = Field(alias="schema")
+    merged_into_entity_id: str | None = None
+
+
+class IdentityDecisionOut(ResponseModel):
+    id: str
+    decision: str
+    confidence: float
+    rationale: str | None = None
+    created_at: datetime
+    other_entity: MergeEntityOut | None = None
+
+
+class IdentityMergeAuditOut(ResponseModel):
+    id: str
+    source_entity_id: str
+    target_entity_id: str
+    resolution_decision_id: str | None = None
+    rationale: str | None = None
+    moved_counts: dict[str, int]
+    created_at: datetime
+
+
+class EntityIdentityHistoryOut(ResponseModel):
+    """Every identity judgement about the entity: merged aliases, reporter
+    decisions, merge audits. Audit-oriented; nothing here is inferred."""
+    canonical_entity_id: str
+    aliases: list[IdentityAliasOut]
+    canonical_decisions: list[IdentityDecisionOut]
+    merge_audits: list[IdentityMergeAuditOut]
+    unresolved_decision_count: int
+
+
+class DossierSummaryOut(ResponseModel):
+    statement_count: int
+    property_conflict_count: int
+    identity_alias_count: int
+    identity_decision_count: int
+    identity_unresolved_count: int
+    relationship_count: int
+    relationship_underlying_count: int
+    relationship_suppressed_duplicate_count: int
+    relationship_schemas: dict[str, int]
+    relationship_review_advisory_count: int
+    relationship_mixed_support_count: int
+    claim_count: int
+    claim_statuses: dict[str, int]
+    evidence_count: int
+    lead_count: int
+    task_count: int
+    timeline_event_count: int
+    external_finding_count: int
+    external_finding_statuses: dict[str, int]
+    enrichment_session_count: int
+    unresolved_external_count: int
+
+
+class DossierConflictDecisionOut(ResponseModel):
+    """A property-conflict decision as the dossier shows it."""
+    id: str
+    decision: str
+    values: list[str]
+    preferred_value: str | None = None
+    rationale: str | None = None
+    temporal_intervals: list[PropertyTemporalIntervalOut]
+    created_at: datetime
+
+
+class DossierConflictValueOut(ResponseModel):
+    """One value of a disputed property: where it is asserted and how it was assessed."""
+    value: str
+    canonical: bool
+    support_count: int
+    conflict_count: int
+    latest_status: str | None = None
+    canonical_statements: list[CanonicalStatementOut]
+    external_assessments: list[ExternalAssessmentOut]
+
+
+class DossierPropertyConflictOut(ResponseModel):
+    """A property with several canonical values, or an outside conflict with
+    its value. Diagnostic only: the dossier never picks a value itself."""
+    prop: str
+    status: str
+    preferred_value: str | None = None
+    reason: str  # multiple_canonical_values | external_conflict
+    latest_decision: DossierConflictDecisionOut | None = None
+    decision_history: list[DossierConflictDecisionOut]
+    values: list[DossierConflictValueOut]
+
+
+class DossierMatchBasisOut(ResponseModel):
+    """Why a record is in the dossier: an explicit link, or (named as such) a
+    text mention of the entity, with the matched terms."""
+    type: str
+    terms: list[str] | None = Field(default=None, exclude_if=_absent_when_none)
+
+
+class DossierClaimOut(ResponseModel):
+    claim: ClaimOut
+    match_basis: DossierMatchBasisOut
+
+
+class DossierClaimLinkOut(ResponseModel):
+    claim_id: str
+    stance: str
+    note: str | None = None
+
+
+class DossierEvidenceOut(ResponseModel):
+    evidence: EvidenceOut
+    source: SourceOut | None = None
+    match_basis: DossierMatchBasisOut
+    claim_links: list[DossierClaimLinkOut]
+
+
+class LeadRowOut(ResponseModel):
+    """A lead as stored (without its profile, links and history)."""
+    id: str
+    investigation_id: str
+    title: str
+    detail: str | None = None
+    provider: str | None = None
+    provider_record_id: str | None = None
+    status: str
+    created_at: datetime
+
+
+class DossierLeadOut(ResponseModel):
+    lead: LeadRowOut
+    match_basis: DossierMatchBasisOut
+
+
+class DossierExternalOut(ResponseModel):
+    """Everything connectors found about the entity and every review of it."""
+    findings: list[ConnectorFindingOut]
+    resolution_decisions: list[ResolutionDecisionOut]
+    statement_assessments: list[StatementAssessmentOut]
+    promotions: list[StatementPromotionOut]
+    enrichment_sessions: list[EnrichmentSessionRowOut]
+    enrichment_links: list[EnrichmentSessionFindingOut]
+    cross_provider_decisions: list[CrossProviderDecisionOut]
+
+
+class EntityDossierOut(ResponseModel):
+    """Everything the workbench holds about one canonical entity."""
+    entity: EntityOut
+    alias_resolution: EntityAliasResolutionOut | None = None
+    identity_history: EntityIdentityHistoryOut
+    summary: DossierSummaryOut
+    statement_history: list[StatementHistoryRowOut]
+    property_conflicts: list[DossierPropertyConflictOut]
+    relationships: list[EntityRelationshipOut]
+    claims: list[DossierClaimOut]
+    evidence: list[DossierEvidenceOut]
+    leads: list[DossierLeadOut]
+    tasks: list[ReportingTaskOut]
+    timeline: list[TimelineEventOut]
+    external: DossierExternalOut
+
+
+# --- Money flows ---------------------------------------------------------------------
+
+class FinancialTransactionOut(ResponseModel):
+    """One Payment edge the ledger could read in full. Keys follow the
+    frontend's transaction type (lib/financial-flow-types.ts)."""
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    id: str
+    relationship_id: str
+    dateTime: str | None = None
+    from_: str = Field(alias="from")
+    to: str
+    from_entity_id: str
+    to_entity_id: str
+    amount: float
+    currency: str
+    statedPurpose: str | None = None
+    transactionNumber: str | None = None
+    evidence: str | None = None
+    evidence_count: int
+    supporting_evidence_count: int
+    status: str | None = None
+    flowType: Literal["direct", "inferred"]
+
+
+class IncompleteTransactionOut(ResponseModel):
+    """A Payment edge the ledger could not chart, with what is missing or
+    ambiguous; nothing is guessed."""
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    id: str
+    relationship_id: str
+    dateTime: str | None = None
+    from_: str | None = Field(default=None, alias="from")
+    to: str | None = None
+    from_entity_id: str | None = None
+    to_entity_id: str | None = None
+    amount: float | None = None
+    currency: str | None = None
+    statedPurpose: str | None = None
+    transactionNumber: str | None = None
+    evidence: str | None = None
+    evidence_count: int
+    supporting_evidence_count: int
+    status: str | None = None
+    flowType: Literal["direct", "inferred"]
+    problems: list[str]
+
+
+class FinancialLedgerOut(ResponseModel):
+    investigation_id: str
+    transactions: list[FinancialTransactionOut]
+    incomplete: list[IncompleteTransactionOut]
+    currencies: list[str]
+    flow_type_rule: str
+    duplicate_rule: str
+
+
+# --- Settings, credentials and the security audit ------------------------------------------
+
+class SettingsLimitsOut(ResponseModel):
+    max_document_bytes: int
+    max_backup_bytes: int
+    max_backup_uncompressed_bytes: int
+    max_backup_files: int
+
+
+class OcrRuntimeStatusOut(ResponseModel):
+    available: bool
+    tessdata: str | None = None
+    requested_languages: list[str]
+    missing_languages: list[str]
+    detail: str | None = None
+
+
+class DocumentExtractionSettingsOut(ResponseModel):
+    pdf_ocr_enabled: bool
+    pdf_ocr_language: str
+    pdf_ocr_dpi: int
+    pdf_ocr_min_native_chars: int
+    local_entity_suggestions_enabled: bool
+    entity_extraction_owner: Literal["workbench_local", "openaleph_ftm_analyze"]
+    ocr_runtime: OcrRuntimeStatusOut
+
+
+class ApiAccessStatusOut(ResponseModel):
+    remote_api_enabled: bool
+    mode: Literal["local_only", "shared_bearer", "persisted_users"]
+    token_configured: bool
+    persisted_identity_count: int
+    investigation_scope_configured: bool
+
+
+class SecurityAuditRecordOut(ResponseModel):
+    """One audit line's public fields: request metadata only, never a body."""
+    timestamp: str
+    event: str
+    request_id: str
+    method: str
+    path: str
+    status_code: int
+    local_request: bool
+    client_host: str | None = Field(default=None, exclude_if=_absent_when_none)
+
+
+class SecurityRemoteHostOut(ResponseModel):
+    client_host: str
+    count: int
+
+
+class SecurityAlertsOut(ResponseModel):
+    """Denial events in a recent window, counted for an operator's glance."""
+    window_hours: float
+    since: str
+    total_denials: int
+    by_event: dict[str, int]
+    remote_hosts: list[SecurityRemoteHostOut]
+    recent: list[SecurityAuditRecordOut]
+    attention_threshold: int
+    needs_attention: bool
+    records_scanned: int
+    malformed_lines: int
+    read_error: bool
+
+
+class AiLimitsOut(ResponseModel):
+    runs_per_minute_per_actor: int
+    max_concurrent_runs: int
+    request_timeout_seconds: float
+    max_output_tokens: int
+
+
+class AiModuleStatusOut(ResponseModel):
+    spec_file: str
+    available: bool
+    vendored_tas: bool
+
+
+class AiControlFlagOut(ResponseModel):
+    default: str
+    allowed: list[str]
+
+
+class AiControlSurfaceOut(ResponseModel):
+    spec_file: str
+    available: bool
+    flags: dict[str, AiControlFlagOut]
+
+
+class AiTasSpecOut(ResponseModel):
+    present: bool
+    version: str | None
+    modules: dict[str, AiModuleStatusOut]
+    control_surface: AiControlSurfaceOut
+
+
+class AiReasoningStatusOut(ResponseModel):
+    """Whether the AI reasoning endpoints can be called, and what they would
+    run on. Never carries key material. Every key is always sent (null when
+    unknown), so the nullable ones have no default: the generated type then
+    matches the AI panel's own status type (lib/api-types.ts)."""
+    enabled: bool
+    provider: str | None
+    provider_key_configured: bool
+    endpoints_callable: bool
+    model: str | None
+    runs_on_this_computer: bool | None
+    remote_endpoint_allowed: bool
+    limits: AiLimitsOut
+    tas_spec: AiTasSpecOut
+
+
+class ConnectorCredentialStatusOut(ResponseModel):
+    """Whether a connector has a credential and where it comes from; the secret itself is never sent."""
+    configured: bool
+    source: str  # local_store | environment | none
+    local_store_present: bool
+    permissions_restricted: bool
+    storage_protection: str
+
+
+class SettingsStatusOut(ResponseModel):
+    """The server configuration the page reads on load. A remote caller
+    without admin rights gets the same keys with the server-wide values blanked."""
+    environment: str
+    database: str
+    document_storage_dir: str
+    limits: SettingsLimitsOut
+    restore_api_enabled: bool
+    document_extraction: DocumentExtractionSettingsOut
+    access: ApiAccessStatusOut
+    cors_allowed_origins: list[str]
+    security: SecurityAlertsOut
+    ai: AiReasoningStatusOut
+    connectors: dict[str, ConnectorCredentialStatusOut]
+
+
+class ConnectorCredentialSavedOut(ConnectorCredentialStatusOut):
+    provider: str
+
+
+class ConnectorCredentialRemovedOut(ConnectorCredentialSavedOut):
+    removed: bool
+
+
+class OrphanFileOut(ResponseModel):
+    relative_path: str
+    size_bytes: int
+    modified_at: float
+    action: str
+
+
+class UnsafeDocumentReferenceOut(ResponseModel):
+    document_id: str
+    storage_path: str
+    error: str
+
+
+class OrphanStoragePreviewOut(ResponseModel):
+    """Files under document storage no document refers to. Read-only: they are kept until a reporter decides."""
+    storage_root: str
+    orphan_files: list[OrphanFileOut]
+    orphan_file_count: int
+    orphan_bytes: int
+    unsafe_document_references: list[UnsafeDocumentReferenceOut]
+    cleanup_available: bool
+    policy: str
+
+
+class SecurityAuditViewOut(ResponseModel):
+    """One page of the audit log, newest first. `read_error` is sent only when the file could not be read."""
+    records: list[SecurityAuditRecordOut]
+    returned: int
+    total_matched: int
+    offset: int
+    has_more: bool
+    next_offset: int | None = None
+    malformed_lines: int
+    file_bytes: int
+    read_error: bool | None = Field(default=None, exclude_if=_absent_when_none)
+
+
+class SecurityAuditSummaryOut(ResponseModel):
+    total_records: int
+    malformed_lines: int
+    local_records: int
+    remote_records: int
+    file_bytes: int
+    by_event: dict[str, int]
+    by_method: dict[str, int]
+    by_status: dict[str, int]
+    read_error: bool | None = Field(default=None, exclude_if=_absent_when_none)
+
+
+class SecurityAuditRetentionPreviewOut(ResponseModel):
+    """What a retention run would keep and remove; malformed lines are always kept."""
+    keep_days: int
+    max_records: int
+    total_lines: int
+    valid_records: int
+    malformed_lines: int
+    would_keep: int
+    would_remove: int
+    file_bytes: int
+
+
+class SecurityAuditRetentionResultOut(SecurityAuditRetentionPreviewOut):
+    removed: int
+    applied: bool

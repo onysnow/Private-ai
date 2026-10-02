@@ -21,7 +21,8 @@ import {errorMessage, isAbortError} from '../../lib/api-client';
 import {checkedReply} from '../../lib/api-generated';
 import {api} from '../../lib/api-instance';
 import {
-  listClaimsQueryKey, listDocumentsOptions, listDocumentsQueryKey, listInvestigationEvidenceQueryKey, listSourcesQueryKey,
+  getInvestigationGraphQueryKey, listClaimsQueryKey, listDocumentsOptions, listDocumentsQueryKey, listEntitiesOptions, listEntitiesQueryKey,
+  listInvestigationEvidenceQueryKey, listSourcesQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {
   createExtractedRelationshipProposal, getDocument, getOpenalephDocumentReviewStatus, listDocumentCandidatesEndpoint, listJobsEndpoint,
@@ -35,16 +36,7 @@ import type {BackgroundJob} from '../../lib/api-types';
 import {describeJob, waitForJob} from '../../lib/jobs';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
-/** The canonical entities a staged relationship can join; the page still owns the list. */
-export type EntityOption = {id: string; caption: string; schema: string};
-
-type Props = {
-  investigationId: string;
-  entities: EntityOption[];
-  /** Panels still on the page's own state reload their copies here after a
-   * proposal is accepted or rejected (the entities). */
-  onReviewed: () => Promise<void> | void;
-};
+type Props = {investigationId: string};
 
 const ACCEPTED_FILES = '.pdf,.docx,.txt,.md,.csv,.html,.htm';
 
@@ -68,7 +60,7 @@ function uploadForm(investigationId: string, title: string, file: File): FormDat
 const upload = (investigationId: string, title: string, file: File): Promise<DocumentUploadOut> =>
   api.parsed('/api/documents/upload', checkedReply(zDocumentUploadOut), {method: 'POST', rawBody: uploadForm(investigationId, title, file)});
 
-export function DocumentsPanel({investigationId, entities, onReviewed}: Props): ReactElement {
+export function DocumentsPanel({investigationId}: Props): ReactElement {
   const queryClient = useQueryClient();
   const router = useRouter();
   const openProvenance = useWorkbenchStore(state => state.openProvenance);
@@ -99,6 +91,9 @@ export function DocumentsPanel({investigationId, entities, onReviewed}: Props): 
 
   const path = {investigation_id: investigationId};
   const documentsQuery = useQuery({...listDocumentsOptions({path}), enabled: Boolean(investigationId)});
+  // The canonical entities a staged relationship can join, from the shared cache.
+  const entitiesQuery = useQuery({...listEntitiesOptions({path}), enabled: Boolean(investigationId)});
+  const entities = entitiesQuery.data ?? [];
   const documents: DocumentOut[] = documentsQuery.data ?? [];
   const reloadDocuments = () => queryClient.invalidateQueries({queryKey: listDocumentsQueryKey({path})});
 
@@ -261,7 +256,8 @@ export function DocumentsPanel({investigationId, entities, onReviewed}: Props): 
         queryClient.invalidateQueries({queryKey: listClaimsQueryKey({path})}),
         queryClient.invalidateQueries({queryKey: listInvestigationEvidenceQueryKey({path})}),
         queryClient.invalidateQueries({queryKey: listSourcesQueryKey({path})}),
-        onReviewed(),
+        queryClient.invalidateQueries({queryKey: listEntitiesQueryKey({path})}),
+        queryClient.invalidateQueries({queryKey: getInvestigationGraphQueryKey({path})}),
       ]);
       setDocStatus(`${c.candidate_type} proposal ${decision === 'accept' ? 'accepted' : 'rejected'}. Its document/chunk/review lineage is retained for provenance tracing.`);
     } catch (error) {

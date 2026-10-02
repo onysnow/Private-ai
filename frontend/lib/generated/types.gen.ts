@@ -19,6 +19,225 @@ export type AiAnalysisCandidateReviewRequest = {
 };
 
 /**
+ * AggregateClaimDependencyOut
+ *
+ * A claim dependency collected across reviewed duplicate edges, naming
+ * the underlying edge it belongs to.
+ */
+export type AggregateClaimDependencyOut = {
+  /**
+   * Claim Id
+   */
+  claim_id: string;
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Evidence Id
+   */
+  evidence_id: string;
+  /**
+   * Needs Review
+   */
+  needs_review: boolean;
+  /**
+   * Note
+   */
+  note?: string | null;
+  /**
+   * Relationship Id
+   */
+  relationship_id?: string | null;
+  /**
+   * Stance
+   */
+  stance: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * AggregateProvenanceOut
+ *
+ * The provenance inventory of a compact preferred edge: every statement
+ * source and evidence record beneath it and its reviewed duplicates.
+ * Presentation only; no records are merged.
+ */
+export type AggregateProvenanceOut = {
+  /**
+   * Evidence
+   */
+  evidence: Array<EvidenceWithSourceOut>;
+  /**
+   * Evidence Count
+   */
+  evidence_count: number;
+  /**
+   * Presentation Only
+   */
+  presentation_only: true;
+  /**
+   * Statement Count
+   */
+  statement_count: number;
+  /**
+   * Statement Sources
+   */
+  statement_sources: Array<string>;
+  /**
+   * Underlying Relationship Count
+   */
+  underlying_relationship_count: number;
+  /**
+   * Underlying Relationship Ids
+   */
+  underlying_relationship_ids: Array<string>;
+};
+
+/**
+ * AiControlFlagOut
+ */
+export type AiControlFlagOut = {
+  /**
+   * Allowed
+   */
+  allowed: Array<string>;
+  /**
+   * Default
+   */
+  default: string;
+};
+
+/**
+ * AiControlSurfaceOut
+ */
+export type AiControlSurfaceOut = {
+  /**
+   * Available
+   */
+  available: boolean;
+  /**
+   * Flags
+   */
+  flags: {
+    [key: string]: AiControlFlagOut;
+  };
+  /**
+   * Spec File
+   */
+  spec_file: string;
+};
+
+/**
+ * AiLimitsOut
+ */
+export type AiLimitsOut = {
+  /**
+   * Max Concurrent Runs
+   */
+  max_concurrent_runs: number;
+  /**
+   * Max Output Tokens
+   */
+  max_output_tokens: number;
+  /**
+   * Request Timeout Seconds
+   */
+  request_timeout_seconds: number;
+  /**
+   * Runs Per Minute Per Actor
+   */
+  runs_per_minute_per_actor: number;
+};
+
+/**
+ * AiModuleStatusOut
+ */
+export type AiModuleStatusOut = {
+  /**
+   * Available
+   */
+  available: boolean;
+  /**
+   * Spec File
+   */
+  spec_file: string;
+  /**
+   * Vendored Tas
+   */
+  vendored_tas: boolean;
+};
+
+/**
+ * AiReasoningStatusOut
+ *
+ * Whether the AI reasoning endpoints can be called, and what they would
+ * run on. Never carries key material. Every key is always sent (null when
+ * unknown), so the nullable ones have no default: the generated type then
+ * matches the AI panel's own status type (lib/api-types.ts).
+ */
+export type AiReasoningStatusOut = {
+  /**
+   * Enabled
+   */
+  enabled: boolean;
+  /**
+   * Endpoints Callable
+   */
+  endpoints_callable: boolean;
+  limits: AiLimitsOut;
+  /**
+   * Model
+   */
+  model: string | null;
+  /**
+   * Provider
+   */
+  provider: string | null;
+  /**
+   * Provider Key Configured
+   */
+  provider_key_configured: boolean;
+  /**
+   * Remote Endpoint Allowed
+   */
+  remote_endpoint_allowed: boolean;
+  /**
+   * Runs On This Computer
+   */
+  runs_on_this_computer: boolean | null;
+  tas_spec: AiTasSpecOut;
+};
+
+/**
+ * AiTasSpecOut
+ */
+export type AiTasSpecOut = {
+  control_surface: AiControlSurfaceOut;
+  /**
+   * Modules
+   */
+  modules: {
+    [key: string]: AiModuleStatusOut;
+  };
+  /**
+   * Present
+   */
+  present: boolean;
+  /**
+   * Version
+   */
+  version: string | null;
+};
+
+/**
  * AlephSearchRequest
  */
 export type AlephSearchRequest = {
@@ -30,6 +249,32 @@ export type AlephSearchRequest = {
    * Query
    */
   query: string;
+};
+
+/**
+ * ApiAccessStatusOut
+ */
+export type ApiAccessStatusOut = {
+  /**
+   * Investigation Scope Configured
+   */
+  investigation_scope_configured: boolean;
+  /**
+   * Mode
+   */
+  mode: 'local_only' | 'shared_bearer' | 'persisted_users';
+  /**
+   * Persisted Identity Count
+   */
+  persisted_identity_count: number;
+  /**
+   * Remote Api Enabled
+   */
+  remote_api_enabled: boolean;
+  /**
+   * Token Configured
+   */
+  token_configured: boolean;
 };
 
 /**
@@ -320,6 +565,125 @@ export type BulkIn = {
 };
 
 /**
+ * CanonicalDecisionSummaryOut
+ *
+ * The latest reporter decision on a duplicate pair (`created_at` as the
+ * service formats it, an ISO string).
+ */
+export type CanonicalDecisionSummaryOut = {
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Decision
+   */
+  decision: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Rationale
+   */
+  rationale?: string | null;
+};
+
+/**
+ * CanonicalDuplicateCandidateOut
+ */
+export type CanonicalDuplicateCandidateOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  latest_decision?: CanonicalDecisionSummaryOut | null;
+  /**
+   * Schema
+   */
+  schema: string;
+  /**
+   * Score
+   */
+  score: number;
+};
+
+/**
+ * CanonicalEntityMergeAuditOut
+ *
+ * The record of a merge: the preview it was executed from and what moved.
+ */
+export type CanonicalEntityMergeAuditOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Moved Counts Json
+   */
+  moved_counts_json: {
+    [key: string]: number;
+  };
+  /**
+   * Preview Digest
+   */
+  preview_digest: string;
+  /**
+   * Preview Json
+   */
+  preview_json: {
+    [key: string]: unknown;
+  };
+  /**
+   * Rationale
+   */
+  rationale?: string | null;
+  /**
+   * Resolution Decision Id
+   */
+  resolution_decision_id?: string | null;
+  /**
+   * Source Entity Id
+   */
+  source_entity_id: string;
+  /**
+   * Target Entity Id
+   */
+  target_entity_id: string;
+};
+
+/**
+ * CanonicalMergeExecuteOut
+ */
+export type CanonicalMergeExecuteOut = {
+  audit: CanonicalEntityMergeAuditOut;
+  /**
+   * Source Entity Id
+   */
+  source_entity_id: string;
+  /**
+   * Target Entity Id
+   */
+  target_entity_id: string;
+};
+
+/**
  * CanonicalMergeExecuteRequest
  */
 export type CanonicalMergeExecuteRequest = {
@@ -335,6 +699,80 @@ export type CanonicalMergeExecuteRequest = {
    * Target Entity Id
    */
   target_entity_id: string;
+};
+
+/**
+ * CanonicalMergePreviewOut
+ *
+ * What a merge would move, what blocks it, and the digest the execute
+ * call must repeat so a stale preview is never acted on.
+ */
+export type CanonicalMergePreviewOut = {
+  /**
+   * Blockers
+   */
+  blockers: Array<MergeBlockerOut>;
+  /**
+   * Can Execute
+   */
+  can_execute: boolean;
+  /**
+   * Preview Digest
+   */
+  preview_digest: string;
+  /**
+   * References
+   */
+  references: {
+    [key: string]: MergeReferenceOut;
+  };
+  resolution?: MergeResolutionOut | null;
+  source: MergeEntityOut;
+  target: MergeEntityOut;
+  /**
+   * Total References
+   */
+  total_references: number;
+};
+
+/**
+ * CanonicalResolutionDecisionOut
+ *
+ * A reporter's decision whether two canonical records are one entity, as stored.
+ */
+export type CanonicalResolutionDecisionOut = {
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Decision
+   */
+  decision: string;
+  /**
+   * Entity A Id
+   */
+  entity_a_id: string;
+  /**
+   * Entity B Id
+   */
+  entity_b_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Rationale
+   */
+  rationale?: string | null;
 };
 
 /**
@@ -791,6 +1229,104 @@ export type ClaimUpdate = {
 };
 
 /**
+ * ClusterDecisionOut
+ */
+export type ClusterDecisionOut = {
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Decision
+   */
+  decision: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Rationale
+   */
+  rationale?: string | null;
+};
+
+/**
+ * ClusterFindingOut
+ */
+export type ClusterFindingOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Properties
+   */
+  properties: {
+    [key: string]: unknown;
+  };
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Provider Record Id
+   */
+  provider_record_id: string;
+  /**
+   * Schema
+   */
+  schema?: string | null;
+  /**
+   * Source Url
+   */
+  source_url?: string | null;
+};
+
+/**
+ * ClusterPairOut
+ */
+export type ClusterPairOut = {
+  /**
+   * Finding Ids
+   */
+  finding_ids: Array<string>;
+  /**
+   * Reasons
+   */
+  reasons: Array<ClusterReasonOut>;
+  /**
+   * Score
+   */
+  score: number;
+};
+
+/**
+ * ClusterReasonOut
+ */
+export type ClusterReasonOut = {
+  /**
+   * Detail
+   */
+  detail: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Weight
+   */
+  weight: number;
+};
+
+/**
  * CollectionIn
  */
 export type CollectionIn = {
@@ -817,6 +1353,201 @@ export type ConfirmIn = {
 };
 
 /**
+ * ConnectorCredentialRemovedOut
+ */
+export type ConnectorCredentialRemovedOut = {
+  /**
+   * Configured
+   */
+  configured: boolean;
+  /**
+   * Local Store Present
+   */
+  local_store_present: boolean;
+  /**
+   * Permissions Restricted
+   */
+  permissions_restricted: boolean;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Removed
+   */
+  removed: boolean;
+  /**
+   * Source
+   */
+  source: string;
+  /**
+   * Storage Protection
+   */
+  storage_protection: string;
+};
+
+/**
+ * ConnectorCredentialSavedOut
+ */
+export type ConnectorCredentialSavedOut = {
+  /**
+   * Configured
+   */
+  configured: boolean;
+  /**
+   * Local Store Present
+   */
+  local_store_present: boolean;
+  /**
+   * Permissions Restricted
+   */
+  permissions_restricted: boolean;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Source
+   */
+  source: string;
+  /**
+   * Storage Protection
+   */
+  storage_protection: string;
+};
+
+/**
+ * ConnectorCredentialStatusOut
+ *
+ * Whether a connector has a credential and where it comes from; the secret itself is never sent.
+ */
+export type ConnectorCredentialStatusOut = {
+  /**
+   * Configured
+   */
+  configured: boolean;
+  /**
+   * Local Store Present
+   */
+  local_store_present: boolean;
+  /**
+   * Permissions Restricted
+   */
+  permissions_restricted: boolean;
+  /**
+   * Source
+   */
+  source: string;
+  /**
+   * Storage Protection
+   */
+  storage_protection: string;
+};
+
+/**
+ * ConnectorFindingOut
+ *
+ * What a connector found, kept as the provider sent it (`properties` and
+ * `raw` are the provider's own shapes) until a reporter decides what it means.
+ */
+export type ConnectorFindingOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Properties
+   */
+  properties: {
+    [key: string]: unknown;
+  };
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Provider Record Id
+   */
+  provider_record_id: string;
+  /**
+   * Raw
+   */
+  raw: {
+    [key: string]: unknown;
+  };
+  /**
+   * Review Status
+   */
+  review_status: string;
+  /**
+   * Run Id
+   */
+  run_id?: string | null;
+  /**
+   * Schema
+   */
+  schema?: string | null;
+  /**
+   * Source Url
+   */
+  source_url?: string | null;
+};
+
+/**
+ * ConnectorRunOut
+ */
+export type ConnectorRunOut = {
+  /**
+   * Error
+   */
+  error?: string | null;
+  /**
+   * Finished At
+   */
+  finished_at?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Query
+   */
+  query: string;
+  /**
+   * Result Count
+   */
+  result_count: number;
+  /**
+   * Started At
+   */
+  started_at: string;
+  /**
+   * Status
+   */
+  status: string;
+};
+
+/**
  * ConnectorSearchRequest
  */
 export type ConnectorSearchRequest = {
@@ -831,6 +1562,34 @@ export type ConnectorSearchRequest = {
 };
 
 /**
+ * ConnectorStatusOut
+ */
+export type ConnectorStatusOut = {
+  /**
+   * Configured
+   */
+  configured: boolean;
+};
+
+/**
+ * ConnectorsOut
+ *
+ * The connectors this server knows, and whether each has what it needs.
+ */
+export type ConnectorsOut = {
+  /**
+   * Providers
+   */
+  providers: Array<string>;
+  /**
+   * Status
+   */
+  status: {
+    [key: string]: ConnectorStatusOut;
+  };
+};
+
+/**
  * CreateIn
  */
 export type CreateIn = {
@@ -842,6 +1601,55 @@ export type CreateIn = {
    * Selection
    */
   selection?: string | null;
+};
+
+/**
+ * CrossProviderDecisionOut
+ *
+ * A reporter's decision that findings from different providers are, or
+ * are not, the same outside entity.
+ */
+export type CrossProviderDecisionOut = {
+  /**
+   * Cluster Key
+   */
+  cluster_key: string;
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Decision
+   */
+  decision: string;
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Finding Ids
+   */
+  finding_ids: Array<string>;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Rationale
+   */
+  rationale?: string | null;
+  /**
+   * Session Id
+   */
+  session_id?: string | null;
 };
 
 /**
@@ -1119,6 +1927,37 @@ export type DocumentDetailOut = {
 };
 
 /**
+ * DocumentExtractionSettingsOut
+ */
+export type DocumentExtractionSettingsOut = {
+  /**
+   * Entity Extraction Owner
+   */
+  entity_extraction_owner: 'workbench_local' | 'openaleph_ftm_analyze';
+  /**
+   * Local Entity Suggestions Enabled
+   */
+  local_entity_suggestions_enabled: boolean;
+  ocr_runtime: OcrRuntimeStatusOut;
+  /**
+   * Pdf Ocr Dpi
+   */
+  pdf_ocr_dpi: number;
+  /**
+   * Pdf Ocr Enabled
+   */
+  pdf_ocr_enabled: boolean;
+  /**
+   * Pdf Ocr Language
+   */
+  pdf_ocr_language: string;
+  /**
+   * Pdf Ocr Min Native Chars
+   */
+  pdf_ocr_min_native_chars: number;
+};
+
+/**
  * DocumentOut
  */
 export type DocumentOut = {
@@ -1236,6 +2075,637 @@ export type DocumentUploadOut = {
 };
 
 /**
+ * DossierClaimLinkOut
+ */
+export type DossierClaimLinkOut = {
+  /**
+   * Claim Id
+   */
+  claim_id: string;
+  /**
+   * Note
+   */
+  note?: string | null;
+  /**
+   * Stance
+   */
+  stance: string;
+};
+
+/**
+ * DossierClaimOut
+ */
+export type DossierClaimOut = {
+  claim: ClaimOut;
+  match_basis: DossierMatchBasisOut;
+};
+
+/**
+ * DossierConflictDecisionOut
+ *
+ * A property-conflict decision as the dossier shows it.
+ */
+export type DossierConflictDecisionOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Decision
+   */
+  decision: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Preferred Value
+   */
+  preferred_value?: string | null;
+  /**
+   * Rationale
+   */
+  rationale?: string | null;
+  /**
+   * Temporal Intervals
+   */
+  temporal_intervals: Array<PropertyTemporalIntervalOut>;
+  /**
+   * Values
+   */
+  values: Array<string>;
+};
+
+/**
+ * DossierConflictValueOut
+ *
+ * One value of a disputed property: where it is asserted and how it was assessed.
+ */
+export type DossierConflictValueOut = {
+  /**
+   * Canonical
+   */
+  canonical: boolean;
+  /**
+   * Canonical Statements
+   */
+  canonical_statements: Array<CanonicalStatementOut>;
+  /**
+   * Conflict Count
+   */
+  conflict_count: number;
+  /**
+   * External Assessments
+   */
+  external_assessments: Array<ExternalAssessmentOut>;
+  /**
+   * Latest Status
+   */
+  latest_status?: string | null;
+  /**
+   * Support Count
+   */
+  support_count: number;
+  /**
+   * Value
+   */
+  value: string;
+};
+
+/**
+ * DossierEvidenceOut
+ */
+export type DossierEvidenceOut = {
+  /**
+   * Claim Links
+   */
+  claim_links: Array<DossierClaimLinkOut>;
+  evidence: EvidenceOut;
+  match_basis: DossierMatchBasisOut;
+  source?: SourceOut | null;
+};
+
+/**
+ * DossierExternalOut
+ *
+ * Everything connectors found about the entity and every review of it.
+ */
+export type DossierExternalOut = {
+  /**
+   * Cross Provider Decisions
+   */
+  cross_provider_decisions: Array<CrossProviderDecisionOut>;
+  /**
+   * Enrichment Links
+   */
+  enrichment_links: Array<EnrichmentSessionFindingOut>;
+  /**
+   * Enrichment Sessions
+   */
+  enrichment_sessions: Array<EnrichmentSessionRowOut>;
+  /**
+   * Findings
+   */
+  findings: Array<ConnectorFindingOut>;
+  /**
+   * Promotions
+   */
+  promotions: Array<StatementPromotionOut>;
+  /**
+   * Resolution Decisions
+   */
+  resolution_decisions: Array<ResolutionDecisionOut>;
+  /**
+   * Statement Assessments
+   */
+  statement_assessments: Array<StatementAssessmentOut>;
+};
+
+/**
+ * DossierLeadOut
+ */
+export type DossierLeadOut = {
+  lead: LeadRowOut;
+  match_basis: DossierMatchBasisOut;
+};
+
+/**
+ * DossierMatchBasisOut
+ *
+ * Why a record is in the dossier: an explicit link, or (named as such) a
+ * text mention of the entity, with the matched terms.
+ */
+export type DossierMatchBasisOut = {
+  /**
+   * Terms
+   */
+  terms?: Array<string> | null;
+  /**
+   * Type
+   */
+  type: string;
+};
+
+/**
+ * DossierPropertyConflictOut
+ *
+ * A property with several canonical values, or an outside conflict with
+ * its value. Diagnostic only: the dossier never picks a value itself.
+ */
+export type DossierPropertyConflictOut = {
+  /**
+   * Decision History
+   */
+  decision_history: Array<DossierConflictDecisionOut>;
+  latest_decision?: DossierConflictDecisionOut | null;
+  /**
+   * Preferred Value
+   */
+  preferred_value?: string | null;
+  /**
+   * Prop
+   */
+  prop: string;
+  /**
+   * Reason
+   */
+  reason: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Values
+   */
+  values: Array<DossierConflictValueOut>;
+};
+
+/**
+ * DossierSummaryOut
+ */
+export type DossierSummaryOut = {
+  /**
+   * Claim Count
+   */
+  claim_count: number;
+  /**
+   * Claim Statuses
+   */
+  claim_statuses: {
+    [key: string]: number;
+  };
+  /**
+   * Enrichment Session Count
+   */
+  enrichment_session_count: number;
+  /**
+   * Evidence Count
+   */
+  evidence_count: number;
+  /**
+   * External Finding Count
+   */
+  external_finding_count: number;
+  /**
+   * External Finding Statuses
+   */
+  external_finding_statuses: {
+    [key: string]: number;
+  };
+  /**
+   * Identity Alias Count
+   */
+  identity_alias_count: number;
+  /**
+   * Identity Decision Count
+   */
+  identity_decision_count: number;
+  /**
+   * Identity Unresolved Count
+   */
+  identity_unresolved_count: number;
+  /**
+   * Lead Count
+   */
+  lead_count: number;
+  /**
+   * Property Conflict Count
+   */
+  property_conflict_count: number;
+  /**
+   * Relationship Count
+   */
+  relationship_count: number;
+  /**
+   * Relationship Mixed Support Count
+   */
+  relationship_mixed_support_count: number;
+  /**
+   * Relationship Review Advisory Count
+   */
+  relationship_review_advisory_count: number;
+  /**
+   * Relationship Schemas
+   */
+  relationship_schemas: {
+    [key: string]: number;
+  };
+  /**
+   * Relationship Suppressed Duplicate Count
+   */
+  relationship_suppressed_duplicate_count: number;
+  /**
+   * Relationship Underlying Count
+   */
+  relationship_underlying_count: number;
+  /**
+   * Statement Count
+   */
+  statement_count: number;
+  /**
+   * Task Count
+   */
+  task_count: number;
+  /**
+   * Timeline Event Count
+   */
+  timeline_event_count: number;
+  /**
+   * Unresolved External Count
+   */
+  unresolved_external_count: number;
+};
+
+/**
+ * EnrichmentClusterOut
+ *
+ * Findings from different providers that may describe one outside
+ * entity, with the reasons for each pairing and the latest reporter decision.
+ */
+export type EnrichmentClusterOut = {
+  /**
+   * Cluster Key
+   */
+  cluster_key: string;
+  decision?: ClusterDecisionOut | null;
+  /**
+   * Finding Ids
+   */
+  finding_ids: Array<string>;
+  /**
+   * Findings
+   */
+  findings: Array<ClusterFindingOut>;
+  /**
+   * Pairs
+   */
+  pairs: Array<ClusterPairOut>;
+  /**
+   * Providers
+   */
+  providers: Array<string>;
+  /**
+   * Score
+   */
+  score: number;
+};
+
+/**
+ * EnrichmentRunResultOut
+ *
+ * One provider's part of an enrichment session; `error` is sent only when it failed.
+ */
+export type EnrichmentRunResultOut = {
+  /**
+   * Error
+   */
+  error?: string | null;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Result Count
+   */
+  result_count: number;
+  /**
+   * Run Id
+   */
+  run_id: string;
+  /**
+   * Status
+   */
+  status: string;
+};
+
+/**
+ * EnrichmentSessionDetailOut
+ *
+ * A stored session with its per-provider runs.
+ */
+export type EnrichmentSessionDetailOut = {
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Finished At
+   */
+  finished_at?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Providers
+   */
+  providers: Array<string>;
+  /**
+   * Runs
+   */
+  runs: Array<EnrichmentSessionRunOut>;
+  /**
+   * Started At
+   */
+  started_at: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Total Results
+   */
+  total_results: number;
+};
+
+/**
+ * EnrichmentSessionFindingOut
+ */
+export type EnrichmentSessionFindingOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Finding Id
+   */
+  finding_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Session Id
+   */
+  session_id: string;
+};
+
+/**
+ * EnrichmentSessionOut
+ *
+ * The reply to running every chosen connector against one entity.
+ */
+export type EnrichmentSessionOut = {
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Finished At
+   */
+  finished_at?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Providers
+   */
+  providers: Array<string>;
+  /**
+   * Runs
+   */
+  runs: Array<EnrichmentRunResultOut>;
+  /**
+   * Started At
+   */
+  started_at: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Total Results
+   */
+  total_results: number;
+};
+
+/**
+ * EnrichmentSessionRowOut
+ *
+ * An enrichment session as stored.
+ */
+export type EnrichmentSessionRowOut = {
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Finished At
+   */
+  finished_at?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Providers
+   */
+  providers: Array<string>;
+  /**
+   * Started At
+   */
+  started_at: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Total Results
+   */
+  total_results: number;
+};
+
+/**
+ * EnrichmentSessionRunOut
+ */
+export type EnrichmentSessionRunOut = {
+  /**
+   * Error
+   */
+  error?: string | null;
+  /**
+   * Finished At
+   */
+  finished_at?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Result Count
+   */
+  result_count: number;
+  /**
+   * Run Id
+   */
+  run_id?: string | null;
+  /**
+   * Session Id
+   */
+  session_id: string;
+  /**
+   * Started At
+   */
+  started_at?: string | null;
+  /**
+   * Status
+   */
+  status: string;
+};
+
+/**
+ * EntityAliasLinkOut
+ */
+export type EntityAliasLinkOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Merged Into Entity Id
+   */
+  merged_into_entity_id?: string | null;
+};
+
+/**
+ * EntityAliasResolutionOut
+ *
+ * Sent when the dossier was asked for by a merged alias: which record
+ * was asked for and which one answers.
+ */
+export type EntityAliasResolutionOut = {
+  /**
+   * Active Caption
+   */
+  active_caption: string;
+  /**
+   * Active Entity Id
+   */
+  active_entity_id: string;
+  /**
+   * Alias Chain
+   */
+  alias_chain: Array<EntityAliasLinkOut>;
+  /**
+   * Requested Caption
+   */
+  requested_caption: string;
+  /**
+   * Requested Entity Id
+   */
+  requested_entity_id: string;
+};
+
+/**
+ * EntityCandidateOut
+ *
+ * A canonical entity that may be what a finding describes, with a name-match score.
+ */
+export type EntityCandidateOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Schema
+   */
+  schema: string;
+  /**
+   * Score
+   */
+  score: number;
+};
+
+/**
  * EntityCreate
  */
 export type EntityCreate = {
@@ -1265,6 +2735,239 @@ export type EntityCreate = {
    * Schema
    */
   schema: string;
+};
+
+/**
+ * EntityDossierOut
+ *
+ * Everything the workbench holds about one canonical entity.
+ */
+export type EntityDossierOut = {
+  alias_resolution?: EntityAliasResolutionOut | null;
+  /**
+   * Claims
+   */
+  claims: Array<DossierClaimOut>;
+  entity: EntityOut;
+  /**
+   * Evidence
+   */
+  evidence: Array<DossierEvidenceOut>;
+  external: DossierExternalOut;
+  identity_history: EntityIdentityHistoryOut;
+  /**
+   * Leads
+   */
+  leads: Array<DossierLeadOut>;
+  /**
+   * Property Conflicts
+   */
+  property_conflicts: Array<DossierPropertyConflictOut>;
+  /**
+   * Relationships
+   */
+  relationships: Array<EntityRelationshipOut>;
+  /**
+   * Statement History
+   */
+  statement_history: Array<StatementHistoryRowOut>;
+  summary: DossierSummaryOut;
+  /**
+   * Tasks
+   */
+  tasks: Array<ReportingTaskOut>;
+  /**
+   * Timeline
+   */
+  timeline: Array<TimelineEventOut>;
+};
+
+/**
+ * EntityIdentityHistoryOut
+ *
+ * Every identity judgement about the entity: merged aliases, reporter
+ * decisions, merge audits. Audit-oriented; nothing here is inferred.
+ */
+export type EntityIdentityHistoryOut = {
+  /**
+   * Aliases
+   */
+  aliases: Array<IdentityAliasOut>;
+  /**
+   * Canonical Decisions
+   */
+  canonical_decisions: Array<IdentityDecisionOut>;
+  /**
+   * Canonical Entity Id
+   */
+  canonical_entity_id: string;
+  /**
+   * Merge Audits
+   */
+  merge_audits: Array<IdentityMergeAuditOut>;
+  /**
+   * Unresolved Decision Count
+   */
+  unresolved_decision_count: number;
+};
+
+/**
+ * EntityOut
+ *
+ * A canonical FollowTheMoney entity as stored. `merged_into_entity_id`
+ * names the surviving record when this one was merged away.
+ */
+export type EntityOut = {
+  /**
+   * Canonical Id
+   */
+  canonical_id?: string | null;
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Ftm Id
+   */
+  ftm_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Merged Into Entity Id
+   */
+  merged_into_entity_id?: string | null;
+  /**
+   * Properties
+   */
+  properties: {
+    [key: string]: Array<string>;
+  };
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
+ * EntityRelationshipOut
+ *
+ * A relationship seen from one entity (its dossier, or its relationship
+ * list): whether the entity is the edge's source or its target.
+ */
+export type EntityRelationshipOut = {
+  /**
+   * Advisory
+   */
+  advisory: RelationshipAdvisoryOut | RelationshipAggregateAdvisoryOut;
+  aggregate_provenance?: AggregateProvenanceOut | null;
+  /**
+   * Caption
+   */
+  caption?: string | null;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Direction
+   */
+  direction: 'outgoing' | 'incoming';
+  /**
+   * Ftm Id
+   */
+  ftm_id?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Properties
+   */
+  properties: {
+    [key: string]: Array<string>;
+  };
+  provenance: RelationshipProvenanceOut;
+  reconciliation?: RelationshipReconciliationOut | null;
+  /**
+   * Relationship Entity Id
+   */
+  relationship_entity_id?: string | null;
+  /**
+   * Schema
+   */
+  schema: string;
+  source?: RelationshipEndpointOut | null;
+  /**
+   * Source Prop
+   */
+  source_prop?: string | null;
+  /**
+   * Statements
+   */
+  statements: Array<StatementOut>;
+  target?: RelationshipEndpointOut | null;
+  /**
+   * Target Prop
+   */
+  target_prop?: string | null;
+};
+
+/**
+ * EntityStatementOut
+ *
+ * A statement as stored, with the entity it belongs to.
+ */
+export type EntityStatementOut = {
+  /**
+   * Dataset
+   */
+  dataset: string;
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * First Seen
+   */
+  first_seen?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Last Seen
+   */
+  last_seen?: string | null;
+  /**
+   * Origin
+   */
+  origin?: string | null;
+  /**
+   * Original Value
+   */
+  original_value?: string | null;
+  /**
+   * Prop
+   */
+  prop: string;
+  /**
+   * Value
+   */
+  value: string;
 };
 
 /**
@@ -1777,6 +3480,160 @@ export type ExternalAssessmentOut = {
 };
 
 /**
+ * ExternalEndpointFindingOut
+ *
+ * The connector finding that describes one end of an external relationship.
+ */
+export type ExternalEndpointFindingOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Provider Record Id
+   */
+  provider_record_id: string;
+  /**
+   * Schema
+   */
+  schema?: string | null;
+  /**
+   * Source Url
+   */
+  source_url?: string | null;
+};
+
+/**
+ * ExternalRelationshipCandidatesOut
+ *
+ * For a relationship a connector found: which canonical entities may be
+ * its two ends. An end's own finding is named only when the connector
+ * also returned it.
+ */
+export type ExternalRelationshipCandidatesOut = {
+  /**
+   * Schema
+   */
+  schema: string;
+  /**
+   * Source Candidates
+   */
+  source_candidates: Array<EntityCandidateOut>;
+  source_external_finding?: ExternalEndpointFindingOut | null;
+  /**
+   * Source External Id
+   */
+  source_external_id: string;
+  /**
+   * Source Prop
+   */
+  source_prop: string;
+  /**
+   * Target Candidates
+   */
+  target_candidates: Array<EntityCandidateOut>;
+  target_external_finding?: ExternalEndpointFindingOut | null;
+  /**
+   * Target External Id
+   */
+  target_external_id: string;
+  /**
+   * Target Prop
+   */
+  target_prop: string;
+};
+
+/**
+ * ExternalRelationshipPromotionOut
+ *
+ * A supported external relationship written into the canonical graph.
+ */
+export type ExternalRelationshipPromotionOut = {
+  /**
+   * Finding Id
+   */
+  finding_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Promoted At
+   */
+  promoted_at: string;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Relationship Edge Id
+   */
+  relationship_edge_id: string;
+  /**
+   * Relationship Entity Id
+   */
+  relationship_entity_id: string;
+  /**
+   * Review Id
+   */
+  review_id: string;
+  /**
+   * Source Url
+   */
+  source_url?: string | null;
+};
+
+/**
+ * ExternalRelationshipReviewOut
+ */
+export type ExternalRelationshipReviewOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Decision
+   */
+  decision: string;
+  /**
+   * Finding Id
+   */
+  finding_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Note
+   */
+  note?: string | null;
+  /**
+   * Schema
+   */
+  schema: string;
+  /**
+   * Source Entity Id
+   */
+  source_entity_id?: string | null;
+  /**
+   * Target Entity Id
+   */
+  target_entity_id?: string | null;
+};
+
+/**
  * ExternalRelationshipReviewRequest
  */
 export type ExternalRelationshipReviewRequest = {
@@ -2028,6 +3885,109 @@ export type ExtractionReviewOut = {
 };
 
 /**
+ * FinancialLedgerOut
+ */
+export type FinancialLedgerOut = {
+  /**
+   * Currencies
+   */
+  currencies: Array<string>;
+  /**
+   * Duplicate Rule
+   */
+  duplicate_rule: string;
+  /**
+   * Flow Type Rule
+   */
+  flow_type_rule: string;
+  /**
+   * Incomplete
+   */
+  incomplete: Array<IncompleteTransactionOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Transactions
+   */
+  transactions: Array<FinancialTransactionOut>;
+};
+
+/**
+ * FinancialTransactionOut
+ *
+ * One Payment edge the ledger could read in full. Keys follow the
+ * frontend's transaction type (lib/financial-flow-types.ts).
+ */
+export type FinancialTransactionOut = {
+  /**
+   * Amount
+   */
+  amount: number;
+  /**
+   * Currency
+   */
+  currency: string;
+  /**
+   * Datetime
+   */
+  dateTime?: string | null;
+  /**
+   * Evidence
+   */
+  evidence?: string | null;
+  /**
+   * Evidence Count
+   */
+  evidence_count: number;
+  /**
+   * Flowtype
+   */
+  flowType: 'direct' | 'inferred';
+  /**
+   * From
+   */
+  from: string;
+  /**
+   * From Entity Id
+   */
+  from_entity_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Relationship Id
+   */
+  relationship_id: string;
+  /**
+   * Statedpurpose
+   */
+  statedPurpose?: string | null;
+  /**
+   * Status
+   */
+  status?: string | null;
+  /**
+   * Supporting Evidence Count
+   */
+  supporting_evidence_count: number;
+  /**
+   * To
+   */
+  to: string;
+  /**
+   * To Entity Id
+   */
+  to_entity_id: string;
+  /**
+   * Transactionnumber
+   */
+  transactionNumber?: string | null;
+};
+
+/**
  * FindingReviewRequest
  */
 export type FindingReviewRequest = {
@@ -2049,6 +4009,79 @@ export type FlagIn = {
    * Value
    */
   value: unknown;
+};
+
+/**
+ * GraphNodeOut
+ *
+ * A canonical entity that is an endpoint of a shown edge.
+ */
+export type GraphNodeOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Ftm Id
+   */
+  ftm_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Properties
+   */
+  properties: {
+    [key: string]: Array<string>;
+  };
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
+ * GraphOut
+ */
+export type GraphOut = {
+  /**
+   * Edges
+   */
+  edges: Array<RelationshipOut>;
+  /**
+   * Nodes
+   */
+  nodes: Array<GraphNodeOut>;
+  reconciliation: GraphReconciliationOut;
+  /**
+   * Schemas
+   */
+  schemas: Array<string>;
+};
+
+/**
+ * GraphReconciliationOut
+ *
+ * How many edges the duplicate view hid.
+ */
+export type GraphReconciliationOut = {
+  /**
+   * Collapsed By Default
+   */
+  collapsed_by_default: boolean;
+  /**
+   * Suppressed Duplicate Count
+   */
+  suppressed_duplicate_count: number;
+  /**
+   * Underlying Edge Count
+   */
+  underlying_edge_count: number;
+  /**
+   * Visible Edge Count
+   */
+  visible_edge_count: number;
 };
 
 /**
@@ -2089,6 +4122,168 @@ export type HypothesisTestRequest = {
    * Working Theory
    */
   working_theory: string;
+};
+
+/**
+ * IdentityAliasOut
+ */
+export type IdentityAliasOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Merged Into Entity Id
+   */
+  merged_into_entity_id?: string | null;
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
+ * IdentityDecisionOut
+ */
+export type IdentityDecisionOut = {
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Decision
+   */
+  decision: string;
+  /**
+   * Id
+   */
+  id: string;
+  other_entity?: MergeEntityOut | null;
+  /**
+   * Rationale
+   */
+  rationale?: string | null;
+};
+
+/**
+ * IdentityMergeAuditOut
+ */
+export type IdentityMergeAuditOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Moved Counts
+   */
+  moved_counts: {
+    [key: string]: number;
+  };
+  /**
+   * Rationale
+   */
+  rationale?: string | null;
+  /**
+   * Resolution Decision Id
+   */
+  resolution_decision_id?: string | null;
+  /**
+   * Source Entity Id
+   */
+  source_entity_id: string;
+  /**
+   * Target Entity Id
+   */
+  target_entity_id: string;
+};
+
+/**
+ * IncompleteTransactionOut
+ *
+ * A Payment edge the ledger could not chart, with what is missing or
+ * ambiguous; nothing is guessed.
+ */
+export type IncompleteTransactionOut = {
+  /**
+   * Amount
+   */
+  amount?: number | null;
+  /**
+   * Currency
+   */
+  currency?: string | null;
+  /**
+   * Datetime
+   */
+  dateTime?: string | null;
+  /**
+   * Evidence
+   */
+  evidence?: string | null;
+  /**
+   * Evidence Count
+   */
+  evidence_count: number;
+  /**
+   * Flowtype
+   */
+  flowType: 'direct' | 'inferred';
+  /**
+   * From
+   */
+  from?: string | null;
+  /**
+   * From Entity Id
+   */
+  from_entity_id?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Problems
+   */
+  problems: Array<string>;
+  /**
+   * Relationship Id
+   */
+  relationship_id: string;
+  /**
+   * Statedpurpose
+   */
+  statedPurpose?: string | null;
+  /**
+   * Status
+   */
+  status?: string | null;
+  /**
+   * Supporting Evidence Count
+   */
+  supporting_evidence_count: number;
+  /**
+   * To
+   */
+  to?: string | null;
+  /**
+   * To Entity Id
+   */
+  to_entity_id?: string | null;
+  /**
+   * Transactionnumber
+   */
+  transactionNumber?: string | null;
 };
 
 /**
@@ -2190,6 +4385,32 @@ export type InvestigationMembershipPut = {
    * Role
    */
   role?: string;
+};
+
+/**
+ * InvestigationOut
+ */
+export type InvestigationOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Description
+   */
+  description?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Is Demo
+   */
+  is_demo: boolean;
+  /**
+   * Name
+   */
+  name: string;
 };
 
 /**
@@ -2465,6 +4686,46 @@ export type LeadQueueOut = {
    * Total
    */
   total: number;
+};
+
+/**
+ * LeadRowOut
+ *
+ * A lead as stored (without its profile, links and history).
+ */
+export type LeadRowOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Detail
+   */
+  detail?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Provider
+   */
+  provider?: string | null;
+  /**
+   * Provider Record Id
+   */
+  provider_record_id?: string | null;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Title
+   */
+  title: string;
 };
 
 /**
@@ -2791,6 +5052,80 @@ export type LineageSourceOut = {
 };
 
 /**
+ * MergeBlockerOut
+ */
+export type MergeBlockerOut = {
+  /**
+   * Code
+   */
+  code: string;
+  /**
+   * Message
+   */
+  message: string;
+  /**
+   * Record Ids
+   */
+  record_ids: Array<string>;
+};
+
+/**
+ * MergeEntityOut
+ */
+export type MergeEntityOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
+ * MergeReferenceOut
+ *
+ * Records of one kind that would move to the surviving entity (the first hundred ids).
+ */
+export type MergeReferenceOut = {
+  /**
+   * Count
+   */
+  count: number;
+  /**
+   * Record Ids
+   */
+  record_ids: Array<string>;
+};
+
+/**
+ * MergeResolutionOut
+ */
+export type MergeResolutionOut = {
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Decision
+   */
+  decision: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Rationale
+   */
+  rationale?: string | null;
+};
+
+/**
  * MultiEnrichmentRequest
  */
 export type MultiEnrichmentRequest = {
@@ -2798,6 +5133,32 @@ export type MultiEnrichmentRequest = {
    * Providers
    */
   providers?: Array<string>;
+};
+
+/**
+ * OcrRuntimeStatusOut
+ */
+export type OcrRuntimeStatusOut = {
+  /**
+   * Available
+   */
+  available: boolean;
+  /**
+   * Detail
+   */
+  detail?: string | null;
+  /**
+   * Missing Languages
+   */
+  missing_languages: Array<string>;
+  /**
+   * Requested Languages
+   */
+  requested_languages: Array<string>;
+  /**
+   * Tessdata
+   */
+  tessdata?: string | null;
 };
 
 /**
@@ -3063,6 +5424,64 @@ export type OpenAlephSyncOut = {
 };
 
 /**
+ * OrphanFileOut
+ */
+export type OrphanFileOut = {
+  /**
+   * Action
+   */
+  action: string;
+  /**
+   * Modified At
+   */
+  modified_at: number;
+  /**
+   * Relative Path
+   */
+  relative_path: string;
+  /**
+   * Size Bytes
+   */
+  size_bytes: number;
+};
+
+/**
+ * OrphanStoragePreviewOut
+ *
+ * Files under document storage no document refers to. Read-only: they are kept until a reporter decides.
+ */
+export type OrphanStoragePreviewOut = {
+  /**
+   * Cleanup Available
+   */
+  cleanup_available: boolean;
+  /**
+   * Orphan Bytes
+   */
+  orphan_bytes: number;
+  /**
+   * Orphan File Count
+   */
+  orphan_file_count: number;
+  /**
+   * Orphan Files
+   */
+  orphan_files: Array<OrphanFileOut>;
+  /**
+   * Policy
+   */
+  policy: string;
+  /**
+   * Storage Root
+   */
+  storage_root: string;
+  /**
+   * Unsafe Document References
+   */
+  unsafe_document_references: Array<UnsafeDocumentReferenceOut>;
+};
+
+/**
  * PlanIn
  */
 export type PlanIn = {
@@ -3070,6 +5489,28 @@ export type PlanIn = {
    * Target
    */
   target?: string;
+};
+
+/**
+ * PostMergeReconciliationOut
+ *
+ * The duplicate pairs a merge left behind, for the reporter to review.
+ * Nothing is deleted: a decision only records which record is preferred.
+ */
+export type PostMergeReconciliationOut = {
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Relationship Duplicates
+   */
+  relationship_duplicates: Array<RelationshipDuplicatePairOut>;
+  /**
+   * Statement Duplicates
+   */
+  statement_duplicates: Array<StatementDuplicatePairOut>;
+  summary: ReconciliationSummaryOut;
 };
 
 /**
@@ -3144,6 +5585,54 @@ export type PromoteToWriteupRequest = {
 };
 
 /**
+ * PropertyConflictDecisionOut
+ *
+ * A reporter's decision on a property with several values, as stored.
+ */
+export type PropertyConflictDecisionOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Decision
+   */
+  decision: string;
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Preferred Value
+   */
+  preferred_value?: string | null;
+  /**
+   * Prop
+   */
+  prop: string;
+  /**
+   * Rationale
+   */
+  rationale?: string | null;
+  /**
+   * Temporal Intervals Json
+   */
+  temporal_intervals_json: Array<PropertyTemporalIntervalOut>;
+  /**
+   * Values Json
+   */
+  values_json: Array<string>;
+};
+
+/**
  * PropertyConflictDecisionRequest
  */
 export type PropertyConflictDecisionRequest = {
@@ -3189,6 +5678,34 @@ export type PropertyTemporalInterval = {
    * Precision
    */
   precision?: string;
+  /**
+   * Value
+   */
+  value: string;
+};
+
+/**
+ * PropertyTemporalIntervalOut
+ *
+ * When one value of a property held, as the reporter recorded it.
+ */
+export type PropertyTemporalIntervalOut = {
+  /**
+   * Date End
+   */
+  date_end?: string | null;
+  /**
+   * Date Start
+   */
+  date_start?: string | null;
+  /**
+   * Evidence Id
+   */
+  evidence_id?: string | null;
+  /**
+   * Precision
+   */
+  precision: string;
   /**
    * Value
    */
@@ -3264,6 +5781,72 @@ export type QueryRef = {
 };
 
 /**
+ * ReconciliationDecisionOut
+ *
+ * A reporter's decision on one duplicate pair after a merge.
+ */
+export type ReconciliationDecisionOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Decision
+   */
+  decision: string;
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Preferred Record Id
+   */
+  preferred_record_id?: string | null;
+  /**
+   * Rationale
+   */
+  rationale?: string | null;
+  /**
+   * Record A Id
+   */
+  record_a_id: string;
+  /**
+   * Record B Id
+   */
+  record_b_id: string;
+  /**
+   * Record Type
+   */
+  record_type: string;
+};
+
+/**
+ * ReconciliationSummaryOut
+ */
+export type ReconciliationSummaryOut = {
+  /**
+   * Relationship Pairs
+   */
+  relationship_pairs: number;
+  /**
+   * Statement Pairs
+   */
+  statement_pairs: number;
+  /**
+   * Unresolved Pairs
+   */
+  unresolved_pairs: number;
+};
+
+/**
  * RecordRef
  */
 export type RecordRef = {
@@ -3293,6 +5876,9 @@ export type RecordRefOut = {
 
 /**
  * RelationshipAdvisoryOut
+ *
+ * What the review layer says about one relationship record: the claims
+ * that rest on its attached evidence, and how its evidence was reviewed.
  */
 export type RelationshipAdvisoryOut = {
   /**
@@ -3320,6 +5906,10 @@ export type RelationshipAdvisoryOut = {
    */
   needs_review: boolean;
   /**
+   * Presentation Aggregate
+   */
+  presentation_aggregate: false;
+  /**
    * Rejected Claim Count
    */
   rejected_claim_count: number;
@@ -3338,6 +5928,53 @@ export type RelationshipAdvisoryOut = {
   relationship_evidence_review_counts: {
     [key: string]: number;
   };
+  /**
+   * Support State
+   */
+  support_state: string;
+};
+
+/**
+ * RelationshipAggregateAdvisoryOut
+ *
+ * The advisory of a compact graph edge that stands in for several
+ * reviewed duplicate records: computed over every underlying edge's
+ * evidence, so one challenged claim does not colour an edge another
+ * reviewed evidence record supports. Presentation only; no record changes.
+ */
+export type RelationshipAggregateAdvisoryOut = {
+  /**
+   * Challenged Supporting Evidence Count
+   */
+  challenged_supporting_evidence_count: number;
+  /**
+   * Claim Dependencies
+   */
+  claim_dependencies: Array<AggregateClaimDependencyOut>;
+  /**
+   * Disputed Claim Count
+   */
+  disputed_claim_count: number;
+  /**
+   * Has Independent Support
+   */
+  has_independent_support: boolean;
+  /**
+   * Healthy Supporting Evidence Count
+   */
+  healthy_supporting_evidence_count: number;
+  /**
+   * Needs Review
+   */
+  needs_review: boolean;
+  /**
+   * Presentation Aggregate
+   */
+  presentation_aggregate: true;
+  /**
+   * Rejected Claim Count
+   */
+  rejected_claim_count: number;
   /**
    * Support State
    */
@@ -3382,6 +6019,29 @@ export type RelationshipCreate = {
    * Target Entity Id
    */
   target_entity_id: string;
+};
+
+/**
+ * RelationshipDuplicatePairOut
+ *
+ * Two edges of the merged entity with the same schema and ends.
+ */
+export type RelationshipDuplicatePairOut = {
+  latest_decision?: ReconciliationDecisionOut | null;
+  /**
+   * Provenance Differs
+   */
+  provenance_differs: boolean;
+  record_a: RelationshipOut;
+  record_b: RelationshipOut;
+  /**
+   * Record Type
+   */
+  record_type: 'relationship';
+  /**
+   * Same Assertion
+   */
+  same_assertion: boolean;
 };
 
 /**
@@ -3489,15 +6149,36 @@ export type RelationshipEvidenceReviewRequest = {
 };
 
 /**
+ * RelationshipEvidenceReviewsOut
+ *
+ * Every reporter assessment of one relationship's attached evidence, oldest first.
+ */
+export type RelationshipEvidenceReviewsOut = {
+  /**
+   * Relationship Id
+   */
+  relationship_id: string;
+  /**
+   * Reviews
+   */
+  reviews: Array<RelationshipEvidenceReviewOut>;
+};
+
+/**
  * RelationshipOut
  *
  * One relationship edge with its FollowTheMoney statements, attached
- * evidence and the advisory the review layer computes. The graph endpoint
- * adds reconciliation and aggregate-provenance blocks for reviewed
- * duplicates, so the model stays open to those.
+ * evidence and the advisory the review layer computes. The graph and the
+ * dossier add `reconciliation` to an edge a reporter reviewed as a
+ * duplicate, and `aggregate_provenance` (with an aggregate advisory) to the
+ * preferred edge of a collapsed pair; both keys are absent otherwise.
  */
 export type RelationshipOut = {
-  advisory: RelationshipAdvisoryOut;
+  /**
+   * Advisory
+   */
+  advisory: RelationshipAdvisoryOut | RelationshipAggregateAdvisoryOut;
+  aggregate_provenance?: AggregateProvenanceOut | null;
   /**
    * Caption
    */
@@ -3522,9 +6203,10 @@ export type RelationshipOut = {
    * Properties
    */
   properties: {
-    [key: string]: unknown;
+    [key: string]: Array<string>;
   };
   provenance: RelationshipProvenanceOut;
+  reconciliation?: RelationshipReconciliationOut | null;
   /**
    * Relationship Entity Id
    */
@@ -3547,7 +6229,6 @@ export type RelationshipOut = {
    * Target Prop
    */
   target_prop?: string | null;
-  [key: string]: unknown;
 };
 
 /**
@@ -3570,6 +6251,51 @@ export type RelationshipProvenanceOut = {
    * Statement Count
    */
   statement_count: number;
+};
+
+/**
+ * RelationshipReconciliationOut
+ *
+ * How a reporter's latest duplicate decision places this edge: the
+ * preferred record of its pair, or a suppressed copy of one.
+ */
+export type RelationshipReconciliationOut = {
+  /**
+   * Decision
+   */
+  decision: string;
+  /**
+   * Decision Id
+   */
+  decision_id: string;
+  /**
+   * Is Preferred
+   */
+  is_preferred: boolean;
+  /**
+   * Preferred Record Id
+   */
+  preferred_record_id: string;
+  /**
+   * Rationale
+   */
+  rationale?: string | null;
+  /**
+   * Secondary Record Id
+   */
+  secondary_record_id: string;
+  /**
+   * Suppressed Duplicate
+   */
+  suppressed_duplicate: boolean;
+  /**
+   * Suppressed Duplicate Count
+   */
+  suppressed_duplicate_count: number;
+  /**
+   * Suppressed Duplicate Ids
+   */
+  suppressed_duplicate_ids: Array<string>;
 };
 
 /**
@@ -3702,6 +6428,46 @@ export type ReportingTaskUpdate = {
    * Workflow Note
    */
   workflow_note?: string | null;
+};
+
+/**
+ * ResolutionDecisionOut
+ *
+ * A reporter's identity decision on a finding, as stored.
+ */
+export type ResolutionDecisionOut = {
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Decision
+   */
+  decision: string;
+  /**
+   * Entity Id
+   */
+  entity_id?: string | null;
+  /**
+   * Finding Id
+   */
+  finding_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Rationale
+   */
+  rationale?: string | null;
 };
 
 /**
@@ -3890,6 +6656,292 @@ export type SearchOut = {
 };
 
 /**
+ * SecurityAlertsOut
+ *
+ * Denial events in a recent window, counted for an operator's glance.
+ */
+export type SecurityAlertsOut = {
+  /**
+   * Attention Threshold
+   */
+  attention_threshold: number;
+  /**
+   * By Event
+   */
+  by_event: {
+    [key: string]: number;
+  };
+  /**
+   * Malformed Lines
+   */
+  malformed_lines: number;
+  /**
+   * Needs Attention
+   */
+  needs_attention: boolean;
+  /**
+   * Read Error
+   */
+  read_error: boolean;
+  /**
+   * Recent
+   */
+  recent: Array<SecurityAuditRecordOut>;
+  /**
+   * Records Scanned
+   */
+  records_scanned: number;
+  /**
+   * Remote Hosts
+   */
+  remote_hosts: Array<SecurityRemoteHostOut>;
+  /**
+   * Since
+   */
+  since: string;
+  /**
+   * Total Denials
+   */
+  total_denials: number;
+  /**
+   * Window Hours
+   */
+  window_hours: number;
+};
+
+/**
+ * SecurityAuditRecordOut
+ *
+ * One audit line's public fields: request metadata only, never a body.
+ */
+export type SecurityAuditRecordOut = {
+  /**
+   * Client Host
+   */
+  client_host?: string | null;
+  /**
+   * Event
+   */
+  event: string;
+  /**
+   * Local Request
+   */
+  local_request: boolean;
+  /**
+   * Method
+   */
+  method: string;
+  /**
+   * Path
+   */
+  path: string;
+  /**
+   * Request Id
+   */
+  request_id: string;
+  /**
+   * Status Code
+   */
+  status_code: number;
+  /**
+   * Timestamp
+   */
+  timestamp: string;
+};
+
+/**
+ * SecurityAuditRetentionPreviewOut
+ *
+ * What a retention run would keep and remove; malformed lines are always kept.
+ */
+export type SecurityAuditRetentionPreviewOut = {
+  /**
+   * File Bytes
+   */
+  file_bytes: number;
+  /**
+   * Keep Days
+   */
+  keep_days: number;
+  /**
+   * Malformed Lines
+   */
+  malformed_lines: number;
+  /**
+   * Max Records
+   */
+  max_records: number;
+  /**
+   * Total Lines
+   */
+  total_lines: number;
+  /**
+   * Valid Records
+   */
+  valid_records: number;
+  /**
+   * Would Keep
+   */
+  would_keep: number;
+  /**
+   * Would Remove
+   */
+  would_remove: number;
+};
+
+/**
+ * SecurityAuditRetentionResultOut
+ */
+export type SecurityAuditRetentionResultOut = {
+  /**
+   * Applied
+   */
+  applied: boolean;
+  /**
+   * File Bytes
+   */
+  file_bytes: number;
+  /**
+   * Keep Days
+   */
+  keep_days: number;
+  /**
+   * Malformed Lines
+   */
+  malformed_lines: number;
+  /**
+   * Max Records
+   */
+  max_records: number;
+  /**
+   * Removed
+   */
+  removed: number;
+  /**
+   * Total Lines
+   */
+  total_lines: number;
+  /**
+   * Valid Records
+   */
+  valid_records: number;
+  /**
+   * Would Keep
+   */
+  would_keep: number;
+  /**
+   * Would Remove
+   */
+  would_remove: number;
+};
+
+/**
+ * SecurityAuditSummaryOut
+ */
+export type SecurityAuditSummaryOut = {
+  /**
+   * By Event
+   */
+  by_event: {
+    [key: string]: number;
+  };
+  /**
+   * By Method
+   */
+  by_method: {
+    [key: string]: number;
+  };
+  /**
+   * By Status
+   */
+  by_status: {
+    [key: string]: number;
+  };
+  /**
+   * File Bytes
+   */
+  file_bytes: number;
+  /**
+   * Local Records
+   */
+  local_records: number;
+  /**
+   * Malformed Lines
+   */
+  malformed_lines: number;
+  /**
+   * Read Error
+   */
+  read_error?: boolean | null;
+  /**
+   * Remote Records
+   */
+  remote_records: number;
+  /**
+   * Total Records
+   */
+  total_records: number;
+};
+
+/**
+ * SecurityAuditViewOut
+ *
+ * One page of the audit log, newest first. `read_error` is sent only when the file could not be read.
+ */
+export type SecurityAuditViewOut = {
+  /**
+   * File Bytes
+   */
+  file_bytes: number;
+  /**
+   * Has More
+   */
+  has_more: boolean;
+  /**
+   * Malformed Lines
+   */
+  malformed_lines: number;
+  /**
+   * Next Offset
+   */
+  next_offset?: number | null;
+  /**
+   * Offset
+   */
+  offset: number;
+  /**
+   * Read Error
+   */
+  read_error?: boolean | null;
+  /**
+   * Records
+   */
+  records: Array<SecurityAuditRecordOut>;
+  /**
+   * Returned
+   */
+  returned: number;
+  /**
+   * Total Matched
+   */
+  total_matched: number;
+};
+
+/**
+ * SecurityRemoteHostOut
+ */
+export type SecurityRemoteHostOut = {
+  /**
+   * Client Host
+   */
+  client_host: string;
+  /**
+   * Count
+   */
+  count: number;
+};
+
+/**
  * SendIn
  */
 export type SendIn = {
@@ -3925,6 +6977,68 @@ export type SendIn = {
    * Timeout Seconds
    */
   timeout_seconds?: number;
+};
+
+/**
+ * SettingsLimitsOut
+ */
+export type SettingsLimitsOut = {
+  /**
+   * Max Backup Bytes
+   */
+  max_backup_bytes: number;
+  /**
+   * Max Backup Files
+   */
+  max_backup_files: number;
+  /**
+   * Max Backup Uncompressed Bytes
+   */
+  max_backup_uncompressed_bytes: number;
+  /**
+   * Max Document Bytes
+   */
+  max_document_bytes: number;
+};
+
+/**
+ * SettingsStatusOut
+ *
+ * The server configuration the page reads on load. A remote caller
+ * without admin rights gets the same keys with the server-wide values blanked.
+ */
+export type SettingsStatusOut = {
+  access: ApiAccessStatusOut;
+  ai: AiReasoningStatusOut;
+  /**
+   * Connectors
+   */
+  connectors: {
+    [key: string]: ConnectorCredentialStatusOut;
+  };
+  /**
+   * Cors Allowed Origins
+   */
+  cors_allowed_origins: Array<string>;
+  /**
+   * Database
+   */
+  database: string;
+  document_extraction: DocumentExtractionSettingsOut;
+  /**
+   * Document Storage Dir
+   */
+  document_storage_dir: string;
+  /**
+   * Environment
+   */
+  environment: string;
+  limits: SettingsLimitsOut;
+  /**
+   * Restore Api Enabled
+   */
+  restore_api_enabled: boolean;
+  security: SecurityAlertsOut;
 };
 
 /**
@@ -4017,6 +7131,50 @@ export type StanceCountsOut = {
 };
 
 /**
+ * StatementAssessmentOut
+ *
+ * A reporter's assessment of one value a finding asserts, as stored.
+ */
+export type StatementAssessmentOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Entity Id
+   */
+  entity_id?: string | null;
+  /**
+   * Finding Id
+   */
+  finding_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Note
+   */
+  note?: string | null;
+  /**
+   * Prop
+   */
+  prop: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Value
+   */
+  value: string;
+};
+
+/**
  * StatementAssessmentRequest
  */
 export type StatementAssessmentRequest = {
@@ -4040,6 +7198,29 @@ export type StatementAssessmentRequest = {
    * Value
    */
   value: string;
+};
+
+/**
+ * StatementDuplicatePairOut
+ *
+ * Two statements of the merged entity that assert the same value.
+ */
+export type StatementDuplicatePairOut = {
+  latest_decision?: ReconciliationDecisionOut | null;
+  /**
+   * Provenance Differs
+   */
+  provenance_differs: boolean;
+  record_a: StatementOut;
+  record_b: StatementOut;
+  /**
+   * Record Type
+   */
+  record_type: 'statement';
+  /**
+   * Same Assertion
+   */
+  same_assertion: boolean;
 };
 
 /**
@@ -4119,6 +7300,62 @@ export type StatementOut = {
    * Value
    */
   value: string;
+};
+
+/**
+ * StatementPromotionOut
+ *
+ * An accepted value written into the canonical graph, with its provenance.
+ */
+export type StatementPromotionOut = {
+  /**
+   * Assessment Id
+   */
+  assessment_id: string;
+  /**
+   * Dataset
+   */
+  dataset: string;
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Finding Id
+   */
+  finding_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Original Value
+   */
+  original_value: string;
+  /**
+   * Promoted At
+   */
+  promoted_at: string;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Reviewer Note
+   */
+  reviewer_note?: string | null;
+  /**
+   * Source Url
+   */
+  source_url?: string | null;
+  /**
+   * Statement Id
+   */
+  statement_id: string;
 };
 
 /**
@@ -4601,6 +7838,24 @@ export type TraceLeadOut = {
    * Title
    */
   title: string;
+};
+
+/**
+ * UnsafeDocumentReferenceOut
+ */
+export type UnsafeDocumentReferenceOut = {
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Error
+   */
+  error: string;
+  /**
+   * Storage Path
+   */
+  storage_path: string;
 };
 
 /**
@@ -5474,10 +8729,15 @@ export type ListAssessmentsError =
 
 export type ListAssessmentsResponses = {
   /**
+   * Response List Assessments
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<StatementAssessmentOut>;
 };
+
+export type ListAssessmentsResponse =
+  ListAssessmentsResponses[keyof ListAssessmentsResponses];
 
 export type AssessStatementData = {
   body: StatementAssessmentRequest;
@@ -5505,8 +8765,11 @@ export type AssessStatementResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: StatementAssessmentOut;
 };
+
+export type AssessStatementResponse =
+  AssessStatementResponses[keyof AssessStatementResponses];
 
 export type FindingCandidatesData = {
   body?: never;
@@ -5532,10 +8795,15 @@ export type FindingCandidatesError =
 
 export type FindingCandidatesResponses = {
   /**
+   * Response Finding Candidates
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<EntityCandidateOut>;
 };
+
+export type FindingCandidatesResponse =
+  FindingCandidatesResponses[keyof FindingCandidatesResponses];
 
 export type ExternalRelationshipCandidatesData = {
   body?: never;
@@ -5563,8 +8831,11 @@ export type ExternalRelationshipCandidatesResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ExternalRelationshipCandidatesOut;
 };
+
+export type ExternalRelationshipCandidatesResponse =
+  ExternalRelationshipCandidatesResponses[keyof ExternalRelationshipCandidatesResponses];
 
 export type ListExternalRelationshipReviewsData = {
   body?: never;
@@ -5590,10 +8861,15 @@ export type ListExternalRelationshipReviewsError =
 
 export type ListExternalRelationshipReviewsResponses = {
   /**
+   * Response List External Relationship Reviews
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<ExternalRelationshipReviewOut>;
 };
+
+export type ListExternalRelationshipReviewsResponse =
+  ListExternalRelationshipReviewsResponses[keyof ListExternalRelationshipReviewsResponses];
 
 export type ReviewExternalRelationshipData = {
   body: ExternalRelationshipReviewRequest;
@@ -5621,8 +8897,11 @@ export type ReviewExternalRelationshipResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ExternalRelationshipReviewOut;
 };
+
+export type ReviewExternalRelationshipResponse =
+  ReviewExternalRelationshipResponses[keyof ReviewExternalRelationshipResponses];
 
 export type ResolveFindingData = {
   body: ResolutionRequest;
@@ -5650,8 +8929,11 @@ export type ResolveFindingResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ResolutionDecisionOut;
 };
+
+export type ResolveFindingResponse =
+  ResolveFindingResponses[keyof ResolveFindingResponses];
 
 export type ReviewFindingData = {
   body: FindingReviewRequest;
@@ -5678,8 +8960,11 @@ export type ReviewFindingResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ConnectorFindingOut;
 };
+
+export type ReviewFindingResponse =
+  ReviewFindingResponses[keyof ReviewFindingResponses];
 
 export type ConnectorsData = {
   body?: never;
@@ -5692,8 +8977,10 @@ export type ConnectorsResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ConnectorsOut;
 };
+
+export type ConnectorsResponse = ConnectorsResponses[keyof ConnectorsResponses];
 
 export type AlephSearchData = {
   body: AlephSearchRequest;
@@ -5713,10 +9000,15 @@ export type AlephSearchError = AlephSearchErrors[keyof AlephSearchErrors];
 
 export type AlephSearchResponses = {
   /**
+   * Response Aleph Search
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<ConnectorFindingOut>;
 };
+
+export type AlephSearchResponse =
+  AlephSearchResponses[keyof AlephSearchResponses];
 
 export type ConnectorSearchData = {
   body: ConnectorSearchRequest;
@@ -5742,10 +9034,15 @@ export type ConnectorSearchError =
 
 export type ConnectorSearchResponses = {
   /**
+   * Response Connector Search
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<ConnectorFindingOut>;
 };
+
+export type ConnectorSearchResponse =
+  ConnectorSearchResponses[keyof ConnectorSearchResponses];
 
 export type ConsoleActivityActivityData = {
   body?: never;
@@ -7894,8 +11191,11 @@ export type EnrichmentSessionDetailResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: EnrichmentSessionDetailOut;
 };
+
+export type EnrichmentSessionDetailResponse =
+  EnrichmentSessionDetailResponses[keyof EnrichmentSessionDetailResponses];
 
 export type EnrichmentSessionClustersData = {
   body?: never;
@@ -7921,10 +11221,15 @@ export type EnrichmentSessionClustersError =
 
 export type EnrichmentSessionClustersResponses = {
   /**
+   * Response Enrichment Session Clusters
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<EnrichmentClusterOut>;
 };
+
+export type EnrichmentSessionClustersResponse =
+  EnrichmentSessionClustersResponses[keyof EnrichmentSessionClustersResponses];
 
 export type DecideCrossProviderClusterData = {
   body: CrossProviderDecisionRequest;
@@ -7952,8 +11257,11 @@ export type DecideCrossProviderClusterResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: CrossProviderDecisionOut;
 };
+
+export type DecideCrossProviderClusterResponse =
+  DecideCrossProviderClusterResponses[keyof DecideCrossProviderClusterResponses];
 
 export type CreateEntityData = {
   body: EntityCreate;
@@ -7975,8 +11283,11 @@ export type CreateEntityResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: EntityOut;
 };
+
+export type CreateEntityResponse =
+  CreateEntityResponses[keyof CreateEntityResponses];
 
 export type UpdateEntityData = {
   body: EntityUpdate;
@@ -8003,8 +11314,11 @@ export type UpdateEntityResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: EntityOut;
 };
+
+export type UpdateEntityResponse =
+  UpdateEntityResponses[keyof UpdateEntityResponses];
 
 export type CanonicalEntityResolutionData = {
   body: CanonicalResolutionRequest;
@@ -8032,8 +11346,11 @@ export type CanonicalEntityResolutionResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: CanonicalResolutionDecisionOut;
 };
+
+export type CanonicalEntityResolutionResponse =
+  CanonicalEntityResolutionResponses[keyof CanonicalEntityResolutionResponses];
 
 export type ListCrossProviderDecisionsData = {
   body?: never;
@@ -8059,10 +11376,15 @@ export type ListCrossProviderDecisionsError =
 
 export type ListCrossProviderDecisionsResponses = {
   /**
+   * Response List Cross Provider Decisions
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<CrossProviderDecisionOut>;
 };
+
+export type ListCrossProviderDecisionsResponse =
+  ListCrossProviderDecisionsResponses[keyof ListCrossProviderDecisionsResponses];
 
 export type GetEntityDossierData = {
   body?: never;
@@ -8090,8 +11412,11 @@ export type GetEntityDossierResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: EntityDossierOut;
 };
+
+export type GetEntityDossierResponse =
+  GetEntityDossierResponses[keyof GetEntityDossierResponses];
 
 export type EntityDuplicateCandidatesData = {
   body?: never;
@@ -8117,10 +11442,15 @@ export type EntityDuplicateCandidatesError =
 
 export type EntityDuplicateCandidatesResponses = {
   /**
+   * Response Entity Duplicate Candidates
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<CanonicalDuplicateCandidateOut>;
 };
+
+export type EntityDuplicateCandidatesResponse =
+  EntityDuplicateCandidatesResponses[keyof EntityDuplicateCandidatesResponses];
 
 export type EnrichEntityMultiData = {
   body: MultiEnrichmentRequest;
@@ -8148,8 +11478,11 @@ export type EnrichEntityMultiResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: EnrichmentSessionOut;
 };
+
+export type EnrichEntityMultiResponse =
+  EnrichEntityMultiResponses[keyof EnrichEntityMultiResponses];
 
 export type EnrichEntityData = {
   body?: never;
@@ -8178,10 +11511,15 @@ export type EnrichEntityError = EnrichEntityErrors[keyof EnrichEntityErrors];
 
 export type EnrichEntityResponses = {
   /**
+   * Response Enrich Entity
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<ConnectorFindingOut>;
 };
+
+export type EnrichEntityResponse =
+  EnrichEntityResponses[keyof EnrichEntityResponses];
 
 export type ListEntityEnrichmentSessionsData = {
   body?: never;
@@ -8207,10 +11545,15 @@ export type ListEntityEnrichmentSessionsError =
 
 export type ListEntityEnrichmentSessionsResponses = {
   /**
+   * Response List Entity Enrichment Sessions
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<EnrichmentSessionRowOut>;
 };
+
+export type ListEntityEnrichmentSessionsResponse =
+  ListEntityEnrichmentSessionsResponses[keyof ListEntityEnrichmentSessionsResponses];
 
 export type ListExternalRelationshipPromotionsData = {
   body?: never;
@@ -8236,10 +11579,15 @@ export type ListExternalRelationshipPromotionsError =
 
 export type ListExternalRelationshipPromotionsResponses = {
   /**
+   * Response List External Relationship Promotions
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<ExternalRelationshipPromotionOut>;
 };
+
+export type ListExternalRelationshipPromotionsResponse =
+  ListExternalRelationshipPromotionsResponses[keyof ListExternalRelationshipPromotionsResponses];
 
 export type EntityMergeExecuteData = {
   body: CanonicalMergeExecuteRequest;
@@ -8267,8 +11615,11 @@ export type EntityMergeExecuteResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: CanonicalMergeExecuteOut;
 };
+
+export type EntityMergeExecuteResponse =
+  EntityMergeExecuteResponses[keyof EntityMergeExecuteResponses];
 
 export type EntityMergeHistoryData = {
   body?: never;
@@ -8294,10 +11645,15 @@ export type EntityMergeHistoryError =
 
 export type EntityMergeHistoryResponses = {
   /**
+   * Response Entity Merge History
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<CanonicalEntityMergeAuditOut>;
 };
+
+export type EntityMergeHistoryResponse =
+  EntityMergeHistoryResponses[keyof EntityMergeHistoryResponses];
 
 export type EntityMergePreviewData = {
   body?: never;
@@ -8330,8 +11686,11 @@ export type EntityMergePreviewResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: CanonicalMergePreviewOut;
 };
+
+export type EntityMergePreviewResponse =
+  EntityMergePreviewResponses[keyof EntityMergePreviewResponses];
 
 export type EntityPostMergeReconciliationData = {
   body?: never;
@@ -8359,8 +11718,11 @@ export type EntityPostMergeReconciliationResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: PostMergeReconciliationOut;
 };
+
+export type EntityPostMergeReconciliationResponse =
+  EntityPostMergeReconciliationResponses[keyof EntityPostMergeReconciliationResponses];
 
 export type DecideEntityPostMergeReconciliationData = {
   body: PostMergeReconciliationRequest;
@@ -8388,8 +11750,11 @@ export type DecideEntityPostMergeReconciliationResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ReconciliationDecisionOut;
 };
+
+export type DecideEntityPostMergeReconciliationResponse =
+  DecideEntityPostMergeReconciliationResponses[keyof DecideEntityPostMergeReconciliationResponses];
 
 export type ListEntityPromotionsData = {
   body?: never;
@@ -8415,10 +11780,15 @@ export type ListEntityPromotionsError =
 
 export type ListEntityPromotionsResponses = {
   /**
+   * Response List Entity Promotions
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<StatementPromotionOut>;
 };
+
+export type ListEntityPromotionsResponse =
+  ListEntityPromotionsResponses[keyof ListEntityPromotionsResponses];
 
 export type ListPropertyConflictDecisionsData = {
   body?: never;
@@ -8448,10 +11818,15 @@ export type ListPropertyConflictDecisionsError =
 
 export type ListPropertyConflictDecisionsResponses = {
   /**
+   * Response List Property Conflict Decisions
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<PropertyConflictDecisionOut>;
 };
+
+export type ListPropertyConflictDecisionsResponse =
+  ListPropertyConflictDecisionsResponses[keyof ListPropertyConflictDecisionsResponses];
 
 export type DecidePropertyConflictData = {
   body: PropertyConflictDecisionRequest;
@@ -8483,8 +11858,11 @@ export type DecidePropertyConflictResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: PropertyConflictDecisionOut;
 };
+
+export type DecidePropertyConflictResponse =
+  DecidePropertyConflictResponses[keyof DecidePropertyConflictResponses];
 
 export type ListEntityRelationshipsData = {
   body?: never;
@@ -8510,10 +11888,15 @@ export type ListEntityRelationshipsError =
 
 export type ListEntityRelationshipsResponses = {
   /**
+   * Response List Entity Relationships
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<EntityRelationshipOut>;
 };
+
+export type ListEntityRelationshipsResponse =
+  ListEntityRelationshipsResponses[keyof ListEntityRelationshipsResponses];
 
 export type ListEntityStatementHistoryData = {
   body?: never;
@@ -8573,10 +11956,15 @@ export type ListEntityStatementsError =
 
 export type ListEntityStatementsResponses = {
   /**
+   * Response List Entity Statements
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<EntityStatementOut>;
 };
+
+export type ListEntityStatementsResponse =
+  ListEntityStatementsResponses[keyof ListEntityStatementsResponses];
 
 export type CreateEvidenceEndpointData = {
   body: EvidenceCreate;
@@ -8631,8 +12019,11 @@ export type PromoteExternalRelationshipResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ExternalRelationshipPromotionOut;
 };
+
+export type PromoteExternalRelationshipResponse =
+  PromoteExternalRelationshipResponses[keyof PromoteExternalRelationshipResponses];
 
 export type GetExtractionEntityMatchesData = {
   body?: never;
@@ -8796,10 +12187,15 @@ export type ListInvestigationsData = {
 
 export type ListInvestigationsResponses = {
   /**
+   * Response List Investigations
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<InvestigationOut>;
 };
+
+export type ListInvestigationsResponse =
+  ListInvestigationsResponses[keyof ListInvestigationsResponses];
 
 export type CreateInvestigationData = {
   body: InvestigationCreate;
@@ -8822,8 +12218,11 @@ export type CreateInvestigationResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: InvestigationOut;
 };
+
+export type CreateInvestigationResponse =
+  CreateInvestigationResponses[keyof CreateInvestigationResponses];
 
 export type RemoveInvestigationData = {
   body?: never;
@@ -9098,10 +12497,15 @@ export type ListConnectorFindingsError =
 
 export type ListConnectorFindingsResponses = {
   /**
+   * Response List Connector Findings
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<ConnectorFindingOut>;
 };
+
+export type ListConnectorFindingsResponse =
+  ListConnectorFindingsResponses[keyof ListConnectorFindingsResponses];
 
 export type ListConnectorRunsData = {
   body?: never;
@@ -9136,10 +12540,15 @@ export type ListConnectorRunsError =
 
 export type ListConnectorRunsResponses = {
   /**
+   * Response List Connector Runs
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<ConnectorRunOut>;
 };
+
+export type ListConnectorRunsResponse =
+  ListConnectorRunsResponses[keyof ListConnectorRunsResponses];
 
 export type GetOpenalephCorpusBindingData = {
   body?: never;
@@ -9367,10 +12776,15 @@ export type ListEntitiesError = ListEntitiesErrors[keyof ListEntitiesErrors];
 
 export type ListEntitiesResponses = {
   /**
+   * Response List Entities
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<EntityOut>;
 };
+
+export type ListEntitiesResponse =
+  ListEntitiesResponses[keyof ListEntitiesResponses];
 
 export type ListInvestigationEvidenceData = {
   body?: never;
@@ -9475,8 +12889,11 @@ export type GetInvestigationFinancialFlowsResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: FinancialLedgerOut;
 };
+
+export type GetInvestigationFinancialFlowsResponse =
+  GetInvestigationFinancialFlowsResponses[keyof GetInvestigationFinancialFlowsResponses];
 
 export type GetInvestigationGraphData = {
   body?: never;
@@ -9513,8 +12930,11 @@ export type GetInvestigationGraphResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: GraphOut;
 };
+
+export type GetInvestigationGraphResponse =
+  GetInvestigationGraphResponses[keyof GetInvestigationGraphResponses];
 
 export type ListLeadsData = {
   body?: never;
@@ -9649,10 +13069,15 @@ export type ListInvestigationRelationshipsError =
 
 export type ListInvestigationRelationshipsResponses = {
   /**
+   * Response List Investigation Relationships
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<RelationshipOut>;
 };
+
+export type ListInvestigationRelationshipsResponse =
+  ListInvestigationRelationshipsResponses[keyof ListInvestigationRelationshipsResponses];
 
 export type ListReportingTasksData = {
   body?: never;
@@ -10346,8 +13771,11 @@ export type CreateCanonicalRelationshipResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: RelationshipOut;
 };
+
+export type CreateCanonicalRelationshipResponse =
+  CreateCanonicalRelationshipResponses[keyof CreateCanonicalRelationshipResponses];
 
 export type AttachRelationshipEvidenceEndpointData = {
   body: RelationshipEvidenceAttachRequest;
@@ -10375,8 +13803,11 @@ export type AttachRelationshipEvidenceEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: RelationshipOut;
 };
+
+export type AttachRelationshipEvidenceEndpointResponse =
+  AttachRelationshipEvidenceEndpointResponses[keyof AttachRelationshipEvidenceEndpointResponses];
 
 export type ListRelationshipEvidenceReviewsData = {
   body?: never;
@@ -10404,8 +13835,11 @@ export type ListRelationshipEvidenceReviewsResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: RelationshipEvidenceReviewsOut;
 };
+
+export type ListRelationshipEvidenceReviewsResponse =
+  ListRelationshipEvidenceReviewsResponses[keyof ListRelationshipEvidenceReviewsResponses];
 
 export type ReviewRelationshipEvidenceEndpointData = {
   body: RelationshipEvidenceReviewRequest;
@@ -10437,8 +13871,11 @@ export type ReviewRelationshipEvidenceEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: RelationshipOut;
 };
+
+export type ReviewRelationshipEvidenceEndpointResponse =
+  ReviewRelationshipEvidenceEndpointResponses[keyof ReviewRelationshipEvidenceEndpointResponses];
 
 export type CreateLeadFromRelationshipContextData = {
   body?: never;
@@ -10601,8 +14038,11 @@ export type DeleteConnectorCredentialResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ConnectorCredentialRemovedOut;
 };
+
+export type DeleteConnectorCredentialResponse =
+  DeleteConnectorCredentialResponses[keyof DeleteConnectorCredentialResponses];
 
 export type SaveConnectorCredentialData = {
   /**
@@ -10635,8 +14075,11 @@ export type SaveConnectorCredentialResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ConnectorCredentialSavedOut;
 };
+
+export type SaveConnectorCredentialResponse =
+  SaveConnectorCredentialResponses[keyof SaveConnectorCredentialResponses];
 
 export type GetSecurityAlertsData = {
   body?: never;
@@ -10668,8 +14111,11 @@ export type GetSecurityAlertsResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: SecurityAlertsOut;
 };
+
+export type GetSecurityAlertsResponse =
+  GetSecurityAlertsResponses[keyof GetSecurityAlertsResponses];
 
 export type GetSecurityAuditData = {
   body?: never;
@@ -10713,8 +14159,11 @@ export type GetSecurityAuditResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: SecurityAuditViewOut;
 };
+
+export type GetSecurityAuditResponse =
+  GetSecurityAuditResponses[keyof GetSecurityAuditResponses];
 
 export type PruneSecurityAuditData = {
   /**
@@ -10742,8 +14191,11 @@ export type PruneSecurityAuditResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: SecurityAuditRetentionResultOut;
 };
+
+export type PruneSecurityAuditResponse =
+  PruneSecurityAuditResponses[keyof PruneSecurityAuditResponses];
 
 export type GetSecurityAuditRetentionPreviewData = {
   body?: never;
@@ -10775,8 +14227,11 @@ export type GetSecurityAuditRetentionPreviewResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: SecurityAuditRetentionPreviewOut;
 };
+
+export type GetSecurityAuditRetentionPreviewResponse =
+  GetSecurityAuditRetentionPreviewResponses[keyof GetSecurityAuditRetentionPreviewResponses];
 
 export type GetSecurityAuditSummaryData = {
   body?: never;
@@ -10789,8 +14244,11 @@ export type GetSecurityAuditSummaryResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: SecurityAuditSummaryOut;
 };
+
+export type GetSecurityAuditSummaryResponse =
+  GetSecurityAuditSummaryResponses[keyof GetSecurityAuditSummaryResponses];
 
 export type ListAppUsersData = {
   body?: never;
@@ -10995,8 +14453,11 @@ export type SettingsStatusResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: SettingsStatusOut;
 };
+
+export type SettingsStatusResponse =
+  SettingsStatusResponses[keyof SettingsStatusResponses];
 
 export type GetOrphanStoragePreviewData = {
   body?: never;
@@ -11009,8 +14470,11 @@ export type GetOrphanStoragePreviewResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: OrphanStoragePreviewOut;
 };
+
+export type GetOrphanStoragePreviewResponse =
+  GetOrphanStoragePreviewResponses[keyof GetOrphanStoragePreviewResponses];
 
 export type CreateSourceEndpointData = {
   body: SourceCreate;
@@ -11099,8 +14563,11 @@ export type PromoteStatementAssessmentResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: StatementPromotionOut;
 };
+
+export type PromoteStatementAssessmentResponse =
+  PromoteStatementAssessmentResponses[keyof PromoteStatementAssessmentResponses];
 
 export type CreateTimelineEventEndpointData = {
   body: TimelineEventCreate;

@@ -11,12 +11,13 @@ from app.api.dependencies import authorize_request_resource
 from app.connectors.registry import registry
 from app.db.session import get_db
 from app.schemas.api import AlephSearchRequest, ConnectorSearchRequest
+from app.schemas.responses import ConnectorFindingOut, ConnectorsOut
 from app.services.connectors import run_connector
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.get("/connectors", response_model=None)
+@router.get("/connectors", response_model=ConnectorsOut)
 def connectors() -> dict[str, Any]:
     return {
         "providers": registry.names(),
@@ -27,11 +28,11 @@ def connectors() -> dict[str, Any]:
     }
 
 
-@router.post("/connectors/{provider}/search", response_model=None)
+@router.post("/connectors/{provider}/search", response_model=list[ConnectorFindingOut])
 async def connector_search(provider: str, body: ConnectorSearchRequest, db: Session = Depends(get_db)) -> Any:
     return await run_connector(provider, body, db)
 
 
-@router.post("/connectors/aleph/search", response_model=None)
+@router.post("/connectors/aleph/search", response_model=list[ConnectorFindingOut])
 async def aleph_search(body: AlephSearchRequest, db: Session = Depends(get_db)) -> Any:
     return await run_connector("aleph", ConnectorSearchRequest(**body.model_dump()), db)

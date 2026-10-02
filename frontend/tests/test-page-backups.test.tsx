@@ -18,7 +18,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {mockApi} from '../test-support/mock-api';
 import type {MockApi} from '../test-support/mock-api';
-import {investigationRoutes, pageRoutes} from '../test-support/page-routes';
+import {investigationRecord, investigationRoutes, pageRoutes} from '../test-support/page-routes';
 
 beforeEach(() => {
   if (!window.matchMedia) {
@@ -172,7 +172,7 @@ describe('Home portable investigation backup & restore', () => {
         restored_counts: {entities: 4},
         manifest: {format: 'jwbackup', version: 1},
       },
-      'GET /api/investigations': [restored],
+      'GET /api/investigations': [investigationRecord(restored)],
       ...investigationRoutes(restored.id),
     });
 

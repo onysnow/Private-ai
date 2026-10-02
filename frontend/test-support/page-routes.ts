@@ -3,26 +3,31 @@
 //
 // On mount the page asks for the settings status, the investigation list
 // and the connector names, then opens the first investigation (or the one
-// named in ?inv=) and loads its records: findings, entities and graph from
-// the page itself, and the timeline, sources, evidence, documents, claims,
-// leads queue and AI reasoning queue from the panels that load their own
-// data. Those loads run side by side, and more move onto TanStack Query with
-// every panel, so a test says what the server holds for the case and never
-// in what order the page asks.
+// named in ?inv=): every panel loads the case's records it shows through
+// the shared cache -- findings, entities, graph, timeline, sources,
+// evidence, documents, claims, leads queue and AI reasoning queue. Those
+// loads run side by side, so a test says what the server holds for the
+// case and never in what order the page asks. The replies are in the
+// generated shapes (lib/generated/types.gen.ts), which the panels check.
 //
 // Usage:
 //   const api = mockApi(pageRoutes({investigations: [investigation], leads: [leadFixture()]}));
 //   api.add({'POST /api/leads': {id: 'lead-2'}});           // a route the test's action needs
 //   api.add({...investigationRoutes('inv-restored')});       // a case opened later
+import type {DossierExternalOut, DossierSummaryOut, InvestigationOut, PostMergeReconciliationOut} from '../lib/generated/types.gen';
 import type {Routes} from './mock-api';
 
+/** A reply as a test writes it: the generated shape, with whatever a test overrides. */
+export type Fixture = Record<string, unknown>;
+
 /** The settings status every page test boots with: local-only access, no
- * connectors configured, no AI or security blocks. */
+ * connectors configured, no denials, the AI layer switched off. In the
+ * generated SettingsStatusOut shape, which the page's access check checks. */
 export const validSettingsStatus = {
   environment: 'test',
   database: 'sqlite',
   document_storage_dir: '/tmp/docs',
-  limits: {},
+  limits: {max_document_bytes: 52428800, max_backup_bytes: 262144000, max_backup_uncompressed_bytes: 1073741824, max_backup_files: 10000},
   restore_api_enabled: true,
   document_extraction: {
     pdf_ocr_enabled: false,
@@ -33,6 +38,7 @@ export const validSettingsStatus = {
     entity_extraction_owner: 'workbench_local',
     ocr_runtime: {
       available: false,
+      tessdata: null,
       requested_languages: [],
       missing_languages: [],
       detail: 'not checked',
@@ -42,10 +48,117 @@ export const validSettingsStatus = {
     remote_api_enabled: false,
     mode: 'local_only',
     token_configured: false,
+    persisted_identity_count: 0,
+    investigation_scope_configured: false,
   },
   cors_allowed_origins: [],
+  security: {
+    window_hours: 24, since: '2026-10-01T00:00:00+00:00', total_denials: 0, by_event: {access_denied: 0, auth_rate_limited: 0, browser_write_denied: 0, request_rejected: 0},
+    remote_hosts: [], recent: [], attention_threshold: 20, needs_attention: false, records_scanned: 0, malformed_lines: 0, read_error: false,
+  },
+  ai: {
+    enabled: false, provider: null, provider_key_configured: false, endpoints_callable: false, model: null, runs_on_this_computer: null, remote_endpoint_allowed: false,
+    limits: {runs_per_minute_per_actor: 6, max_concurrent_runs: 2, request_timeout_seconds: 120, max_output_tokens: 8192},
+    tas_spec: {present: false, version: null, modules: {}, control_surface: {spec_file: 'CORE/CONTROL_SURFACE.md', available: false, flags: {}}},
+  },
   connectors: {},
 };
+
+/** An investigation as the list reports it (the generated InvestigationOut shape). */
+export function investigationRecord(row: {id: string; name: string; is_demo?: boolean}): InvestigationOut {
+  return {description: null, is_demo: false, created_at: '2026-10-01T00:00:00', ...row};
+}
+
+/** A canonical entity as the list reports it (the generated EntityOut shape). */
+export function entityFixture(id: string, caption: string, schema: string, overrides: Fixture = {}): Fixture & {id: string} {
+  return {id, investigation_id: 'inv-1', ftm_id: `ftm-${id}`, schema, caption, properties: {}, canonical_id: null, merged_into_entity_id: null, created_at: '2026-10-01T00:00:00', ...overrides};
+}
+
+/** The advisory of a relationship nothing has been said about yet. */
+export function plainAdvisory(overrides: Fixture = {}): Fixture {
+  return {
+    needs_review: false, support_state: 'no_claim_dependency', has_independent_support: false, healthy_supporting_claim_count: 0, challenged_supporting_claim_count: 0,
+    disputed_claim_count: 0, rejected_claim_count: 0, claim_dependencies: [], relationship_evidence_review: null, relationship_evidence_needs_review: false,
+    relationship_evidence_attachment_count: 0, relationship_evidence_review_counts: {supports: 0, contradicts: 0, context: 0, superseded: 0, unresolved: 0, unreviewed: 0},
+    presentation_aggregate: false, ...overrides,
+  };
+}
+
+/** A relationship edge in the generated RelationshipOut shape, which the
+ * graph and the relationship routes check: Kestrelwood Holdings owned by Jane Doe. */
+export function relationshipFixture(overrides: Fixture = {}): Fixture {
+  return {
+    id: 'rel-1',
+    investigation_id: 'inv-1',
+    relationship_entity_id: 'rel-entity-1',
+    ftm_id: 'ftm-1',
+    schema: 'Ownership',
+    source_prop: 'owner',
+    target_prop: 'asset',
+    caption: 'Ownership',
+    properties: {},
+    source: {id: 'ent-1', ftm_id: 'ftm-ent-1', caption: 'Kestrelwood Holdings Ltd', schema: 'Company'},
+    target: {id: 'ent-2', ftm_id: 'ftm-ent-2', caption: 'Jane Doe', schema: 'Person'},
+    statements: [],
+    provenance: {statement_count: 0, sources: [], evidence_review_history: [], evidence_attachments: []},
+    advisory: plainAdvisory(),
+    created_at: '2026-10-01T00:00:00',
+    ...overrides,
+  };
+}
+
+/** A connector finding in the generated ConnectorFindingOut shape. */
+export function findingFixture(overrides: Fixture = {}): Fixture {
+  return {
+    id: 'find-1', investigation_id: 'inv-1', run_id: 'run-1', provider: 'aleph', provider_record_id: 'aleph-1', caption: 'Kestrelwood Holdings',
+    schema: 'Company', properties: {}, source_url: null, raw: {}, review_status: 'unreviewed', created_at: '2026-10-01T00:00:00', ...overrides,
+  };
+}
+
+/** An entity dossier in the generated EntityDossierOut shape: an entity
+ * with nothing linked to it. Every list is empty unless overridden. */
+export function dossierFixture(entity: Fixture & {id: string}, overrides: Fixture = {}): Fixture & {summary: DossierSummaryOut; external: DossierExternalOut} {
+  return {
+    entity,
+    alias_resolution: null,
+    identity_history: {canonical_entity_id: entity.id, aliases: [], canonical_decisions: [], merge_audits: [], unresolved_decision_count: 0},
+    summary: {
+      statement_count: 0, property_conflict_count: 0, identity_alias_count: 0, identity_decision_count: 0, identity_unresolved_count: 0,
+      relationship_count: 0, relationship_underlying_count: 0, relationship_suppressed_duplicate_count: 0, relationship_schemas: {},
+      relationship_review_advisory_count: 0, relationship_mixed_support_count: 0, claim_count: 0, claim_statuses: {}, evidence_count: 0, lead_count: 0,
+      task_count: 0, timeline_event_count: 0, external_finding_count: 0, external_finding_statuses: {}, enrichment_session_count: 0, unresolved_external_count: 0,
+    },
+    statement_history: [],
+    property_conflicts: [],
+    relationships: [],
+    claims: [],
+    evidence: [],
+    leads: [],
+    tasks: [],
+    timeline: [],
+    external: {findings: [], resolution_decisions: [], statement_assessments: [], promotions: [], enrichment_sessions: [], enrichment_links: [], cross_provider_decisions: []},
+    ...overrides,
+  };
+}
+
+/** A post-merge reconciliation with no duplicate pairs. */
+export function emptyReconciliation(entityId = 'ent-1'): PostMergeReconciliationOut {
+  return {
+    entity_id: entityId,
+    statement_duplicates: [],
+    relationship_duplicates: [],
+    summary: {statement_pairs: 0, relationship_pairs: 0, unresolved_pairs: 0},
+  };
+}
+
+/** The three routes opening an entity's dossier requests. */
+export function dossierRoutes(entityId: string, dossier: unknown, duplicates: unknown[] = [], reconciliation: unknown = emptyReconciliation(entityId)): Routes {
+  return {
+    [`GET /api/entities/${entityId}/dossier`]: dossier,
+    [`GET /api/entities/${entityId}/duplicate-candidates`]: duplicates,
+    [`GET /api/entities/${entityId}/post-merge-reconciliation`]: reconciliation,
+  };
+}
 
 export type GraphBody = {
   nodes: unknown[];
@@ -144,7 +257,7 @@ export type PageRoutesOptions = InvestigationRecords & {
   settings?: unknown;
   /** The investigation list; the page opens the first one (or the one in
    * ?inv=), and every one listed gets the same records. */
-  investigations?: {id: string; name: string}[];
+  investigations?: {id: string; name: string; is_demo?: boolean}[];
   providers?: string[];
 };
 
@@ -153,8 +266,8 @@ export function pageRoutes(options: PageRoutesOptions = {}): Routes {
   const {settings = validSettingsStatus, investigations = [], providers = ['aleph'], ...records} = options;
   const routes: Routes = {
     'GET /api/settings/status': settings,
-    'GET /api/investigations': investigations,
-    'GET /api/connectors': {providers},
+    'GET /api/investigations': investigations.map(investigationRecord),
+    'GET /api/connectors': {providers, status: Object.fromEntries(providers.map(p => [p, {configured: true}]))},
   };
   for (const investigation of investigations) Object.assign(routes, investigationRoutes(investigation.id, records));
   return routes;

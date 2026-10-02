@@ -22,8 +22,8 @@ import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {mockApi} from '../test-support/mock-api';
-import type {MockApi, Routes} from '../test-support/mock-api';
-import {pageRoutes} from '../test-support/page-routes';
+import type {MockApi} from '../test-support/mock-api';
+import {dossierFixture as baseDossier, dossierRoutes, emptyReconciliation, entityFixture, pageRoutes} from '../test-support/page-routes';
 
 beforeEach(() => {
   if (!window.matchMedia) {
@@ -52,41 +52,16 @@ async function importHome(): Promise<() => ReactElement> {
 }
 
 const investigation = {id: 'inv-1', name: 'Kestrelwood filings'};
-const entityA = {id: 'ent-1', caption: 'Kestrelwood Holdings Ltd', schema: 'Company', properties: {}};
-const entityB = {id: 'ent-2', caption: 'Kestrelwood Holdings LLC', schema: 'Company', properties: {}};
+const entityA = entityFixture('ent-1', 'Kestrelwood Holdings Ltd', 'Company');
+const entityB = entityFixture('ent-2', 'Kestrelwood Holdings LLC', 'Company');
 
 const ENTITIES = 'GET /api/investigations/inv-1/entities';
 const dossierRoute = (entityId: string) => `GET /api/entities/${entityId}/dossier`;
 const duplicatesRoute = (entityId: string) => `GET /api/entities/${entityId}/duplicate-candidates`;
 const reconciliationRoute = (entityId: string) => `GET /api/entities/${entityId}/post-merge-reconciliation`;
 
-function emptyReconciliation(entityId = 'ent-1') {
-  return {
-    entity_id: entityId,
-    statement_duplicates: [],
-    relationship_duplicates: [],
-    summary: {statement_pairs: 0, relationship_pairs: 0, unresolved_pairs: 0},
-  };
-}
-
-function dossierFixture(entity: unknown, overrides: Record<string, unknown> = {}) {
-  return {
-    entity,
-    summary: {
-      statement_count: 5,
-      relationship_count: 0,
-      claim_count: 0,
-      evidence_count: 0,
-      lead_count: 0,
-      external_finding_count: 0,
-      unresolved_external_count: 0,
-    },
-    property_conflicts: [],
-    relationships: [],
-    claims: [],
-    evidence: [],
-    ...overrides,
-  };
+function dossierFixture(entity: ReturnType<typeof entityFixture>, overrides: Record<string, unknown> = {}) {
+  return baseDossier(entity, {summary: {...baseDossier(entity).summary, statement_count: 5}, ...overrides});
 }
 
 function duplicateCandidate(overrides: Record<string, unknown> = {}) {
@@ -100,14 +75,7 @@ function duplicateCandidate(overrides: Record<string, unknown> = {}) {
   };
 }
 
-/** The three routes loadDossier(entityId) requests. */
-function dossierRoutes(entityId: string, dossier: unknown, duplicates: unknown[], reconciliation: unknown): Routes {
-  return {
-    [dossierRoute(entityId)]: dossier,
-    [duplicatesRoute(entityId)]: duplicates,
-    [reconciliationRoute(entityId)]: reconciliation,
-  };
-}
+const sameDecision = {id: 'dec-1', decision: 'same', confidence: 0.9, rationale: null, created_at: '2026-09-23T00:00:00'};
 
 async function bootstrapAndOpenDossier(
   dossier: unknown,
@@ -139,9 +107,9 @@ describe('Home entity dossier: canonical duplicates & merge', () => {
     expect(screen.getByRole('button', {name: 'Preview merge into this record'})).toBeDisabled();
 
     api.add({
-      [decision]: {},
+      [decision]: {id: 'dec-1', investigation_id: 'inv-1', entity_a_id: 'ent-1', entity_b_id: 'ent-2', decision: 'same', confidence: 0.9, rationale: 'Reporter-reviewed canonical duplicate decision', created_at: '2026-09-23T00:00:00'},
       // The duplicate list the reload finds carries the decision.
-      [duplicatesRoute('ent-1')]: [duplicateCandidate({latest_decision: {id: 'dec-1', decision: 'same', confidence: 0.9}})],
+      [duplicatesRoute('ent-1')]: [duplicateCandidate({latest_decision: sameDecision})],
     });
 
     await userEvent.setup().click(screen.getByRole('button', {name: 'Same entity'}));
@@ -168,7 +136,7 @@ describe('Home entity dossier: canonical duplicates & merge', () => {
   it('previews a canonical merge once the duplicate is marked "same" and executes it', async () => {
     const api = await bootstrapAndOpenDossier(
       dossierFixture(entityA),
-      [duplicateCandidate({latest_decision: {id: 'dec-1', decision: 'same', confidence: 0.9}})],
+      [duplicateCandidate({latest_decision: sameDecision})],
       emptyReconciliation(),
     );
     const preview = 'GET /api/entities/ent-1/merge-preview';
@@ -201,7 +169,10 @@ describe('Home entity dossier: canonical duplicates & merge', () => {
     // After the merge the page reloads the entities and opens the surviving
     // record's dossier.
     api.add({
-      [merge]: {},
+      [merge]: {
+        audit: {id: 'merge-1', investigation_id: 'inv-1', source_entity_id: 'ent-1', target_entity_id: 'ent-2', resolution_decision_id: 'dec-1', preview_digest: 'digest-abc', preview_json: {}, moved_counts_json: {statements: 5}, rationale: 'Reporter executed previewed canonical merge.', created_at: '2026-09-23T00:00:00'},
+        source_entity_id: 'ent-1', target_entity_id: 'ent-2',
+      },
       ...dossierRoutes('ent-2', dossierFixture(entityB), [], emptyReconciliation('ent-2')),
     });
 
@@ -242,12 +213,13 @@ describe('Home entity dossier: canonical duplicates & merge', () => {
     await screen.findByText('Post-merge duplicate review');
     expect(screen.getByText('1 statement pair(s) · 0 relationship pair(s) · 1 unresolved')).toBeInTheDocument();
 
+    const recorded = {id: 'rd-1', investigation_id: 'inv-1', entity_id: 'ent-1', record_type: 'statement', record_a_id: 'st-1', record_b_id: 'st-2', decision: 'duplicate', rationale: null, preferred_record_id: 'st-1', created_at: '2026-09-23T00:00:00'};
     api.add({
-      [decision]: {},
+      [decision]: recorded,
       // What the reload finds: the pair now decided.
       [reconciliationRoute('ent-1')]: {
         ...reconciliationWithPair,
-        statement_duplicates: [{...statementPair, latest_decision: {id: 'rd-1', record_type: 'statement', record_a_id: 'st-1', record_b_id: 'st-2', decision: 'duplicate'}}],
+        statement_duplicates: [{...statementPair, latest_decision: recorded}],
         summary: {statement_pairs: 1, relationship_pairs: 0, unresolved_pairs: 0},
       },
     });

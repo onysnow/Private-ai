@@ -20,6 +20,10 @@ from app.models.domain import ConnectorFinding, Entity, ExternalRelationshipRevi
 from app.schemas.api import (
     ExternalRelationshipReviewRequest, FindingReviewRequest, ResolutionRequest, StatementAssessmentRequest,
 )
+from app.schemas.responses import (
+    ConnectorFindingOut, EntityCandidateOut, ExternalRelationshipCandidatesOut, ExternalRelationshipPromotionOut,
+    ExternalRelationshipReviewOut, ResolutionDecisionOut, StatementAssessmentOut,
+)
 from app.services.connector_findings import (
     create_resolution_decision, create_statement_assessment, list_statement_assessments,
     update_finding_review_status,
@@ -32,7 +36,7 @@ from app.services.resolution import candidate_entities
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.get("/connector-findings/{finding_id}/relationship-candidates", response_model=None)
+@router.get("/connector-findings/{finding_id}/relationship-candidates", response_model=ExternalRelationshipCandidatesOut)
 def external_relationship_candidates(finding_id: str, db: Session = Depends(get_db)) -> Any:
     finding = db.get(ConnectorFinding, finding_id)
     if finding is None:
@@ -43,14 +47,14 @@ def external_relationship_candidates(finding_id: str, db: Session = Depends(get_
         raise HTTPException(400, str(exc))
 
 
-@router.get("/connector-findings/{finding_id}/relationship-reviews", response_model=None)
+@router.get("/connector-findings/{finding_id}/relationship-reviews", response_model=list[ExternalRelationshipReviewOut])
 def list_external_relationship_reviews(finding_id: str, db: Session = Depends(get_db)) -> Any:
     if db.get(ConnectorFinding, finding_id) is None:
         raise HTTPException(404, "Finding not found")
     return list_relationship_reviews(db, finding_id)
 
 
-@router.post("/connector-findings/{finding_id}/relationship-reviews", response_model=None)
+@router.post("/connector-findings/{finding_id}/relationship-reviews", response_model=ExternalRelationshipReviewOut)
 def review_external_relationship(finding_id: str, body: ExternalRelationshipReviewRequest, db: Session = Depends(get_db)) -> Any:
     finding = db.get(ConnectorFinding, finding_id)
     if finding is None:
@@ -61,7 +65,7 @@ def review_external_relationship(finding_id: str, body: ExternalRelationshipRevi
         raise HTTPException(400, str(exc))
 
 
-@router.post("/external-relationship-reviews/{review_id}/promote", response_model=None)
+@router.post("/external-relationship-reviews/{review_id}/promote", response_model=ExternalRelationshipPromotionOut)
 def promote_external_relationship(review_id: str, db: Session = Depends(get_db)) -> Any:
     review = db.get(ExternalRelationshipReview, review_id)
     if review is None:
@@ -72,7 +76,7 @@ def promote_external_relationship(review_id: str, db: Session = Depends(get_db))
         raise HTTPException(409, str(exc))
 
 
-@router.patch("/connector-findings/{finding_id}/review", response_model=None)
+@router.patch("/connector-findings/{finding_id}/review", response_model=ConnectorFindingOut)
 def review_finding(finding_id: str, body: FindingReviewRequest, db: Session = Depends(get_db)) -> Any:
     row = db.get(ConnectorFinding, finding_id)
     if row is None:
@@ -83,7 +87,7 @@ def review_finding(finding_id: str, body: FindingReviewRequest, db: Session = De
         raise HTTPException(400, str(exc))
 
 
-@router.get("/connector-findings/{finding_id}/candidates", response_model=None)
+@router.get("/connector-findings/{finding_id}/candidates", response_model=list[EntityCandidateOut])
 def finding_candidates(finding_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(ConnectorFinding, finding_id)
     if row is None:
@@ -91,7 +95,7 @@ def finding_candidates(finding_id: str, db: Session = Depends(get_db)) -> Any:
     return candidate_entities(db, row.investigation_id, row.caption, row.schema)
 
 
-@router.post("/connector-findings/{finding_id}/resolution", response_model=None)
+@router.post("/connector-findings/{finding_id}/resolution", response_model=ResolutionDecisionOut)
 def resolve_finding(finding_id: str, body: ResolutionRequest, db: Session = Depends(get_db)) -> Any:
     finding = db.get(ConnectorFinding, finding_id)
     if finding is None:
@@ -104,12 +108,12 @@ def resolve_finding(finding_id: str, body: ResolutionRequest, db: Session = Depe
         raise HTTPException(400, str(exc))
 
 
-@router.get("/connector-findings/{finding_id}/assessments", response_model=None)
+@router.get("/connector-findings/{finding_id}/assessments", response_model=list[StatementAssessmentOut])
 def list_assessments(finding_id: str, db: Session = Depends(get_db)) -> Any:
     return list_statement_assessments(db, finding_id)
 
 
-@router.post("/connector-findings/{finding_id}/assessments", response_model=None)
+@router.post("/connector-findings/{finding_id}/assessments", response_model=StatementAssessmentOut)
 def assess_statement(finding_id: str, body: StatementAssessmentRequest, db: Session = Depends(get_db)) -> Any:
     finding = db.get(ConnectorFinding, finding_id)
     if finding is None:

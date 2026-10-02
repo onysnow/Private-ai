@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
 from app.schemas.api import CrossProviderDecisionRequest
+from app.schemas.responses import CrossProviderDecisionOut, EnrichmentClusterOut, EnrichmentSessionDetailOut
 from app.services.consolidation import (
     create_cross_provider_decision, get_enrichment_session_clusters, get_enrichment_session_detail,
 )
@@ -22,7 +23,7 @@ from app.services.consolidation import (
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.get("/enrichment-sessions/{session_id}", response_model=None)
+@router.get("/enrichment-sessions/{session_id}", response_model=EnrichmentSessionDetailOut)
 def enrichment_session_detail(session_id: str, db: Session = Depends(get_db)) -> Any:
     try:
         return get_enrichment_session_detail(db, session_id)
@@ -30,7 +31,7 @@ def enrichment_session_detail(session_id: str, db: Session = Depends(get_db)) ->
         raise HTTPException(404, str(exc))
 
 
-@router.get("/enrichment-sessions/{session_id}/clusters", response_model=None)
+@router.get("/enrichment-sessions/{session_id}/clusters", response_model=list[EnrichmentClusterOut])
 def enrichment_session_clusters(session_id: str, db: Session = Depends(get_db)) -> Any:
     try:
         return get_enrichment_session_clusters(db, session_id)
@@ -38,7 +39,7 @@ def enrichment_session_clusters(session_id: str, db: Session = Depends(get_db)) 
         raise HTTPException(404, str(exc))
 
 
-@router.post("/enrichment-sessions/{session_id}/clusters/decision", response_model=None)
+@router.post("/enrichment-sessions/{session_id}/clusters/decision", response_model=CrossProviderDecisionOut)
 def decide_cross_provider_cluster(session_id: str, body: CrossProviderDecisionRequest, db: Session = Depends(get_db)) -> Any:
     try:
         return create_cross_provider_decision(db, session_id, body)

@@ -25,6 +25,334 @@
         "title": "AIAnalysisCandidateReviewRequest",
         "type": "object"
       },
+      "AggregateClaimDependencyOut": {
+        "description": "A claim dependency collected across reviewed duplicate edges, naming\nthe underlying edge it belongs to.",
+        "properties": {
+          "claim_id": {
+            "title": "Claim Id",
+            "type": "string"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "evidence_id": {
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "needs_review": {
+            "title": "Needs Review",
+            "type": "boolean"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "relationship_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relationship Id"
+          },
+          "stance": {
+            "title": "Stance",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_id",
+          "evidence_id",
+          "text",
+          "status",
+          "confidence",
+          "stance",
+          "needs_review"
+        ],
+        "title": "AggregateClaimDependencyOut",
+        "type": "object"
+      },
+      "AggregateProvenanceOut": {
+        "description": "The provenance inventory of a compact preferred edge: every statement\nsource and evidence record beneath it and its reviewed duplicates.\nPresentation only; no records are merged.",
+        "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceWithSourceOut"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "evidence_count": {
+            "title": "Evidence Count",
+            "type": "integer"
+          },
+          "presentation_only": {
+            "const": true,
+            "title": "Presentation Only",
+            "type": "boolean"
+          },
+          "statement_count": {
+            "title": "Statement Count",
+            "type": "integer"
+          },
+          "statement_sources": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statement Sources",
+            "type": "array"
+          },
+          "underlying_relationship_count": {
+            "title": "Underlying Relationship Count",
+            "type": "integer"
+          },
+          "underlying_relationship_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Underlying Relationship Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "presentation_only",
+          "underlying_relationship_ids",
+          "underlying_relationship_count",
+          "statement_count",
+          "statement_sources",
+          "evidence_count",
+          "evidence"
+        ],
+        "title": "AggregateProvenanceOut",
+        "type": "object"
+      },
+      "AiControlFlagOut": {
+        "properties": {
+          "allowed": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Allowed",
+            "type": "array"
+          },
+          "default": {
+            "title": "Default",
+            "type": "string"
+          }
+        },
+        "required": [
+          "default",
+          "allowed"
+        ],
+        "title": "AiControlFlagOut",
+        "type": "object"
+      },
+      "AiControlSurfaceOut": {
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "flags": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/AiControlFlagOut"
+            },
+            "title": "Flags",
+            "type": "object"
+          },
+          "spec_file": {
+            "title": "Spec File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "spec_file",
+          "available",
+          "flags"
+        ],
+        "title": "AiControlSurfaceOut",
+        "type": "object"
+      },
+      "AiLimitsOut": {
+        "properties": {
+          "max_concurrent_runs": {
+            "title": "Max Concurrent Runs",
+            "type": "integer"
+          },
+          "max_output_tokens": {
+            "title": "Max Output Tokens",
+            "type": "integer"
+          },
+          "request_timeout_seconds": {
+            "title": "Request Timeout Seconds",
+            "type": "number"
+          },
+          "runs_per_minute_per_actor": {
+            "title": "Runs Per Minute Per Actor",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "runs_per_minute_per_actor",
+          "max_concurrent_runs",
+          "request_timeout_seconds",
+          "max_output_tokens"
+        ],
+        "title": "AiLimitsOut",
+        "type": "object"
+      },
+      "AiModuleStatusOut": {
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "spec_file": {
+            "title": "Spec File",
+            "type": "string"
+          },
+          "vendored_tas": {
+            "title": "Vendored Tas",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "spec_file",
+          "available",
+          "vendored_tas"
+        ],
+        "title": "AiModuleStatusOut",
+        "type": "object"
+      },
+      "AiReasoningStatusOut": {
+        "description": "Whether the AI reasoning endpoints can be called, and what they would\nrun on. Never carries key material. Every key is always sent (null when\nunknown), so the nullable ones have no default: the generated type then\nmatches the AI panel's own status type (lib/api-types.ts).",
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "endpoints_callable": {
+            "title": "Endpoints Callable",
+            "type": "boolean"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/AiLimitsOut"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "provider_key_configured": {
+            "title": "Provider Key Configured",
+            "type": "boolean"
+          },
+          "remote_endpoint_allowed": {
+            "title": "Remote Endpoint Allowed",
+            "type": "boolean"
+          },
+          "runs_on_this_computer": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Runs On This Computer"
+          },
+          "tas_spec": {
+            "$ref": "#/components/schemas/AiTasSpecOut"
+          }
+        },
+        "required": [
+          "enabled",
+          "provider",
+          "provider_key_configured",
+          "endpoints_callable",
+          "model",
+          "runs_on_this_computer",
+          "remote_endpoint_allowed",
+          "limits",
+          "tas_spec"
+        ],
+        "title": "AiReasoningStatusOut",
+        "type": "object"
+      },
+      "AiTasSpecOut": {
+        "properties": {
+          "control_surface": {
+            "$ref": "#/components/schemas/AiControlSurfaceOut"
+          },
+          "modules": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/AiModuleStatusOut"
+            },
+            "title": "Modules",
+            "type": "object"
+          },
+          "present": {
+            "title": "Present",
+            "type": "boolean"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "required": [
+          "present",
+          "version",
+          "modules",
+          "control_surface"
+        ],
+        "title": "AiTasSpecOut",
+        "type": "object"
+      },
       "AlephSearchRequest": {
         "properties": {
           "investigation_id": {
@@ -41,6 +369,44 @@
           "query"
         ],
         "title": "AlephSearchRequest",
+        "type": "object"
+      },
+      "ApiAccessStatusOut": {
+        "properties": {
+          "investigation_scope_configured": {
+            "title": "Investigation Scope Configured",
+            "type": "boolean"
+          },
+          "mode": {
+            "enum": [
+              "local_only",
+              "shared_bearer",
+              "persisted_users"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "persisted_identity_count": {
+            "title": "Persisted Identity Count",
+            "type": "integer"
+          },
+          "remote_api_enabled": {
+            "title": "Remote Api Enabled",
+            "type": "boolean"
+          },
+          "token_configured": {
+            "title": "Token Configured",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "remote_api_enabled",
+          "mode",
+          "token_configured",
+          "persisted_identity_count",
+          "investigation_scope_configured"
+        ],
+        "title": "ApiAccessStatusOut",
         "type": "object"
       },
       "AppUserCreate": {
@@ -539,6 +905,182 @@
         "title": "BulkIn",
         "type": "object"
       },
+      "CanonicalDecisionSummaryOut": {
+        "description": "The latest reporter decision on a duplicate pair (`created_at` as the\nservice formats it, an ISO string).",
+        "properties": {
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rationale"
+          }
+        },
+        "required": [
+          "id",
+          "decision",
+          "confidence",
+          "created_at"
+        ],
+        "title": "CanonicalDecisionSummaryOut",
+        "type": "object"
+      },
+      "CanonicalDuplicateCandidateOut": {
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "latest_decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CanonicalDecisionSummaryOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "entity_id",
+          "caption",
+          "schema",
+          "score"
+        ],
+        "title": "CanonicalDuplicateCandidateOut",
+        "type": "object"
+      },
+      "CanonicalEntityMergeAuditOut": {
+        "description": "The record of a merge: the preview it was executed from and what moved.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "moved_counts_json": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Moved Counts Json",
+            "type": "object"
+          },
+          "preview_digest": {
+            "title": "Preview Digest",
+            "type": "string"
+          },
+          "preview_json": {
+            "additionalProperties": true,
+            "title": "Preview Json",
+            "type": "object"
+          },
+          "rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rationale"
+          },
+          "resolution_decision_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution Decision Id"
+          },
+          "source_entity_id": {
+            "title": "Source Entity Id",
+            "type": "string"
+          },
+          "target_entity_id": {
+            "title": "Target Entity Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "source_entity_id",
+          "target_entity_id",
+          "preview_digest",
+          "preview_json",
+          "moved_counts_json",
+          "created_at"
+        ],
+        "title": "CanonicalEntityMergeAuditOut",
+        "type": "object"
+      },
+      "CanonicalMergeExecuteOut": {
+        "properties": {
+          "audit": {
+            "$ref": "#/components/schemas/CanonicalEntityMergeAuditOut"
+          },
+          "source_entity_id": {
+            "title": "Source Entity Id",
+            "type": "string"
+          },
+          "target_entity_id": {
+            "title": "Target Entity Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "audit",
+          "source_entity_id",
+          "target_entity_id"
+        ],
+        "title": "CanonicalMergeExecuteOut",
+        "type": "object"
+      },
       "CanonicalMergeExecuteRequest": {
         "properties": {
           "preview_digest": {
@@ -566,6 +1108,120 @@
           "preview_digest"
         ],
         "title": "CanonicalMergeExecuteRequest",
+        "type": "object"
+      },
+      "CanonicalMergePreviewOut": {
+        "description": "What a merge would move, what blocks it, and the digest the execute\ncall must repeat so a stale preview is never acted on.",
+        "properties": {
+          "blockers": {
+            "items": {
+              "$ref": "#/components/schemas/MergeBlockerOut"
+            },
+            "title": "Blockers",
+            "type": "array"
+          },
+          "can_execute": {
+            "title": "Can Execute",
+            "type": "boolean"
+          },
+          "preview_digest": {
+            "title": "Preview Digest",
+            "type": "string"
+          },
+          "references": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/MergeReferenceOut"
+            },
+            "title": "References",
+            "type": "object"
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MergeResolutionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "$ref": "#/components/schemas/MergeEntityOut"
+          },
+          "target": {
+            "$ref": "#/components/schemas/MergeEntityOut"
+          },
+          "total_references": {
+            "title": "Total References",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "source",
+          "target",
+          "references",
+          "total_references",
+          "blockers",
+          "can_execute",
+          "preview_digest"
+        ],
+        "title": "CanonicalMergePreviewOut",
+        "type": "object"
+      },
+      "CanonicalResolutionDecisionOut": {
+        "description": "A reporter's decision whether two canonical records are one entity, as stored.",
+        "properties": {
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "entity_a_id": {
+            "title": "Entity A Id",
+            "type": "string"
+          },
+          "entity_b_id": {
+            "title": "Entity B Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rationale"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "entity_a_id",
+          "entity_b_id",
+          "decision",
+          "confidence",
+          "created_at"
+        ],
+        "title": "CanonicalResolutionDecisionOut",
         "type": "object"
       },
       "CanonicalResolutionRequest": {
@@ -1298,6 +1954,154 @@
         "title": "ClaimUpdate",
         "type": "object"
       },
+      "ClusterDecisionOut": {
+        "properties": {
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rationale"
+          }
+        },
+        "required": [
+          "id",
+          "decision",
+          "confidence",
+          "created_at"
+        ],
+        "title": "ClusterDecisionOut",
+        "type": "object"
+      },
+      "ClusterFindingOut": {
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "properties": {
+            "additionalProperties": true,
+            "title": "Properties",
+            "type": "object"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "provider_record_id": {
+            "title": "Provider Record Id",
+            "type": "string"
+          },
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schema"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          }
+        },
+        "required": [
+          "id",
+          "provider",
+          "provider_record_id",
+          "caption",
+          "properties"
+        ],
+        "title": "ClusterFindingOut",
+        "type": "object"
+      },
+      "ClusterPairOut": {
+        "properties": {
+          "finding_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Finding Ids",
+            "type": "array"
+          },
+          "reasons": {
+            "items": {
+              "$ref": "#/components/schemas/ClusterReasonOut"
+            },
+            "title": "Reasons",
+            "type": "array"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "finding_ids",
+          "score",
+          "reasons"
+        ],
+        "title": "ClusterPairOut",
+        "type": "object"
+      },
+      "ClusterReasonOut": {
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "weight": {
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "kind",
+          "detail",
+          "weight"
+        ],
+        "title": "ClusterReasonOut",
+        "type": "object"
+      },
       "CollectionIn": {
         "properties": {
           "name": {
@@ -1336,6 +2140,278 @@
         "title": "ConfirmIn",
         "type": "object"
       },
+      "ConnectorCredentialRemovedOut": {
+        "properties": {
+          "configured": {
+            "title": "Configured",
+            "type": "boolean"
+          },
+          "local_store_present": {
+            "title": "Local Store Present",
+            "type": "boolean"
+          },
+          "permissions_restricted": {
+            "title": "Permissions Restricted",
+            "type": "boolean"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "removed": {
+            "title": "Removed",
+            "type": "boolean"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "storage_protection": {
+            "title": "Storage Protection",
+            "type": "string"
+          }
+        },
+        "required": [
+          "configured",
+          "source",
+          "local_store_present",
+          "permissions_restricted",
+          "storage_protection",
+          "provider",
+          "removed"
+        ],
+        "title": "ConnectorCredentialRemovedOut",
+        "type": "object"
+      },
+      "ConnectorCredentialSavedOut": {
+        "properties": {
+          "configured": {
+            "title": "Configured",
+            "type": "boolean"
+          },
+          "local_store_present": {
+            "title": "Local Store Present",
+            "type": "boolean"
+          },
+          "permissions_restricted": {
+            "title": "Permissions Restricted",
+            "type": "boolean"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "storage_protection": {
+            "title": "Storage Protection",
+            "type": "string"
+          }
+        },
+        "required": [
+          "configured",
+          "source",
+          "local_store_present",
+          "permissions_restricted",
+          "storage_protection",
+          "provider"
+        ],
+        "title": "ConnectorCredentialSavedOut",
+        "type": "object"
+      },
+      "ConnectorCredentialStatusOut": {
+        "description": "Whether a connector has a credential and where it comes from; the secret itself is never sent.",
+        "properties": {
+          "configured": {
+            "title": "Configured",
+            "type": "boolean"
+          },
+          "local_store_present": {
+            "title": "Local Store Present",
+            "type": "boolean"
+          },
+          "permissions_restricted": {
+            "title": "Permissions Restricted",
+            "type": "boolean"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "storage_protection": {
+            "title": "Storage Protection",
+            "type": "string"
+          }
+        },
+        "required": [
+          "configured",
+          "source",
+          "local_store_present",
+          "permissions_restricted",
+          "storage_protection"
+        ],
+        "title": "ConnectorCredentialStatusOut",
+        "type": "object"
+      },
+      "ConnectorFindingOut": {
+        "description": "What a connector found, kept as the provider sent it (`properties` and\n`raw` are the provider's own shapes) until a reporter decides what it means.",
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "properties": {
+            "additionalProperties": true,
+            "title": "Properties",
+            "type": "object"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "provider_record_id": {
+            "title": "Provider Record Id",
+            "type": "string"
+          },
+          "raw": {
+            "additionalProperties": true,
+            "title": "Raw",
+            "type": "object"
+          },
+          "review_status": {
+            "title": "Review Status",
+            "type": "string"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schema"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "provider",
+          "provider_record_id",
+          "caption",
+          "properties",
+          "raw",
+          "review_status",
+          "created_at"
+        ],
+        "title": "ConnectorFindingOut",
+        "type": "object"
+      },
+      "ConnectorRunOut": {
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "result_count": {
+            "title": "Result Count",
+            "type": "integer"
+          },
+          "started_at": {
+            "format": "date-time",
+            "title": "Started At",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "provider",
+          "query",
+          "status",
+          "result_count",
+          "started_at"
+        ],
+        "title": "ConnectorRunOut",
+        "type": "object"
+      },
       "ConnectorSearchRequest": {
         "properties": {
           "investigation_id": {
@@ -1352,6 +2428,44 @@
           "query"
         ],
         "title": "ConnectorSearchRequest",
+        "type": "object"
+      },
+      "ConnectorStatusOut": {
+        "properties": {
+          "configured": {
+            "title": "Configured",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "configured"
+        ],
+        "title": "ConnectorStatusOut",
+        "type": "object"
+      },
+      "ConnectorsOut": {
+        "description": "The connectors this server knows, and whether each has what it needs.",
+        "properties": {
+          "providers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Providers",
+            "type": "array"
+          },
+          "status": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ConnectorStatusOut"
+            },
+            "title": "Status",
+            "type": "object"
+          }
+        },
+        "required": [
+          "providers",
+          "status"
+        ],
+        "title": "ConnectorsOut",
         "type": "object"
       },
       "CreateIn": {
@@ -1378,6 +2492,81 @@
           "kind"
         ],
         "title": "CreateIn",
+        "type": "object"
+      },
+      "CrossProviderDecisionOut": {
+        "description": "A reporter's decision that findings from different providers are, or\nare not, the same outside entity.",
+        "properties": {
+          "cluster_key": {
+            "title": "Cluster Key",
+            "type": "string"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "finding_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Finding Ids",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rationale"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "entity_id",
+          "cluster_key",
+          "finding_ids",
+          "decision",
+          "confidence",
+          "created_at"
+        ],
+        "title": "CrossProviderDecisionOut",
         "type": "object"
       },
       "CrossProviderDecisionRequest": {
@@ -1803,6 +2992,52 @@
         "title": "DocumentDetailOut",
         "type": "object"
       },
+      "DocumentExtractionSettingsOut": {
+        "properties": {
+          "entity_extraction_owner": {
+            "enum": [
+              "workbench_local",
+              "openaleph_ftm_analyze"
+            ],
+            "title": "Entity Extraction Owner",
+            "type": "string"
+          },
+          "local_entity_suggestions_enabled": {
+            "title": "Local Entity Suggestions Enabled",
+            "type": "boolean"
+          },
+          "ocr_runtime": {
+            "$ref": "#/components/schemas/OcrRuntimeStatusOut"
+          },
+          "pdf_ocr_dpi": {
+            "title": "Pdf Ocr Dpi",
+            "type": "integer"
+          },
+          "pdf_ocr_enabled": {
+            "title": "Pdf Ocr Enabled",
+            "type": "boolean"
+          },
+          "pdf_ocr_language": {
+            "title": "Pdf Ocr Language",
+            "type": "string"
+          },
+          "pdf_ocr_min_native_chars": {
+            "title": "Pdf Ocr Min Native Chars",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "pdf_ocr_enabled",
+          "pdf_ocr_language",
+          "pdf_ocr_dpi",
+          "pdf_ocr_min_native_chars",
+          "local_entity_suggestions_enabled",
+          "entity_extraction_owner",
+          "ocr_runtime"
+        ],
+        "title": "DocumentExtractionSettingsOut",
+        "type": "object"
+      },
       "DocumentOut": {
         "properties": {
           "candidate_counts": {
@@ -1998,6 +3233,1001 @@
         "title": "DocumentUploadOut",
         "type": "object"
       },
+      "DossierClaimLinkOut": {
+        "properties": {
+          "claim_id": {
+            "title": "Claim Id",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "stance": {
+            "title": "Stance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_id",
+          "stance"
+        ],
+        "title": "DossierClaimLinkOut",
+        "type": "object"
+      },
+      "DossierClaimOut": {
+        "properties": {
+          "claim": {
+            "$ref": "#/components/schemas/ClaimOut"
+          },
+          "match_basis": {
+            "$ref": "#/components/schemas/DossierMatchBasisOut"
+          }
+        },
+        "required": [
+          "claim",
+          "match_basis"
+        ],
+        "title": "DossierClaimOut",
+        "type": "object"
+      },
+      "DossierConflictDecisionOut": {
+        "description": "A property-conflict decision as the dossier shows it.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "preferred_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferred Value"
+          },
+          "rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rationale"
+          },
+          "temporal_intervals": {
+            "items": {
+              "$ref": "#/components/schemas/PropertyTemporalIntervalOut"
+            },
+            "title": "Temporal Intervals",
+            "type": "array"
+          },
+          "values": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "decision",
+          "values",
+          "temporal_intervals",
+          "created_at"
+        ],
+        "title": "DossierConflictDecisionOut",
+        "type": "object"
+      },
+      "DossierConflictValueOut": {
+        "description": "One value of a disputed property: where it is asserted and how it was assessed.",
+        "properties": {
+          "canonical": {
+            "title": "Canonical",
+            "type": "boolean"
+          },
+          "canonical_statements": {
+            "items": {
+              "$ref": "#/components/schemas/CanonicalStatementOut"
+            },
+            "title": "Canonical Statements",
+            "type": "array"
+          },
+          "conflict_count": {
+            "title": "Conflict Count",
+            "type": "integer"
+          },
+          "external_assessments": {
+            "items": {
+              "$ref": "#/components/schemas/ExternalAssessmentOut"
+            },
+            "title": "External Assessments",
+            "type": "array"
+          },
+          "latest_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Status"
+          },
+          "support_count": {
+            "title": "Support Count",
+            "type": "integer"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "canonical",
+          "support_count",
+          "conflict_count",
+          "canonical_statements",
+          "external_assessments"
+        ],
+        "title": "DossierConflictValueOut",
+        "type": "object"
+      },
+      "DossierEvidenceOut": {
+        "properties": {
+          "claim_links": {
+            "items": {
+              "$ref": "#/components/schemas/DossierClaimLinkOut"
+            },
+            "title": "Claim Links",
+            "type": "array"
+          },
+          "evidence": {
+            "$ref": "#/components/schemas/EvidenceOut"
+          },
+          "match_basis": {
+            "$ref": "#/components/schemas/DossierMatchBasisOut"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SourceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "evidence",
+          "match_basis",
+          "claim_links"
+        ],
+        "title": "DossierEvidenceOut",
+        "type": "object"
+      },
+      "DossierExternalOut": {
+        "description": "Everything connectors found about the entity and every review of it.",
+        "properties": {
+          "cross_provider_decisions": {
+            "items": {
+              "$ref": "#/components/schemas/CrossProviderDecisionOut"
+            },
+            "title": "Cross Provider Decisions",
+            "type": "array"
+          },
+          "enrichment_links": {
+            "items": {
+              "$ref": "#/components/schemas/EnrichmentSessionFindingOut"
+            },
+            "title": "Enrichment Links",
+            "type": "array"
+          },
+          "enrichment_sessions": {
+            "items": {
+              "$ref": "#/components/schemas/EnrichmentSessionRowOut"
+            },
+            "title": "Enrichment Sessions",
+            "type": "array"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/ConnectorFindingOut"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "promotions": {
+            "items": {
+              "$ref": "#/components/schemas/StatementPromotionOut"
+            },
+            "title": "Promotions",
+            "type": "array"
+          },
+          "resolution_decisions": {
+            "items": {
+              "$ref": "#/components/schemas/ResolutionDecisionOut"
+            },
+            "title": "Resolution Decisions",
+            "type": "array"
+          },
+          "statement_assessments": {
+            "items": {
+              "$ref": "#/components/schemas/StatementAssessmentOut"
+            },
+            "title": "Statement Assessments",
+            "type": "array"
+          }
+        },
+        "required": [
+          "findings",
+          "resolution_decisions",
+          "statement_assessments",
+          "promotions",
+          "enrichment_sessions",
+          "enrichment_links",
+          "cross_provider_decisions"
+        ],
+        "title": "DossierExternalOut",
+        "type": "object"
+      },
+      "DossierLeadOut": {
+        "properties": {
+          "lead": {
+            "$ref": "#/components/schemas/LeadRowOut"
+          },
+          "match_basis": {
+            "$ref": "#/components/schemas/DossierMatchBasisOut"
+          }
+        },
+        "required": [
+          "lead",
+          "match_basis"
+        ],
+        "title": "DossierLeadOut",
+        "type": "object"
+      },
+      "DossierMatchBasisOut": {
+        "description": "Why a record is in the dossier: an explicit link, or (named as such) a\ntext mention of the entity, with the matched terms.",
+        "properties": {
+          "terms": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Terms"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "title": "DossierMatchBasisOut",
+        "type": "object"
+      },
+      "DossierPropertyConflictOut": {
+        "description": "A property with several canonical values, or an outside conflict with\nits value. Diagnostic only: the dossier never picks a value itself.",
+        "properties": {
+          "decision_history": {
+            "items": {
+              "$ref": "#/components/schemas/DossierConflictDecisionOut"
+            },
+            "title": "Decision History",
+            "type": "array"
+          },
+          "latest_decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DossierConflictDecisionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "preferred_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferred Value"
+          },
+          "prop": {
+            "title": "Prop",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "values": {
+            "items": {
+              "$ref": "#/components/schemas/DossierConflictValueOut"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "prop",
+          "status",
+          "reason",
+          "decision_history",
+          "values"
+        ],
+        "title": "DossierPropertyConflictOut",
+        "type": "object"
+      },
+      "DossierSummaryOut": {
+        "properties": {
+          "claim_count": {
+            "title": "Claim Count",
+            "type": "integer"
+          },
+          "claim_statuses": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Claim Statuses",
+            "type": "object"
+          },
+          "enrichment_session_count": {
+            "title": "Enrichment Session Count",
+            "type": "integer"
+          },
+          "evidence_count": {
+            "title": "Evidence Count",
+            "type": "integer"
+          },
+          "external_finding_count": {
+            "title": "External Finding Count",
+            "type": "integer"
+          },
+          "external_finding_statuses": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "External Finding Statuses",
+            "type": "object"
+          },
+          "identity_alias_count": {
+            "title": "Identity Alias Count",
+            "type": "integer"
+          },
+          "identity_decision_count": {
+            "title": "Identity Decision Count",
+            "type": "integer"
+          },
+          "identity_unresolved_count": {
+            "title": "Identity Unresolved Count",
+            "type": "integer"
+          },
+          "lead_count": {
+            "title": "Lead Count",
+            "type": "integer"
+          },
+          "property_conflict_count": {
+            "title": "Property Conflict Count",
+            "type": "integer"
+          },
+          "relationship_count": {
+            "title": "Relationship Count",
+            "type": "integer"
+          },
+          "relationship_mixed_support_count": {
+            "title": "Relationship Mixed Support Count",
+            "type": "integer"
+          },
+          "relationship_review_advisory_count": {
+            "title": "Relationship Review Advisory Count",
+            "type": "integer"
+          },
+          "relationship_schemas": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Relationship Schemas",
+            "type": "object"
+          },
+          "relationship_suppressed_duplicate_count": {
+            "title": "Relationship Suppressed Duplicate Count",
+            "type": "integer"
+          },
+          "relationship_underlying_count": {
+            "title": "Relationship Underlying Count",
+            "type": "integer"
+          },
+          "statement_count": {
+            "title": "Statement Count",
+            "type": "integer"
+          },
+          "task_count": {
+            "title": "Task Count",
+            "type": "integer"
+          },
+          "timeline_event_count": {
+            "title": "Timeline Event Count",
+            "type": "integer"
+          },
+          "unresolved_external_count": {
+            "title": "Unresolved External Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "statement_count",
+          "property_conflict_count",
+          "identity_alias_count",
+          "identity_decision_count",
+          "identity_unresolved_count",
+          "relationship_count",
+          "relationship_underlying_count",
+          "relationship_suppressed_duplicate_count",
+          "relationship_schemas",
+          "relationship_review_advisory_count",
+          "relationship_mixed_support_count",
+          "claim_count",
+          "claim_statuses",
+          "evidence_count",
+          "lead_count",
+          "task_count",
+          "timeline_event_count",
+          "external_finding_count",
+          "external_finding_statuses",
+          "enrichment_session_count",
+          "unresolved_external_count"
+        ],
+        "title": "DossierSummaryOut",
+        "type": "object"
+      },
+      "EnrichmentClusterOut": {
+        "description": "Findings from different providers that may describe one outside\nentity, with the reasons for each pairing and the latest reporter decision.",
+        "properties": {
+          "cluster_key": {
+            "title": "Cluster Key",
+            "type": "string"
+          },
+          "decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClusterDecisionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "finding_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Finding Ids",
+            "type": "array"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/ClusterFindingOut"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "pairs": {
+            "items": {
+              "$ref": "#/components/schemas/ClusterPairOut"
+            },
+            "title": "Pairs",
+            "type": "array"
+          },
+          "providers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Providers",
+            "type": "array"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "cluster_key",
+          "score",
+          "providers",
+          "finding_ids",
+          "findings",
+          "pairs"
+        ],
+        "title": "EnrichmentClusterOut",
+        "type": "object"
+      },
+      "EnrichmentRunResultOut": {
+        "description": "One provider's part of an enrichment session; `error` is sent only when it failed.",
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "result_count": {
+            "title": "Result Count",
+            "type": "integer"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "status",
+          "result_count",
+          "run_id"
+        ],
+        "title": "EnrichmentRunResultOut",
+        "type": "object"
+      },
+      "EnrichmentSessionDetailOut": {
+        "description": "A stored session with its per-provider runs.",
+        "properties": {
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "providers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Providers",
+            "type": "array"
+          },
+          "runs": {
+            "items": {
+              "$ref": "#/components/schemas/EnrichmentSessionRunOut"
+            },
+            "title": "Runs",
+            "type": "array"
+          },
+          "started_at": {
+            "format": "date-time",
+            "title": "Started At",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "total_results": {
+            "title": "Total Results",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "entity_id",
+          "status",
+          "providers",
+          "total_results",
+          "started_at",
+          "runs"
+        ],
+        "title": "EnrichmentSessionDetailOut",
+        "type": "object"
+      },
+      "EnrichmentSessionFindingOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "finding_id": {
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "session_id",
+          "finding_id",
+          "provider",
+          "created_at"
+        ],
+        "title": "EnrichmentSessionFindingOut",
+        "type": "object"
+      },
+      "EnrichmentSessionOut": {
+        "description": "The reply to running every chosen connector against one entity.",
+        "properties": {
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "providers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Providers",
+            "type": "array"
+          },
+          "runs": {
+            "items": {
+              "$ref": "#/components/schemas/EnrichmentRunResultOut"
+            },
+            "title": "Runs",
+            "type": "array"
+          },
+          "started_at": {
+            "format": "date-time",
+            "title": "Started At",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "total_results": {
+            "title": "Total Results",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "entity_id",
+          "investigation_id",
+          "status",
+          "providers",
+          "total_results",
+          "started_at",
+          "runs"
+        ],
+        "title": "EnrichmentSessionOut",
+        "type": "object"
+      },
+      "EnrichmentSessionRowOut": {
+        "description": "An enrichment session as stored.",
+        "properties": {
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "providers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Providers",
+            "type": "array"
+          },
+          "started_at": {
+            "format": "date-time",
+            "title": "Started At",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "total_results": {
+            "title": "Total Results",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "entity_id",
+          "status",
+          "providers",
+          "total_results",
+          "started_at"
+        ],
+        "title": "EnrichmentSessionRowOut",
+        "type": "object"
+      },
+      "EnrichmentSessionRunOut": {
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "result_count": {
+            "title": "Result Count",
+            "type": "integer"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "session_id",
+          "provider",
+          "status",
+          "result_count"
+        ],
+        "title": "EnrichmentSessionRunOut",
+        "type": "object"
+      },
+      "EntityAliasLinkOut": {
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "merged_into_entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Merged Into Entity Id"
+          }
+        },
+        "required": [
+          "id",
+          "caption"
+        ],
+        "title": "EntityAliasLinkOut",
+        "type": "object"
+      },
+      "EntityAliasResolutionOut": {
+        "description": "Sent when the dossier was asked for by a merged alias: which record\nwas asked for and which one answers.",
+        "properties": {
+          "active_caption": {
+            "title": "Active Caption",
+            "type": "string"
+          },
+          "active_entity_id": {
+            "title": "Active Entity Id",
+            "type": "string"
+          },
+          "alias_chain": {
+            "items": {
+              "$ref": "#/components/schemas/EntityAliasLinkOut"
+            },
+            "title": "Alias Chain",
+            "type": "array"
+          },
+          "requested_caption": {
+            "title": "Requested Caption",
+            "type": "string"
+          },
+          "requested_entity_id": {
+            "title": "Requested Entity Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "requested_entity_id",
+          "requested_caption",
+          "active_entity_id",
+          "active_caption",
+          "alias_chain"
+        ],
+        "title": "EntityAliasResolutionOut",
+        "type": "object"
+      },
+      "EntityCandidateOut": {
+        "description": "A canonical entity that may be what a finding describes, with a name-match score.",
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "entity_id",
+          "caption",
+          "schema",
+          "score"
+        ],
+        "title": "EntityCandidateOut",
+        "type": "object"
+      },
       "EntityCreate": {
         "properties": {
           "caption": {
@@ -2045,6 +4275,470 @@
           "caption"
         ],
         "title": "EntityCreate",
+        "type": "object"
+      },
+      "EntityDossierOut": {
+        "description": "Everything the workbench holds about one canonical entity.",
+        "properties": {
+          "alias_resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EntityAliasResolutionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "claims": {
+            "items": {
+              "$ref": "#/components/schemas/DossierClaimOut"
+            },
+            "title": "Claims",
+            "type": "array"
+          },
+          "entity": {
+            "$ref": "#/components/schemas/EntityOut"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/DossierEvidenceOut"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "external": {
+            "$ref": "#/components/schemas/DossierExternalOut"
+          },
+          "identity_history": {
+            "$ref": "#/components/schemas/EntityIdentityHistoryOut"
+          },
+          "leads": {
+            "items": {
+              "$ref": "#/components/schemas/DossierLeadOut"
+            },
+            "title": "Leads",
+            "type": "array"
+          },
+          "property_conflicts": {
+            "items": {
+              "$ref": "#/components/schemas/DossierPropertyConflictOut"
+            },
+            "title": "Property Conflicts",
+            "type": "array"
+          },
+          "relationships": {
+            "items": {
+              "$ref": "#/components/schemas/EntityRelationshipOut"
+            },
+            "title": "Relationships",
+            "type": "array"
+          },
+          "statement_history": {
+            "items": {
+              "$ref": "#/components/schemas/StatementHistoryRowOut"
+            },
+            "title": "Statement History",
+            "type": "array"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/DossierSummaryOut"
+          },
+          "tasks": {
+            "items": {
+              "$ref": "#/components/schemas/ReportingTaskOut"
+            },
+            "title": "Tasks",
+            "type": "array"
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineEventOut"
+            },
+            "title": "Timeline",
+            "type": "array"
+          }
+        },
+        "required": [
+          "entity",
+          "identity_history",
+          "summary",
+          "statement_history",
+          "property_conflicts",
+          "relationships",
+          "claims",
+          "evidence",
+          "leads",
+          "tasks",
+          "timeline",
+          "external"
+        ],
+        "title": "EntityDossierOut",
+        "type": "object"
+      },
+      "EntityIdentityHistoryOut": {
+        "description": "Every identity judgement about the entity: merged aliases, reporter\ndecisions, merge audits. Audit-oriented; nothing here is inferred.",
+        "properties": {
+          "aliases": {
+            "items": {
+              "$ref": "#/components/schemas/IdentityAliasOut"
+            },
+            "title": "Aliases",
+            "type": "array"
+          },
+          "canonical_decisions": {
+            "items": {
+              "$ref": "#/components/schemas/IdentityDecisionOut"
+            },
+            "title": "Canonical Decisions",
+            "type": "array"
+          },
+          "canonical_entity_id": {
+            "title": "Canonical Entity Id",
+            "type": "string"
+          },
+          "merge_audits": {
+            "items": {
+              "$ref": "#/components/schemas/IdentityMergeAuditOut"
+            },
+            "title": "Merge Audits",
+            "type": "array"
+          },
+          "unresolved_decision_count": {
+            "title": "Unresolved Decision Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "canonical_entity_id",
+          "aliases",
+          "canonical_decisions",
+          "merge_audits",
+          "unresolved_decision_count"
+        ],
+        "title": "EntityIdentityHistoryOut",
+        "type": "object"
+      },
+      "EntityOut": {
+        "description": "A canonical FollowTheMoney entity as stored. `merged_into_entity_id`\nnames the surviving record when this one was merged away.",
+        "properties": {
+          "canonical_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Canonical Id"
+          },
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "ftm_id": {
+            "title": "Ftm Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "merged_into_entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Merged Into Entity Id"
+          },
+          "properties": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Properties",
+            "type": "object"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "ftm_id",
+          "schema",
+          "caption",
+          "properties",
+          "created_at"
+        ],
+        "title": "EntityOut",
+        "type": "object"
+      },
+      "EntityRelationshipOut": {
+        "description": "A relationship seen from one entity (its dossier, or its relationship\nlist): whether the entity is the edge's source or its target.",
+        "properties": {
+          "advisory": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RelationshipAdvisoryOut"
+              },
+              {
+                "$ref": "#/components/schemas/RelationshipAggregateAdvisoryOut"
+              }
+            ],
+            "title": "Advisory"
+          },
+          "aggregate_provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AggregateProvenanceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "caption": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caption"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "direction": {
+            "enum": [
+              "outgoing",
+              "incoming"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "ftm_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ftm Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "properties": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Properties",
+            "type": "object"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/RelationshipProvenanceOut"
+          },
+          "reconciliation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RelationshipReconciliationOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "relationship_entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relationship Entity Id"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RelationshipEndpointOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_prop": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Prop"
+          },
+          "statements": {
+            "items": {
+              "$ref": "#/components/schemas/StatementOut"
+            },
+            "title": "Statements",
+            "type": "array"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RelationshipEndpointOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "target_prop": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Prop"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "schema",
+          "properties",
+          "statements",
+          "provenance",
+          "advisory",
+          "created_at",
+          "direction"
+        ],
+        "title": "EntityRelationshipOut",
+        "type": "object"
+      },
+      "EntityStatementOut": {
+        "description": "A statement as stored, with the entity it belongs to.",
+        "properties": {
+          "dataset": {
+            "title": "Dataset",
+            "type": "string"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "first_seen": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Seen"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "last_seen": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Seen"
+          },
+          "origin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Origin"
+          },
+          "original_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Value"
+          },
+          "prop": {
+            "title": "Prop",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "prop",
+          "value",
+          "dataset",
+          "entity_id"
+        ],
+        "title": "EntityStatementOut",
         "type": "object"
       },
       "EntityUpdate": {
@@ -2947,6 +5641,255 @@
         "title": "ExternalAssessmentOut",
         "type": "object"
       },
+      "ExternalEndpointFindingOut": {
+        "description": "The connector finding that describes one end of an external relationship.",
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "provider_record_id": {
+            "title": "Provider Record Id",
+            "type": "string"
+          },
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schema"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          }
+        },
+        "required": [
+          "id",
+          "caption",
+          "provider_record_id"
+        ],
+        "title": "ExternalEndpointFindingOut",
+        "type": "object"
+      },
+      "ExternalRelationshipCandidatesOut": {
+        "description": "For a relationship a connector found: which canonical entities may be\nits two ends. An end's own finding is named only when the connector\nalso returned it.",
+        "properties": {
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "source_candidates": {
+            "items": {
+              "$ref": "#/components/schemas/EntityCandidateOut"
+            },
+            "title": "Source Candidates",
+            "type": "array"
+          },
+          "source_external_finding": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExternalEndpointFindingOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_external_id": {
+            "title": "Source External Id",
+            "type": "string"
+          },
+          "source_prop": {
+            "title": "Source Prop",
+            "type": "string"
+          },
+          "target_candidates": {
+            "items": {
+              "$ref": "#/components/schemas/EntityCandidateOut"
+            },
+            "title": "Target Candidates",
+            "type": "array"
+          },
+          "target_external_finding": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExternalEndpointFindingOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "target_external_id": {
+            "title": "Target External Id",
+            "type": "string"
+          },
+          "target_prop": {
+            "title": "Target Prop",
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema",
+          "source_prop",
+          "target_prop",
+          "source_external_id",
+          "target_external_id",
+          "source_candidates",
+          "target_candidates"
+        ],
+        "title": "ExternalRelationshipCandidatesOut",
+        "type": "object"
+      },
+      "ExternalRelationshipPromotionOut": {
+        "description": "A supported external relationship written into the canonical graph.",
+        "properties": {
+          "finding_id": {
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "promoted_at": {
+            "format": "date-time",
+            "title": "Promoted At",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "relationship_edge_id": {
+            "title": "Relationship Edge Id",
+            "type": "string"
+          },
+          "relationship_entity_id": {
+            "title": "Relationship Entity Id",
+            "type": "string"
+          },
+          "review_id": {
+            "title": "Review Id",
+            "type": "string"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "finding_id",
+          "review_id",
+          "relationship_edge_id",
+          "relationship_entity_id",
+          "provider",
+          "promoted_at"
+        ],
+        "title": "ExternalRelationshipPromotionOut",
+        "type": "object"
+      },
+      "ExternalRelationshipReviewOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "finding_id": {
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "source_entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Entity Id"
+          },
+          "target_entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Entity Id"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "finding_id",
+          "schema",
+          "decision",
+          "created_at"
+        ],
+        "title": "ExternalRelationshipReviewOut",
+        "type": "object"
+      },
       "ExternalRelationshipReviewRequest": {
         "properties": {
           "decision": {
@@ -3451,6 +6394,176 @@
         "title": "ExtractionReviewOut",
         "type": "object"
       },
+      "FinancialLedgerOut": {
+        "properties": {
+          "currencies": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Currencies",
+            "type": "array"
+          },
+          "duplicate_rule": {
+            "title": "Duplicate Rule",
+            "type": "string"
+          },
+          "flow_type_rule": {
+            "title": "Flow Type Rule",
+            "type": "string"
+          },
+          "incomplete": {
+            "items": {
+              "$ref": "#/components/schemas/IncompleteTransactionOut"
+            },
+            "title": "Incomplete",
+            "type": "array"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "transactions": {
+            "items": {
+              "$ref": "#/components/schemas/FinancialTransactionOut"
+            },
+            "title": "Transactions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "transactions",
+          "incomplete",
+          "currencies",
+          "flow_type_rule",
+          "duplicate_rule"
+        ],
+        "title": "FinancialLedgerOut",
+        "type": "object"
+      },
+      "FinancialTransactionOut": {
+        "description": "One Payment edge the ledger could read in full. Keys follow the\nfrontend's transaction type (lib/financial-flow-types.ts).",
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "number"
+          },
+          "currency": {
+            "title": "Currency",
+            "type": "string"
+          },
+          "dateTime": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Datetime"
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence"
+          },
+          "evidence_count": {
+            "title": "Evidence Count",
+            "type": "integer"
+          },
+          "flowType": {
+            "enum": [
+              "direct",
+              "inferred"
+            ],
+            "title": "Flowtype",
+            "type": "string"
+          },
+          "from": {
+            "title": "From",
+            "type": "string"
+          },
+          "from_entity_id": {
+            "title": "From Entity Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "relationship_id": {
+            "title": "Relationship Id",
+            "type": "string"
+          },
+          "statedPurpose": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Statedpurpose"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "supporting_evidence_count": {
+            "title": "Supporting Evidence Count",
+            "type": "integer"
+          },
+          "to": {
+            "title": "To",
+            "type": "string"
+          },
+          "to_entity_id": {
+            "title": "To Entity Id",
+            "type": "string"
+          },
+          "transactionNumber": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transactionnumber"
+          }
+        },
+        "required": [
+          "id",
+          "relationship_id",
+          "from",
+          "to",
+          "from_entity_id",
+          "to_entity_id",
+          "amount",
+          "currency",
+          "evidence_count",
+          "supporting_evidence_count",
+          "flowType"
+        ],
+        "title": "FinancialTransactionOut",
+        "type": "object"
+      },
       "FindingReviewRequest": {
         "properties": {
           "status": {
@@ -3480,6 +6593,111 @@
           "confirm"
         ],
         "title": "FlagIn",
+        "type": "object"
+      },
+      "GraphNodeOut": {
+        "description": "A canonical entity that is an endpoint of a shown edge.",
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "ftm_id": {
+            "title": "Ftm Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "properties": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Properties",
+            "type": "object"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "ftm_id",
+          "caption",
+          "schema",
+          "properties"
+        ],
+        "title": "GraphNodeOut",
+        "type": "object"
+      },
+      "GraphOut": {
+        "properties": {
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/RelationshipOut"
+            },
+            "title": "Edges",
+            "type": "array"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/GraphNodeOut"
+            },
+            "title": "Nodes",
+            "type": "array"
+          },
+          "reconciliation": {
+            "$ref": "#/components/schemas/GraphReconciliationOut"
+          },
+          "schemas": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Schemas",
+            "type": "array"
+          }
+        },
+        "required": [
+          "nodes",
+          "edges",
+          "schemas",
+          "reconciliation"
+        ],
+        "title": "GraphOut",
+        "type": "object"
+      },
+      "GraphReconciliationOut": {
+        "description": "How many edges the duplicate view hid.",
+        "properties": {
+          "collapsed_by_default": {
+            "title": "Collapsed By Default",
+            "type": "boolean"
+          },
+          "suppressed_duplicate_count": {
+            "title": "Suppressed Duplicate Count",
+            "type": "integer"
+          },
+          "underlying_edge_count": {
+            "title": "Underlying Edge Count",
+            "type": "integer"
+          },
+          "visible_edge_count": {
+            "title": "Visible Edge Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "collapsed_by_default",
+          "suppressed_duplicate_count",
+          "underlying_edge_count",
+          "visible_edge_count"
+        ],
+        "title": "GraphReconciliationOut",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -3562,6 +6780,316 @@
           "question"
         ],
         "title": "HypothesisTestRequest",
+        "type": "object"
+      },
+      "IdentityAliasOut": {
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "merged_into_entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Merged Into Entity Id"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "caption",
+          "schema"
+        ],
+        "title": "IdentityAliasOut",
+        "type": "object"
+      },
+      "IdentityDecisionOut": {
+        "properties": {
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "other_entity": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MergeEntityOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rationale"
+          }
+        },
+        "required": [
+          "id",
+          "decision",
+          "confidence",
+          "created_at"
+        ],
+        "title": "IdentityDecisionOut",
+        "type": "object"
+      },
+      "IdentityMergeAuditOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "moved_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Moved Counts",
+            "type": "object"
+          },
+          "rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rationale"
+          },
+          "resolution_decision_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution Decision Id"
+          },
+          "source_entity_id": {
+            "title": "Source Entity Id",
+            "type": "string"
+          },
+          "target_entity_id": {
+            "title": "Target Entity Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source_entity_id",
+          "target_entity_id",
+          "moved_counts",
+          "created_at"
+        ],
+        "title": "IdentityMergeAuditOut",
+        "type": "object"
+      },
+      "IncompleteTransactionOut": {
+        "description": "A Payment edge the ledger could not chart, with what is missing or\nambiguous; nothing is guessed.",
+        "properties": {
+          "amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "dateTime": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Datetime"
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence"
+          },
+          "evidence_count": {
+            "title": "Evidence Count",
+            "type": "integer"
+          },
+          "flowType": {
+            "enum": [
+              "direct",
+              "inferred"
+            ],
+            "title": "Flowtype",
+            "type": "string"
+          },
+          "from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From"
+          },
+          "from_entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Entity Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "problems": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Problems",
+            "type": "array"
+          },
+          "relationship_id": {
+            "title": "Relationship Id",
+            "type": "string"
+          },
+          "statedPurpose": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Statedpurpose"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "supporting_evidence_count": {
+            "title": "Supporting Evidence Count",
+            "type": "integer"
+          },
+          "to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To"
+          },
+          "to_entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Entity Id"
+          },
+          "transactionNumber": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transactionnumber"
+          }
+        },
+        "required": [
+          "id",
+          "relationship_id",
+          "evidence_count",
+          "supporting_evidence_count",
+          "flowType",
+          "problems"
+        ],
+        "title": "IncompleteTransactionOut",
         "type": "object"
       },
       "InvestigationCreate": {
@@ -3704,6 +7232,46 @@
           }
         },
         "title": "InvestigationMembershipPut",
+        "type": "object"
+      },
+      "InvestigationOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "is_demo": {
+            "title": "Is Demo",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "is_demo",
+          "created_at"
+        ],
+        "title": "InvestigationOut",
         "type": "object"
       },
       "InvestigationQuestionContextRequest": {
@@ -4241,6 +7809,74 @@
         "title": "LeadQueueOut",
         "type": "object"
       },
+      "LeadRowOut": {
+        "description": "A lead as stored (without its profile, links and history).",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "provider_record_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Record Id"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "title",
+          "status",
+          "created_at"
+        ],
+        "title": "LeadRowOut",
+        "type": "object"
+      },
       "LeadTaskConversionOut": {
         "properties": {
           "kind": {
@@ -4772,6 +8408,111 @@
         "title": "LineageSourceOut",
         "type": "object"
       },
+      "MergeBlockerOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "record_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Record Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "code",
+          "record_ids",
+          "message"
+        ],
+        "title": "MergeBlockerOut",
+        "type": "object"
+      },
+      "MergeEntityOut": {
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "caption",
+          "schema"
+        ],
+        "title": "MergeEntityOut",
+        "type": "object"
+      },
+      "MergeReferenceOut": {
+        "description": "Records of one kind that would move to the surviving entity (the first hundred ids).",
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "record_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Record Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "count",
+          "record_ids"
+        ],
+        "title": "MergeReferenceOut",
+        "type": "object"
+      },
+      "MergeResolutionOut": {
+        "properties": {
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rationale"
+          }
+        },
+        "required": [
+          "id",
+          "decision",
+          "confidence"
+        ],
+        "title": "MergeResolutionOut",
+        "type": "object"
+      },
       "MultiEnrichmentRequest": {
         "properties": {
           "providers": {
@@ -4783,6 +8524,57 @@
           }
         },
         "title": "MultiEnrichmentRequest",
+        "type": "object"
+      },
+      "OcrRuntimeStatusOut": {
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "missing_languages": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing Languages",
+            "type": "array"
+          },
+          "requested_languages": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Requested Languages",
+            "type": "array"
+          },
+          "tessdata": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tessdata"
+          }
+        },
+        "required": [
+          "available",
+          "requested_languages",
+          "missing_languages"
+        ],
+        "title": "OcrRuntimeStatusOut",
         "type": "object"
       },
       "OpenAlephBindingOut": {
@@ -5192,6 +8984,84 @@
         "title": "OpenAlephSyncOut",
         "type": "object"
       },
+      "OrphanFileOut": {
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "modified_at": {
+            "title": "Modified At",
+            "type": "number"
+          },
+          "relative_path": {
+            "title": "Relative Path",
+            "type": "string"
+          },
+          "size_bytes": {
+            "title": "Size Bytes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "relative_path",
+          "size_bytes",
+          "modified_at",
+          "action"
+        ],
+        "title": "OrphanFileOut",
+        "type": "object"
+      },
+      "OrphanStoragePreviewOut": {
+        "description": "Files under document storage no document refers to. Read-only: they are kept until a reporter decides.",
+        "properties": {
+          "cleanup_available": {
+            "title": "Cleanup Available",
+            "type": "boolean"
+          },
+          "orphan_bytes": {
+            "title": "Orphan Bytes",
+            "type": "integer"
+          },
+          "orphan_file_count": {
+            "title": "Orphan File Count",
+            "type": "integer"
+          },
+          "orphan_files": {
+            "items": {
+              "$ref": "#/components/schemas/OrphanFileOut"
+            },
+            "title": "Orphan Files",
+            "type": "array"
+          },
+          "policy": {
+            "title": "Policy",
+            "type": "string"
+          },
+          "storage_root": {
+            "title": "Storage Root",
+            "type": "string"
+          },
+          "unsafe_document_references": {
+            "items": {
+              "$ref": "#/components/schemas/UnsafeDocumentReferenceOut"
+            },
+            "title": "Unsafe Document References",
+            "type": "array"
+          }
+        },
+        "required": [
+          "storage_root",
+          "orphan_files",
+          "orphan_file_count",
+          "orphan_bytes",
+          "unsafe_document_references",
+          "cleanup_available",
+          "policy"
+        ],
+        "title": "OrphanStoragePreviewOut",
+        "type": "object"
+      },
       "PlanIn": {
         "properties": {
           "target": {
@@ -5203,6 +9073,40 @@
           }
         },
         "title": "PlanIn",
+        "type": "object"
+      },
+      "PostMergeReconciliationOut": {
+        "description": "The duplicate pairs a merge left behind, for the reporter to review.\nNothing is deleted: a decision only records which record is preferred.",
+        "properties": {
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "relationship_duplicates": {
+            "items": {
+              "$ref": "#/components/schemas/RelationshipDuplicatePairOut"
+            },
+            "title": "Relationship Duplicates",
+            "type": "array"
+          },
+          "statement_duplicates": {
+            "items": {
+              "$ref": "#/components/schemas/StatementDuplicatePairOut"
+            },
+            "title": "Statement Duplicates",
+            "type": "array"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/ReconciliationSummaryOut"
+          }
+        },
+        "required": [
+          "entity_id",
+          "statement_duplicates",
+          "relationship_duplicates",
+          "summary"
+        ],
+        "title": "PostMergeReconciliationOut",
         "type": "object"
       },
       "PostMergeReconciliationRequest": {
@@ -5331,6 +9235,84 @@
         "title": "PromoteToWriteupRequest",
         "type": "object"
       },
+      "PropertyConflictDecisionOut": {
+        "description": "A reporter's decision on a property with several values, as stored.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "preferred_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferred Value"
+          },
+          "prop": {
+            "title": "Prop",
+            "type": "string"
+          },
+          "rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rationale"
+          },
+          "temporal_intervals_json": {
+            "items": {
+              "$ref": "#/components/schemas/PropertyTemporalIntervalOut"
+            },
+            "title": "Temporal Intervals Json",
+            "type": "array"
+          },
+          "values_json": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Values Json",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "entity_id",
+          "prop",
+          "decision",
+          "values_json",
+          "temporal_intervals_json",
+          "created_at"
+        ],
+        "title": "PropertyConflictDecisionOut",
+        "type": "object"
+      },
       "PropertyConflictDecisionRequest": {
         "properties": {
           "decision": {
@@ -5430,6 +9412,58 @@
           "value"
         ],
         "title": "PropertyTemporalInterval",
+        "type": "object"
+      },
+      "PropertyTemporalIntervalOut": {
+        "description": "When one value of a property held, as the reporter recorded it.",
+        "properties": {
+          "date_end": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date End"
+          },
+          "date_start": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Start"
+          },
+          "evidence_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence Id"
+          },
+          "precision": {
+            "title": "Precision",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "precision"
+        ],
+        "title": "PropertyTemporalIntervalOut",
         "type": "object"
       },
       "ProvenanceTraceOut": {
@@ -5544,6 +9578,101 @@
         "title": "QueryRef",
         "type": "object"
       },
+      "ReconciliationDecisionOut": {
+        "description": "A reporter's decision on one duplicate pair after a merge.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "preferred_record_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferred Record Id"
+          },
+          "rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rationale"
+          },
+          "record_a_id": {
+            "title": "Record A Id",
+            "type": "string"
+          },
+          "record_b_id": {
+            "title": "Record B Id",
+            "type": "string"
+          },
+          "record_type": {
+            "title": "Record Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "entity_id",
+          "record_type",
+          "record_a_id",
+          "record_b_id",
+          "decision",
+          "created_at"
+        ],
+        "title": "ReconciliationDecisionOut",
+        "type": "object"
+      },
+      "ReconciliationSummaryOut": {
+        "properties": {
+          "relationship_pairs": {
+            "title": "Relationship Pairs",
+            "type": "integer"
+          },
+          "statement_pairs": {
+            "title": "Statement Pairs",
+            "type": "integer"
+          },
+          "unresolved_pairs": {
+            "title": "Unresolved Pairs",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "statement_pairs",
+          "relationship_pairs",
+          "unresolved_pairs"
+        ],
+        "title": "ReconciliationSummaryOut",
+        "type": "object"
+      },
       "RecordRef": {
         "properties": {
           "record_id": {
@@ -5581,6 +9710,7 @@
         "type": "object"
       },
       "RelationshipAdvisoryOut": {
+        "description": "What the review layer says about one relationship record: the claims\nthat rest on its attached evidence, and how its evidence was reviewed.",
         "properties": {
           "challenged_supporting_claim_count": {
             "title": "Challenged Supporting Claim Count",
@@ -5607,6 +9737,11 @@
           },
           "needs_review": {
             "title": "Needs Review",
+            "type": "boolean"
+          },
+          "presentation_aggregate": {
+            "const": false,
+            "title": "Presentation Aggregate",
             "type": "boolean"
           },
           "rejected_claim_count": {
@@ -5654,9 +9789,68 @@
           "claim_dependencies",
           "relationship_evidence_needs_review",
           "relationship_evidence_attachment_count",
-          "relationship_evidence_review_counts"
+          "relationship_evidence_review_counts",
+          "presentation_aggregate"
         ],
         "title": "RelationshipAdvisoryOut",
+        "type": "object"
+      },
+      "RelationshipAggregateAdvisoryOut": {
+        "description": "The advisory of a compact graph edge that stands in for several\nreviewed duplicate records: computed over every underlying edge's\nevidence, so one challenged claim does not colour an edge another\nreviewed evidence record supports. Presentation only; no record changes.",
+        "properties": {
+          "challenged_supporting_evidence_count": {
+            "title": "Challenged Supporting Evidence Count",
+            "type": "integer"
+          },
+          "claim_dependencies": {
+            "items": {
+              "$ref": "#/components/schemas/AggregateClaimDependencyOut"
+            },
+            "title": "Claim Dependencies",
+            "type": "array"
+          },
+          "disputed_claim_count": {
+            "title": "Disputed Claim Count",
+            "type": "integer"
+          },
+          "has_independent_support": {
+            "title": "Has Independent Support",
+            "type": "boolean"
+          },
+          "healthy_supporting_evidence_count": {
+            "title": "Healthy Supporting Evidence Count",
+            "type": "integer"
+          },
+          "needs_review": {
+            "title": "Needs Review",
+            "type": "boolean"
+          },
+          "presentation_aggregate": {
+            "const": true,
+            "title": "Presentation Aggregate",
+            "type": "boolean"
+          },
+          "rejected_claim_count": {
+            "title": "Rejected Claim Count",
+            "type": "integer"
+          },
+          "support_state": {
+            "title": "Support State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "needs_review",
+          "support_state",
+          "has_independent_support",
+          "healthy_supporting_evidence_count",
+          "challenged_supporting_evidence_count",
+          "disputed_claim_count",
+          "rejected_claim_count",
+          "claim_dependencies",
+          "presentation_aggregate"
+        ],
+        "title": "RelationshipAggregateAdvisoryOut",
         "type": "object"
       },
       "RelationshipCreate": {
@@ -5722,6 +9916,49 @@
           "target_entity_id"
         ],
         "title": "RelationshipCreate",
+        "type": "object"
+      },
+      "RelationshipDuplicatePairOut": {
+        "description": "Two edges of the merged entity with the same schema and ends.",
+        "properties": {
+          "latest_decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReconciliationDecisionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "provenance_differs": {
+            "title": "Provenance Differs",
+            "type": "boolean"
+          },
+          "record_a": {
+            "$ref": "#/components/schemas/RelationshipOut"
+          },
+          "record_b": {
+            "$ref": "#/components/schemas/RelationshipOut"
+          },
+          "record_type": {
+            "const": "relationship",
+            "title": "Record Type",
+            "type": "string"
+          },
+          "same_assertion": {
+            "title": "Same Assertion",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "record_type",
+          "record_a",
+          "record_b",
+          "same_assertion",
+          "provenance_differs"
+        ],
+        "title": "RelationshipDuplicatePairOut",
         "type": "object"
       },
       "RelationshipEndpointOut": {
@@ -5906,12 +10143,51 @@
         "title": "RelationshipEvidenceReviewRequest",
         "type": "object"
       },
+      "RelationshipEvidenceReviewsOut": {
+        "description": "Every reporter assessment of one relationship's attached evidence, oldest first.",
+        "properties": {
+          "relationship_id": {
+            "title": "Relationship Id",
+            "type": "string"
+          },
+          "reviews": {
+            "items": {
+              "$ref": "#/components/schemas/RelationshipEvidenceReviewOut"
+            },
+            "title": "Reviews",
+            "type": "array"
+          }
+        },
+        "required": [
+          "relationship_id",
+          "reviews"
+        ],
+        "title": "RelationshipEvidenceReviewsOut",
+        "type": "object"
+      },
       "RelationshipOut": {
-        "additionalProperties": true,
-        "description": "One relationship edge with its FollowTheMoney statements, attached\nevidence and the advisory the review layer computes. The graph endpoint\nadds reconciliation and aggregate-provenance blocks for reviewed\nduplicates, so the model stays open to those.",
+        "description": "One relationship edge with its FollowTheMoney statements, attached\nevidence and the advisory the review layer computes. The graph and the\ndossier add `reconciliation` to an edge a reporter reviewed as a\nduplicate, and `aggregate_provenance` (with an aggregate advisory) to the\npreferred edge of a collapsed pair; both keys are absent otherwise.",
         "properties": {
           "advisory": {
-            "$ref": "#/components/schemas/RelationshipAdvisoryOut"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RelationshipAdvisoryOut"
+              },
+              {
+                "$ref": "#/components/schemas/RelationshipAggregateAdvisoryOut"
+              }
+            ],
+            "title": "Advisory"
+          },
+          "aggregate_provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AggregateProvenanceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "caption": {
             "anyOf": [
@@ -5949,12 +10225,27 @@
             "type": "string"
           },
           "properties": {
-            "additionalProperties": true,
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
             "title": "Properties",
             "type": "object"
           },
           "provenance": {
             "$ref": "#/components/schemas/RelationshipProvenanceOut"
+          },
+          "reconciliation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RelationshipReconciliationOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "relationship_entity_id": {
             "anyOf": [
@@ -6069,6 +10360,69 @@
           "sources"
         ],
         "title": "RelationshipProvenanceOut",
+        "type": "object"
+      },
+      "RelationshipReconciliationOut": {
+        "description": "How a reporter's latest duplicate decision places this edge: the\npreferred record of its pair, or a suppressed copy of one.",
+        "properties": {
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "decision_id": {
+            "title": "Decision Id",
+            "type": "string"
+          },
+          "is_preferred": {
+            "title": "Is Preferred",
+            "type": "boolean"
+          },
+          "preferred_record_id": {
+            "title": "Preferred Record Id",
+            "type": "string"
+          },
+          "rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rationale"
+          },
+          "secondary_record_id": {
+            "title": "Secondary Record Id",
+            "type": "string"
+          },
+          "suppressed_duplicate": {
+            "title": "Suppressed Duplicate",
+            "type": "boolean"
+          },
+          "suppressed_duplicate_count": {
+            "title": "Suppressed Duplicate Count",
+            "type": "integer"
+          },
+          "suppressed_duplicate_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Suppressed Duplicate Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "decision_id",
+          "decision",
+          "preferred_record_id",
+          "secondary_record_id",
+          "is_preferred",
+          "suppressed_duplicate",
+          "suppressed_duplicate_ids",
+          "suppressed_duplicate_count"
+        ],
+        "title": "RelationshipReconciliationOut",
         "type": "object"
       },
       "ReportingTaskCreate": {
@@ -6333,6 +10687,68 @@
           }
         },
         "title": "ReportingTaskUpdate",
+        "type": "object"
+      },
+      "ResolutionDecisionOut": {
+        "description": "A reporter's identity decision on a finding, as stored.",
+        "properties": {
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entity Id"
+          },
+          "finding_id": {
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rationale"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "finding_id",
+          "decision",
+          "confidence",
+          "created_at"
+        ],
+        "title": "ResolutionDecisionOut",
         "type": "object"
       },
       "ResolutionRequest": {
@@ -6602,6 +11018,396 @@
         "title": "SearchOut",
         "type": "object"
       },
+      "SecurityAlertsOut": {
+        "description": "Denial events in a recent window, counted for an operator's glance.",
+        "properties": {
+          "attention_threshold": {
+            "title": "Attention Threshold",
+            "type": "integer"
+          },
+          "by_event": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Event",
+            "type": "object"
+          },
+          "malformed_lines": {
+            "title": "Malformed Lines",
+            "type": "integer"
+          },
+          "needs_attention": {
+            "title": "Needs Attention",
+            "type": "boolean"
+          },
+          "read_error": {
+            "title": "Read Error",
+            "type": "boolean"
+          },
+          "recent": {
+            "items": {
+              "$ref": "#/components/schemas/SecurityAuditRecordOut"
+            },
+            "title": "Recent",
+            "type": "array"
+          },
+          "records_scanned": {
+            "title": "Records Scanned",
+            "type": "integer"
+          },
+          "remote_hosts": {
+            "items": {
+              "$ref": "#/components/schemas/SecurityRemoteHostOut"
+            },
+            "title": "Remote Hosts",
+            "type": "array"
+          },
+          "since": {
+            "title": "Since",
+            "type": "string"
+          },
+          "total_denials": {
+            "title": "Total Denials",
+            "type": "integer"
+          },
+          "window_hours": {
+            "title": "Window Hours",
+            "type": "number"
+          }
+        },
+        "required": [
+          "window_hours",
+          "since",
+          "total_denials",
+          "by_event",
+          "remote_hosts",
+          "recent",
+          "attention_threshold",
+          "needs_attention",
+          "records_scanned",
+          "malformed_lines",
+          "read_error"
+        ],
+        "title": "SecurityAlertsOut",
+        "type": "object"
+      },
+      "SecurityAuditRecordOut": {
+        "description": "One audit line's public fields: request metadata only, never a body.",
+        "properties": {
+          "client_host": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Host"
+          },
+          "event": {
+            "title": "Event",
+            "type": "string"
+          },
+          "local_request": {
+            "title": "Local Request",
+            "type": "boolean"
+          },
+          "method": {
+            "title": "Method",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          },
+          "status_code": {
+            "title": "Status Code",
+            "type": "integer"
+          },
+          "timestamp": {
+            "title": "Timestamp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "timestamp",
+          "event",
+          "request_id",
+          "method",
+          "path",
+          "status_code",
+          "local_request"
+        ],
+        "title": "SecurityAuditRecordOut",
+        "type": "object"
+      },
+      "SecurityAuditRetentionPreviewOut": {
+        "description": "What a retention run would keep and remove; malformed lines are always kept.",
+        "properties": {
+          "file_bytes": {
+            "title": "File Bytes",
+            "type": "integer"
+          },
+          "keep_days": {
+            "title": "Keep Days",
+            "type": "integer"
+          },
+          "malformed_lines": {
+            "title": "Malformed Lines",
+            "type": "integer"
+          },
+          "max_records": {
+            "title": "Max Records",
+            "type": "integer"
+          },
+          "total_lines": {
+            "title": "Total Lines",
+            "type": "integer"
+          },
+          "valid_records": {
+            "title": "Valid Records",
+            "type": "integer"
+          },
+          "would_keep": {
+            "title": "Would Keep",
+            "type": "integer"
+          },
+          "would_remove": {
+            "title": "Would Remove",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "keep_days",
+          "max_records",
+          "total_lines",
+          "valid_records",
+          "malformed_lines",
+          "would_keep",
+          "would_remove",
+          "file_bytes"
+        ],
+        "title": "SecurityAuditRetentionPreviewOut",
+        "type": "object"
+      },
+      "SecurityAuditRetentionResultOut": {
+        "properties": {
+          "applied": {
+            "title": "Applied",
+            "type": "boolean"
+          },
+          "file_bytes": {
+            "title": "File Bytes",
+            "type": "integer"
+          },
+          "keep_days": {
+            "title": "Keep Days",
+            "type": "integer"
+          },
+          "malformed_lines": {
+            "title": "Malformed Lines",
+            "type": "integer"
+          },
+          "max_records": {
+            "title": "Max Records",
+            "type": "integer"
+          },
+          "removed": {
+            "title": "Removed",
+            "type": "integer"
+          },
+          "total_lines": {
+            "title": "Total Lines",
+            "type": "integer"
+          },
+          "valid_records": {
+            "title": "Valid Records",
+            "type": "integer"
+          },
+          "would_keep": {
+            "title": "Would Keep",
+            "type": "integer"
+          },
+          "would_remove": {
+            "title": "Would Remove",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "keep_days",
+          "max_records",
+          "total_lines",
+          "valid_records",
+          "malformed_lines",
+          "would_keep",
+          "would_remove",
+          "file_bytes",
+          "removed",
+          "applied"
+        ],
+        "title": "SecurityAuditRetentionResultOut",
+        "type": "object"
+      },
+      "SecurityAuditSummaryOut": {
+        "properties": {
+          "by_event": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Event",
+            "type": "object"
+          },
+          "by_method": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Method",
+            "type": "object"
+          },
+          "by_status": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Status",
+            "type": "object"
+          },
+          "file_bytes": {
+            "title": "File Bytes",
+            "type": "integer"
+          },
+          "local_records": {
+            "title": "Local Records",
+            "type": "integer"
+          },
+          "malformed_lines": {
+            "title": "Malformed Lines",
+            "type": "integer"
+          },
+          "read_error": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read Error"
+          },
+          "remote_records": {
+            "title": "Remote Records",
+            "type": "integer"
+          },
+          "total_records": {
+            "title": "Total Records",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total_records",
+          "malformed_lines",
+          "local_records",
+          "remote_records",
+          "file_bytes",
+          "by_event",
+          "by_method",
+          "by_status"
+        ],
+        "title": "SecurityAuditSummaryOut",
+        "type": "object"
+      },
+      "SecurityAuditViewOut": {
+        "description": "One page of the audit log, newest first. `read_error` is sent only when the file could not be read.",
+        "properties": {
+          "file_bytes": {
+            "title": "File Bytes",
+            "type": "integer"
+          },
+          "has_more": {
+            "title": "Has More",
+            "type": "boolean"
+          },
+          "malformed_lines": {
+            "title": "Malformed Lines",
+            "type": "integer"
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Offset"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "read_error": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read Error"
+          },
+          "records": {
+            "items": {
+              "$ref": "#/components/schemas/SecurityAuditRecordOut"
+            },
+            "title": "Records",
+            "type": "array"
+          },
+          "returned": {
+            "title": "Returned",
+            "type": "integer"
+          },
+          "total_matched": {
+            "title": "Total Matched",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "records",
+          "returned",
+          "total_matched",
+          "offset",
+          "has_more",
+          "malformed_lines",
+          "file_bytes"
+        ],
+        "title": "SecurityAuditViewOut",
+        "type": "object"
+      },
+      "SecurityRemoteHostOut": {
+        "properties": {
+          "client_host": {
+            "title": "Client Host",
+            "type": "string"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "client_host",
+          "count"
+        ],
+        "title": "SecurityRemoteHostOut",
+        "type": "object"
+      },
       "SendIn": {
         "properties": {
           "act_as": {
@@ -6671,6 +11477,99 @@
           "path"
         ],
         "title": "SendIn",
+        "type": "object"
+      },
+      "SettingsLimitsOut": {
+        "properties": {
+          "max_backup_bytes": {
+            "title": "Max Backup Bytes",
+            "type": "integer"
+          },
+          "max_backup_files": {
+            "title": "Max Backup Files",
+            "type": "integer"
+          },
+          "max_backup_uncompressed_bytes": {
+            "title": "Max Backup Uncompressed Bytes",
+            "type": "integer"
+          },
+          "max_document_bytes": {
+            "title": "Max Document Bytes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "max_document_bytes",
+          "max_backup_bytes",
+          "max_backup_uncompressed_bytes",
+          "max_backup_files"
+        ],
+        "title": "SettingsLimitsOut",
+        "type": "object"
+      },
+      "SettingsStatusOut": {
+        "description": "The server configuration the page reads on load. A remote caller\nwithout admin rights gets the same keys with the server-wide values blanked.",
+        "properties": {
+          "access": {
+            "$ref": "#/components/schemas/ApiAccessStatusOut"
+          },
+          "ai": {
+            "$ref": "#/components/schemas/AiReasoningStatusOut"
+          },
+          "connectors": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ConnectorCredentialStatusOut"
+            },
+            "title": "Connectors",
+            "type": "object"
+          },
+          "cors_allowed_origins": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Cors Allowed Origins",
+            "type": "array"
+          },
+          "database": {
+            "title": "Database",
+            "type": "string"
+          },
+          "document_extraction": {
+            "$ref": "#/components/schemas/DocumentExtractionSettingsOut"
+          },
+          "document_storage_dir": {
+            "title": "Document Storage Dir",
+            "type": "string"
+          },
+          "environment": {
+            "title": "Environment",
+            "type": "string"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/SettingsLimitsOut"
+          },
+          "restore_api_enabled": {
+            "title": "Restore Api Enabled",
+            "type": "boolean"
+          },
+          "security": {
+            "$ref": "#/components/schemas/SecurityAlertsOut"
+          }
+        },
+        "required": [
+          "environment",
+          "database",
+          "document_storage_dir",
+          "limits",
+          "restore_api_enabled",
+          "document_extraction",
+          "access",
+          "cors_allowed_origins",
+          "security",
+          "ai",
+          "connectors"
+        ],
+        "title": "SettingsStatusOut",
         "type": "object"
       },
       "SortOrder": {
@@ -6803,6 +11702,73 @@
         "title": "StanceCountsOut",
         "type": "object"
       },
+      "StatementAssessmentOut": {
+        "description": "A reporter's assessment of one value a finding asserts, as stored.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entity Id"
+          },
+          "finding_id": {
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "prop": {
+            "title": "Prop",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "finding_id",
+          "prop",
+          "value",
+          "status",
+          "created_at"
+        ],
+        "title": "StatementAssessmentOut",
+        "type": "object"
+      },
       "StatementAssessmentRequest": {
         "properties": {
           "entity_id": {
@@ -6846,6 +11812,49 @@
           "status"
         ],
         "title": "StatementAssessmentRequest",
+        "type": "object"
+      },
+      "StatementDuplicatePairOut": {
+        "description": "Two statements of the merged entity that assert the same value.",
+        "properties": {
+          "latest_decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReconciliationDecisionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "provenance_differs": {
+            "title": "Provenance Differs",
+            "type": "boolean"
+          },
+          "record_a": {
+            "$ref": "#/components/schemas/StatementOut"
+          },
+          "record_b": {
+            "$ref": "#/components/schemas/StatementOut"
+          },
+          "record_type": {
+            "const": "statement",
+            "title": "Record Type",
+            "type": "string"
+          },
+          "same_assertion": {
+            "title": "Same Assertion",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "record_type",
+          "record_a",
+          "record_b",
+          "same_assertion",
+          "provenance_differs"
+        ],
+        "title": "StatementDuplicatePairOut",
         "type": "object"
       },
       "StatementHistoryRowOut": {
@@ -6981,6 +11990,88 @@
           "dataset"
         ],
         "title": "StatementOut",
+        "type": "object"
+      },
+      "StatementPromotionOut": {
+        "description": "An accepted value written into the canonical graph, with its provenance.",
+        "properties": {
+          "assessment_id": {
+            "title": "Assessment Id",
+            "type": "string"
+          },
+          "dataset": {
+            "title": "Dataset",
+            "type": "string"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "finding_id": {
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "original_value": {
+            "title": "Original Value",
+            "type": "string"
+          },
+          "promoted_at": {
+            "format": "date-time",
+            "title": "Promoted At",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "reviewer_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewer Note"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "statement_id": {
+            "title": "Statement Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "finding_id",
+          "assessment_id",
+          "entity_id",
+          "statement_id",
+          "provider",
+          "dataset",
+          "original_value",
+          "promoted_at"
+        ],
+        "title": "StatementPromotionOut",
         "type": "object"
       },
       "StatementPromotionRequest": {
@@ -7876,6 +12967,29 @@
           "status"
         ],
         "title": "TraceLeadOut",
+        "type": "object"
+      },
+      "UnsafeDocumentReferenceOut": {
+        "properties": {
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "error": {
+            "title": "Error",
+            "type": "string"
+          },
+          "storage_path": {
+            "title": "Storage Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "document_id",
+          "storage_path",
+          "error"
+        ],
+        "title": "UnsafeDocumentReferenceOut",
         "type": "object"
       },
       "UpgradeIn": {
@@ -9199,7 +14313,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StatementAssessmentOut"
+                  },
+                  "title": "Response List Assessments",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -9244,7 +14364,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/StatementAssessmentOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -9281,7 +14403,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EntityCandidateOut"
+                  },
+                  "title": "Response Finding Candidates",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -9318,7 +14446,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalRelationshipCandidatesOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -9355,7 +14485,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ExternalRelationshipReviewOut"
+                  },
+                  "title": "Response List External Relationship Reviews",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -9400,7 +14536,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalRelationshipReviewOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -9447,7 +14585,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ResolutionDecisionOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -9494,7 +14634,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorFindingOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -9520,7 +14662,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorsOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -9546,7 +14690,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConnectorFindingOut"
+                  },
+                  "title": "Response Aleph Search",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -9593,7 +14743,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConnectorFindingOut"
+                  },
+                  "title": "Response Connector Search",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -12762,7 +17918,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/EnrichmentSessionDetailOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -12799,7 +17957,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EnrichmentClusterOut"
+                  },
+                  "title": "Response Enrichment Session Clusters",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -12846,7 +18010,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/CrossProviderDecisionOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -12882,7 +18048,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/EntityOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -12929,7 +18097,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/EntityOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -12976,7 +18146,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/CanonicalResolutionDecisionOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -13013,7 +18185,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CrossProviderDecisionOut"
+                  },
+                  "title": "Response List Cross Provider Decisions",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -13050,7 +18228,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/EntityDossierOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -13087,7 +18267,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CanonicalDuplicateCandidateOut"
+                  },
+                  "title": "Response Entity Duplicate Candidates",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -13134,7 +18320,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/EnrichmentSessionOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -13180,7 +18368,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConnectorFindingOut"
+                  },
+                  "title": "Response Enrich Entity",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -13217,7 +18411,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EnrichmentSessionRowOut"
+                  },
+                  "title": "Response List Entity Enrichment Sessions",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -13254,7 +18454,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ExternalRelationshipPromotionOut"
+                  },
+                  "title": "Response List External Relationship Promotions",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -13301,7 +18507,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/CanonicalMergeExecuteOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -13338,7 +18546,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CanonicalEntityMergeAuditOut"
+                  },
+                  "title": "Response Entity Merge History",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -13384,7 +18598,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/CanonicalMergePreviewOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -13421,7 +18637,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PostMergeReconciliationOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -13466,7 +18684,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ReconciliationDecisionOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -13503,7 +18723,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StatementPromotionOut"
+                  },
+                  "title": "Response List Entity Promotions",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -13549,7 +18775,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PropertyConflictDecisionOut"
+                  },
+                  "title": "Response List Property Conflict Decisions",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -13603,7 +18835,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PropertyConflictDecisionOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -13640,7 +18874,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EntityRelationshipOut"
+                  },
+                  "title": "Response List Entity Relationships",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -13720,7 +18960,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EntityStatementOut"
+                  },
+                  "title": "Response List Entity Statements",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -13795,7 +19041,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalRelationshipPromotionOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -14019,7 +19267,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/InvestigationOut"
+                  },
+                  "title": "Response List Investigations",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -14043,7 +19297,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/InvestigationOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -14514,7 +19770,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConnectorFindingOut"
+                  },
+                  "title": "Response List Connector Findings",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -14580,7 +19842,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConnectorRunOut"
+                  },
+                  "title": "Response List Connector Runs",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -14916,7 +20184,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EntityOut"
+                  },
+                  "title": "Response List Entities",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -15073,7 +20347,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/FinancialLedgerOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -15139,7 +20415,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/GraphOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -15419,7 +20697,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RelationshipOut"
+                  },
+                  "title": "Response List Investigation Relationships",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -16474,7 +21758,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/RelationshipOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -16521,7 +21807,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/RelationshipOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -16558,7 +21846,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/RelationshipEvidenceReviewsOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -16614,7 +21904,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/RelationshipOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -16856,7 +22148,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorCredentialRemovedOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -16903,7 +22197,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorCredentialSavedOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -16956,7 +22252,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SecurityAlertsOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17058,7 +22356,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SecurityAuditViewOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17096,7 +22396,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SecurityAuditRetentionResultOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17148,7 +22450,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SecurityAuditRetentionPreviewOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17174,7 +22478,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SecurityAuditSummaryOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17456,7 +22762,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsStatusOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17473,7 +22781,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/OrphanStoragePreviewOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17591,7 +22901,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/StatementPromotionOut"
+                }
               }
             },
             "description": "Successful Response"

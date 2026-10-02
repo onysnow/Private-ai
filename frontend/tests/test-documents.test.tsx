@@ -16,6 +16,7 @@ import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
 import type {RouteCall} from '../test-support/mock-api';
+import {emptyGraph, entityFixture} from '../test-support/page-routes';
 
 // Bulk import navigates to the batch triage screen with useRouter().push().
 const {mockPush} = vi.hoisted(() => ({mockPush: vi.fn()}));
@@ -34,9 +35,11 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); mockPush.mockClear(); });
 
 const DOCUMENTS = 'GET /api/investigations/inv-1/documents';
+const ENTITIES = 'GET /api/investigations/inv-1/entities';
 const UPLOAD = 'POST /api/documents/upload';
 const CANDIDATES = 'GET /api/documents/doc-1/candidates';
-const entities = [{id: 'ent-1', caption: 'Kestrelwood Holdings', schema: 'Company'}, {id: 'ent-2', caption: 'Jane Doe', schema: 'Person'}];
+// The canonical entities a staged relationship can join, read from the shared cache.
+const entities = [entityFixture('ent-1', 'Kestrelwood Holdings', 'Company'), entityFixture('ent-2', 'Jane Doe', 'Person')];
 
 function docFixture(overrides: Record<string, unknown> = {}) {
   return {
@@ -77,9 +80,9 @@ function bulkFileInput(): HTMLInputElement {
   return input as HTMLInputElement;
 }
 
-async function renderWithDocuments(documents: unknown[] = [docFixture()], onReviewed = vi.fn()) {
-  const api = mockApi({[DOCUMENTS]: documents});
-  wrap(<DocumentsPanel investigationId="inv-1" entities={entities} onReviewed={onReviewed}/>);
+async function renderWithDocuments(documents: unknown[] = [docFixture()]) {
+  const api = mockApi({[DOCUMENTS]: documents, [ENTITIES]: entities, 'GET /api/investigations/inv-1/graph': emptyGraph()});
+  wrap(<DocumentsPanel investigationId="inv-1"/>);
   await screen.findByText(String((documents[0] as {filename: string}).filename));
   return api;
 }
@@ -130,9 +133,8 @@ describe('DocumentsPanel upload and review', () => {
     await screen.findByText(/Document is empty/);
   });
 
-  it('accepts an entity proposal, reloads the documents and tells the page to reload the rest', async () => {
-    const onReviewed = vi.fn();
-    const api = await renderWithDocuments([docFixture()], onReviewed);
+  it('accepts an entity proposal, reloads the documents and marks the entities stale', async () => {
+    const api = await renderWithDocuments([docFixture()]);
     const review = 'POST /api/extraction-candidates/cand-1/review';
     api.add({[CANDIDATES]: [candidateFixture()]});
     await userEvent.setup().click(screen.getByRole('button', {name: 'Review proposals'}));
@@ -147,7 +149,8 @@ describe('DocumentsPanel upload and review', () => {
     expect(screen.queryByText('Kestrelwood Holdings Ltd')).not.toBeInTheDocument();
     expect(api.lastBody(review)).toEqual({decision: 'accept', note: 'Reviewed in Next.js workbench', caption: 'Kestrelwood Holdings Ltd', entity_schema: 'Company'});
     expect(api.calls(DOCUMENTS)).toHaveLength(2);
-    expect(onReviewed).toHaveBeenCalledTimes(1);
+    // The entities (which an accepted entity proposal may have grown) are read again too.
+    expect(api.calls(ENTITIES)).toHaveLength(2);
     expect(api.unmatched()).toEqual([]);
   });
 
@@ -237,12 +240,15 @@ describe('DocumentsPanel upload and review', () => {
   });
 
   it('forgets the loaded proposals when the case changes', async () => {
-    const api = mockApi({[DOCUMENTS]: [docFixture()], 'GET /api/investigations/inv-2/documents': [docFixture({id: 'doc-9', filename: 'harbor.pdf'})], [CANDIDATES]: [candidateFixture()]});
-    const view = wrap(<DocumentsPanel investigationId="inv-1" entities={entities} onReviewed={vi.fn()}/>);
+    const api = mockApi({
+      [DOCUMENTS]: [docFixture()], [ENTITIES]: entities, 'GET /api/investigations/inv-2/documents': [docFixture({id: 'doc-9', filename: 'harbor.pdf'})],
+      'GET /api/investigations/inv-2/entities': [], [CANDIDATES]: [candidateFixture()],
+    });
+    const view = wrap(<DocumentsPanel investigationId="inv-1"/>);
     await userEvent.setup().click(await screen.findByRole('button', {name: 'Review proposals'}));
     await screen.findByText('Kestrelwood Holdings Ltd');
 
-    view.rerender(<QueryProvider><DocumentsPanel investigationId="inv-2" entities={entities} onReviewed={vi.fn()}/></QueryProvider>);
+    view.rerender(<QueryProvider><DocumentsPanel investigationId="inv-2"/></QueryProvider>);
     await screen.findByText('harbor.pdf');
     expect(screen.queryByText('Kestrelwood Holdings Ltd')).not.toBeInTheDocument();
     expect(api.calls('GET /api/investigations/inv-2/documents')).toHaveLength(1);

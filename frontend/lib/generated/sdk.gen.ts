@@ -631,16 +631,22 @@ import type {
 } from './types.gen';
 import {
   zAlephSearchBody,
+  zAlephSearchResponse,
   zAssessStatementBody,
   zAssessStatementPath,
+  zAssessStatementResponse,
   zAttachRelationshipEvidenceEndpointBody,
   zAttachRelationshipEvidenceEndpointPath,
+  zAttachRelationshipEvidenceEndpointResponse,
   zCancelJobEndpointPath,
   zCancelJobEndpointResponse,
   zCanonicalEntityResolutionBody,
   zCanonicalEntityResolutionPath,
+  zCanonicalEntityResolutionResponse,
   zConnectorSearchBody,
   zConnectorSearchPath,
+  zConnectorSearchResponse,
+  zConnectorsResponse,
   zConsoleActivityActivityDetailPath,
   zConsoleActivityActivityQuery,
   zConsoleActivityUndoPath,
@@ -708,18 +714,21 @@ import {
   zConvertLeadEndpointResponse,
   zCreateAppUserBody,
   zCreateCanonicalRelationshipBody,
+  zCreateCanonicalRelationshipResponse,
   zCreateClaimEndpointBody,
   zCreateClaimEndpointResponse,
   zCreateClaimReviewBody,
   zCreateClaimReviewPath,
   zCreateClaimReviewResponse,
   zCreateEntityBody,
+  zCreateEntityResponse,
   zCreateEvidenceEndpointBody,
   zCreateEvidenceEndpointResponse,
   zCreateExtractedRelationshipProposalBody,
   zCreateExtractedRelationshipProposalPath,
   zCreateExtractedRelationshipProposalResponse,
   zCreateInvestigationBody,
+  zCreateInvestigationResponse,
   zCreateLeadEndpointBody,
   zCreateLeadEndpointResponse,
   zCreateLeadFromRelationshipContextPath,
@@ -733,36 +742,51 @@ import {
   zCreateWriteupEndpointBody,
   zDecideCrossProviderClusterBody,
   zDecideCrossProviderClusterPath,
+  zDecideCrossProviderClusterResponse,
   zDecideEntityPostMergeReconciliationBody,
   zDecideEntityPostMergeReconciliationPath,
+  zDecideEntityPostMergeReconciliationResponse,
   zDecidePropertyConflictBody,
   zDecidePropertyConflictPath,
+  zDecidePropertyConflictResponse,
   zDeleteConnectorCredentialPath,
+  zDeleteConnectorCredentialResponse,
   zDeleteDeckEndpointPath,
   zDeleteInvestigationMembershipPath,
   zDeleteInvestigationMembershipResponse,
   zDeleteWriteupEndpointPath,
   zEnrichEntityMultiBody,
   zEnrichEntityMultiPath,
+  zEnrichEntityMultiResponse,
   zEnrichEntityPath,
+  zEnrichEntityResponse,
   zEnrichmentSessionClustersPath,
+  zEnrichmentSessionClustersResponse,
   zEnrichmentSessionDetailPath,
+  zEnrichmentSessionDetailResponse,
   zEnsureOpenalephCorpusBindingPath,
   zEntityDuplicateCandidatesPath,
+  zEntityDuplicateCandidatesResponse,
   zEntityMergeExecuteBody,
   zEntityMergeExecutePath,
+  zEntityMergeExecuteResponse,
   zEntityMergeHistoryPath,
+  zEntityMergeHistoryResponse,
   zEntityMergePreviewPath,
   zEntityMergePreviewQuery,
+  zEntityMergePreviewResponse,
   zEntityPostMergeReconciliationPath,
+  zEntityPostMergeReconciliationResponse,
   zExportDeckPptxPath,
   zExportInvestigationPath,
   zExportInvestigationQuery,
   zExportWriteupDocxPath,
   zExternalRelationshipCandidatesPath,
+  zExternalRelationshipCandidatesResponse,
   zFindExtractionLineageEndpointQuery,
   zFindExtractionLineageEndpointResponse,
   zFindingCandidatesPath,
+  zFindingCandidatesResponse,
   zGetAiAnalysisCandidateEndpointPath,
   zGetClaimReviewWorkspacePath,
   zGetClaimReviewWorkspaceResponse,
@@ -770,14 +794,17 @@ import {
   zGetDocumentPath,
   zGetDocumentResponse,
   zGetEntityDossierPath,
+  zGetEntityDossierResponse,
   zGetExtractionCandidateExplanationPath,
   zGetExtractionCandidateExplanationResponse,
   zGetExtractionCandidateLineagePath,
   zGetExtractionCandidateLineageResponse,
   zGetExtractionEntityMatchesPath,
   zGetInvestigationFinancialFlowsPath,
+  zGetInvestigationFinancialFlowsResponse,
   zGetInvestigationGraphPath,
   zGetInvestigationGraphQuery,
+  zGetInvestigationGraphResponse,
   zGetInvestigationTimelinePath,
   zGetInvestigationTimelineQuery,
   zGetInvestigationTimelineResponse,
@@ -790,11 +817,16 @@ import {
   zGetOpenalephDocumentReviewStatusResponse,
   zGetOpenalephDocumentSyncPath,
   zGetOpenalephDocumentSyncResponse,
+  zGetOrphanStoragePreviewResponse,
   zGetRecordProvenanceTraceQuery,
   zGetRecordProvenanceTraceResponse,
   zGetSecurityAlertsQuery,
+  zGetSecurityAlertsResponse,
   zGetSecurityAuditQuery,
+  zGetSecurityAuditResponse,
   zGetSecurityAuditRetentionPreviewQuery,
+  zGetSecurityAuditRetentionPreviewResponse,
+  zGetSecurityAuditSummaryResponse,
   zGetWriteupEndpointPath,
   zImportOpenalephDocumentEntitiesPath,
   zImportOpenalephDocumentEntitiesResponse,
@@ -826,6 +858,7 @@ import {
   zLinkLeadPath,
   zLinkLeadResponse,
   zListAssessmentsPath,
+  zListAssessmentsResponse,
   zListClaimEvidenceEndpointPath,
   zListClaimEvidenceEndpointResponse,
   zListClaimsPath,
@@ -833,9 +866,12 @@ import {
   zListClaimsResponse,
   zListConnectorFindingsPath,
   zListConnectorFindingsQuery,
+  zListConnectorFindingsResponse,
   zListConnectorRunsPath,
   zListConnectorRunsQuery,
+  zListConnectorRunsResponse,
   zListCrossProviderDecisionsPath,
+  zListCrossProviderDecisionsResponse,
   zListDecksEndpointPath,
   zListDocumentCandidatesEndpointPath,
   zListDocumentCandidatesEndpointQuery,
@@ -845,14 +881,21 @@ import {
   zListDocumentsResponse,
   zListEntitiesPath,
   zListEntitiesQuery,
+  zListEntitiesResponse,
   zListEntityEnrichmentSessionsPath,
+  zListEntityEnrichmentSessionsResponse,
   zListEntityPromotionsPath,
+  zListEntityPromotionsResponse,
   zListEntityRelationshipsPath,
+  zListEntityRelationshipsResponse,
   zListEntityStatementHistoryPath,
   zListEntityStatementHistoryResponse,
   zListEntityStatementsPath,
+  zListEntityStatementsResponse,
   zListExternalRelationshipPromotionsPath,
+  zListExternalRelationshipPromotionsResponse,
   zListExternalRelationshipReviewsPath,
+  zListExternalRelationshipReviewsResponse,
   zListInvestigationAiAnalysisCandidatesPath,
   zListInvestigationAiAnalysisCandidatesQuery,
   zListInvestigationEvidencePath,
@@ -860,6 +903,8 @@ import {
   zListInvestigationEvidenceResponse,
   zListInvestigationRelationshipsPath,
   zListInvestigationRelationshipsQuery,
+  zListInvestigationRelationshipsResponse,
+  zListInvestigationsResponse,
   zListJobsEndpointQuery,
   zListJobsEndpointResponse,
   zListLeadLinksEndpointPath,
@@ -869,7 +914,9 @@ import {
   zListLeadsResponse,
   zListOpenalephCorpusFailuresPath,
   zListPropertyConflictDecisionsPath,
+  zListPropertyConflictDecisionsResponse,
   zListRelationshipEvidenceReviewsPath,
+  zListRelationshipEvidenceReviewsResponse,
   zListReportingTasksPath,
   zListReportingTasksQuery,
   zListReportingTasksResponse,
@@ -887,9 +934,12 @@ import {
   zPromoteAiAnalysisCandidateToWriteupEndpointBody,
   zPromoteAiAnalysisCandidateToWriteupEndpointPath,
   zPromoteExternalRelationshipPath,
+  zPromoteExternalRelationshipResponse,
   zPromoteStatementAssessmentBody,
   zPromoteStatementAssessmentPath,
+  zPromoteStatementAssessmentResponse,
   zPruneSecurityAuditBody,
+  zPruneSecurityAuditResponse,
   zPutInvestigationMembershipBody,
   zPutInvestigationMembershipPath,
   zRefreshOpenalephDocumentReviewPath,
@@ -899,6 +949,7 @@ import {
   zRemoveInvestigationResponse,
   zResolveFindingBody,
   zResolveFindingPath,
+  zResolveFindingResponse,
   zRestoreBackupBody,
   zRestoreBackupResponse,
   zRetryJobEndpointPath,
@@ -907,19 +958,24 @@ import {
   zReviewAiAnalysisCandidateEndpointPath,
   zReviewExternalRelationshipBody,
   zReviewExternalRelationshipPath,
+  zReviewExternalRelationshipResponse,
   zReviewExtractionCandidateBody,
   zReviewExtractionCandidatePath,
   zReviewExtractionCandidateResponse,
   zReviewFindingBody,
   zReviewFindingPath,
+  zReviewFindingResponse,
   zReviewRelationshipEvidenceEndpointBody,
   zReviewRelationshipEvidenceEndpointPath,
+  zReviewRelationshipEvidenceEndpointResponse,
   zRevokeAppUserTokenPath,
   zRotateAppUserTokenPath,
   zSaveConnectorCredentialBody,
   zSaveConnectorCredentialPath,
+  zSaveConnectorCredentialResponse,
   zSearchWorkbenchQuery,
   zSearchWorkbenchResponse,
+  zSettingsStatusResponse,
   zSyncOpenalephDocumentPath,
   zSyncOpenalephDocumentResponse,
   zUpdateAppUserBody,
@@ -931,6 +987,7 @@ import {
   zUpdateDeckEndpointPath,
   zUpdateEntityBody,
   zUpdateEntityPath,
+  zUpdateEntityResponse,
   zUpdateLeadEndpointBody,
   zUpdateLeadEndpointPath,
   zUpdateLeadEndpointResponse,
@@ -1464,6 +1521,8 @@ export const listAssessments = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListAssessmentsResponse.parseAsync(data),
     url: '/api/connector-findings/{finding_id}/assessments',
     ...options,
   });
@@ -1491,6 +1550,8 @@ export const assessStatement = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAssessStatementResponse.parseAsync(data),
     url: '/api/connector-findings/{finding_id}/assessments',
     ...options,
     headers: {
@@ -1522,6 +1583,8 @@ export const findingCandidates = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zFindingCandidatesResponse.parseAsync(data),
     url: '/api/connector-findings/{finding_id}/candidates',
     ...options,
   });
@@ -1551,6 +1614,8 @@ export const externalRelationshipCandidates = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zExternalRelationshipCandidatesResponse.parseAsync(data),
     url: '/api/connector-findings/{finding_id}/relationship-candidates',
     ...options,
   });
@@ -1580,6 +1645,8 @@ export const listExternalRelationshipReviews = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListExternalRelationshipReviewsResponse.parseAsync(data),
     url: '/api/connector-findings/{finding_id}/relationship-reviews',
     ...options,
   });
@@ -1609,6 +1676,8 @@ export const reviewExternalRelationship = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zReviewExternalRelationshipResponse.parseAsync(data),
     url: '/api/connector-findings/{finding_id}/relationship-reviews',
     ...options,
     headers: {
@@ -1636,6 +1705,8 @@ export const resolveFinding = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zResolveFindingResponse.parseAsync(data),
     url: '/api/connector-findings/{finding_id}/resolution',
     ...options,
     headers: {
@@ -1663,6 +1734,8 @@ export const reviewFinding = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zReviewFindingResponse.parseAsync(data),
     url: '/api/connector-findings/{finding_id}/review',
     ...options,
     headers: {
@@ -1686,6 +1759,8 @@ export const connectors = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zConnectorsResponse.parseAsync(data),
     url: '/api/connectors',
     ...options,
   });
@@ -1709,6 +1784,8 @@ export const alephSearch = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAlephSearchResponse.parseAsync(data),
     url: '/api/connectors/aleph/search',
     ...options,
     headers: {
@@ -1740,6 +1817,8 @@ export const connectorSearch = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zConnectorSearchResponse.parseAsync(data),
     url: '/api/connectors/{provider}/search',
     ...options,
     headers: {
@@ -3962,6 +4041,8 @@ export const enrichmentSessionDetail = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zEnrichmentSessionDetailResponse.parseAsync(data),
     url: '/api/enrichment-sessions/{session_id}',
     ...options,
   });
@@ -3989,6 +4070,8 @@ export const enrichmentSessionClusters = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zEnrichmentSessionClustersResponse.parseAsync(data),
     url: '/api/enrichment-sessions/{session_id}/clusters',
     ...options,
   });
@@ -4018,6 +4101,8 @@ export const decideCrossProviderCluster = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDecideCrossProviderClusterResponse.parseAsync(data),
     url: '/api/enrichment-sessions/{session_id}/clusters/decision',
     ...options,
     headers: {
@@ -4045,6 +4130,8 @@ export const createEntity = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateEntityResponse.parseAsync(data),
     url: '/api/entities',
     ...options,
     headers: {
@@ -4072,6 +4159,8 @@ export const updateEntity = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateEntityResponse.parseAsync(data),
     url: '/api/entities/{entity_id}',
     ...options,
     headers: {
@@ -4103,6 +4192,8 @@ export const canonicalEntityResolution = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCanonicalEntityResolutionResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/canonical-resolution',
     ...options,
     headers: {
@@ -4136,6 +4227,8 @@ export const listCrossProviderDecisions = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListCrossProviderDecisionsResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/cross-provider-decisions',
     ...options,
   });
@@ -4163,6 +4256,8 @@ export const getEntityDossier = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEntityDossierResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/dossier',
     ...options,
   });
@@ -4190,6 +4285,8 @@ export const entityDuplicateCandidates = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zEntityDuplicateCandidatesResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/duplicate-candidates',
     ...options,
   });
@@ -4217,6 +4314,8 @@ export const enrichEntityMulti = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zEnrichEntityMultiResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/enrich',
     ...options,
     headers: {
@@ -4244,6 +4343,8 @@ export const enrichEntity = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zEnrichEntityResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/enrich/{provider}',
     ...options,
   });
@@ -4273,6 +4374,8 @@ export const listEntityEnrichmentSessions = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListEntityEnrichmentSessionsResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/enrichment-sessions',
     ...options,
   });
@@ -4302,6 +4405,8 @@ export const listExternalRelationshipPromotions = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListExternalRelationshipPromotionsResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/external-relationship-promotions',
     ...options,
   });
@@ -4329,6 +4434,8 @@ export const entityMergeExecute = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zEntityMergeExecuteResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/merge',
     ...options,
     headers: {
@@ -4360,6 +4467,8 @@ export const entityMergeHistory = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zEntityMergeHistoryResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/merge-history',
     ...options,
   });
@@ -4387,6 +4496,8 @@ export const entityMergePreview = <ThrowOnError extends boolean = false>(
           query: zEntityMergePreviewQuery,
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zEntityMergePreviewResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/merge-preview',
     ...options,
   });
@@ -4416,6 +4527,8 @@ export const entityPostMergeReconciliation = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zEntityPostMergeReconciliationResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/post-merge-reconciliation',
     ...options,
   });
@@ -4445,6 +4558,8 @@ export const decideEntityPostMergeReconciliation = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDecideEntityPostMergeReconciliationResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/post-merge-reconciliation',
     ...options,
     headers: {
@@ -4476,6 +4591,8 @@ export const listEntityPromotions = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListEntityPromotionsResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/promotions',
     ...options,
   });
@@ -4505,6 +4622,8 @@ export const listPropertyConflictDecisions = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListPropertyConflictDecisionsResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/property-conflicts/{prop}/decisions',
     ...options,
   });
@@ -4532,6 +4651,8 @@ export const decidePropertyConflict = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDecidePropertyConflictResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/property-conflicts/{prop}/decisions',
     ...options,
     headers: {
@@ -4563,6 +4684,8 @@ export const listEntityRelationships = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListEntityRelationshipsResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/relationships',
     ...options,
   });
@@ -4621,6 +4744,8 @@ export const listEntityStatements = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListEntityStatementsResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/statements',
     ...options,
   });
@@ -4683,6 +4808,8 @@ export const promoteExternalRelationship = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPromoteExternalRelationshipResponse.parseAsync(data),
     url: '/api/external-relationship-reviews/{review_id}/promote',
     ...options,
   });
@@ -4878,6 +5005,8 @@ export const listInvestigations = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListInvestigationsResponse.parseAsync(data),
     url: '/api/investigations',
     ...options,
   });
@@ -4905,6 +5034,8 @@ export const createInvestigation = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateInvestigationResponse.parseAsync(data),
     url: '/api/investigations',
     ...options,
     headers: {
@@ -5174,6 +5305,8 @@ export const listConnectorFindings = <ThrowOnError extends boolean = false>(
           query: zListConnectorFindingsQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListConnectorFindingsResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/connector-findings',
     ...options,
   });
@@ -5201,6 +5334,8 @@ export const listConnectorRuns = <ThrowOnError extends boolean = false>(
           query: zListConnectorRunsQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListConnectorRunsResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/connector-runs',
     ...options,
   });
@@ -5398,6 +5533,8 @@ export const listEntities = <ThrowOnError extends boolean = false>(
           query: zListEntitiesQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListEntitiesResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/entities',
     ...options,
   });
@@ -5485,6 +5622,8 @@ export const getInvestigationFinancialFlows = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetInvestigationFinancialFlowsResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/financial-flows',
     ...options,
   });
@@ -5512,6 +5651,8 @@ export const getInvestigationGraph = <ThrowOnError extends boolean = false>(
           query: zGetInvestigationGraphQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetInvestigationGraphResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/graph',
     ...options,
   });
@@ -5591,6 +5732,8 @@ export const listInvestigationRelationships = <
           query: zListInvestigationRelationshipsQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListInvestigationRelationshipsResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/relationships',
     ...options,
   });
@@ -6204,6 +6347,8 @@ export const createCanonicalRelationship = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateCanonicalRelationshipResponse.parseAsync(data),
     url: '/api/relationships',
     ...options,
     headers: {
@@ -6237,6 +6382,8 @@ export const attachRelationshipEvidenceEndpoint = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAttachRelationshipEvidenceEndpointResponse.parseAsync(data),
     url: '/api/relationships/{relationship_id}/evidence',
     ...options,
     headers: {
@@ -6270,6 +6417,8 @@ export const listRelationshipEvidenceReviews = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListRelationshipEvidenceReviewsResponse.parseAsync(data),
     url: '/api/relationships/{relationship_id}/evidence-reviews',
     ...options,
   });
@@ -6299,6 +6448,8 @@ export const reviewRelationshipEvidenceEndpoint = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zReviewRelationshipEvidenceEndpointResponse.parseAsync(data),
     url: '/api/relationships/{relationship_id}/evidence/{evidence_id}/reviews',
     ...options,
     headers: {
@@ -6462,6 +6613,8 @@ export const deleteConnectorCredential = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeleteConnectorCredentialResponse.parseAsync(data),
     url: '/api/settings/connectors/{provider}/credential',
     ...options,
   });
@@ -6489,6 +6642,8 @@ export const saveConnectorCredential = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSaveConnectorCredentialResponse.parseAsync(data),
     url: '/api/settings/connectors/{provider}/credential',
     ...options,
     headers: {
@@ -6526,6 +6681,8 @@ export const getSecurityAlerts = <ThrowOnError extends boolean = false>(
           query: zGetSecurityAlertsQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetSecurityAlertsResponse.parseAsync(data),
     url: '/api/settings/security/alerts',
     ...options,
   });
@@ -6553,6 +6710,8 @@ export const getSecurityAudit = <ThrowOnError extends boolean = false>(
           query: zGetSecurityAuditQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetSecurityAuditResponse.parseAsync(data),
     url: '/api/settings/security/audit',
     ...options,
   });
@@ -6580,6 +6739,8 @@ export const pruneSecurityAudit = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPruneSecurityAuditResponse.parseAsync(data),
     url: '/api/settings/security/audit/retention',
     ...options,
     headers: {
@@ -6613,6 +6774,8 @@ export const getSecurityAuditRetentionPreview = <
           query: zGetSecurityAuditRetentionPreviewQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetSecurityAuditRetentionPreviewResponse.parseAsync(data),
     url: '/api/settings/security/audit/retention-preview',
     ...options,
   });
@@ -6636,6 +6799,8 @@ export const getSecurityAuditSummary = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetSecurityAuditSummaryResponse.parseAsync(data),
     url: '/api/settings/security/audit/summary',
     ...options,
   });
@@ -6852,6 +7017,8 @@ export const settingsStatus = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSettingsStatusResponse.parseAsync(data),
     url: '/api/settings/status',
     ...options,
   });
@@ -6881,6 +7048,8 @@ export const getOrphanStoragePreview = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetOrphanStoragePreviewResponse.parseAsync(data),
     url: '/api/settings/storage/orphans',
     ...options,
   });
@@ -6974,6 +7143,8 @@ export const promoteStatementAssessment = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPromoteStatementAssessmentResponse.parseAsync(data),
     url: '/api/statement-assessments/{assessment_id}/promote',
     ...options,
     headers: {

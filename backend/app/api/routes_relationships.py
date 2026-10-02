@@ -13,7 +13,7 @@ from app.models.domain import Investigation, RelationshipEdge
 from app.schemas.api import (
     RelationshipCreate, RelationshipEvidenceAttachRequest, RelationshipEvidenceReviewRequest,
 )
-from app.schemas.responses import LeadOut
+from app.schemas.responses import LeadOut, RelationshipEvidenceReviewsOut, RelationshipOut
 from app.services.leads import create_relationship_context_lead, serialize_lead
 from app.services.relationships import (
     attach_relationship_evidence, create_relationship, relationship_evidence_review_history,
@@ -23,7 +23,7 @@ from app.services.relationships import (
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.post("/relationships", response_model=None)
+@router.post("/relationships", response_model=RelationshipOut)
 def create_canonical_relationship(body: RelationshipCreate, db: Session = Depends(get_db)) -> Any:
     if db.get(Investigation, body.investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
@@ -38,7 +38,7 @@ def create_canonical_relationship(body: RelationshipCreate, db: Session = Depend
     return serialize_relationship(db, edge)
 
 
-@router.post("/relationships/{relationship_id}/evidence", response_model=None)
+@router.post("/relationships/{relationship_id}/evidence", response_model=RelationshipOut)
 def attach_relationship_evidence_endpoint(relationship_id: str, body: RelationshipEvidenceAttachRequest, db: Session = Depends(get_db)) -> Any:
     edge = db.get(RelationshipEdge, relationship_id)
     if edge is None:
@@ -50,7 +50,7 @@ def attach_relationship_evidence_endpoint(relationship_id: str, body: Relationsh
     return serialize_relationship(db, edge)
 
 
-@router.get("/relationships/{relationship_id}/evidence-reviews", response_model=None)
+@router.get("/relationships/{relationship_id}/evidence-reviews", response_model=RelationshipEvidenceReviewsOut)
 def list_relationship_evidence_reviews(relationship_id: str, db: Session = Depends(get_db)) -> dict[str, Any]:
     edge = db.get(RelationshipEdge, relationship_id)
     if edge is None:
@@ -58,7 +58,7 @@ def list_relationship_evidence_reviews(relationship_id: str, db: Session = Depen
     return {"relationship_id": edge.id, "reviews": relationship_evidence_review_history(db, edge)}
 
 
-@router.post("/relationships/{relationship_id}/evidence/{evidence_id}/reviews", response_model=None)
+@router.post("/relationships/{relationship_id}/evidence/{evidence_id}/reviews", response_model=RelationshipOut)
 def review_relationship_evidence_endpoint(relationship_id: str, evidence_id: str, body: RelationshipEvidenceReviewRequest, db: Session = Depends(get_db)) -> Any:
     edge = db.get(RelationshipEdge, relationship_id)
     if edge is None:

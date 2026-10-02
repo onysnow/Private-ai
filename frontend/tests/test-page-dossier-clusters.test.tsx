@@ -21,7 +21,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {mockApi} from '../test-support/mock-api';
 import type {MockApi} from '../test-support/mock-api';
-import {pageRoutes} from '../test-support/page-routes';
+import {entityFixture, findingFixture, pageRoutes} from '../test-support/page-routes';
 
 beforeEach(() => {
   if (!window.matchMedia) {
@@ -50,7 +50,7 @@ async function importHome(): Promise<() => ReactElement> {
 }
 
 const investigation = {id: 'inv-1', name: 'Kestrelwood filings'};
-const entityA = {id: 'ent-1', caption: 'Kestrelwood Holdings Ltd', schema: 'Company', properties: {}};
+const entityA = entityFixture('ent-1', 'Kestrelwood Holdings Ltd', 'Company');
 
 const FINDINGS = 'GET /api/investigations/inv-1/connector-findings';
 const ENRICH_ALL = 'POST /api/entities/ent-1/enrich';
@@ -61,13 +61,24 @@ function clusterFixture(overrides: Record<string, unknown> = {}) {
   return {
     cluster_key: 'cluster-1',
     score: 0.82,
+    providers: ['aleph', 'opensanctions'],
     finding_ids: ['find-1', 'find-2'],
     findings: [
-      {id: 'find-1', provider: 'aleph', caption: 'Kestrelwood Holdings Ltd'},
-      {id: 'find-2', provider: 'opensanctions', caption: 'Kestrelwood Holdings'},
+      {id: 'find-1', provider: 'aleph', provider_record_id: 'aleph-1', caption: 'Kestrelwood Holdings Ltd', schema: 'Company', properties: {}, source_url: null},
+      {id: 'find-2', provider: 'opensanctions', provider_record_id: 'os-1', caption: 'Kestrelwood Holdings', schema: 'Company', properties: {}, source_url: null},
     ],
-    pairs: [{reasons: [{kind: 'name_match', detail: 'Normalized names match exactly.'}]}],
+    pairs: [{finding_ids: ['find-1', 'find-2'], score: 0.82, reasons: [{kind: 'name_match', detail: 'Normalized names match exactly.', weight: 0.38}]}],
+    decision: null,
     ...overrides,
+  };
+}
+
+/** The reply to enriching with every provider, in the generated EnrichmentSessionOut shape. */
+function sessionFixture(runs: {provider: string; status: string; result_count?: number}[]) {
+  return {
+    id: 'session-1', entity_id: 'ent-1', investigation_id: 'inv-1', status: 'completed', providers: runs.map(r => r.provider),
+    total_results: runs.reduce((sum, r) => sum + (r.result_count ?? 0), 0), started_at: '2026-10-01T00:00:00', finished_at: '2026-10-01T00:00:01',
+    runs: runs.map((r, i) => ({provider: r.provider, status: r.status, result_count: r.result_count ?? 0, run_id: `run-${i + 1}`})),
   };
 }
 
@@ -90,8 +101,8 @@ describe('Home entity dossier: enrichment & cross-provider clusters', () => {
 
     api.add({
       'POST /api/entities/ent-1/enrich/aleph': [
-        {id: 'find-3', provider: 'aleph', caption: 'Kestrelwood Holdings', properties: {}, review_status: 'unreviewed'},
-        {id: 'find-4', provider: 'aleph', caption: 'Kestrelwood Trading Ltd', properties: {}, review_status: 'unreviewed'},
+        findingFixture({id: 'find-3', provider_record_id: 'aleph-3', caption: 'Kestrelwood Holdings'}),
+        findingFixture({id: 'find-4', provider_record_id: 'aleph-4', caption: 'Kestrelwood Trading Ltd'}),
       ],
     });
 
@@ -108,14 +119,10 @@ describe('Home entity dossier: enrichment & cross-provider clusters', () => {
     const api = await bootstrap();
 
     api.add({
-      [ENRICH_ALL]: {
-        id: 'session-1',
-        status: 'completed',
-        runs: [
-          {provider: 'aleph', status: 'ok', result_count: 3},
-          {provider: 'opensanctions', status: 'ok', result_count: 1},
-        ],
-      },
+      [ENRICH_ALL]: sessionFixture([
+        {provider: 'aleph', status: 'ok', result_count: 3},
+        {provider: 'opensanctions', status: 'ok', result_count: 1},
+      ]),
       [CLUSTERS]: [clusterFixture()],
     });
 
@@ -140,16 +147,17 @@ describe('Home entity dossier: enrichment & cross-provider clusters', () => {
     const api = await bootstrap();
 
     api.add({
-      [ENRICH_ALL]: {id: 'session-1', status: 'completed', runs: [{provider: 'aleph', status: 'ok'}]},
+      [ENRICH_ALL]: sessionFixture([{provider: 'aleph', status: 'ok'}]),
       [CLUSTERS]: [clusterFixture()],
     });
 
     await userEvent.setup().click(screen.getByRole('button', {name: 'Enrich all providers'}));
     await screen.findByText('Cross-provider candidates');
 
+    const decided = {id: 'cpd-1', decision: 'positive', confidence: 0.9, rationale: null, created_at: '2026-10-01T00:00:02'};
     api.add({
-      [CLUSTER_DECISION]: {},
-      [CLUSTERS]: [clusterFixture({decision: {decision: 'positive'}})], // what the reload finds
+      [CLUSTER_DECISION]: {...decided, investigation_id: 'inv-1', entity_id: 'ent-1', session_id: 'session-1', cluster_key: 'cluster-1', finding_ids: ['find-1', 'find-2']},
+      [CLUSTERS]: [clusterFixture({decision: decided})], // what the reload finds
     });
 
     await userEvent.setup().click(screen.getByRole('button', {name: 'Same external entity'}));

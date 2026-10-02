@@ -414,3 +414,348 @@ def test_lead_and_task_replies(demo):
     _same_through_model(r.LeadQueueOut, queue)
     _same_through_model(list[r.LeadOut], list_investigation_leads(db, inv.id))
     _same_through_model(list[r.ReportingTaskOut], list_investigation_reporting_tasks(db, inv.id))
+
+
+# --- Connectors, dossier, graph, money flows, settings (slice 5) -------------------------
+
+class _ConnectorA:
+    """Finds the demo company under a provider record, with a relationship
+    finding whose ends are two other findings of the same provider (so the
+    relationship-candidate lookup finds them), and enriches any entity."""
+    name = "fake-a"
+
+    async def search(self, query):
+        from app.connectors.base import ExternalFinding
+
+        return [
+            ExternalFinding(provider=self.name, record_id="a-company", caption="Meridian Holdings Ltd", schema="Company",
+                            url="https://a.example/a-company", properties={"name": ["Meridian Holdings Ltd"], "registrationNumber": ["GB-123"],
+                                                                            "jurisdiction": ["gb"]},
+                            raw={"id": "a-company", "dataset": "registry_a"}),
+            ExternalFinding(provider=self.name, record_id="a-owner", caption="Bellcastle Trading Group", schema="Company",
+                            url="https://a.example/a-owner", properties={"name": ["Bellcastle Trading Group"]}, raw={"id": "a-owner"}),
+            ExternalFinding(provider=self.name, record_id="a-ownership", caption="Bellcastle owns Meridian", schema="Ownership",
+                            url="https://a.example/a-ownership", properties={"owner": ["a-owner"], "asset": ["a-company"], "percentage": ["100"]},
+                            raw={"id": "a-ownership"}),
+        ]
+
+    async def enrich(self, entity):
+        from app.connectors.base import ExternalFinding
+
+        return [ExternalFinding(provider=self.name, record_id="a-company", caption=entity["caption"], schema=entity["schema"],
+                                url="https://a.example/a-company",
+                                properties={"name": [entity["caption"]], "registrationNumber": ["GB-123"], "jurisdiction": ["gb"]},
+                                raw={"id": "a-company", "dataset": "registry_a"})]
+
+
+class _ConnectorB(_ConnectorA):
+    """A second provider that knows the same company by the same registration number."""
+    name = "fake-b"
+
+    async def search(self, query):
+        from app.connectors.base import ExternalFinding
+
+        return [ExternalFinding(provider=self.name, record_id="b-1", caption="Meridian Holdings Limited", schema="Company",
+                                properties={"name": ["Meridian Holdings Limited"], "registrationNumber": ["GB-123"]}, raw={})]
+
+    async def enrich(self, entity):
+        from app.connectors.base import ExternalFinding
+
+        return [ExternalFinding(provider=self.name, record_id="b-1", caption=entity["caption"], schema=entity["schema"],
+                                properties={"name": [entity["caption"]], "registrationNumber": ["GB-123"]}, raw={})]
+
+
+class _ConnectorDown:
+    name = "fake-down"
+
+    async def search(self, query):
+        return []
+
+    async def enrich(self, entity):
+        raise RuntimeError("provider unavailable")
+
+
+@pytest.fixture()
+def fake_connectors():
+    from app.connectors.registry import registry
+
+    names = []
+    for connector in (_ConnectorA(), _ConnectorB(), _ConnectorDown()):
+        registry.register(connector.name, connector)
+        names.append(connector.name)
+    yield names
+    for name in names:
+        registry._connectors.pop(name, None)
+
+
+def _run(coroutine):
+    import asyncio
+
+    return asyncio.run(coroutine)
+
+
+def test_connector_and_review_replies(demo, fake_connectors):
+    from app.api.routes_connectors import connectors as connectors_route
+    from app.models.domain import Entity
+    from app.schemas.api import ConnectorSearchRequest, CrossProviderDecisionRequest, ResolutionRequest, StatementAssessmentRequest
+    from app.services.connector_findings import (
+        create_resolution_decision, create_statement_assessment, list_statement_assessments, update_finding_review_status,
+    )
+    from app.services.connectors import enrich_entity, run_connector
+    from app.services.consolidation import (
+        create_cross_provider_decision, get_enrichment_session_clusters, get_enrichment_session_detail,
+    )
+    from app.services.entities import (
+        list_cross_provider_decisions, list_entity_enrichment_sessions, list_entity_promotions,
+        list_external_relationship_promotions, run_multi_enrichment,
+    )
+    from app.services.external_relationships import create_review, list_relationship_reviews, promote_review, relationship_endpoint_candidates
+    from app.services.investigations import list_investigation_connector_findings, list_investigation_connector_runs
+    from app.services.promotion import promote_assessment
+    from app.services.resolution import candidate_entities
+
+    db, inv, _doc, _candidates, _accepted = demo
+    _same_through_model(r.ConnectorsOut, connectors_route())
+
+    findings = _run(run_connector("fake-a", ConnectorSearchRequest(investigation_id=inv.id, query="Meridian"), db))
+    assert len(findings) == 3
+    _same_through_model(list[r.ConnectorFindingOut], findings)
+    _same_through_model(list[r.ConnectorFindingOut], list_investigation_connector_findings(db, inv.id))
+    _same_through_model(list[r.ConnectorRunOut], list_investigation_connector_runs(db, inv.id))
+    company = next(row for row in findings if row.provider_record_id == "a-company")
+    _same_through_model(r.ConnectorFindingOut, update_finding_review_status(db, company, "needs_followup"))
+
+    # Identity: the candidates for a finding, a decision, an assessment, a promotion.
+    candidates = candidate_entities(db, inv.id, company.caption, company.schema)
+    assert candidates
+    _same_through_model(list[r.EntityCandidateOut], candidates)
+    meridian = db.get(Entity, candidates[0]["entity_id"])
+    decision = create_resolution_decision(db, company, ResolutionRequest(entity_id=meridian.id, decision="positive", confidence=0.9, rationale="Exact name"))
+    _same_through_model(r.ResolutionDecisionOut, decision)
+    assessment = create_statement_assessment(db, company, StatementAssessmentRequest(entity_id=meridian.id, prop="registrationNumber", value="GB-123", status="accepted", note="matches"))
+    _same_through_model(r.StatementAssessmentOut, assessment)
+    _same_through_model(list[r.StatementAssessmentOut], list_statement_assessments(db, company.id))
+    promotion = promote_assessment(db, assessment, "checked against the registry")
+    _same_through_model(r.StatementPromotionOut, promotion)
+    _same_through_model(list[r.StatementPromotionOut], list_entity_promotions(db, meridian.id))
+
+    # An external relationship: its endpoint candidates, a review, its promotion.
+    ownership = next(row for row in findings if row.schema == "Ownership")
+    endpoints = relationship_endpoint_candidates(db, ownership)
+    assert endpoints["source_external_finding"] and endpoints["source_candidates"] and endpoints["target_candidates"]
+    _same_through_model(r.ExternalRelationshipCandidatesOut, endpoints)
+    review = create_review(db, ownership, endpoints["source_candidates"][0]["entity_id"], endpoints["target_candidates"][0]["entity_id"], "supported", "registry agrees")
+    _same_through_model(r.ExternalRelationshipReviewOut, review)
+    _same_through_model(list[r.ExternalRelationshipReviewOut], list_relationship_reviews(db, ownership.id))
+    promoted = promote_review(db, review)
+    _same_through_model(r.ExternalRelationshipPromotionOut, promoted)
+    _same_through_model(list[r.ExternalRelationshipPromotionOut], list_external_relationship_promotions(db, db.get(Entity, promoted.relationship_entity_id)))
+
+    # Enrichment: one provider, then every provider in one session (one of them down).
+    _same_through_model(list[r.ConnectorFindingOut], _run(enrich_entity("fake-a", meridian, db)))
+    session = _run(run_multi_enrichment(db, meridian, ["fake-a", "fake-b", "fake-down"]))
+    assert session["status"] == "partial" and any("error" in run for run in session["runs"])
+    _same_through_model(r.EnrichmentSessionOut, session)
+    _same_through_model(r.EnrichmentSessionDetailOut, get_enrichment_session_detail(db, session["id"]))
+    _same_through_model(list[r.EnrichmentSessionRowOut], list_entity_enrichment_sessions(db, meridian.id))
+    clusters = get_enrichment_session_clusters(db, session["id"])
+    assert clusters and clusters[0]["pairs"], "the two providers share a registration number, so they must cluster"
+    _same_through_model(list[r.EnrichmentClusterOut], clusters)
+    cross = create_cross_provider_decision(db, session["id"], CrossProviderDecisionRequest(finding_ids=clusters[0]["finding_ids"], decision="positive", confidence=0.9))
+    _same_through_model(r.CrossProviderDecisionOut, cross)
+    _same_through_model(list[r.CrossProviderDecisionOut], list_cross_provider_decisions(db, meridian.id))
+    decided = get_enrichment_session_clusters(db, session["id"])
+    assert decided[0]["decision"]
+    _same_through_model(list[r.EnrichmentClusterOut], decided)
+
+
+def test_entity_dossier_merge_and_graph_replies(demo, fake_connectors):
+    from app.models.domain import Evidence, Lead, Source
+    from app.schemas.api import (
+        ConnectorSearchRequest, EntityCreate, EntityUpdate, PropertyConflictDecisionRequest, ReportingTaskCreate, ResolutionRequest,
+    )
+    from app.services.connector_findings import create_resolution_decision
+    from app.services.connectors import run_connector
+    from app.services.dossier import entity_dossier
+    from app.services.entities import (
+        create_entity, decide_property_conflict, entity_merge_history, list_entities, list_entity_statements,
+        list_property_conflict_decisions, run_multi_enrichment, update_entity,
+    )
+    from app.services.entity_merge import execute_entity_merge, preview_entity_merge
+    from app.services.financial_flows import investigation_financial_ledger
+    from app.services.leads import create_reporting_task
+    from app.services.post_merge_reconciliation import detect_post_merge_reconciliation, record_post_merge_reconciliation
+    from app.services.relationships import (
+        attach_relationship_evidence, create_relationship, entity_relationships, investigation_graph,
+        investigation_relationships, relationship_evidence_review_history, review_relationship_evidence, serialize_relationship,
+    )
+    from app.services.resolution import canonical_duplicate_candidates, record_canonical_resolution
+    from app.services.search import investigation_search
+
+    db, inv, _doc, _candidates, _accepted = demo
+    entities = list_entities(db, inv.id, False)
+    assert entities
+    _same_through_model(list[r.EntityOut], entities)
+    meridian = next(row for row in entities if row.caption == "Meridian Holdings Ltd")
+    vessel = next(row for row in entities if row.caption.startswith("MV Fair Tern"))
+
+    # A second value for a property makes a conflict the reporter can decide.
+    _same_through_model(r.EntityOut, update_entity(db, meridian, EntityUpdate(caption="Meridian Holdings Ltd", properties={"jurisdiction": ["je"]})))
+    _same_through_model(list[r.EntityStatementOut], list_entity_statements(db, meridian.id))
+    conflict = decide_property_conflict(db, meridian, "jurisdiction", PropertyConflictDecisionRequest(
+        decision="temporal_change", values=["gb", "je"], rationale="moved its seat",
+        temporal_intervals=[{"value": "gb", "date_end": "2022-12-31"}, {"value": "je", "date_start": "2023-01-01"}],
+    ))
+    _same_through_model(r.PropertyConflictDecisionOut, conflict)
+    _same_through_model(list[r.PropertyConflictDecisionOut], list_property_conflict_decisions(db, meridian.id, "jurisdiction"))
+
+    # Connector findings, an identity decision and an enrichment session give
+    # the dossier's external block something to hold.
+    findings = _run(run_connector("fake-a", ConnectorSearchRequest(investigation_id=inv.id, query="Meridian"), db))
+    company = next(row for row in findings if row.provider_record_id == "a-company")
+    create_resolution_decision(db, company, ResolutionRequest(entity_id=meridian.id, decision="positive", confidence=0.9))
+    _run(run_multi_enrichment(db, meridian, ["fake-a", "fake-b"]))
+    # The finding's lead names the company, so a task on it lands in the dossier too.
+    finding_lead = db.query(Lead).filter(Lead.investigation_id == inv.id, Lead.title == "Meridian Holdings Ltd").first()
+    create_reporting_task(db, ReportingTaskCreate(investigation_id=inv.id, title="Check the registry entry", lead_id=finding_lead.id))
+
+    # A near-duplicate of the company, with the same jurisdiction statement and
+    # an edge to the same vessel, so a merge leaves both kinds of duplicate pair.
+    duplicate = create_entity(db, EntityCreate(investigation_id=inv.id, schema="Company", caption="Meridian Holdings Limited", properties={"jurisdiction": ["gb"]}))
+    _same_through_model(r.EntityOut, duplicate)
+    second_edge = create_relationship(db, investigation_id=inv.id, schema="Ownership", source_entity_id=duplicate.id, target_entity_id=vessel.id,
+                                      properties={"role": ["registered owner"]}, dataset="registry_b", origin="https://b.example/vessel")
+    evidence = db.query(Evidence).join(Source, Source.id == Evidence.source_id).filter(Source.investigation_id == inv.id).first()
+    attach_relationship_evidence(db, second_edge, evidence_id=evidence.id, note="the registry page")
+    review_relationship_evidence(db, second_edge, evidence_id=evidence.id, stance="supports", rationale="names the vessel")
+    _same_through_model(r.RelationshipOut, serialize_relationship(db, second_edge))
+    _same_through_model(r.RelationshipEvidenceReviewsOut, {"relationship_id": second_edge.id, "reviews": relationship_evidence_review_history(db, second_edge)})
+
+    before = entity_dossier(db, meridian.id)
+    assert before["property_conflicts"] and before["external"]["findings"] and before["claims"] and before["evidence"] and before["leads"] and before["tasks"] and before["timeline"]
+    assert any(item["match_basis"].get("terms") for item in before["claims"] + before["evidence"] + before["leads"]), "a text mention names its terms"
+    _same_through_model(r.EntityDossierOut, before)
+    _same_through_model(list[r.EntityRelationshipOut], entity_relationships(db, meridian.id))
+
+    # Duplicates: the candidate list, a decision, a merge, and the records it left to reconcile.
+    candidates = canonical_duplicate_candidates(db, duplicate)
+    assert any(row["entity_id"] == meridian.id for row in candidates)
+    _same_through_model(list[r.CanonicalDuplicateCandidateOut], candidates)
+    same = record_canonical_resolution(db, duplicate, meridian, decision="same", confidence=0.95, rationale="one registry number")
+    _same_through_model(r.CanonicalResolutionDecisionOut, same)
+    _same_through_model(list[r.CanonicalDuplicateCandidateOut], canonical_duplicate_candidates(db, duplicate))
+    preview = preview_entity_merge(db, duplicate, meridian)
+    assert preview["can_execute"]
+    _same_through_model(r.CanonicalMergePreviewOut, preview)
+    audit = execute_entity_merge(db, duplicate, meridian, preview_digest=preview["preview_digest"], rationale="merged in a test")
+    _same_through_model(r.CanonicalMergeExecuteOut, {"audit": audit, "source_entity_id": duplicate.id, "target_entity_id": meridian.id})
+    _same_through_model(list[r.CanonicalEntityMergeAuditOut], entity_merge_history(db, meridian))
+
+    reconciliation = detect_post_merge_reconciliation(db, meridian)
+    assert reconciliation["summary"]["statement_pairs"] >= 1 and reconciliation["summary"]["relationship_pairs"] == 1
+    _same_through_model(r.PostMergeReconciliationOut, reconciliation)
+    pair = reconciliation["relationship_duplicates"][0]
+    decided = record_post_merge_reconciliation(db, meridian, record_type="relationship", record_a_id=pair["record_a"]["id"], record_b_id=pair["record_b"]["id"],
+                                               decision="duplicate", rationale="one edge", preferred_record_id=second_edge.id)
+    _same_through_model(r.ReconciliationDecisionOut, decided)
+    statement_pair = reconciliation["statement_duplicates"][0]
+    record_post_merge_reconciliation(db, meridian, record_type="statement", record_a_id=statement_pair["record_a"]["id"], record_b_id=statement_pair["record_b"]["id"], decision="keep_separate")
+    _same_through_model(r.PostMergeReconciliationOut, detect_post_merge_reconciliation(db, meridian))
+
+    # The graph: collapsed (the preferred edge carries the pair's provenance and an
+    # aggregate advisory) and expanded (the suppressed copy says which edge is preferred).
+    compact = investigation_graph(db, inv.id)
+    preferred = next(edge for edge in compact["edges"] if edge["id"] == second_edge.id)
+    assert preferred["aggregate_provenance"]["underlying_relationship_count"] == 2 and preferred["advisory"]["presentation_aggregate"] is True
+    assert all("aggregate_provenance" not in edge for edge in compact["edges"] if edge["id"] != second_edge.id)
+    _same_through_model(r.GraphOut, compact)
+    expanded = investigation_graph(db, inv.id, include_reconciled_duplicates=True)
+    assert any(edge.get("reconciliation", {}).get("suppressed_duplicate") for edge in expanded["edges"])
+    _same_through_model(r.GraphOut, expanded)
+    _same_through_model(list[r.RelationshipOut], investigation_relationships(db, inv.id))
+    _same_through_model(list[r.RelationshipOut], investigation_relationships(db, inv.id, include_reconciled_duplicates=False))
+
+    # The dossier after the merge: the alias resolves, the collapsed edge shows its aggregate.
+    after = entity_dossier(db, duplicate.id)
+    assert after["alias_resolution"] and after["identity_history"]["aliases"] and after["identity_history"]["merge_audits"]
+    assert any(edge.get("aggregate_provenance") for edge in after["relationships"])
+    _same_through_model(r.EntityDossierOut, after)
+    _same_through_model(list[r.EntityRelationshipOut], entity_relationships(db, meridian.id, include_reconciled_duplicates=False))
+    assert investigation_search(db, "Meridian", investigation_id=inv.id)["results"]
+
+    # Money flows: the demo payment charts; a payment without an amount is listed as incomplete.
+    bellcastle = next(row for row in entities if row.caption == "Bellcastle Trading Group")
+    create_relationship(db, investigation_id=inv.id, schema="Payment", source_entity_id=bellcastle.id, target_entity_id=meridian.id,
+                        properties={"currency": ["USD"], "date": ["2024-01"]})
+    ledger = investigation_financial_ledger(db, inv.id)
+    assert ledger["transactions"] and ledger["incomplete"]
+    _same_through_model(r.FinancialLedgerOut, ledger)
+
+
+def test_investigation_replies(demo):
+    from app.core.authorization import AuthorizationScope
+    from app.schemas.api import InvestigationCreate
+    from app.services.investigations import create_investigation, list_investigations
+
+    db, _inv, _doc, _candidates, _accepted = demo
+    rows = list_investigations(db, AuthorizationScope(actor_id="local"))
+    assert rows
+    _same_through_model(list[r.InvestigationOut], rows)
+    _same_through_model(r.InvestigationOut, create_investigation(db, InvestigationCreate(name="Second case", description="with a description")))
+
+
+def test_settings_and_security_replies(demo, tmp_path, monkeypatch):
+    import json
+    from datetime import datetime, timedelta, timezone
+
+    from app.core.audit_log import (
+        apply_security_audit_retention, preview_security_audit_retention, read_security_audit, recent_security_denials,
+        summarize_security_audit,
+    )
+    from app.core.config import settings
+    from app.services.lifecycle import preview_orphan_document_files
+    from app.services.settings import delete_connector_credential, get_settings_status, save_connector_credential, security_alerts
+
+    db, _inv, _doc, _candidates, _accepted = demo
+    monkeypatch.setattr(settings, "connector_credentials_file", str(tmp_path / "connectors.json"))
+    audit_file = tmp_path / "security.jsonl"
+    monkeypatch.setattr(settings, "audit_log_file", str(audit_file))
+    now = datetime.now(timezone.utc)
+
+    def record(offset_days: float, request_id: str, event: str, *, remote: bool) -> dict:
+        row = {"timestamp": (now - timedelta(days=offset_days)).isoformat(), "event": event, "request_id": request_id, "method": "GET",
+               "path": "/api/entities", "status_code": 403 if event != "api_request" else 200, "local_request": not remote}
+        if remote:
+            row["client_host"] = "203.0.113.9"
+        return row
+
+    rows = [record(400, "old", "api_request", remote=False), record(0.5, "r1", "access_denied", remote=True), record(0, "r2", "api_request", remote=False)]
+    audit_file.write_text("".join(json.dumps(row) + "\n" for row in rows) + "not-json\n", encoding="utf-8")
+
+    for local in (True, False):
+        status = get_settings_status(db, local=local)
+        assert status["security"]["total_denials"] == 1 and status["ai"]["tas_spec"]["modules"]
+        _same_through_model(r.SettingsStatusOut, status)
+    _same_through_model(r.SecurityAlertsOut, security_alerts(window_hours=48.0, max_examples=5))
+    _same_through_model(r.SecurityAlertsOut, recent_security_denials(audit_file, window_hours=48.0, max_examples=5, now=now))
+    _same_through_model(r.ConnectorCredentialSavedOut, save_connector_credential("aleph", "aleph-secret"))
+    _same_through_model(r.ConnectorCredentialRemovedOut, delete_connector_credential("aleph"))
+
+    storage = tmp_path / "documents"
+    storage.mkdir()
+    (storage / "stray.bin").write_bytes(b"orphan")
+    preview = preview_orphan_document_files(db, storage)
+    assert preview["orphan_file_count"] == 1
+    _same_through_model(r.OrphanStoragePreviewOut, preview)
+
+    page = read_security_audit(audit_file, limit=1)
+    assert page["has_more"] and page["malformed_lines"] == 1
+    _same_through_model(r.SecurityAuditViewOut, page)
+    _same_through_model(r.SecurityAuditViewOut, read_security_audit(audit_file, limit=100, offset=1))
+    _same_through_model(r.SecurityAuditViewOut, read_security_audit(tmp_path / "missing.jsonl"))
+    _same_through_model(r.SecurityAuditSummaryOut, summarize_security_audit(audit_file))
+    retention = preview_security_audit_retention(audit_file, keep_days=90, max_records=5000, now=now)
+    retention.pop("_lines"); retention.pop("_keep_indexes")  # as the route does
+    assert retention["would_remove"] == 1
+    _same_through_model(r.SecurityAuditRetentionPreviewOut, retention)
+    _same_through_model(r.SecurityAuditRetentionResultOut, apply_security_audit_retention(audit_file, keep_days=90, max_records=5000, confirmation="PRUNE SECURITY AUDIT", now=now))
