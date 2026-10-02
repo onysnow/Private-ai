@@ -40,6 +40,31 @@ os.environ.setdefault("JOB_RUNNER", "inline")
 # test_document_reader.py covers the separate reader process.
 os.environ.setdefault("DOCUMENT_READ_IN_SUBPROCESS", "false")
 
+import tempfile  # noqa: E402
+from urllib.parse import urlparse  # noqa: E402
+
+# The fixture below deletes every row before each test, so the suite must
+# never open the developer's own database. The app's default is
+# ./journalism.db -- the Workbench's real data on a reporter's machine -- and a
+# DATABASE_URL exported in the shell may point at it too. Only a PostgreSQL
+# database whose name says it is disposable (the same rule
+# run_postgres_gate.py enforces, and what CI sets) is used as given; anything
+# else is replaced with a fresh SQLite file in a temporary folder that belongs
+# to this run alone, so two runs at once never share one either.
+_DISPOSABLE_NAME_TOKENS = ("test", "ci", "tmp", "scratch")
+
+
+def _is_disposable_postgres(url: str) -> bool:
+    if not url.startswith(("postgresql://", "postgresql+psycopg://")):
+        return False
+    name = urlparse(url.replace("postgresql+psycopg://", "postgresql://", 1)).path.lstrip("/").lower()
+    return any(token in name for token in _DISPOSABLE_NAME_TOKENS)
+
+
+if not _is_disposable_postgres(os.environ.get("DATABASE_URL", "")):
+    _run_folder = tempfile.mkdtemp(prefix="journalism-tests-")
+    os.environ["DATABASE_URL"] = f"sqlite:///{os.path.join(_run_folder, 'journalism.db')}"
+
 import pytest  # noqa: E402
 
 from app.db.session import Base, engine  # noqa: E402
