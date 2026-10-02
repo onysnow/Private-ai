@@ -7,6 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db.locking import lock_investigation_transaction
+from app.jobs.corpus import request_corpus_sync
 from app.models.domain import (
     Entity, Statement, LeadLink, TimelineEvent, ResolutionDecision, StatementAssessment,
     StatementPromotion, EnrichmentSession, CrossProviderDecision, RelationshipEdge,
@@ -145,7 +146,11 @@ def execute_entity_merge(db: Session, source: Entity, target: Entity, *, preview
         db.add(audit)
         db.commit()
         db.refresh(audit)
-        return audit
     except Exception:
         db.rollback()
         raise
+    # The merged-away record leaves the OpenAleph collection and its
+    # relationships are re-sent pointing at the record that stays (ADR-0006,
+    # Wave B; app/services/corpus_push.py).
+    request_corpus_sync(db, audit.investigation_id)
+    return audit

@@ -995,6 +995,34 @@ export const zCoreCapabilitiesOut = z.object({
 });
 
 /**
+ * CorpusPendingOut
+ *
+ * What the next push would change, and the records it cannot send (with why).
+ */
+export const zCorpusPendingOut = z.object({
+  cannot_send: z.array(z.string()),
+  to_remove: z.number().int(),
+  to_send: z.number().int(),
+});
+
+/**
+ * CorpusPushOut
+ *
+ * The last push of confirmed records to the investigation's collection.
+ */
+export const zCorpusPushOut = z.object({
+  error: z.string().nullable(),
+  finished_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  message: z.string().nullable(),
+  removals_waiting: z.number().int(),
+  removed: z.number().int(),
+  sent: z.number().int(),
+  started_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  status: z.enum(['never', 'running', 'succeeded', 'waiting', 'failed']),
+  unchanged: z.number().int(),
+});
+
+/**
  * CrossProviderDecisionOut
  *
  * A reporter's decision that findings from different providers are, or
@@ -2624,24 +2652,6 @@ export const zOpenAlephEvidenceImportOut = z.object({
   retrieved: z.number().int(),
   review_required: z.boolean(),
   skipped: z.number().int(),
-});
-
-/**
- * OpenAlephOperationFailureOut
- *
- * A failed OpenAleph pipeline step, kept server-side so a 502 can be explained later.
- */
-export const zOpenAlephOperationFailureOut = z.object({
-  created_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    ),
-  document_id: z.string().nullable(),
-  error: z.string(),
-  id: z.string(),
-  investigation_id: z.string(),
-  operation: z.string(),
 });
 
 /**
@@ -4694,6 +4704,67 @@ export const zWriteupsOut = z.object({
   writeups: z.array(zWriteupSummaryOut),
 });
 
+/**
+ * OpenAlephOperationFailureOut
+ *
+ * A failed OpenAleph pipeline step, kept server-side so a 502 can be explained later.
+ */
+export const zAppSchemasResponsesOpenAlephOperationFailureOut1 = z.object({
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  document_id: z.string().nullable(),
+  error: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  operation: z.string(),
+});
+
+/**
+ * OpenAlephOperationFailureOut
+ *
+ * A failed OpenAleph operation, kept for the reporter and the operator.
+ */
+export const zAppSchemasResponsesOpenAlephOperationFailureOut2 = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  document_id: z.string().nullable(),
+  error: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  operation: z.string(),
+});
+
+/**
+ * CorpusSyncOut
+ *
+ * The "Corpus sync" line: is OpenAleph in step with what reporters confirmed?
+ */
+export const zCorpusSyncOut = z.object({
+  background: z.boolean(),
+  collection_id: z.string().nullable(),
+  collection_label: z.string().nullable(),
+  consecutive_failures: z.number().int(),
+  enabled: z.boolean(),
+  failures: z.array(zAppSchemasResponsesOpenAlephOperationFailureOut2),
+  investigation_id: z.string(),
+  pending: zCorpusPendingOut,
+  push: zCorpusPushOut,
+  pushed_records: z.number().int(),
+});
+
+/**
+ * CorpusSyncNowOut
+ *
+ * The answer to "Sync now": queued for the worker, or run here and finished.
+ */
+export const zCorpusSyncNowOut = z.object({
+  queued: z.boolean(),
+  ran: z.boolean(),
+  sync: zCorpusSyncOut,
+});
+
 export const zGetAiAnalysisCandidateEndpointPath = z.object({
   candidate_id: z.string(),
 });
@@ -5621,8 +5692,26 @@ export const zListOpenalephCorpusFailuresPath = z.object({
  * Successful Response
  */
 export const zListOpenalephCorpusFailuresResponse = z.array(
-  zOpenAlephOperationFailureOut,
+  zAppSchemasResponsesOpenAlephOperationFailureOut1,
 );
+
+export const zGetCorpusSyncPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetCorpusSyncResponse = zCorpusSyncOut;
+
+export const zSyncCorpusNowPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zSyncCorpusNowResponse = zCorpusSyncNowOut;
 
 export const zListDecksEndpointPath = z.object({
   investigation_id: z.string(),

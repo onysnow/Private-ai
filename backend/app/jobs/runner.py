@@ -25,6 +25,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from starlette.concurrency import run_in_threadpool
 
 from app.db.session import build_session_factory
+from app.jobs import corpus as corpus_jobs
 from app.jobs.handlers import HANDLERS
 from app.jobs.queue_schema import QUEUE_SCHEMA, ensure_queue_schema
 from app.jobs.records import Handler, execute_job, mark_interrupted
@@ -71,6 +72,7 @@ class JobRunner:
         self._task: Any = None          # the procrastinate Task that runs a job
         self._worker: asyncio.Task[None] | None = None
         self._watchdog: asyncio.Task[None] | None = None
+        self._corpus_queue: corpus_jobs.CorpusQueue | None = None
         if mode == "procrastinate":
             self._build_queue()
 
@@ -90,6 +92,8 @@ class JobRunner:
             execute_job(runner.session_factory, job_id, runner.handlers, resume_running=True)
 
         self._task = run_background_job
+        # The corpus jobs (ADR-0006, Wave B) share this queue and its worker.
+        corpus_jobs.register_tasks(self.queue, self.session_factory, self.engine, queue_name=QUEUE_NAME)
 
     async def start(self) -> None:
         """Called from the app's lifespan after the schema is migrated."""
@@ -102,6 +106,11 @@ class JobRunner:
         if await run_in_threadpool(ensure_queue_schema, self.engine):
             logger.info("created the job queue schema")
         await self.queue.open_async()
+        # Services queue corpus pushes from synchronous code: a synchronous
+        # pool of their own (app/jobs/corpus.py says why).
+        self._corpus_queue = corpus_jobs.CorpusQueue(queue_conninfo(self.engine), queue_name=QUEUE_NAME)
+        await run_in_threadpool(self._corpus_queue.open)
+        corpus_jobs.register_queue(self.engine, self._corpus_queue)
         await self._retry_stalled()
         self._worker = asyncio.create_task(self.queue.run_worker_async(
             queues=[QUEUE_NAME], concurrency=self.concurrency, install_signal_handlers=False,
@@ -119,20 +128,43 @@ class JobRunner:
                 with contextlib.suppress(asyncio.CancelledError, Exception):
                     await task
         self._watchdog = self._worker = None
+        if self._corpus_queue is not None:
+            corpus_jobs.unregister_queue(self.engine, self._corpus_queue)
+            with contextlib.suppress(Exception):
+                await run_in_threadpool(self._corpus_queue.close)
+            self._corpus_queue = None
         if self.queue is not None:
             with contextlib.suppress(Exception):
                 await self.queue.close_async()
 
     async def _retry_stalled(self) -> None:
         """Hand back jobs whose worker stopped heartbeating (a crash or a
-        killed container), as Procrastinate's docs recommend."""
+        killed container), as Procrastinate's docs recommend.
+
+        One job at a time: a stalled corpus job cannot go back to waiting
+        while a newer job with its queueing lock already waits (the unique
+        index procrastinate_jobs_queueing_lock_idx_v1), and that must not stop
+        the others being handed back. The newer job does its work anyway, so
+        the stalled one is closed as failed.
+        """
+        from procrastinate.exceptions import UniqueViolation
+        from procrastinate.jobs import Status
+
         try:
             stalled = await self.queue.job_manager.get_stalled_jobs(queue=QUEUE_NAME, seconds_since_heartbeat=60)
-            for job in stalled:
-                await self.queue.job_manager.retry_job(job)
-                logger.info("retried stalled job %s", job.id)
         except Exception:
             logger.warning("could not check for stalled jobs", exc_info=True)
+            return
+        for job in stalled:
+            try:
+                await self.queue.job_manager.retry_job(job)
+                logger.info("retried stalled job %s", job.id)
+            except UniqueViolation:
+                with contextlib.suppress(Exception):
+                    await self.queue.job_manager.finish_job(job=job, status=Status.FAILED, delete_job=False)
+                logger.info("closed stalled job %s: a newer one with its queueing lock is waiting", job.id)
+            except Exception:
+                logger.warning("could not retry stalled job %s", job.id, exc_info=True)
 
     async def _watch_stalled(self) -> None:
         while True:

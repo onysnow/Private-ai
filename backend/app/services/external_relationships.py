@@ -5,6 +5,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.jobs.corpus import request_corpus_sync
 from app.models.domain import (
     ConnectorFinding, Entity, ExternalRelationshipReview, ExternalRelationshipPromotion,
 )
@@ -109,6 +110,9 @@ def promote_review(db: Session, review: ExternalRelationshipReview) -> ExternalR
         provider=finding.provider, source_url=finding.source_url,
     )
     db.add(row); db.commit(); db.refresh(row)
+    # create_relationship queued the push already; asking again after the
+    # promotion's own commit keeps that true if it stops committing for us.
+    request_corpus_sync(db, review.investigation_id)
     return row
 
 

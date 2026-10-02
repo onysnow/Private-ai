@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.connectors.registry import registry
 from app.core.time import utcnow_naive
+from app.jobs.corpus import request_corpus_sync
 from app.models.domain import (
     CanonicalEntityMergeAudit, ConnectorRun, CrossProviderDecision, Entity, Evidence,
     EnrichmentSession, EnrichmentSessionFinding, EnrichmentSessionRun,
@@ -35,6 +36,9 @@ def create_entity(db: Session, body: EntityCreate) -> Entity:
             db.add(Statement(entity_id=row.id, prop=prop, value=value, dataset=body.dataset, origin=body.origin, original_value=value))
     db.commit()
     db.refresh(row)
+    # A confirmed entity goes to the investigation's OpenAleph collection
+    # (ADR-0006, Wave B); queued after the commit, so it can never undo it.
+    request_corpus_sync(db, row.investigation_id)
     return row
 
 
@@ -66,6 +70,7 @@ def update_entity(db: Session, entity: Entity, body: EntityUpdate) -> Entity:
         entity.properties = merged
     db.commit()
     db.refresh(entity)
+    request_corpus_sync(db, entity.investigation_id)
     return entity
 
 

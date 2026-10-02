@@ -14,6 +14,7 @@ from app.services.pdf_ocr import extract_pdf_chunks
 from app.services.document_reader import read_chunks
 from app.core.config import settings
 from app.db.locking import lock_investigation_transaction
+from app.jobs.corpus import request_corpus_sync
 
 SUPPORTED_EXTENSIONS = {'.txt', '.md', '.csv', '.html', '.htm', '.pdf', '.docx'}
 NAME_RE = re.compile(r"\b([A-Z][A-Za-z'’.-]+(?:\s+(?:[A-Z][A-Za-z'’.-]+|of|the|and|&)){1,5})\b")
@@ -561,6 +562,10 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
     else: raise ValueError('Unsupported candidate type')
     candidate.review_status='accepted'; candidate.accepted_record_type=rtype; candidate.accepted_record_id=accepted_id
     db.commit(); db.refresh(candidate)
+    if rtype in {'entity', 'relationship'}:
+        # An accepted entity or relationship goes to the OpenAleph collection
+        # (ADR-0006, Wave B), queued once the acceptance is committed.
+        request_corpus_sync(db, doc.investigation_id)
     record_out: dict
     if entity_record is not None:
         record_out = {'id': entity_record.id, 'investigation_id': entity_record.investigation_id, 'ftm_id': entity_record.ftm_id, 'schema': entity_record.schema, 'caption': entity_record.caption, 'properties': entity_record.properties}

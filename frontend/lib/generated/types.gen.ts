@@ -2368,6 +2368,129 @@ export type CoreCapabilitiesOut = {
 };
 
 /**
+ * CorpusPendingOut
+ *
+ * What the next push would change, and the records it cannot send (with why).
+ */
+export type CorpusPendingOut = {
+  /**
+   * Cannot Send
+   */
+  cannot_send: Array<string>;
+  /**
+   * To Remove
+   */
+  to_remove: number;
+  /**
+   * To Send
+   */
+  to_send: number;
+};
+
+/**
+ * CorpusPushOut
+ *
+ * The last push of confirmed records to the investigation's collection.
+ */
+export type CorpusPushOut = {
+  /**
+   * Error
+   */
+  error: string | null;
+  /**
+   * Finished At
+   */
+  finished_at: string | null;
+  /**
+   * Message
+   */
+  message: string | null;
+  /**
+   * Removals Waiting
+   */
+  removals_waiting: number;
+  /**
+   * Removed
+   */
+  removed: number;
+  /**
+   * Sent
+   */
+  sent: number;
+  /**
+   * Started At
+   */
+  started_at: string | null;
+  /**
+   * Status
+   */
+  status: 'never' | 'running' | 'succeeded' | 'waiting' | 'failed';
+  /**
+   * Unchanged
+   */
+  unchanged: number;
+};
+
+/**
+ * CorpusSyncNowOut
+ *
+ * The answer to "Sync now": queued for the worker, or run here and finished.
+ */
+export type CorpusSyncNowOut = {
+  /**
+   * Queued
+   */
+  queued: boolean;
+  /**
+   * Ran
+   */
+  ran: boolean;
+  sync: CorpusSyncOut;
+};
+
+/**
+ * CorpusSyncOut
+ *
+ * The "Corpus sync" line: is OpenAleph in step with what reporters confirmed?
+ */
+export type CorpusSyncOut = {
+  /**
+   * Background
+   */
+  background: boolean;
+  /**
+   * Collection Id
+   */
+  collection_id: string | null;
+  /**
+   * Collection Label
+   */
+  collection_label: string | null;
+  /**
+   * Consecutive Failures
+   */
+  consecutive_failures: number;
+  /**
+   * Enabled
+   */
+  enabled: boolean;
+  /**
+   * Failures
+   */
+  failures: Array<AppSchemasResponsesOpenAlephOperationFailureOut2>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  pending: CorpusPendingOut;
+  push: CorpusPushOut;
+  /**
+   * Pushed Records
+   */
+  pushed_records: number;
+};
+
+/**
  * CrossProviderDecisionOut
  *
  * A reporter's decision that findings from different providers are, or
@@ -6540,40 +6663,6 @@ export type OpenAlephEvidenceImportOut = {
 };
 
 /**
- * OpenAlephOperationFailureOut
- *
- * A failed OpenAleph pipeline step, kept server-side so a 502 can be explained later.
- */
-export type OpenAlephOperationFailureOut = {
-  /**
-   * Created At
-   *
-   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
-   */
-  created_at: string;
-  /**
-   * Document Id
-   */
-  document_id: string | null;
-  /**
-   * Error
-   */
-  error: string;
-  /**
-   * Id
-   */
-  id: string;
-  /**
-   * Investigation Id
-   */
-  investigation_id: string;
-  /**
-   * Operation
-   */
-  operation: string;
-};
-
-/**
  * OpenAlephPlatformOut
  */
 export type OpenAlephPlatformOut = {
@@ -10005,6 +10094,72 @@ export type WriteupsOut = {
   writeups: Array<WriteupSummaryOut>;
 };
 
+/**
+ * OpenAlephOperationFailureOut
+ *
+ * A failed OpenAleph pipeline step, kept server-side so a 502 can be explained later.
+ */
+export type AppSchemasResponsesOpenAlephOperationFailureOut1 = {
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Document Id
+   */
+  document_id: string | null;
+  /**
+   * Error
+   */
+  error: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Operation
+   */
+  operation: string;
+};
+
+/**
+ * OpenAlephOperationFailureOut
+ *
+ * A failed OpenAleph operation, kept for the reporter and the operator.
+ */
+export type AppSchemasResponsesOpenAlephOperationFailureOut2 = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Document Id
+   */
+  document_id: string | null;
+  /**
+   * Error
+   */
+  error: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Operation
+   */
+  operation: string;
+};
+
 export type GetAiAnalysisCandidateEndpointData = {
   body?: never;
   path: {
@@ -11461,9 +11616,13 @@ export type AnalyzeOpenalephDocumentData = {
 
 export type AnalyzeOpenalephDocumentErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type AnalyzeOpenalephDocumentError =
@@ -12533,9 +12692,13 @@ export type GetIdentifierTargetsData = {
 
 export type GetIdentifierTargetsErrors = {
   /**
-   * Validation Error
+   * The request's input does not match what the route declares
    */
-  422: HttpValidationError;
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
 };
 
 export type GetIdentifierTargetsError =
@@ -13272,11 +13435,81 @@ export type ListOpenalephCorpusFailuresResponses = {
    *
    * Successful Response
    */
-  200: Array<OpenAlephOperationFailureOut>;
+  200: Array<AppSchemasResponsesOpenAlephOperationFailureOut1>;
 };
 
 export type ListOpenalephCorpusFailuresResponse =
   ListOpenalephCorpusFailuresResponses[keyof ListOpenalephCorpusFailuresResponses];
+
+export type GetCorpusSyncData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/corpus/sync';
+};
+
+export type GetCorpusSyncErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCorpusSyncError = GetCorpusSyncErrors[keyof GetCorpusSyncErrors];
+
+export type GetCorpusSyncResponses = {
+  /**
+   * Successful Response
+   */
+  200: CorpusSyncOut;
+};
+
+export type GetCorpusSyncResponse =
+  GetCorpusSyncResponses[keyof GetCorpusSyncResponses];
+
+export type SyncCorpusNowData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/corpus/sync';
+};
+
+export type SyncCorpusNowErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SyncCorpusNowError = SyncCorpusNowErrors[keyof SyncCorpusNowErrors];
+
+export type SyncCorpusNowResponses = {
+  /**
+   * Successful Response
+   */
+  200: CorpusSyncNowOut;
+};
+
+export type SyncCorpusNowResponse =
+  SyncCorpusNowResponses[keyof SyncCorpusNowResponses];
 
 export type ListDecksEndpointData = {
   body?: never;

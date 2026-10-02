@@ -336,6 +336,43 @@ def test_openaleph_corpus_replies(demo, monkeypatch):
     _same_through_model(list[r.ExtractionCandidateOut], explained)
 
 
+def test_corpus_sync_replies(monkeypatch):
+    """The "Corpus sync" line before any push, after one, after a failure
+    (ADR-0006, Wave B), and the "Sync now" reply around it."""
+    from app.core.config import settings
+    from app.jobs import corpus as corpus_jobs
+    from app.schemas.api import EntityCreate
+    from app.services.corpus_push import corpus_sync_status
+    from app.services.entities import create_entity
+    from app.services.relationships import create_relationship
+    from tests.openaleph_corpus_fake import BASE_URL, FakeOpenAleph
+
+    monkeypatch.setattr(settings, "openaleph_enabled", True)
+    monkeypatch.setattr(settings, "openaleph_base_url", BASE_URL)
+    monkeypatch.setattr(settings, "openaleph_api_key", "test-key")
+    fake = FakeOpenAleph()
+    with SessionLocal() as db:
+        inv = Investigation(name="Corpus replies")
+        db.add(inv); db.commit(); db.refresh(inv)
+        a = create_entity(db, EntityCreate(investigation_id=inv.id, schema="Person", caption="Jane Doe"))
+        b = create_entity(db, EntityCreate(investigation_id=inv.id, schema="Thing", caption="Unclassified"))
+        create_relationship(db, investigation_id=inv.id, schema="UnknownLink", source_entity_id=a.id, target_entity_id=b.id)
+        before = corpus_sync_status(db, inv.id, background=False)
+        assert before["pending"]["cannot_send"] and before["push"]["status"] == "never"
+        _same_through_model(r.CorpusSyncOut, before)
+        corpus_jobs.push_step(SessionLocal, inv.id, gateway=fake.gateway())
+        after = corpus_sync_status(db, inv.id, background=True)
+        assert after["push"]["finished_at"] is not None and after["collection_id"]
+        _same_through_model(r.CorpusSyncOut, after)
+        _same_through_model(r.CorpusSyncNowOut, {"queued": True, "ran": False, "sync": after})
+        fake.fail[("POST", "/api/2/collections")] = 503
+        fake.fail[("GET", "/api/2/collections")] = 503
+        corpus_jobs.push_step(SessionLocal, inv.id, gateway=fake.gateway())
+        failed = corpus_sync_status(db, inv.id, background=False)
+        assert failed["failures"] and failed["push"]["error"]
+        _same_through_model(r.CorpusSyncOut, failed)
+
+
 def test_backup_replies(demo, tmp_path):
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
