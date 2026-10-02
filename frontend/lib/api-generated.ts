@@ -4,10 +4,16 @@
 // (Foundation Fixes fix 2). A reply that fails its generated Zod check
 // becomes an ApiPayloadError, as the hand-written validators do.
 import {ZodError} from 'zod';
+import type {ZodType} from 'zod';
 
 import type {ApiClient} from './api-client';
 import {ApiPayloadError} from './api-validate';
 import {client} from './generated/client.gen';
+
+function payloadError(error: ZodError, endpoint: string): ApiPayloadError {
+  const issue = error.issues[0];
+  return new ApiPayloadError(endpoint, `${issue?.path.join('.') || 'reply'}: ${issue?.message || 'unexpected shape'}`);
+}
 
 export function connectGeneratedClient(api:ApiClient):void{
   // The generated client always calls fetch with a single Request.
@@ -15,12 +21,23 @@ export function connectGeneratedClient(api:ApiClient):void{
   client.setConfig({baseUrl:api.baseUrl,fetch:viaApiClient,throwOnError:true});
   client.interceptors.error.use((error,_response,request)=>{
     if(error instanceof ZodError){
-      const path=request?new URL(request.url).pathname:'(unknown endpoint)';
-      const issue=error.issues[0];
-      return new ApiPayloadError(path,`${issue?.path.join('.')||'reply'}: ${issue?.message||'unexpected shape'}`);
+      return payloadError(error, request?new URL(request.url).pathname:'(unknown endpoint)');
     }
     return error;
   });
+}
+
+/** The reply check for a call that cannot go through the generated client:
+ * a file upload, whose FormData must reach fetch as it is (the bridge above
+ * re-reads a request's body as text, which a zip or a PDF does not survive).
+ * The call goes through ApiClient.parsed with the same generated Zod schema
+ * the client would run, and fails the same way. */
+export function checkedReply<T>(schema: ZodType<T>): (value: unknown, endpoint: string) => T {
+  return (value, endpoint) => {
+    const parsed = schema.safeParse(value);
+    if (parsed.success) return parsed.data;
+    throw payloadError(parsed.error, endpoint);
+  };
 }
 
 export {client as generatedClient};

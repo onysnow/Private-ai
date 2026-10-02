@@ -362,12 +362,3 @@ def explain_extraction_candidate(db: Session, candidate: ExtractionCandidate) ->
         "review_rule": "Nothing in this proposal is in the investigation until a reporter accepts it.",
     }
 
-
-def serialize_candidate(candidate: ExtractionCandidate) -> dict[str, Any]:
-    return {
-        "id": candidate.id, "investigation_id": candidate.investigation_id, "document_id": candidate.document_id,
-        "chunk_id": candidate.chunk_id, "candidate_type": candidate.candidate_type, "payload": candidate.payload or {},
-        "confidence": candidate.confidence, "review_status": candidate.review_status,
-        "accepted_record_type": candidate.accepted_record_type, "accepted_record_id": candidate.accepted_record_id,
-        "reviewer_note": candidate.reviewer_note, "created_at": candidate.created_at, "reviewed_at": candidate.reviewed_at,
-    }

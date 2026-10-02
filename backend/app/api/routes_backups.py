@@ -13,6 +13,7 @@ from app.api.dependencies import authorize_request_resource, read_upload_limited
 from app.core.authorization import require_scope_global_admin, scope_for_request
 from app.core.config import settings
 from app.db.session import get_db
+from app.schemas.responses import BackupPreviewOut, BackupRestoreResultOut
 from app.services.exports import inspect_export, preview_investigation_restore, restore_investigation_export
 from app.services.security import resolve_storage_root
 
@@ -29,7 +30,7 @@ async def inspect_backup(file: UploadFile = File(...)) -> dict[str, Any]:
     return {"manifest": manifest, "record_counts": {k: len(v) for k, v in records.items()}}
 
 
-@router.post("/backups/preview", response_model=None)
+@router.post("/backups/preview", response_model=BackupPreviewOut)
 async def preview_backup_restore(file: UploadFile = File(...), db: Session = Depends(get_db)) -> Any:
     data = await read_upload_limited(file, settings.max_backup_bytes)
     try:
@@ -38,7 +39,7 @@ async def preview_backup_restore(file: UploadFile = File(...), db: Session = Dep
         raise HTTPException(400, str(exc))
 
 
-@router.post("/backups/restore", response_model=None)
+@router.post("/backups/restore", response_model=BackupRestoreResultOut)
 async def restore_backup(request: Request, file: UploadFile = File(...), db: Session = Depends(get_db)) -> Any:
     if not settings.enable_restore_api:
         raise HTTPException(403, "Backup restore API is disabled; set ENABLE_RESTORE_API=true to enable it")

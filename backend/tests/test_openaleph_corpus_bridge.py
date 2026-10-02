@@ -160,7 +160,7 @@ def test_openaleph_page_text_is_staged_for_human_review(tmp_path, monkeypatch):
         assert lineage["candidate"]["payload"]["provenance"]["provider_entity_id"] == "oa-page-1"
 
         accepted = review_candidate(db, candidates[0], decision="accept", note="Reporter verified against the source page")
-        assert accepted["candidate"].review_status == "accepted"
+        assert accepted["candidate"]["review_status"] == "accepted"
         evidence = db.get(Evidence, accepted["record"]["id"])
         assert evidence.quote == "Exact extracted page text from OpenAleph."
         assert evidence.locator == "openaleph:page:oa-page-1"

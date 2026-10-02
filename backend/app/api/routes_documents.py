@@ -23,10 +23,13 @@ from app.jobs.handlers import EXTRACT_DOCUMENT
 from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Document, Investigation
+from app.schemas.responses import (
+    DocumentDetailOut, DocumentUploadOut, ExtractionCandidateOut, OpenAlephDocumentSyncOut, OpenAlephEntityImportOut,
+    OpenAlephEvidenceImportOut, OpenAlephReviewRefreshOut, OpenAlephReviewStatusOut,
+)
 from app.services.documents import (
     get_document_detail, list_document_candidates, serialize_document, store_document,
 )
-from app.services.extraction_explanations import explain_extraction_candidate, serialize_candidate
 from app.services.openaleph_corpus import (
     get_document_sync, get_openaleph_review_status, import_openaleph_entity_candidates,
     import_openaleph_evidence_candidates, record_openaleph_operation_failure,
@@ -38,14 +41,14 @@ router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resour
 logger = logging.getLogger("journalism.jobs")
 
 
-@router.get("/documents/{document_id}/corpus/openaleph", response_model=None)
+@router.get("/documents/{document_id}/corpus/openaleph", response_model=OpenAlephDocumentSyncOut)
 def get_openaleph_document_sync(document_id: str, db: Session = Depends(get_db)) -> dict[str, Any]:
     if db.get(Document, document_id) is None:
         raise HTTPException(404, "Document not found")
     return {"sync": serialize_sync(get_document_sync(db, document_id))}
 
 
-@router.get("/documents/{document_id}/corpus/openaleph/review-status", response_model=None)
+@router.get("/documents/{document_id}/corpus/openaleph/review-status", response_model=OpenAlephReviewStatusOut)
 def get_openaleph_document_review_status(document_id: str, db: Session = Depends(get_db)) -> Any:
     """Report provider sync plus human-review queue progress for one document."""
     try:
@@ -54,7 +57,7 @@ def get_openaleph_document_review_status(document_id: str, db: Session = Depends
         raise HTTPException(404, str(exc))
 
 
-@router.post("/documents/{document_id}/corpus/openaleph/sync", response_model=None)
+@router.post("/documents/{document_id}/corpus/openaleph/sync", response_model=OpenAlephDocumentSyncOut)
 def sync_openaleph_document(document_id: str, db: Session = Depends(get_db)) -> dict[str, Any]:
     try:
         row = sync_document_to_openaleph(db, document_id)
@@ -65,7 +68,7 @@ def sync_openaleph_document(document_id: str, db: Session = Depends(get_db)) -> 
     return {"sync": serialize_sync(row)}
 
 
-@router.post("/documents/{document_id}/corpus/openaleph/refresh-review", response_model=None)
+@router.post("/documents/{document_id}/corpus/openaleph/refresh-review", response_model=OpenAlephReviewRefreshOut)
 def refresh_openaleph_document_review(document_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
     """Refresh OpenAleph Page + Mention candidates without auto-accepting either."""
     try:
@@ -85,7 +88,7 @@ def refresh_openaleph_document_review(document_id: str, request: Request, db: Se
         raise HTTPException(502, f"OpenAleph review refresh failed. Details were logged server-side (request {request.state.request_id}).")
 
 
-@router.post("/documents/{document_id}/corpus/openaleph/import-evidence", response_model=None)
+@router.post("/documents/{document_id}/corpus/openaleph/import-evidence", response_model=OpenAlephEvidenceImportOut)
 def import_openaleph_document_evidence(document_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
     """Stage OpenAleph page text as review-required evidence candidates."""
     try:
@@ -105,7 +108,7 @@ def import_openaleph_document_evidence(document_id: str, request: Request, db: S
         raise HTTPException(502, f"OpenAleph extraction import failed. Details were logged server-side (request {request.state.request_id}).")
 
 
-@router.post("/documents/{document_id}/corpus/openaleph/import-entities", response_model=None)
+@router.post("/documents/{document_id}/corpus/openaleph/import-entities", response_model=OpenAlephEntityImportOut)
 def import_openaleph_document_entities(document_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
     """Stage OpenAleph/ftm-analyze Mention entities for explicit reporter review."""
     try:
@@ -125,7 +128,7 @@ def import_openaleph_document_entities(document_id: str, request: Request, db: S
         raise HTTPException(502, f"OpenAleph entity import failed. Details were logged server-side (request {request.state.request_id}).")
 
 
-@router.post("/documents/upload", response_model=None)
+@router.post("/documents/upload", response_model=DocumentUploadOut)
 async def upload_document(
     request: Request,
     response: Response,
@@ -193,7 +196,7 @@ async def upload_document(
     return result
 
 
-@router.get("/documents/{document_id}", response_model=None)
+@router.get("/documents/{document_id}", response_model=DocumentDetailOut)
 def get_document(document_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(Document, document_id)
     if row is None:
@@ -201,13 +204,8 @@ def get_document(document_id: str, db: Session = Depends(get_db)) -> Any:
     return get_document_detail(db, row)
 
 
-@router.get("/documents/{document_id}/candidates", response_model=None)
+@router.get("/documents/{document_id}/candidates", response_model=list[ExtractionCandidateOut])
 def list_document_candidates_endpoint(document_id: str, status: str | None = None, candidate_type: str | None = None, explain: bool = False, db: Session = Depends(get_db)) -> Any:
     if db.get(Document, document_id) is None:
         raise HTTPException(404, "Document not found")
-    rows = list_document_candidates(db, document_id, status, candidate_type)
-    if not explain:
-        return rows
-    # #190: attach each proposal's per-part reasoning/sources so the review list
-    # can show why every proposal exists without one request per row.
-    return [{**serialize_candidate(row), "explanation": explain_extraction_candidate(db, row)} for row in rows]
+    return list_document_candidates(db, document_id, status, candidate_type, explain=explain)

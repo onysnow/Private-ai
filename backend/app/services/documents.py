@@ -260,6 +260,26 @@ def serialize_document(db: Session, doc: Document) -> dict:
     return {'id':doc.id,'investigation_id':doc.investigation_id,'source_id':doc.source_id,'filename':doc.filename,'mime_type':doc.mime_type,'sha256':doc.sha256,'extraction_status':doc.extraction_status,'extraction_error':doc.extraction_error,'extraction_issues':doc.extraction_issues or [],'created_at':doc.created_at,'chunk_count':len(chunks),'candidate_counts':counts}
 
 
+def serialize_chunk(chunk: DocumentChunk) -> dict:
+    """One extracted chunk as the API sends it. Rows used to go out as ORM
+    objects, relying on FastAPI's encoder to read their columns; with a
+    declared response model that is fragile, so the shape is explicit."""
+    return {'id': chunk.id, 'document_id': chunk.document_id, 'locator': chunk.locator, 'page_number': chunk.page_number,
+            'ordinal': chunk.ordinal, 'text': chunk.text, 'created_at': chunk.created_at}
+
+
+def serialize_candidate(candidate: ExtractionCandidate) -> dict:
+    """One extraction proposal as the API sends it, the same shape in every
+    reply that carries one (list, review, staged relationship)."""
+    return {
+        'id': candidate.id, 'investigation_id': candidate.investigation_id, 'document_id': candidate.document_id,
+        'chunk_id': candidate.chunk_id, 'candidate_type': candidate.candidate_type, 'payload': candidate.payload or {},
+        'confidence': candidate.confidence, 'review_status': candidate.review_status,
+        'accepted_record_type': candidate.accepted_record_type, 'accepted_record_id': candidate.accepted_record_id,
+        'reviewer_note': candidate.reviewer_note, 'created_at': candidate.created_at, 'reviewed_at': candidate.reviewed_at,
+    }
+
+
 def serialize_extraction_lineage(db: Session, candidate: ExtractionCandidate) -> dict:
     """Return the complete read-only document -> chunk -> proposal -> review -> accepted-record trail."""
     doc = db.get(Document, candidate.document_id)
@@ -375,7 +395,7 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
     candidate.reviewer_note = note
     candidate.reviewed_at = utcnow_naive()
     if decision == 'reject':
-        candidate.review_status='rejected'; db.commit(); db.refresh(candidate); return {'candidate': {'id': candidate.id, 'review_status': candidate.review_status, 'reviewer_note': candidate.reviewer_note, 'reviewed_at': candidate.reviewed_at}, 'record': None}
+        candidate.review_status='rejected'; db.commit(); db.refresh(candidate); return {'candidate': serialize_candidate(candidate), 'record': None}
     doc=db.get(Document,candidate.document_id); source=db.get(Source,doc.source_id) if doc else None; chunk=db.get(DocumentChunk,candidate.chunk_id) if candidate.chunk_id else None
     if not doc or not source: raise ValueError('Document/source missing')
     span = candidate.payload.get('span') if isinstance(candidate.payload, dict) else None
@@ -510,20 +530,29 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
     else:
         assert evidence_record is not None
         record_out = {'id': evidence_record.id, 'source_id': evidence_record.source_id, 'quote': evidence_record.quote, 'locator': evidence_record.locator, 'notes': evidence_record.notes}
-    return {'candidate':candidate,'record':record_out}
+    return {'candidate': serialize_candidate(candidate), 'record': record_out}
 
 
 def get_document_detail(db: Session, row: Document) -> dict:
     """Serialize a Document with its chunks attached."""
     result = serialize_document(db, row)
-    result["chunks"] = db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == row.id).order_by(DocumentChunk.ordinal)).all()
+    chunks = db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == row.id).order_by(DocumentChunk.ordinal)).all()
+    result["chunks"] = [serialize_chunk(chunk) for chunk in chunks]
     return result
 
 
-def list_document_candidates(db: Session, document_id: str, status: str | None = None, candidate_type: str | None = None) -> list[ExtractionCandidate]:
+def list_document_candidates(db: Session, document_id: str, status: str | None = None, candidate_type: str | None = None, *, explain: bool = False) -> list[dict]:
+    """A document's proposals, oldest first. With `explain`, each carries the
+    per-part reasoning behind it (#190) so the review list can show why every
+    proposal exists without one request per row."""
+    from app.services.extraction_explanations import explain_extraction_candidate
+
     stmt = select(ExtractionCandidate).where(ExtractionCandidate.document_id == document_id)
     if status:
         stmt = stmt.where(ExtractionCandidate.review_status == status)
     if candidate_type:
         stmt = stmt.where(ExtractionCandidate.candidate_type == candidate_type)
-    return list(db.scalars(stmt.order_by(ExtractionCandidate.created_at)).all())
+    rows = db.scalars(stmt.order_by(ExtractionCandidate.created_at)).all()
+    if not explain:
+        return [serialize_candidate(row) for row in rows]
+    return [{**serialize_candidate(row), "explanation": explain_extraction_candidate(db, row)} for row in rows]

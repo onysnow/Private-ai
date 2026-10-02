@@ -75,6 +75,171 @@ export type ApplyIn = {
 };
 
 /**
+ * BackgroundJobOut
+ *
+ * One piece of slow work and where it stands; the screen polls this.
+ * Every key is always sent (null when unknown), so the nullable ones have
+ * no default: the generated type then matches lib/jobs.ts, which follows a
+ * job.
+ */
+export type BackgroundJobOut = {
+  /**
+   * Attempts
+   */
+  attempts: number;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Error
+   */
+  error: string | null;
+  /**
+   * Finished
+   */
+  finished: boolean;
+  /**
+   * Finished At
+   */
+  finished_at: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string | null;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Message
+   */
+  message: string | null;
+  /**
+   * Progress
+   */
+  progress: number | null;
+  /**
+   * Result
+   */
+  result?: unknown;
+  /**
+   * Runner
+   */
+  runner: string;
+  /**
+   * Started At
+   */
+  started_at: string | null;
+  /**
+   * Status
+   */
+  status: 'queued' | 'running' | 'succeeded' | 'failed' | 'cancelled';
+  /**
+   * Subject Id
+   */
+  subject_id: string | null;
+  /**
+   * Subject Type
+   */
+  subject_type: string | null;
+  /**
+   * Updated At
+   */
+  updated_at: string;
+};
+
+/**
+ * BackupInvestigationOut
+ */
+export type BackupInvestigationOut = {
+  /**
+   * Description
+   */
+  description?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Name
+   */
+  name: string;
+};
+
+/**
+ * BackupPreviewOut
+ */
+export type BackupPreviewOut = {
+  /**
+   * Can Restore
+   */
+  can_restore: boolean;
+  /**
+   * Conflicts
+   */
+  conflicts: Array<RestoreConflictOut>;
+  /**
+   * Document File Count
+   */
+  document_file_count: number;
+  /**
+   * Format
+   */
+  format: string;
+  investigation: BackupInvestigationOut;
+  lineage_integrity?: LineageIntegrityOut | null;
+  /**
+   * Missing Document Count
+   */
+  missing_document_count: number;
+  /**
+   * Record Counts
+   */
+  record_counts: {
+    [key: string]: number;
+  };
+  /**
+   * Restore Api Enabled
+   */
+  restore_api_enabled: boolean;
+  /**
+   * Version
+   */
+  version: number;
+  /**
+   * Warnings
+   */
+  warnings: Array<string>;
+};
+
+/**
+ * BackupRestoreResultOut
+ */
+export type BackupRestoreResultOut = {
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Manifest
+   */
+  manifest: {
+    [key: string]: unknown;
+  };
+  /**
+   * Restored Counts
+   */
+  restored_counts: {
+    [key: string]: number;
+  };
+};
+
+/**
  * Body_inspect_backup
  */
 export type BodyInspectBackup = {
@@ -671,6 +836,219 @@ export type DisabledIn = {
 };
 
 /**
+ * DocumentChunkOut
+ */
+export type DocumentChunkOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Locator
+   */
+  locator: string;
+  /**
+   * Ordinal
+   */
+  ordinal: number;
+  /**
+   * Page Number
+   */
+  page_number?: number | null;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * DocumentDetailOut
+ *
+ * A document with its extracted chunks (GET /documents/{id}).
+ */
+export type DocumentDetailOut = {
+  /**
+   * Candidate Counts
+   */
+  candidate_counts: {
+    [key: string]: number;
+  };
+  /**
+   * Chunk Count
+   */
+  chunk_count: number;
+  /**
+   * Chunks
+   */
+  chunks: Array<DocumentChunkOut>;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Extraction Error
+   */
+  extraction_error?: string | null;
+  /**
+   * Extraction Issues
+   */
+  extraction_issues: Array<string>;
+  /**
+   * Extraction Status
+   */
+  extraction_status: string;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Mime Type
+   */
+  mime_type?: string | null;
+  /**
+   * Sha256
+   */
+  sha256: string;
+  /**
+   * Source Id
+   */
+  source_id: string;
+};
+
+/**
+ * DocumentOut
+ */
+export type DocumentOut = {
+  /**
+   * Candidate Counts
+   */
+  candidate_counts: {
+    [key: string]: number;
+  };
+  /**
+   * Chunk Count
+   */
+  chunk_count: number;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Extraction Error
+   */
+  extraction_error?: string | null;
+  /**
+   * Extraction Issues
+   */
+  extraction_issues: Array<string>;
+  /**
+   * Extraction Status
+   */
+  extraction_status: string;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Mime Type
+   */
+  mime_type?: string | null;
+  /**
+   * Sha256
+   */
+  sha256: string;
+  /**
+   * Source Id
+   */
+  source_id: string;
+};
+
+/**
+ * DocumentUploadOut
+ *
+ * The reply to an upload: the saved document, the job that reads it
+ * (already finished in developer mode), and its OpenAleph state.
+ */
+export type DocumentUploadOut = {
+  /**
+   * Candidate Counts
+   */
+  candidate_counts: {
+    [key: string]: number;
+  };
+  /**
+   * Chunk Count
+   */
+  chunk_count: number;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Extraction Error
+   */
+  extraction_error?: string | null;
+  /**
+   * Extraction Issues
+   */
+  extraction_issues: Array<string>;
+  /**
+   * Extraction Status
+   */
+  extraction_status: string;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  job?: BackgroundJobOut | null;
+  /**
+   * Mime Type
+   */
+  mime_type?: string | null;
+  openaleph_sync?: OpenAlephSyncOut | null;
+  /**
+   * Sha256
+   */
+  sha256: string;
+  /**
+   * Source Id
+   */
+  source_id: string;
+};
+
+/**
  * EntityCreate
  */
 export type EntityCreate = {
@@ -859,6 +1237,297 @@ export type ExplainIn = {
 };
 
 /**
+ * ExplanationChunkRefOut
+ */
+export type ExplanationChunkRefOut = {
+  excerpt?: ExplanationExcerptOut | null;
+  /**
+   * Extraction Method
+   */
+  extraction_method: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: 'chunk';
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Locator
+   */
+  locator: string;
+  /**
+   * Page Number
+   */
+  page_number?: number | null;
+};
+
+/**
+ * ExplanationClaimRefOut
+ */
+export type ExplanationClaimRefOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: 'claim';
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Status
+   */
+  status: string;
+};
+
+/**
+ * ExplanationConfidenceOut
+ */
+export type ExplanationConfidenceOut = {
+  /**
+   * Basis
+   */
+  basis: string;
+  /**
+   * Value
+   */
+  value?: number | null;
+};
+
+/**
+ * ExplanationDocumentRefOut
+ */
+export type ExplanationDocumentRefOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: 'document';
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Mime Type
+   */
+  mime_type?: string | null;
+  /**
+   * Sha256
+   */
+  sha256: string;
+};
+
+/**
+ * ExplanationEntityRefOut
+ */
+export type ExplanationEntityRefOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: 'entity';
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
+ * ExplanationEvidenceRefOut
+ */
+export type ExplanationEvidenceRefOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: 'evidence';
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Locator
+   */
+  locator?: string | null;
+  /**
+   * Source Id
+   */
+  source_id: string;
+  /**
+   * Source Title
+   */
+  source_title?: string | null;
+};
+
+/**
+ * ExplanationExcerptOut
+ *
+ * The matched text with a little of what surrounds it.
+ */
+export type ExplanationExcerptOut = {
+  /**
+   * After
+   */
+  after: string;
+  /**
+   * Before
+   */
+  before: string;
+  /**
+   * End Char
+   */
+  end_char: number;
+  /**
+   * Match
+   */
+  match: string;
+  /**
+   * Start Char
+   */
+  start_char: number;
+};
+
+/**
+ * ExplanationMethodOut
+ */
+export type ExplanationMethodOut = {
+  /**
+   * Automated
+   */
+  automated: boolean;
+  /**
+   * Description
+   */
+  description: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Label
+   */
+  label: string;
+};
+
+/**
+ * ExplanationPartOut
+ *
+ * One part of a proposal: what it says, why, and where it came from.
+ */
+export type ExplanationPartOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Reasoning
+   */
+  reasoning: Array<string>;
+  /**
+   * Sources
+   */
+  sources: Array<
+    | ExplanationChunkRefOut
+    | ExplanationDocumentRefOut
+    | ExplanationSourceRefOut
+    | ExplanationProviderRefOut
+    | ExplanationClaimRefOut
+    | ExplanationEvidenceRefOut
+    | ExplanationEntityRefOut
+  >;
+  /**
+   * Value
+   */
+  value?: unknown;
+};
+
+/**
+ * ExplanationProviderRefOut
+ */
+export type ExplanationProviderRefOut = {
+  /**
+   * Collection Id
+   */
+  collection_id?: string | null;
+  /**
+   * Id
+   */
+  id?: string | null;
+  /**
+   * Kind
+   */
+  kind: 'provider';
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Provider Document Id
+   */
+  provider_document_id?: string | null;
+  /**
+   * Provider Entity Id
+   */
+  provider_entity_id?: string | null;
+};
+
+/**
+ * ExplanationSourceRefOut
+ */
+export type ExplanationSourceRefOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: 'source';
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Source Type
+   */
+  source_type: string;
+  /**
+   * Url
+   */
+  url?: string | null;
+};
+
+/**
  * ExternalAssessmentOut
  */
 export type ExternalAssessmentOut = {
@@ -975,6 +1644,71 @@ export type ExtractedRelationshipProposalCreate = {
 };
 
 /**
+ * ExtractionCandidateOut
+ *
+ * One extraction proposal. `explanation` is present only when the list
+ * was asked for explanations (?explain=true), so it is left out of the
+ * reply rather than sent as null.
+ */
+export type ExtractionCandidateOut = {
+  /**
+   * Accepted Record Id
+   */
+  accepted_record_id?: string | null;
+  /**
+   * Accepted Record Type
+   */
+  accepted_record_type?: string | null;
+  /**
+   * Candidate Type
+   */
+  candidate_type: string;
+  /**
+   * Chunk Id
+   */
+  chunk_id?: string | null;
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  explanation?: ExtractionExplanationOut | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Payload
+   */
+  payload: {
+    [key: string]: unknown;
+  };
+  /**
+   * Review Status
+   */
+  review_status: string;
+  /**
+   * Reviewed At
+   */
+  reviewed_at?: string | null;
+  /**
+   * Reviewer Note
+   */
+  reviewer_note?: string | null;
+};
+
+/**
  * ExtractionCandidateReviewRequest
  */
 export type ExtractionCandidateReviewRequest = {
@@ -1013,6 +1747,60 @@ export type ExtractionCandidateReviewRequest = {
 };
 
 /**
+ * ExtractionExplanationOut
+ *
+ * Why a proposal exists (#190): per-part reasoning and sources.
+ */
+export type ExtractionExplanationOut = {
+  /**
+   * Candidate Id
+   */
+  candidate_id: string;
+  /**
+   * Candidate Type
+   */
+  candidate_type: string;
+  /**
+   * Caveats
+   */
+  caveats: Array<string>;
+  confidence: ExplanationConfidenceOut;
+  method: ExplanationMethodOut;
+  /**
+   * Parts
+   */
+  parts: Array<ExplanationPartOut>;
+  /**
+   * Rationale Basis
+   */
+  rationale_basis: 'recorded' | 'reconstructed' | 'provider' | 'reporter';
+  /**
+   * Review Rule
+   */
+  review_rule: string;
+  /**
+   * Review Status
+   */
+  review_status: string;
+  /**
+   * Sources
+   */
+  sources: Array<
+    | ExplanationChunkRefOut
+    | ExplanationDocumentRefOut
+    | ExplanationSourceRefOut
+    | ExplanationProviderRefOut
+    | ExplanationClaimRefOut
+    | ExplanationEvidenceRefOut
+    | ExplanationEntityRefOut
+  >;
+  /**
+   * Summary
+   */
+  summary: string;
+};
+
+/**
  * ExtractionLineageLookupOut
  */
 export type ExtractionLineageLookupOut = {
@@ -1033,6 +1821,23 @@ export type ExtractionLineageOut = {
   chunk?: LineageChunkOut | null;
   document?: LineageDocumentOut | null;
   source?: LineageSourceOut | null;
+};
+
+/**
+ * ExtractionReviewOut
+ *
+ * The reply to a review decision: the proposal as it now stands and, for
+ * an acceptance, the record it made (an entity, claim, evidence record or
+ * relationship, each in its own shape).
+ */
+export type ExtractionReviewOut = {
+  candidate: ExtractionCandidateOut;
+  /**
+   * Record
+   */
+  record?: {
+    [key: string]: unknown;
+  } | null;
 };
 
 /**
@@ -1507,6 +2312,47 @@ export type LineageDocumentOut = {
 };
 
 /**
+ * LineageIntegrityOut
+ *
+ * Whether every proposal in the archive still points at its document,
+ * chunk and accepted record.
+ */
+export type LineageIntegrityOut = {
+  /**
+   * Accepted Record Counts
+   */
+  accepted_record_counts: {
+    [key: string]: number;
+  };
+  /**
+   * Candidate Count
+   */
+  candidate_count: number;
+  /**
+   * Candidate Status Counts
+   */
+  candidate_status_counts: {
+    [key: string]: number;
+  };
+  /**
+   * Chunk Count
+   */
+  chunk_count: number;
+  /**
+   * Document Count
+   */
+  document_count: number;
+  /**
+   * Errors
+   */
+  errors: Array<string>;
+  /**
+   * Valid
+   */
+  valid: boolean;
+};
+
+/**
  * LineageSourceOut
  */
 export type LineageSourceOut = {
@@ -1546,6 +2392,268 @@ export type MultiEnrichmentRequest = {
    * Providers
    */
   providers?: Array<string>;
+};
+
+/**
+ * OpenAlephBindingOut
+ */
+export type OpenAlephBindingOut = {
+  /**
+   * Collection Id
+   */
+  collection_id: string;
+  /**
+   * Collection Label
+   */
+  collection_label?: string | null;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Foreign Id
+   */
+  foreign_id?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Updated At
+   */
+  updated_at: string;
+};
+
+/**
+ * OpenAlephDocumentSyncOut
+ */
+export type OpenAlephDocumentSyncOut = {
+  sync?: OpenAlephSyncOut | null;
+};
+
+/**
+ * OpenAlephEntityImportOut
+ */
+export type OpenAlephEntityImportOut = {
+  /**
+   * Automatic Resolution
+   */
+  automatic_resolution: boolean;
+  /**
+   * Collection Id
+   */
+  collection_id: string;
+  /**
+   * Created Candidates
+   */
+  created_candidates: number;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Provider Document Id
+   */
+  provider_document_id?: string | null;
+  /**
+   * Retrieved
+   */
+  retrieved: number;
+  /**
+   * Review Required
+   */
+  review_required: boolean;
+  /**
+   * Skipped
+   */
+  skipped: number;
+};
+
+/**
+ * OpenAlephEvidenceImportOut
+ */
+export type OpenAlephEvidenceImportOut = {
+  /**
+   * Collection Id
+   */
+  collection_id: string;
+  /**
+   * Created Candidates
+   */
+  created_candidates: number;
+  /**
+   * Created Chunks
+   */
+  created_chunks: number;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Provider Document Id
+   */
+  provider_document_id?: string | null;
+  /**
+   * Retrieved
+   */
+  retrieved: number;
+  /**
+   * Review Required
+   */
+  review_required: boolean;
+  /**
+   * Skipped
+   */
+  skipped: number;
+};
+
+/**
+ * OpenAlephReviewRefreshOut
+ */
+export type OpenAlephReviewRefreshOut = {
+  /**
+   * Document Id
+   */
+  document_id: string;
+  entities: OpenAlephEntityImportOut;
+  evidence: OpenAlephEvidenceImportOut;
+  /**
+   * Provider
+   */
+  provider: string;
+  status: OpenAlephReviewStatusOut;
+};
+
+/**
+ * OpenAlephReviewStatusOut
+ *
+ * Provider sync plus how far reporter review of its proposals has got.
+ */
+export type OpenAlephReviewStatusOut = {
+  binding?: OpenAlephBindingOut | null;
+  /**
+   * Candidate Counts
+   */
+  candidate_counts: {
+    [key: string]: {
+      [key: string]: number;
+    };
+  };
+  /**
+   * Document Extraction Status
+   */
+  document_extraction_status: string;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Provider Candidate Accepted
+   */
+  provider_candidate_accepted: number;
+  /**
+   * Provider Candidate Pending Review
+   */
+  provider_candidate_pending_review: number;
+  /**
+   * Provider Candidate Rejected
+   */
+  provider_candidate_rejected: number;
+  /**
+   * Provider Candidate Total
+   */
+  provider_candidate_total: number;
+  /**
+   * Ready For Import
+   */
+  ready_for_import: boolean;
+  sync?: OpenAlephSyncOut | null;
+};
+
+/**
+ * OpenAlephSyncOut
+ *
+ * How one document stands in the OpenAleph corpus.
+ */
+export type OpenAlephSyncOut = {
+  /**
+   * Collection Id
+   */
+  collection_id: string;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Error
+   */
+  error?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Provider Record Id
+   */
+  provider_record_id?: string | null;
+  /**
+   * Response Json
+   */
+  response_json: {
+    [key: string]: unknown;
+  };
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Synced At
+   */
+  synced_at?: string | null;
+  /**
+   * Updated At
+   */
+  updated_at: string;
 };
 
 /**
@@ -2150,6 +3258,28 @@ export type ResolutionRequest = {
    * Rationale
    */
   rationale?: string | null;
+};
+
+/**
+ * RestoreConflictOut
+ */
+export type RestoreConflictOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Message
+   */
+  message: string;
+  /**
+   * Table
+   */
+  table: string;
 };
 
 /**
@@ -3535,8 +4665,11 @@ export type PreviewBackupRestoreResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: BackupPreviewOut;
 };
+
+export type PreviewBackupRestoreResponse =
+  PreviewBackupRestoreResponses[keyof PreviewBackupRestoreResponses];
 
 export type RestoreBackupData = {
   body: BodyRestoreBackup;
@@ -3558,8 +4691,11 @@ export type RestoreBackupResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: BackupRestoreResultOut;
 };
+
+export type RestoreBackupResponse =
+  RestoreBackupResponses[keyof RestoreBackupResponses];
 
 export type CapabilitiesData = {
   body?: never;
@@ -3712,8 +4848,11 @@ export type CreateExtractedRelationshipProposalResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ExtractionCandidateOut;
 };
+
+export type CreateExtractedRelationshipProposalResponse =
+  CreateExtractedRelationshipProposalResponses[keyof CreateExtractedRelationshipProposalResponses];
 
 export type GetClaimReviewWorkspaceData = {
   body?: never;
@@ -5915,8 +7054,11 @@ export type UploadDocumentResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: DocumentUploadOut;
 };
+
+export type UploadDocumentResponse =
+  UploadDocumentResponses[keyof UploadDocumentResponses];
 
 export type GetDocumentData = {
   body?: never;
@@ -5943,8 +7085,11 @@ export type GetDocumentResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: DocumentDetailOut;
 };
+
+export type GetDocumentResponse =
+  GetDocumentResponses[keyof GetDocumentResponses];
 
 export type ListDocumentCandidatesEndpointData = {
   body?: never;
@@ -5983,10 +7128,15 @@ export type ListDocumentCandidatesEndpointError =
 
 export type ListDocumentCandidatesEndpointResponses = {
   /**
+   * Response List Document Candidates Endpoint
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<ExtractionCandidateOut>;
 };
+
+export type ListDocumentCandidatesEndpointResponse =
+  ListDocumentCandidatesEndpointResponses[keyof ListDocumentCandidatesEndpointResponses];
 
 export type GetOpenalephDocumentSyncData = {
   body?: never;
@@ -6014,8 +7164,11 @@ export type GetOpenalephDocumentSyncResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: OpenAlephDocumentSyncOut;
 };
+
+export type GetOpenalephDocumentSyncResponse =
+  GetOpenalephDocumentSyncResponses[keyof GetOpenalephDocumentSyncResponses];
 
 export type ImportOpenalephDocumentEntitiesData = {
   body?: never;
@@ -6043,8 +7196,11 @@ export type ImportOpenalephDocumentEntitiesResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: OpenAlephEntityImportOut;
 };
+
+export type ImportOpenalephDocumentEntitiesResponse =
+  ImportOpenalephDocumentEntitiesResponses[keyof ImportOpenalephDocumentEntitiesResponses];
 
 export type ImportOpenalephDocumentEvidenceData = {
   body?: never;
@@ -6072,8 +7228,11 @@ export type ImportOpenalephDocumentEvidenceResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: OpenAlephEvidenceImportOut;
 };
+
+export type ImportOpenalephDocumentEvidenceResponse =
+  ImportOpenalephDocumentEvidenceResponses[keyof ImportOpenalephDocumentEvidenceResponses];
 
 export type RefreshOpenalephDocumentReviewData = {
   body?: never;
@@ -6101,8 +7260,11 @@ export type RefreshOpenalephDocumentReviewResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: OpenAlephReviewRefreshOut;
 };
+
+export type RefreshOpenalephDocumentReviewResponse =
+  RefreshOpenalephDocumentReviewResponses[keyof RefreshOpenalephDocumentReviewResponses];
 
 export type GetOpenalephDocumentReviewStatusData = {
   body?: never;
@@ -6130,8 +7292,11 @@ export type GetOpenalephDocumentReviewStatusResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: OpenAlephReviewStatusOut;
 };
+
+export type GetOpenalephDocumentReviewStatusResponse =
+  GetOpenalephDocumentReviewStatusResponses[keyof GetOpenalephDocumentReviewStatusResponses];
 
 export type SyncOpenalephDocumentData = {
   body?: never;
@@ -6159,8 +7324,11 @@ export type SyncOpenalephDocumentResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: OpenAlephDocumentSyncOut;
 };
+
+export type SyncOpenalephDocumentResponse =
+  SyncOpenalephDocumentResponses[keyof SyncOpenalephDocumentResponses];
 
 export type EnrichmentSessionDetailData = {
   body?: never;
@@ -6983,8 +8151,11 @@ export type GetExtractionCandidateExplanationResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ExtractionExplanationOut;
 };
+
+export type GetExtractionCandidateExplanationResponse =
+  GetExtractionCandidateExplanationResponses[keyof GetExtractionCandidateExplanationResponses];
 
 export type GetExtractionCandidateLineageData = {
   body?: never;
@@ -7044,8 +8215,11 @@ export type ReviewExtractionCandidateResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: ExtractionReviewOut;
 };
+
+export type ReviewExtractionCandidateResponse =
+  ReviewExtractionCandidateResponses[keyof ReviewExtractionCandidateResponses];
 
 export type HealthData = {
   body?: never;
@@ -7605,10 +8779,15 @@ export type ListDocumentsError = ListDocumentsErrors[keyof ListDocumentsErrors];
 
 export type ListDocumentsResponses = {
   /**
+   * Response List Documents
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<DocumentOut>;
 };
+
+export type ListDocumentsResponse =
+  ListDocumentsResponses[keyof ListDocumentsResponses];
 
 export type ListEntitiesData = {
   body?: never;
@@ -8194,10 +9373,15 @@ export type ListJobsEndpointError =
 
 export type ListJobsEndpointResponses = {
   /**
+   * Response List Jobs Endpoint
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<BackgroundJobOut>;
 };
+
+export type ListJobsEndpointResponse =
+  ListJobsEndpointResponses[keyof ListJobsEndpointResponses];
 
 export type GetJobEndpointData = {
   body?: never;
@@ -8225,8 +9409,11 @@ export type GetJobEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: BackgroundJobOut;
 };
+
+export type GetJobEndpointResponse =
+  GetJobEndpointResponses[keyof GetJobEndpointResponses];
 
 export type CancelJobEndpointData = {
   body?: never;
@@ -8254,8 +9441,11 @@ export type CancelJobEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: BackgroundJobOut;
 };
+
+export type CancelJobEndpointResponse =
+  CancelJobEndpointResponses[keyof CancelJobEndpointResponses];
 
 export type RetryJobEndpointData = {
   body?: never;
@@ -8283,8 +9473,11 @@ export type RetryJobEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: BackgroundJobOut;
 };
+
+export type RetryJobEndpointResponse =
+  RetryJobEndpointResponses[keyof RetryJobEndpointResponses];
 
 export type CreateLeadEndpointData = {
   body: LeadCreate;

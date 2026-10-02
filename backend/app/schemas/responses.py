@@ -10,7 +10,7 @@ end's types, Zod checks and query hooks are generated from that file.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -567,3 +567,344 @@ class StatementHistoryRowOut(ResponseModel):
     support_count: int
     conflict_count: int
     latest_status: str | None = None
+
+
+# --- Background jobs (ADR-0004) -------------------------------------------------
+
+class BackgroundJobOut(ResponseModel):
+    """One piece of slow work and where it stands; the screen polls this.
+    Every key is always sent (null when unknown), so the nullable ones have
+    no default: the generated type then matches lib/jobs.ts, which follows a
+    job."""
+    id: str
+    kind: str
+    investigation_id: str | None
+    subject_type: str | None
+    subject_id: str | None
+    status: Literal["queued", "running", "succeeded", "failed", "cancelled"]
+    finished: bool
+    progress: int | None
+    message: str | None
+    error: str | None
+    attempts: int
+    runner: str
+    # What the job produced, in the shape its handler chose.
+    result: Any = None
+    created_at: datetime
+    started_at: datetime | None
+    finished_at: datetime | None
+    updated_at: datetime
+
+
+# --- Documents and extraction proposals ----------------------------------------
+
+class DocumentOut(ResponseModel):
+    id: str
+    investigation_id: str
+    source_id: str
+    filename: str
+    mime_type: str | None = None
+    sha256: str
+    extraction_status: str
+    extraction_error: str | None = None
+    extraction_issues: list[str]
+    created_at: datetime
+    chunk_count: int
+    candidate_counts: dict[str, int]
+
+
+class DocumentChunkOut(ResponseModel):
+    id: str
+    document_id: str
+    locator: str
+    page_number: int | None = None
+    ordinal: int
+    text: str
+    created_at: datetime
+
+
+class DocumentDetailOut(DocumentOut):
+    """A document with its extracted chunks (GET /documents/{id})."""
+    chunks: list[DocumentChunkOut]
+
+
+class OpenAlephSyncOut(ResponseModel):
+    """How one document stands in the OpenAleph corpus."""
+    id: str
+    document_id: str
+    investigation_id: str
+    provider: str
+    collection_id: str
+    provider_record_id: str | None = None
+    status: str
+    error: str | None = None
+    response_json: dict[str, Any]
+    synced_at: datetime | None = None
+    created_at: datetime
+    updated_at: datetime
+
+
+class DocumentUploadOut(DocumentOut):
+    """The reply to an upload: the saved document, the job that reads it
+    (already finished in developer mode), and its OpenAleph state."""
+    job: BackgroundJobOut | None = None
+    openaleph_sync: OpenAlephSyncOut | None = None
+
+
+class ExplanationExcerptOut(ResponseModel):
+    """The matched text with a little of what surrounds it."""
+    before: str
+    match: str
+    after: str
+    start_char: int
+    end_char: int
+
+
+# Where a part of a proposal came from. Each kind of source carries its own
+# detail, so `kind` says which shape follows.
+class ExplanationChunkRefOut(ResponseModel):
+    kind: Literal["chunk"]
+    id: str
+    label: str
+    locator: str
+    page_number: int | None = None
+    extraction_method: str
+    excerpt: ExplanationExcerptOut | None = None
+
+
+class ExplanationDocumentRefOut(ResponseModel):
+    kind: Literal["document"]
+    id: str
+    label: str
+    sha256: str
+    mime_type: str | None = None
+
+
+class ExplanationSourceRefOut(ResponseModel):
+    kind: Literal["source"]
+    id: str
+    label: str
+    url: str | None = None
+    source_type: str
+
+
+class ExplanationProviderRefOut(ResponseModel):
+    kind: Literal["provider"]
+    id: str | None = None
+    label: str
+    provider: str
+    collection_id: str | None = None
+    provider_document_id: str | None = None
+    provider_entity_id: str | None = None
+
+
+class ExplanationClaimRefOut(ResponseModel):
+    kind: Literal["claim"]
+    id: str
+    label: str
+    status: str
+
+
+class ExplanationEvidenceRefOut(ResponseModel):
+    kind: Literal["evidence"]
+    id: str
+    label: str
+    locator: str | None = None
+    source_id: str
+    source_title: str | None = None
+
+
+class ExplanationEntityRefOut(ResponseModel):
+    kind: Literal["entity"]
+    id: str
+    label: str
+    schema_: str = Field(alias="schema")
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+ExplanationSourceOut = Annotated[
+    ExplanationChunkRefOut | ExplanationDocumentRefOut | ExplanationSourceRefOut | ExplanationProviderRefOut
+    | ExplanationClaimRefOut | ExplanationEvidenceRefOut | ExplanationEntityRefOut,
+    Field(discriminator="kind"),
+]
+
+
+class ExplanationMethodOut(ResponseModel):
+    id: str
+    label: str
+    description: str
+    automated: bool
+
+
+class ExplanationConfidenceOut(ResponseModel):
+    value: float | None = None
+    basis: str
+
+
+class ExplanationPartOut(ResponseModel):
+    """One part of a proposal: what it says, why, and where it came from."""
+    id: str
+    label: str
+    # The part's value: a string for most parts, a property map for a
+    # staged relationship's properties.
+    value: Any = None
+    reasoning: list[str]
+    sources: list[ExplanationSourceOut]
+
+
+class ExtractionExplanationOut(ResponseModel):
+    """Why a proposal exists (#190): per-part reasoning and sources."""
+    candidate_id: str
+    candidate_type: str
+    review_status: str
+    summary: str
+    method: ExplanationMethodOut
+    rationale_basis: Literal["recorded", "reconstructed", "provider", "reporter"]
+    confidence: ExplanationConfidenceOut
+    parts: list[ExplanationPartOut]
+    sources: list[ExplanationSourceOut]
+    caveats: list[str]
+    review_rule: str
+
+
+class ExtractionCandidateOut(ResponseModel):
+    """One extraction proposal. `explanation` is present only when the list
+    was asked for explanations (?explain=true), so it is left out of the
+    reply rather than sent as null."""
+    id: str
+    investigation_id: str
+    document_id: str
+    chunk_id: str | None = None
+    candidate_type: str
+    payload: dict[str, Any]
+    confidence: float
+    review_status: str
+    accepted_record_type: str | None = None
+    accepted_record_id: str | None = None
+    reviewer_note: str | None = None
+    created_at: datetime
+    reviewed_at: datetime | None = None
+    explanation: ExtractionExplanationOut | None = Field(default=None, exclude_if=lambda value: value is None)
+
+
+class ExtractionReviewOut(ResponseModel):
+    """The reply to a review decision: the proposal as it now stands and, for
+    an acceptance, the record it made (an entity, claim, evidence record or
+    relationship, each in its own shape)."""
+    candidate: ExtractionCandidateOut
+    record: dict[str, Any] | None = None
+
+
+# --- OpenAleph corpus ------------------------------------------------------------
+
+class OpenAlephBindingOut(ResponseModel):
+    id: str
+    investigation_id: str
+    provider: str
+    collection_id: str
+    foreign_id: str | None = None
+    collection_label: str | None = None
+    status: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class OpenAlephDocumentSyncOut(ResponseModel):
+    sync: OpenAlephSyncOut | None = None
+
+
+class OpenAlephReviewStatusOut(ResponseModel):
+    """Provider sync plus how far reporter review of its proposals has got."""
+    document_id: str
+    investigation_id: str
+    provider: str
+    document_extraction_status: str
+    binding: OpenAlephBindingOut | None = None
+    sync: OpenAlephSyncOut | None = None
+    ready_for_import: bool
+    candidate_counts: dict[str, dict[str, int]]
+    provider_candidate_total: int
+    provider_candidate_pending_review: int
+    provider_candidate_accepted: int
+    provider_candidate_rejected: int
+
+
+class OpenAlephEvidenceImportOut(ResponseModel):
+    document_id: str
+    collection_id: str
+    provider_document_id: str | None = None
+    provider: str
+    retrieved: int
+    created_chunks: int
+    created_candidates: int
+    skipped: int
+    review_required: bool
+
+
+class OpenAlephEntityImportOut(ResponseModel):
+    document_id: str
+    collection_id: str
+    provider_document_id: str | None = None
+    provider: str
+    retrieved: int
+    created_candidates: int
+    skipped: int
+    review_required: bool
+    automatic_resolution: bool
+
+
+class OpenAlephReviewRefreshOut(ResponseModel):
+    document_id: str
+    provider: str
+    evidence: OpenAlephEvidenceImportOut
+    entities: OpenAlephEntityImportOut
+    status: OpenAlephReviewStatusOut
+
+
+# --- Portable backups --------------------------------------------------------------
+
+class BackupInvestigationOut(ResponseModel):
+    id: str
+    name: str
+    description: str | None = None
+
+
+class LineageIntegrityOut(ResponseModel):
+    """Whether every proposal in the archive still points at its document,
+    chunk and accepted record."""
+    document_count: int
+    chunk_count: int
+    candidate_count: int
+    candidate_status_counts: dict[str, int]
+    accepted_record_counts: dict[str, int]
+    valid: bool
+    errors: list[str]
+
+
+class RestoreConflictOut(ResponseModel):
+    kind: str  # database_record | foreign_investigation | document_path
+    table: str
+    id: str
+    message: str
+
+
+class BackupPreviewOut(ResponseModel):
+    format: str
+    version: int
+    investigation: BackupInvestigationOut
+    record_counts: dict[str, int]
+    lineage_integrity: LineageIntegrityOut | None = None
+    document_file_count: int
+    missing_document_count: int
+    warnings: list[str]
+    conflicts: list[RestoreConflictOut]
+    can_restore: bool
+    restore_api_enabled: bool
+
+
+class BackupRestoreResultOut(ResponseModel):
+    investigation_id: str
+    restored_counts: dict[str, int]
+    # The archive's own manifest.json, echoed back as it was read.
+    manifest: dict[str, Any]

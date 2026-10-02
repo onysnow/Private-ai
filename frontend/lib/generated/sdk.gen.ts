@@ -636,6 +636,7 @@ import {
   zAttachRelationshipEvidenceEndpointBody,
   zAttachRelationshipEvidenceEndpointPath,
   zCancelJobEndpointPath,
+  zCancelJobEndpointResponse,
   zCanonicalEntityResolutionBody,
   zCanonicalEntityResolutionPath,
   zConnectorSearchBody,
@@ -714,6 +715,7 @@ import {
   zCreateEvidenceEndpointResponse,
   zCreateExtractedRelationshipProposalBody,
   zCreateExtractedRelationshipProposalPath,
+  zCreateExtractedRelationshipProposalResponse,
   zCreateInvestigationBody,
   zCreateLeadEndpointBody,
   zCreateLeadFromRelationshipContextPath,
@@ -759,8 +761,10 @@ import {
   zGetClaimReviewWorkspacePath,
   zGetDeckEndpointPath,
   zGetDocumentPath,
+  zGetDocumentResponse,
   zGetEntityDossierPath,
   zGetExtractionCandidateExplanationPath,
+  zGetExtractionCandidateExplanationResponse,
   zGetExtractionCandidateLineagePath,
   zGetExtractionCandidateLineageResponse,
   zGetExtractionEntityMatchesPath,
@@ -771,10 +775,13 @@ import {
   zGetInvestigationTimelineQuery,
   zGetInvestigationTimelineResponse,
   zGetJobEndpointPath,
+  zGetJobEndpointResponse,
   zGetLeadPath,
   zGetOpenalephCorpusBindingPath,
   zGetOpenalephDocumentReviewStatusPath,
+  zGetOpenalephDocumentReviewStatusResponse,
   zGetOpenalephDocumentSyncPath,
+  zGetOpenalephDocumentSyncResponse,
   zGetRecordProvenanceTraceQuery,
   zGetRecordProvenanceTraceResponse,
   zGetSecurityAlertsQuery,
@@ -782,7 +789,9 @@ import {
   zGetSecurityAuditRetentionPreviewQuery,
   zGetWriteupEndpointPath,
   zImportOpenalephDocumentEntitiesPath,
+  zImportOpenalephDocumentEntitiesResponse,
   zImportOpenalephDocumentEvidencePath,
+  zImportOpenalephDocumentEvidenceResponse,
   zInspectBackupBody,
   zInvestigationCaseSynthesisBody,
   zInvestigationCaseSynthesisPath,
@@ -817,8 +826,10 @@ import {
   zListDecksEndpointPath,
   zListDocumentCandidatesEndpointPath,
   zListDocumentCandidatesEndpointQuery,
+  zListDocumentCandidatesEndpointResponse,
   zListDocumentsPath,
   zListDocumentsQuery,
+  zListDocumentsResponse,
   zListEntitiesPath,
   zListEntitiesQuery,
   zListEntityEnrichmentSessionsPath,
@@ -837,6 +848,7 @@ import {
   zListInvestigationRelationshipsPath,
   zListInvestigationRelationshipsQuery,
   zListJobsEndpointQuery,
+  zListJobsEndpointResponse,
   zListLeadLinksEndpointPath,
   zListLeadsPath,
   zListLeadsQuery,
@@ -853,6 +865,7 @@ import {
   zListWriteupsEndpointPath,
   zListWriteupsEndpointQuery,
   zPreviewBackupRestoreBody,
+  zPreviewBackupRestoreResponse,
   zPromoteAiAnalysisCandidateToDeckEndpointBody,
   zPromoteAiAnalysisCandidateToDeckEndpointPath,
   zPromoteAiAnalysisCandidateToWriteupEndpointBody,
@@ -864,19 +877,23 @@ import {
   zPutInvestigationMembershipBody,
   zPutInvestigationMembershipPath,
   zRefreshOpenalephDocumentReviewPath,
+  zRefreshOpenalephDocumentReviewResponse,
   zRemoveInvestigationPath,
   zRemoveInvestigationQuery,
   zRemoveInvestigationResponse,
   zResolveFindingBody,
   zResolveFindingPath,
   zRestoreBackupBody,
+  zRestoreBackupResponse,
   zRetryJobEndpointPath,
+  zRetryJobEndpointResponse,
   zReviewAiAnalysisCandidateEndpointBody,
   zReviewAiAnalysisCandidateEndpointPath,
   zReviewExternalRelationshipBody,
   zReviewExternalRelationshipPath,
   zReviewExtractionCandidateBody,
   zReviewExtractionCandidatePath,
+  zReviewExtractionCandidateResponse,
   zReviewFindingBody,
   zReviewFindingPath,
   zReviewRelationshipEvidenceEndpointBody,
@@ -888,6 +905,7 @@ import {
   zSearchWorkbenchQuery,
   zSearchWorkbenchResponse,
   zSyncOpenalephDocumentPath,
+  zSyncOpenalephDocumentResponse,
   zUpdateAppUserBody,
   zUpdateAppUserPath,
   zUpdateClaimEndpointBody,
@@ -903,6 +921,7 @@ import {
   zUpdateWriteupEndpointBody,
   zUpdateWriteupEndpointPath,
   zUploadDocumentBody,
+  zUploadDocumentResponse,
 } from './zod.gen';
 
 export type Options<
@@ -1115,6 +1134,8 @@ export const previewBackupRestore = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPreviewBackupRestoreResponse.parseAsync(data),
     url: '/api/backups/preview',
     ...options,
     headers: {
@@ -1143,6 +1164,8 @@ export const restoreBackup = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRestoreBackupResponse.parseAsync(data),
     url: '/api/backups/restore',
     ...options,
     headers: {
@@ -1319,6 +1342,8 @@ export const createExtractedRelationshipProposal = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateExtractedRelationshipProposalResponse.parseAsync(data),
     url: '/api/claims/{claim_id}/relationship-proposals',
     ...options,
     headers: {
@@ -3627,6 +3652,8 @@ export const uploadDocument = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUploadDocumentResponse.parseAsync(data),
     url: '/api/documents/upload',
     ...options,
     headers: {
@@ -3654,6 +3681,8 @@ export const getDocument = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDocumentResponse.parseAsync(data),
     url: '/api/documents/{document_id}',
     ...options,
   });
@@ -3683,6 +3712,8 @@ export const listDocumentCandidatesEndpoint = <
           query: zListDocumentCandidatesEndpointQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListDocumentCandidatesEndpointResponse.parseAsync(data),
     url: '/api/documents/{document_id}/candidates',
     ...options,
   });
@@ -3710,6 +3741,8 @@ export const getOpenalephDocumentSync = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetOpenalephDocumentSyncResponse.parseAsync(data),
     url: '/api/documents/{document_id}/corpus/openaleph',
     ...options,
   });
@@ -3741,6 +3774,8 @@ export const importOpenalephDocumentEntities = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zImportOpenalephDocumentEntitiesResponse.parseAsync(data),
     url: '/api/documents/{document_id}/corpus/openaleph/import-entities',
     ...options,
   });
@@ -3772,6 +3807,8 @@ export const importOpenalephDocumentEvidence = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zImportOpenalephDocumentEvidenceResponse.parseAsync(data),
     url: '/api/documents/{document_id}/corpus/openaleph/import-evidence',
     ...options,
   });
@@ -3803,6 +3840,8 @@ export const refreshOpenalephDocumentReview = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRefreshOpenalephDocumentReviewResponse.parseAsync(data),
     url: '/api/documents/{document_id}/corpus/openaleph/refresh-review',
     ...options,
   });
@@ -3834,6 +3873,8 @@ export const getOpenalephDocumentReviewStatus = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetOpenalephDocumentReviewStatusResponse.parseAsync(data),
     url: '/api/documents/{document_id}/corpus/openaleph/review-status',
     ...options,
   });
@@ -3861,6 +3902,8 @@ export const syncOpenalephDocument = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSyncOpenalephDocumentResponse.parseAsync(data),
     url: '/api/documents/{document_id}/corpus/openaleph/sync',
     ...options,
   });
@@ -4669,6 +4712,8 @@ export const getExtractionCandidateExplanation = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetExtractionCandidateExplanationResponse.parseAsync(data),
     url: '/api/extraction-candidates/{candidate_id}/explanation',
     ...options,
   });
@@ -4727,6 +4772,8 @@ export const reviewExtractionCandidate = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zReviewExtractionCandidateResponse.parseAsync(data),
     url: '/api/extraction-candidates/{candidate_id}/review',
     ...options,
     headers: {
@@ -5293,6 +5340,8 @@ export const listDocuments = <ThrowOnError extends boolean = false>(
           query: zListDocumentsQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListDocumentsResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/documents',
     ...options,
   });
@@ -5714,6 +5763,8 @@ export const listJobsEndpoint = <ThrowOnError extends boolean = false>(
           query: zListJobsEndpointQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListJobsEndpointResponse.parseAsync(data),
     url: '/api/jobs',
     ...options,
   });
@@ -5737,6 +5788,8 @@ export const getJobEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetJobEndpointResponse.parseAsync(data),
     url: '/api/jobs/{job_id}',
     ...options,
   });
@@ -5764,6 +5817,8 @@ export const cancelJobEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCancelJobEndpointResponse.parseAsync(data),
     url: '/api/jobs/{job_id}/cancel',
     ...options,
   });
@@ -5791,6 +5846,8 @@ export const retryJobEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRetryJobEndpointResponse.parseAsync(data),
     url: '/api/jobs/{job_id}/retry',
     ...options,
   });

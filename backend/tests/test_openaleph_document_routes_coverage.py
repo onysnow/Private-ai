@@ -42,6 +42,39 @@ def _new_document(inv: str, title: str) -> str:
     return r.json()['id']
 
 
+# Canned service replies must have the shape the route declares
+# (app/schemas/responses.py); the route now checks what it sends back.
+def _sync_shape(doc: str, inv: str, **overrides) -> dict:
+    row = {
+        'id': 'sync-1', 'document_id': doc, 'investigation_id': inv, 'provider': 'openaleph', 'collection_id': 'oa-collection-1',
+        'provider_record_id': 'oa-document-1', 'status': 'synced', 'error': None, 'response_json': {},
+        'synced_at': '2026-10-02T00:00:00', 'created_at': '2026-10-02T00:00:00', 'updated_at': '2026-10-02T00:00:00',
+    }
+    row.update(overrides)
+    return row
+
+
+def _review_status_shape(doc: str, inv: str) -> dict:
+    return {
+        'document_id': doc, 'investigation_id': inv, 'provider': 'openaleph', 'document_extraction_status': 'complete',
+        'binding': None, 'sync': _sync_shape(doc, inv), 'ready_for_import': True, 'candidate_counts': {'evidence': {'proposed': 3}},
+        'provider_candidate_total': 3, 'provider_candidate_pending_review': 1, 'provider_candidate_accepted': 2,
+        'provider_candidate_rejected': 0,
+    }
+
+
+def _import_shape(doc: str, *, entities: bool) -> dict:
+    reply = {
+        'document_id': doc, 'collection_id': 'oa-collection-1', 'provider_document_id': 'oa-document-1', 'provider': 'openaleph',
+        'retrieved': 3, 'created_candidates': 2, 'skipped': 1, 'review_required': True,
+    }
+    if entities:
+        reply['automatic_resolution'] = False
+    else:
+        reply['created_chunks'] = 2
+    return reply
+
+
 # --- get_openaleph_document_sync (GET /documents/{id}/corpus/openaleph) ---
 
 def test_get_document_sync_404_for_unknown_document():
@@ -83,7 +116,7 @@ def test_review_status_404_when_service_raises_value_error(monkeypatch):
 def test_review_status_success(monkeypatch):
     inv = _new_investigation('OpenAleph route coverage: review status ok')
     doc = _new_document(inv, 'memo')
-    canned = {'sync_status': 'synced', 'pages_total': 3, 'pages_reviewed': 1}
+    canned = _review_status_shape(doc, inv)
     monkeypatch.setattr(
         'app.api.routes_documents.get_openaleph_review_status',
         lambda db, document_id: canned,
@@ -118,11 +151,11 @@ def test_sync_success(monkeypatch):
     monkeypatch.setattr('app.api.routes_documents.sync_document_to_openaleph', lambda db, document_id: sentinel)
     monkeypatch.setattr(
         'app.api.routes_documents.serialize_sync',
-        lambda row: {'status': 'synced'} if row is sentinel else None,
+        lambda row: _sync_shape(doc, inv) if row is sentinel else None,
     )
     r = client.post(f'/api/documents/{doc}/corpus/openaleph/sync')
     assert r.status_code == 200, r.text
-    assert r.json() == {'sync': {'status': 'synced'}}
+    assert r.json() == {'sync': _sync_shape(doc, inv)}
 
 
 # --- refresh_openaleph_document_review / import_openaleph_document_evidence
@@ -165,8 +198,14 @@ def test_ops_409_when_service_raises_runtime_error(monkeypatch):
 def test_ops_success(monkeypatch):
     inv = _new_investigation('OpenAleph route coverage: ops ok')
     doc = _new_document(inv, 'memo')
+    replies = {
+        'refresh-review': {'document_id': doc, 'provider': 'openaleph', 'evidence': _import_shape(doc, entities=False),
+                           'entities': _import_shape(doc, entities=True), 'status': _review_status_shape(doc, inv)},
+        'import-evidence': _import_shape(doc, entities=False),
+        'import-entities': _import_shape(doc, entities=True),
+    }
     for path, service_name in _OPS:
-        canned = {'op': path, 'staged': 2}
+        canned = replies[path]
         monkeypatch.setattr(f'app.api.routes_documents.{service_name}', lambda db, document_id, c=canned: c)
         r = client.post(f'/api/documents/{doc}/corpus/openaleph/{path}')
         assert r.status_code == 200, f'{path}: {r.text}'
@@ -222,7 +261,7 @@ def test_upload_auto_syncs_to_openaleph_when_enabled(monkeypatch):
     # The Workbench reads the file and then sends it on (OpenAleph reading
     # uploads itself is covered in test_openaleph_reader.py).
     monkeypatch.setattr('app.api.routes_documents.settings.document_reader', 'local')
-    canned = {'status': 'synced', 'auto': True}
+    canned = _sync_shape('pending', inv)
     # The upload's background job (app/jobs/handlers.py) does the sync.
     synced = []
     monkeypatch.setattr('app.services.openaleph_corpus.sync_document_to_openaleph',

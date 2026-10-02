@@ -236,6 +236,7 @@ import type {
   AttachRelationshipEvidenceEndpointError,
   CancelJobEndpointData,
   CancelJobEndpointError,
+  CancelJobEndpointResponse,
   CanonicalEntityResolutionData,
   CanonicalEntityResolutionError,
   CapabilitiesData,
@@ -372,6 +373,7 @@ import type {
   CreateEvidenceEndpointResponse,
   CreateExtractedRelationshipProposalData,
   CreateExtractedRelationshipProposalError,
+  CreateExtractedRelationshipProposalResponse,
   CreateInvestigationData,
   CreateInvestigationError,
   CreateLeadEndpointData,
@@ -444,10 +446,12 @@ import type {
   GetDeckEndpointError,
   GetDocumentData,
   GetDocumentError,
+  GetDocumentResponse,
   GetEntityDossierData,
   GetEntityDossierError,
   GetExtractionCandidateExplanationData,
   GetExtractionCandidateExplanationError,
+  GetExtractionCandidateExplanationResponse,
   GetExtractionCandidateLineageData,
   GetExtractionCandidateLineageError,
   GetExtractionCandidateLineageResponse,
@@ -462,14 +466,17 @@ import type {
   GetInvestigationTimelineResponse,
   GetJobEndpointData,
   GetJobEndpointError,
+  GetJobEndpointResponse,
   GetLeadData,
   GetLeadError,
   GetOpenalephCorpusBindingData,
   GetOpenalephCorpusBindingError,
   GetOpenalephDocumentReviewStatusData,
   GetOpenalephDocumentReviewStatusError,
+  GetOpenalephDocumentReviewStatusResponse,
   GetOpenalephDocumentSyncData,
   GetOpenalephDocumentSyncError,
+  GetOpenalephDocumentSyncResponse,
   GetOrphanStoragePreviewData,
   GetRecordProvenanceTraceData,
   GetRecordProvenanceTraceError,
@@ -486,8 +493,10 @@ import type {
   HealthData,
   ImportOpenalephDocumentEntitiesData,
   ImportOpenalephDocumentEntitiesError,
+  ImportOpenalephDocumentEntitiesResponse,
   ImportOpenalephDocumentEvidenceData,
   ImportOpenalephDocumentEvidenceError,
+  ImportOpenalephDocumentEvidenceResponse,
   InspectBackupData,
   InspectBackupError,
   InvestigationCaseSynthesisData,
@@ -530,8 +539,10 @@ import type {
   ListDecksEndpointError,
   ListDocumentCandidatesEndpointData,
   ListDocumentCandidatesEndpointError,
+  ListDocumentCandidatesEndpointResponse,
   ListDocumentsData,
   ListDocumentsError,
+  ListDocumentsResponse,
   ListEntitiesData,
   ListEntitiesError,
   ListEntityEnrichmentSessionsData,
@@ -559,6 +570,7 @@ import type {
   ListInvestigationsData,
   ListJobsEndpointData,
   ListJobsEndpointError,
+  ListJobsEndpointResponse,
   ListLeadLinksEndpointData,
   ListLeadLinksEndpointError,
   ListLeadsData,
@@ -583,6 +595,7 @@ import type {
   PresentationStylesData,
   PreviewBackupRestoreData,
   PreviewBackupRestoreError,
+  PreviewBackupRestoreResponse,
   PromoteAiAnalysisCandidateToDeckEndpointData,
   PromoteAiAnalysisCandidateToDeckEndpointError,
   PromoteAiAnalysisCandidateToWriteupEndpointData,
@@ -597,6 +610,7 @@ import type {
   PutInvestigationMembershipError,
   RefreshOpenalephDocumentReviewData,
   RefreshOpenalephDocumentReviewError,
+  RefreshOpenalephDocumentReviewResponse,
   RelationshipSchemasData,
   RemoveInvestigationData,
   RemoveInvestigationError,
@@ -605,14 +619,17 @@ import type {
   ResolveFindingError,
   RestoreBackupData,
   RestoreBackupError,
+  RestoreBackupResponse,
   RetryJobEndpointData,
   RetryJobEndpointError,
+  RetryJobEndpointResponse,
   ReviewAiAnalysisCandidateEndpointData,
   ReviewAiAnalysisCandidateEndpointError,
   ReviewExternalRelationshipData,
   ReviewExternalRelationshipError,
   ReviewExtractionCandidateData,
   ReviewExtractionCandidateError,
+  ReviewExtractionCandidateResponse,
   ReviewFindingData,
   ReviewFindingError,
   ReviewRelationshipEvidenceEndpointData,
@@ -630,6 +647,7 @@ import type {
   SettingsStatusData,
   SyncOpenalephDocumentData,
   SyncOpenalephDocumentError,
+  SyncOpenalephDocumentResponse,
   UpdateAppUserData,
   UpdateAppUserError,
   UpdateClaimEndpointData,
@@ -646,6 +664,7 @@ import type {
   UpdateWriteupEndpointError,
   UploadDocumentData,
   UploadDocumentError,
+  UploadDocumentResponse,
 } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
@@ -839,12 +858,12 @@ export const inspectBackupMutation = (
 export const previewBackupRestoreMutation = (
   options?: Partial<Options<PreviewBackupRestoreData>>,
 ): UseMutationOptions<
-  unknown,
+  PreviewBackupRestoreResponse,
   PreviewBackupRestoreError,
   Options<PreviewBackupRestoreData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    PreviewBackupRestoreResponse,
     PreviewBackupRestoreError,
     Options<PreviewBackupRestoreData>
   > = {
@@ -866,12 +885,12 @@ export const previewBackupRestoreMutation = (
 export const restoreBackupMutation = (
   options?: Partial<Options<RestoreBackupData>>,
 ): UseMutationOptions<
-  unknown,
+  RestoreBackupResponse,
   RestoreBackupError,
   Options<RestoreBackupData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    RestoreBackupResponse,
     RestoreBackupError,
     Options<RestoreBackupData>
   > = {
@@ -1029,12 +1048,12 @@ export const linkClaimEvidenceEndpointMutation = (
 export const createExtractedRelationshipProposalMutation = (
   options?: Partial<Options<CreateExtractedRelationshipProposalData>>,
 ): UseMutationOptions<
-  unknown,
+  CreateExtractedRelationshipProposalResponse,
   CreateExtractedRelationshipProposalError,
   Options<CreateExtractedRelationshipProposalData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    CreateExtractedRelationshipProposalResponse,
     CreateExtractedRelationshipProposalError,
     Options<CreateExtractedRelationshipProposalData>
   > = {
@@ -3415,12 +3434,12 @@ export const seedDemoMutation = (
 export const uploadDocumentMutation = (
   options?: Partial<Options<UploadDocumentData>>,
 ): UseMutationOptions<
-  unknown,
+  UploadDocumentResponse,
   UploadDocumentError,
   Options<UploadDocumentData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    UploadDocumentResponse,
     UploadDocumentError,
     Options<UploadDocumentData>
   > = {
@@ -3444,9 +3463,9 @@ export const getDocumentQueryKey = (options: Options<GetDocumentData>) =>
  */
 export const getDocumentOptions = (options: Options<GetDocumentData>) =>
   queryOptions<
-    unknown,
+    GetDocumentResponse,
     GetDocumentError,
-    unknown,
+    GetDocumentResponse,
     ReturnType<typeof getDocumentQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -3472,9 +3491,9 @@ export const listDocumentCandidatesEndpointOptions = (
   options: Options<ListDocumentCandidatesEndpointData>,
 ) =>
   queryOptions<
-    unknown,
+    ListDocumentCandidatesEndpointResponse,
     ListDocumentCandidatesEndpointError,
-    unknown,
+    ListDocumentCandidatesEndpointResponse,
     ReturnType<typeof listDocumentCandidatesEndpointQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -3500,9 +3519,9 @@ export const getOpenalephDocumentSyncOptions = (
   options: Options<GetOpenalephDocumentSyncData>,
 ) =>
   queryOptions<
-    unknown,
+    GetOpenalephDocumentSyncResponse,
     GetOpenalephDocumentSyncError,
-    unknown,
+    GetOpenalephDocumentSyncResponse,
     ReturnType<typeof getOpenalephDocumentSyncQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -3525,12 +3544,12 @@ export const getOpenalephDocumentSyncOptions = (
 export const importOpenalephDocumentEntitiesMutation = (
   options?: Partial<Options<ImportOpenalephDocumentEntitiesData>>,
 ): UseMutationOptions<
-  unknown,
+  ImportOpenalephDocumentEntitiesResponse,
   ImportOpenalephDocumentEntitiesError,
   Options<ImportOpenalephDocumentEntitiesData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    ImportOpenalephDocumentEntitiesResponse,
     ImportOpenalephDocumentEntitiesError,
     Options<ImportOpenalephDocumentEntitiesData>
   > = {
@@ -3554,12 +3573,12 @@ export const importOpenalephDocumentEntitiesMutation = (
 export const importOpenalephDocumentEvidenceMutation = (
   options?: Partial<Options<ImportOpenalephDocumentEvidenceData>>,
 ): UseMutationOptions<
-  unknown,
+  ImportOpenalephDocumentEvidenceResponse,
   ImportOpenalephDocumentEvidenceError,
   Options<ImportOpenalephDocumentEvidenceData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    ImportOpenalephDocumentEvidenceResponse,
     ImportOpenalephDocumentEvidenceError,
     Options<ImportOpenalephDocumentEvidenceData>
   > = {
@@ -3583,12 +3602,12 @@ export const importOpenalephDocumentEvidenceMutation = (
 export const refreshOpenalephDocumentReviewMutation = (
   options?: Partial<Options<RefreshOpenalephDocumentReviewData>>,
 ): UseMutationOptions<
-  unknown,
+  RefreshOpenalephDocumentReviewResponse,
   RefreshOpenalephDocumentReviewError,
   Options<RefreshOpenalephDocumentReviewData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    RefreshOpenalephDocumentReviewResponse,
     RefreshOpenalephDocumentReviewError,
     Options<RefreshOpenalephDocumentReviewData>
   > = {
@@ -3617,9 +3636,9 @@ export const getOpenalephDocumentReviewStatusOptions = (
   options: Options<GetOpenalephDocumentReviewStatusData>,
 ) =>
   queryOptions<
-    unknown,
+    GetOpenalephDocumentReviewStatusResponse,
     GetOpenalephDocumentReviewStatusError,
-    unknown,
+    GetOpenalephDocumentReviewStatusResponse,
     ReturnType<typeof getOpenalephDocumentReviewStatusQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -3640,12 +3659,12 @@ export const getOpenalephDocumentReviewStatusOptions = (
 export const syncOpenalephDocumentMutation = (
   options?: Partial<Options<SyncOpenalephDocumentData>>,
 ): UseMutationOptions<
-  unknown,
+  SyncOpenalephDocumentResponse,
   SyncOpenalephDocumentError,
   Options<SyncOpenalephDocumentData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    SyncOpenalephDocumentResponse,
     SyncOpenalephDocumentError,
     Options<SyncOpenalephDocumentData>
   > = {
@@ -4419,9 +4438,9 @@ export const getExtractionCandidateExplanationOptions = (
   options: Options<GetExtractionCandidateExplanationData>,
 ) =>
   queryOptions<
-    unknown,
+    GetExtractionCandidateExplanationResponse,
     GetExtractionCandidateExplanationError,
-    unknown,
+    GetExtractionCandidateExplanationResponse,
     ReturnType<typeof getExtractionCandidateExplanationQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -4470,12 +4489,12 @@ export const getExtractionCandidateLineageOptions = (
 export const reviewExtractionCandidateMutation = (
   options?: Partial<Options<ReviewExtractionCandidateData>>,
 ): UseMutationOptions<
-  unknown,
+  ReviewExtractionCandidateResponse,
   ReviewExtractionCandidateError,
   Options<ReviewExtractionCandidateData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    ReviewExtractionCandidateResponse,
     ReviewExtractionCandidateError,
     Options<ReviewExtractionCandidateData>
   > = {
@@ -5230,9 +5249,9 @@ export const listDocumentsQueryKey = (options: Options<ListDocumentsData>) =>
  */
 export const listDocumentsOptions = (options: Options<ListDocumentsData>) =>
   queryOptions<
-    unknown,
+    ListDocumentsResponse,
     ListDocumentsError,
-    unknown,
+    ListDocumentsResponse,
     ReturnType<typeof listDocumentsQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -5259,9 +5278,9 @@ export const listDocumentsInfiniteOptions = (
   options: Options<ListDocumentsData>,
 ) => {
   const opts = infiniteQueryOptions<
-    unknown,
+    ListDocumentsResponse,
     ListDocumentsError,
-    InfiniteData<unknown>,
+    InfiniteData<ListDocumentsResponse>,
     QueryKey<Options<ListDocumentsData>>,
     | number
     | Pick<
@@ -6111,9 +6130,9 @@ export const listJobsEndpointOptions = (
   options?: Options<ListJobsEndpointData>,
 ) =>
   queryOptions<
-    unknown,
+    ListJobsEndpointResponse,
     ListJobsEndpointError,
-    unknown,
+    ListJobsEndpointResponse,
     ReturnType<typeof listJobsEndpointQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -6136,9 +6155,9 @@ export const getJobEndpointQueryKey = (options: Options<GetJobEndpointData>) =>
  */
 export const getJobEndpointOptions = (options: Options<GetJobEndpointData>) =>
   queryOptions<
-    unknown,
+    GetJobEndpointResponse,
     GetJobEndpointError,
-    unknown,
+    GetJobEndpointResponse,
     ReturnType<typeof getJobEndpointQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -6159,12 +6178,12 @@ export const getJobEndpointOptions = (options: Options<GetJobEndpointData>) =>
 export const cancelJobEndpointMutation = (
   options?: Partial<Options<CancelJobEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  CancelJobEndpointResponse,
   CancelJobEndpointError,
   Options<CancelJobEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    CancelJobEndpointResponse,
     CancelJobEndpointError,
     Options<CancelJobEndpointData>
   > = {
@@ -6186,12 +6205,12 @@ export const cancelJobEndpointMutation = (
 export const retryJobEndpointMutation = (
   options?: Partial<Options<RetryJobEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  RetryJobEndpointResponse,
   RetryJobEndpointError,
   Options<RetryJobEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    RetryJobEndpointResponse,
     RetryJobEndpointError,
     Options<RetryJobEndpointData>
   > = {

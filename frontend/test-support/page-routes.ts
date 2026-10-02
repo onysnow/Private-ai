@@ -4,11 +4,11 @@
 // On mount the page asks for the settings status, the investigation list
 // and the connector names, then opens the first investigation (or the one
 // named in ?inv=) and loads its records: findings, entities, graph, leads
-// queue, claims, evidence, sources and documents from the page itself, and
-// the timeline, the sources and the AI reasoning queue from the panels that
-// load their own data. Those loads run side by side, and more move onto
-// TanStack Query with every panel, so a test says what the server holds for
-// the case and never in what order the page asks.
+// queue, claims, evidence and sources from the page itself, and the
+// timeline, the sources, the documents and the AI reasoning queue from the
+// panels that load their own data. Those loads run side by side, and more
+// move onto TanStack Query with every panel, so a test says what the server
+// holds for the case and never in what order the page asks.
 //
 // Usage:
 //   const api = mockApi(pageRoutes({investigations: [investigation], leads: [leadFixture()]}));

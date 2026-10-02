@@ -175,3 +175,160 @@ def test_provenance_replies(demo):
         trace = record_provenance_trace(db, record_type, record_id)
         assert trace["record_type"] == record_type
         _same_through_model(r.ProvenanceTraceOut, trace)
+
+
+# --- Documents, jobs, OpenAleph corpus, backups (slice 3) ------------------------
+
+def test_document_and_job_replies(demo):
+    from app.jobs.handlers import HANDLERS
+    from app.jobs.records import create_job, execute_job, list_jobs, serialize_job
+    from app.models.jobs import BackgroundJob
+    from app.services.documents import get_document_detail, serialize_document
+    from app.services.investigations import list_investigation_documents
+    from app.services.openaleph_corpus import get_document_sync, serialize_sync
+
+    db, inv, doc, _candidates, _accepted = demo
+    rows = list_investigation_documents(db, inv.id)
+    assert rows
+    _same_through_model(list[r.DocumentOut], rows)
+    detail = get_document_detail(db, doc)
+    assert detail["chunks"], "the case must cover a document with chunks"
+    _same_through_model(r.DocumentDetailOut, detail)
+
+    # The upload reply: the saved document, the job that reads it, its OpenAleph state.
+    job = create_job(db, kind="extract_document", investigation_id=inv.id, subject_type="document", subject_id=doc.id)
+    upload = {**serialize_document(db, doc), "job": serialize_job(job), "openaleph_sync": serialize_sync(get_document_sync(db, doc.id))}
+    _same_through_model(r.DocumentUploadOut, upload)
+
+    # A job that ran (the demo document is already read, so this one fails and
+    # says so) and one that carries a result.
+    assert execute_job(SessionLocal, job.id, HANDLERS) == "failed"
+    db.expire_all()
+    ran = db.get(BackgroundJob, job.id)
+    assert ran is not None and ran.error
+    _same_through_model(r.BackgroundJobOut, serialize_job(ran))
+    with_result = create_job(db, kind="probe", investigation_id=inv.id, payload={"result": {"chunks": 3}})
+    _same_through_model(r.BackgroundJobOut, serialize_job(with_result))
+    listed = [serialize_job(row) for row in list_jobs(db, investigation_ids=[inv.id], subject_id=doc.id)]
+    assert listed
+    _same_through_model(list[r.BackgroundJobOut], listed)
+
+
+def test_extraction_candidate_replies(demo):
+    from app.models.domain import Entity
+    from app.services.documents import (
+        list_document_candidates, propose_relationship_from_extracted_claim, review_candidate, serialize_candidate,
+    )
+    from app.services.extraction_explanations import explain_extraction_candidate
+
+    db, inv, doc, candidates, _accepted = demo
+    plain = list_document_candidates(db, doc.id, "proposed", None)
+    explained = list_document_candidates(db, doc.id, None, None, explain=True)
+    assert plain and explained
+    assert "explanation" not in plain[0] and "explanation" in explained[0]
+    _same_through_model(list[r.ExtractionCandidateOut], plain)
+    _same_through_model(list[r.ExtractionCandidateOut], explained)
+
+    def source_kinds(explanation: dict) -> set[str]:
+        parts = [source for part in explanation["parts"] for source in part["sources"]]
+        return {source["kind"] for source in explanation["sources"] + parts}
+
+    kinds = set().union(*(source_kinds(row["explanation"]) for row in explained))
+    assert {"chunk", "document", "source"} <= kinds, "the demo document must give the rule-based explanations"
+
+    # Reviewing: a claim accepted (it needs no identity decision) and an entity rejected.
+    claim_candidate = next(row for row in candidates if row.candidate_type == "claim")
+    entity_candidate = next(row for row in candidates if row.candidate_type == "entity")
+    accepted = review_candidate(db, claim_candidate, decision="accept", note="checked")
+    assert accepted["record"]
+    _same_through_model(r.ExtractionReviewOut, accepted)
+    _same_through_model(r.ExtractionReviewOut, review_candidate(db, entity_candidate, decision="reject", note="not a name"))
+
+    # A relationship staged from the accepted claim: its explanation points at
+    # the entities, the claim and the evidence the reporter chose.
+    source, target = db.query(Entity).filter(Entity.investigation_id == inv.id).order_by(Entity.caption).all()[:2]
+    staged = propose_relationship_from_extracted_claim(
+        db, claim_id=accepted["record"]["id"], schema="Payment", source_entity_id=source.id, target_entity_id=target.id,
+        properties={"amount": ["2400000"]}, note="staged in a test",
+    )
+    _same_through_model(r.ExtractionCandidateOut, serialize_candidate(staged))
+    explanation = explain_extraction_candidate(db, staged)
+    assert {"entity", "claim", "evidence"} <= source_kinds(explanation)
+    _same_through_model(r.ExtractionExplanationOut, explanation)
+    _same_through_model(r.ExtractionCandidateOut, {**serialize_candidate(staged), "explanation": explanation})
+
+
+class _FakeOpenAleph:
+    """The two OpenAleph calls a sync makes, answered locally."""
+
+    def create_collection(self, data):
+        return {"id": "oa-collection-1", "foreign_id": "oa-foreign-1", "label": data["label"]}
+
+    def ingest_upload(self, *, collection_id, file_path, metadata, sync=False, index=True):
+        return {"id": "oa-document-1", "foreign_id": metadata["foreign_id"]}
+
+
+def test_openaleph_corpus_replies(demo, monkeypatch):
+    from app.core.config import settings
+    from app.services.documents import list_document_candidates
+    from app.services.openaleph_corpus import (
+        get_document_sync, get_openaleph_review_status, import_openaleph_entity_candidates,
+        import_openaleph_evidence_candidates, refresh_openaleph_review_candidates, serialize_sync, sync_document_to_openaleph,
+    )
+
+    monkeypatch.setattr(settings, "openaleph_enabled", True)
+    db, _inv, doc, _candidates, _accepted = demo
+    before = get_openaleph_review_status(db, doc.id)
+    assert before["sync"] is None and before["binding"] is None
+    _same_through_model(r.OpenAlephReviewStatusOut, before)
+    _same_through_model(r.OpenAlephDocumentSyncOut, {"sync": serialize_sync(get_document_sync(db, doc.id))})
+
+    client = _FakeOpenAleph()
+    sync_document_to_openaleph(db, doc.id, client_factory=lambda: client)
+    _same_through_model(r.OpenAlephDocumentSyncOut, {"sync": serialize_sync(get_document_sync(db, doc.id))})
+
+    def pages(*, collection_id, document_record_id):
+        return [{"id": "oa-page-1", "schema": "Page", "properties": {"index": ["1"], "bodyText": ["Provider page text."]}}]
+
+    def mentions(*, collection_id, document_record_id):
+        return [{"id": "oa-mention-1", "schema": "Mention", "properties": {"name": ["Example Person"], "detectedSchema": ["Person"]}}]
+
+    refreshed = refresh_openaleph_review_candidates(db, doc.id, evidence_searcher=pages, entity_searcher=mentions)
+    assert refreshed["status"]["provider_candidate_total"] == 2
+    _same_through_model(r.OpenAlephReviewRefreshOut, refreshed)
+    _same_through_model(r.OpenAlephEvidenceImportOut, import_openaleph_evidence_candidates(db, doc.id, searcher=pages))
+    _same_through_model(r.OpenAlephEntityImportOut, import_openaleph_entity_candidates(db, doc.id, searcher=mentions))
+    after = get_openaleph_review_status(db, doc.id)
+    assert after["sync"] and after["binding"] and after["ready_for_import"]
+    _same_through_model(r.OpenAlephReviewStatusOut, after)
+
+    # Provider-sourced proposals explain themselves with a provider reference.
+    explained = list_document_candidates(db, doc.id, None, None, explain=True)
+    provider_refs = [source for row in explained for source in row["explanation"]["sources"] if source["kind"] == "provider"]
+    assert provider_refs
+    _same_through_model(list[r.ExtractionCandidateOut], explained)
+
+
+def test_backup_replies(demo, tmp_path):
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    from app.db.session import Base
+    from app.services.exports import build_investigation_export, preview_investigation_restore, restore_investigation_export
+
+    db, inv, _doc, _candidates, _accepted = demo
+    package, _manifest = build_investigation_export(db, inv.id, include_documents=True)
+
+    # Against the live database the case already exists, so the preview reports conflicts.
+    blocked = preview_investigation_restore(db, package, tmp_path / "live")
+    assert blocked["conflicts"] and not blocked["can_restore"]
+    _same_through_model(r.BackupPreviewOut, blocked)
+
+    engine = create_engine(f"sqlite:///{tmp_path / 'restored.db'}", connect_args={"check_same_thread": False})
+    Base.metadata.create_all(engine)
+    FreshSession = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+    with FreshSession() as fresh:
+        allowed = preview_investigation_restore(fresh, package, tmp_path / "fresh")
+        assert allowed["can_restore"] and allowed["lineage_integrity"]["valid"]
+        _same_through_model(r.BackupPreviewOut, allowed)
+        _same_through_model(r.BackupRestoreResultOut, restore_investigation_export(fresh, package, tmp_path / "fresh"))

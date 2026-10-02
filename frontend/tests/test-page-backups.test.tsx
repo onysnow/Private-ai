@@ -61,7 +61,7 @@ function restorablePreview(overrides: Record<string, unknown> = {}) {
     version: 1,
     investigation: {id: 'inv-src', name: 'Kestrelwood filings'},
     record_counts: {entities: 4, relationships: 2},
-    lineage_integrity: {valid: true},
+    lineage_integrity: {document_count: 1, chunk_count: 3, candidate_count: 4, candidate_status_counts: {proposed: 4}, accepted_record_counts: {}, valid: true, errors: []},
     document_file_count: 1,
     missing_document_count: 0,
     warnings: [] as string[],

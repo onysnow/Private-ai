@@ -30,7 +30,9 @@ from app.jobs.handlers import AI_REASONING
 from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Investigation
-from app.schemas.responses import EvidencePoolRow, InvestigationDeletionPreview, InvestigationDeletionResult, SourceOut, TimelineOut
+from app.schemas.responses import (
+    DocumentOut, EvidencePoolRow, InvestigationDeletionPreview, InvestigationDeletionResult, SourceOut, TimelineOut,
+)
 from app.schemas.api import (
     CaseSynthesisRequest, HypothesisTestRequest, InvestigationCreate,
     InvestigationQuestionContextRequest, PresentationDraftRequest,
@@ -360,7 +362,7 @@ def get_investigation_financial_flows(investigation_id: str, db: Session = Depen
     return investigation_financial_ledger(db, investigation_id)
 
 
-@router.get("/investigations/{investigation_id}/documents", response_model=None)
+@router.get("/investigations/{investigation_id}/documents", response_model=list[DocumentOut])
 def list_documents(
     investigation_id: str,
     limit: int | None = Query(default=None, ge=1, le=500),

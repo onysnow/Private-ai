@@ -43,6 +43,52 @@ export const zApplyIn = z.object({
 });
 
 /**
+ * BackgroundJobOut
+ *
+ * One piece of slow work and where it stands; the screen polls this.
+ * Every key is always sent (null when unknown), so the nullable ones have
+ * no default: the generated type then matches lib/jobs.ts, which follows a
+ * job.
+ */
+export const zBackgroundJobOut = z.object({
+  attempts: z.number().int(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  error: z.string().nullable(),
+  finished: z.boolean(),
+  finished_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  id: z.string(),
+  investigation_id: z.string().nullable(),
+  kind: z.string(),
+  message: z.string().nullable(),
+  progress: z.number().int().nullable(),
+  result: z.unknown().optional(),
+  runner: z.string(),
+  started_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  status: z.enum(['queued', 'running', 'succeeded', 'failed', 'cancelled']),
+  subject_id: z.string().nullable(),
+  subject_type: z.string().nullable(),
+  updated_at: z.string().datetime({ offset: true, local: true }),
+});
+
+/**
+ * BackupInvestigationOut
+ */
+export const zBackupInvestigationOut = z.object({
+  description: z.string().nullish(),
+  id: z.string(),
+  name: z.string(),
+});
+
+/**
+ * BackupRestoreResultOut
+ */
+export const zBackupRestoreResultOut = z.object({
+  investigation_id: z.string(),
+  manifest: z.record(z.unknown()),
+  restored_counts: z.record(z.number().int()),
+});
+
+/**
  * Body_inspect_backup
  */
 export const zBodyInspectBackup = z.object({
@@ -317,6 +363,58 @@ export const zDisabledIn = z.object({
 });
 
 /**
+ * DocumentChunkOut
+ */
+export const zDocumentChunkOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  document_id: z.string(),
+  id: z.string(),
+  locator: z.string(),
+  ordinal: z.number().int(),
+  page_number: z.number().int().nullish(),
+  text: z.string(),
+});
+
+/**
+ * DocumentDetailOut
+ *
+ * A document with its extracted chunks (GET /documents/{id}).
+ */
+export const zDocumentDetailOut = z.object({
+  candidate_counts: z.record(z.number().int()),
+  chunk_count: z.number().int(),
+  chunks: z.array(zDocumentChunkOut),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  extraction_error: z.string().nullish(),
+  extraction_issues: z.array(z.string()),
+  extraction_status: z.string(),
+  filename: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  mime_type: z.string().nullish(),
+  sha256: z.string(),
+  source_id: z.string(),
+});
+
+/**
+ * DocumentOut
+ */
+export const zDocumentOut = z.object({
+  candidate_counts: z.record(z.number().int()),
+  chunk_count: z.number().int(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  extraction_error: z.string().nullish(),
+  extraction_issues: z.array(z.string()),
+  extraction_status: z.string(),
+  filename: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  mime_type: z.string().nullish(),
+  sha256: z.string(),
+  source_id: z.string(),
+});
+
+/**
  * EntityCreate
  */
 export const zEntityCreate = z.object({
@@ -399,6 +497,140 @@ export const zExplainIn = z.object({
 });
 
 /**
+ * ExplanationClaimRefOut
+ */
+export const zExplanationClaimRefOut = z.object({
+  id: z.string(),
+  kind: z.literal('claim'),
+  label: z.string(),
+  status: z.string(),
+});
+
+/**
+ * ExplanationConfidenceOut
+ */
+export const zExplanationConfidenceOut = z.object({
+  basis: z.string(),
+  value: z.number().nullish(),
+});
+
+/**
+ * ExplanationDocumentRefOut
+ */
+export const zExplanationDocumentRefOut = z.object({
+  id: z.string(),
+  kind: z.literal('document'),
+  label: z.string(),
+  mime_type: z.string().nullish(),
+  sha256: z.string(),
+});
+
+/**
+ * ExplanationEntityRefOut
+ */
+export const zExplanationEntityRefOut = z.object({
+  id: z.string(),
+  kind: z.literal('entity'),
+  label: z.string(),
+  schema: z.string(),
+});
+
+/**
+ * ExplanationEvidenceRefOut
+ */
+export const zExplanationEvidenceRefOut = z.object({
+  id: z.string(),
+  kind: z.literal('evidence'),
+  label: z.string(),
+  locator: z.string().nullish(),
+  source_id: z.string(),
+  source_title: z.string().nullish(),
+});
+
+/**
+ * ExplanationExcerptOut
+ *
+ * The matched text with a little of what surrounds it.
+ */
+export const zExplanationExcerptOut = z.object({
+  after: z.string(),
+  before: z.string(),
+  end_char: z.number().int(),
+  match: z.string(),
+  start_char: z.number().int(),
+});
+
+/**
+ * ExplanationChunkRefOut
+ */
+export const zExplanationChunkRefOut = z.object({
+  excerpt: zExplanationExcerptOut.nullish(),
+  extraction_method: z.string(),
+  id: z.string(),
+  kind: z.literal('chunk'),
+  label: z.string(),
+  locator: z.string(),
+  page_number: z.number().int().nullish(),
+});
+
+/**
+ * ExplanationMethodOut
+ */
+export const zExplanationMethodOut = z.object({
+  automated: z.boolean(),
+  description: z.string(),
+  id: z.string(),
+  label: z.string(),
+});
+
+/**
+ * ExplanationProviderRefOut
+ */
+export const zExplanationProviderRefOut = z.object({
+  collection_id: z.string().nullish(),
+  id: z.string().nullish(),
+  kind: z.literal('provider'),
+  label: z.string(),
+  provider: z.string(),
+  provider_document_id: z.string().nullish(),
+  provider_entity_id: z.string().nullish(),
+});
+
+/**
+ * ExplanationSourceRefOut
+ */
+export const zExplanationSourceRefOut = z.object({
+  id: z.string(),
+  kind: z.literal('source'),
+  label: z.string(),
+  source_type: z.string(),
+  url: z.string().nullish(),
+});
+
+/**
+ * ExplanationPartOut
+ *
+ * One part of a proposal: what it says, why, and where it came from.
+ */
+export const zExplanationPartOut = z.object({
+  id: z.string(),
+  label: z.string(),
+  reasoning: z.array(z.string()),
+  sources: z.array(
+    z.union([
+      zExplanationChunkRefOut,
+      zExplanationDocumentRefOut,
+      zExplanationSourceRefOut,
+      zExplanationProviderRefOut,
+      zExplanationClaimRefOut,
+      zExplanationEvidenceRefOut,
+      zExplanationEntityRefOut,
+    ]),
+  ),
+  value: z.unknown().optional(),
+});
+
+/**
  * ExternalAssessmentOut
  */
 export const zExternalAssessmentOut = z.object({
@@ -452,6 +684,76 @@ export const zExtractionCandidateReviewRequest = z.object({
   entity_schema: z.string().nullish(),
   matched_entity_id: z.string().nullish(),
   note: z.string().nullish(),
+});
+
+/**
+ * ExtractionExplanationOut
+ *
+ * Why a proposal exists (#190): per-part reasoning and sources.
+ */
+export const zExtractionExplanationOut = z.object({
+  candidate_id: z.string(),
+  candidate_type: z.string(),
+  caveats: z.array(z.string()),
+  confidence: zExplanationConfidenceOut,
+  method: zExplanationMethodOut,
+  parts: z.array(zExplanationPartOut),
+  rationale_basis: z.enum([
+    'recorded',
+    'reconstructed',
+    'provider',
+    'reporter',
+  ]),
+  review_rule: z.string(),
+  review_status: z.string(),
+  sources: z.array(
+    z.union([
+      zExplanationChunkRefOut,
+      zExplanationDocumentRefOut,
+      zExplanationSourceRefOut,
+      zExplanationProviderRefOut,
+      zExplanationClaimRefOut,
+      zExplanationEvidenceRefOut,
+      zExplanationEntityRefOut,
+    ]),
+  ),
+  summary: z.string(),
+});
+
+/**
+ * ExtractionCandidateOut
+ *
+ * One extraction proposal. `explanation` is present only when the list
+ * was asked for explanations (?explain=true), so it is left out of the
+ * reply rather than sent as null.
+ */
+export const zExtractionCandidateOut = z.object({
+  accepted_record_id: z.string().nullish(),
+  accepted_record_type: z.string().nullish(),
+  candidate_type: z.string(),
+  chunk_id: z.string().nullish(),
+  confidence: z.number(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  document_id: z.string(),
+  explanation: zExtractionExplanationOut.nullish(),
+  id: z.string(),
+  investigation_id: z.string(),
+  payload: z.record(z.unknown()),
+  review_status: z.string(),
+  reviewed_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  reviewer_note: z.string().nullish(),
+});
+
+/**
+ * ExtractionReviewOut
+ *
+ * The reply to a review decision: the proposal as it now stands and, for
+ * an acceptance, the record it made (an entity, claim, evidence record or
+ * relationship, each in its own shape).
+ */
+export const zExtractionReviewOut = z.object({
+  candidate: zExtractionCandidateOut,
+  record: z.record(z.unknown()).nullish(),
 });
 
 /**
@@ -647,6 +949,22 @@ export const zLineageDocumentOut = z.object({
 });
 
 /**
+ * LineageIntegrityOut
+ *
+ * Whether every proposal in the archive still points at its document,
+ * chunk and accepted record.
+ */
+export const zLineageIntegrityOut = z.object({
+  accepted_record_counts: z.record(z.number().int()),
+  candidate_count: z.number().int(),
+  candidate_status_counts: z.record(z.number().int()),
+  chunk_count: z.number().int(),
+  document_count: z.number().int(),
+  errors: z.array(z.string()),
+  valid: z.boolean(),
+});
+
+/**
  * LineageSourceOut
  */
 export const zLineageSourceOut = z.object({
@@ -683,6 +1001,132 @@ export const zExtractionLineageLookupOut = z.object({
  */
 export const zMultiEnrichmentRequest = z.object({
   providers: z.array(z.string()).optional(),
+});
+
+/**
+ * OpenAlephBindingOut
+ */
+export const zOpenAlephBindingOut = z.object({
+  collection_id: z.string(),
+  collection_label: z.string().nullish(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  foreign_id: z.string().nullish(),
+  id: z.string(),
+  investigation_id: z.string(),
+  provider: z.string(),
+  status: z.string(),
+  updated_at: z.string().datetime({ offset: true, local: true }),
+});
+
+/**
+ * OpenAlephEntityImportOut
+ */
+export const zOpenAlephEntityImportOut = z.object({
+  automatic_resolution: z.boolean(),
+  collection_id: z.string(),
+  created_candidates: z.number().int(),
+  document_id: z.string(),
+  provider: z.string(),
+  provider_document_id: z.string().nullish(),
+  retrieved: z.number().int(),
+  review_required: z.boolean(),
+  skipped: z.number().int(),
+});
+
+/**
+ * OpenAlephEvidenceImportOut
+ */
+export const zOpenAlephEvidenceImportOut = z.object({
+  collection_id: z.string(),
+  created_candidates: z.number().int(),
+  created_chunks: z.number().int(),
+  document_id: z.string(),
+  provider: z.string(),
+  provider_document_id: z.string().nullish(),
+  retrieved: z.number().int(),
+  review_required: z.boolean(),
+  skipped: z.number().int(),
+});
+
+/**
+ * OpenAlephSyncOut
+ *
+ * How one document stands in the OpenAleph corpus.
+ */
+export const zOpenAlephSyncOut = z.object({
+  collection_id: z.string(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  document_id: z.string(),
+  error: z.string().nullish(),
+  id: z.string(),
+  investigation_id: z.string(),
+  provider: z.string(),
+  provider_record_id: z.string().nullish(),
+  response_json: z.record(z.unknown()),
+  status: z.string(),
+  synced_at: z.string().datetime({ offset: true, local: true }).nullish(),
+  updated_at: z.string().datetime({ offset: true, local: true }),
+});
+
+/**
+ * DocumentUploadOut
+ *
+ * The reply to an upload: the saved document, the job that reads it
+ * (already finished in developer mode), and its OpenAleph state.
+ */
+export const zDocumentUploadOut = z.object({
+  candidate_counts: z.record(z.number().int()),
+  chunk_count: z.number().int(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  extraction_error: z.string().nullish(),
+  extraction_issues: z.array(z.string()),
+  extraction_status: z.string(),
+  filename: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  job: zBackgroundJobOut.nullish(),
+  mime_type: z.string().nullish(),
+  openaleph_sync: zOpenAlephSyncOut.nullish(),
+  sha256: z.string(),
+  source_id: z.string(),
+});
+
+/**
+ * OpenAlephDocumentSyncOut
+ */
+export const zOpenAlephDocumentSyncOut = z.object({
+  sync: zOpenAlephSyncOut.nullish(),
+});
+
+/**
+ * OpenAlephReviewStatusOut
+ *
+ * Provider sync plus how far reporter review of its proposals has got.
+ */
+export const zOpenAlephReviewStatusOut = z.object({
+  binding: zOpenAlephBindingOut.nullish(),
+  candidate_counts: z.record(z.record(z.number().int())),
+  document_extraction_status: z.string(),
+  document_id: z.string(),
+  investigation_id: z.string(),
+  provider: z.string(),
+  provider_candidate_accepted: z.number().int(),
+  provider_candidate_pending_review: z.number().int(),
+  provider_candidate_rejected: z.number().int(),
+  provider_candidate_total: z.number().int(),
+  ready_for_import: z.boolean(),
+  sync: zOpenAlephSyncOut.nullish(),
+});
+
+/**
+ * OpenAlephReviewRefreshOut
+ */
+export const zOpenAlephReviewRefreshOut = z.object({
+  document_id: z.string(),
+  entities: zOpenAlephEntityImportOut,
+  evidence: zOpenAlephEvidenceImportOut,
+  provider: z.string(),
+  status: zOpenAlephReviewStatusOut,
 });
 
 /**
@@ -924,6 +1368,33 @@ export const zResolutionRequest = z.object({
   decision: z.string(),
   entity_id: z.string().nullish(),
   rationale: z.string().nullish(),
+});
+
+/**
+ * RestoreConflictOut
+ */
+export const zRestoreConflictOut = z.object({
+  id: z.string(),
+  kind: z.string(),
+  message: z.string(),
+  table: z.string(),
+});
+
+/**
+ * BackupPreviewOut
+ */
+export const zBackupPreviewOut = z.object({
+  can_restore: z.boolean(),
+  conflicts: z.array(zRestoreConflictOut),
+  document_file_count: z.number().int(),
+  format: z.string(),
+  investigation: zBackupInvestigationOut,
+  lineage_integrity: zLineageIntegrityOut.nullish(),
+  missing_document_count: z.number().int(),
+  record_counts: z.record(z.number().int()),
+  restore_api_enabled: z.boolean(),
+  version: z.number().int(),
+  warnings: z.array(z.string()),
 });
 
 /**
@@ -1544,7 +2015,17 @@ export const zInspectBackupBody = zBodyInspectBackup;
 
 export const zPreviewBackupRestoreBody = zBodyPreviewBackupRestore;
 
+/**
+ * Successful Response
+ */
+export const zPreviewBackupRestoreResponse = zBackupPreviewOut;
+
 export const zRestoreBackupBody = zBodyRestoreBackup;
+
+/**
+ * Successful Response
+ */
+export const zRestoreBackupResponse = zBackupRestoreResultOut;
 
 export const zCreateClaimEndpointBody = zClaimCreate;
 
@@ -1570,6 +2051,12 @@ export const zCreateExtractedRelationshipProposalBody =
 export const zCreateExtractedRelationshipProposalPath = z.object({
   claim_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zCreateExtractedRelationshipProposalResponse =
+  zExtractionCandidateOut;
 
 export const zGetClaimReviewWorkspacePath = z.object({
   claim_id: z.string(),
@@ -1894,9 +2381,19 @@ export const zExportDeckPptxPath = z.object({
 
 export const zUploadDocumentBody = zBodyUploadDocument;
 
+/**
+ * Successful Response
+ */
+export const zUploadDocumentResponse = zDocumentUploadOut;
+
 export const zGetDocumentPath = z.object({
   document_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zGetDocumentResponse = zDocumentDetailOut;
 
 export const zListDocumentCandidatesEndpointPath = z.object({
   document_id: z.string(),
@@ -1908,29 +2405,72 @@ export const zListDocumentCandidatesEndpointQuery = z.object({
   explain: z.boolean().optional().default(false),
 });
 
+/**
+ * Response List Document Candidates Endpoint
+ *
+ * Successful Response
+ */
+export const zListDocumentCandidatesEndpointResponse = z.array(
+  zExtractionCandidateOut,
+);
+
 export const zGetOpenalephDocumentSyncPath = z.object({
   document_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zGetOpenalephDocumentSyncResponse = zOpenAlephDocumentSyncOut;
 
 export const zImportOpenalephDocumentEntitiesPath = z.object({
   document_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zImportOpenalephDocumentEntitiesResponse =
+  zOpenAlephEntityImportOut;
+
 export const zImportOpenalephDocumentEvidencePath = z.object({
   document_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zImportOpenalephDocumentEvidenceResponse =
+  zOpenAlephEvidenceImportOut;
 
 export const zRefreshOpenalephDocumentReviewPath = z.object({
   document_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zRefreshOpenalephDocumentReviewResponse =
+  zOpenAlephReviewRefreshOut;
+
 export const zGetOpenalephDocumentReviewStatusPath = z.object({
   document_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zGetOpenalephDocumentReviewStatusResponse =
+  zOpenAlephReviewStatusOut;
+
 export const zSyncOpenalephDocumentPath = z.object({
   document_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zSyncOpenalephDocumentResponse = zOpenAlephDocumentSyncOut;
 
 export const zEnrichmentSessionDetailPath = z.object({
   session_id: z.string(),
@@ -2076,6 +2616,12 @@ export const zGetExtractionCandidateExplanationPath = z.object({
   candidate_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zGetExtractionCandidateExplanationResponse =
+  zExtractionExplanationOut;
+
 export const zGetExtractionCandidateLineagePath = z.object({
   candidate_id: z.string(),
 });
@@ -2090,6 +2636,11 @@ export const zReviewExtractionCandidateBody = zExtractionCandidateReviewRequest;
 export const zReviewExtractionCandidatePath = z.object({
   candidate_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zReviewExtractionCandidateResponse = zExtractionReviewOut;
 
 export const zCreateInvestigationBody = zInvestigationCreate;
 
@@ -2203,6 +2754,13 @@ export const zListDocumentsQuery = z.object({
   limit: z.number().int().gte(1).lte(500).nullish(),
   offset: z.number().int().gte(0).optional().default(0),
 });
+
+/**
+ * Response List Documents
+ *
+ * Successful Response
+ */
+export const zListDocumentsResponse = z.array(zDocumentOut);
 
 export const zListEntitiesPath = z.object({
   investigation_id: z.string(),
@@ -2360,17 +2918,39 @@ export const zListJobsEndpointQuery = z.object({
   limit: z.number().int().optional().default(50),
 });
 
+/**
+ * Response List Jobs Endpoint
+ *
+ * Successful Response
+ */
+export const zListJobsEndpointResponse = z.array(zBackgroundJobOut);
+
 export const zGetJobEndpointPath = z.object({
   job_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zGetJobEndpointResponse = zBackgroundJobOut;
 
 export const zCancelJobEndpointPath = z.object({
   job_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zCancelJobEndpointResponse = zBackgroundJobOut;
+
 export const zRetryJobEndpointPath = z.object({
   job_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zRetryJobEndpointResponse = zBackgroundJobOut;
 
 export const zCreateLeadEndpointBody = zLeadCreate;
 

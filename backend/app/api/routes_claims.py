@@ -18,22 +18,19 @@ from app.services.claims import (
     claim_review_workspace, create_claim, link_claim_evidence, list_claim_evidence,
     review_claim, update_claim, validate_claim_fields,
 )
-from app.services.documents import propose_relationship_from_extracted_claim
+from app.schemas.responses import ExtractionCandidateOut
+from app.services.documents import propose_relationship_from_extracted_claim, serialize_candidate
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.post("/claims/{claim_id}/relationship-proposals", response_model=None)
+@router.post("/claims/{claim_id}/relationship-proposals", response_model=ExtractionCandidateOut)
 def create_extracted_relationship_proposal(claim_id: str, body: ExtractedRelationshipProposalCreate, db: Session = Depends(get_db)) -> dict[str, Any]:
     try:
         row = propose_relationship_from_extracted_claim(db, claim_id=claim_id, **body.model_dump())
     except ValueError as exc:
         raise HTTPException(400, str(exc))
-    return {
-        'id': row.id, 'investigation_id': row.investigation_id, 'document_id': row.document_id,
-        'chunk_id': row.chunk_id, 'candidate_type': row.candidate_type, 'payload': row.payload,
-        'confidence': row.confidence, 'review_status': row.review_status,
-    }
+    return serialize_candidate(row)
 
 
 @router.post("/claims/{claim_id}/evidence", response_model=None)

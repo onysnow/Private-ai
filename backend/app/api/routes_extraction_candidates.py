@@ -13,7 +13,7 @@ from app.models.domain import ExtractionCandidate
 from app.schemas.api import ExtractionCandidateReviewRequest
 from app.services.documents import preview_entity_candidate_matches, review_candidate, serialize_extraction_lineage
 from app.services.extraction_explanations import explain_extraction_candidate
-from app.schemas.responses import ExtractionLineageOut
+from app.schemas.responses import ExtractionExplanationOut, ExtractionLineageOut, ExtractionReviewOut
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
@@ -37,7 +37,7 @@ def get_extraction_candidate_lineage(candidate_id: str, db: Session = Depends(ge
     return serialize_extraction_lineage(db, row)
 
 
-@router.get("/extraction-candidates/{candidate_id}/explanation", response_model=None)
+@router.get("/extraction-candidates/{candidate_id}/explanation", response_model=ExtractionExplanationOut)
 def get_extraction_candidate_explanation(candidate_id: str, db: Session = Depends(get_db)) -> Any:
     """Per-part reasoning and sources behind one proposal (#190). Read-only."""
     row = db.get(ExtractionCandidate, candidate_id)
@@ -46,7 +46,7 @@ def get_extraction_candidate_explanation(candidate_id: str, db: Session = Depend
     return explain_extraction_candidate(db, row)
 
 
-@router.post("/extraction-candidates/{candidate_id}/review", response_model=None)
+@router.post("/extraction-candidates/{candidate_id}/review", response_model=ExtractionReviewOut)
 def review_extraction_candidate(candidate_id: str, body: ExtractionCandidateReviewRequest, db: Session = Depends(get_db)) -> Any:
     row = db.get(ExtractionCandidate, candidate_id)
     if row is None:

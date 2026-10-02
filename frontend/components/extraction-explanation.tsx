@@ -8,7 +8,34 @@
 // proposals (a staged relationship) arrive already broken into parts.
 import type {ReactElement} from 'react';
 
-import type {ExtractionExplanation, ExtractionExplanationSource, ExtractionRationaleBasis, JsonValue} from '../lib/api-types';
+import type {ExtractionRationaleBasis} from '../lib/api-types';
+
+// The view asks only for what it draws, so an explanation fits whether it
+// came through the generated API client (ExtractionExplanationOut) or the
+// hand-written types the review pages still use (ExtractionExplanation).
+export type ExplanationExcerptView = {before: string; match: string; after: string; start_char: number; end_char: number};
+export type ExplanationSourceView = {
+  kind: string;
+  id?: string | null;
+  label?: string | null;
+  locator?: string | null;
+  url?: string | null;
+  excerpt?: ExplanationExcerptView | null;
+  // Each kind of source adds its own detail (a chunk's extraction method, a
+  // provider's record ids, a document's hash).
+  [key: string]: unknown;
+};
+export type ExplanationPartView = {id: string; label: string; value?: unknown; reasoning: string[]; sources: ExplanationSourceView[]};
+export type ExplanationView = {
+  summary: string;
+  method: {label: string; description: string; automated: boolean};
+  rationale_basis: ExtractionRationaleBasis;
+  confidence: {value?: number | null; basis: string};
+  parts: ExplanationPartView[];
+  sources: ExplanationSourceView[];
+  caveats: string[];
+  review_rule: string;
+};
 
 export const RATIONALE_BASIS_LABEL: Record<ExtractionRationaleBasis, string> = {
   recorded: 'reasoning recorded by the extractor',
@@ -17,14 +44,14 @@ export const RATIONALE_BASIS_LABEL: Record<ExtractionRationaleBasis, string> = {
   reporter: 'chosen by a reporter',
 };
 
-function formatValue(value: JsonValue): string {
+function formatValue(value: unknown): string {
   if (value === null || value === undefined || value === '') return '—';
   if (typeof value === 'string') return value;
   if (typeof value === 'number' || typeof value === 'boolean') return String(value);
   return JSON.stringify(value);
 }
 
-function sourceLine(s: ExtractionExplanationSource): string {
+function sourceLine(s: ExplanationSourceView): string {
   const bits: string[] = [];
   bits.push(s.kind);
   if (s.label) bits.push(String(s.label));
@@ -37,7 +64,7 @@ function sourceLine(s: ExtractionExplanationSource): string {
   return bits.join(' · ');
 }
 
-function Source({source}: {source: ExtractionExplanationSource}): ReactElement {
+function Source({source}: {source: ExplanationSourceView}): ReactElement {
   return (
     <li data-testid={`explanation-source-${source.kind}`}>
       <small>{sourceLine(source)}</small>
@@ -52,7 +79,7 @@ function Source({source}: {source: ExtractionExplanationSource}): ReactElement {
   );
 }
 
-export function ExtractionExplanationView({explanation}: {explanation: ExtractionExplanation}): ReactElement {
+export function ExtractionExplanationView({explanation}: {explanation: ExplanationView}): ReactElement {
   const {method, confidence} = explanation;
   return (
     <details className="explanation" data-testid="extraction-explanation">
@@ -72,7 +99,7 @@ export function ExtractionExplanationView({explanation}: {explanation: Extractio
           ))}
         </ol>
       )}
-      <div><small><b>Confidence{confidence.value === null ? '' : ` ${Math.round(confidence.value * 100)}%`}:</b> {confidence.basis}</small></div>
+      <div><small><b>Confidence{typeof confidence.value === 'number' ? ` ${Math.round(confidence.value * 100)}%` : ''}:</b> {confidence.basis}</small></div>
       {explanation.sources.length > 0 && (
         <div><small><b>Sources</b></small><ul className="explanation-sources">{explanation.sources.map((s, i) => <Source key={`${s.kind}-${s.id ?? i}`} source={s}/>)}</ul></div>
       )}

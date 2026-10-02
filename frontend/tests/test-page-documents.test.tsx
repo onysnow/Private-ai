@@ -64,12 +64,20 @@ const investigation = {id: 'inv-1', name: 'Kestrelwood filings'};
 const DOCUMENTS = 'GET /api/investigations/inv-1/documents';
 const UPLOAD = 'POST /api/documents/upload';
 
+// Replies carry the full shape the API declares (lib/generated/types.gen.ts):
+// the panel's generated client checks each one.
 function docFixture(overrides: Record<string, unknown> = {}) {
   return {
     id: 'doc-1',
+    investigation_id: 'inv-1',
     filename: 'board-minutes.pdf',
     source_id: 'src-1',
+    mime_type: 'application/pdf',
+    sha256: 'abc123',
     extraction_status: 'extracted',
+    extraction_error: null,
+    extraction_issues: [],
+    created_at: '2026-10-01T00:00:00',
     chunk_count: 12,
     candidate_counts: {entity: 2},
     ...overrides,
@@ -79,10 +87,18 @@ function docFixture(overrides: Record<string, unknown> = {}) {
 function candidateFixture(overrides: Record<string, unknown> = {}) {
   return {
     id: 'cand-1',
+    investigation_id: 'inv-1',
+    document_id: 'doc-1',
+    chunk_id: 'chunk-1',
     candidate_type: 'entity',
     payload: {caption: 'Kestrelwood Holdings Ltd', suggested_schema: 'Company'},
     review_status: 'proposed',
     confidence: 0.82,
+    accepted_record_type: null,
+    accepted_record_id: null,
+    reviewer_note: null,
+    created_at: '2026-10-01T00:00:00',
+    reviewed_at: null,
     ...overrides,
   };
 }
@@ -164,7 +180,7 @@ describe('Home document ingestion & extraction', () => {
     await screen.findByText('Kestrelwood Holdings Ltd');
 
     api.add({
-      [review]: {},
+      [review]: {candidate: candidateFixture({review_status: 'accepted', accepted_record_type: 'entity', accepted_record_id: 'ent-9'}), record: {id: 'ent-9'}},
       [DOCUMENTS]: [docFixture({candidate_counts: {}})], // the list the reload finds
     });
     // Every record kind the proposal may have changed is loaded once more
@@ -197,7 +213,7 @@ describe('Home document ingestion & extraction', () => {
       rationale_basis: 'provider',
       confidence: {value: 1, basis: 'Fixed value of 1.0 set on import.'},
       parts: [{id: 'caption', label: 'Name', value: 'Kestrelwood Holdings Ltd', reasoning: ['OpenAleph returned this name as a mention.'], sources: []}],
-      sources: [{kind: 'provider', id: 'm1', label: 'openaleph Mention', provider_entity_id: 'm1', collection_id: '7'}],
+      sources: [{kind: 'provider', id: 'm1', label: 'openaleph Mention', provider: 'openaleph', provider_entity_id: 'm1', collection_id: '7'}],
       caveats: [],
       review_rule: 'Nothing in this proposal is in the investigation until a reporter accepts it.',
     };
@@ -215,7 +231,8 @@ function jobFixture(overrides: Record<string, unknown> = {}) {
   return {
     id: 'job-1', kind: 'extract_document', investigation_id: 'inv-1', subject_type: 'document', subject_id: 'doc-2',
     status: 'queued', finished: false, progress: null, message: 'Waiting to start', error: null, attempts: 0,
-    runner: 'procrastinate', ...overrides,
+    runner: 'procrastinate', result: null, created_at: '2026-10-01T00:00:00', started_at: null, finished_at: null,
+    updated_at: '2026-10-01T00:00:00', ...overrides,
   };
 }
 
@@ -234,7 +251,7 @@ describe('Home document reading runs as a background job (ADR-0004)', () => {
       'GET /api/jobs/job-1': () => (++polls === 1
         ? jobFixture({status: 'running', progress: 5, message: 'Reading the document'})
         : jobFixture({status: 'succeeded', finished: true, progress: 100, message: 'Document read', attempts: 1})),
-      'GET /api/documents/doc-2': read,
+      'GET /api/documents/doc-2': {...read, chunks: []},
       'GET /api/documents/doc-2/candidates': [candidateFixture({id: 'cand-2'})],
     });
 

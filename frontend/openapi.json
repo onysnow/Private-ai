@@ -114,6 +114,297 @@
         "title": "ApplyIn",
         "type": "object"
       },
+      "BackgroundJobOut": {
+        "description": "One piece of slow work and where it stands; the screen polls this.\nEvery key is always sent (null when unknown), so the nullable ones have\nno default: the generated type then matches lib/jobs.ts, which follows a\njob.",
+        "properties": {
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "finished": {
+            "title": "Finished",
+            "type": "boolean"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Investigation Id"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "progress": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Progress"
+          },
+          "result": {
+            "title": "Result"
+          },
+          "runner": {
+            "title": "Runner",
+            "type": "string"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "succeeded",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "subject_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject Id"
+          },
+          "subject_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject Type"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "investigation_id",
+          "subject_type",
+          "subject_id",
+          "status",
+          "finished",
+          "progress",
+          "message",
+          "error",
+          "attempts",
+          "runner",
+          "created_at",
+          "started_at",
+          "finished_at",
+          "updated_at"
+        ],
+        "title": "BackgroundJobOut",
+        "type": "object"
+      },
+      "BackupInvestigationOut": {
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "BackupInvestigationOut",
+        "type": "object"
+      },
+      "BackupPreviewOut": {
+        "properties": {
+          "can_restore": {
+            "title": "Can Restore",
+            "type": "boolean"
+          },
+          "conflicts": {
+            "items": {
+              "$ref": "#/components/schemas/RestoreConflictOut"
+            },
+            "title": "Conflicts",
+            "type": "array"
+          },
+          "document_file_count": {
+            "title": "Document File Count",
+            "type": "integer"
+          },
+          "format": {
+            "title": "Format",
+            "type": "string"
+          },
+          "investigation": {
+            "$ref": "#/components/schemas/BackupInvestigationOut"
+          },
+          "lineage_integrity": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LineageIntegrityOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "missing_document_count": {
+            "title": "Missing Document Count",
+            "type": "integer"
+          },
+          "record_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Record Counts",
+            "type": "object"
+          },
+          "restore_api_enabled": {
+            "title": "Restore Api Enabled",
+            "type": "boolean"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "format",
+          "version",
+          "investigation",
+          "record_counts",
+          "document_file_count",
+          "missing_document_count",
+          "warnings",
+          "conflicts",
+          "can_restore",
+          "restore_api_enabled"
+        ],
+        "title": "BackupPreviewOut",
+        "type": "object"
+      },
+      "BackupRestoreResultOut": {
+        "properties": {
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "manifest": {
+            "additionalProperties": true,
+            "title": "Manifest",
+            "type": "object"
+          },
+          "restored_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Restored Counts",
+            "type": "object"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "restored_counts",
+          "manifest"
+        ],
+        "title": "BackupRestoreResultOut",
+        "type": "object"
+      },
       "Body_inspect_backup": {
         "properties": {
           "file": {
@@ -1072,6 +1363,347 @@
         "title": "DisabledIn",
         "type": "object"
       },
+      "DocumentChunkOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "locator": {
+            "title": "Locator",
+            "type": "string"
+          },
+          "ordinal": {
+            "title": "Ordinal",
+            "type": "integer"
+          },
+          "page_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Number"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "document_id",
+          "locator",
+          "ordinal",
+          "text",
+          "created_at"
+        ],
+        "title": "DocumentChunkOut",
+        "type": "object"
+      },
+      "DocumentDetailOut": {
+        "description": "A document with its extracted chunks (GET /documents/{id}).",
+        "properties": {
+          "candidate_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Candidate Counts",
+            "type": "object"
+          },
+          "chunk_count": {
+            "title": "Chunk Count",
+            "type": "integer"
+          },
+          "chunks": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentChunkOut"
+            },
+            "title": "Chunks",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "extraction_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extraction Error"
+          },
+          "extraction_issues": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Extraction Issues",
+            "type": "array"
+          },
+          "extraction_status": {
+            "title": "Extraction Status",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "mime_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mime Type"
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          },
+          "source_id": {
+            "title": "Source Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "source_id",
+          "filename",
+          "sha256",
+          "extraction_status",
+          "extraction_issues",
+          "created_at",
+          "chunk_count",
+          "candidate_counts",
+          "chunks"
+        ],
+        "title": "DocumentDetailOut",
+        "type": "object"
+      },
+      "DocumentOut": {
+        "properties": {
+          "candidate_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Candidate Counts",
+            "type": "object"
+          },
+          "chunk_count": {
+            "title": "Chunk Count",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "extraction_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extraction Error"
+          },
+          "extraction_issues": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Extraction Issues",
+            "type": "array"
+          },
+          "extraction_status": {
+            "title": "Extraction Status",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "mime_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mime Type"
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          },
+          "source_id": {
+            "title": "Source Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "source_id",
+          "filename",
+          "sha256",
+          "extraction_status",
+          "extraction_issues",
+          "created_at",
+          "chunk_count",
+          "candidate_counts"
+        ],
+        "title": "DocumentOut",
+        "type": "object"
+      },
+      "DocumentUploadOut": {
+        "description": "The reply to an upload: the saved document, the job that reads it\n(already finished in developer mode), and its OpenAleph state.",
+        "properties": {
+          "candidate_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Candidate Counts",
+            "type": "object"
+          },
+          "chunk_count": {
+            "title": "Chunk Count",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "extraction_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extraction Error"
+          },
+          "extraction_issues": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Extraction Issues",
+            "type": "array"
+          },
+          "extraction_status": {
+            "title": "Extraction Status",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "job": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BackgroundJobOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mime_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mime Type"
+          },
+          "openaleph_sync": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OpenAlephSyncOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          },
+          "source_id": {
+            "title": "Source Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "source_id",
+          "filename",
+          "sha256",
+          "extraction_status",
+          "extraction_issues",
+          "created_at",
+          "chunk_count",
+          "candidate_counts"
+        ],
+        "title": "DocumentUploadOut",
+        "type": "object"
+      },
       "EntityCreate": {
         "properties": {
           "caption": {
@@ -1407,6 +2039,476 @@
         "title": "ExplainIn",
         "type": "object"
       },
+      "ExplanationChunkRefOut": {
+        "properties": {
+          "excerpt": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExplanationExcerptOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "extraction_method": {
+            "title": "Extraction Method",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "const": "chunk",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "locator": {
+            "title": "Locator",
+            "type": "string"
+          },
+          "page_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Number"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "label",
+          "locator",
+          "extraction_method"
+        ],
+        "title": "ExplanationChunkRefOut",
+        "type": "object"
+      },
+      "ExplanationClaimRefOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "const": "claim",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "label",
+          "status"
+        ],
+        "title": "ExplanationClaimRefOut",
+        "type": "object"
+      },
+      "ExplanationConfidenceOut": {
+        "properties": {
+          "basis": {
+            "title": "Basis",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "basis"
+        ],
+        "title": "ExplanationConfidenceOut",
+        "type": "object"
+      },
+      "ExplanationDocumentRefOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "const": "document",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "mime_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mime Type"
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "label",
+          "sha256"
+        ],
+        "title": "ExplanationDocumentRefOut",
+        "type": "object"
+      },
+      "ExplanationEntityRefOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "const": "entity",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "label",
+          "schema"
+        ],
+        "title": "ExplanationEntityRefOut",
+        "type": "object"
+      },
+      "ExplanationEvidenceRefOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "const": "evidence",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "locator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locator"
+          },
+          "source_id": {
+            "title": "Source Id",
+            "type": "string"
+          },
+          "source_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Title"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "label",
+          "source_id"
+        ],
+        "title": "ExplanationEvidenceRefOut",
+        "type": "object"
+      },
+      "ExplanationExcerptOut": {
+        "description": "The matched text with a little of what surrounds it.",
+        "properties": {
+          "after": {
+            "title": "After",
+            "type": "string"
+          },
+          "before": {
+            "title": "Before",
+            "type": "string"
+          },
+          "end_char": {
+            "title": "End Char",
+            "type": "integer"
+          },
+          "match": {
+            "title": "Match",
+            "type": "string"
+          },
+          "start_char": {
+            "title": "Start Char",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "before",
+          "match",
+          "after",
+          "start_char",
+          "end_char"
+        ],
+        "title": "ExplanationExcerptOut",
+        "type": "object"
+      },
+      "ExplanationMethodOut": {
+        "properties": {
+          "automated": {
+            "title": "Automated",
+            "type": "boolean"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "description",
+          "automated"
+        ],
+        "title": "ExplanationMethodOut",
+        "type": "object"
+      },
+      "ExplanationPartOut": {
+        "description": "One part of a proposal: what it says, why, and where it came from.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "reasoning": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasoning",
+            "type": "array"
+          },
+          "sources": {
+            "items": {
+              "discriminator": {
+                "mapping": {
+                  "chunk": "#/components/schemas/ExplanationChunkRefOut",
+                  "claim": "#/components/schemas/ExplanationClaimRefOut",
+                  "document": "#/components/schemas/ExplanationDocumentRefOut",
+                  "entity": "#/components/schemas/ExplanationEntityRefOut",
+                  "evidence": "#/components/schemas/ExplanationEvidenceRefOut",
+                  "provider": "#/components/schemas/ExplanationProviderRefOut",
+                  "source": "#/components/schemas/ExplanationSourceRefOut"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ExplanationChunkRefOut"
+                },
+                {
+                  "$ref": "#/components/schemas/ExplanationDocumentRefOut"
+                },
+                {
+                  "$ref": "#/components/schemas/ExplanationSourceRefOut"
+                },
+                {
+                  "$ref": "#/components/schemas/ExplanationProviderRefOut"
+                },
+                {
+                  "$ref": "#/components/schemas/ExplanationClaimRefOut"
+                },
+                {
+                  "$ref": "#/components/schemas/ExplanationEvidenceRefOut"
+                },
+                {
+                  "$ref": "#/components/schemas/ExplanationEntityRefOut"
+                }
+              ]
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "value": {
+            "title": "Value"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "reasoning",
+          "sources"
+        ],
+        "title": "ExplanationPartOut",
+        "type": "object"
+      },
+      "ExplanationProviderRefOut": {
+        "properties": {
+          "collection_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collection Id"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "kind": {
+            "const": "provider",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "provider_document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Document Id"
+          },
+          "provider_entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Entity Id"
+          }
+        },
+        "required": [
+          "kind",
+          "label",
+          "provider"
+        ],
+        "title": "ExplanationProviderRefOut",
+        "type": "object"
+      },
+      "ExplanationSourceRefOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "const": "source",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "source_type": {
+            "title": "Source Type",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "label",
+          "source_type"
+        ],
+        "title": "ExplanationSourceRefOut",
+        "type": "object"
+      },
       "ExternalAssessmentOut": {
         "properties": {
           "assessment_id": {
@@ -1652,6 +2754,123 @@
         "title": "ExtractedRelationshipProposalCreate",
         "type": "object"
       },
+      "ExtractionCandidateOut": {
+        "description": "One extraction proposal. `explanation` is present only when the list\nwas asked for explanations (?explain=true), so it is left out of the\nreply rather than sent as null.",
+        "properties": {
+          "accepted_record_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted Record Id"
+          },
+          "accepted_record_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted Record Type"
+          },
+          "candidate_type": {
+            "title": "Candidate Type",
+            "type": "string"
+          },
+          "chunk_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chunk Id"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExtractionExplanationOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          },
+          "review_status": {
+            "title": "Review Status",
+            "type": "string"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "reviewer_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewer Note"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "document_id",
+          "candidate_type",
+          "payload",
+          "confidence",
+          "review_status",
+          "created_at"
+        ],
+        "title": "ExtractionCandidateOut",
+        "type": "object"
+      },
       "ExtractionCandidateReviewRequest": {
         "properties": {
           "caption": {
@@ -1736,6 +2955,117 @@
         "title": "ExtractionCandidateReviewRequest",
         "type": "object"
       },
+      "ExtractionExplanationOut": {
+        "description": "Why a proposal exists (#190): per-part reasoning and sources.",
+        "properties": {
+          "candidate_id": {
+            "title": "Candidate Id",
+            "type": "string"
+          },
+          "candidate_type": {
+            "title": "Candidate Type",
+            "type": "string"
+          },
+          "caveats": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Caveats",
+            "type": "array"
+          },
+          "confidence": {
+            "$ref": "#/components/schemas/ExplanationConfidenceOut"
+          },
+          "method": {
+            "$ref": "#/components/schemas/ExplanationMethodOut"
+          },
+          "parts": {
+            "items": {
+              "$ref": "#/components/schemas/ExplanationPartOut"
+            },
+            "title": "Parts",
+            "type": "array"
+          },
+          "rationale_basis": {
+            "enum": [
+              "recorded",
+              "reconstructed",
+              "provider",
+              "reporter"
+            ],
+            "title": "Rationale Basis",
+            "type": "string"
+          },
+          "review_rule": {
+            "title": "Review Rule",
+            "type": "string"
+          },
+          "review_status": {
+            "title": "Review Status",
+            "type": "string"
+          },
+          "sources": {
+            "items": {
+              "discriminator": {
+                "mapping": {
+                  "chunk": "#/components/schemas/ExplanationChunkRefOut",
+                  "claim": "#/components/schemas/ExplanationClaimRefOut",
+                  "document": "#/components/schemas/ExplanationDocumentRefOut",
+                  "entity": "#/components/schemas/ExplanationEntityRefOut",
+                  "evidence": "#/components/schemas/ExplanationEvidenceRefOut",
+                  "provider": "#/components/schemas/ExplanationProviderRefOut",
+                  "source": "#/components/schemas/ExplanationSourceRefOut"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ExplanationChunkRefOut"
+                },
+                {
+                  "$ref": "#/components/schemas/ExplanationDocumentRefOut"
+                },
+                {
+                  "$ref": "#/components/schemas/ExplanationSourceRefOut"
+                },
+                {
+                  "$ref": "#/components/schemas/ExplanationProviderRefOut"
+                },
+                {
+                  "$ref": "#/components/schemas/ExplanationClaimRefOut"
+                },
+                {
+                  "$ref": "#/components/schemas/ExplanationEvidenceRefOut"
+                },
+                {
+                  "$ref": "#/components/schemas/ExplanationEntityRefOut"
+                }
+              ]
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "candidate_type",
+          "review_status",
+          "summary",
+          "method",
+          "rationale_basis",
+          "confidence",
+          "parts",
+          "sources",
+          "caveats",
+          "review_rule"
+        ],
+        "title": "ExtractionExplanationOut",
+        "type": "object"
+      },
       "ExtractionLineageLookupOut": {
         "properties": {
           "found": {
@@ -1800,6 +3130,31 @@
           "candidate"
         ],
         "title": "ExtractionLineageOut",
+        "type": "object"
+      },
+      "ExtractionReviewOut": {
+        "description": "The reply to a review decision: the proposal as it now stands and, for\nan acceptance, the record it made (an entity, claim, evidence record or\nrelationship, each in its own shape).",
+        "properties": {
+          "candidate": {
+            "$ref": "#/components/schemas/ExtractionCandidateOut"
+          },
+          "record": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Record"
+          }
+        },
+        "required": [
+          "candidate"
+        ],
+        "title": "ExtractionReviewOut",
         "type": "object"
       },
       "FindingReviewRequest": {
@@ -2639,6 +3994,59 @@
         "title": "LineageDocumentOut",
         "type": "object"
       },
+      "LineageIntegrityOut": {
+        "description": "Whether every proposal in the archive still points at its document,\nchunk and accepted record.",
+        "properties": {
+          "accepted_record_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Accepted Record Counts",
+            "type": "object"
+          },
+          "candidate_count": {
+            "title": "Candidate Count",
+            "type": "integer"
+          },
+          "candidate_status_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Candidate Status Counts",
+            "type": "object"
+          },
+          "chunk_count": {
+            "title": "Chunk Count",
+            "type": "integer"
+          },
+          "document_count": {
+            "title": "Document Count",
+            "type": "integer"
+          },
+          "errors": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "valid": {
+            "title": "Valid",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "document_count",
+          "chunk_count",
+          "candidate_count",
+          "candidate_status_counts",
+          "accepted_record_counts",
+          "valid",
+          "errors"
+        ],
+        "title": "LineageIntegrityOut",
+        "type": "object"
+      },
       "LineageSourceOut": {
         "properties": {
           "id": {
@@ -2695,6 +4103,413 @@
           }
         },
         "title": "MultiEnrichmentRequest",
+        "type": "object"
+      },
+      "OpenAlephBindingOut": {
+        "properties": {
+          "collection_id": {
+            "title": "Collection Id",
+            "type": "string"
+          },
+          "collection_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collection Label"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "foreign_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Foreign Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "provider",
+          "collection_id",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "OpenAlephBindingOut",
+        "type": "object"
+      },
+      "OpenAlephDocumentSyncOut": {
+        "properties": {
+          "sync": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OpenAlephSyncOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "OpenAlephDocumentSyncOut",
+        "type": "object"
+      },
+      "OpenAlephEntityImportOut": {
+        "properties": {
+          "automatic_resolution": {
+            "title": "Automatic Resolution",
+            "type": "boolean"
+          },
+          "collection_id": {
+            "title": "Collection Id",
+            "type": "string"
+          },
+          "created_candidates": {
+            "title": "Created Candidates",
+            "type": "integer"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "provider_document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Document Id"
+          },
+          "retrieved": {
+            "title": "Retrieved",
+            "type": "integer"
+          },
+          "review_required": {
+            "title": "Review Required",
+            "type": "boolean"
+          },
+          "skipped": {
+            "title": "Skipped",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "document_id",
+          "collection_id",
+          "provider",
+          "retrieved",
+          "created_candidates",
+          "skipped",
+          "review_required",
+          "automatic_resolution"
+        ],
+        "title": "OpenAlephEntityImportOut",
+        "type": "object"
+      },
+      "OpenAlephEvidenceImportOut": {
+        "properties": {
+          "collection_id": {
+            "title": "Collection Id",
+            "type": "string"
+          },
+          "created_candidates": {
+            "title": "Created Candidates",
+            "type": "integer"
+          },
+          "created_chunks": {
+            "title": "Created Chunks",
+            "type": "integer"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "provider_document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Document Id"
+          },
+          "retrieved": {
+            "title": "Retrieved",
+            "type": "integer"
+          },
+          "review_required": {
+            "title": "Review Required",
+            "type": "boolean"
+          },
+          "skipped": {
+            "title": "Skipped",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "document_id",
+          "collection_id",
+          "provider",
+          "retrieved",
+          "created_chunks",
+          "created_candidates",
+          "skipped",
+          "review_required"
+        ],
+        "title": "OpenAlephEvidenceImportOut",
+        "type": "object"
+      },
+      "OpenAlephReviewRefreshOut": {
+        "properties": {
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "entities": {
+            "$ref": "#/components/schemas/OpenAlephEntityImportOut"
+          },
+          "evidence": {
+            "$ref": "#/components/schemas/OpenAlephEvidenceImportOut"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OpenAlephReviewStatusOut"
+          }
+        },
+        "required": [
+          "document_id",
+          "provider",
+          "evidence",
+          "entities",
+          "status"
+        ],
+        "title": "OpenAlephReviewRefreshOut",
+        "type": "object"
+      },
+      "OpenAlephReviewStatusOut": {
+        "description": "Provider sync plus how far reporter review of its proposals has got.",
+        "properties": {
+          "binding": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OpenAlephBindingOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "candidate_counts": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "title": "Candidate Counts",
+            "type": "object"
+          },
+          "document_extraction_status": {
+            "title": "Document Extraction Status",
+            "type": "string"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "provider_candidate_accepted": {
+            "title": "Provider Candidate Accepted",
+            "type": "integer"
+          },
+          "provider_candidate_pending_review": {
+            "title": "Provider Candidate Pending Review",
+            "type": "integer"
+          },
+          "provider_candidate_rejected": {
+            "title": "Provider Candidate Rejected",
+            "type": "integer"
+          },
+          "provider_candidate_total": {
+            "title": "Provider Candidate Total",
+            "type": "integer"
+          },
+          "ready_for_import": {
+            "title": "Ready For Import",
+            "type": "boolean"
+          },
+          "sync": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OpenAlephSyncOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "document_id",
+          "investigation_id",
+          "provider",
+          "document_extraction_status",
+          "ready_for_import",
+          "candidate_counts",
+          "provider_candidate_total",
+          "provider_candidate_pending_review",
+          "provider_candidate_accepted",
+          "provider_candidate_rejected"
+        ],
+        "title": "OpenAlephReviewStatusOut",
+        "type": "object"
+      },
+      "OpenAlephSyncOut": {
+        "description": "How one document stands in the OpenAleph corpus.",
+        "properties": {
+          "collection_id": {
+            "title": "Collection Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "provider_record_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Record Id"
+          },
+          "response_json": {
+            "additionalProperties": true,
+            "title": "Response Json",
+            "type": "object"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "synced_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Synced At"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "document_id",
+          "investigation_id",
+          "provider",
+          "collection_id",
+          "status",
+          "response_json",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "OpenAlephSyncOut",
         "type": "object"
       },
       "PlanIn": {
@@ -3769,6 +5584,34 @@
           "decision"
         ],
         "title": "ResolutionRequest",
+        "type": "object"
+      },
+      "RestoreConflictOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "table": {
+            "title": "Table",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "table",
+          "id",
+          "message"
+        ],
+        "title": "RestoreConflictOut",
         "type": "object"
       },
       "RestoreIn": {
@@ -6077,7 +7920,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/BackupPreviewOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -6113,7 +7958,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/BackupRestoreResultOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -6342,7 +8189,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ExtractionCandidateOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -9625,7 +11474,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentUploadOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -9662,7 +11513,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentDetailOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -9741,7 +11594,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ExtractionCandidateOut"
+                  },
+                  "title": "Response List Document Candidates Endpoint",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -9778,7 +11637,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/OpenAlephDocumentSyncOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -9816,7 +11677,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/OpenAlephEntityImportOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -9854,7 +11717,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/OpenAlephEvidenceImportOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -9892,7 +11757,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/OpenAlephReviewRefreshOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -9930,7 +11797,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/OpenAlephReviewStatusOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -9967,7 +11836,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/OpenAlephDocumentSyncOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -11112,7 +12983,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ExtractionExplanationOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -11198,7 +13071,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ExtractionReviewOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -12066,7 +13941,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentOut"
+                  },
+                  "title": "Response List Documents",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -13120,7 +15001,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BackgroundJobOut"
+                  },
+                  "title": "Response List Jobs Endpoint",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -13157,7 +15044,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/BackgroundJobOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -13194,7 +15083,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/BackgroundJobOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -13231,7 +15122,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/BackgroundJobOut"
+                }
               }
             },
             "description": "Successful Response"
