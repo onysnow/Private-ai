@@ -240,3 +240,62 @@ def test_routes_are_scoped_to_the_investigations_a_token_may_see(monkeypatch):
         assert remote.get("/api/investigations/inv-denied/visuals/catalog").status_code == 404
         assert remote.post(f"/api/investigations/{allowed_id}/visuals/preview", json=SPEC).status_code == 200
         assert remote.post("/api/investigations/inv-denied/visuals/preview", json=SPEC).status_code == 404
+        stored = remote.post(f"/api/investigations/{allowed_id}/visuals/preview", json=SPEC).json()
+        restyle = {"chart": {"spec": stored["spec"], "data": stored["data"]}, "style": {"preset": "column"}}
+        assert remote.post(f"/api/investigations/{allowed_id}/visuals/restyle", json=restyle).status_code == 200
+        assert remote.post("/api/investigations/inv-denied/visuals/restyle", json=restyle).status_code == 404
+
+
+# --- restyle: a stored chart drawn again in a style and a theme -----------------------------
+
+def _stored(inv_id: str, order: dict) -> dict:
+    """A chart as a draft or a deck keeps it: its order slip and cooked rows."""
+    preview = client.post(f"/api/investigations/{inv_id}/visuals/preview", json=order).json()
+    return {"spec": preview["spec"], "data": preview["data"], "option": preview["option"]}
+
+
+def test_restyle_draws_a_stored_chart_again_in_its_style_and_checks_it():
+    inv_id = _demo_with_payments()
+    chart = _stored(inv_id, {**SPEC, "question": "ranking"})
+    plain = client.post(f"/api/investigations/{inv_id}/visuals/restyle", json={"chart": chart})
+    assert plain.status_code == 200, plain.text
+    body = plain.json()
+    # No style is the chart as it was ordered, with the presets it can take.
+    assert body["option"] == chart["option"] and body["style"] == {"preset": "", "options": {}}
+    assert body["presets"] == ["horizontal", "ranked", "column", "minimal"] and body["default_preset"] == "horizontal"
+    assert body["options"] == {"sort": "as_ordered", "thickness": "regular", "axis_line": True, "highlight": []}
+    columns = client.post(f"/api/investigations/{inv_id}/visuals/restyle", json={
+        "chart": chart, "style": {"preset": "column", "options": {"gridlines": False, "axis_min": 100}}, "deck_style": {"theme": "newsprint"}}).json()
+    assert columns["spec"]["kind"] == "column" and columns["option"]["xAxis"]["type"] == "category"
+    assert columns["style"] == {"preset": "column", "options": {"gridlines": False}}   # no control starts an axis above zero
+    assert columns["option"]["backgroundColor"] == "#FFFFFF"                            # the deck's theme, Newsprint
+    assert columns["report"]["ok"] is True and columns["data"] == chart["data"]       # the rows as cooked
+    _same_through_model(r.ChartRestyleOut, columns)
+
+
+def test_restyle_warns_beside_a_control_and_the_checker_refuses_a_broken_style():
+    from app.models.domain import Entity
+    from app.services.relationships import create_relationship
+
+    inv_id = _demo_with_payments()
+    with SessionLocal() as db:   # a fifth recipient, so "every part" is five slices
+        ids = {e.caption: e.id for e in db.query(Entity).filter_by(investigation_id=inv_id).all()}
+        create_relationship(db, investigation_id=inv_id, schema="Payment", source_entity_id=ids["Meridian Holdings Ltd"],
+                            target_entity_id=ids["MV Fair Tern (cargo vessel)"], properties={"amount": ["30000"], "currency": ["USD"], "date": ["2024-03-01"]})
+    chart = _stored(inv_id, {"kind": "donut", "title": "Meridian received most of the money", "query": {"name": "payments_by_party"}, "limit": 3})
+    every_part = client.post(f"/api/investigations/{inv_id}/visuals/restyle", json={"chart": chart, "style": {"options": {"other_after": "all"}}}).json()
+    assert every_part["report"]["ok"] is False and 5 in {e["rule"] for e in every_part["report"]["errors"]}
+    assert [w["option"] for w in every_part["warnings"]] == ["other_after"]
+    assert every_part["options"]["other_after"] == "all"
+
+
+def test_restyle_refuses_what_is_not_a_stored_chart():
+    inv_id = _demo_id()
+    url = f"/api/investigations/{inv_id}/visuals/restyle"
+    assert client.post(url, json={"chart": {"spec": {"kind": "bar"}}}).status_code == 422
+    chart = _stored(inv_id, SPEC)
+    no_rows = client.post(url, json={"chart": {**chart, "data": {**chart["data"], "rows": []}}})
+    assert no_rows.status_code == 422 and "no cooked data" in no_rows.text
+    odd = {**chart["data"], "rows": [{**chart["data"]["rows"][0], "value": "nan"}]}
+    assert client.post(url, json={"chart": {**chart, "data": odd}}).status_code == 422
+    assert client.post("/api/investigations/nope/visuals/restyle", json={"chart": chart}).status_code == 404

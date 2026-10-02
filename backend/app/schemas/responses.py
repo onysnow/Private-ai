@@ -2376,6 +2376,24 @@ class VisualOptionSpecOut(ResponseModel):
     values: list[str] | None = Field(default=None, exclude_if=_absent_when_none)
 
 
+class ChartOptionSpecOut(VisualOptionSpecOut):
+    """What one chart option accepts. `kinds` and `series`, when sent, say
+    which chart kinds and query shapes it is for; `warning`, when sent, is
+    shown beside it while it is on."""
+    kinds: list[str] | None = Field(default=None, exclude_if=_absent_when_none)
+    series: list[str] | None = Field(default=None, exclude_if=_absent_when_none)
+    warning: str | None = Field(default=None, exclude_if=_absent_when_none)
+
+
+class ChartPresetOut(ResponseModel):
+    """A named look for one chart family: the kind it draws and its option defaults."""
+    id: str
+    label: str
+    description: str
+    kind: str
+    options: dict[str, VisualOptionValueOut]
+
+
 class VisualPresetsOut(ResponseModel):
     bar: list[VisualPresetOut]
     timeline: list[VisualPresetOut]
@@ -2396,6 +2414,10 @@ class PresentationStyleCatalogOut(ResponseModel):
     font_pairs: list[FontPairOut]
     visual_presets: VisualPresetsOut
     visual_options: VisualOptionsOut
+    # Checked charts: each drawn kind's family, and each family's presets and options.
+    chart_families: dict[str, str]
+    chart_presets: dict[str, list[ChartPresetOut]]
+    chart_options: dict[str, dict[str, ChartOptionSpecOut]]
 
 
 # --- Decks and write-ups --------------------------------------------------------------
@@ -2459,6 +2481,28 @@ class ChartVisualOut(ResponseModel):
     report: dict[str, Any]
     text: dict[str, Any]
     option: dict[str, Any] | None = Field(default=None, exclude_if=_absent_when_none)
+    # The chart's preset and options (app/visuals/style.py), when it was styled.
+    style: VisualStyleOut | None = Field(default=None, exclude_if=_absent_when_none)
+
+
+class StyleWarningOut(ResponseModel):
+    """A warning the style panel shows beside one option's control."""
+    option: str
+    message: str
+
+
+class ChartRestyleOut(VisualPreviewOut):
+    """A stored chart drawn again in a style and a deck theme, and checked
+    again (app/visuals/style.py): the preview's reply, plus the style as it
+    will be kept (`preset` empty for the chart as it was ordered), the
+    presets this chart can take, the one that draws it as ordered, every
+    option its kind offers with its value, and the warnings to show beside
+    the controls."""
+    style: VisualStyleOut
+    presets: list[str]
+    default_preset: str
+    options: dict[str, VisualOptionValueOut]
+    warnings: list[StyleWarningOut]
 
 
 # A slide's visual: `type` says which shape follows.

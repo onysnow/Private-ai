@@ -53,8 +53,12 @@ def test_resolved_chart_carries_its_data_report_and_words(demo):
 
 def test_normalize_visual_keeps_a_resolved_chart_and_drops_a_bare_order(demo):
     _db, _inv, chart = demo
-    kept = normalize_visual({**chart, "style": {"preset": "ranked"}})
-    assert kept is not None and kept["type"] == "chart" and "style" not in kept
+    # A chart keeps its style as the catalogue allows it (app/visuals/style.py);
+    # an unknown preset or option is dropped, and nothing else changes.
+    kept = normalize_visual({**chart, "style": {"preset": "ranked", "options": {"thickness": "thin", "start_above_zero": True}}})
+    assert kept is not None and kept["type"] == "chart" and kept["style"] == {"preset": "ranked", "options": {"thickness": "thin"}}
+    assert kept["data"] == chart["data"] and kept["spec"] == chart["spec"]
+    assert "style" not in (normalize_visual({**chart, "style": {"preset": "three_d"}}) or {})
     assert normalize_visual({"type": "chart", "spec": chart["spec"]}) is None
     assert normalize_visual({"type": "chart", "spec": {"kind": "bar"}, "data": chart["data"]}) is None
     assert chart_record_refs(chart) == [{"record_type": "relationship", "record_id": chart["data"]["rows"][0]["record_refs"][0]["record_id"]}]
@@ -286,6 +290,42 @@ def test_a_treemap_falls_back_to_native_bars_when_the_render_service_is_down(eve
     assert len(frames) == 1 and list(frames[0].chart.plots[0].categories)[-1].startswith(largest)
     text = "\n".join(shape.text_frame.text for shape in slide.shapes if shape.has_text_frame)
     assert "Treemap image not available" in text and "the same parts are shown as bars" in text
+
+
+def test_a_chart_goes_into_the_deck_in_its_own_style_and_is_checked_again_when_saved(every_kind):
+    from pptx.enum.chart import XL_CHART_TYPE
+
+    from app.services.decks import create_deck, update_deck
+
+    db, inv_id, charts = every_kind
+
+    def content(visual):
+        return {"kind": "content", "heading": "A styled chart", "bullets": [], "evidence": [], "notes": "", "visual": visual}
+
+    area = {**copy.deepcopy(charts["line"]), "style": {"preset": "area"}}
+    donut = {**copy.deepcopy(charts["stacked_bar_100"]), "style": {"preset": "donut"}}
+    deck = create_deck(db, investigation_id=inv_id, title="Styled", slides=[content(area), content(donut)])
+    kept = [slide["visual"] for slide in deck.slides_json]
+    assert kept[0]["style"] == {"preset": "area", "options": {}} and "areaStyle" in kept[0]["option"]["series"][0]
+    assert kept[1]["option"]["series"][0]["type"] == "pie" and kept[1]["report"]["ok"] is True
+    # The rows are the ones the draft cooked; the order slip is the one the model wrote.
+    assert kept[0]["data"] == charts["line"]["data"] and kept[0]["spec"] == charts["line"]["spec"]
+    native = [shape.chart.chart_type for slide in render_deck_pptx(deck, []).slides for shape in slide.shapes if shape.has_chart]
+    assert XL_CHART_TYPE.AREA in native and XL_CHART_TYPE.DOUGHNUT in native
+
+    # A style that breaks a rule is kept as failing, and the export says so instead of drawing it:
+    # the payments are too lopsided for a treemap to name every part (rule 12).
+    broken = create_deck(db, investigation_id=inv_id, title="Broken", slides=[
+        content({**copy.deepcopy(charts["stacked_bar_100"]), "style": {"preset": "treemap"}})])
+    report = broken.slides_json[0]["visual"]["report"]
+    assert report["ok"] is False and 12 in {e["rule"] for e in report["errors"]}
+    slide = list(render_deck_pptx(broken, []).slides)[1]   # after the cover
+    assert not any(shape.has_chart for shape in slide.shapes)
+    assert "Chart not drawn: it fails the design checks (rule 12:" in "\n".join(s.text_frame.text for s in slide.shapes if s.has_text_frame)
+
+    # A new look for the deck: every chart is drawn again in it.
+    newsprint = update_deck(db, deck, {"style_json": {"theme": "newsprint", "fonts": "theme"}})
+    assert {slide["visual"]["option"]["backgroundColor"] for slide in newsprint.slides_json} == {"#FFFFFF"}
 
 
 def test_a_stored_chart_that_now_fails_a_rule_is_not_drawn(every_kind):

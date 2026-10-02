@@ -133,8 +133,9 @@ export function visualRefs(visual: PresentationVisual | null | undefined): AiCit
   return (visual.items as {evidence?: AiCitationRef[]}[]).flatMap(i => i.evidence || []);
 }
 
-/** The style layer (presets and options) applies to the three drawn visuals;
- * a chart's look comes from the deck theme and its own order slip. */
+/** The style layer drawn here (presets and options) applies to the three
+ * drawn visuals; a checked chart is drawn again in its style by the backend,
+ * which checks it again (applyVisualStyles in draft-preview.tsx). */
 export const isStyledVisual = (visual: PresentationVisual | null | undefined): visual is StyledVisual => Boolean(visual) && visual!.type !== 'chart';
 
 /** Number every ref in first-appearance order, the same order the export's sources slide uses. */

@@ -11,9 +11,10 @@ import type {KeyboardEvent, ReactElement} from 'react';
 import {ChevronLeft, ChevronRight} from 'lucide-react';
 
 import type {AiCitationRef, CitationDetail, DeckSlide, DeckStyle, JsonObject, JsonValue, PresentationDraftPayload, PresentationSection, PresentationStyleCatalog, PresentationVisual, QuotedRef, VisualStyle} from '../../lib/api-types';
+import type {ChartRestyleOut} from '../../lib/generated/types.gen';
 import {Button} from '@/components/ui/button';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {asChart, isObj, refs, str} from './chart-data';
+import {asChart, chartFromPreview, isObj, refs, str} from './chart-data';
 import {DECK, SlideCanvas, SlideStyleProvider, SourcesCanvas, buildCitationLookup, displayDate, formatValue, isStyledVisual, refKey, resolveTheme} from './slide-canvas';
 
 // ECharts loads only when a brief actually holds a chart.
@@ -156,13 +157,22 @@ function BriefView({draft, lookup, onTrace}: {draft: PresentationDraftPayload, l
 type Frame = {kind: 'slide', slide: DeckSlide, contentIndex: number} | {kind: 'sources'};
 
 /** Attach each section's chosen style to its content slide's visual (the Nth
- *  content slide is section N-1, as in backend deck_slides_from_payload). */
-export function applyVisualStyles(slides: DeckSlide[], visualStyles: Record<string, VisualStyle>): DeckSlide[] {
+ *  content slide is section N-1, as in backend deck_slides_from_payload).
+ *  A checked chart is not restyled here: the backend draws it again in the
+ *  style and checks it again, and its reply (`chartLooks`, POST
+ *  /api/investigations/{id}/visuals/restyle) replaces the slide's chart. */
+export function applyVisualStyles(slides: DeckSlide[], visualStyles: Record<string, VisualStyle>, chartLooks: Record<string, ChartRestyleOut> = {}): DeckSlide[] {
   let section = -1;
   return slides.map(slide => {
     if ((slide.kind || 'content') !== 'content') return slide;
     section += 1;
-    const style = visualStyles[String(section)];
+    const key = String(section);
+    if (slide.visual?.type === 'chart') {
+      const look = chartLooks[key];
+      const drawn = look ? chartFromPreview(look) : null;
+      return look && drawn ? {...slide, visual: {...drawn, style: look.style}} : slide;
+    }
+    const style = visualStyles[key];
     return isStyledVisual(slide.visual) && style ? {...slide, visual: {...slide.visual, style}} : slide;
   });
 }
@@ -175,11 +185,15 @@ export type DraftPreviewProps = {
   onDeckStyleChange?: (style: DeckStyle) => void,
   visualStyles?: Record<string, VisualStyle>,
   onVisualStyleChange?: (section: string, style: VisualStyle) => void,
+  /** Each charted section's chart as the backend drew and checked it in the
+   * picked style and theme, and why it could not be, by section index. */
+  chartLooks?: Record<string, ChartRestyleOut>,
+  chartProblems?: Record<string, string>,
 };
 
-export function DraftPreview({payload, slides: baseSlides, citationDetails, onTrace, catalog, deckStyle, onDeckStyleChange, visualStyles, onVisualStyleChange}: DraftPreviewProps): ReactElement {
+export function DraftPreview({payload, slides: baseSlides, citationDetails, onTrace, catalog, deckStyle, onDeckStyleChange, visualStyles, onVisualStyleChange, chartLooks, chartProblems}: DraftPreviewProps): ReactElement {
   const draft = useMemo(() => asDraft(payload), [payload]);
-  const slides = useMemo(() => applyVisualStyles(baseSlides, visualStyles || {}), [baseSlides, visualStyles]);
+  const slides = useMemo(() => applyVisualStyles(baseSlides, visualStyles || {}, chartLooks), [baseSlides, visualStyles, chartLooks]);
   const theme = useMemo(() => resolveTheme(catalog, deckStyle), [catalog, deckStyle]);
   const lookup = useMemo(() => buildCitationLookup(slides, citationDetails), [slides, citationDetails]);
   const frames = useMemo<Frame[]>(() => {
@@ -239,6 +253,8 @@ export function DraftPreview({payload, slides: baseSlides, citationDetails, onTr
         catalog={catalog} deckStyle={deckStyle} onDeckStyle={onDeckStyleChange}
         visual={activeVisual} sectionLabel={active?.kind === 'slide' ? active.slide.heading : undefined}
         onVisualStyle={style => { if (activeSection !== null) onVisualStyleChange(activeSection, style); }}
+        chartLook={activeSection !== null ? chartLooks?.[activeSection] ?? null : null}
+        chartProblem={activeSection !== null ? chartProblems?.[activeSection] ?? null : null}
       />}
       </div>
     </TabsContent>

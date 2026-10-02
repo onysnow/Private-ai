@@ -11,7 +11,10 @@ presentation_draft module's per-section visual (app/ai/reasoning.py
 VISUAL_TYPES) -- every data point carries its own evidence refs. A "chart"
 visual is a resolved order slip (app/ai/chart_check.py): its spec, the data
 the Workbench cooked from the records (every row tagged with record refs),
-the check report and the chart's words; it is drawn as a native bar chart.
+the check report and the chart's words, and its style (preset and options,
+app/visuals/style.py) when it has one. It is drawn as a native PowerPoint
+chart of its kind (a treemap as the render service's picture), and checked
+again whenever the deck is saved and when it is exported.
 
 Export draws every slide itself on a 16:9 canvas rather than relying on the
 stock python-pptx template: an editorial layout in the app's Dark Academia
@@ -43,6 +46,7 @@ from app.visuals.echarts import (
     part_colours, part_value_text, prepare_rows, singular, value_label,
 )
 from app.visuals.spec import ChartKind, VisualSpec, spec_errors
+from app.visuals.style import normalize_chart_style, styled_chart
 
 MAX_BULLETS_PER_SLIDE = 8
 SLIDE_KINDS = {"title", "statement", "content", "questions"}
@@ -78,13 +82,41 @@ def normalize_chart_visual(visual: Any) -> dict | None:
         return None
     report = visual.get("report") if isinstance(visual.get("report"), dict) else {"ok": True, "errors": [], "warnings": []}
     text = visual.get("text") if isinstance(visual.get("text"), dict) else {}
-    kept = {"type": CHART_VISUAL, "spec": VisualSpec.model_validate(visual["spec"]).model_dump(mode="json"),
-            "data": data.as_dict(), "report": report, "text": text}
+    spec = VisualSpec.model_validate(visual["spec"])
+    kept = {"type": CHART_VISUAL, "spec": spec.model_dump(mode="json"), "data": data.as_dict(), "report": report, "text": text}
     if isinstance(visual.get("option"), dict):
         # The checked drawing travels with the deck so the preview of a
         # promoted deck is the one the reporter approved.
         kept["option"] = visual["option"]
+    # The chart's preset and options (app/visuals/style.py), kept as the
+    # catalogue allows them; the order slip and the data stay as they are.
+    style = normalize_chart_style(spec, data, visual.get("style"))
+    if style:
+        kept["style"] = style
     return kept
+
+
+def recheck_charts(slides: list[dict], theme: Theme) -> list[dict]:
+    """Every chart in a deck drawn again in the deck's theme and its own
+    style, and checked again, whenever the deck's slides or look change
+    ("the checker re-runs on every change", Visual Editor design, "Keeping
+    it honest"). The stored drawing, words and report become the ones the
+    deck will export, so a chart a style or a theme has broken is marked as
+    failing where it is kept, and the export draws a note naming the rules
+    instead of the chart. A chart that cannot be drawn at all is left as it
+    was stored; the export says why. New dicts are returned, the given ones
+    left as they were: a deck's stored slides are compared with the new ones
+    to know what to save."""
+    out: list[dict] = []
+    for slide in slides:
+        visual = slide.get("visual")
+        if isinstance(visual, dict) and visual.get("type") == CHART_VISUAL:
+            checked = checked_chart(visual, theme)
+            if checked.built is not None and checked.report is not None:
+                slide = {**slide, "visual": {**visual, "option": checked.built.option, "text": checked.built.text(),
+                                             "report": checked.report.as_dict()}}
+        out.append(slide)
+    return out
 
 
 def chart_record_refs(visual: dict) -> list[dict]:
@@ -144,7 +176,10 @@ def checked_chart(visual: dict, theme: Theme) -> CheckedChart:
     spec = VisualSpec.model_validate(visual["spec"])
     data = VisualData.from_dict(visual["data"])
     try:
-        built = build_chart(spec, data, theme)
+        # The chart's own style (preset and options) on top of its order slip;
+        # the rows are drawn as the data service cooked them.
+        spec, draw = styled_chart(spec, data, visual.get("style"))
+        built = build_chart(spec, data, theme, draw=draw)
     except (UnsupportedChartKind, ChartDoesNotFit) as exc:
         return CheckedChart(spec, data, None, None, f"Chart not drawn: {exc}.")
     report = check_visual(spec, data, theme, built)
@@ -279,9 +314,10 @@ def serialize_deck(row: Deck) -> dict:
 
 def create_deck(db: Session, *, investigation_id: str, title: str, slides: list[dict] | None = None,
                  source_ai_candidate_id: str | None = None, created_by: str | None = None, style: dict | None = None) -> Deck:
+    deck_style = normalize_deck_style(style)
     row = Deck(
         investigation_id=investigation_id, title=title.strip() or "Untitled deck",
-        slides_json=_normalize_slides(slides), style_json=normalize_deck_style(style),
+        slides_json=recheck_charts(_normalize_slides(slides), resolved_theme(deck_style)), style_json=deck_style,
         source_ai_candidate_id=source_ai_candidate_id,
         created_by=created_by, created_at=utcnow_naive(),
     )
@@ -294,10 +330,14 @@ def create_deck(db: Session, *, investigation_id: str, title: str, slides: list[
 def update_deck(db: Session, row: Deck, data: dict) -> Deck:
     if "title" in data and data["title"] is not None:
         row.title = data["title"].strip() or row.title
-    if "slides_json" in data and data["slides_json"] is not None:
-        row.slides_json = _normalize_slides(data["slides_json"])
-    if "style_json" in data and data["style_json"] is not None:
+    slides_changed = "slides_json" in data and data["slides_json"] is not None
+    style_changed = "style_json" in data and data["style_json"] is not None
+    if style_changed:
         row.style_json = normalize_deck_style(data["style_json"])
+    if slides_changed or style_changed:
+        # A new look or new slides: every chart is drawn and checked again.
+        slides = _normalize_slides(data["slides_json"]) if slides_changed else list(row.slides_json or [])
+        row.slides_json = recheck_charts(slides, resolved_theme(row.style_json))
     db.commit()
     db.refresh(row)
     return row

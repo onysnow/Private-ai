@@ -49,7 +49,7 @@ export type ChartDataRow={label:string,value:number,record_refs:AiCitationRef[],
 // A part's share of the whole (100% bar, donut, treemap) and a scatter plot's second number come only with those kinds.
 export type ChartDataTableRow={label:string,value:number,formatted:string,record_count:number,record_refs:AiCitationRef[],share?:number,x?:number,x_formatted?:string};
 /** A chart the AI ordered and the data service cooked (backend/app/visuals): the rows, the checked ECharts drawing and the words that go with it (alt text, description, data table, source line). */
-export type ChartVisual={type:'chart',spec:JsonObject,data:{rows:ChartDataRow[],unit?:string|null,currency?:string|null}&JsonObject,option:JsonObject,width?:number,height?:number,text:{alt_text:string,description:string,source_line:string,data_table:{columns:string[],rows:ChartDataTableRow[]}}};
+export type ChartVisual={type:'chart',spec:JsonObject,data:{rows:ChartDataRow[],unit?:string|null,currency?:string|null}&JsonObject,option:JsonObject,width?:number,height?:number,text:{alt_text:string,description:string,source_line:string,data_table:{columns:string[],rows:ChartDataTableRow[]}},style?:VisualStyle|null};
 export type PresentationVisual=StyledVisual|ChartVisual;
 export type VisualKind=StyledVisual['type'];
 // A quote the backend found word for word in the cited record (app/ai/quote_check.py).
@@ -69,7 +69,12 @@ export type DeckTheme={id:string,label:string,description:string,cover_bg:string
 export type FontPair={id:string,label:string,heading:string,body:string};
 export type VisualPreset={id:string,label:string,description:string,layout:Record<string,string|boolean>,options:Record<string,VisualOptionValue>};
 export type VisualOptionSpec={type:'bool'|'choice'|'labels',label:string,values?:string[]};
-export type PresentationStyleCatalog={defaults:DeckStyle,themes:DeckTheme[],font_pairs:FontPair[],visual_presets:Record<VisualKind,VisualPreset[]>,visual_options:Record<VisualKind,Record<string,VisualOptionSpec>>};
+// A checked chart's presets and options, per chart family (backend app/services/presentation_style.py
+// CHART_PRESETS, CHART_OPTIONS): an option may be for some kinds or query shapes only, and carry a warning.
+export type ChartPresetSpec={id:string,label:string,description:string,kind:string,options:Record<string,VisualOptionValue>};
+export type ChartOptionSpec=VisualOptionSpec&{kinds?:string[],series?:string[],warning?:string};
+export type PresentationStyleCatalog={defaults:DeckStyle,themes:DeckTheme[],font_pairs:FontPair[],visual_presets:Record<VisualKind,VisualPreset[]>,visual_options:Record<VisualKind,Record<string,VisualOptionSpec>>,
+  chart_families?:Record<string,string>,chart_presets?:Record<string,ChartPresetSpec[]>,chart_options?:Record<string,Record<string,ChartOptionSpec>>};
 export type Deck={id:string,investigation_id:string,title:string,slides:DeckSlide[],slide_count:number,style?:DeckStyle,source_ai_candidate_id?:string|null,created_by?:string|null,created_at:string,updated_at:string};
 export type AiAnalysisCandidateSummary={id:string,investigation_id:string,module:AiModuleName|string,request:AiAnalysisRequest,review_status:AiReviewStatus|string,confidence:number,reviewer_note:string|null,accepted_record_type:string|null,accepted_record_id:string|null,created_at:string,reviewed_at:string|null,checked_citation_count:number};
 export type AiAnalysisCandidate=AiAnalysisCandidateSummary&{payload:JsonObject,checked_citation_ids:AiCitationRef[],trace?:JsonObject|null,citation_details?:CitationDetail[],deck_preview?:DeckSlide[]};

@@ -6,7 +6,17 @@
 // No React and no ECharts here: the builder's panel imports this without
 // pulling either into the page's first load.
 import type {AiCitationRef, ChartVisual, JsonObject, JsonValue} from '../../lib/api-types';
-import type {VisualPreviewOut} from '../../lib/generated/types.gen';
+import type {ChartKind, VisualPreviewOut} from '../../lib/generated/types.gen';
+
+/** What each kind is called on screen (backend/app/visuals/echarts.py KIND_LABELS). */
+export const KIND_NAMES: Record<ChartKind, string> = {
+  bar: 'Bar chart', column: 'Column chart', line: 'Line chart', area: 'Area chart', stacked_bar_100: '100% bar', donut: 'Donut',
+  treemap: 'Treemap', histogram: 'Histogram', scatter: 'Scatter plot', timeline: 'Timeline', sankey: 'Flow diagram',
+};
+
+/** Kinds come as plain strings from the catalogue and stored charts; only a kind the order slip knows counts. */
+export const isChartKind = (value: string): value is ChartKind => Object.prototype.hasOwnProperty.call(KIND_NAMES, value);
+export const kindName = (value: string): string => (isChartKind(value) ? KIND_NAMES[value] : value);
 
 export const isObj = (v: JsonValue | undefined): v is JsonObject => typeof v === 'object' && v !== null && !Array.isArray(v);
 export const str = (v: JsonValue | undefined): string => (typeof v === 'string' ? v : '');
