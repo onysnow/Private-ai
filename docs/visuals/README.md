@@ -30,7 +30,10 @@ order slip  →  kitchen  →  checker  →  drawing  →  review
    `QUESTIONS` is the chart chooser, after the FT Visual Vocabulary: ranking,
    change over time, part of a whole, distribution, correlation and flow,
    each with the kinds that answer it and the query shapes that hold that
-   relationship (`category`, `time`, `distribution`, `pairs`).
+   relationship (`category`, `time`, `distribution`, `pairs`). An order may
+   name its `question`; an unknown one is a malformed order, and a kind or
+   query that does not answer it is refused when the chart is drawn
+   (`ChartDoesNotFit`), which sends the model back with the kinds that do.
 2. **The kitchen** (`backend/app/visuals/data_service.py`). Eleven read-only
    queries, each scoped to one investigation: `payments_by_party`,
    `payments_over_time`, `events_over_time`, `links_by_type`,
@@ -125,6 +128,13 @@ order slip  →  kitchen  →  checker  →  drawing  →  review
   `app/ai/presentation_modules/PRESENTATION_DRAFT.md` and
   `OUTPUT_SCHEMAS["presentation_draft"]` in `app/ai/reasoning.py`). After the
   chart check it is `{"type": "chart", "spec", "data", "report", "text"}`.
+  The model is told to choose by the question the data answers, then a
+  query listed under that question, then one of the question's kinds, and
+  to write a title that states the finding in words. Its packet's
+  `visual_catalog` (`chart_check.visual_catalog_for_prompt`) lists the
+  questions with their kinds and queries, and every query with the kinds
+  that can draw it. The kinds and questions in the output schema are read
+  from the drawing's own lists, so the schema cannot fall behind it.
 - **Both exports check again first.** A stored chart is rebuilt from its
   stored order slip and data and checked again (`decks.checked_chart`), so
   a chart stored before a rule tightened, or edited by hand, is replaced by

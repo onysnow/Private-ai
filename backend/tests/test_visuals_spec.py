@@ -56,6 +56,33 @@ def test_each_question_names_the_kinds_and_query_shapes_that_answer_it():
     assert QUERY_CATALOG["payments_count_and_total_by_party"].kinds == (ChartKind.scatter,)
 
 
+def test_an_order_may_name_the_question_and_its_kind_and_query_must_answer_it():
+    assert parse_spec(_bar(question="ranking")).question == "ranking"
+    assert parse_spec(_bar(question="part_of_whole", kind="donut")).question == "part_of_whole"
+    assert parse_spec({"kind": "histogram", "question": "distribution", "title": "Most payments were small",
+                       "query": {"name": "payment_amounts"}}).kind == ChartKind.histogram
+    assert parse_spec(_bar()).question is None   # orders stored before the question still parse
+
+
+def test_an_unknown_question_is_a_malformed_order():
+    problems = spec_errors(_bar(question="trend"))
+    assert any("unknown question 'trend'; the questions are: ranking, change_over_time" in p for p in problems), problems
+
+
+@pytest.mark.parametrize("raw, fragment", [
+    (_bar(question="part_of_whole"), "a bar does not answer 'part of a whole'; the kinds that do: stacked_bar_100, donut, treemap"),
+    (_bar(question="change_over_time", kind="line"),
+     "the query 'payments_by_party' cannot answer 'change over time'; the queries that can: payments_over_time, events_over_time"),
+    (_bar(question="correlation", kind="scatter"), "the queries that can: payments_count_and_total_by_party"),
+])
+def test_a_kind_or_query_that_does_not_answer_the_question_is_a_choice_to_fix(raw, fragment):
+    # Well formed, so it parses; the drawing refuses it (ChartDoesNotFit),
+    # which sends the model back with the reason instead of failing the draft.
+    spec = parse_spec(raw)
+    assert spec_errors(raw) == []
+    assert fragment in (spec.question_problem() or "")
+
+
 @pytest.mark.parametrize("raw, fragment", [
     (_bar(kind="pie"), "kind"),
     (_bar(query={"name": "payments_by_payee"}), "unknown query 'payments_by_payee'; the catalogue has: "),

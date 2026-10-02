@@ -293,6 +293,7 @@
     "name": "payments_over_time",
     "params": {}
    },
+   "question": null,
    "scale": "linear",
    "sort": null,
    "stack": false,
@@ -610,6 +611,7 @@
     "name": "payments_by_party",
     "params": {}
    },
+   "question": null,
    "scale": "linear",
    "sort": null,
    "stack": false,
@@ -927,6 +929,7 @@
     "name": "payments_over_time",
     "params": {}
    },
+   "question": null,
    "scale": "linear",
    "sort": null,
    "stack": false,
@@ -1214,6 +1217,7 @@
     "name": "payments_by_party",
     "params": {}
    },
+   "question": null,
    "scale": "linear",
    "sort": null,
    "stack": false,
@@ -1625,6 +1629,7 @@
     "name": "payment_amounts",
     "params": {}
    },
+   "question": null,
    "scale": "linear",
    "sort": null,
    "stack": false,
@@ -2000,6 +2005,7 @@
     "name": "payments_over_time",
     "params": {}
    },
+   "question": null,
    "scale": "linear",
    "sort": null,
    "stack": false,
@@ -2358,6 +2364,7 @@
     "name": "payments_count_and_total_by_party",
     "params": {}
    },
+   "question": null,
    "scale": "linear",
    "sort": null,
    "stack": false,
@@ -2683,6 +2690,7 @@
     "name": "payments_by_party",
     "params": {}
    },
+   "question": null,
    "scale": "linear",
    "sort": null,
    "stack": false,
@@ -3010,6 +3018,7 @@
     "name": "payments_by_party",
     "params": {}
    },
+   "question": null,
    "scale": "linear",
    "sort": null,
    "stack": false,

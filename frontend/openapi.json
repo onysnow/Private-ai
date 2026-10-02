@@ -20836,6 +20836,18 @@
           "query": {
             "$ref": "#/components/schemas/QueryRef"
           },
+          "question": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The question the chart answers: ranking, change_over_time, part_of_whole, distribution, correlation or flow.",
+            "title": "Question"
+          },
           "scale": {
             "$ref": "#/components/schemas/Scale",
             "default": "linear"

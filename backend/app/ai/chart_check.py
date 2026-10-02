@@ -38,15 +38,24 @@ MAX_CHART_RETRIES = 2
 
 
 def visual_catalog_for_prompt(db: Session, investigation_id: str) -> dict[str, Any]:
-    """The menu the model sees in the retrieval packet: each query, its
-    parameters, and whether this investigation has data for it."""
+    """The menu the model sees in the retrieval packet: the questions a
+    chart can answer (FT Visual Vocabulary) with the kinds that answer each
+    and the queries that hold that relationship; then each query, its
+    parameters, whether this investigation has data for it, and the kinds
+    that can draw it. The model picks the question first, then a query
+    that answers it, then a kind (PRESENTATION_DRAFT.md)."""
     catalog = describe_catalog(db, investigation_id)
     return {
         "note": ("A chart visual names one of these queries; the Workbench runs it and supplies every number. "
-                 f"Chart kinds that can be drawn now: {', '.join(catalog['drawn_kinds'])}."),
+                 "Pick the question the chart answers, then a query listed under it that has data, then one of the question's kinds "
+                 f"that can draw that query. Chart kinds that can be drawn now: {', '.join(catalog['drawn_kinds'])}."),
+        "questions": [
+            {"id": q["id"], "label": q["label"], "description": q["description"], "kinds": q["drawn_kinds"], "queries": q["queries"]}
+            for q in catalog["questions"] if q["drawn_kinds"]
+        ],
         "queries": [
             {"name": q["name"], "description": q["description"], "params": {k: {"choices": p["choices"], "default": p["default"]} for k, p in q["params"].items()},
-             "has_data": q["has_data"], "record_count": q["record_count"], "currencies": q["currencies"]}
+             "has_data": q["has_data"], "record_count": q["record_count"], "currencies": q["currencies"], "kinds": q["kinds"], "questions": q["questions"]}
             for q in catalog["queries"]
         ],
     }

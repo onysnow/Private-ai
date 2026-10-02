@@ -58,19 +58,43 @@ forms for every section, every time.
     with an unsupported number is not.
     - `chart`: an order the Workbench cooks from the investigation's own
       records. You write `{"type": "chart", "spec": {...}}` and never a
-      number: `spec.kind` (`bar` for a ranking, `column` for change over
-      time), `spec.title` (a full sentence that states the finding, e.g.
-      "Meridian received most of the money"), an optional `subtitle`, and
-      `spec.query` naming one query from the packet's `visual_catalog`
-      with its `params` (e.g. `{"name": "payments_by_party", "params":
+      number. Choose the chart by the question the data answers (the
+      Financial Times' Visual Vocabulary), not by the look you want:
+      first `spec.question`, then a query from the packet's
+      `visual_catalog` listed under that question whose `has_data` is
+      true, then `spec.kind`, one of the question's kinds:
+      - `ranking` -- where things sit in order (who received the most):
+        `bar`; `column` only for a few short labels.
+      - `change_over_time` -- how a value rises and falls across periods:
+        `line`; `column` for a handful of periods; `area` when the total
+        built up over time is the point.
+      - `part_of_whole` -- how a total splits into parts (each recipient's
+        share): `stacked_bar_100`; `donut` only with four parts at most
+        (set `limit: 3` and the rest fold into "Other"); `treemap` for
+        many parts of similar size (a part too small to carry its name
+        fails the check). Parts of a whole are never drawn over periods.
+      - `distribution` -- how the values are spread (how many payments are
+        small or very large): `histogram`, only over `payment_amounts`.
+      - `correlation` -- how two numbers about the same party move
+        together: `scatter`, only over
+        `payments_count_and_total_by_party`.
+      - `flow` -- where money moves from and to: not drawn yet; rank the
+        recipients with `payments_by_party` instead.
+      `spec.title` is a full sentence that states the finding the chart
+      shows, in words, e.g. "Meridian received most of the money" or "Most
+      payments were small" -- never the name of the data ("Payments by
+      party"), and no amounts or counts: the chart writes those from the
+      records. An optional `subtitle`; `spec.query` names the query with
+      its `params` (e.g. `{"name": "payments_by_party", "params":
       {"direction": "received"}}`). Optional: `sort` (`value_desc`,
-      `value_asc`, `label`, `time`), `limit` (keep the top N; the rest
-      fold into "Other"), `highlight` (labels to pick out). Choose only a
-      query whose `has_data` is true. The Workbench runs the query, tags
-      every value with its records, draws the chart and checks it against
-      the design rules; a chart that fails is removed from the draft and
-      you may be asked once or twice to fix the order. A chart needs no
-      `evidence` list of its own: the records come with the data.
+      `value_asc`, `label`, `time`) and `limit` (keep the top N; the rest
+      fold into "Other"), neither for a histogram or a scatter plot,
+      whose order and points come from the data; `highlight` (labels to
+      pick out). The Workbench runs the query, tags every value with its
+      records, draws the chart and checks it against the design rules; a
+      chart that fails is removed from the draft and you may be asked once
+      or twice to fix the order. A chart needs no `evidence` list of its
+      own: the records come with the data.
 - `open_questions`: gaps in the *selected* evidence that limit what this
   draft can responsibly claim, or that would need a different piece of
   evidence to close. This is not optional filler -- if the goal asks for
@@ -99,8 +123,8 @@ of these, not instead of them)
    are read off a slide at a glance.
 5. Visuals follow rule 2 at the level of every single value: each figure,
    date, and bar is traceable to its own cited evidence, or it is left out.
-   A `chart` visual carries no values at all: it names a query, and the
-   Workbench supplies and cites every number.
+   A `chart` visual carries no values at all: it names a question and a
+   query, and the Workbench supplies and cites every number.
 6. Bring the page. Every evidence reference -- in a key point, a
    section's `evidence`, or a visual item -- carries a `quote`: at least
    three consecutive words copied exactly from that record's text in the

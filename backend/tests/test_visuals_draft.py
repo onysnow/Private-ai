@@ -199,7 +199,53 @@ def test_a_kind_that_cannot_draw_its_query_goes_back_with_the_reason_and_a_fitti
     assert visual["text"]["data_table"]["rows"][0]["share"] == 100.0
 
 
+def test_a_kind_that_does_not_answer_its_question_goes_back_and_the_answering_kind_is_kept(monkeypatch, demo):
+    # Picked by the question first (PRESENTATION_DRAFT.md): a bar does not
+    # show a part of a whole, so the model is asked again with the kinds that do.
+    wrong = _chart(question="part_of_whole")
+    fixed = _chart(question="part_of_whole", kind="stacked_bar_100")
+    fake = _FakeLLMClient(_draft(demo, wrong), _draft(demo, fixed))
+    response = _run(monkeypatch, demo, fake)
+    assert response.status_code == 200, response.text
+    assert fake.calls == 2
+    assert "a bar does not answer 'part of a whole'; the kinds that do: stacked_bar_100, donut, treemap" in fake.user_prompts[1]
+    visual = response.json()["payload"]["sections"][0]["visual"]
+    assert visual["spec"]["question"] == "part_of_whole" and visual["spec"]["kind"] == "stacked_bar_100"
+
+
+def test_the_model_sees_the_questions_and_every_kind_it_may_order(monkeypatch, demo):
+    from app.ai.chart_check import visual_catalog_for_prompt
+    from app.ai.reasoning import OUTPUT_SCHEMAS
+    from app.visuals.spec import DRAWN_KINDS, QUESTIONS
+
+    drawn = {kind.value for kind in DRAWN_KINDS}
+    asked = {q.id for q in QUESTIONS.values() if any(k in DRAWN_KINDS for k in q.kinds)}
+    schema = OUTPUT_SCHEMAS["presentation_draft"]["sections"][0]["visual"]
+    chart_line = next(line for line in schema.splitlines() if '"type": "chart"' in line)
+    kinds = chart_line.split('"kind": "', 1)[1].split(" - ", 1)[0].split("|")
+    questions = chart_line.split('"question": "', 1)[1].split(" - ", 1)[0].split("|")
+    assert set(kinds) == drawn and set(questions) == asked
+    module = (reasoning_module.APP_MODULES_ROOT / "PRESENTATION_DRAFT.md").read_text(encoding="utf-8")
+    for name in drawn | asked | {"flow"}:
+        assert f"`{name}`" in module, name
+
+    with SessionLocal() as db:
+        catalog = visual_catalog_for_prompt(db, demo["investigation_id"])
+    assert [q["id"] for q in catalog["questions"]] == ["ranking", "change_over_time", "part_of_whole", "distribution", "correlation"]
+    by_question = {q["id"]: q for q in catalog["questions"]}
+    assert by_question["distribution"] == {**by_question["distribution"], "kinds": ["histogram"], "queries": ["payment_amounts"]}
+    by_query = {q["name"]: q for q in catalog["queries"]}
+    assert by_query["payments_count_and_total_by_party"]["kinds"] == ["scatter"]
+    assert by_query["payments_count_and_total_by_party"]["questions"] == ["correlation"]
+    assert by_query["payments_by_party"]["questions"] == ["ranking", "part_of_whole"]
+
+    fake = _FakeLLMClient(_draft(demo, _chart()))
+    _run(monkeypatch, demo, fake)
+    assert '"questions"' in fake.user_prompts[0] and '"part_of_whole"' in fake.user_prompts[0]
+
+
 @pytest.mark.parametrize("bad_visual, fragment", [
+    (_chart(question="trend"), "unknown question 'trend'"),
     (_chart(query={"name": "payments_by_payee"}), "unknown query 'payments_by_payee'"),
     ({"type": "chart", "spec": {**_chart()["spec"], "values": [2400000]}}, "Extra inputs are not permitted"),
     ({"type": "chart"}, "spec must be an object"),

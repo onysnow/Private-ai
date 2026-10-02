@@ -9903,6 +9903,12 @@ export type VisualSpec = {
    */
   limit?: number | null;
   query: QueryRef;
+  /**
+   * Question
+   *
+   * The question the chart answers: ranking, change_over_time, part_of_whole, distribution, correlation or flow.
+   */
+  question?: string | null;
   scale?: Scale;
   sort?: SortOrder | null;
   /**

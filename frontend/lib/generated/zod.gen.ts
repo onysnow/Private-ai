@@ -4514,6 +4514,7 @@ export const zVisualSpec = z.object({
   kind: zChartKind,
   limit: z.number().int().gte(1).lte(50).nullish(),
   query: zQueryRef,
+  question: z.string().nullish(),
   scale: zScale.optional().default('linear'),
   sort: zSortOrder.nullish(),
   stack: z.boolean().optional().default(false),
