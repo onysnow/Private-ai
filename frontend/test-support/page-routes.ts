@@ -218,6 +218,20 @@ export function leadQueueBody(investigationId: string, leads: unknown[] = []): L
   return {investigation_id: investigationId, total: leads.length, counts: tally(leads, 'status'), items: leads};
 }
 
+/** The "Corpus sync" line in the generated CorpusSyncOut shape: OpenAleph
+ * integration disabled and nothing sent, unless overridden. */
+export function corpusSyncBody(investigationId: string, overrides: Fixture = {}): Fixture {
+  return {
+    investigation_id: investigationId, enabled: false, background: false, collection_id: null, collection_label: null, pushed_records: 0,
+    pending: {to_send: 0, to_remove: 0, judgements: 0, cannot_send: []},
+    push: {status: 'never', started_at: null, finished_at: null, message: null, error: null, sent: 0, removed: 0, unchanged: 0, removals_waiting: 0,
+      judgements_sent: 0, judgements_failed: 0},
+    cross_reference: {status: 'never', requested_at: null, finished_at: null, error: null, results: 0, new: 0, updated: 0, duplicates: 0, open: 0},
+    consecutive_failures: 0, failures: [],
+    ...overrides,
+  };
+}
+
 /** What the server holds for one investigation. Anything left out is empty,
  * which every loader accepts without inspecting a row. */
 export type InvestigationRecords = {
@@ -250,6 +264,8 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/sources`]: records.sources ?? [],
     [`GET ${base}/documents`]: records.documents ?? [],
     [`GET ${base}/ai-analysis-candidates`]: {candidates: records.aiCandidates ?? []},
+    [`GET ${base}/corpus/sync`]: corpusSyncBody(id),
+    [`GET ${base}/cross-references`]: [],
   };
 }
 

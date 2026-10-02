@@ -19,6 +19,7 @@ import {useApiAccess} from '../features/api-access/use-api-access';
 import {BackupPanel} from '../features/backups/backup-panel';
 import {ClaimsPanel} from '../features/claims/claims-panel';
 import {ConnectorsPanel} from '../features/connectors/connectors-panel';
+import {CorpusPanel} from '../features/corpus/corpus-panel';
 import {DeletionPanel} from '../features/deletion/deletion-panel';
 import {DocumentsPanel} from '../features/documents/documents-panel';
 import {LeadsPanel} from '../features/leads/leads-panel';
@@ -172,6 +173,7 @@ function Workbench(): ReactElement {
     <PanelErrorBoundary name="External connectors"><ConnectorsPanel investigationId={inv} providers={providers} picker={picker}/></PanelErrorBoundary>
     <PanelErrorBoundary name="FollowTheMoney relationship graph"><RelationshipGraphPanel investigationId={inv}/></PanelErrorBoundary>
     <PanelErrorBoundary name="Review queue"><ReviewQueuePanel investigationId={inv}/></PanelErrorBoundary>
+    <PanelErrorBoundary name="OpenAleph corpus"><CorpusPanel investigationId={inv}/></PanelErrorBoundary>
     <Toaster />
   </main>;
 }
