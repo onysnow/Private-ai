@@ -1537,28 +1537,6 @@ class ExternalRelationshipPromotionOut(ResponseModel):
 
 # --- Enrichment sessions and cross-provider clusters -----------------------------------
 
-class EnrichmentRunResultOut(ResponseModel):
-    """One provider's part of an enrichment session; `error` is sent only when it failed."""
-    provider: str
-    status: str  # completed | failed
-    result_count: int
-    run_id: str
-    error: str | None = Field(default=None, exclude_if=_absent_when_none)
-
-
-class EnrichmentSessionOut(ResponseModel):
-    """The reply to running every chosen connector against one entity."""
-    id: str
-    entity_id: str
-    investigation_id: str
-    status: str  # completed | partial | failed
-    providers: list[str]
-    total_results: int
-    started_at: Timestamp
-    finished_at: Timestamp | None = None
-    runs: list[EnrichmentRunResultOut]
-
-
 class EnrichmentSessionRowOut(ResponseModel):
     """An enrichment session as stored."""
     id: str
@@ -1572,6 +1550,7 @@ class EnrichmentSessionRowOut(ResponseModel):
 
 
 class EnrichmentSessionRunOut(ResponseModel):
+    """One provider's part of an enrichment session (serialize_enrichment_session_run)."""
     id: str
     session_id: str
     run_id: str | None = None
@@ -1584,7 +1563,8 @@ class EnrichmentSessionRunOut(ResponseModel):
 
 
 class EnrichmentSessionDetailOut(EnrichmentSessionRowOut):
-    """A stored session with its per-provider runs."""
+    """A session with its per-provider runs: the reply to running every chosen
+    connector against one entity, and to reading that session back."""
     runs: list[EnrichmentSessionRunOut]
 
 

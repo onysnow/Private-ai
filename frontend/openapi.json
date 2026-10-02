@@ -10098,48 +10098,8 @@
         "title": "EnrichmentClusterOut",
         "type": "object"
       },
-      "EnrichmentRunResultOut": {
-        "description": "One provider's part of an enrichment session; `error` is sent only when it failed.",
-        "properties": {
-          "error": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Error"
-          },
-          "provider": {
-            "title": "Provider",
-            "type": "string"
-          },
-          "result_count": {
-            "title": "Result Count",
-            "type": "integer"
-          },
-          "run_id": {
-            "title": "Run Id",
-            "type": "string"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          }
-        },
-        "required": [
-          "provider",
-          "status",
-          "result_count",
-          "run_id"
-        ],
-        "title": "EnrichmentRunResultOut",
-        "type": "object"
-      },
       "EnrichmentSessionDetailOut": {
-        "description": "A stored session with its per-provider runs.",
+        "description": "A session with its per-provider runs: the reply to running every chosen\nconnector against one entity, and to reading that session back.",
         "properties": {
           "entity_id": {
             "title": "Entity Id",
@@ -10243,76 +10203,6 @@
         "title": "EnrichmentSessionFindingOut",
         "type": "object"
       },
-      "EnrichmentSessionOut": {
-        "description": "The reply to running every chosen connector against one entity.",
-        "properties": {
-          "entity_id": {
-            "title": "Entity Id",
-            "type": "string"
-          },
-          "finished_at": {
-            "anyOf": [
-              {
-                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
-                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Finished At"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "investigation_id": {
-            "title": "Investigation Id",
-            "type": "string"
-          },
-          "providers": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Providers",
-            "type": "array"
-          },
-          "runs": {
-            "items": {
-              "$ref": "#/components/schemas/EnrichmentRunResultOut"
-            },
-            "title": "Runs",
-            "type": "array"
-          },
-          "started_at": {
-            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
-            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
-            "title": "Started At",
-            "type": "string"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          },
-          "total_results": {
-            "title": "Total Results",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "id",
-          "entity_id",
-          "investigation_id",
-          "status",
-          "providers",
-          "total_results",
-          "started_at",
-          "runs"
-        ],
-        "title": "EnrichmentSessionOut",
-        "type": "object"
-      },
       "EnrichmentSessionRowOut": {
         "description": "An enrichment session as stored.",
         "properties": {
@@ -10376,6 +10266,7 @@
         "type": "object"
       },
       "EnrichmentSessionRunOut": {
+        "description": "One provider's part of an enrichment session (serialize_enrichment_session_run).",
         "properties": {
           "error": {
             "anyOf": [
@@ -31260,7 +31151,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EnrichmentSessionOut"
+                  "$ref": "#/components/schemas/EnrichmentSessionDetailOut"
                 }
               }
             },

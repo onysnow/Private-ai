@@ -5,9 +5,9 @@ import pytest
 from app.core.config import settings
 from app.models.domain import Investigation, DocumentCorpusSync, InvestigationCorpusBinding
 from app.db.session import SessionLocal, engine, Base
-from app.services.documents import ingest_document
 from app.services.openaleph_corpus import ensure_openaleph_collection, sync_document_to_openaleph
 from app.services.exports import collect_investigation_records
+from tests.document_helpers import ingest_document
 
 
 

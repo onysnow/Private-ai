@@ -149,6 +149,25 @@ describe('RelationshipGraphPanel', () => {
     expect(api.unmatched()).toEqual([]);
   });
 
+  it('draws another investigation with its own schemas, not the last one\'s filter', async () => {
+    const api = mockApi({
+      [ENTITIES]: [entityA, entityB], [GRAPH]: emptyGraph([relationshipFixture()]), [EVIDENCE]: [],
+      'GET /api/investigations/inv-2/entities': [entityFixture('ent-3', 'Harbor Trust', 'Company', {investigation_id: 'inv-2'}), entityFixture('ent-4', 'John Roe', 'Person', {investigation_id: 'inv-2'})],
+      'GET /api/investigations/inv-2/graph': emptyGraph([relationshipFixture({id: 'rel-9', investigation_id: 'inv-2', schema: 'Directorship',
+        source: {id: 'ent-4', ftm_id: 'f4', caption: 'John Roe', schema: 'Person'}, target: {id: 'ent-3', ftm_id: 'f3', caption: 'Harbor Trust', schema: 'Company'}})]),
+      'GET /api/investigations/inv-2/evidence': [],
+    });
+    const view = wrap(<RelationshipGraphPanel investigationId="inv-1"/>);
+    expect(await screen.findByTestId('graph-edge-rel-1')).toBeInTheDocument();
+
+    view.rerender(<QueryProvider><RelationshipGraphPanel investigationId="inv-2"/></QueryProvider>);
+
+    // The first case had only Ownership; the filter used to stay at that and hide this Directorship.
+    expect(await screen.findByTestId('graph-edge-rel-9')).toHaveTextContent('ent-4->ent-3:Directorship');
+    expect(screen.getByRole('checkbox', {name: 'Directorship'})).toBeChecked();
+    expect(api.unmatched()).toEqual([]);
+  });
+
   it('asks for a dossier when a node or a listed endpoint is clicked', async () => {
     await renderPanel({}, {edges: [relationshipFixture()]});
     const user = userEvent.setup();

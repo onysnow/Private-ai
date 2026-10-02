@@ -73,12 +73,13 @@ function clusterFixture(overrides: Record<string, unknown> = {}) {
   };
 }
 
-/** The reply to enriching with every provider, in the generated EnrichmentSessionOut shape. */
+/** The reply to enriching with every provider, in the generated EnrichmentSessionDetailOut shape. */
 function sessionFixture(runs: {provider: string; status: string; result_count?: number}[]) {
   return {
     id: 'session-1', entity_id: 'ent-1', investigation_id: 'inv-1', status: 'completed', providers: runs.map(r => r.provider),
     total_results: runs.reduce((sum, r) => sum + (r.result_count ?? 0), 0), started_at: '2026-10-01T00:00:00', finished_at: '2026-10-01T00:00:01',
-    runs: runs.map((r, i) => ({provider: r.provider, status: r.status, result_count: r.result_count ?? 0, run_id: `run-${i + 1}`})),
+    runs: runs.map((r, i) => ({id: `session-run-${i + 1}`, session_id: 'session-1', run_id: `run-${i + 1}`, provider: r.provider, status: r.status,
+      result_count: r.result_count ?? 0, error: null, started_at: '2026-10-01T00:00:00', finished_at: '2026-10-01T00:00:01'})),
   };
 }
 

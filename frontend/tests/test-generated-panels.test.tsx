@@ -17,6 +17,8 @@ import {QueryProvider} from '../lib/query-client';
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {status, headers: {'content-type': 'application/json'}});
 const url = (call: unknown[]) => String(call[0]);
 const init = (call: unknown[]) => (call[1] || {}) as RequestInit;
+/** The JSON a call sent: generated calls hand fetch their body as bytes (ApiClient.fetchForGenerated). */
+const sentJson = async (call: unknown[]): Promise<unknown> => JSON.parse(await new Response(init(call).body).text());
 const wrap = (node: ReactElement) => render(<QueryProvider>{node}</QueryProvider>);
 
 let api: ApiClient;
@@ -110,9 +112,9 @@ describe('SourceCapturePanel', () => {
     await screen.findByText('Saved evidence ev-1. It is now available for claim review.');
     expect(onSaved).toHaveBeenCalledTimes(1);
     expect(screen.getByPlaceholderText('Source title')).toHaveValue('');
-    expect(JSON.parse(String(init(fetchMock.mock.calls[0]).body))).toEqual(
+    expect(await sentJson(fetchMock.mock.calls[0])).toEqual(
       {investigation_id: 'inv-1', title: 'Wire log', url: null, source_type: 'web', metadata_json: {capture: 'reporter'}});
-    expect(JSON.parse(String(init(fetchMock.mock.calls[1]).body))).toEqual({source_id: 'src-1', quote: '$2.4M wired', locator: 'row 41', notes: null});
+    expect(await sentJson(fetchMock.mock.calls[1])).toEqual({source_id: 'src-1', quote: '$2.4M wired', locator: 'row 41', notes: null});
   });
 
   it('shows the error and keeps what was typed when saving fails', async () => {

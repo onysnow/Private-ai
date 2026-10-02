@@ -102,7 +102,9 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
   const documents: DocumentOut[] = documentsQuery.data ?? [];
   const reloadDocuments = () => queryClient.invalidateQueries({queryKey: listDocumentsQueryKey({path})});
 
-  const loadCandidates = async (documentId: string, status: 'proposed' | 'all' = 'proposed') => {
+  // `kept` is a status line to keep once the proposals are in (an upload's
+  // "Extracted ..."): it stays, and a failure is added to it, not put in its place.
+  const loadCandidates = async (documentId: string, status: 'proposed' | 'all' = 'proposed', kept = '') => {
     candidatesRequest.current?.abort();
     const controller = new AbortController();
     candidatesRequest.current = controller;
@@ -112,10 +114,10 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
       const rows = (await listDocumentCandidatesEndpoint({path: {document_id: documentId}, query, signal: controller.signal, throwOnError: true})).data;
       if (!controller.signal.aborted && activeInvestigation.current === forInvestigation) {
         setCandidates(rows);
-        setDocStatus(status === 'all' ? `Loaded ${rows.length} extraction proposal/review record(s).` : '');
+        setDocStatus(status === 'all' ? `Loaded ${rows.length} extraction proposal/review record(s).` : kept);
       }
     } catch (error) {
-      if (!isAbortError(error)) setDocStatus(errorMessage(error, 'Could not load extraction proposals'));
+      if (!isAbortError(error)) setDocStatus([kept, errorMessage(error, 'Could not load extraction proposals')].filter(Boolean).join(' '));
     }
   };
 
@@ -142,8 +144,9 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
         return;
       }
       const note = job && job.message && job.message !== 'Document read' ? ` ${job.message}.` : '';
-      setDocStatus(`Extracted ${saved.chunk_count} chunk(s).${note} Review proposals before canonicalizing.`);
-      await loadCandidates(saved.id);
+      const extracted = `Extracted ${saved.chunk_count} chunk(s).${note} Review proposals before canonicalizing.`;
+      setDocStatus(extracted);
+      await loadCandidates(saved.id, 'proposed', extracted);
     } catch (error) {
       setDocStatus(errorMessage(error, 'Document upload failed'));
     }

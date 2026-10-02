@@ -35,11 +35,28 @@ function routeKey(method: string, url: URL): string {
   return `${method.toUpperCase()} ${url.pathname}`;
 }
 
+function parsedText(text: string): unknown {
+  try { return JSON.parse(text); } catch { return text; }
+}
+
+/** Bytes, not a form or a string. Checked by shape rather than instanceof:
+ * under jsdom the Blob a Request hands back is Node's, not the window's. */
+function isBytes(value: unknown): value is Blob | ArrayBuffer | ArrayBufferView {
+  if (value instanceof ArrayBuffer || ArrayBuffer.isView(value)) return true;
+  return typeof value === 'object' && value !== null && typeof (value as Blob).arrayBuffer === 'function' && typeof (value as Blob).size === 'number';
+}
+
 async function readBody(input: RequestInfo | URL, init?: RequestInit): Promise<unknown> {
-  const raw = init?.body ?? (input instanceof Request && !['GET', 'HEAD'].includes(input.method.toUpperCase()) ? await input.text() : undefined);
+  const raw = init?.body ?? (input instanceof Request && !['GET', 'HEAD'].includes(input.method.toUpperCase()) ? await input.blob() : undefined);
   if (raw === undefined || raw === null) return undefined;
-  if (typeof raw === 'string') {
-    try { return JSON.parse(raw); } catch { return raw; }
+  if (typeof raw === 'string') return parsedText(raw);
+  // Bytes -- how the generated client's calls arrive, through
+  // ApiClient.fetchForGenerated -- are read the way the server reads them: a
+  // multipart body as its form, anything else as JSON when it parses.
+  if (isBytes(raw)) {
+    const type = new Headers(init?.headers ?? (input instanceof Request ? input.headers : undefined)).get('content-type') ?? '';
+    const bytes = new Response(raw, {headers: type ? {'content-type': type} : {}});
+    return type.startsWith('multipart/form-data') ? bytes.formData() : parsedText(await bytes.text());
   }
   return raw;
 }
