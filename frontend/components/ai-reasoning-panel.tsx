@@ -52,7 +52,9 @@ const asStr=(v:JsonValue|undefined):string=>typeof v==='string'?v:(v===undefined
 const refLabel=(v:JsonValue):string=>{const o=asObj(v);return o?`${asStr(o.record_type)}:${asStr(o.record_id)}`:asStr(v)};
 
 // Which computer reads the evidence the model is sent (Foundation Fixes fix 4).
-const whereItRuns=(status:AiReasoningStatus):string=>status.runs_on_this_computer===true?' (runs on this computer)':status.runs_on_this_computer===false?' (runs on the provider\'s servers)':'';
+// Which computer answers (Foundation Fixes fix 4): the settings page shows the same words.
+export const whereModelRuns=(status:AiReasoningStatus):string=>status.runs_on_this_computer===true?' (runs on this computer)':status.runs_on_this_computer===false?' (runs on the provider\'s servers)':'';
+const whereItRuns=whereModelRuns;
 
 export function describeAiStatus(status:AiReasoningStatus|null|undefined):string{
   if(!status)return 'AI reasoning status unavailable from this backend.';

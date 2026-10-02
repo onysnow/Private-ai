@@ -56,7 +56,7 @@ export type DocumentExtractionStatus={pdf_ocr_enabled:boolean,pdf_ocr_language:s
 // commit still validates an older backend's settings payload; the panel treats absence as "unknown".
 export type AiModuleName='case_synthesis'|'hypothesis_test'|'presentation_draft';
 export type AiReviewStatus='proposed'|'accepted'|'rejected';
-export type AiReasoningStatus={enabled:boolean,provider:string|null,provider_key_configured:boolean,endpoints_callable:boolean,model?:string|null,runs_on_this_computer?:boolean|null,tas_spec:{present:boolean,version:string|null,modules:Record<string,{spec_file:string,available:boolean}>}};
+export type AiReasoningStatus={enabled:boolean,provider:string|null,provider_key_configured:boolean,endpoints_callable:boolean,model?:string|null,runs_on_this_computer?:boolean|null,remote_endpoint_allowed?:boolean,tas_spec:{present:boolean,version:string|null,modules:Record<string,{spec_file:string,available:boolean}>}};
 // presentation_draft's request stores the goal in `question` (same field the
 // other two modules use) and the reporter-picked evidence in `record_refs`.
 export type AiAnalysisRequest={question?:string|null,working_theory?:string|null,max_results?:number,include_external_leads?:boolean,record_refs?:AiCitationRef[]|null};

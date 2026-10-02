@@ -7,6 +7,7 @@ import {ApiHttpError, errorMessage} from '../../lib/api-client';
 import {isSettingsStatus, parseInvestigationList, isInvestigationDeletionPreview, isInvestigationDeletionResult} from '../../lib/api-validate';
 import type {SettingsStatus, Investigation, InvestigationDeletionPreview} from '../../lib/api-types';
 import {isDemoHidden, setDemoHidden} from '../../lib/demo-preference';
+import {describeAiStatus, whereModelRuns} from '../../components/ai-reasoning-panel';
 
 // Phase 1 scope: the bearer-token API access card only, reusing the shared
 // `api` singleton (lib/api-instance.ts) so a token entered here is the same
@@ -238,6 +239,19 @@ export default function SettingsPage(): ReactElement {
           Open console
         </a>
       </div>
+      </div>
+
+      <div className="mt-8 rounded-xl border border-border bg-card p-5">
+        <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
+          Private AI
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">{describeAiStatus(status?.ai)}</p>
+        {status?.ai?.model && (
+          <p className="mt-2 text-sm">
+            Model: <code>{status.ai.model}</code>{whereModelRuns(status.ai)}
+            {status.ai.remote_endpoint_allowed ? ' · remote endpoints allowed (AI_ALLOW_REMOTE_ENDPOINT is on)' : ''}
+          </p>
+        )}
       </div>
 
       <div className="mt-8 rounded-xl border border-border bg-card p-5">
