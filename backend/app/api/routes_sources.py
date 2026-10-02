@@ -15,12 +15,13 @@ from app.db.locking import lock_investigation_transaction
 from app.db.session import get_db
 from app.models.domain import Investigation, Source
 from app.schemas.api import SourceCreate
+from app.schemas.responses import EvidenceOut, SourceOut
 from app.services.sources import create_source, list_source_evidence
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
 
-@router.post("/sources", response_model=None)
+@router.post("/sources", response_model=SourceOut)
 def create_source_endpoint(body: SourceCreate, db: Session = Depends(get_db)) -> Any:
     # Source creation participates in the same investigation-scoped PostgreSQL lock
     # as document ingest/delete/restore so a source cannot commit after deletion.
@@ -33,7 +34,7 @@ def create_source_endpoint(body: SourceCreate, db: Session = Depends(get_db)) ->
         raise HTTPException(400, str(exc))
 
 
-@router.get("/sources/{source_id}/evidence", response_model=None)
+@router.get("/sources/{source_id}/evidence", response_model=list[EvidenceOut])
 def list_source_evidence_endpoint(source_id: str, db: Session = Depends(get_db)) -> Any:
     if db.get(Source, source_id) is None:
         raise HTTPException(404, "Source not found")

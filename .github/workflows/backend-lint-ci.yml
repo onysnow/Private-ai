@@ -4,10 +4,14 @@ on:
   push:
     paths:
       - "backend/**"
+      - "frontend/openapi.json"
+      - "tools/export_openapi.py"
       - ".github/workflows/backend-lint-ci.yml"
   pull_request:
     paths:
       - "backend/**"
+      - "frontend/openapi.json"
+      - "tools/export_openapi.py"
       - ".github/workflows/backend-lint-ci.yml"
 
 jobs:
@@ -45,3 +49,10 @@ jobs:
         # nothing enforced [tool.ruff.lint]'s import-order rule in CI. Widen the
         # workflow only after pyproject.toml's own [tool.ruff] `include` grows.
         run: python -m ruff check .
+
+      - name: API schema is up to date
+        # Foundation Fixes fix 2: frontend/openapi.json is the contract the
+        # front end's client is generated from. A route change without
+        # re-exporting it fails here.
+        working-directory: .
+        run: python tools/export_openapi.py --check

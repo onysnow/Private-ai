@@ -12,6 +12,10 @@ are whatever is installed in the backend virtualenv, so install
 requirements-local.txt there first; the script warns if mypy or ruff don't
 match CI's pins.
 
+The API schema (frontend/openapi.json) and the generated client
+(frontend/lib/generated) must match the code; regenerate with
+`python tools/export_openapi.py` and `npm run generate:api`.
+
 Backend tests run against SQLite by default. Set POSTGRES_TEST_URL to also
 run CI's PostgreSQL gate (backend/run_postgres_gate.py).
 """
@@ -77,6 +81,7 @@ def backend_checks(*, fast: bool = False) -> None:
     _run("backend: mypy", [python, "-m", "mypy"], BACKEND, env)
     if fast:
         return
+    _run("backend: API schema up to date", [python, str(ROOT / "tools" / "export_openapi.py"), "--check"], ROOT, env)
     _run("backend: pytest (SQLite)", [python, "-m", "pytest", "-q", "-p", "no:warnings"], BACKEND, env)
     if env.get("POSTGRES_TEST_URL"):
         _run("backend: pytest (PostgreSQL gate)", [python, "run_postgres_gate.py"], BACKEND, env)
@@ -89,6 +94,10 @@ def frontend_checks() -> None:
     if npm is None:
         print("npm not found: install Node 22 to run the frontend checks")
         sys.exit(1)
+    _run("frontend: generated API client up to date", [npm, "run", "generate:api"], FRONTEND)
+    git = shutil.which("git")
+    if git:
+        _run("frontend: lib/generated matches openapi.json", [git, "diff", "--exit-code", "--", "lib/generated"], FRONTEND)
     for script in ("lint", "typecheck", "test", "build"):
         _run(f"frontend: npm run {script}", [npm, "run", script], FRONTEND)
 

@@ -30,6 +30,7 @@ from app.jobs.handlers import AI_REASONING
 from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Investigation
+from app.schemas.responses import EvidencePoolRow, InvestigationDeletionPreview, InvestigationDeletionResult, SourceOut
 from app.schemas.api import (
     CaseSynthesisRequest, HypothesisTestRequest, InvestigationCreate,
     InvestigationQuestionContextRequest, PresentationDraftRequest,
@@ -300,7 +301,7 @@ def seed_demo(db: Session = Depends(get_db)) -> Any:
     return {"investigation_id": inv.id, "created": created}
 
 
-@router.get("/investigations/{investigation_id}/deletion-preview", response_model=None)
+@router.get("/investigations/{investigation_id}/deletion-preview", response_model=InvestigationDeletionPreview)
 def investigation_deletion_preview(investigation_id: str, db: Session = Depends(get_db)) -> Any:
     try:
         return preview_investigation_deletion(db, investigation_id, settings.document_storage_dir)
@@ -308,7 +309,7 @@ def investigation_deletion_preview(investigation_id: str, db: Session = Depends(
         raise HTTPException(404 if str(exc) == "Investigation not found" else 400, str(exc))
 
 
-@router.delete("/investigations/{investigation_id}", response_model=None)
+@router.delete("/investigations/{investigation_id}", response_model=InvestigationDeletionResult)
 def remove_investigation(investigation_id: str, request: Request, confirmation: str = Query(...), db: Session = Depends(get_db)) -> Any:
     require_scope_investigation_admin(scope_for_request(request), investigation_id)
     try:
@@ -371,7 +372,7 @@ def list_documents(
     return _list_investigation_documents(db, investigation_id, limit=limit, offset=offset)
 
 
-@router.get("/investigations/{investigation_id}/evidence", response_model=None)
+@router.get("/investigations/{investigation_id}/evidence", response_model=list[EvidencePoolRow])
 def list_investigation_evidence(
     investigation_id: str,
     limit: int | None = Query(default=None, ge=1, le=500),
@@ -383,7 +384,7 @@ def list_investigation_evidence(
     return _list_investigation_evidence(db, investigation_id, limit=limit, offset=offset)
 
 
-@router.get("/investigations/{investigation_id}/sources", response_model=None)
+@router.get("/investigations/{investigation_id}/sources", response_model=list[SourceOut])
 def list_sources(
     investigation_id: str,
     limit: int | None = Query(default=None, ge=1, le=500),

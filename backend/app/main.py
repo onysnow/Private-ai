@@ -4,6 +4,7 @@ from time import monotonic
 from typing import Any, AsyncIterator, Awaitable, Callable, Iterator
 
 from fastapi import FastAPI, Request, Response
+from fastapi.routing import APIRoute
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import Engine
@@ -79,6 +80,15 @@ def register_domain_routers(app: FastAPI) -> None:
     app.include_router(jobs_router)
 
 
+def operation_id(route: APIRoute) -> str:
+    """The route function's name. The operator console (a separate package
+    whose modules reuse short names like `run`) gets console_<module>_<name>."""
+    module = getattr(route.endpoint, "__module__", "") or ""
+    if module.startswith("opsconsole"):
+        return f"console_{module.rsplit('.', 1)[-1]}_{route.name}"
+    return route.name
+
+
 def create_app(
     app_settings: Settings | None = None,
     *,
@@ -136,7 +146,11 @@ def create_app(
         if console is not None:
             console.shutdown()
 
-    app = FastAPI(title="Journalism Workbench API", version="1.24.0", lifespan=lifespan)
+    # Operation ids are the route functions' names (unique; pinned by
+    # tests/test_response_models.py), so the generated front-end client reads
+    # `investigationDeletionPreview`, not the name, path and method run together.
+    app = FastAPI(title="Journalism Workbench API", version="1.24.0", lifespan=lifespan,
+                  generate_unique_id_function=operation_id)
     if app_settings.app_log_file:
         configure_app_logging(app_settings.app_log_file)
     app_logger = logging.getLogger("journalism.request")

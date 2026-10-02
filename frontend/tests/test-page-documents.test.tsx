@@ -325,6 +325,32 @@ describe('Home document reading runs as a background job (ADR-0004)', () => {
   });
 });
 
+describe('Home remembers the open investigation in the address bar (?inv=)', () => {
+  it('opens the investigation named in ?inv= and keeps it there', async () => {
+    window.history.replaceState(null, '', '/?inv=inv-2');
+    const second = {id: 'inv-2', name: 'Harbor contracts'};
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(jsonResponse(validSettingsStatus))
+      .mockResolvedValueOnce(jsonResponse([investigation, second]))
+      .mockResolvedValueOnce(jsonResponse({providers: ['aleph']}));
+    for (const response of bootstrapCalls([docFixture({id: 'doc-9', filename: 'harbor.pdf'})])) fetchMock.mockResolvedValueOnce(response);
+    vi.stubGlobal('fetch', fetchMock);
+    const Home = await importHome();
+    render(<Home />);
+    await screen.findByText('harbor.pdf');
+    expect(fetchMock.mock.calls.slice(3).map(([url]) => String(url)).some(url => url.includes('/api/investigations/inv-2/documents'))).toBe(true);
+    expect(window.location.search).toBe('?inv=inv-2');
+    window.history.replaceState(null, '', '/');
+  });
+
+  it('writes the opened investigation into the address', async () => {
+    window.history.replaceState(null, '', '/');
+    await bootstrapWithOneDocument();
+    expect(window.location.search).toBe('?inv=inv-1');
+    window.history.replaceState(null, '', '/');
+  });
+});
+
 describe('Home bulk document import', () => {
   it('uploads every selected file sequentially, tolerates one failure, and navigates to the batch triage screen', async () => {
     const {fetchMock} = await bootstrapWithOneDocument();

@@ -22,6 +22,7 @@ from app.core.authorization import scope_for_request
 from app.core.config import settings
 from app.db.session import get_db
 from app.models.domain import AIAnalysisCandidate, Investigation, Source, StatementAssessment
+from app.schemas.responses import EvidenceOut
 from app.schemas.api import (
     AIAnalysisCandidateReviewRequest,
     EvidenceCreate,
@@ -193,7 +194,7 @@ def promote_ai_analysis_candidate_to_deck_endpoint(candidate_id: str, body: Prom
     return serialize_deck(deck)
 
 
-@router.post("/evidence", response_model=None)
+@router.post("/evidence", response_model=EvidenceOut)
 def create_evidence_endpoint(body: EvidenceCreate, db: Session = Depends(get_db)) -> Any:
     source = db.get(Source, body.source_id)
     if source is None:

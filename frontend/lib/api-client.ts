@@ -58,6 +58,16 @@ export class ApiClient {
     return response;
   }
 
+  // The generated client (lib/generated, Foundation Fixes fix 2) sends every
+  // call through here, so the login token and error messages work exactly as
+  // they do for hand-written calls. See lib/api-generated.ts.
+  fetchForGenerated=async(input:Request):Promise<Response>=>{
+    const url=new URL(input.url);
+    const method=input.method.toUpperCase();
+    const body=method==='GET'||method==='HEAD'?undefined:await input.text();
+    return this.request(`${url.pathname}${url.search}`,{method,headers:new Headers(input.headers),rawBody:body||undefined,signal:input.signal});
+  };
+
   async blob(endpoint:string,options:RequestOptions={}):Promise<Blob>{
     return (await this.request(endpoint,options)).blob();
   }

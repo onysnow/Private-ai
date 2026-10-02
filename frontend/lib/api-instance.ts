@@ -1,4 +1,5 @@
 import {ApiClient} from './api-client';
+import {connectGeneratedClient} from './api-generated';
 
 // Single shared client instance, used by the workbench (app/page.tsx) and by
 // app/settings/page.tsx. Factored out of page.tsx so a settings-page auth
@@ -12,3 +13,6 @@ export const api = new ApiClient(API);
 
 const DEFAULT_API_AUTH_TOKEN = process.env.NEXT_PUBLIC_API_AUTH_TOKEN?.trim() || '';
 if (DEFAULT_API_AUTH_TOKEN) api.setAuthToken(DEFAULT_API_AUTH_TOKEN);
+
+// Generated calls (lib/generated) go through this same client.
+connectGeneratedClient(api);
