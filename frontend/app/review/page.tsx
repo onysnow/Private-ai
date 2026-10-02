@@ -8,6 +8,9 @@ import {errorMessage} from '../../lib/api-client';
 import {isDocItem, isExtractionCandidate} from '../../lib/api-validate';
 import type {DocItem, DocumentChunk, ExtractionCandidate} from '../../lib/api-types';
 import {ExtractionExplanationView} from '../../components/extraction-explanation';
+import {IdentifierOwner} from '../../features/documents/identifier-owner';
+import {SchemaQuestion, needsSchemaAnswer} from '../../features/documents/schema-question';
+import {QueryProvider} from '../../lib/query-client';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 
@@ -47,12 +50,12 @@ function renderChunkBody(chunk: DocumentChunk, active: {chunk_id?: string, paylo
 // vs Organization) at a flat, genuinely uncertain confidence. Below that
 // threshold, Accept is gated on the reporter explicitly confirming or
 // overriding the guess -- the suggested answer is pre-highlighted so
-// confirming it is a single click, but nothing accepts silently.
-const CLARIFY_CONFIDENCE_THRESHOLD = 0.5;
+// confirming it is a single click, but nothing accepts silently. A name
+// OpenAleph found without saying what it is asks the same question, with
+// nothing suggested (features/documents/schema-question.tsx, ADR-0006).
+// An email or phone proposal asks whose it is (identifier-owner.tsx).
 
-function needsClarification(c: ExtractionCandidate): boolean {
-  return c.candidate_type === 'entity' && (c.confidence ?? 0) < CLARIFY_CONFIDENCE_THRESHOLD;
-}
+const REVIEW_NOTE = 'Reviewed in bulk-import review queue';
 
 type DocState = {
   doc: DocItem;
@@ -124,10 +127,22 @@ function ReviewPageInner(): ReactElement {
     if (docIds && docIds.length > 0 && index < docIds.length) void loadDoc(docIds[index]);
   }, [docIds, index, loadDoc]);
 
+  // A decision the server has recorded: the proposal leaves the queue and
+  // the session's counts move.
+  const recorded = (candidateId: string, decision: 'accept' | 'reject') => {
+    setCurrent(cur => cur ? {
+      ...cur,
+      candidates: cur.candidates.filter(c => c.id !== candidateId),
+      accepted: cur.accepted + (decision === 'accept' ? 1 : 0),
+      rejected: cur.rejected + (decision === 'reject' ? 1 : 0),
+    } : cur);
+    setTotals(t => ({accepted: t.accepted + (decision === 'accept' ? 1 : 0), rejected: t.rejected + (decision === 'reject' ? 1 : 0)}));
+  };
+
   const decide = async (candidate: ExtractionCandidate, decision: 'accept' | 'reject') => {
     if (!current) return;
     const body: {decision: 'accept' | 'reject', note: string, caption?: string, entity_schema?: string} = {
-      decision, note: 'Reviewed in bulk-import review queue',
+      decision, note: REVIEW_NOTE,
     };
     if (decision === 'accept' && candidate.candidate_type === 'entity') {
       body.caption = candidate.payload.caption;
@@ -135,13 +150,7 @@ function ReviewPageInner(): ReactElement {
     }
     try {
       await api.unknown(`/api/extraction-candidates/${candidate.id}/review`, {method: 'POST', body});
-      setCurrent(cur => cur ? {
-        ...cur,
-        candidates: cur.candidates.filter(c => c.id !== candidate.id),
-        accepted: cur.accepted + (decision === 'accept' ? 1 : 0),
-        rejected: cur.rejected + (decision === 'reject' ? 1 : 0),
-      } : cur);
-      setTotals(t => ({accepted: t.accepted + (decision === 'accept' ? 1 : 0), rejected: t.rejected + (decision === 'reject' ? 1 : 0)}));
+      recorded(candidate.id, decision);
     } catch (error) {
       setStatus(errorMessage(error, 'Review action failed'));
     }
@@ -238,10 +247,10 @@ function ReviewPageInner(): ReactElement {
             {current.candidates.length === 0 && hasIssues && <p className="muted">No proposals were generated from what could be parsed.</p>}
 
             {current.candidates.map(c => {
-              const clarify = needsClarification(c);
-              const suggested = c.payload.suggested_schema || 'Person';
+              const clarify = needsSchemaAnswer(c);
               const answered = answers[c.id];
               const acceptBlocked = clarify && !answered;
+              const identifier = c.candidate_type === 'identifier';
               const isActive = activeCandidateId === c.id;
               return (
                 <div
@@ -257,23 +266,15 @@ function ReviewPageInner(): ReactElement {
                   <div>{c.payload.caption || c.payload.text || c.payload.quote || ''}</div>
                   {c.payload.locator && <small>{c.payload.locator}</small>}
                   {c.explanation && <ExtractionExplanationView explanation={c.explanation} />}
-                  {clarify && (
-                    <div className="rounded border border-accent/40 bg-accent/10 p-2 text-sm" data-testid={`clarify-${c.id}`}>
-                      <b>Clarifying question:</b> Is &quot;{c.payload.caption}&quot; a Person or an Organization?
-                      <div className="flex gap-2 mt-1">
-                        {(['Person', 'Organization'] as const).map(choice => (
-                          <Button key={choice} size="sm" variant={answered === choice ? 'default' : 'outline'}
-                            onClick={() => setAnswers(a => ({...a, [c.id]: choice}))}>
-                            {choice}{choice === suggested ? ' (suggested)' : ''}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  <div className="flex gap-2 mt-1">
-                    <Button size="sm" onClick={() => decide(c, 'accept')} disabled={acceptBlocked}>Accept</Button>
-                    <Button size="sm" variant="outline" onClick={() => decide(c, 'reject')}>Reject</Button>
-                  </div>
+                  {clarify && <SchemaQuestion candidate={c} answer={answered} onAnswer={choice => setAnswers(a => ({...a, [c.id]: choice}))}/>}
+                  {identifier
+                    ? <IdentifierOwner candidateId={c.id} kind={String(c.payload.kind || 'email')} note={REVIEW_NOTE}
+                        onReviewed={decision => recorded(c.id, decision)}
+                        onEntityAccepted={entityCandidateId => recorded(entityCandidateId, 'accept')}/>
+                    : <div className="flex gap-2 mt-1">
+                      <Button size="sm" onClick={() => decide(c, 'accept')} disabled={acceptBlocked}>Accept</Button>
+                      <Button size="sm" variant="outline" onClick={() => decide(c, 'reject')}>Reject</Button>
+                    </div>}
                 </div>
               );
             })}
@@ -294,9 +295,12 @@ function ReviewPageInner(): ReactElement {
 }
 
 export default function ReviewPage(): ReactElement {
+  // The email/phone owner choice reads its options through TanStack Query.
   return (
-    <Suspense fallback={<main className="p-6"><p className="muted">Loading…</p></main>}>
-      <ReviewPageInner />
-    </Suspense>
+    <QueryProvider>
+      <Suspense fallback={<main className="p-6"><p className="muted">Loading…</p></main>}>
+        <ReviewPageInner />
+      </Suspense>
+    </QueryProvider>
   );
 }

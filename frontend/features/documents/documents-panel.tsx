@@ -25,8 +25,8 @@ import {
   listInvestigationEvidenceQueryKey, listSourcesQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {
-  createExtractedRelationshipProposal, getDocument, getOpenalephDocumentReviewStatus, listDocumentCandidatesEndpoint, listJobsEndpoint,
-  refreshOpenalephDocumentReview, retryJobEndpoint, reviewExtractionCandidate, syncOpenalephDocument,
+  analyzeOpenalephDocument, createExtractedRelationshipProposal, getDocument, getOpenalephDocumentReviewStatus, listDocumentCandidatesEndpoint,
+  listJobsEndpoint, refreshOpenalephDocumentReview, retryJobEndpoint, reviewExtractionCandidate, syncOpenalephDocument,
 } from '../../lib/generated/sdk.gen';
 import type {
   DocumentOut, DocumentUploadOut, ExtractionCandidateOut, ExtractionCandidateReviewRequest, OpenAlephReviewStatusOut,
@@ -35,10 +35,13 @@ import {zDocumentUploadOut} from '../../lib/generated/zod.gen';
 import type {BackgroundJob} from '../../lib/api-types';
 import {describeJob, waitForJob} from '../../lib/jobs';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {IdentifierOwner} from './identifier-owner';
+import {SchemaQuestion} from './schema-question';
 
 type Props = {investigationId: string};
 
 const ACCEPTED_FILES = '.pdf,.docx,.txt,.md,.csv,.html,.htm';
+const REVIEW_NOTE = 'Reviewed in Next.js workbench';
 
 function text(value: unknown): string | undefined {
   return typeof value === 'string' ? value : undefined;
@@ -68,6 +71,8 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
   const [docFile, setDocFile] = useState<File | null>(null);
   const [docStatus, setDocStatus] = useState('');
   const [candidates, setCandidates] = useState<ExtractionCandidateOut[]>([]);
+  // What kind of entity a name is, for proposals that ask (schema-question.tsx).
+  const [schemaAnswers, setSchemaAnswers] = useState<Record<string, string>>({});
   const [openAleph, setOpenAleph] = useState<Record<string, OpenAlephReviewStatusOut>>({});
   const [relationshipClaimCandidate, setRelationshipClaimCandidate] = useState<ExtractionCandidateOut | null>(null);
   const [relSchema, setRelSchema] = useState('Directorship');
@@ -240,28 +245,48 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
     }
   };
 
+  // A decision the server has recorded. An accepted proposal may have made an
+  // entity, a claim, evidence (with its source), a relationship or a
+  // statement on an entity: every list that could show it is stale.
+  const reviewed = async (c: Pick<ExtractionCandidateOut, 'id' | 'candidate_type'>, decision: 'accept' | 'reject') => {
+    setCandidates(cur => cur.filter(x => x.id !== c.id));
+    await Promise.all([
+      reloadDocuments(),
+      queryClient.invalidateQueries({queryKey: listClaimsQueryKey({path})}),
+      queryClient.invalidateQueries({queryKey: listInvestigationEvidenceQueryKey({path})}),
+      queryClient.invalidateQueries({queryKey: listSourcesQueryKey({path})}),
+      queryClient.invalidateQueries({queryKey: listEntitiesQueryKey({path})}),
+      queryClient.invalidateQueries({queryKey: getInvestigationGraphQueryKey({path})}),
+    ]);
+    setDocStatus(`${c.candidate_type} proposal ${decision === 'accept' ? 'accepted' : 'rejected'}. Its document/chunk/review lineage is retained for provenance tracing.`);
+  };
+
   const reviewCandidate = async (c: ExtractionCandidateOut, decision: 'accept' | 'reject') => {
-    const body: ExtractionCandidateReviewRequest = {decision, note: 'Reviewed in Next.js workbench'};
+    const body: ExtractionCandidateReviewRequest = {decision, note: REVIEW_NOTE};
     if (decision === 'accept' && c.candidate_type === 'entity') {
       body.caption = text(c.payload.caption);
-      body.entity_schema = text(c.payload.suggested_schema) || 'Thing';
+      body.entity_schema = schemaAnswers[c.id] || text(c.payload.suggested_schema) || 'Thing';
     }
     try {
       await reviewExtractionCandidate({path: {candidate_id: c.id}, body, throwOnError: true});
-      setCandidates(cur => cur.filter(x => x.id !== c.id));
-      // An accepted proposal may have made an entity, a claim, evidence (with
-      // its source) or a relationship: every list that could show it is stale.
-      await Promise.all([
-        reloadDocuments(),
-        queryClient.invalidateQueries({queryKey: listClaimsQueryKey({path})}),
-        queryClient.invalidateQueries({queryKey: listInvestigationEvidenceQueryKey({path})}),
-        queryClient.invalidateQueries({queryKey: listSourcesQueryKey({path})}),
-        queryClient.invalidateQueries({queryKey: listEntitiesQueryKey({path})}),
-        queryClient.invalidateQueries({queryKey: getInvestigationGraphQueryKey({path})}),
-      ]);
-      setDocStatus(`${c.candidate_type} proposal ${decision === 'accept' ? 'accepted' : 'rejected'}. Its document/chunk/review lineage is retained for provenance tracing.`);
+      await reviewed(c, decision);
     } catch (error) {
       setDocStatus(errorMessage(error, 'Extraction review failed'));
+    }
+  };
+
+  // "Find names again" (ADR-0006): OpenAleph analyses the document again in
+  // a background job, and what it finds joins the document's proposals.
+  const findNamesAgain = async (d: DocumentOut) => {
+    setDocStatus(`${d.filename}: asking OpenAleph to find names again…`);
+    try {
+      let job: BackgroundJob = (await analyzeOpenalephDocument({path: {document_id: d.id}, throwOnError: true})).data;
+      if (!job.finished) job = await waitForJob(api, job.id, j => setDocStatus(`${d.filename}: ${describeJob(j)}`));
+      setDocStatus(`${d.filename}: ${describeJob(job)}`);
+      await reloadDocuments();
+      if (job.status === 'succeeded') await loadCandidates(d.id);
+    } catch (error) {
+      setDocStatus(errorMessage(error, 'Could not ask OpenAleph to find names again'));
     }
   };
 
@@ -341,6 +366,7 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
             <Button onClick={() => loadOpenAlephStatus(d.id)}>OpenAleph status</Button>
             <Button onClick={() => syncOpenAleph(d.id)}>Sync to OpenAleph</Button>
             <Button onClick={() => refreshOpenAleph(d.id)} disabled={Boolean(oa && !oa.ready_for_import)}>Refresh OpenAleph review</Button>
+            {d.openaleph_document_id && d.extraction_status === 'complete' && <Button onClick={() => findNamesAgain(d)}>Find names again</Button>}
             <Button onClick={() => openProvenance({title: d.filename, kind: 'document', sourceId: d.source_id, documentId: d.id})}>Trace document</Button>
             {d.extraction_status === 'failed' && <Button onClick={() => retryDocumentRead(d)}>Retry reading</Button>}
             {(d.extraction_status === 'queued' || d.extraction_status === 'extracting') && <Button onClick={() => retryDocumentRead(d)}>Check reading progress</Button>}
@@ -357,9 +383,17 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
           <div>{String(c.payload.schema || 'Relationship')}: {entityCaption(c.payload.source_entity_id, 'source')} → {entityCaption(c.payload.target_entity_id, 'target')}</div>
         </div>}
         {c.reviewer_note && <div><small>Reporter note: {c.reviewer_note}</small></div>}
+        {c.review_status === 'proposed' && c.payload.schema_question === true &&
+          <SchemaQuestion candidate={c} answer={schemaAnswers[c.id]} onAnswer={choice => setSchemaAnswers(cur => ({...cur, [c.id]: choice}))}/>}
+        {c.review_status === 'proposed' && c.candidate_type === 'identifier' &&
+          <IdentifierOwner candidateId={c.id} kind={text(c.payload.kind) || 'email'} note={REVIEW_NOTE}
+            onReviewed={decision => reviewed(c, decision)}
+            onEntityAccepted={entityCandidateId => reviewed({id: entityCandidateId, candidate_type: 'entity'}, 'accept')}/>}
         <div>
-          {c.review_status === 'proposed' && <>
-            <Button onClick={() => reviewCandidate(c, 'accept')}>{c.candidate_type === 'relationship' ? 'Accept canonical relationship' : 'Accept'}</Button>
+          {c.review_status === 'proposed' && c.candidate_type !== 'identifier' && <>
+            <Button onClick={() => reviewCandidate(c, 'accept')} disabled={c.payload.schema_question === true && !schemaAnswers[c.id]}>
+              {c.candidate_type === 'relationship' ? 'Accept canonical relationship' : 'Accept'}
+            </Button>
             <Button onClick={() => reviewCandidate(c, 'reject')}>Reject</Button>
           </>}
           {c.candidate_type === 'claim' && c.review_status === 'accepted' && c.accepted_record_id && <Button onClick={() => setRelationshipClaimCandidate(c)}>Stage relationship from this claim</Button>}

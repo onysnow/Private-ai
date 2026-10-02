@@ -19,6 +19,12 @@ class Settings(BaseSettings):
     document_reader: str = "auto"
     openaleph_read_timeout_seconds: float = 900.0
     openaleph_read_poll_seconds: float = 3.0
+    # How long a read waits for OpenAleph's ftm-analyze to finish finding
+    # names (ADR-0006). The read still succeeds when it runs out; "Find names
+    # again" fetches the names later.
+    openaleph_analysis_timeout_seconds: float = 300.0
+    # The Workbench's own pattern name-finder: only for documents OpenAleph
+    # did not analyse (read by the fallback reader, or no analysis came back).
     enable_local_entity_suggestions: bool = True
     opensanctions_base_url: str = "https://api.opensanctions.org"
     opensanctions_api_key: str = ""

@@ -2913,6 +2913,10 @@ export type DocumentDetailOut = {
    */
   mime_type?: string | null;
   /**
+   * Openaleph Document Id
+   */
+  openaleph_document_id?: string | null;
+  /**
    * Sha256
    */
   sha256: string;
@@ -3002,6 +3006,10 @@ export type DocumentOut = {
    */
   mime_type?: string | null;
   /**
+   * Openaleph Document Id
+   */
+  openaleph_document_id?: string | null;
+  /**
    * Sha256
    */
   sha256: string;
@@ -3089,6 +3097,10 @@ export type DocumentUploadOut = {
    * Mime Type
    */
   mime_type?: string | null;
+  /**
+   * Openaleph Document Id
+   */
+  openaleph_document_id?: string | null;
   openaleph_sync?: OpenAlephSyncOut | null;
   /**
    * Sha256
@@ -4858,6 +4870,10 @@ export type ExtractionCandidateReviewRequest = {
    * Note
    */
   note?: string | null;
+  /**
+   * Target Entity Id
+   */
+  target_entity_id?: string | null;
 };
 
 /**
@@ -4941,8 +4957,9 @@ export type ExtractionLineageOut = {
  * ExtractionReviewOut
  *
  * The reply to a review decision: the proposal as it now stands and, for
- * an acceptance, the record it made (an entity, claim, evidence record or
- * relationship, each in its own shape).
+ * an acceptance, the record it made (an entity, claim, evidence record,
+ * relationship, or for an email or phone proposal the statement added to
+ * the chosen entity, each in its own shape).
  */
 export type ExtractionReviewOut = {
   candidate: ExtractionCandidateOut;
@@ -5235,6 +5252,86 @@ export type HypothesisTestRequest = {
    * Working Theory
    */
   working_theory: string;
+};
+
+/**
+ * IdentifierTargetEntityOut
+ */
+export type IdentifierTargetEntityOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
+ * IdentifierTargetProposalOut
+ *
+ * An entity proposal of the same document, still waiting: accepting it
+ * first makes it an entity the email or phone can be attached to.
+ */
+export type IdentifierTargetProposalOut = {
+  /**
+   * Candidate Id
+   */
+  candidate_id: string;
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Schema Question
+   */
+  schema_question: boolean;
+  /**
+   * Suggested Schema
+   */
+  suggested_schema: string;
+};
+
+/**
+ * IdentifierTargetsOut
+ *
+ * Which entities an email or phone proposal can belong to (ADR-0006),
+ * the document's own first. Only schemas with the property are listed.
+ */
+export type IdentifierTargetsOut = {
+  /**
+   * Candidate Id
+   */
+  candidate_id: string;
+  /**
+   * Document Entities
+   */
+  document_entities: Array<IdentifierTargetEntityOut>;
+  /**
+   * Document Proposals
+   */
+  document_proposals: Array<IdentifierTargetProposalOut>;
+  /**
+   * Kind
+   */
+  kind: 'email' | 'phone';
+  /**
+   * Other Entities
+   */
+  other_entities: Array<IdentifierTargetEntityOut>;
+  /**
+   * Property
+   */
+  property: string;
+  /**
+   * Value
+   */
+  value: string;
 };
 
 /**
@@ -11350,6 +11447,38 @@ export type SyncOpenalephDocumentResponses = {
 export type SyncOpenalephDocumentResponse =
   SyncOpenalephDocumentResponses[keyof SyncOpenalephDocumentResponses];
 
+export type AnalyzeOpenalephDocumentData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/openaleph/analyze';
+};
+
+export type AnalyzeOpenalephDocumentErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type AnalyzeOpenalephDocumentError =
+  AnalyzeOpenalephDocumentErrors[keyof AnalyzeOpenalephDocumentErrors];
+
+export type AnalyzeOpenalephDocumentResponses = {
+  /**
+   * Successful Response
+   */
+  200: BackgroundJobOut;
+};
+
+export type AnalyzeOpenalephDocumentResponse =
+  AnalyzeOpenalephDocumentResponses[keyof AnalyzeOpenalephDocumentResponses];
+
 export type EnrichmentSessionDetailData = {
   body?: never;
   path: {
@@ -12389,6 +12518,38 @@ export type GetExtractionCandidateExplanationResponses = {
 
 export type GetExtractionCandidateExplanationResponse =
   GetExtractionCandidateExplanationResponses[keyof GetExtractionCandidateExplanationResponses];
+
+export type GetIdentifierTargetsData = {
+  body?: never;
+  path: {
+    /**
+     * Candidate Id
+     */
+    candidate_id: string;
+  };
+  query?: never;
+  url: '/api/extraction-candidates/{candidate_id}/identifier-targets';
+};
+
+export type GetIdentifierTargetsErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type GetIdentifierTargetsError =
+  GetIdentifierTargetsErrors[keyof GetIdentifierTargetsErrors];
+
+export type GetIdentifierTargetsResponses = {
+  /**
+   * Successful Response
+   */
+  200: IdentifierTargetsOut;
+};
+
+export type GetIdentifierTargetsResponse =
+  GetIdentifierTargetsResponses[keyof GetIdentifierTargetsResponses];
 
 export type GetExtractionCandidateLineageData = {
   body?: never;

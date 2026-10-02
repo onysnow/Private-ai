@@ -15,6 +15,9 @@ import type {
   AlephSearchData,
   AlephSearchErrors,
   AlephSearchResponses,
+  AnalyzeOpenalephDocumentData,
+  AnalyzeOpenalephDocumentErrors,
+  AnalyzeOpenalephDocumentResponses,
   AssessStatementData,
   AssessStatementErrors,
   AssessStatementResponses,
@@ -28,14 +31,190 @@ import type {
   CanonicalEntityResolutionErrors,
   CanonicalEntityResolutionResponses,
   CapabilitiesData,
-  CapabilitiesErrors,
   CapabilitiesResponses,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchErrors,
   ConnectorSearchResponses,
-  ConnectorsErrors,
   ConnectorsResponses,
+  ConsoleActivityActivityData,
+  ConsoleActivityActivityDetailData,
+  ConsoleActivityActivityDetailErrors,
+  ConsoleActivityActivityDetailResponses,
+  ConsoleActivityActivityErrors,
+  ConsoleActivityActivityResponses,
+  ConsoleActivityUndoData,
+  ConsoleActivityUndoErrors,
+  ConsoleActivityUndoResponses,
+  ConsoleApiplayCollectionsData,
+  ConsoleApiplayCollectionsResponses,
+  ConsoleApiplayDeleteCollectionData,
+  ConsoleApiplayDeleteCollectionErrors,
+  ConsoleApiplayDeleteCollectionResponses,
+  ConsoleApiplayProbesData,
+  ConsoleApiplayProbesResponses,
+  ConsoleApiplayRecentData,
+  ConsoleApiplayRecentErrors,
+  ConsoleApiplayRecentResponses,
+  ConsoleApiplayRoutesData,
+  ConsoleApiplayRoutesResponses,
+  ConsoleApiplaySaveCollectionData,
+  ConsoleApiplaySaveCollectionErrors,
+  ConsoleApiplaySaveCollectionResponses,
+  ConsoleApiplaySendData,
+  ConsoleApiplaySendErrors,
+  ConsoleApiplaySendResponses,
+  ConsoleApiplayTrafficData,
+  ConsoleApiplayTrafficErrors,
+  ConsoleApiplayTrafficResponses,
+  ConsoleBackupsCreateData,
+  ConsoleBackupsCreateErrors,
+  ConsoleBackupsCreateResponses,
+  ConsoleBackupsDownloadData,
+  ConsoleBackupsDownloadErrors,
+  ConsoleBackupsDownloadResponses,
+  ConsoleBackupsListBackupsData,
+  ConsoleBackupsListBackupsResponses,
+  ConsoleBackupsPlanData,
+  ConsoleBackupsPlanErrors,
+  ConsoleBackupsPlanResponses,
+  ConsoleBackupsRestoreData,
+  ConsoleBackupsRestoreErrors,
+  ConsoleBackupsRestoreResponses,
+  ConsoleBackupsRunsData,
+  ConsoleBackupsRunsErrors,
+  ConsoleBackupsRunsResponses,
+  ConsoleChecksRegistryData,
+  ConsoleChecksRegistryResponses,
+  ConsoleChecksRunData,
+  ConsoleChecksRunDetailData,
+  ConsoleChecksRunDetailErrors,
+  ConsoleChecksRunDetailResponses,
+  ConsoleChecksRunErrors,
+  ConsoleChecksRunResponses,
+  ConsoleChecksRunsData,
+  ConsoleChecksRunsErrors,
+  ConsoleChecksRunsResponses,
+  ConsoleConfigSectionConfigData,
+  ConsoleConfigSectionConfigResponses,
+  ConsoleConfigSectionFlagData,
+  ConsoleConfigSectionFlagErrors,
+  ConsoleConfigSectionFlagResponses,
+  ConsoleDataApplyChangesetData,
+  ConsoleDataApplyChangesetErrors,
+  ConsoleDataApplyChangesetResponses,
+  ConsoleDataBulkData,
+  ConsoleDataBulkErrors,
+  ConsoleDataBulkResponses,
+  ConsoleDataCreateChangesetData,
+  ConsoleDataCreateChangesetErrors,
+  ConsoleDataCreateChangesetResponses,
+  ConsoleDataDiscardChangesetData,
+  ConsoleDataDiscardChangesetErrors,
+  ConsoleDataDiscardChangesetResponses,
+  ConsoleDataExportData,
+  ConsoleDataExportErrors,
+  ConsoleDataExportResponses,
+  ConsoleDataGetChangesetData,
+  ConsoleDataGetChangesetErrors,
+  ConsoleDataGetChangesetResponses,
+  ConsoleDataListChangesetsData,
+  ConsoleDataListChangesetsErrors,
+  ConsoleDataListChangesetsResponses,
+  ConsoleDataRowData,
+  ConsoleDataRowErrors,
+  ConsoleDataRowResponses,
+  ConsoleDataRowsData,
+  ConsoleDataRowsErrors,
+  ConsoleDataRowsResponses,
+  ConsoleDataTableDetailData,
+  ConsoleDataTableDetailErrors,
+  ConsoleDataTableDetailResponses,
+  ConsoleDataTablesData,
+  ConsoleDataTablesResponses,
+  ConsoleLogsListSourcesData,
+  ConsoleLogsListSourcesResponses,
+  ConsoleLogsTailData,
+  ConsoleLogsTailErrors,
+  ConsoleLogsTailResponses,
+  ConsoleOverviewEventsData,
+  ConsoleOverviewEventsErrors,
+  ConsoleOverviewEventsResponses,
+  ConsoleOverviewHealthData,
+  ConsoleOverviewHealthErrors,
+  ConsoleOverviewHealthResponses,
+  ConsoleOverviewManifestData,
+  ConsoleOverviewManifestResponses,
+  ConsoleOverviewServerData,
+  ConsoleOverviewServerResponses,
+  ConsoleQueryDeleteSavedData,
+  ConsoleQueryDeleteSavedErrors,
+  ConsoleQueryDeleteSavedResponses,
+  ConsoleQueryExplainData,
+  ConsoleQueryExplainErrors,
+  ConsoleQueryExplainResponses,
+  ConsoleQueryHistoryData,
+  ConsoleQueryHistoryErrors,
+  ConsoleQueryHistoryResponses,
+  ConsoleQueryRunData,
+  ConsoleQueryRunErrors,
+  ConsoleQueryRunResponses,
+  ConsoleQuerySaveData,
+  ConsoleQuerySavedData,
+  ConsoleQuerySavedResponses,
+  ConsoleQuerySaveErrors,
+  ConsoleQuerySaveResponses,
+  ConsoleQueryUpdateSavedData,
+  ConsoleQueryUpdateSavedErrors,
+  ConsoleQueryUpdateSavedResponses,
+  ConsoleSchemaDictionaryData,
+  ConsoleSchemaDictionaryResponses,
+  ConsoleSchemaMigrationStateData,
+  ConsoleSchemaMigrationStateResponses,
+  ConsoleSchemaPlanData,
+  ConsoleSchemaPlanErrors,
+  ConsoleSchemaPlanResponses,
+  ConsoleSchemaSchemaMapData,
+  ConsoleSchemaSchemaMapResponses,
+  ConsoleSchemaUpgradeData,
+  ConsoleSchemaUpgradeErrors,
+  ConsoleSchemaUpgradeResponses,
+  ConsoleTestsCancelData,
+  ConsoleTestsCancelErrors,
+  ConsoleTestsCancelResponses,
+  ConsoleTestsRerunFailedData,
+  ConsoleTestsRerunFailedResponses,
+  ConsoleTestsRunData,
+  ConsoleTestsRunErrors,
+  ConsoleTestsRunLogData,
+  ConsoleTestsRunLogErrors,
+  ConsoleTestsRunLogResponses,
+  ConsoleTestsRunResponses,
+  ConsoleTestsRunsData,
+  ConsoleTestsRunsErrors,
+  ConsoleTestsRunsResponses,
+  ConsoleTestsRunStatusData,
+  ConsoleTestsRunStatusErrors,
+  ConsoleTestsRunStatusResponses,
+  ConsoleTestsTreeData,
+  ConsoleTestsTreeErrors,
+  ConsoleTestsTreeResponses,
+  ConsoleUsersIssueData,
+  ConsoleUsersIssueErrors,
+  ConsoleUsersIssueResponses,
+  ConsoleUsersListUsersData,
+  ConsoleUsersListUsersResponses,
+  ConsoleUsersRevokeData,
+  ConsoleUsersRevokeErrors,
+  ConsoleUsersRevokeResponses,
+  ConsoleUsersRolesData,
+  ConsoleUsersRolesResponses,
+  ConsoleUsersSetDisabledData,
+  ConsoleUsersSetDisabledErrors,
+  ConsoleUsersSetDisabledResponses,
+  ConsoleUsersSetRolesData,
+  ConsoleUsersSetRolesErrors,
+  ConsoleUsersSetRolesResponses,
   ConvertLeadEndpointData,
   ConvertLeadEndpointErrors,
   ConvertLeadEndpointResponses,
@@ -174,6 +353,9 @@ import type {
   GetExtractionEntityMatchesData,
   GetExtractionEntityMatchesErrors,
   GetExtractionEntityMatchesResponses,
+  GetIdentifierTargetsData,
+  GetIdentifierTargetsErrors,
+  GetIdentifierTargetsResponses,
   GetInvestigationFinancialFlowsData,
   GetInvestigationFinancialFlowsErrors,
   GetInvestigationFinancialFlowsResponses,
@@ -199,7 +381,6 @@ import type {
   GetOpenalephDocumentSyncErrors,
   GetOpenalephDocumentSyncResponses,
   GetOrphanStoragePreviewData,
-  GetOrphanStoragePreviewErrors,
   GetOrphanStoragePreviewResponses,
   GetRecordProvenanceTraceData,
   GetRecordProvenanceTraceErrors,
@@ -214,13 +395,11 @@ import type {
   GetSecurityAuditRetentionPreviewErrors,
   GetSecurityAuditRetentionPreviewResponses,
   GetSecurityAuditSummaryData,
-  GetSecurityAuditSummaryErrors,
   GetSecurityAuditSummaryResponses,
   GetWriteupEndpointData,
   GetWriteupEndpointErrors,
   GetWriteupEndpointResponses,
   HealthData,
-  HealthErrors,
   HealthResponses,
   ImportOpenalephDocumentEntitiesData,
   ImportOpenalephDocumentEntitiesErrors,
@@ -262,7 +441,6 @@ import type {
   LinkLeadErrors,
   LinkLeadResponses,
   ListAppUsersData,
-  ListAppUsersErrors,
   ListAppUsersResponses,
   ListAssessmentsData,
   ListAssessmentsErrors,
@@ -325,7 +503,6 @@ import type {
   ListInvestigationRelationshipsErrors,
   ListInvestigationRelationshipsResponses,
   ListInvestigationsData,
-  ListInvestigationsErrors,
   ListInvestigationsResponses,
   ListJobsEndpointData,
   ListJobsEndpointErrors,
@@ -358,10 +535,8 @@ import type {
   ListWriteupsEndpointErrors,
   ListWriteupsEndpointResponses,
   OpenalephIntegrationStatusData,
-  OpenalephIntegrationStatusErrors,
   OpenalephIntegrationStatusResponses,
   PresentationStylesData,
-  PresentationStylesErrors,
   PresentationStylesResponses,
   PreviewBackupRestoreData,
   PreviewBackupRestoreErrors,
@@ -388,7 +563,6 @@ import type {
   RefreshOpenalephDocumentReviewErrors,
   RefreshOpenalephDocumentReviewResponses,
   RelationshipSchemasData,
-  RelationshipSchemasErrors,
   RelationshipSchemasResponses,
   RemoveInvestigationData,
   RemoveInvestigationErrors,
@@ -430,10 +604,8 @@ import type {
   SearchWorkbenchErrors,
   SearchWorkbenchResponses,
   SeedDemoData,
-  SeedDemoErrors,
   SeedDemoResponses,
   SettingsStatusData,
-  SettingsStatusErrors,
   SettingsStatusResponses,
   SyncOpenalephDocumentData,
   SyncOpenalephDocumentErrors,
@@ -466,6 +638,8 @@ import type {
 import {
   zAlephSearchBody,
   zAlephSearchResponse,
+  zAnalyzeOpenalephDocumentPath,
+  zAnalyzeOpenalephDocumentResponse,
   zAssessStatementBody,
   zAssessStatementPath,
   zAssessStatementResponse,
@@ -477,16 +651,76 @@ import {
   zCanonicalEntityResolutionBody,
   zCanonicalEntityResolutionPath,
   zCanonicalEntityResolutionResponse,
-  zCapabilitiesResponse,
   zConnectorSearchBody,
   zConnectorSearchPath,
   zConnectorSearchResponse,
   zConnectorsResponse,
+  zConsoleActivityActivityDetailPath,
+  zConsoleActivityActivityQuery,
+  zConsoleActivityUndoPath,
+  zConsoleApiplayDeleteCollectionPath,
+  zConsoleApiplayRecentQuery,
+  zConsoleApiplaySaveCollectionBody,
+  zConsoleApiplaySendBody,
+  zConsoleApiplayTrafficQuery,
+  zConsoleBackupsCreateBody,
+  zConsoleBackupsDownloadPath,
+  zConsoleBackupsPlanPath,
+  zConsoleBackupsPlanQuery,
+  zConsoleBackupsRestoreBody,
+  zConsoleBackupsRestorePath,
+  zConsoleBackupsRunsQuery,
+  zConsoleChecksRunBody,
+  zConsoleChecksRunDetailPath,
+  zConsoleChecksRunsQuery,
+  zConsoleConfigSectionFlagBody,
+  zConsoleConfigSectionFlagPath,
+  zConsoleDataApplyChangesetBody,
+  zConsoleDataApplyChangesetPath,
+  zConsoleDataBulkBody,
+  zConsoleDataBulkPath,
+  zConsoleDataCreateChangesetBody,
+  zConsoleDataDiscardChangesetPath,
+  zConsoleDataExportPath,
+  zConsoleDataExportQuery,
+  zConsoleDataGetChangesetPath,
+  zConsoleDataListChangesetsQuery,
+  zConsoleDataRowPath,
+  zConsoleDataRowsPath,
+  zConsoleDataRowsQuery,
+  zConsoleDataTableDetailPath,
+  zConsoleLogsTailPath,
+  zConsoleLogsTailQuery,
+  zConsoleOverviewEventsQuery,
+  zConsoleOverviewHealthQuery,
+  zConsoleQueryDeleteSavedPath,
+  zConsoleQueryExplainBody,
+  zConsoleQueryHistoryQuery,
+  zConsoleQueryRunBody,
+  zConsoleQuerySaveBody,
+  zConsoleQueryUpdateSavedBody,
+  zConsoleQueryUpdateSavedPath,
+  zConsoleSchemaPlanBody,
+  zConsoleSchemaUpgradeBody,
+  zConsoleTestsCancelPath,
+  zConsoleTestsRunBody,
+  zConsoleTestsRunLogPath,
+  zConsoleTestsRunsQuery,
+  zConsoleTestsRunStatusPath,
+  zConsoleTestsRunStatusQuery,
+  zConsoleTestsTreeQuery,
+  zConsoleUsersIssueBody,
+  zConsoleUsersIssuePath,
+  zConsoleUsersRevokeBody,
+  zConsoleUsersRevokePath,
+  zConsoleUsersSetDisabledBody,
+  zConsoleUsersSetDisabledPath,
+  zConsoleUsersSetRolesBody,
+  zConsoleUsersSetRolesPath,
   zConvertLeadEndpointBody,
   zConvertLeadEndpointPath,
   zConvertLeadEndpointResponse,
   zCreateAppUserBody,
-  zCreateAppUserResponse,
   zCreateCanonicalRelationshipBody,
   zCreateCanonicalRelationshipResponse,
   zCreateClaimEndpointBody,
@@ -514,7 +748,6 @@ import {
   zCreateTimelineEventEndpointBody,
   zCreateTimelineEventEndpointResponse,
   zCreateWriteupEndpointBody,
-  zCreateWriteupEndpointResponse,
   zDecideCrossProviderClusterBody,
   zDecideCrossProviderClusterPath,
   zDecideCrossProviderClusterResponse,
@@ -527,11 +760,9 @@ import {
   zDeleteConnectorCredentialPath,
   zDeleteConnectorCredentialResponse,
   zDeleteDeckEndpointPath,
-  zDeleteDeckEndpointResponse,
   zDeleteInvestigationMembershipPath,
   zDeleteInvestigationMembershipResponse,
   zDeleteWriteupEndpointPath,
-  zDeleteWriteupEndpointResponse,
   zEnrichEntityMultiBody,
   zEnrichEntityMultiPath,
   zEnrichEntityMultiResponse,
@@ -542,7 +773,6 @@ import {
   zEnrichmentSessionDetailPath,
   zEnrichmentSessionDetailResponse,
   zEnsureOpenalephCorpusBindingPath,
-  zEnsureOpenalephCorpusBindingResponse,
   zEntityDuplicateCandidatesPath,
   zEntityDuplicateCandidatesResponse,
   zEntityMergeExecuteBody,
@@ -556,12 +786,9 @@ import {
   zEntityPostMergeReconciliationPath,
   zEntityPostMergeReconciliationResponse,
   zExportDeckPptxPath,
-  zExportDeckPptxResponse,
   zExportInvestigationPath,
   zExportInvestigationQuery,
-  zExportInvestigationResponse,
   zExportWriteupDocxPath,
-  zExportWriteupDocxResponse,
   zExternalRelationshipCandidatesPath,
   zExternalRelationshipCandidatesResponse,
   zFindExtractionLineageEndpointQuery,
@@ -569,11 +796,9 @@ import {
   zFindingCandidatesPath,
   zFindingCandidatesResponse,
   zGetAiAnalysisCandidateEndpointPath,
-  zGetAiAnalysisCandidateEndpointResponse,
   zGetClaimReviewWorkspacePath,
   zGetClaimReviewWorkspaceResponse,
   zGetDeckEndpointPath,
-  zGetDeckEndpointResponse,
   zGetDocumentPath,
   zGetDocumentResponse,
   zGetEntityDossierPath,
@@ -583,7 +808,8 @@ import {
   zGetExtractionCandidateLineagePath,
   zGetExtractionCandidateLineageResponse,
   zGetExtractionEntityMatchesPath,
-  zGetExtractionEntityMatchesResponse,
+  zGetIdentifierTargetsPath,
+  zGetIdentifierTargetsResponse,
   zGetInvestigationFinancialFlowsPath,
   zGetInvestigationFinancialFlowsResponse,
   zGetInvestigationGraphPath,
@@ -597,7 +823,6 @@ import {
   zGetLeadPath,
   zGetLeadResponse,
   zGetOpenalephCorpusBindingPath,
-  zGetOpenalephCorpusBindingResponse,
   zGetOpenalephDocumentReviewStatusPath,
   zGetOpenalephDocumentReviewStatusResponse,
   zGetOpenalephDocumentSyncPath,
@@ -613,28 +838,21 @@ import {
   zGetSecurityAuditRetentionPreviewResponse,
   zGetSecurityAuditSummaryResponse,
   zGetWriteupEndpointPath,
-  zGetWriteupEndpointResponse,
-  zHealthResponse,
   zImportOpenalephDocumentEntitiesPath,
   zImportOpenalephDocumentEntitiesResponse,
   zImportOpenalephDocumentEvidencePath,
   zImportOpenalephDocumentEvidenceResponse,
   zInspectBackupBody,
-  zInspectBackupResponse,
   zInvestigationCaseSynthesisBody,
   zInvestigationCaseSynthesisPath,
-  zInvestigationCaseSynthesisResponse,
   zInvestigationDeletionPreviewPath,
   zInvestigationDeletionPreviewResponse,
   zInvestigationHypothesisTestBody,
   zInvestigationHypothesisTestPath,
-  zInvestigationHypothesisTestResponse,
   zInvestigationPresentationDraftBody,
   zInvestigationPresentationDraftPath,
-  zInvestigationPresentationDraftResponse,
   zInvestigationQuestionContextBody,
   zInvestigationQuestionContextPath,
-  zInvestigationQuestionContextResponse,
   zInvestigationVisualCatalogPath,
   zInvestigationVisualCatalogResponse,
   zInvestigationVisualPreviewBody,
@@ -649,7 +867,6 @@ import {
   zLinkLeadBody,
   zLinkLeadPath,
   zLinkLeadResponse,
-  zListAppUsersResponse,
   zListAssessmentsPath,
   zListAssessmentsResponse,
   zListClaimEvidenceEndpointPath,
@@ -666,7 +883,6 @@ import {
   zListCrossProviderDecisionsPath,
   zListCrossProviderDecisionsResponse,
   zListDecksEndpointPath,
-  zListDecksEndpointResponse,
   zListDocumentCandidatesEndpointPath,
   zListDocumentCandidatesEndpointQuery,
   zListDocumentCandidatesEndpointResponse,
@@ -692,7 +908,6 @@ import {
   zListExternalRelationshipReviewsResponse,
   zListInvestigationAiAnalysisCandidatesPath,
   zListInvestigationAiAnalysisCandidatesQuery,
-  zListInvestigationAiAnalysisCandidatesResponse,
   zListInvestigationEvidencePath,
   zListInvestigationEvidenceQuery,
   zListInvestigationEvidenceResponse,
@@ -708,7 +923,6 @@ import {
   zListLeadsQuery,
   zListLeadsResponse,
   zListOpenalephCorpusFailuresPath,
-  zListOpenalephCorpusFailuresResponse,
   zListPropertyConflictDecisionsPath,
   zListPropertyConflictDecisionsResponse,
   zListRelationshipEvidenceReviewsPath,
@@ -723,17 +937,12 @@ import {
   zListSourcesResponse,
   zListWriteupsEndpointPath,
   zListWriteupsEndpointQuery,
-  zListWriteupsEndpointResponse,
-  zOpenalephIntegrationStatusResponse,
-  zPresentationStylesResponse,
   zPreviewBackupRestoreBody,
   zPreviewBackupRestoreResponse,
   zPromoteAiAnalysisCandidateToDeckEndpointBody,
   zPromoteAiAnalysisCandidateToDeckEndpointPath,
-  zPromoteAiAnalysisCandidateToDeckEndpointResponse,
   zPromoteAiAnalysisCandidateToWriteupEndpointBody,
   zPromoteAiAnalysisCandidateToWriteupEndpointPath,
-  zPromoteAiAnalysisCandidateToWriteupEndpointResponse,
   zPromoteExternalRelationshipPath,
   zPromoteExternalRelationshipResponse,
   zPromoteStatementAssessmentBody,
@@ -743,10 +952,8 @@ import {
   zPruneSecurityAuditResponse,
   zPutInvestigationMembershipBody,
   zPutInvestigationMembershipPath,
-  zPutInvestigationMembershipResponse,
   zRefreshOpenalephDocumentReviewPath,
   zRefreshOpenalephDocumentReviewResponse,
-  zRelationshipSchemasResponse,
   zRemoveInvestigationPath,
   zRemoveInvestigationQuery,
   zRemoveInvestigationResponse,
@@ -759,7 +966,6 @@ import {
   zRetryJobEndpointResponse,
   zReviewAiAnalysisCandidateEndpointBody,
   zReviewAiAnalysisCandidateEndpointPath,
-  zReviewAiAnalysisCandidateEndpointResponse,
   zReviewExternalRelationshipBody,
   zReviewExternalRelationshipPath,
   zReviewExternalRelationshipResponse,
@@ -773,27 +979,22 @@ import {
   zReviewRelationshipEvidenceEndpointPath,
   zReviewRelationshipEvidenceEndpointResponse,
   zRevokeAppUserTokenPath,
-  zRevokeAppUserTokenResponse,
   zRotateAppUserTokenPath,
-  zRotateAppUserTokenResponse,
   zSaveConnectorCredentialBody,
   zSaveConnectorCredentialPath,
   zSaveConnectorCredentialResponse,
   zSearchWorkbenchQuery,
   zSearchWorkbenchResponse,
-  zSeedDemoResponse,
   zSettingsStatusResponse,
   zSyncOpenalephDocumentPath,
   zSyncOpenalephDocumentResponse,
   zUpdateAppUserBody,
   zUpdateAppUserPath,
-  zUpdateAppUserResponse,
   zUpdateClaimEndpointBody,
   zUpdateClaimEndpointPath,
   zUpdateClaimEndpointResponse,
   zUpdateDeckEndpointBody,
   zUpdateDeckEndpointPath,
-  zUpdateDeckEndpointResponse,
   zUpdateEntityBody,
   zUpdateEntityPath,
   zUpdateEntityResponse,
@@ -805,7 +1006,6 @@ import {
   zUpdateReportingTaskEndpointResponse,
   zUpdateWriteupEndpointBody,
   zUpdateWriteupEndpointPath,
-  zUpdateWriteupEndpointResponse,
   zUploadDocumentBody,
   zUploadDocumentResponse,
 } from './zod.gen';
@@ -853,8 +1053,6 @@ export const getAiAnalysisCandidateEndpoint = <
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zGetAiAnalysisCandidateEndpointResponse.parseAsync(data),
     url: '/api/ai-analysis-candidates/{candidate_id}',
     ...options,
   });
@@ -888,8 +1086,6 @@ export const promoteAiAnalysisCandidateToDeckEndpoint = <
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zPromoteAiAnalysisCandidateToDeckEndpointResponse.parseAsync(data),
     url: '/api/ai-analysis-candidates/{candidate_id}/promote-to-deck',
     ...options,
     headers: {
@@ -931,10 +1127,6 @@ export const promoteAiAnalysisCandidateToWriteupEndpoint = <
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zPromoteAiAnalysisCandidateToWriteupEndpointResponse.parseAsync(
-        data,
-      ),
     url: '/api/ai-analysis-candidates/{candidate_id}/promote-to-writeup',
     ...options,
     headers: {
@@ -968,8 +1160,6 @@ export const reviewAiAnalysisCandidateEndpoint = <
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zReviewAiAnalysisCandidateEndpointResponse.parseAsync(data),
     url: '/api/ai-analysis-candidates/{candidate_id}/review',
     ...options,
     headers: {
@@ -998,8 +1188,6 @@ export const inspectBackup = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zInspectBackupResponse.parseAsync(data),
     url: '/api/backups/inspect',
     ...options,
     headers: {
@@ -1079,25 +1267,21 @@ export const restoreBackup = <ThrowOnError extends boolean = false>(
  */
 export const capabilities = <ThrowOnError extends boolean = false>(
   options?: Options<CapabilitiesData, ThrowOnError>,
-): RequestResult<CapabilitiesResponses, CapabilitiesErrors, ThrowOnError> =>
-  (options?.client ?? client).get<
-    CapabilitiesResponses,
-    CapabilitiesErrors,
-    ThrowOnError
-  >({
-    requestValidator: async (data) =>
-      await z
-        .object({
-          body: z.never().optional(),
-          path: z.never().optional(),
-          query: z.never().optional(),
-        })
-        .parseAsync(data),
-    responseValidator: async (data) =>
-      await zCapabilitiesResponse.parseAsync(data),
-    url: '/api/capabilities',
-    ...options,
-  });
+): RequestResult<CapabilitiesResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<CapabilitiesResponses, unknown, ThrowOnError>(
+    {
+      requestValidator: async (data) =>
+        await z
+          .object({
+            body: z.never().optional(),
+            path: z.never().optional(),
+            query: z.never().optional(),
+          })
+          .parseAsync(data),
+      url: '/api/capabilities',
+      ...options,
+    },
+  );
 
 /**
  * Create Claim Endpoint
@@ -1575,12 +1759,8 @@ export const reviewFinding = <ThrowOnError extends boolean = false>(
  */
 export const connectors = <ThrowOnError extends boolean = false>(
   options?: Options<ConnectorsData, ThrowOnError>,
-): RequestResult<ConnectorsResponses, ConnectorsErrors, ThrowOnError> =>
-  (options?.client ?? client).get<
-    ConnectorsResponses,
-    ConnectorsErrors,
-    ThrowOnError
-  >({
+): RequestResult<ConnectorsResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<ConnectorsResponses, unknown, ThrowOnError>({
     requestValidator: async (data) =>
       await z
         .object({
@@ -1658,6 +1838,1783 @@ export const connectorSearch = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Activity
+ */
+export const consoleActivityActivity = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleActivityActivityData, ThrowOnError>,
+): RequestResult<
+  ConsoleActivityActivityResponses,
+  ConsoleActivityActivityErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    ConsoleActivityActivityResponses,
+    ConsoleActivityActivityErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zConsoleActivityActivityQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/activity',
+    ...options,
+  });
+
+/**
+ * Activity Detail
+ */
+export const consoleActivityActivityDetail = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ConsoleActivityActivityDetailData, ThrowOnError>,
+): RequestResult<
+  ConsoleActivityActivityDetailResponses,
+  ConsoleActivityActivityDetailErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ConsoleActivityActivityDetailResponses,
+    ConsoleActivityActivityDetailErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zConsoleActivityActivityDetailPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/activity/{aid}',
+    ...options,
+  });
+
+/**
+ * Undo
+ */
+export const consoleActivityUndo = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleActivityUndoData, ThrowOnError>,
+): RequestResult<
+  ConsoleActivityUndoResponses,
+  ConsoleActivityUndoErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleActivityUndoResponses,
+    ConsoleActivityUndoErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zConsoleActivityUndoPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/activity/{aid}/undo',
+    ...options,
+  });
+
+/**
+ * Collections
+ */
+export const consoleApiplayCollections = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleApiplayCollectionsData, ThrowOnError>,
+): RequestResult<ConsoleApiplayCollectionsResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ConsoleApiplayCollectionsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/api/collections',
+    ...options,
+  });
+
+/**
+ * Save Collection
+ */
+export const consoleApiplaySaveCollection = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ConsoleApiplaySaveCollectionData, ThrowOnError>,
+): RequestResult<
+  ConsoleApiplaySaveCollectionResponses,
+  ConsoleApiplaySaveCollectionErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleApiplaySaveCollectionResponses,
+    ConsoleApiplaySaveCollectionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleApiplaySaveCollectionBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/api/collections',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete Collection
+ */
+export const consoleApiplayDeleteCollection = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ConsoleApiplayDeleteCollectionData, ThrowOnError>,
+): RequestResult<
+  ConsoleApiplayDeleteCollectionResponses,
+  ConsoleApiplayDeleteCollectionErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    ConsoleApiplayDeleteCollectionResponses,
+    ConsoleApiplayDeleteCollectionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zConsoleApiplayDeleteCollectionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/api/collections/{cid}',
+    ...options,
+  });
+
+/**
+ * Probes
+ */
+export const consoleApiplayProbes = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleApiplayProbesData, ThrowOnError>,
+): RequestResult<ConsoleApiplayProbesResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).post<
+    ConsoleApiplayProbesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/api/probes/run',
+    ...options,
+  });
+
+/**
+ * Routes
+ */
+export const consoleApiplayRoutes = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleApiplayRoutesData, ThrowOnError>,
+): RequestResult<ConsoleApiplayRoutesResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ConsoleApiplayRoutesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/api/routes',
+    ...options,
+  });
+
+/**
+ * Send
+ */
+export const consoleApiplaySend = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleApiplaySendData, ThrowOnError>,
+): RequestResult<
+  ConsoleApiplaySendResponses,
+  ConsoleApiplaySendErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleApiplaySendResponses,
+    ConsoleApiplaySendErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleApiplaySendBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/api/send',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Traffic
+ */
+export const consoleApiplayTraffic = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleApiplayTrafficData, ThrowOnError>,
+): RequestResult<
+  ConsoleApiplayTrafficResponses,
+  ConsoleApiplayTrafficErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    ConsoleApiplayTrafficResponses,
+    ConsoleApiplayTrafficErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zConsoleApiplayTrafficQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/api/traffic',
+    ...options,
+  });
+
+/**
+ * Recent
+ */
+export const consoleApiplayRecent = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleApiplayRecentData, ThrowOnError>,
+): RequestResult<
+  ConsoleApiplayRecentResponses,
+  ConsoleApiplayRecentErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    ConsoleApiplayRecentResponses,
+    ConsoleApiplayRecentErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zConsoleApiplayRecentQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/api/traffic/recent',
+    ...options,
+  });
+
+/**
+ * List Backups
+ */
+export const consoleBackupsListBackups = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleBackupsListBackupsData, ThrowOnError>,
+): RequestResult<ConsoleBackupsListBackupsResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ConsoleBackupsListBackupsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/backups',
+    ...options,
+  });
+
+/**
+ * Create
+ */
+export const consoleBackupsCreate = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleBackupsCreateData, ThrowOnError>,
+): RequestResult<
+  ConsoleBackupsCreateResponses,
+  ConsoleBackupsCreateErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleBackupsCreateResponses,
+    ConsoleBackupsCreateErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleBackupsCreateBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/backups',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Runs
+ */
+export const consoleBackupsRuns = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleBackupsRunsData, ThrowOnError>,
+): RequestResult<
+  ConsoleBackupsRunsResponses,
+  ConsoleBackupsRunsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    ConsoleBackupsRunsResponses,
+    ConsoleBackupsRunsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zConsoleBackupsRunsQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/backups/runs',
+    ...options,
+  });
+
+/**
+ * Restore
+ */
+export const consoleBackupsRestore = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleBackupsRestoreData, ThrowOnError>,
+): RequestResult<
+  ConsoleBackupsRestoreResponses,
+  ConsoleBackupsRestoreErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleBackupsRestoreResponses,
+    ConsoleBackupsRestoreErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleBackupsRestoreBody,
+          path: zConsoleBackupsRestorePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/backups/{bid}/restore',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Plan
+ */
+export const consoleBackupsPlan = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleBackupsPlanData, ThrowOnError>,
+): RequestResult<
+  ConsoleBackupsPlanResponses,
+  ConsoleBackupsPlanErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleBackupsPlanResponses,
+    ConsoleBackupsPlanErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zConsoleBackupsPlanPath,
+          query: zConsoleBackupsPlanQuery,
+        })
+        .parseAsync(data),
+    url: '/api/console/backups/{bid}/restore/plan',
+    ...options,
+  });
+
+/**
+ * Download
+ */
+export const consoleBackupsDownload = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleBackupsDownloadData, ThrowOnError>,
+): RequestResult<
+  ConsoleBackupsDownloadResponses,
+  ConsoleBackupsDownloadErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ConsoleBackupsDownloadResponses,
+    ConsoleBackupsDownloadErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zConsoleBackupsDownloadPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/backups/{kind}/{bid}/download',
+    ...options,
+  });
+
+/**
+ * Registry
+ */
+export const consoleChecksRegistry = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleChecksRegistryData, ThrowOnError>,
+): RequestResult<ConsoleChecksRegistryResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ConsoleChecksRegistryResponses,
+    unknown,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/checks',
+    ...options,
+  });
+
+/**
+ * Run
+ */
+export const consoleChecksRun = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleChecksRunData, ThrowOnError>,
+): RequestResult<
+  ConsoleChecksRunResponses,
+  ConsoleChecksRunErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).post<
+    ConsoleChecksRunResponses,
+    ConsoleChecksRunErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleChecksRunBody.optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/checks/run',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options?.headers,
+    },
+  });
+
+/**
+ * Runs
+ */
+export const consoleChecksRuns = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleChecksRunsData, ThrowOnError>,
+): RequestResult<
+  ConsoleChecksRunsResponses,
+  ConsoleChecksRunsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    ConsoleChecksRunsResponses,
+    ConsoleChecksRunsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zConsoleChecksRunsQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/checks/runs',
+    ...options,
+  });
+
+/**
+ * Run Detail
+ */
+export const consoleChecksRunDetail = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleChecksRunDetailData, ThrowOnError>,
+): RequestResult<
+  ConsoleChecksRunDetailResponses,
+  ConsoleChecksRunDetailErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ConsoleChecksRunDetailResponses,
+    ConsoleChecksRunDetailErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zConsoleChecksRunDetailPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/checks/runs/{rid}',
+    ...options,
+  });
+
+/**
+ * Config
+ */
+export const consoleConfigSectionConfig = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<ConsoleConfigSectionConfigData, ThrowOnError>,
+): RequestResult<ConsoleConfigSectionConfigResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ConsoleConfigSectionConfigResponses,
+    unknown,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/config',
+    ...options,
+  });
+
+/**
+ * Flag
+ */
+export const consoleConfigSectionFlag = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleConfigSectionFlagData, ThrowOnError>,
+): RequestResult<
+  ConsoleConfigSectionFlagResponses,
+  ConsoleConfigSectionFlagErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleConfigSectionFlagResponses,
+    ConsoleConfigSectionFlagErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleConfigSectionFlagBody,
+          path: zConsoleConfigSectionFlagPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/config/flags/{name}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * List Changesets
+ */
+export const consoleDataListChangesets = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleDataListChangesetsData, ThrowOnError>,
+): RequestResult<
+  ConsoleDataListChangesetsResponses,
+  ConsoleDataListChangesetsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    ConsoleDataListChangesetsResponses,
+    ConsoleDataListChangesetsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zConsoleDataListChangesetsQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/data/changesets',
+    ...options,
+  });
+
+/**
+ * Create Changeset
+ */
+export const consoleDataCreateChangeset = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ConsoleDataCreateChangesetData, ThrowOnError>,
+): RequestResult<
+  ConsoleDataCreateChangesetResponses,
+  ConsoleDataCreateChangesetErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleDataCreateChangesetResponses,
+    ConsoleDataCreateChangesetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleDataCreateChangesetBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/data/changesets',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get Changeset
+ */
+export const consoleDataGetChangeset = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleDataGetChangesetData, ThrowOnError>,
+): RequestResult<
+  ConsoleDataGetChangesetResponses,
+  ConsoleDataGetChangesetErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ConsoleDataGetChangesetResponses,
+    ConsoleDataGetChangesetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zConsoleDataGetChangesetPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/data/changesets/{cid}',
+    ...options,
+  });
+
+/**
+ * Apply Changeset
+ */
+export const consoleDataApplyChangeset = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleDataApplyChangesetData, ThrowOnError>,
+): RequestResult<
+  ConsoleDataApplyChangesetResponses,
+  ConsoleDataApplyChangesetErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleDataApplyChangesetResponses,
+    ConsoleDataApplyChangesetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleDataApplyChangesetBody,
+          path: zConsoleDataApplyChangesetPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/data/changesets/{cid}/apply',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Discard Changeset
+ */
+export const consoleDataDiscardChangeset = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ConsoleDataDiscardChangesetData, ThrowOnError>,
+): RequestResult<
+  ConsoleDataDiscardChangesetResponses,
+  ConsoleDataDiscardChangesetErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleDataDiscardChangesetResponses,
+    ConsoleDataDiscardChangesetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zConsoleDataDiscardChangesetPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/data/changesets/{cid}/discard',
+    ...options,
+  });
+
+/**
+ * Tables
+ */
+export const consoleDataTables = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleDataTablesData, ThrowOnError>,
+): RequestResult<ConsoleDataTablesResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ConsoleDataTablesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/data/tables',
+    ...options,
+  });
+
+/**
+ * Table Detail
+ */
+export const consoleDataTableDetail = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleDataTableDetailData, ThrowOnError>,
+): RequestResult<
+  ConsoleDataTableDetailResponses,
+  ConsoleDataTableDetailErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ConsoleDataTableDetailResponses,
+    ConsoleDataTableDetailErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zConsoleDataTableDetailPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/data/tables/{name}',
+    ...options,
+  });
+
+/**
+ * Bulk
+ */
+export const consoleDataBulk = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleDataBulkData, ThrowOnError>,
+): RequestResult<
+  ConsoleDataBulkResponses,
+  ConsoleDataBulkErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleDataBulkResponses,
+    ConsoleDataBulkErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleDataBulkBody,
+          path: zConsoleDataBulkPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/data/tables/{name}/bulk',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Export
+ */
+export const consoleDataExport = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleDataExportData, ThrowOnError>,
+): RequestResult<
+  ConsoleDataExportResponses,
+  ConsoleDataExportErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ConsoleDataExportResponses,
+    ConsoleDataExportErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zConsoleDataExportPath,
+          query: zConsoleDataExportQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/data/tables/{name}/export',
+    ...options,
+  });
+
+/**
+ * Rows
+ */
+export const consoleDataRows = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleDataRowsData, ThrowOnError>,
+): RequestResult<
+  ConsoleDataRowsResponses,
+  ConsoleDataRowsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ConsoleDataRowsResponses,
+    ConsoleDataRowsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zConsoleDataRowsPath,
+          query: zConsoleDataRowsQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/data/tables/{name}/rows',
+    ...options,
+  });
+
+/**
+ * Row
+ */
+export const consoleDataRow = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleDataRowData, ThrowOnError>,
+): RequestResult<ConsoleDataRowResponses, ConsoleDataRowErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    ConsoleDataRowResponses,
+    ConsoleDataRowErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zConsoleDataRowPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/data/tables/{name}/rows/{pk}',
+    ...options,
+  });
+
+/**
+ * Events
+ */
+export const consoleOverviewEvents = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleOverviewEventsData, ThrowOnError>,
+): RequestResult<
+  ConsoleOverviewEventsResponses,
+  ConsoleOverviewEventsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    ConsoleOverviewEventsResponses,
+    ConsoleOverviewEventsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zConsoleOverviewEventsQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/events',
+    ...options,
+  });
+
+/**
+ * Health
+ */
+export const consoleOverviewHealth = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleOverviewHealthData, ThrowOnError>,
+): RequestResult<
+  ConsoleOverviewHealthResponses,
+  ConsoleOverviewHealthErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    ConsoleOverviewHealthResponses,
+    ConsoleOverviewHealthErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zConsoleOverviewHealthQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/health',
+    ...options,
+  });
+
+/**
+ * Server
+ */
+export const consoleOverviewServer = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleOverviewServerData, ThrowOnError>,
+): RequestResult<ConsoleOverviewServerResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ConsoleOverviewServerResponses,
+    unknown,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/health/server',
+    ...options,
+  });
+
+/**
+ * List Sources
+ */
+export const consoleLogsListSources = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleLogsListSourcesData, ThrowOnError>,
+): RequestResult<ConsoleLogsListSourcesResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ConsoleLogsListSourcesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/logs/sources',
+    ...options,
+  });
+
+/**
+ * Tail
+ */
+export const consoleLogsTail = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleLogsTailData, ThrowOnError>,
+): RequestResult<
+  ConsoleLogsTailResponses,
+  ConsoleLogsTailErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ConsoleLogsTailResponses,
+    ConsoleLogsTailErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zConsoleLogsTailPath,
+          query: zConsoleLogsTailQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/logs/{source}',
+    ...options,
+  });
+
+/**
+ * Manifest
+ */
+export const consoleOverviewManifest = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleOverviewManifestData, ThrowOnError>,
+): RequestResult<ConsoleOverviewManifestResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ConsoleOverviewManifestResponses,
+    unknown,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/manifest',
+    ...options,
+  });
+
+/**
+ * Explain
+ */
+export const consoleQueryExplain = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleQueryExplainData, ThrowOnError>,
+): RequestResult<
+  ConsoleQueryExplainResponses,
+  ConsoleQueryExplainErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleQueryExplainResponses,
+    ConsoleQueryExplainErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleQueryExplainBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/query/explain',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * History
+ */
+export const consoleQueryHistory = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleQueryHistoryData, ThrowOnError>,
+): RequestResult<
+  ConsoleQueryHistoryResponses,
+  ConsoleQueryHistoryErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    ConsoleQueryHistoryResponses,
+    ConsoleQueryHistoryErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zConsoleQueryHistoryQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/query/history',
+    ...options,
+  });
+
+/**
+ * Run
+ */
+export const consoleQueryRun = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleQueryRunData, ThrowOnError>,
+): RequestResult<
+  ConsoleQueryRunResponses,
+  ConsoleQueryRunErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleQueryRunResponses,
+    ConsoleQueryRunErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleQueryRunBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/query/run',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Saved
+ */
+export const consoleQuerySaved = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleQuerySavedData, ThrowOnError>,
+): RequestResult<ConsoleQuerySavedResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ConsoleQuerySavedResponses,
+    unknown,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/query/saved',
+    ...options,
+  });
+
+/**
+ * Save
+ */
+export const consoleQuerySave = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleQuerySaveData, ThrowOnError>,
+): RequestResult<
+  ConsoleQuerySaveResponses,
+  ConsoleQuerySaveErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleQuerySaveResponses,
+    ConsoleQuerySaveErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleQuerySaveBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/query/saved',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete Saved
+ */
+export const consoleQueryDeleteSaved = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleQueryDeleteSavedData, ThrowOnError>,
+): RequestResult<
+  ConsoleQueryDeleteSavedResponses,
+  ConsoleQueryDeleteSavedErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    ConsoleQueryDeleteSavedResponses,
+    ConsoleQueryDeleteSavedErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zConsoleQueryDeleteSavedPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/query/saved/{qid}',
+    ...options,
+  });
+
+/**
+ * Update Saved
+ */
+export const consoleQueryUpdateSaved = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleQueryUpdateSavedData, ThrowOnError>,
+): RequestResult<
+  ConsoleQueryUpdateSavedResponses,
+  ConsoleQueryUpdateSavedErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    ConsoleQueryUpdateSavedResponses,
+    ConsoleQueryUpdateSavedErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleQueryUpdateSavedBody,
+          path: zConsoleQueryUpdateSavedPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/query/saved/{qid}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Dictionary
+ */
+export const consoleSchemaDictionary = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleSchemaDictionaryData, ThrowOnError>,
+): RequestResult<ConsoleSchemaDictionaryResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ConsoleSchemaDictionaryResponses,
+    unknown,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/schema/dictionary',
+    ...options,
+  });
+
+/**
+ * Schema Map
+ */
+export const consoleSchemaSchemaMap = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleSchemaSchemaMapData, ThrowOnError>,
+): RequestResult<ConsoleSchemaSchemaMapResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ConsoleSchemaSchemaMapResponses,
+    unknown,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/schema/map',
+    ...options,
+  });
+
+/**
+ * Migration State
+ */
+export const consoleSchemaMigrationState = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<ConsoleSchemaMigrationStateData, ThrowOnError>,
+): RequestResult<ConsoleSchemaMigrationStateResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ConsoleSchemaMigrationStateResponses,
+    unknown,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/schema/migrations',
+    ...options,
+  });
+
+/**
+ * Plan
+ */
+export const consoleSchemaPlan = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleSchemaPlanData, ThrowOnError>,
+): RequestResult<
+  ConsoleSchemaPlanResponses,
+  ConsoleSchemaPlanErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleSchemaPlanResponses,
+    ConsoleSchemaPlanErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleSchemaPlanBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/schema/migrations/plan',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Upgrade
+ */
+export const consoleSchemaUpgrade = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleSchemaUpgradeData, ThrowOnError>,
+): RequestResult<
+  ConsoleSchemaUpgradeResponses,
+  ConsoleSchemaUpgradeErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleSchemaUpgradeResponses,
+    ConsoleSchemaUpgradeErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleSchemaUpgradeBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/schema/migrations/upgrade',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Rerun Failed
+ */
+export const consoleTestsRerunFailed = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleTestsRerunFailedData, ThrowOnError>,
+): RequestResult<ConsoleTestsRerunFailedResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).post<
+    ConsoleTestsRerunFailedResponses,
+    unknown,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/tests/rerun-failed',
+    ...options,
+  });
+
+/**
+ * Run
+ */
+export const consoleTestsRun = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleTestsRunData, ThrowOnError>,
+): RequestResult<
+  ConsoleTestsRunResponses,
+  ConsoleTestsRunErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).post<
+    ConsoleTestsRunResponses,
+    ConsoleTestsRunErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleTestsRunBody.optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/tests/run',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options?.headers,
+    },
+  });
+
+/**
+ * Runs
+ */
+export const consoleTestsRuns = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleTestsRunsData, ThrowOnError>,
+): RequestResult<
+  ConsoleTestsRunsResponses,
+  ConsoleTestsRunsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    ConsoleTestsRunsResponses,
+    ConsoleTestsRunsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zConsoleTestsRunsQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/tests/runs',
+    ...options,
+  });
+
+/**
+ * Run Status
+ */
+export const consoleTestsRunStatus = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleTestsRunStatusData, ThrowOnError>,
+): RequestResult<
+  ConsoleTestsRunStatusResponses,
+  ConsoleTestsRunStatusErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ConsoleTestsRunStatusResponses,
+    ConsoleTestsRunStatusErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zConsoleTestsRunStatusPath,
+          query: zConsoleTestsRunStatusQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/tests/runs/{rid}',
+    ...options,
+  });
+
+/**
+ * Cancel
+ */
+export const consoleTestsCancel = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleTestsCancelData, ThrowOnError>,
+): RequestResult<
+  ConsoleTestsCancelResponses,
+  ConsoleTestsCancelErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleTestsCancelResponses,
+    ConsoleTestsCancelErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zConsoleTestsCancelPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/tests/runs/{rid}/cancel',
+    ...options,
+  });
+
+/**
+ * Run Log
+ */
+export const consoleTestsRunLog = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleTestsRunLogData, ThrowOnError>,
+): RequestResult<
+  ConsoleTestsRunLogResponses,
+  ConsoleTestsRunLogErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ConsoleTestsRunLogResponses,
+    ConsoleTestsRunLogErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zConsoleTestsRunLogPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/tests/runs/{rid}/log',
+    ...options,
+  });
+
+/**
+ * Tree
+ */
+export const consoleTestsTree = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleTestsTreeData, ThrowOnError>,
+): RequestResult<
+  ConsoleTestsTreeResponses,
+  ConsoleTestsTreeErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    ConsoleTestsTreeResponses,
+    ConsoleTestsTreeErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zConsoleTestsTreeQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/tests/tree',
+    ...options,
+  });
+
+/**
+ * List Users
+ */
+export const consoleUsersListUsers = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleUsersListUsersData, ThrowOnError>,
+): RequestResult<ConsoleUsersListUsersResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ConsoleUsersListUsersResponses,
+    unknown,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/users',
+    ...options,
+  });
+
+/**
+ * Roles
+ */
+export const consoleUsersRoles = <ThrowOnError extends boolean = false>(
+  options?: Options<ConsoleUsersRolesData, ThrowOnError>,
+): RequestResult<ConsoleUsersRolesResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ConsoleUsersRolesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/users/roles',
+    ...options,
+  });
+
+/**
+ * Revoke
+ */
+export const consoleUsersRevoke = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleUsersRevokeData, ThrowOnError>,
+): RequestResult<
+  ConsoleUsersRevokeResponses,
+  ConsoleUsersRevokeErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleUsersRevokeResponses,
+    ConsoleUsersRevokeErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleUsersRevokeBody,
+          path: zConsoleUsersRevokePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/users/tokens/{tid}/revoke',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Set Disabled
+ */
+export const consoleUsersSetDisabled = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleUsersSetDisabledData, ThrowOnError>,
+): RequestResult<
+  ConsoleUsersSetDisabledResponses,
+  ConsoleUsersSetDisabledErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleUsersSetDisabledResponses,
+    ConsoleUsersSetDisabledErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleUsersSetDisabledBody,
+          path: zConsoleUsersSetDisabledPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/users/{uid}/disabled',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Set Roles
+ */
+export const consoleUsersSetRoles = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleUsersSetRolesData, ThrowOnError>,
+): RequestResult<
+  ConsoleUsersSetRolesResponses,
+  ConsoleUsersSetRolesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleUsersSetRolesResponses,
+    ConsoleUsersSetRolesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleUsersSetRolesBody,
+          path: zConsoleUsersSetRolesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/users/{uid}/roles',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Issue
+ */
+export const consoleUsersIssue = <ThrowOnError extends boolean = false>(
+  options: Options<ConsoleUsersIssueData, ThrowOnError>,
+): RequestResult<
+  ConsoleUsersIssueResponses,
+  ConsoleUsersIssueErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ConsoleUsersIssueResponses,
+    ConsoleUsersIssueErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zConsoleUsersIssueBody,
+          path: zConsoleUsersIssuePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/console/users/{uid}/tokens',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Delete Deck Endpoint
  */
 export const deleteDeckEndpoint = <ThrowOnError extends boolean = false>(
@@ -1680,8 +3637,6 @@ export const deleteDeckEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zDeleteDeckEndpointResponse.parseAsync(data),
     url: '/api/decks/{deck_id}',
     ...options,
   });
@@ -1709,8 +3664,6 @@ export const getDeckEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zGetDeckEndpointResponse.parseAsync(data),
     url: '/api/decks/{deck_id}',
     ...options,
   });
@@ -1738,8 +3691,6 @@ export const updateDeckEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zUpdateDeckEndpointResponse.parseAsync(data),
     url: '/api/decks/{deck_id}',
     ...options,
     headers: {
@@ -1767,8 +3718,6 @@ export const exportDeckPptx = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zExportDeckPptxResponse.parseAsync(data),
     url: '/api/decks/{deck_id}/export.pptx',
     ...options,
   });
@@ -1782,12 +3731,8 @@ export const exportDeckPptx = <ThrowOnError extends boolean = false>(
  */
 export const seedDemo = <ThrowOnError extends boolean = false>(
   options?: Options<SeedDemoData, ThrowOnError>,
-): RequestResult<SeedDemoResponses, SeedDemoErrors, ThrowOnError> =>
-  (options?.client ?? client).post<
-    SeedDemoResponses,
-    SeedDemoErrors,
-    ThrowOnError
-  >({
+): RequestResult<SeedDemoResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).post<SeedDemoResponses, unknown, ThrowOnError>({
     requestValidator: async (data) =>
       await z
         .object({
@@ -1796,7 +3741,6 @@ export const seedDemo = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) => await zSeedDemoResponse.parseAsync(data),
     url: '/api/demo/seed',
     ...options,
   });
@@ -1926,7 +3870,9 @@ export const getOpenalephDocumentSync = <ThrowOnError extends boolean = false>(
 /**
  * Import Openaleph Document Entities
  *
- * Stage OpenAleph/ftm-analyze Mention entities for explicit reporter review.
+ * Stage the names, IBANs, emails and phones OpenAleph's ftm-analyze left on
+ * the document for explicit reporter review (ADR-0006). Reads what is
+ * there now; "Find names again" (…/openaleph/analyze) asks for a new run.
  */
 export const importOpenalephDocumentEntities = <
   ThrowOnError extends boolean = false,
@@ -1992,7 +3938,7 @@ export const importOpenalephDocumentEvidence = <
 /**
  * Refresh Openaleph Document Review
  *
- * Refresh OpenAleph Page + Mention candidates without auto-accepting either.
+ * Refresh OpenAleph page-text and name proposals without auto-accepting either.
  */
 export const refreshOpenalephDocumentReview = <
   ThrowOnError extends boolean = false,
@@ -2081,6 +4027,40 @@ export const syncOpenalephDocument = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zSyncOpenalephDocumentResponse.parseAsync(data),
     url: '/api/documents/{document_id}/corpus/openaleph/sync',
+    ...options,
+  });
+
+/**
+ * Analyze Openaleph Document
+ *
+ * "Find names again": OpenAleph analyses the document again
+ * (POST /api/2/entities/{id}/analyze) and what it finds becomes proposals,
+ * as a background job (ADR-0006). Answers 202 with the job while it runs;
+ * in developer mode (SQLite) the job has finished when this answers.
+ */
+export const analyzeOpenalephDocument = <ThrowOnError extends boolean = false>(
+  options: Options<AnalyzeOpenalephDocumentData, ThrowOnError>,
+): RequestResult<
+  AnalyzeOpenalephDocumentResponses,
+  AnalyzeOpenalephDocumentErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    AnalyzeOpenalephDocumentResponses,
+    AnalyzeOpenalephDocumentErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zAnalyzeOpenalephDocumentPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAnalyzeOpenalephDocumentResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/openaleph/analyze',
     ...options,
   });
 
@@ -2905,8 +4885,6 @@ export const getExtractionEntityMatches = <
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zGetExtractionEntityMatchesResponse.parseAsync(data),
     url: '/api/extraction-candidates/{candidate_id}/entity-matches',
     ...options,
   });
@@ -2941,6 +4919,38 @@ export const getExtractionCandidateExplanation = <
     responseValidator: async (data) =>
       await zGetExtractionCandidateExplanationResponse.parseAsync(data),
     url: '/api/extraction-candidates/{candidate_id}/explanation',
+    ...options,
+  });
+
+/**
+ * Get Identifier Targets
+ *
+ * The entities an email or phone proposal can belong to, this
+ * document's own first (ADR-0006). Accepting it needs one of them.
+ */
+export const getIdentifierTargets = <ThrowOnError extends boolean = false>(
+  options: Options<GetIdentifierTargetsData, ThrowOnError>,
+): RequestResult<
+  GetIdentifierTargetsResponses,
+  GetIdentifierTargetsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetIdentifierTargetsResponses,
+    GetIdentifierTargetsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetIdentifierTargetsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetIdentifierTargetsResponse.parseAsync(data),
+    url: '/api/extraction-candidates/{candidate_id}/identifier-targets',
     ...options,
   });
 
@@ -3013,8 +5023,8 @@ export const reviewExtractionCandidate = <ThrowOnError extends boolean = false>(
  */
 export const health = <ThrowOnError extends boolean = false>(
   options?: Options<HealthData, ThrowOnError>,
-): RequestResult<HealthResponses, HealthErrors, ThrowOnError> =>
-  (options?.client ?? client).get<HealthResponses, HealthErrors, ThrowOnError>({
+): RequestResult<HealthResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<HealthResponses, unknown, ThrowOnError>({
     requestValidator: async (data) =>
       await z
         .object({
@@ -3023,7 +5033,6 @@ export const health = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) => await zHealthResponse.parseAsync(data),
     url: '/api/health',
     ...options,
   });
@@ -3037,14 +5046,10 @@ export const openalephIntegrationStatus = <
   ThrowOnError extends boolean = false,
 >(
   options?: Options<OpenalephIntegrationStatusData, ThrowOnError>,
-): RequestResult<
-  OpenalephIntegrationStatusResponses,
-  OpenalephIntegrationStatusErrors,
-  ThrowOnError
-> =>
+): RequestResult<OpenalephIntegrationStatusResponses, unknown, ThrowOnError> =>
   (options?.client ?? client).get<
     OpenalephIntegrationStatusResponses,
-    OpenalephIntegrationStatusErrors,
+    unknown,
     ThrowOnError
   >({
     requestValidator: async (data) =>
@@ -3055,8 +5060,6 @@ export const openalephIntegrationStatus = <
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zOpenalephIntegrationStatusResponse.parseAsync(data),
     url: '/api/integrations/openaleph/status',
     ...options,
   });
@@ -3066,14 +5069,10 @@ export const openalephIntegrationStatus = <
  */
 export const listInvestigations = <ThrowOnError extends boolean = false>(
   options?: Options<ListInvestigationsData, ThrowOnError>,
-): RequestResult<
-  ListInvestigationsResponses,
-  ListInvestigationsErrors,
-  ThrowOnError
-> =>
+): RequestResult<ListInvestigationsResponses, unknown, ThrowOnError> =>
   (options?.client ?? client).get<
     ListInvestigationsResponses,
-    ListInvestigationsErrors,
+    unknown,
     ThrowOnError
   >({
     requestValidator: async (data) =>
@@ -3180,8 +5179,6 @@ export const listInvestigationAiAnalysisCandidates = <
           query: zListInvestigationAiAnalysisCandidatesQuery.optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zListInvestigationAiAnalysisCandidatesResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/ai-analysis-candidates',
     ...options,
   });
@@ -3216,8 +5213,6 @@ export const investigationCaseSynthesis = <
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zInvestigationCaseSynthesisResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/assistant/case-synthesis',
     ...options,
     headers: {
@@ -3253,8 +5248,6 @@ export const investigationQuestionContext = <
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zInvestigationQuestionContextResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/assistant/context',
     ...options,
     headers: {
@@ -3292,8 +5285,6 @@ export const investigationHypothesisTest = <
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zInvestigationHypothesisTestResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/assistant/hypothesis-test',
     ...options,
     headers: {
@@ -3336,8 +5327,6 @@ export const investigationPresentationDraft = <
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zInvestigationPresentationDraftResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/assistant/presentation-draft',
     ...options,
     headers: {
@@ -3452,8 +5441,6 @@ export const getOpenalephCorpusBinding = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zGetOpenalephCorpusBindingResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/corpus/openaleph',
     ...options,
   });
@@ -3483,8 +5470,6 @@ export const ensureOpenalephCorpusBinding = <
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zEnsureOpenalephCorpusBindingResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/corpus/openaleph/ensure',
     ...options,
   });
@@ -3520,8 +5505,6 @@ export const listOpenalephCorpusFailures = <
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zListOpenalephCorpusFailuresResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/corpus/openaleph/failures',
     ...options,
   });
@@ -3549,8 +5532,6 @@ export const listDecksEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zListDecksEndpointResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/decks',
     ...options,
   });
@@ -3688,8 +5669,6 @@ export const exportInvestigation = <ThrowOnError extends boolean = false>(
           query: zExportInvestigationQuery.optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zExportInvestigationResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/export',
     ...options,
   });
@@ -4017,8 +5996,6 @@ export const listWriteupsEndpoint = <ThrowOnError extends boolean = false>(
           query: zListWriteupsEndpointQuery.optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zListWriteupsEndpointResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/writeups',
     ...options,
   });
@@ -4322,14 +6299,10 @@ export const linkLead = <ThrowOnError extends boolean = false>(
  */
 export const presentationStyles = <ThrowOnError extends boolean = false>(
   options?: Options<PresentationStylesData, ThrowOnError>,
-): RequestResult<
-  PresentationStylesResponses,
-  PresentationStylesErrors,
-  ThrowOnError
-> =>
+): RequestResult<PresentationStylesResponses, unknown, ThrowOnError> =>
   (options?.client ?? client).get<
     PresentationStylesResponses,
-    PresentationStylesErrors,
+    unknown,
     ThrowOnError
   >({
     requestValidator: async (data) =>
@@ -4340,8 +6313,6 @@ export const presentationStyles = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zPresentationStylesResponse.parseAsync(data),
     url: '/api/presentation-styles',
     ...options,
   });
@@ -4411,14 +6382,10 @@ export const getRecordProvenanceTrace = <ThrowOnError extends boolean = false>(
  */
 export const relationshipSchemas = <ThrowOnError extends boolean = false>(
   options?: Options<RelationshipSchemasData, ThrowOnError>,
-): RequestResult<
-  RelationshipSchemasResponses,
-  RelationshipSchemasErrors,
-  ThrowOnError
-> =>
+): RequestResult<RelationshipSchemasResponses, unknown, ThrowOnError> =>
   (options?.client ?? client).get<
     RelationshipSchemasResponses,
-    RelationshipSchemasErrors,
+    unknown,
     ThrowOnError
   >({
     requestValidator: async (data) =>
@@ -4429,8 +6396,6 @@ export const relationshipSchemas = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zRelationshipSchemasResponse.parseAsync(data),
     url: '/api/relationship-schemas',
     ...options,
   });
@@ -4898,14 +6863,10 @@ export const getSecurityAuditRetentionPreview = <
  */
 export const getSecurityAuditSummary = <ThrowOnError extends boolean = false>(
   options?: Options<GetSecurityAuditSummaryData, ThrowOnError>,
-): RequestResult<
-  GetSecurityAuditSummaryResponses,
-  GetSecurityAuditSummaryErrors,
-  ThrowOnError
-> =>
+): RequestResult<GetSecurityAuditSummaryResponses, unknown, ThrowOnError> =>
   (options?.client ?? client).get<
     GetSecurityAuditSummaryResponses,
-    GetSecurityAuditSummaryErrors,
+    unknown,
     ThrowOnError
   >({
     requestValidator: async (data) =>
@@ -4927,25 +6888,21 @@ export const getSecurityAuditSummary = <ThrowOnError extends boolean = false>(
  */
 export const listAppUsers = <ThrowOnError extends boolean = false>(
   options?: Options<ListAppUsersData, ThrowOnError>,
-): RequestResult<ListAppUsersResponses, ListAppUsersErrors, ThrowOnError> =>
-  (options?.client ?? client).get<
-    ListAppUsersResponses,
-    ListAppUsersErrors,
-    ThrowOnError
-  >({
-    requestValidator: async (data) =>
-      await z
-        .object({
-          body: z.never().optional(),
-          path: z.never().optional(),
-          query: z.never().optional(),
-        })
-        .parseAsync(data),
-    responseValidator: async (data) =>
-      await zListAppUsersResponse.parseAsync(data),
-    url: '/api/settings/security/users',
-    ...options,
-  });
+): RequestResult<ListAppUsersResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<ListAppUsersResponses, unknown, ThrowOnError>(
+    {
+      requestValidator: async (data) =>
+        await z
+          .object({
+            body: z.never().optional(),
+            path: z.never().optional(),
+            query: z.never().optional(),
+          })
+          .parseAsync(data),
+      url: '/api/settings/security/users',
+      ...options,
+    },
+  );
 
 /**
  * Create App User
@@ -4966,8 +6923,6 @@ export const createAppUser = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zCreateAppUserResponse.parseAsync(data),
     url: '/api/settings/security/users',
     ...options,
     headers: {
@@ -4995,8 +6950,6 @@ export const updateAppUser = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zUpdateAppUserResponse.parseAsync(data),
     url: '/api/settings/security/users/{user_id}',
     ...options,
     headers: {
@@ -5061,8 +7014,6 @@ export const putInvestigationMembership = <
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zPutInvestigationMembershipResponse.parseAsync(data),
     url: '/api/settings/security/users/{user_id}/investigations/{investigation_id}',
     ...options,
     headers: {
@@ -5094,8 +7045,6 @@ export const revokeAppUserToken = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zRevokeAppUserTokenResponse.parseAsync(data),
     url: '/api/settings/security/users/{user_id}/token/revoke',
     ...options,
   });
@@ -5123,8 +7072,6 @@ export const rotateAppUserToken = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zRotateAppUserTokenResponse.parseAsync(data),
     url: '/api/settings/security/users/{user_id}/token/rotate',
     ...options,
   });
@@ -5134,10 +7081,10 @@ export const rotateAppUserToken = <ThrowOnError extends boolean = false>(
  */
 export const settingsStatus = <ThrowOnError extends boolean = false>(
   options?: Options<SettingsStatusData, ThrowOnError>,
-): RequestResult<SettingsStatusResponses, SettingsStatusErrors, ThrowOnError> =>
+): RequestResult<SettingsStatusResponses, unknown, ThrowOnError> =>
   (options?.client ?? client).get<
     SettingsStatusResponses,
-    SettingsStatusErrors,
+    unknown,
     ThrowOnError
   >({
     requestValidator: async (data) =>
@@ -5165,14 +7112,10 @@ export const settingsStatus = <ThrowOnError extends boolean = false>(
  */
 export const getOrphanStoragePreview = <ThrowOnError extends boolean = false>(
   options?: Options<GetOrphanStoragePreviewData, ThrowOnError>,
-): RequestResult<
-  GetOrphanStoragePreviewResponses,
-  GetOrphanStoragePreviewErrors,
-  ThrowOnError
-> =>
+): RequestResult<GetOrphanStoragePreviewResponses, unknown, ThrowOnError> =>
   (options?.client ?? client).get<
     GetOrphanStoragePreviewResponses,
-    GetOrphanStoragePreviewErrors,
+    unknown,
     ThrowOnError
   >({
     requestValidator: async (data) =>
@@ -5346,8 +7289,6 @@ export const createWriteupEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zCreateWriteupEndpointResponse.parseAsync(data),
     url: '/api/writeups',
     ...options,
     headers: {
@@ -5379,8 +7320,6 @@ export const deleteWriteupEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zDeleteWriteupEndpointResponse.parseAsync(data),
     url: '/api/writeups/{writeup_id}',
     ...options,
   });
@@ -5408,8 +7347,6 @@ export const getWriteupEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zGetWriteupEndpointResponse.parseAsync(data),
     url: '/api/writeups/{writeup_id}',
     ...options,
   });
@@ -5437,8 +7374,6 @@ export const updateWriteupEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zUpdateWriteupEndpointResponse.parseAsync(data),
     url: '/api/writeups/{writeup_id}',
     ...options,
     headers: {
@@ -5470,8 +7405,6 @@ export const exportWriteupDocx = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
-    responseValidator: async (data) =>
-      await zExportWriteupDocxResponse.parseAsync(data),
     url: '/api/writeups/{writeup_id}/export.docx',
     ...options,
   });

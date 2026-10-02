@@ -264,6 +264,8 @@ class ExtractionCandidateReviewRequest(BaseModel):
     confidence: float | None = None
     matched_entity_id: str | None = None
     entity_identity_decision: str | None = None
+    # Accepting an email or phone proposal: the entity it belongs to (ADR-0006).
+    target_entity_id: str | None = None
 
 
 # TAS CONTROL_SURFACE §4 flags. Literal types put the value tables in the OpenAPI

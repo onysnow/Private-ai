@@ -115,9 +115,16 @@ get through. If setup fails, check
 For front-end work, `cd frontend && npm run dev` serves the screen with hot reload
 at `http://localhost:3000`, talking to the API at `http://localhost:8000`.
 
-Name proposals come from OpenAleph's `ftm-analyze` when it returns them, and
-from the Workbench's own name-finder while `ENABLE_LOCAL_ENTITY_SUGGESTIONS`
-is true (the default). To leave names to OpenAleph alone:
+Name proposals come from OpenAleph's `ftm-analyze`
+([ADR-0006](docs/adr/0006-openaleph-used-in-full.md)): after OpenAleph reads a
+document, the read waits for its analysis (at most
+`OPENALEPH_ANALYSIS_TIMEOUT_SECONDS`) and every person, company, place, IBAN,
+email address and phone number it found becomes a proposal, shown in the
+document's own spelling at its place in the text. An email address or phone
+number is accepted by choosing the entity it belongs to. **Find names again**
+on a document asks OpenAleph to analyse it again. The Workbench's own
+pattern name-finder runs only for documents OpenAleph did not analyse;
+to switch it off entirely:
 
 ```bash
 ENABLE_LOCAL_ENTITY_SUGGESTIONS=false docker compose up --build

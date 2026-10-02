@@ -5,8 +5,9 @@ from typing import Iterable
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.core.time import utcnow_naive
-from app.models.domain import Document, DocumentChunk, ExtractionCandidate, Source, Evidence, Claim, ClaimEvidenceLink, Entity, Statement, Investigation, RelationshipEdge
+from app.models.domain import Document, DocumentChunk, DocumentCorpusSync, ExtractionCandidate, Source, Evidence, Claim, ClaimEvidenceLink, Entity, Statement, Investigation, RelationshipEdge
 from app.services.ftm import make_ftm_entity
+from app.services.identifier_proposals import accept_identifier
 from app.services.security import contained_path, resolve_storage_root
 from app.services.resolution import candidate_entities
 from app.services.pdf_ocr import extract_pdf_chunks
@@ -199,13 +200,19 @@ def store_document(db: Session, *, investigation_id: str, title: str, filename: 
             pass
 
 
-def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], list[str]] | None = None) -> Document | None:
+def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], list[str]] | None = None,
+                     find_names: bool = True) -> Document | None:
     """Turn a stored document into locator-preserving chunks and proposals.
 
     ``text`` is text already read elsewhere (OpenAleph; see
     app/services/openaleph_reader.py) as ``(chunks, issues)``; a chunk may
     carry a ``provenance`` dict, which every proposal made from it records.
     Without it the Workbench reads the file itself.
+
+    ``find_names`` runs the Workbench's own pattern name-finder (when
+    ENABLE_LOCAL_ENTITY_SUGGESTIONS is on). The caller turns it off when
+    OpenAleph's ftm-analyze has analysed the document: the pattern finder is
+    the fallback only (ADR-0004, decision 5; ADR-0006).
 
     Returns None when the document (or its investigation) was deleted before
     this ran. Extraction failures remain a valid committed document state: the
@@ -231,7 +238,7 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
             provenance = item.pop('provenance', None)
             chunk = DocumentChunk(document_id=doc.id, ordinal=ordinal, **item)
             db.add(chunk); db.flush()
-            for typ, payload, conf in _candidate_payloads(chunk, include_entities=settings.enable_local_entity_suggestions):
+            for typ, payload, conf in _candidate_payloads(chunk, include_entities=find_names and settings.enable_local_entity_suggestions):
                 if provenance:
                     payload = {**payload, 'provenance': provenance}
                 db.add(ExtractionCandidate(investigation_id=doc.investigation_id, document_id=doc.id, chunk_id=chunk.id, candidate_type=typ, payload=payload, confidence=conf))
@@ -252,12 +259,29 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
     return doc
 
 
-def serialize_document(db: Session, doc: Document) -> dict:
+def openaleph_document_ids(db: Session, document_ids: Iterable[str]) -> dict[str, str]:
+    """OpenAleph's id for each of these documents that OpenAleph holds, in one query."""
+    ids = list(document_ids)
+    if not ids:
+        return {}
+    rows = db.scalars(select(DocumentCorpusSync).where(
+        DocumentCorpusSync.document_id.in_(ids), DocumentCorpusSync.provider == 'openaleph',
+        DocumentCorpusSync.status == 'synced', DocumentCorpusSync.provider_record_id.is_not(None))).all()
+    return {row.document_id: str(row.provider_record_id) for row in rows}
+
+
+def serialize_document(db: Session, doc: Document, *, openaleph_ids: dict[str, str] | None = None) -> dict:
+    """``openaleph_document_id`` is OpenAleph's id for the document when
+    OpenAleph holds it (ADR-0006: names, similar documents and threads come
+    from there). A list passes ``openaleph_ids``, looked up for all its rows
+    at once (openaleph_document_ids)."""
     chunks = db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == doc.id).order_by(DocumentChunk.ordinal)).all()
     candidates = db.scalars(select(ExtractionCandidate).where(ExtractionCandidate.document_id == doc.id).order_by(ExtractionCandidate.created_at)).all()
     counts: dict[str, int] = {}
     for c in candidates: counts[c.candidate_type] = counts.get(c.candidate_type,0)+1
-    return {'id':doc.id,'investigation_id':doc.investigation_id,'source_id':doc.source_id,'filename':doc.filename,'mime_type':doc.mime_type,'sha256':doc.sha256,'extraction_status':doc.extraction_status,'extraction_error':doc.extraction_error,'extraction_issues':doc.extraction_issues or [],'created_at':doc.created_at,'chunk_count':len(chunks),'candidate_counts':counts}
+    known = openaleph_ids if openaleph_ids is not None else openaleph_document_ids(db, [doc.id])
+    return {'id':doc.id,'investigation_id':doc.investigation_id,'source_id':doc.source_id,'filename':doc.filename,'mime_type':doc.mime_type,'sha256':doc.sha256,'extraction_status':doc.extraction_status,'extraction_error':doc.extraction_error,'extraction_issues':doc.extraction_issues or [],'created_at':doc.created_at,'chunk_count':len(chunks),'candidate_counts':counts,
+            'openaleph_document_id':known.get(doc.id)}
 
 
 def serialize_chunk(chunk: DocumentChunk) -> dict:
@@ -287,7 +311,13 @@ def serialize_extraction_lineage(db: Session, candidate: ExtractionCandidate) ->
     source = db.get(Source, doc.source_id) if doc else None
     locator = chunk.locator if chunk else None
     provenance = (candidate.payload or {}).get('provenance') if isinstance(candidate.payload, dict) else None
-    extraction_method = ((provenance or {}).get('extraction_method') if isinstance(provenance, dict) else None) or ('ocr' if locator and '(OCR)' in locator else ('native_pdf' if doc and (doc.mime_type == 'application/pdf' or doc.filename.lower().endswith('.pdf')) else 'native_text'))
+    recorded_method: object = None
+    if isinstance(provenance, dict):
+        # A name OpenAleph found was located in a chunk read earlier; the
+        # chunk's own reading method is recorded beside it (openaleph_analysis.py).
+        recorded_method = (provenance.get('chunk_extraction_method') if provenance.get('extraction_method') == 'openaleph_ftm_analyze'
+                           else provenance.get('extraction_method'))
+    extraction_method = (recorded_method if isinstance(recorded_method, str) and recorded_method else None) or ('ocr' if locator and '(OCR)' in locator else ('native_pdf' if doc and (doc.mime_type == 'application/pdf' or doc.filename.lower().endswith('.pdf')) else 'native_text'))
     return {
         'candidate': {
             'id': candidate.id, 'investigation_id': candidate.investigation_id,
@@ -388,7 +418,7 @@ def preview_entity_candidate_matches(db: Session, candidate: ExtractionCandidate
         'identity_rule': 'Provider resolution is a lead only. Reporter must choose same, different, or create_new.',
     }
 
-def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: str, note: str|None=None, entity_schema: str|None=None, caption: str|None=None, claim_status: str='lead', confidence: float|None=None, matched_entity_id: str|None=None, entity_identity_decision: str|None=None) -> dict:
+def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: str, note: str|None=None, entity_schema: str|None=None, caption: str|None=None, claim_status: str='lead', confidence: float|None=None, matched_entity_id: str|None=None, entity_identity_decision: str|None=None, target_entity_id: str|None=None) -> dict:
     if candidate.review_status != 'proposed':
         raise ValueError('Candidate has already been reviewed')
     if decision not in {'accept','reject'}: raise ValueError('Decision must be accept or reject')
@@ -410,6 +440,7 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
     claim_record: Claim | None = None
     entity_record: Entity | None = None
     edge_record: RelationshipEdge | None = None
+    statement_record: Statement | None = None
     accepted_id: str
     if candidate.candidate_type=='evidence':
         evidence_quote = candidate.payload.get('quote')
@@ -486,7 +517,13 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
             collection_id = str(provenance.get('collection_id') or '').strip()
             provider_entity_id = str(provenance.get('provider_entity_id') or '').strip()
             dataset = f'{provider}:{collection_id}' if collection_id else provider
-            statement_origin = f'{provider}:entity:{provider_entity_id}' if provider_entity_id else origin
+            # A name the Workbench found again in the document text points at
+            # that exact place; one it could not find points at the provider's
+            # record of the document (openaleph_analysis.import_analysis_proposals).
+            if chunk is not None and span_suffix:
+                statement_origin = origin
+            else:
+                statement_origin = f'{provider}:entity:{provider_entity_id}' if provider_entity_id else origin
         else:
             dataset = f'document:{doc.id}'
             statement_origin = origin
@@ -516,6 +553,11 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
             origin=f'extraction-candidate:{candidate.id}', evidence_id=evidence_id, commit=False,
         )
         rtype='relationship'; accepted_id=edge_record.id
+    elif candidate.candidate_type=='identifier':
+        # An email or phone number found by OpenAleph: the reporter chose
+        # whose it is; it becomes a statement on that entity (identifier_proposals.py).
+        statement_record = accept_identifier(db, candidate, doc, origin=origin, target_entity_id=target_entity_id)
+        rtype='statement'; accepted_id=statement_record.id
     else: raise ValueError('Unsupported candidate type')
     candidate.review_status='accepted'; candidate.accepted_record_type=rtype; candidate.accepted_record_id=accepted_id
     db.commit(); db.refresh(candidate)
@@ -527,6 +569,10 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
     elif edge_record is not None:
         from app.services.relationships import serialize_relationship
         record_out = serialize_relationship(db, edge_record)
+    elif statement_record is not None:
+        record_out = {'id': statement_record.id, 'entity_id': statement_record.entity_id, 'prop': statement_record.prop,
+                      'value': statement_record.value, 'dataset': statement_record.dataset, 'origin': statement_record.origin,
+                      'original_value': statement_record.original_value}
     else:
         assert evidence_record is not None
         record_out = {'id': evidence_record.id, 'source_id': evidence_record.source_id, 'quote': evidence_record.quote, 'locator': evidence_record.locator, 'notes': evidence_record.notes}

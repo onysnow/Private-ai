@@ -14,6 +14,7 @@ from app.schemas.api import AppUserCreate, AppUserUpdate
 from app.core.audit_log import recent_security_denials
 from app.services.credentials import credential_status, remove_secret, set_secret
 from app.services.identity import token_digest
+from app.services.openaleph_reader import reading_with_openaleph
 from app.services.pdf_ocr import ocr_runtime_status
 from app.services.security import redact_database_url, resolve_storage_root
 
@@ -59,7 +60,10 @@ def get_settings_status(db: Session, *, local: bool = True) -> dict:
             "pdf_ocr_dpi": settings.pdf_ocr_dpi,
             "pdf_ocr_min_native_chars": settings.pdf_ocr_min_native_chars,
             "local_entity_suggestions_enabled": settings.enable_local_entity_suggestions,
-            "entity_extraction_owner": "workbench_local" if settings.enable_local_entity_suggestions else "openaleph_ftm_analyze",
+            # Who finds names in uploads: OpenAleph's ftm-analyze whenever
+            # OpenAleph reads them (ADR-0006); the Workbench's own pattern
+            # finder is then only the fallback for documents it did not analyse.
+            "entity_extraction_owner": "openaleph_ftm_analyze" if reading_with_openaleph() else "workbench_local",
             "ocr_runtime": ({
                 "available": ocr.available,
                 "tessdata": ocr.tessdata,

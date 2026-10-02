@@ -161,7 +161,9 @@ export function SecurityPanel({settingsStatus, providers}: Props): ReactElement 
     <div><small>Environment: {settingsStatus.environment}</small></div>
     <div><small>Database: {settingsStatus.database}</small></div>
     <div><small>Document storage: {settingsStatus.document_storage_dir}</small></div>
-    <div><small>Entity extraction owner: {settingsStatus.document_extraction.entity_extraction_owner === 'openaleph_ftm_analyze' ? 'OpenAleph / ftm-analyze (local duplicate detector disabled)' : 'Workbench local fallback'}</small></div>
+    <div><small>Entity extraction owner: {settingsStatus.document_extraction.entity_extraction_owner === 'openaleph_ftm_analyze'
+      ? `OpenAleph / ftm-analyze (the Workbench's own name-finder only for documents OpenAleph did not analyse${settingsStatus.document_extraction.local_entity_suggestions_enabled ? '' : '; switched off'})`
+      : `Workbench's own name-finder${settingsStatus.document_extraction.local_entity_suggestions_enabled ? '' : ' (switched off)'}`}</small></div>
     <div><small>Allowed browser origins: {settingsStatus.cors_allowed_origins.join(', ') || 'none'}</small></div>
     <div><small>Connector credentials: {Object.entries(settingsStatus.connectors).map(([name, status]) => `${providerLabel(name)}: ${status.configured ? 'configured' : 'not configured'} (${status.source || 'unknown source'})`).join(' · ')}</small></div>
     <div><small>Restore API: {settingsStatus.restore_api_enabled ? 'enabled' : 'disabled by default'}</small></div>
