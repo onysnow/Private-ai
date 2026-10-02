@@ -27,14 +27,19 @@
 // literal below now traces to the real current Dark Academia tokens.
 
 import * as echarts from 'echarts/core';
-import {CustomChart, LineChart, SankeyChart} from 'echarts/charts';
-import {DataZoomComponent, GridComponent, LegendComponent, TooltipComponent} from 'echarts/components';
+import {BarChart, CustomChart, LineChart, SankeyChart} from 'echarts/charts';
+import {AriaComponent, DataZoomComponent, GridComponent, LegendComponent, TitleComponent, TooltipComponent} from 'echarts/components';
 import {CanvasRenderer} from 'echarts/renderers';
 
 echarts.use([
   SankeyChart,
   CustomChart,
   LineChart,
+  // Checked presentation charts (backend/app/visuals/echarts.py): bars, a
+  // title and source line, and the aria description the checker requires.
+  BarChart,
+  TitleComponent,
+  AriaComponent,
   TooltipComponent,
   GridComponent,
   DataZoomComponent,

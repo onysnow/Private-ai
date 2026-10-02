@@ -71,8 +71,13 @@ export type BarItem={value:number,label:string,evidence:AiCitationRef[]};
 // Style is presentation only -- it never changes a value, a date, a label or a citation.
 export type VisualOptionValue=boolean|string|string[];
 export type VisualStyle={preset?:string,options?:Record<string,VisualOptionValue>};
-export type PresentationVisual=({type:'figures',items:FigureItem[]}|{type:'timeline',items:TimelineItem[]}|{type:'bar',title?:string,unit?:string,items:BarItem[]})&{style?:VisualStyle|null};
-export type VisualKind=PresentationVisual['type'];
+export type StyledVisual=({type:'figures',items:FigureItem[]}|{type:'timeline',items:TimelineItem[]}|{type:'bar',title?:string,unit?:string,items:BarItem[]})&{style?:VisualStyle|null};
+export type ChartDataRow={label:string,value:number,record_refs:AiCitationRef[],record_count:number,[key:string]:JsonValue|undefined};
+export type ChartDataTableRow={label:string,value:number,formatted:string,record_count:number,record_refs:AiCitationRef[]};
+/** A chart the AI ordered and the data service cooked (backend/app/visuals): the rows, the checked ECharts drawing and the words that go with it (alt text, description, data table, source line). */
+export type ChartVisual={type:'chart',spec:JsonObject,data:{rows:ChartDataRow[],unit?:string|null,currency?:string|null}&JsonObject,option:JsonObject,width?:number,height?:number,text:{alt_text:string,description:string,source_line:string,data_table:{columns:string[],rows:ChartDataTableRow[]}}};
+export type PresentationVisual=StyledVisual|ChartVisual;
+export type VisualKind=StyledVisual['type'];
 // A quote the backend found word for word in the cited record (app/ai/quote_check.py).
 export type QuotedRef=AiCitationRef&{matched_text:string,field?:string,locator?:string|null,start_char?:number,end_char?:number};
 export type PresentationSection={heading:string,body:string,key_points:string[],key_point_evidence?:QuotedRef[][],evidence:AiCitationRef[],visual?:PresentationVisual|null};

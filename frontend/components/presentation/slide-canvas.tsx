@@ -11,10 +11,14 @@
 // Look comes from three layers (backend app/services/presentation_style.py):
 // the deck theme (colours + fonts), a visual's preset (layout), and its
 // options. Style never touches a value, date, label or citation.
+import dynamic from 'next/dynamic';
 import {createContext, useContext} from 'react';
 import type {CSSProperties, ReactElement, ReactNode} from 'react';
 
-import type {AiCitationRef, CitationDetail, DeckSlide, DeckStyle, DeckTheme, PresentationStyleCatalog, PresentationVisual, VisualKind, VisualOptionValue, VisualPreset} from '../../lib/api-types';
+import type {AiCitationRef, ChartVisual, CitationDetail, DeckSlide, DeckStyle, DeckTheme, PresentationStyleCatalog, PresentationVisual, StyledVisual, VisualKind, VisualOptionValue, VisualPreset} from '../../lib/api-types';
+
+// ECharts loads only when a slide actually shows a chart.
+const ScaledChart = dynamic(() => import('./chart-visual').then(m => m.ScaledChart), {ssr: false, loading: () => null});
 
 /** Dark Academia: the v2 look, used until the catalogue loads (hex without '#', as the API sends it). */
 export const DEFAULT_THEME: DeckTheme = {
@@ -57,7 +61,7 @@ export function resolveTheme(catalog: PresentationStyleCatalog | null | undefine
 
 export type ResolvedVisualStyle = {preset: string, layout: Record<string, string | boolean>, options: Record<string, VisualOptionValue>};
 /** Preset layout + preset options overlaid with the visual's own (port of resolved_visual_style). */
-export function resolveVisualStyle(visual: PresentationVisual, presets?: Record<VisualKind, VisualPreset[]>): ResolvedVisualStyle {
+export function resolveVisualStyle(visual: StyledVisual, presets?: Record<VisualKind, VisualPreset[]>): ResolvedVisualStyle {
   const list = presets?.[visual.type] || FALLBACK_PRESETS[visual.type];
   const chosen = list.find(p => p.id === visual.style?.preset) || list[0];
   return {preset: chosen.id, layout: {...chosen.layout}, options: {...chosen.options, ...(visual.style?.options || {})}};
@@ -121,11 +125,23 @@ export function formatValue(value: number, unit?: string): string {
 export type CitationLookup = {numbers: Map<string, number>, details: Map<string, CitationDetail>};
 export const refKey = (r: AiCitationRef): string => `${r.record_type}:${r.record_id}`;
 
+/** Every record a visual cites, in drawing order: a chart's rows carry
+ * their records (decks.chart_record_refs); the other visuals cite per item. */
+export function visualRefs(visual: PresentationVisual | null | undefined): AiCitationRef[] {
+  if (!visual) return [];
+  if (visual.type === 'chart') return visual.data.rows.flatMap(row => row.record_refs || []);
+  return (visual.items as {evidence?: AiCitationRef[]}[]).flatMap(i => i.evidence || []);
+}
+
+/** The style layer (presets and options) applies to the three drawn visuals;
+ * a chart's look comes from the deck theme and its own order slip. */
+export const isStyledVisual = (visual: PresentationVisual | null | undefined): visual is StyledVisual => Boolean(visual) && visual!.type !== 'chart';
+
 /** Number every ref in first-appearance order, the same order the export's sources slide uses. */
 export function buildCitationLookup(slides: DeckSlide[], details: CitationDetail[] = []): CitationLookup {
   const numbers = new Map<string, number>();
   for (const slide of slides) {
-    const refs = [...(slide.evidence || []), ...((slide.visual?.items || []) as {evidence?: AiCitationRef[]}[]).flatMap(i => i.evidence || [])];
+    const refs = [...(slide.evidence || []), ...visualRefs(slide.visual)];
     for (const r of refs) if (r.record_type && r.record_id && !numbers.has(refKey(r))) numbers.set(refKey(r), numbers.size + 1);
   }
   return {numbers, details: new Map(details.map(d => [refKey(d), d]))};
@@ -245,6 +261,12 @@ function Timeline({visual, style, lookup, region}: {visual: Extract<Presentation
   </div>;
 }
 
+/** A checked chart placed in a slide region, scaled to fit it. */
+function SlideChart({visual, region}: {visual: ChartVisual, region: Region}): ReactElement {
+  const [x, y, w, h] = region;
+  return <div style={{...box(x, y, w, h), background: '#fff0'}} data-testid="slide-chart"><ScaledChart visual={visual} fill/></div>;
+}
+
 function BarChart({visual, style, region}: {visual: Extract<PresentationVisual, {type: 'bar'}>, style: ResolvedVisualStyle, region: Region}): ReactElement {
   const {c, sans} = useTheme();
   const [x, y, w, h] = region;
@@ -338,11 +360,17 @@ export function SlideCanvas({slide, page, contentIndex, contentTotal, deckTitle,
   const visual = slide.visual || null;
   const bullets = slide.bullets;
   const has = bullets.length > 0;
-  const refs = [...slide.evidence, ...((visual?.items || []) as {evidence?: AiCitationRef[]}[]).flatMap(i => i.evidence || [])];
+  const refs = [...slide.evidence, ...visualRefs(visual)];
   const headingSize = fitSize([slide.heading], 11.8, 0.9, [34, 30, 28, 26, 24], {charW: 0.58, lineSpacing: 1.1});
-  const style = visual ? resolveVisualStyle(visual, presets) : null;
+  const style = isStyledVisual(visual) ? resolveVisualStyle(visual, presets) : null;
   let body: ReactElement;
-  if (visual?.type === 'timeline' && style) {
+  if (visual?.type === 'chart') {
+    // Same split as the export's native chart (decks.py content_slide).
+    body = <>
+      {has && <Bullets x={0.75} y={2.1} w={5.3} h={4.55} items={bullets} sizes={[22, 20, 18, 16, 15, 14]}/>}
+      <SlideChart visual={visual} region={has ? [6.45, 2.0, 6.1, 4.7] : [0.75, 2.0, 11.8, 4.7]}/>
+    </>;
+  } else if (visual?.type === 'timeline' && style) {
     if (style.layout.direction === 'vertical') {
       body = <>
         {has && <Bullets x={0.75} y={2.1} w={5.0} h={4.55} items={bullets} sizes={[22, 20, 18, 16, 15, 14]}/>}

@@ -5,14 +5,18 @@
 // the written brief (mirroring the .docx layout). Every citation is a chip
 // with the record's real name -- locator, claim text, entity caption -- that
 // opens the provenance trace, never a raw UUID.
+import dynamic from 'next/dynamic';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import type {KeyboardEvent, ReactElement} from 'react';
 import {ChevronLeft, ChevronRight} from 'lucide-react';
 
-import type {AiCitationRef, CitationDetail, DeckSlide, DeckStyle, JsonObject, JsonValue, PresentationDraftPayload, PresentationSection, PresentationStyleCatalog, PresentationVisual, QuotedRef, VisualStyle} from '../../lib/api-types';
+import type {AiCitationRef, ChartVisual, CitationDetail, DeckSlide, DeckStyle, JsonObject, JsonValue, PresentationDraftPayload, PresentationSection, PresentationStyleCatalog, PresentationVisual, QuotedRef, VisualStyle} from '../../lib/api-types';
 import {Button} from '@/components/ui/button';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {DECK, SlideCanvas, SlideStyleProvider, SourcesCanvas, buildCitationLookup, displayDate, formatValue, refKey, resolveTheme} from './slide-canvas';
+import {DECK, SlideCanvas, SlideStyleProvider, SourcesCanvas, buildCitationLookup, displayDate, formatValue, isStyledVisual, refKey, resolveTheme} from './slide-canvas';
+
+// ECharts loads only when a brief actually holds a chart.
+const ChartFigure = dynamic(() => import('./chart-visual').then(m => m.ChartFigure), {ssr: false, loading: () => <p className="text-xs">Loading chart…</p>});
 import {StylePanel} from './style-panel';
 import type {CitationLookup} from './slide-canvas';
 
@@ -27,7 +31,27 @@ const quotedRefs = (v: JsonValue | undefined): QuotedRef[] => (Array.isArray(v) 
   .map(r => ({record_type: r.record_type as string, record_id: r.record_id as string, matched_text: r.matched_text as string,
     locator: typeof r.locator === 'string' ? r.locator : null})) : []);
 
+/** A chart is stored resolved (backend app/ai/chart_check.py): its rows,
+ * the checked drawing and its words. Anything less is not drawn. */
+function asChart(v: JsonObject): ChartVisual | null {
+  const data = v.data, option = v.option, text = v.text, spec = v.spec;
+  if (!isObj(data) || !Array.isArray(data.rows) || !isObj(option) || !isObj(text) || !isObj(spec)) return null;
+  const table = isObj(text.data_table) ? text.data_table : null;
+  if (!table || !Array.isArray(table.columns) || !Array.isArray(table.rows)) return null;
+  const rows = data.rows.filter(isObj).filter(r => typeof r.label === 'string' && typeof r.value === 'number')
+    .map(r => ({...r, label: r.label as string, value: r.value as number, record_refs: refs(r.record_refs), record_count: typeof r.record_count === 'number' ? r.record_count : 0}));
+  const tableRows = table.rows.filter(isObj).filter(r => typeof r.label === 'string' && typeof r.value === 'number')
+    .map(r => ({label: r.label as string, value: r.value as number, formatted: str(r.formatted), record_count: typeof r.record_count === 'number' ? r.record_count : 0, record_refs: refs(r.record_refs)}));
+  return {
+    type: 'chart', spec, option, data: {...data, rows},
+    width: typeof v.width === 'number' ? v.width : undefined, height: typeof v.height === 'number' ? v.height : undefined,
+    text: {alt_text: str(text.alt_text), description: str(text.description), source_line: str(text.source_line),
+      data_table: {columns: table.columns.map(c => str(c)), rows: tableRows}},
+  };
+}
+
 function asVisual(v: JsonValue | undefined): PresentationVisual | null {
+  if (isObj(v) && v.type === 'chart') return asChart(v);
   if (!isObj(v) || !Array.isArray(v.items)) return null;
   const items = v.items.filter(isObj);
   if (v.type === 'figures') return {type: 'figures', items: items.map(i => ({value: str(i.value), label: str(i.label), evidence: refs(i.evidence)}))};
@@ -79,6 +103,9 @@ function Cite({items, lookup, onTrace}: {items: AiCitationRef[], lookup: Citatio
 }
 
 function BriefVisual({visual, lookup, onTrace}: {visual: PresentationVisual, lookup: CitationLookup, onTrace?: TraceHandler}): ReactElement {
+  if (visual.type === 'chart') {
+    return <ChartFigure visual={visual} renderCitations={rowRefs => <Cite items={rowRefs} lookup={lookup} onTrace={onTrace}/>}/>;
+  }
   if (visual.type === 'figures') {
     return <div className="my-4 grid gap-3" style={{gridTemplateColumns: `repeat(${visual.items.length}, minmax(0, 1fr))`}}>
       {visual.items.map((item, i) => <div key={i} className="rounded-md px-4 py-3" style={{background: DECK.panel, borderLeft: `3px solid ${DECK.oxblood}`}}>
@@ -158,7 +185,7 @@ export function applyVisualStyles(slides: DeckSlide[], visualStyles: Record<stri
     if ((slide.kind || 'content') !== 'content') return slide;
     section += 1;
     const style = visualStyles[String(section)];
-    return slide.visual && style ? {...slide, visual: {...slide.visual, style}} : slide;
+    return isStyledVisual(slide.visual) && style ? {...slide, visual: {...slide.visual, style}} : slide;
   });
 }
 

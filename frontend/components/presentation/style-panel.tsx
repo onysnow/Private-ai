@@ -7,9 +7,9 @@
 import type {ReactElement} from 'react';
 import {RotateCcw} from 'lucide-react';
 
-import type {DeckStyle, PresentationStyleCatalog, PresentationVisual, VisualOptionSpec, VisualOptionValue, VisualStyle} from '../../lib/api-types';
+import type {DeckStyle, PresentationStyleCatalog, PresentationVisual, VisualOptionSpec, VisualOptionValue, VisualStyle, StyledVisual} from '../../lib/api-types';
 import {Button} from '@/components/ui/button';
-import {resolveVisualStyle} from './slide-canvas';
+import {resolveVisualStyle, isStyledVisual} from './slide-canvas';
 
 const CHOICE_LABEL: Record<string, string> = {
   as_given: 'As drafted', desc: 'Largest first', asc: 'Smallest first',
@@ -17,7 +17,7 @@ const CHOICE_LABEL: Record<string, string> = {
   ring: 'Ring', dot: 'Dot',
   alert: 'Alert colour', accent: 'Accent colour', text: 'Text colour',
 };
-const KIND_LABEL: Record<PresentationVisual['type'], string> = {bar: 'Bar chart', timeline: 'Timeline', figures: 'Headline figures'};
+const KIND_LABEL: Record<StyledVisual['type'], string> = {bar: 'Bar chart', timeline: 'Timeline', figures: 'Headline figures'};
 
 const selectClass = 'h-8 w-full rounded-md border border-input bg-transparent px-2 text-sm text-foreground';
 
@@ -53,12 +53,15 @@ export type StylePanelProps = {
   catalog: PresentationStyleCatalog,
   deckStyle: DeckStyle,
   onDeckStyle: (style: DeckStyle) => void,
+  /** The active slide's visual; only the three styled visuals take presets
+   * and options (a chart's look comes from the deck theme). */
   visual: PresentationVisual | null,
   onVisualStyle: (style: VisualStyle) => void,
   sectionLabel?: string,
 };
 
-export function StylePanel({catalog, deckStyle, onDeckStyle, visual, onVisualStyle, sectionLabel}: StylePanelProps): ReactElement {
+export function StylePanel({catalog, deckStyle, onDeckStyle, visual: active, onVisualStyle, sectionLabel}: StylePanelProps): ReactElement {
+  const visual = isStyledVisual(active) ? active : null;
   const resolved = visual ? resolveVisualStyle(visual, catalog.visual_presets) : null;
   const presets = visual ? catalog.visual_presets[visual.type] : [];
   const specs = visual ? catalog.visual_options[visual.type] : {};

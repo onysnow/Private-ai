@@ -66,8 +66,13 @@ def normalize_chart_visual(visual: Any) -> dict | None:
         return None
     report = visual.get("report") if isinstance(visual.get("report"), dict) else {"ok": True, "errors": [], "warnings": []}
     text = visual.get("text") if isinstance(visual.get("text"), dict) else {}
-    return {"type": CHART_VISUAL, "spec": VisualSpec.model_validate(visual["spec"]).model_dump(mode="json"),
+    kept = {"type": CHART_VISUAL, "spec": VisualSpec.model_validate(visual["spec"]).model_dump(mode="json"),
             "data": data.as_dict(), "report": report, "text": text}
+    if isinstance(visual.get("option"), dict):
+        # The checked drawing travels with the deck so the preview of a
+        # promoted deck is the one the reporter approved.
+        kept["option"] = visual["option"]
+    return kept
 
 
 def chart_record_refs(visual: dict) -> list[dict]:

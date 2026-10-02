@@ -27,6 +27,9 @@ export type ChartProps = {
   onEvents?: Record<string, (params: unknown) => void>;
   className?: string;
   notMerge?: boolean;
+  /** The registered theme to draw with; null for an option that carries
+   * its own colours and fonts (a checked presentation chart). */
+  theme?: string | null;
 };
 
 /**
@@ -43,6 +46,7 @@ export function Chart({
   onEvents,
   className,
   notMerge = true,
+  theme = WORKBENCH_THEME_NAME,
 }: ChartProps): React.ReactElement {
   const style: CSSProperties = {height, width: '100%'};
 
@@ -51,7 +55,7 @@ export function Chart({
       <ReactEChartsCore
         echarts={echarts}
         option={option}
-        theme={WORKBENCH_THEME_NAME}
+        theme={theme ?? undefined}
         notMerge={notMerge}
         lazyUpdate
         style={style}

@@ -82,6 +82,11 @@ def resolve_chart(db: Session, investigation_id: str, visual: dict) -> tuple[dic
         "data": data.as_dict(),
         "report": report.as_dict(),
         "text": built.text(),
+        # The drawing as checked, so the in-app preview shows exactly what
+        # passed; exports draw again from the same data and theme.
+        "option": built.option,
+        "width": built.width,
+        "height": built.height,
     }
     return resolved, {"reason": None, "rules": [], "warnings": [w.as_dict() for w in report.warnings]}
 
