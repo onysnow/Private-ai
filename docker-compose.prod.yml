@@ -248,6 +248,7 @@ services:
       OPENALEPH_API_KEY: ${OPENALEPH_API_KEY:-}
       OPENALEPH_AUTO_SYNC_DOCUMENTS: ${OPENALEPH_AUTO_SYNC_DOCUMENTS:-true}
       ENABLE_LOCAL_ENTITY_SUGGESTIONS: ${ENABLE_LOCAL_ENTITY_SUGGESTIONS:-false}
+      RENDER_SERVICE_URL: http://render:8070
     ports:
       - "${BIND_ADDRESS:-127.0.0.1}:8000:8000"
     volumes:
@@ -259,6 +260,17 @@ services:
     # images are large and Elasticsearch is slow to come up; the workbench must be
     # reachable while that happens. The backend probes OpenAleph on demand
     # (/api/integrations/openaleph/status) and reports it as down until it is up.
+    # Nor depends_on: render -- an export falls back to native charts and tables
+    # when the render service is down (ADR-0005, line 2).
+
+  # Chart images for PowerPoint and Word exports (ADR-0005, line 2): ECharts
+  # drawn as SVG on the server, no browser. Internal network only; the backend
+  # is its only caller. See render/README.md.
+  render:
+    build:
+      context: ./render
+    image: journalism-workbench-render:${WORKBENCH_TAG:-latest}
+    restart: unless-stopped
 
 volumes:
   workbench-pgdata:

@@ -9,6 +9,9 @@ followthemoney==4.11.0
 python-multipart==0.0.32
 python-docx==1.2.0
 python-pptx==1.0.2
+# SVG -> PNG for chart images in PowerPoint and Word exports (ADR-0005, line 2;
+# BSD-3). The SVG comes from the render service (render/).
+vl-convert-python==1.9.0.post1
 alembic==1.20.0
 PyMuPDF==1.28.2
 Pillow==12.3.0

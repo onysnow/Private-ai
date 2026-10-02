@@ -62,6 +62,11 @@ class Settings(BaseSettings):
     ai_max_output_tokens: int = 8192
     ai_runs_per_minute: int = 6          # per actor (token / persisted user / local owner)
     ai_max_concurrent_runs: int = 2      # per process, all actors together
+    # The render service (render/, ADR-0005 line 2) that draws chart images for
+    # PowerPoint and Word exports. Compose sets http://render:8070; exports fall
+    # back to native charts and tables when it cannot be reached.
+    render_service_url: str = "http://127.0.0.1:8070"
+    render_service_timeout_seconds: float = 15.0
     cors_allowed_origins: str = (
         "http://localhost:3000,http://127.0.0.1:3000,http://127.0.0.1:8000,http://localhost:8000"
     )

@@ -215,6 +215,7 @@ services:
       API_AUTH_TOKEN: ${API_AUTH_TOKEN:-docker-compose-local-dev-token}
       API_AUTH_INVESTIGATION_IDS: ${API_AUTH_INVESTIGATION_IDS:-}
       ENABLE_AI_FEATURES: "false"
+      RENDER_SERVICE_URL: http://render:8070
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
@@ -224,8 +225,18 @@ services:
     # images are large and Elasticsearch is slow to come up; the workbench must be
     # reachable while that happens. The backend probes OpenAleph on demand
     # (/api/integrations/openaleph/status) and reports it as down until it is up.
+    # Nor depends_on: render -- an export falls back to native charts and tables
+    # when the render service is down (ADR-0005, line 2).
     volumes:
       - ./backend:/app
+
+  # Chart images for PowerPoint and Word exports (ADR-0005, line 2): ECharts
+  # drawn as SVG on the server, no browser. See render/README.md.
+  render:
+    build:
+      context: ./render
+    ports:
+      - "127.0.0.1:8070:8070"
 
   # Database inspector for local development: browse and edit workbench-db tables, run SQL.
   # Chosen over pgweb/CloudBeaver/sqladmin on 2026-09-21 (see dev-log.md). Bound to localhost only;

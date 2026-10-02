@@ -50,6 +50,23 @@ def test_root_compose_declares_core_stack_with_openaleph_always_on():
         assert "profiles" not in services[name], f"{name} must boot with the default stack, not behind a profile"
     assert "api" not in services["backend"]["depends_on"], "the workbench must come up even while OpenAleph is still pulling/starting"
     _assert_openaleph_setup_runs_first(services)
+    _assert_render_service(services, production=False)
+
+
+def _assert_render_service(services, *, production: bool):
+    """ADR-0005, line 2: chart images come from a small separate Node service
+    in both compose files; the backend reaches it by name and never waits
+    for it (an export falls back when it is down)."""
+    render = services["render"]
+    assert render["build"] == {"context": "./render"}
+    assert services["backend"]["environment"]["RENDER_SERVICE_URL"] == "http://render:8070"
+    assert "render" not in services["backend"].get("depends_on", {}), "exports fall back when the render service is down"
+    if production:
+        assert render.get("restart") == "unless-stopped"
+        assert "ports" not in render, "the render service stays on the internal network; only the backend calls it"
+        assert render["image"].startswith("journalism-workbench-render:")
+    else:
+        assert render["ports"] == ["127.0.0.1:8070:8070"]
 
 
 def _assert_openaleph_setup_runs_first(services):
@@ -91,8 +108,9 @@ def test_production_compose_has_no_dev_shortcuts():
     compose = yaml.safe_load(text)
     services = compose["services"]
     openaleph = {"postgres", "elasticsearch", "redis", "ingest", "analyze", "worker", "api", "ui"}
-    assert set(services) == {"workbench-db", "backend", "openaleph-setup"} | openaleph, "workbench + OpenAleph, nothing dev-only (no adminer, no separate frontend: ADR-0004)"
+    assert set(services) == {"workbench-db", "backend", "openaleph-setup", "render"} | openaleph, "workbench + render + OpenAleph, nothing dev-only (no adminer, no separate frontend: ADR-0004)"
     _assert_openaleph_setup_runs_first(services)
+    _assert_render_service(services, production=True)
     for name in openaleph:
         assert "profiles" not in services[name] and services[name].get("restart") == "unless-stopped", name
         if name != "ui":

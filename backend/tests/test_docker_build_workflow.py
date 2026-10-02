@@ -17,3 +17,5 @@ def test_docker_build_workflow_builds_the_workbench_image_on_push_and_pr():
     # ADR-0004: one image carries the API and the screen it serves.
     assert any("docker compose build backend" in step for step in run_steps)
     assert not any("frontend" in step for step in run_steps)
+    # ADR-0005, line 2: the render service is its own small image.
+    assert any("docker compose build render" in step for step in run_steps)
