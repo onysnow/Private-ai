@@ -31,12 +31,24 @@ from app.services.openaleph_corpus import PROVIDER, _first_property
 
 Report = Callable[[int | None, str | None], None]
 PARAGRAPH_SPLIT_RE = re.compile(r"\n\s*\n")
+NO_TEXT_ISSUE = "OpenAleph read this file and found no text in it."
 logger = logging.getLogger("journalism.openaleph")
 
 
 class OpenAlephUnavailable(Exception):
     """OpenAleph could not read this document; the plain-language reason
-    is the message. The caller reads it with the Workbench's own reader."""
+    is the message. The caller reads it with the Workbench's own reader
+    when that reader can read the file (app/services/document_formats.py).
+
+    ``kind`` says what went wrong, for a file only OpenAleph can read:
+    ``unreachable`` (it could not be reached, or did not take the file:
+    retrying when it runs may help), ``failed`` (OpenAleph tried and could
+    not read it), ``timeout`` (it had not finished in time) or ``no_text``.
+    """
+
+    def __init__(self, message: str, *, kind: str = "unreachable") -> None:
+        super().__init__(message)
+        self.kind = kind
 
 
 @dataclass
@@ -46,6 +58,8 @@ class OpenAlephText:
     collection_id: str = ""
     provider_document_id: str = ""
     schema: str = "Document"              # the FtM schema OpenAleph gave the document
+    # An email's headers as OpenAleph read them (email_headers), else empty.
+    headers: dict[str, list[str]] = field(default_factory=dict)
 
 
 def reading_with_openaleph() -> bool:
@@ -87,12 +101,16 @@ def read_with_openaleph(
     sync: Callable[[Session, str], Any] | None = None,
     sleep: Callable[[float], None] = time.sleep,
     clock: Callable[[], float] = time.monotonic,
+    allow_empty: bool = False,
 ) -> OpenAlephText:
     """Send the document to OpenAleph, wait for it to be read, return its text.
 
     Raises OpenAlephUnavailable with the reason when OpenAleph is
     unreachable, rejects the file, fails to read it, does not finish within
-    OPENALEPH_READ_TIMEOUT_SECONDS, or returns no text.
+    OPENALEPH_READ_TIMEOUT_SECONDS, or returns no text. ``allow_empty``
+    (for a file only OpenAleph can read, such as an archive, whose files are
+    its children, or a picture without words) returns no chunks and an issue
+    instead of raising when OpenAleph read the file and found no text.
     """
     from app.services import openaleph_corpus
 
@@ -125,10 +143,10 @@ def read_with_openaleph(
             break
         if status == "failure":
             reason = _first_property(properties, "processingError") or "no reason given"
-            raise OpenAlephUnavailable(f"OpenAleph could not read the file: {reason}")
+            raise OpenAlephUnavailable(f"OpenAleph could not read the file: {reason}", kind="failed")
         if clock() >= deadline:
             minutes = max(1, round(settings.openaleph_read_timeout_seconds / 60))
-            raise OpenAlephUnavailable(f"OpenAleph had not finished reading after {minutes} minute(s)")
+            raise OpenAlephUnavailable(f"OpenAleph had not finished reading after {minutes} minute(s)", kind="timeout")
         sleep(max(0.1, settings.openaleph_read_poll_seconds))
 
     report(70, "Taking OpenAleph's text")
@@ -169,6 +187,29 @@ def read_with_openaleph(
                 "provenance": {**base, "provider_entity_id": record_id, "provider_schema": schema},
             })
     if not chunks:
-        raise OpenAlephUnavailable("OpenAleph returned no text for this file")
+        if not allow_empty:
+            raise OpenAlephUnavailable("OpenAleph returned no text for this file", kind="no_text")
+        issues.append(NO_TEXT_ISSUE)
+    schema = str((entity or {}).get("schema") or "Document")
     return OpenAlephText(chunks=chunks, issues=issues, collection_id=collection_id, provider_document_id=record_id,
-                         schema=str((entity or {}).get("schema") or "Document"))
+                         schema=schema, headers=email_headers(entity) if schema == "Email" else {})
+
+
+# The Email properties ingest-file fills from a message's headers
+# (ingestors/support/email.py), under the names the Workbench shows.
+EMAIL_HEADERS = {"from": "from", "to": "to", "cc": "cc", "bcc": "bcc", "date": "date", "subject": "subject",
+                 "messageId": "message_id", "inReplyTo": "in_reply_to"}
+
+
+def email_headers(entity: dict | None) -> dict[str, list[str]]:
+    """An Email entity's headers, each as the list of values OpenAleph keeps."""
+    raw = entity.get("properties") if isinstance(entity, dict) else None
+    properties: dict = raw if isinstance(raw, dict) else {}
+    headers: dict[str, list[str]] = {}
+    for prop, name in EMAIL_HEADERS.items():
+        values = properties.get(prop)
+        found = [str(value).strip() for value in (values if isinstance(values, list) else [values])
+                 if isinstance(value, (str, int, float)) and str(value).strip()]
+        if found:
+            headers[name] = found
+    return headers

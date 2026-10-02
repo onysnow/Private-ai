@@ -16,7 +16,7 @@ import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
 import type {RouteCall} from '../test-support/mock-api';
-import {emptyGraph, entityFixture} from '../test-support/page-routes';
+import {corpusStatusBody, documentFormatsBody, emptyGraph, entityFixture} from '../test-support/page-routes';
 
 // Bulk import navigates to the batch triage screen with useRouter().push().
 const {mockPush} = vi.hoisted(() => ({mockPush: vi.fn()}));
@@ -38,6 +38,7 @@ const DOCUMENTS = 'GET /api/investigations/inv-1/documents';
 const ENTITIES = 'GET /api/investigations/inv-1/entities';
 const UPLOAD = 'POST /api/documents/upload';
 const CANDIDATES = 'GET /api/documents/doc-1/candidates';
+const CORPUS_STATUS = 'GET /api/investigations/inv-1/corpus/status';
 // The canonical entities a staged relationship can join, read from the shared cache.
 const entities = [entityFixture('ent-1', 'Kestrelwood Holdings', 'Company'), entityFixture('ent-2', 'Jane Doe', 'Person')];
 
@@ -81,7 +82,7 @@ function bulkFileInput(): HTMLInputElement {
 }
 
 async function renderWithDocuments(documents: unknown[] = [docFixture()]) {
-  const api = mockApi({[DOCUMENTS]: documents, [ENTITIES]: entities, 'GET /api/investigations/inv-1/graph': emptyGraph()});
+  const api = mockApi({[DOCUMENTS]: documents, [ENTITIES]: entities, 'GET /api/investigations/inv-1/graph': emptyGraph(), [CORPUS_STATUS]: corpusStatusBody('inv-1'), 'GET /api/document-formats': documentFormatsBody()});
   wrap(<DocumentsPanel investigationId="inv-1"/>);
   await screen.findByText(String((documents[0] as {filename: string}).filename));
   return api;
@@ -260,6 +261,7 @@ describe('DocumentsPanel upload and review', () => {
     const api = mockApi({
       [DOCUMENTS]: [docFixture()], [ENTITIES]: entities, 'GET /api/investigations/inv-2/documents': [docFixture({id: 'doc-9', filename: 'harbor.pdf'})],
       'GET /api/investigations/inv-2/entities': [], [CANDIDATES]: [candidateFixture()],
+      [CORPUS_STATUS]: corpusStatusBody('inv-1'), 'GET /api/document-formats': documentFormatsBody(), 'GET /api/investigations/inv-2/corpus/status': corpusStatusBody('inv-2'),
     });
     const view = wrap(<DocumentsPanel investigationId="inv-1"/>);
     await userEvent.setup().click(await screen.findByRole('button', {name: 'Review proposals'}));

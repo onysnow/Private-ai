@@ -2518,6 +2518,47 @@ export type CoreCapabilitiesOut = {
 };
 
 /**
+ * CorpusHitOut
+ *
+ * A document (or a page of one) OpenAleph found, linked to its Workbench
+ * document when the Workbench holds it (app/services/openaleph_search.py).
+ */
+export type CorpusHitOut = {
+  /**
+   * Document Id
+   */
+  document_id: string | null;
+  /**
+   * Filename
+   */
+  filename: string | null;
+  /**
+   * Highlights
+   */
+  highlights: Array<Array<HighlightSegmentOut>>;
+  /**
+   * Openaleph Entity Id
+   */
+  openaleph_entity_id: string;
+  /**
+   * Page Number
+   */
+  page_number: number | null;
+  /**
+   * Schema
+   */
+  schema: string;
+  /**
+   * Score
+   */
+  score: number | null;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
  * CorpusPendingOut
  *
  * What the next push would change, and the records it cannot send (with why).
@@ -2579,6 +2620,114 @@ export type CorpusPushOut = {
    * Unchanged
    */
   unchanged: number;
+};
+
+/**
+ * CorpusSearchOut
+ *
+ * Full-text search of the investigation's corpus in OpenAleph.
+ */
+export type CorpusSearchOut = {
+  /**
+   * Detail
+   */
+  detail: string | null;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Query
+   */
+  query: string;
+  /**
+   * Results
+   */
+  results: Array<CorpusHitOut>;
+  /**
+   * State
+   */
+  state: 'ok' | 'not_configured' | 'no_collection' | 'unreachable';
+  /**
+   * Total
+   */
+  total: number;
+};
+
+/**
+ * CorpusStageOut
+ *
+ * One of OpenAleph's queues for the collection, jobs counted across its
+ * batches (app/services/openaleph_status.py).
+ */
+export type CorpusStageOut = {
+  /**
+   * Failed
+   */
+  failed: number;
+  /**
+   * Finished
+   */
+  finished: number;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Pending
+   */
+  pending: number;
+  /**
+   * Queue
+   */
+  queue: string;
+  /**
+   * Running
+   */
+  running: number;
+};
+
+/**
+ * CorpusStatusOut
+ *
+ * How OpenAleph's reading of an investigation's corpus stands (ADR-0006).
+ */
+export type CorpusStatusOut = {
+  /**
+   * Active
+   */
+  active: boolean;
+  /**
+   * Checked At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  checked_at: string;
+  /**
+   * Collection Id
+   */
+  collection_id?: string | null;
+  /**
+   * Detail
+   */
+  detail?: string | null;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Stages
+   */
+  stages: Array<CorpusStageOut>;
+  /**
+   * State
+   */
+  state:
+    | 'not_configured'
+    | 'no_collection'
+    | 'unreachable'
+    | 'working'
+    | 'idle';
 };
 
 /**
@@ -3194,6 +3343,14 @@ export type DocumentDetailOut = {
    */
   openaleph_document_id?: string | null;
   /**
+   * Openaleph Schema
+   */
+  openaleph_schema?: string | null;
+  /**
+   * Parent Document Id
+   */
+  parent_document_id?: string | null;
+  /**
    * Sha256
    */
   sha256: string;
@@ -3201,6 +3358,27 @@ export type DocumentDetailOut = {
    * Source Id
    */
   source_id: string;
+};
+
+/**
+ * DocumentEmailOut
+ *
+ * An email document's headers and thread (app/services/email_documents.py).
+ */
+export type DocumentEmailOut = {
+  /**
+   * Document Id
+   */
+  document_id: string;
+  headers: EmailHeadersOut;
+  /**
+   * Thread
+   */
+  thread: Array<EmailThreadMessageOut>;
+  /**
+   * Thread Note
+   */
+  thread_note: string | null;
 };
 
 /**
@@ -3232,6 +3410,42 @@ export type DocumentExtractionSettingsOut = {
    * Pdf Ocr Min Native Chars
    */
   pdf_ocr_min_native_chars: number;
+};
+
+/**
+ * DocumentFormatsOut
+ *
+ * What an upload accepts now (app/services/document_formats.py).
+ */
+export type DocumentFormatsOut = {
+  /**
+   * Accept
+   */
+  accept: string;
+  /**
+   * Extensions
+   */
+  extensions: Array<string>;
+  /**
+   * Ingest File Image
+   */
+  ingest_file_image?: string | null;
+  /**
+   * Max Bytes
+   */
+  max_bytes: number;
+  /**
+   * Mime Types
+   */
+  mime_types: Array<string>;
+  /**
+   * Openaleph Only Extensions
+   */
+  openaleph_only_extensions: Array<string>;
+  /**
+   * Reader
+   */
+  reader: 'openaleph' | 'workbench';
 };
 
 /**
@@ -3286,6 +3500,14 @@ export type DocumentOut = {
    * Openaleph Document Id
    */
   openaleph_document_id?: string | null;
+  /**
+   * Openaleph Schema
+   */
+  openaleph_schema?: string | null;
+  /**
+   * Parent Document Id
+   */
+  parent_document_id?: string | null;
   /**
    * Sha256
    */
@@ -3378,7 +3600,15 @@ export type DocumentUploadOut = {
    * Openaleph Document Id
    */
   openaleph_document_id?: string | null;
+  /**
+   * Openaleph Schema
+   */
+  openaleph_schema?: string | null;
   openaleph_sync?: OpenAlephSyncOut | null;
+  /**
+   * Parent Document Id
+   */
+  parent_document_id?: string | null;
   /**
    * Sha256
    */
@@ -3691,6 +3921,79 @@ export type DossierSummaryOut = {
    * Unresolved External Count
    */
   unresolved_external_count: number;
+};
+
+/**
+ * EmailHeadersOut
+ *
+ * An email's headers as OpenAleph read them.
+ */
+export type EmailHeadersOut = {
+  /**
+   * Bcc
+   */
+  bcc: Array<string>;
+  /**
+   * Cc
+   */
+  cc: Array<string>;
+  /**
+   * Date
+   */
+  date: string | null;
+  /**
+   * From
+   */
+  from: Array<string>;
+  /**
+   * In Reply To
+   */
+  in_reply_to: Array<string>;
+  /**
+   * Message Id
+   */
+  message_id: string | null;
+  /**
+   * Subject
+   */
+  subject: string | null;
+  /**
+   * To
+   */
+  to: Array<string>;
+};
+
+/**
+ * EmailThreadMessageOut
+ *
+ * One message of the thread, oldest first; ``document_id`` when the
+ * Workbench holds it too.
+ */
+export type EmailThreadMessageOut = {
+  /**
+   * Current
+   */
+  current: boolean;
+  /**
+   * Date
+   */
+  date: string | null;
+  /**
+   * Document Id
+   */
+  document_id: string | null;
+  /**
+   * Openaleph Entity Id
+   */
+  openaleph_entity_id: string;
+  /**
+   * Sender
+   */
+  sender: string | null;
+  /**
+   * Subject
+   */
+  subject: string | null;
 };
 
 /**
@@ -5428,6 +5731,22 @@ export type HealthOut = {
    * Status
    */
   status: 'ok';
+};
+
+/**
+ * HighlightSegmentOut
+ *
+ * A piece of a snippet; ``match`` marks the words the search found.
+ */
+export type HighlightSegmentOut = {
+  /**
+   * Match
+   */
+  match: boolean;
+  /**
+   * Text
+   */
+  text: string;
 };
 
 /**
@@ -8699,6 +9018,64 @@ export type SettingsStatusOut = {
 };
 
 /**
+ * SimilarDocumentOut
+ */
+export type SimilarDocumentOut = {
+  /**
+   * Document Id
+   */
+  document_id: string | null;
+  /**
+   * Filename
+   */
+  filename: string | null;
+  /**
+   * Openaleph Entity Id
+   */
+  openaleph_entity_id: string;
+  /**
+   * Page Number
+   */
+  page_number: number | null;
+  /**
+   * Schema
+   */
+  schema: string;
+  /**
+   * Score
+   */
+  score: number | null;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * SimilarDocumentsOut
+ *
+ * Documents whose text is like this one's (OpenAleph's more_like_this).
+ */
+export type SimilarDocumentsOut = {
+  /**
+   * Detail
+   */
+  detail: string | null;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Results
+   */
+  results: Array<SimilarDocumentOut>;
+  /**
+   * State
+   */
+  state: 'ok' | 'not_configured' | 'no_collection' | 'unreachable';
+};
+
+/**
  * SortOrder
  */
 export type SortOrder = 'value_desc' | 'value_asc' | 'label' | 'time';
@@ -11341,6 +11718,37 @@ export type SeedDemoResponses = {
 
 export type SeedDemoResponse = SeedDemoResponses[keyof SeedDemoResponses];
 
+export type GetDocumentFormatsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/document-formats';
+};
+
+export type GetDocumentFormatsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetDocumentFormatsError =
+  GetDocumentFormatsErrors[keyof GetDocumentFormatsErrors];
+
+export type GetDocumentFormatsResponses = {
+  /**
+   * Successful Response
+   */
+  200: DocumentFormatsOut;
+};
+
+export type GetDocumentFormatsResponse =
+  GetDocumentFormatsResponses[keyof GetDocumentFormatsResponses];
+
 export type UploadDocumentData = {
   body: BodyUploadDocument;
   path?: never;
@@ -11349,6 +11757,10 @@ export type UploadDocumentData = {
 };
 
 export type UploadDocumentErrors = {
+  /**
+   * The reader this deployment uses cannot read this kind of file (GET /api/document-formats)
+   */
+  415: ErrorOut;
   /**
    * Response 422 Upload Document
    *
@@ -11696,6 +12108,42 @@ export type SyncOpenalephDocumentResponses = {
 export type SyncOpenalephDocumentResponse =
   SyncOpenalephDocumentResponses[keyof SyncOpenalephDocumentResponses];
 
+export type GetDocumentEmailData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/email';
+};
+
+export type GetDocumentEmailErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetDocumentEmailError =
+  GetDocumentEmailErrors[keyof GetDocumentEmailErrors];
+
+export type GetDocumentEmailResponses = {
+  /**
+   * Successful Response
+   */
+  200: DocumentEmailOut;
+};
+
+export type GetDocumentEmailResponse =
+  GetDocumentEmailResponses[keyof GetDocumentEmailResponses];
+
 export type AnalyzeOpenalephDocumentData = {
   body?: never;
   path: {
@@ -11731,6 +12179,83 @@ export type AnalyzeOpenalephDocumentResponses = {
 
 export type AnalyzeOpenalephDocumentResponse =
   AnalyzeOpenalephDocumentResponses[keyof AnalyzeOpenalephDocumentResponses];
+
+export type FindOpenalephChildrenData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/openaleph/children';
+};
+
+export type FindOpenalephChildrenErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type FindOpenalephChildrenError =
+  FindOpenalephChildrenErrors[keyof FindOpenalephChildrenErrors];
+
+export type FindOpenalephChildrenResponses = {
+  /**
+   * Successful Response
+   */
+  200: BackgroundJobOut;
+};
+
+export type FindOpenalephChildrenResponse =
+  FindOpenalephChildrenResponses[keyof FindOpenalephChildrenResponses];
+
+export type GetSimilarDocumentsData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: {
+    /**
+     * Limit
+     */
+    limit?: number;
+  };
+  url: '/api/documents/{document_id}/similar';
+};
+
+export type GetSimilarDocumentsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSimilarDocumentsError =
+  GetSimilarDocumentsErrors[keyof GetSimilarDocumentsErrors];
+
+export type GetSimilarDocumentsResponses = {
+  /**
+   * Successful Response
+   */
+  200: SimilarDocumentsOut;
+};
+
+export type GetSimilarDocumentsResponse =
+  GetSimilarDocumentsResponses[keyof GetSimilarDocumentsResponses];
 
 export type EnrichmentSessionDetailData = {
   body?: never;
@@ -13534,6 +14059,91 @@ export type ListOpenalephCorpusFailuresResponses = {
 
 export type ListOpenalephCorpusFailuresResponse =
   ListOpenalephCorpusFailuresResponses[keyof ListOpenalephCorpusFailuresResponses];
+
+export type SearchInvestigationCorpusData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query: {
+    /**
+     * Q
+     */
+    q: string;
+    /**
+     * Limit
+     */
+    limit?: number;
+    /**
+     * Offset
+     */
+    offset?: number;
+  };
+  url: '/api/investigations/{investigation_id}/corpus/search';
+};
+
+export type SearchInvestigationCorpusErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SearchInvestigationCorpusError =
+  SearchInvestigationCorpusErrors[keyof SearchInvestigationCorpusErrors];
+
+export type SearchInvestigationCorpusResponses = {
+  /**
+   * Successful Response
+   */
+  200: CorpusSearchOut;
+};
+
+export type SearchInvestigationCorpusResponse =
+  SearchInvestigationCorpusResponses[keyof SearchInvestigationCorpusResponses];
+
+export type GetCorpusStatusData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/corpus/status';
+};
+
+export type GetCorpusStatusErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCorpusStatusError =
+  GetCorpusStatusErrors[keyof GetCorpusStatusErrors];
+
+export type GetCorpusStatusResponses = {
+  /**
+   * Successful Response
+   */
+  200: CorpusStatusOut;
+};
+
+export type GetCorpusStatusResponse =
+  GetCorpusStatusResponses[keyof GetCorpusStatusResponses];
 
 export type GetCorpusSyncData = {
   body?: never;

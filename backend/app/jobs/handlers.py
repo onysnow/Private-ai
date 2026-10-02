@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NoReturn
 
 from sqlalchemy.orm import Session
 
@@ -11,41 +11,152 @@ from app.jobs.records import Handler, JobFailed, Report
 from app.models.jobs import BackgroundJob
 
 if TYPE_CHECKING:
-    from app.services.openaleph_reader import OpenAlephText
+    from app.services.openaleph_reader import OpenAlephText, OpenAlephUnavailable
 
 EXTRACT_DOCUMENT = "extract_document"
 ANALYZE_DOCUMENT = "openaleph_analyze"
+FIND_CHILDREN = "openaleph_children"
 
 
-def _finish_openaleph_read(db: Session, document_id: str, read: OpenAlephText, report: Report) -> str:
+def _record_openaleph_details(db: Session, document_id: str, read: OpenAlephText) -> None:
+    """Keep what OpenAleph said the document is: its schema on the sync row
+    (an email or an archive is shown as one), an email's headers on the
+    document's Source, so they stay with the document."""
+    from app.models.domain import Document, Source
+    from app.services.openaleph_corpus import get_document_sync
+
+    sync = get_document_sync(db, document_id)
+    if sync is not None:
+        sync.response_json = {**(sync.response_json or {}), "schema": read.schema}
+    doc = db.get(Document, document_id)
+    source = db.get(Source, doc.source_id) if doc is not None else None
+    if source is not None and read.headers:
+        source.metadata_json = {**(source.metadata_json or {}), "email": read.headers}
+    db.commit()
+
+
+def _add_and_read_children(db: Session, document_id: str, *, collection_id: str, container_id: str,
+                           report: Report, runner: str) -> tuple[str, dict[str, int]]:
+    """Make each file inside an archive or email a document under it, and
+    read each one as a job of its own, so a child that fails can be retried
+    from its row (app/services/openaleph_children.py). Returns a sentence
+    for the job's message and the counts."""
+    from sqlalchemy import Engine
+
+    from app.db.session import build_session_factory
+    from app.jobs.records import create_job, execute_job
+    from app.models.domain import Document
+    from app.services.openaleph_children import NOT_ADDED, NOT_LISTED, STILL_READING, add_children
+    from app.services.openaleph_reader import NO_TEXT_ISSUE
+
+    parent = db.get(Document, document_id)
+    if parent is None:
+        return "the document was deleted", {}
+    result = add_children(db, parent, collection_id=collection_id, container_id=container_id, report=report)
+    bind = db.get_bind()
+    # Each child's job runs on the same database as this one, in its own session.
+    factory = build_session_factory(bind if isinstance(bind, Engine) else bind.engine)
+    unread = 0
+    for number, child_id in enumerate(result.added, 1):
+        report(None, f"Reading the files inside: {number} of {len(result.added)}")
+        child_job = create_job(db, kind=EXTRACT_DOCUMENT, investigation_id=parent.investigation_id,
+                               subject_type="document", subject_id=child_id, runner=runner)
+        if execute_job(factory, child_job.id, HANDLERS) != "succeeded":
+            unread += 1
+    db.expire_all()
+    parent = db.get(Document, document_id)
+    if parent is not None:
+        kept = [issue for issue in parent.extraction_issues or [] if not issue.startswith((NOT_ADDED, NOT_LISTED, STILL_READING))]
+        if result.found:   # an archive's text is its files
+            kept = [issue for issue in kept if issue != NO_TEXT_ISSUE]
+        parent.extraction_issues = [*kept, *result.issues()] or None
+        db.commit()
+    parts: list[str] = []
+    if result.added:
+        parts.append(f"{len(result.added)} file(s) inside added as documents"
+                     + (f", {unread} of which could not be read" if unread else ""))
+    if result.already:
+        parts.append(f"{result.already} file(s) inside were already added")
+    if result.not_added:
+        parts.append(f"{len(result.not_added)} file(s) inside not added")
+    if result.error:
+        parts.append("the files inside could not be listed")
+    counts = {"added": len(result.added), "already": result.already, "not_added": len(result.not_added), "unread": unread}
+    return "; ".join(parts) or "no files inside", counts
+
+
+def _finish_openaleph_read(db: Session, document_id: str, read: OpenAlephText, report: Report, runner: str = "inline") -> str:
     """Wait for OpenAleph's name-finding, make the document's chunks and
-    proposals from OpenAleph's text, and stage the names it found.
+    proposals from OpenAleph's text, and stage the names it found. An
+    archive's or an email's files become documents under it.
 
     The Workbench's own pattern name-finder runs only when OpenAleph gave no
     analysis (ADR-0004, decision 5; ADR-0006).
     """
+    message = _read_openaleph_text(db, document_id, read, report)
+    if message is None:
+        return "The document was deleted before it was read"
+    _record_openaleph_details(db, document_id, read)
+    from app.services.openaleph_children import is_container
+
+    if is_container(read.schema):
+        children, _counts = _add_and_read_children(db, document_id, collection_id=read.collection_id,
+                                                   container_id=read.provider_document_id, report=report, runner=runner)
+        message = f"{message}; {children}"
+    return message
+
+
+def _read_openaleph_text(db: Session, document_id: str, read: OpenAlephText, report: Report) -> str | None:
+    """The document's chunks and proposals from OpenAleph's text and names;
+    the job's message, or None when the document was deleted meanwhile."""
     from app.services.documents import extract_document
     from app.services.openaleph_analysis import describe_import, find_names, import_analysis_proposals
 
     analysis = find_names(read.collection_id, read.provider_document_id, read.schema, report)
     report(85, "Making proposals from OpenAleph's text")
-    issue = analysis.issue()
+    issue = analysis.issue() if read.chunks else None
     issues = [*read.issues, issue] if issue else list(read.issues)
     doc = extract_document(db, document_id, text=(read.chunks, issues), find_names=not analysis.analysed)
     if doc is None:
-        return "The document was deleted before it was read"
+        return None
     if doc.extraction_status == "failed":
         raise RuntimeError(doc.extraction_error or "The document could not be read")
-    unit = "page" if read.chunks[0]["page_number"] is not None else "paragraph"
-    message = f"Read by OpenAleph ({len(read.chunks)} {unit}(s))"
     report(92, "Staging the names OpenAleph found")
     made = describe_import(import_analysis_proposals(db, doc.id, analysis))
+    if not read.chunks:   # a file only OpenAleph reads, in which it found no text
+        return f"Read by OpenAleph (no text){'; ' + made if made else ''}"
+    unit = "page" if read.chunks[0]["page_number"] is not None else "paragraph"
+    message = f"Read by OpenAleph ({len(read.chunks)} {unit}(s))"
     if analysis.analysed:
         return f"{message}; {made or 'OpenAleph found no names'}"
     # Header names of an email can arrive without an analysis of its text.
     finder = ("so the Workbench's own name-finder looked for names" if settings.enable_local_entity_suggestions
               else "and the Workbench's own name-finder is switched off")
     return f"{message}; {made + '; ' if made else ''}OpenAleph gave no analysis, {finder}"
+
+
+def _fail_openaleph_only_read(db: Session, document_id: str, filename: str, exc: OpenAlephUnavailable) -> NoReturn:
+    """A file the Workbench's own reader cannot read (an email, an archive,
+    a spreadsheet...) and OpenAleph did not read: record why on the document
+    and fail the job, so the reporter can retry it from the document row
+    (ADR-0006, Wave A). Nothing else can read it, so there is no fallback."""
+    from app.models.domain import Document
+    from app.services.document_formats import kind_of
+
+    kind = exc.kind
+    if kind == "unreachable":
+        message = f"{filename} needs OpenAleph to read; retry when it is running ({exc})"
+    else:
+        extension = kind_of(filename, None).extension
+        named = f".{extension} files" if extension else "this kind of file"
+        message = f"{exc}; the Workbench's own reader cannot read {named}"
+    db.rollback()
+    doc = db.get(Document, document_id)
+    if doc is not None:
+        doc.extraction_status = "failed"
+        doc.extraction_error = message
+        db.commit()
+    raise JobFailed(message, {"reason": "needs_openaleph" if kind == "unreachable" else f"openaleph_{kind}"})
 
 
 def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str | None:
@@ -57,6 +168,8 @@ def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str
     and the job's message says which one read it and why. A failed read
     fails the job, with the reason the document also records.
     """
+    from app.models.domain import Document
+    from app.services.document_formats import needs_openaleph
     from app.services.documents import extract_document
     from app.services.openaleph_corpus import sync_document_to_openaleph
     from app.services.openaleph_reader import OpenAlephUnavailable, read_with_openaleph, reading_with_openaleph
@@ -67,12 +180,16 @@ def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str
 
     fallback_reason: str | None = None
     if reading_with_openaleph():
+        stored = db.get(Document, document_id)
+        openaleph_only = stored is not None and needs_openaleph(stored.filename)
         try:
-            read = read_with_openaleph(db, document_id, report)
+            read = read_with_openaleph(db, document_id, report, allow_empty=openaleph_only)
         except OpenAlephUnavailable as exc:
+            if stored is not None and openaleph_only:
+                _fail_openaleph_only_read(db, document_id, stored.filename, exc)
             fallback_reason = str(exc)
         else:
-            return _finish_openaleph_read(db, document_id, read, report)
+            return _finish_openaleph_read(db, document_id, read, report, runner=job.runner)
 
     report(5, "Reading the document")
     doc = extract_document(db, document_id)
@@ -135,6 +252,29 @@ def analyze_document_job(db: Session, job: BackgroundJob, report: Report) -> dic
     return {"message": message, "result": counts}
 
 
+def children_job(db: Session, job: BackgroundJob, report: Report) -> dict:
+    """"Look for files inside again": list an archive's or an email's files
+    in OpenAleph once more and add those the Workbench does not hold yet
+    (ADR-0006, Wave A). Files already added are not added twice."""
+    from app.models.domain import Document
+    from app.services.openaleph_children import is_container
+    from app.services.openaleph_corpus import get_document_sync
+
+    document_id = job.subject_id
+    doc = db.get(Document, document_id) if document_id else None
+    if doc is None:
+        raise ValueError("The document no longer exists")
+    sync = get_document_sync(db, doc.id)
+    if sync is None or sync.status != "synced" or not sync.provider_record_id:
+        raise JobFailed("This document is not in OpenAleph, so OpenAleph holds no files inside it",
+                        {"reason": "not_in_openaleph"})
+    if not is_container(str((sync.response_json or {}).get("schema") or "")):
+        raise JobFailed("Only an archive or an email has files inside", {"reason": "not_a_container"})
+    message, counts = _add_and_read_children(db, doc.id, collection_id=sync.collection_id,
+                                             container_id=str(sync.provider_record_id), report=report, runner=job.runner)
+    return {"message": message[0].upper() + message[1:], "result": counts}
+
+
 AI_REASONING = "ai_reasoning"
 
 
@@ -169,5 +309,6 @@ def ai_reasoning_job(db: Session, job: BackgroundJob, report: Report) -> dict:
 HANDLERS: dict[str, Handler] = {
     EXTRACT_DOCUMENT: extract_document_job,
     ANALYZE_DOCUMENT: analyze_document_job,
+    FIND_CHILDREN: children_job,
     AI_REASONING: ai_reasoning_job,
 }

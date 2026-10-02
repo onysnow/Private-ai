@@ -1052,6 +1052,46 @@ export const zCorpusPushOut = z.object({
 });
 
 /**
+ * CorpusStageOut
+ *
+ * One of OpenAleph's queues for the collection, jobs counted across its
+ * batches (app/services/openaleph_status.py).
+ */
+export const zCorpusStageOut = z.object({
+  failed: z.number().int(),
+  finished: z.number().int(),
+  label: z.string(),
+  pending: z.number().int(),
+  queue: z.string(),
+  running: z.number().int(),
+});
+
+/**
+ * CorpusStatusOut
+ *
+ * How OpenAleph's reading of an investigation's corpus stands (ADR-0006).
+ */
+export const zCorpusStatusOut = z.object({
+  active: z.boolean(),
+  checked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  collection_id: z.string().nullish(),
+  detail: z.string().nullish(),
+  investigation_id: z.string(),
+  stages: z.array(zCorpusStageOut),
+  state: z.enum([
+    'not_configured',
+    'no_collection',
+    'unreachable',
+    'working',
+    'idle',
+  ]),
+});
+
+/**
  * CrossProviderDecisionOut
  *
  * A reporter's decision that findings from different providers are, or
@@ -1223,8 +1263,25 @@ export const zDocumentDetailOut = z.object({
   investigation_id: z.string(),
   mime_type: z.string().nullish(),
   openaleph_document_id: z.string().nullish(),
+  openaleph_schema: z.string().nullish(),
+  parent_document_id: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
+});
+
+/**
+ * DocumentFormatsOut
+ *
+ * What an upload accepts now (app/services/document_formats.py).
+ */
+export const zDocumentFormatsOut = z.object({
+  accept: z.string(),
+  extensions: z.array(z.string()),
+  ingest_file_image: z.string().nullish(),
+  max_bytes: z.number().int(),
+  mime_types: z.array(z.string()),
+  openaleph_only_extensions: z.array(z.string()),
+  reader: z.enum(['openaleph', 'workbench']),
 });
 
 /**
@@ -1246,6 +1303,8 @@ export const zDocumentOut = z.object({
   investigation_id: z.string(),
   mime_type: z.string().nullish(),
   openaleph_document_id: z.string().nullish(),
+  openaleph_schema: z.string().nullish(),
+  parent_document_id: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
 });
@@ -1323,6 +1382,49 @@ export const zDossierSummaryOut = z.object({
   task_count: z.number().int(),
   timeline_event_count: z.number().int(),
   unresolved_external_count: z.number().int(),
+});
+
+/**
+ * EmailHeadersOut
+ *
+ * An email's headers as OpenAleph read them.
+ */
+export const zEmailHeadersOut = z.object({
+  bcc: z.array(z.string()),
+  cc: z.array(z.string()),
+  date: z.string().nullable(),
+  from: z.array(z.string()),
+  in_reply_to: z.array(z.string()),
+  message_id: z.string().nullable(),
+  subject: z.string().nullable(),
+  to: z.array(z.string()),
+});
+
+/**
+ * EmailThreadMessageOut
+ *
+ * One message of the thread, oldest first; ``document_id`` when the
+ * Workbench holds it too.
+ */
+export const zEmailThreadMessageOut = z.object({
+  current: z.boolean(),
+  date: z.string().nullable(),
+  document_id: z.string().nullable(),
+  openaleph_entity_id: z.string(),
+  sender: z.string().nullable(),
+  subject: z.string().nullable(),
+});
+
+/**
+ * DocumentEmailOut
+ *
+ * An email document's headers and thread (app/services/email_documents.py).
+ */
+export const zDocumentEmailOut = z.object({
+  document_id: z.string(),
+  headers: zEmailHeadersOut,
+  thread: z.array(zEmailThreadMessageOut),
+  thread_note: z.string().nullable(),
 });
 
 /**
@@ -2055,6 +2157,47 @@ export const zHealthOut = z.object({
 });
 
 /**
+ * HighlightSegmentOut
+ *
+ * A piece of a snippet; ``match`` marks the words the search found.
+ */
+export const zHighlightSegmentOut = z.object({
+  match: z.boolean(),
+  text: z.string(),
+});
+
+/**
+ * CorpusHitOut
+ *
+ * A document (or a page of one) OpenAleph found, linked to its Workbench
+ * document when the Workbench holds it (app/services/openaleph_search.py).
+ */
+export const zCorpusHitOut = z.object({
+  document_id: z.string().nullable(),
+  filename: z.string().nullable(),
+  highlights: z.array(z.array(zHighlightSegmentOut)),
+  openaleph_entity_id: z.string(),
+  page_number: z.number().int().nullable(),
+  schema: z.string(),
+  score: z.number().nullable(),
+  title: z.string(),
+});
+
+/**
+ * CorpusSearchOut
+ *
+ * Full-text search of the investigation's corpus in OpenAleph.
+ */
+export const zCorpusSearchOut = z.object({
+  detail: z.string().nullable(),
+  investigation_id: z.string(),
+  query: z.string(),
+  results: z.array(zCorpusHitOut),
+  state: z.enum(['ok', 'not_configured', 'no_collection', 'unreachable']),
+  total: z.number().int(),
+});
+
+/**
  * HypothesisTestRequest
  */
 export const zHypothesisTestRequest = z.object({
@@ -2776,7 +2919,9 @@ export const zDocumentUploadOut = z.object({
   job: zBackgroundJobOut.nullish(),
   mime_type: z.string().nullish(),
   openaleph_document_id: z.string().nullish(),
+  openaleph_schema: z.string().nullish(),
   openaleph_sync: zOpenAlephSyncOut.nullish(),
+  parent_document_id: z.string().nullish(),
   sha256: z.string(),
   source_id: z.string(),
 });
@@ -3565,6 +3710,31 @@ export const zSettingsStatusOut = z.object({
   limits: zSettingsLimitsOut,
   restore_api_enabled: z.boolean(),
   security: zSecurityAlertsOut,
+});
+
+/**
+ * SimilarDocumentOut
+ */
+export const zSimilarDocumentOut = z.object({
+  document_id: z.string().nullable(),
+  filename: z.string().nullable(),
+  openaleph_entity_id: z.string(),
+  page_number: z.number().int().nullable(),
+  schema: z.string(),
+  score: z.number().nullable(),
+  title: z.string(),
+});
+
+/**
+ * SimilarDocumentsOut
+ *
+ * Documents whose text is like this one's (OpenAleph's more_like_this).
+ */
+export const zSimilarDocumentsOut = z.object({
+  detail: z.string().nullable(),
+  document_id: z.string(),
+  results: z.array(zSimilarDocumentOut),
+  state: z.enum(['ok', 'not_configured', 'no_collection', 'unreachable']),
 });
 
 /**
@@ -5108,6 +5278,11 @@ export const zExportDeckPptxResponse = z.string();
  */
 export const zSeedDemoResponse = zDemoSeedOut;
 
+/**
+ * Successful Response
+ */
+export const zGetDocumentFormatsResponse = zDocumentFormatsOut;
+
 export const zUploadDocumentBody = zBodyUploadDocument;
 
 /**
@@ -5201,6 +5376,15 @@ export const zSyncOpenalephDocumentPath = z.object({
  */
 export const zSyncOpenalephDocumentResponse = zOpenAlephDocumentSyncOut;
 
+export const zGetDocumentEmailPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetDocumentEmailResponse = zDocumentEmailOut;
+
 export const zAnalyzeOpenalephDocumentPath = z.object({
   document_id: z.string(),
 });
@@ -5209,6 +5393,28 @@ export const zAnalyzeOpenalephDocumentPath = z.object({
  * Successful Response
  */
 export const zAnalyzeOpenalephDocumentResponse = zBackgroundJobOut;
+
+export const zFindOpenalephChildrenPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zFindOpenalephChildrenResponse = zBackgroundJobOut;
+
+export const zGetSimilarDocumentsPath = z.object({
+  document_id: z.string(),
+});
+
+export const zGetSimilarDocumentsQuery = z.object({
+  limit: z.number().int().gte(1).lte(50).optional().default(10),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetSimilarDocumentsResponse = zSimilarDocumentsOut;
 
 export const zEnrichmentSessionDetailPath = z.object({
   session_id: z.string(),
@@ -5731,6 +5937,30 @@ export const zListOpenalephCorpusFailuresPath = z.object({
 export const zListOpenalephCorpusFailuresResponse = z.array(
   zOpenAlephOperationFailureOut,
 );
+
+export const zSearchInvestigationCorpusPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zSearchInvestigationCorpusQuery = z.object({
+  q: z.string().min(1).max(500),
+  limit: z.number().int().gte(1).lte(100).optional().default(20),
+  offset: z.number().int().gte(0).lte(9000).optional().default(0),
+});
+
+/**
+ * Successful Response
+ */
+export const zSearchInvestigationCorpusResponse = zCorpusSearchOut;
+
+export const zGetCorpusStatusPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetCorpusStatusResponse = zCorpusStatusOut;
 
 export const zGetCorpusSyncPath = z.object({
   investigation_id: z.string(),

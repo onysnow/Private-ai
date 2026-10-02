@@ -11,7 +11,7 @@ its URL prefix is /investigations, so it belongs with group 8.
 from typing import Any
 import logging
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, Response, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Request, Response, UploadFile
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
@@ -19,15 +19,19 @@ from starlette.concurrency import run_in_threadpool
 from app.api.dependencies import authorize_request_resource, read_upload_limited
 from app.core.config import settings
 from app.db.session import get_db
-from app.jobs.handlers import ANALYZE_DOCUMENT, EXTRACT_DOCUMENT
+from app.jobs.handlers import ANALYZE_DOCUMENT, EXTRACT_DOCUMENT, FIND_CHILDREN
 from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Document, Investigation
 from app.schemas.responses import (
-    BackgroundJobOut, DocumentDetailOut, DocumentReadFailedOut, DocumentUploadOut, ExtractionCandidateOut, OpenAlephDocumentSyncOut,
-    OpenAlephEntityImportOut, OpenAlephEvidenceImportOut, OpenAlephReviewRefreshOut, OpenAlephReviewStatusOut,
-    ValidationErrorOut, upstream,
+    BackgroundJobOut, DocumentDetailOut, DocumentEmailOut, DocumentFormatsOut, DocumentReadFailedOut, DocumentUploadOut, ErrorOut,
+    ExtractionCandidateOut, OpenAlephDocumentSyncOut, OpenAlephEntityImportOut, OpenAlephEvidenceImportOut,
+    OpenAlephReviewRefreshOut, OpenAlephReviewStatusOut, SimilarDocumentsOut, ValidationErrorOut, upstream,
 )
+from app.services.document_formats import UnsupportedFormat, accepted_formats, check_upload
+from app.services.email_documents import document_email
+from app.services.openaleph_children import is_container
+from app.services.openaleph_search import similar_documents
 from app.services.documents import (
     get_document_detail, list_document_candidates, serialize_document, store_document,
 )
@@ -162,6 +166,59 @@ async def analyze_openaleph_document(document_id: str, request: Request, respons
     return job_out
 
 
+@router.post("/documents/{document_id}/openaleph/children", response_model=BackgroundJobOut)
+async def find_openaleph_children(document_id: str, request: Request, response: Response, db: Session = Depends(get_db)) -> Any:
+    """"Look for files inside again": list an archive's or an email's files
+    in OpenAleph once more and add, as documents under it, those the
+    Workbench does not hold yet (ADR-0006, Wave A). A background job, like
+    "Find names again"."""
+    doc = db.get(Document, document_id)
+    if doc is None:
+        raise HTTPException(404, "Document not found")
+    sync = get_document_sync(db, document_id)
+    if sync is None or sync.status != "synced" or not sync.provider_record_id:
+        raise HTTPException(409, "This document is not in OpenAleph, so OpenAleph holds no files inside it")
+    if not is_container(str((sync.response_json or {}).get("schema") or "")):
+        raise HTTPException(409, "Only an archive or an email has files inside")
+    runner = job_runner(request)
+    job = create_job(
+        db, kind=FIND_CHILDREN, investigation_id=doc.investigation_id,
+        subject_type="document", subject_id=doc.id, runner=runner.mode,
+    )
+    await _submit_or_record_failure(request, job, db)
+    db.expire_all()
+    row = db.get(BackgroundJob, job.id)
+    if row is None:  # its investigation was deleted meanwhile
+        raise HTTPException(404, "Document not found")
+    job_out = serialize_job(row)
+    if not job_out["finished"]:
+        response.status_code = 202
+    return job_out
+
+
+@router.get("/documents/{document_id}/similar", response_model=SimilarDocumentsOut)
+def get_similar_documents(document_id: str, limit: int = Query(default=10, ge=1, le=50), db: Session = Depends(get_db)) -> Any:
+    """Documents of the same investigation whose text is like this one's,
+    from OpenAleph's more_like_this (ADR-0006, Wave A), each linked to its
+    Workbench document. A document OpenAleph does not hold, or OpenAleph
+    not answering, is a ``state`` of the reply."""
+    try:
+        return similar_documents(db, document_id, limit=limit)
+    except ValueError as exc:
+        raise HTTPException(404, str(exc))
+
+
+@router.get("/documents/{document_id}/email", response_model=DocumentEmailOut)
+def get_document_email(document_id: str, db: Session = Depends(get_db)) -> Any:
+    """An email document's headers (as OpenAleph read them) and its thread
+    from OpenAleph, each message linked to its Workbench document when the
+    Workbench holds it. 404 for a document that is not an email."""
+    try:
+        return document_email(db, document_id)
+    except ValueError as exc:   # NotAnEmail is one
+        raise HTTPException(404, str(exc))
+
+
 async def _submit_or_record_failure(request: Request, job: BackgroundJob, db: Session) -> None:
     """Hand a job to the runner; if it cannot even be queued, record why on
     the job so the reporter can retry it from the screen."""
@@ -176,8 +233,17 @@ async def _submit_or_record_failure(request: Request, job: BackgroundJob, db: Se
             db.commit()
 
 
+@router.get("/document-formats", response_model=DocumentFormatsOut)
+def get_document_formats() -> Any:
+    """The kinds of file an upload accepts now: every format OpenAleph's
+    ingest-file reads while OpenAleph reads uploads, else the Workbench's
+    own reader's list. ``accept`` is ready for a file picker."""
+    return accepted_formats()
+
+
 @router.post("/documents/upload", response_model=DocumentUploadOut, responses={
     202: {"model": DocumentUploadOut, "description": "Saved; the document is read by a background job (follow `job`)"},
+    415: {"model": ErrorOut, "description": "The reader this deployment uses cannot read this kind of file (GET /api/document-formats)"},
     422: {"model": ValidationErrorOut | DocumentReadFailedOut,
           "description": "The input does not match the route, or the file was saved but could not be read"},
 })
@@ -198,6 +264,10 @@ async def upload_document(
     """
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
+    try:
+        check_upload(file.filename, file.content_type)
+    except UnsupportedFormat as exc:
+        raise HTTPException(415, str(exc))
     data = await read_upload_limited(file, settings.max_document_bytes)
     if not data:
         raise HTTPException(400, "Document is empty")

@@ -1,4 +1,5 @@
 'use client';
+import {useQuery} from '@tanstack/react-query';
 import type {ReactElement} from 'react';
 import {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
 import Link from 'next/link';
@@ -11,6 +12,10 @@ import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import {nestDocuments} from '../../../features/documents/document-tree';
+import {listDocumentsOptions} from '../../../lib/generated/@tanstack/react-query.gen';
+import type {DocumentOut} from '../../../lib/generated/types.gen';
+import {QueryProvider} from '../../../lib/query-client';
 
 // Batch triage table (design doc "Document Ingestion & Review System
 // Design", Phase 1). Shown right after a bulk import, before the existing
@@ -21,12 +26,36 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/c
 // frontend screen: every field it needs (extraction_status, extraction_error,
 // extraction_issues, candidate_counts) is already returned by the existing
 // GET /api/documents/{id} endpoint, so no backend change was needed.
+// Files OpenAleph found inside an archive or attached to an email of the
+// batch (ADR-0006, Wave A) are listed under it, from the investigation's
+// document list, and the review walks them after their container.
 
-function hasIssues(d: DocItem): boolean {
+type Row = Pick<DocItem, 'id' | 'filename' | 'extraction_status' | 'extraction_error' | 'extraction_issues' | 'candidate_counts'>;
+
+/** The files found in the batch's documents, each after its container, at any depth. */
+function withFilesInside(batch: DocItem[], all: DocumentOut[]): {document: Row; depth: number; parent: Row | null}[] {
+  const batchIds = new Set(batch.map(d => d.id));
+  const inside = new Map<string, DocumentOut>();
+  let grew = true;
+  while (grew) {   // a file in an archive in an archive is in the batch too
+    grew = false;
+    for (const d of all) {
+      const parentId = d.parent_document_id;
+      if (parentId && !inside.has(d.id) && !batchIds.has(d.id) && (batchIds.has(parentId) || inside.has(parentId))) {
+        inside.set(d.id, d);
+        grew = true;
+      }
+    }
+  }
+  const rows: (Row & {parent_document_id?: string | null})[] = [...batch.map(d => ({...d, parent_document_id: null})), ...inside.values()];
+  return nestDocuments(rows);
+}
+
+function hasIssues(d: Row): boolean {
   return Boolean(d.extraction_error) || Boolean(d.extraction_issues?.length);
 }
 
-function candidateTotal(d: DocItem): number {
+function candidateTotal(d: Row): number {
   return Object.values(d.candidate_counts || {}).reduce((sum, n) => sum + n, 0);
 }
 
@@ -64,24 +93,29 @@ function BatchTriagePageInner(): ReactElement {
   }, [docIds]);
 
   useEffect(() => { void load() }, [load]);
+  // The investigation's documents, for the files found inside the batch's.
+  const listed = useQuery({...listDocumentsOptions({path: {investigation_id: invId}}), enabled: Boolean(invId) && docIds.length > 0});
 
   const startReviewAt = (id: string) => {
-    router.push(`/review?inv=${encodeURIComponent(invId)}&docs=${reorderStartingAt(docIds, id).map(encodeURIComponent).join(',')}`);
+    router.push(`/review?inv=${encodeURIComponent(invId)}&docs=${reorderStartingAt(reviewOrder, id).map(encodeURIComponent).join(',')}`);
   };
 
   if (loading) return <main className="p-6"><p className="muted">Loading batch…</p></main>;
 
-  const rows = docs || [];
+  const nested = withFilesInside(docs || [], listed.data ?? []);
+  const rows = nested.map(row => row.document);
+  const filesInside = nested.filter(row => row.depth > 0).length;
   const flagged = rows.filter(hasIssues);
-  const visibleRows = problemsOnly ? flagged : rows;
+  const visibleRows = problemsOnly ? nested.filter(row => hasIssues(row.document)) : nested;
   const firstToReview = flagged[0]?.id || rows[0]?.id;
+  const reviewOrder = rows.map(d => d.id);
 
   return (
     <main className="p-6 space-y-4 max-w-4xl mx-auto" data-testid="batch-triage-page">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Batch import triage</h1>
         <span className="text-sm muted" data-testid="triage-summary">
-          {rows.length} document(s) imported · {flagged.length} with problems
+          {rows.length - filesInside} document(s) imported{filesInside > 0 ? ` · ${filesInside} file(s) found inside` : ''} · {flagged.length} with problems
         </span>
       </div>
 
@@ -117,11 +151,14 @@ function BatchTriagePageInner(): ReactElement {
                 {visibleRows.length === 0 && (
                   <TableRow><TableCell colSpan={5} className="muted">No rows with problems -- every document in this batch parsed cleanly.</TableCell></TableRow>
                 )}
-                {visibleRows.map(d => {
+                {visibleRows.map(({document: d, depth, parent}) => {
                   const issues = hasIssues(d);
                   return (
                     <TableRow key={d.id} data-testid={`triage-row-${d.id}`}>
-                      <TableCell>{d.filename}</TableCell>
+                      <TableCell style={depth ? {paddingLeft: `${depth * 1.5}rem`} : undefined}>
+                        {d.filename}
+                        {parent && <div className="muted text-xs">Inside {parent.filename}</div>}
+                      </TableCell>
                       <TableCell>
                         <span className={issues ? 'text-destructive' : ''}>{d.extraction_status}</span>
                       </TableCell>
@@ -164,8 +201,10 @@ function BatchTriagePageInner(): ReactElement {
 
 export default function BatchTriagePage(): ReactElement {
   return (
-    <Suspense fallback={<main className="p-6"><p className="muted">Loading…</p></main>}>
-      <BatchTriagePageInner />
-    </Suspense>
+    <QueryProvider>
+      <Suspense fallback={<main className="p-6"><p className="muted">Loading…</p></main>}>
+        <BatchTriagePageInner />
+      </Suspense>
+    </QueryProvider>
   );
 }

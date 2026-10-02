@@ -42,6 +42,17 @@ async function importBatchPage(): Promise<() => ReactElement> {
 }
 
 const documentRoute = (id: string) => `GET /api/documents/${id}`;
+const LIST = 'GET /api/investigations/inv-1/documents';
+
+/** A document as the investigation's list returns it (the generated DocumentOut shape). */
+function listed(overrides: Record<string, unknown> = {}) {
+  return {
+    id: 'doc-1', investigation_id: 'inv-1', filename: 'clean.txt', source_id: 'src-1', mime_type: 'text/plain', sha256: 'abc',
+    extraction_status: 'complete', extraction_error: null, extraction_issues: [], created_at: '2026-10-02T00:00:00',
+    chunk_count: 1, candidate_counts: {evidence: 1}, openaleph_document_id: null, openaleph_schema: null, parent_document_id: null,
+    ...overrides,
+  };
+}
 
 function docFixture(overrides: Record<string, unknown> = {}) {
   return {
@@ -63,6 +74,7 @@ describe('Batch triage table', () => {
       [documentRoute('doc-c')]: docFixture({
         id: 'doc-c', filename: 'broken.docx', extraction_status: 'failed', extraction_error: 'Unsupported or corrupt file', candidate_counts: {},
       }),
+      [LIST]: [],
     });
 
     const BatchTriagePage = await importBatchPage();
@@ -131,5 +143,29 @@ describe('Batch triage table', () => {
 
     await screen.findByText(/Nothing was imported in this batch/);
     expect(api.fetch).not.toHaveBeenCalled();
+  });
+
+  it('lists the files found inside an archive of the batch under it and reviews them after it', async () => {
+    setParams('inv=inv-1&docs=doc-zip');
+    mockApi({
+      [documentRoute('doc-zip')]: docFixture({id: 'doc-zip', filename: 'bundle.zip', candidate_counts: {}, chunk_count: 0}),
+      [LIST]: [
+        listed({id: 'doc-zip', filename: 'bundle.zip', openaleph_schema: 'Package', candidate_counts: {}}),
+        listed({id: 'doc-first', filename: 'letters/first.txt', parent_document_id: 'doc-zip', candidate_counts: {entity: 1}}),
+        listed({id: 'doc-inner', filename: 'inner.zip', parent_document_id: 'doc-zip', openaleph_schema: 'Package', candidate_counts: {}}),
+        listed({id: 'doc-deep', filename: 'deep.txt', parent_document_id: 'doc-inner', extraction_status: 'failed', extraction_error: 'needs OpenAleph'}),
+        listed({id: 'doc-other', filename: 'unrelated.txt'}),
+      ],
+    });
+    const BatchTriagePage = await importBatchPage();
+    render(<BatchTriagePage />);
+
+    await screen.findByTestId('triage-row-doc-first');
+    expect(screen.getByTestId('triage-summary')).toHaveTextContent('1 document(s) imported · 3 file(s) found inside · 1 with problems');
+    expect(within(screen.getByTestId('triage-row-doc-deep')).getByText('Inside inner.zip')).toBeInTheDocument();
+    expect(screen.queryByTestId('triage-row-doc-other')).not.toBeInTheDocument();
+
+    await userEvent.setup().click(within(screen.getByTestId('triage-row-doc-zip')).getByRole('button', {name: 'Review'}));
+    expect(mockPush).toHaveBeenCalledWith('/review?inv=inv-1&docs=doc-zip,doc-first,doc-inner,doc-deep');
   });
 });

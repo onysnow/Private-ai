@@ -237,6 +237,29 @@ def _identifier_proposal(document_id: str) -> str:
         return row.id
 
 
+def _email_document(document_id: str) -> str:
+    """An email read by OpenAleph, as the read job keeps it: a document of the
+    seeded investigation whose Source carries the headers OpenAleph read
+    (jobs/handlers.py _record_openaleph_details)."""
+    from app.db.session import SessionLocal
+    from app.models.domain import Document, Source
+
+    with SessionLocal() as db:
+        seeded = db.get(Document, document_id)
+        assert seeded is not None
+        source = Source(investigation_id=seeded.investigation_id, title="transfer.eml", source_type="document",
+                        metadata_json={"filename": "transfer.eml", "email": {
+                            "from": ["Jane Doe <jane.doe@meridian.example>"], "subject": ["Transfer"]}})
+        db.add(source)
+        db.flush()
+        email = Document(investigation_id=seeded.investigation_id, source_id=source.id, filename="transfer.eml",
+                         mime_type="message/rfc822", sha256=seeded.sha256, storage_path=seeded.storage_path,
+                         extraction_status="complete")
+        db.add(email)
+        db.commit()
+        return email.id
+
+
 def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, reasoning: Any) -> Seeded:
     """The demo investigation and one of everything else the API can read."""
     def ok(response: httpx.Response) -> Any:
@@ -267,6 +290,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     # An email proposal as OpenAleph's analysis makes it (app/services/openaleph_analysis.py);
     # the fallback reader used here has no analysis, so it is written directly.
     identifier = _identifier_proposal(document["id"])
+    email = _email_document(document["id"])
 
     # Connector findings, a statement assessment, an external relationship review, an enrichment session.
     findings = ok(client.post("/api/connectors/fake-a/search", json={"investigation_id": inv, "query": "Meridian"}))
@@ -326,6 +350,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
                 ("POST", "/api/ai-analysis-candidates/{candidate_id}/promote-to-writeup"),
                 ("POST", "/api/ai-analysis-candidates/{candidate_id}/review"))},
             ("GET", "/api/extraction-candidates/{candidate_id}/identifier-targets"): {"candidate_id": identifier},
+            ("GET", "/api/documents/{document_id}/email"): {"document_id": email},
             **{(method, path): {"candidate_id": proposal} for method, path in (
                 ("GET", "/api/extraction-candidates/{candidate_id}/entity-matches"),
                 ("GET", "/api/extraction-candidates/{candidate_id}/explanation"),
@@ -349,6 +374,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             ("GET", "/api/provenance/extraction-lineage"): {"record_type": "evidence", "record_id": accepted["accepted_record_id"]},
             ("GET", "/api/provenance/trace"): {"record_type": "claim", "record_id": claim["id"]},
             ("GET", "/api/search"): {"q": "Meridian"},
+            ("GET", "/api/investigations/{investigation_id}/corpus/search"): {"q": "Meridian"},
             ("POST", "/api/console/backups/{bid}/restore/plan"): {"kind": "investigation_export"},
         },
     )

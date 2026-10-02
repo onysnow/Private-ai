@@ -16,6 +16,7 @@ import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
+import {corpusSearchBody} from '../test-support/page-routes';
 
 vi.mock('next/dynamic', () => ({
   // The timeline chart needs a canvas; the panel's own list is what these tests check.
@@ -43,7 +44,7 @@ const searchBody = (results: unknown[]) => ({query: 'x', investigation_id: 'inv-
 
 describe('SearchPanel', () => {
   it('searches on click and on Enter, keeps groups apart, and asks for a trace', async () => {
-    const api = mockApi({'GET /api/search': searchBody([canonicalHit, externalLeadHit])});
+    const api = mockApi({'GET /api/search': searchBody([canonicalHit, externalLeadHit]), 'GET /api/investigations/inv-1/corpus/search': corpusSearchBody('inv-1')});
     wrap(<SearchPanel investigationId="inv-1"/>);
     const user = userEvent.setup();
     await user.type(screen.getByPlaceholderText('Search this investigation…'), 'Kestrelwood');

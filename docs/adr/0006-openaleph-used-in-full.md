@@ -71,6 +71,64 @@ Workbench's search for `Mention` entities could never find anything.
 - **The image has fifteen spaCy models**, not only English (correcting the
   table below): `SpacyNerModels` lists one small model per language and all
   are installed in `ftm-analyze:5.3.1`.
+- **Collection status counts only a collection with work in hand.**
+  `GET /collections/{id}/status` returns openaleph-procrastinate's
+  `DatasetStatus`: job counts per batch and queue while any job of the
+  collection waits or runs (`STATUS_SUMMARY_ACTIVE` in
+  `manage/sql.py`), finished jobs included; an idle collection answers
+  zeros and no batches. The Workbench's reading progress
+  (`GET /api/investigations/{id}/corpus/status`) therefore lists stages
+  only while OpenAleph works, and asks again every three seconds until it
+  is idle.
+- **What ingest-file reads is read from the image, not listed by hand.**
+  `tools/openaleph_ingest_formats.py` asks the ingestor registry inside
+  `ghcr.io/openaleph/ingest-file:<tag>` (servicelayer's
+  `get_extensions("ingestors")`, which `Manager.auction` uses) for each
+  ingestor's score and the MIME types and extensions it claims, normalised
+  as `Ingestor.match` normalises them, and writes
+  `backend/app/services/openaleph_formats.py`. The upload check runs the
+  same auction: the highest score among the ingestors claiming a file wins.
+  5.3.1 has 37 ingestors; a file whose auction `IgnoreIngestor` wins
+  (executables, fonts, keys, `.log` files, which it outbids plain text for)
+  is refused, since OpenAleph would store it without reading it. A test
+  fails when the compose files move to another ingest-file tag without the
+  list being generated again.
+- **RAR archives match by extension only.** `RARIngestor.MIME_TYPES` in
+  `ingestors/packages/rar.py` is `['application/rarapplication/x-rar']`: a
+  missing comma joins the two types into one that matches nothing, so only
+  `.rar` selects it.
+- **Files inside a container are its children.** A zip becomes a
+  `Package`; a directory in it a `Folder` (no file of its own); each file a
+  document whose `parent` is that folder or the package; an email's
+  attachments have the `Email` as parent. They are listed with
+  `GET /search?filter:properties.parent=<id>` and their bytes come from
+  `GET /archive/resolve?entity=<id>&redirect=false`, which answers a signed
+  link to `/api/2/archive` built on OpenAleph's public address; the
+  Workbench follows that path on the address it reaches OpenAleph at. A
+  container's status turns `success` before its files are read (each is a
+  job of its own), so the Workbench waits until the collection has no
+  reading, name-finding or indexing work left. Each file becomes a
+  Workbench document with `parent_document_id`, read by a job of its own
+  so it can be retried alone; a workbook's sheets (`Table` entities, no
+  file of their own) are not included.
+- **Search finds pages only when asked.** `GET /search` returns whole
+  documents (a PDF as its `Pages` entity) unless `filter:schemata` names
+  `Page` as well; then the matching page comes back too, with its `index`
+  and its `document` (nested as an entity in a search reply). The
+  Workbench asks for `Document` and `Page`, shows a document by the page
+  that matched, and links every hit to its Workbench document; snippets are
+  OpenAleph's highlights (`<em>` around each match, HTML-escaped text),
+  turned into plain pieces so nothing is rendered as markup.
+  `GET /entities/{id}/more_like_this` gives similar documents, filtered to
+  the investigation's collection.
+- **A message nothing replies to has no thread.** `GET /entities/{id}/thread`
+  answers no results for it (its docstring says the source is included);
+  the Workbench says "no other message in this email's thread".
+- **A file only OpenAleph reads waits for OpenAleph.** When OpenAleph
+  cannot be reached, a PDF, Word file or text file falls back to the
+  Workbench's own reader as before; an email, archive, spreadsheet or image
+  fails its read with "needs OpenAleph to read; retry when it is running",
+  and the read can be retried from the document row.
 
 ## Decision: what each part of OpenAleph does for the Workbench
 

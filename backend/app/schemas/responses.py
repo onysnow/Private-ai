@@ -766,6 +766,10 @@ class DocumentOut(ResponseModel):
     candidate_counts: dict[str, int]
     # OpenAleph's id for the document when OpenAleph holds it (ADR-0006).
     openaleph_document_id: str | None = None
+    # What OpenAleph read it as (an Email, a Package...), once read.
+    openaleph_schema: str | None = None
+    # The archive or email the file was found in (ADR-0006, Wave A).
+    parent_document_id: str | None = None
 
 
 class DocumentChunkOut(ResponseModel):
@@ -1045,6 +1049,124 @@ class OpenAlephReviewRefreshOut(ResponseModel):
     evidence: OpenAlephEvidenceImportOut
     entities: OpenAlephEntityImportOut
     status: OpenAlephReviewStatusOut
+
+
+class EmailHeadersOut(ResponseModel):
+    """An email's headers as OpenAleph read them."""
+    from_: list[str] = Field(alias="from")
+    to: list[str]
+    cc: list[str]
+    bcc: list[str]
+    date: str | None
+    subject: str | None
+    message_id: str | None
+    in_reply_to: list[str]
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class EmailThreadMessageOut(ResponseModel):
+    """One message of the thread, oldest first; ``document_id`` when the
+    Workbench holds it too."""
+    openaleph_entity_id: str
+    subject: str | None
+    sender: str | None
+    date: str | None
+    document_id: str | None
+    current: bool
+
+
+class DocumentEmailOut(ResponseModel):
+    """An email document's headers and thread (app/services/email_documents.py)."""
+    document_id: str
+    headers: EmailHeadersOut
+    thread: list[EmailThreadMessageOut]
+    # Why the thread is missing or cut short, in a sentence.
+    thread_note: str | None
+
+
+class HighlightSegmentOut(ResponseModel):
+    """A piece of a snippet; ``match`` marks the words the search found."""
+    text: str
+    match: bool
+
+
+class CorpusHitOut(ResponseModel):
+    """A document (or a page of one) OpenAleph found, linked to its Workbench
+    document when the Workbench holds it (app/services/openaleph_search.py)."""
+    openaleph_entity_id: str
+    schema_: str = Field(alias="schema")
+    title: str
+    document_id: str | None
+    filename: str | None
+    page_number: int | None
+    highlights: list[list[HighlightSegmentOut]]
+    score: float | None
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class CorpusSearchOut(ResponseModel):
+    """Full-text search of the investigation's corpus in OpenAleph."""
+    investigation_id: str
+    query: str
+    state: Literal["ok", "not_configured", "no_collection", "unreachable"]
+    detail: str | None
+    total: int
+    results: list[CorpusHitOut]
+
+
+class SimilarDocumentOut(ResponseModel):
+    openaleph_entity_id: str
+    schema_: str = Field(alias="schema")
+    title: str
+    document_id: str | None
+    filename: str | None
+    page_number: int | None
+    score: float | None
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class SimilarDocumentsOut(ResponseModel):
+    """Documents whose text is like this one's (OpenAleph's more_like_this)."""
+    document_id: str
+    state: Literal["ok", "not_configured", "no_collection", "unreachable"]
+    detail: str | None
+    results: list[SimilarDocumentOut]
+
+
+class DocumentFormatsOut(ResponseModel):
+    """What an upload accepts now (app/services/document_formats.py)."""
+    reader: Literal["openaleph", "workbench"]
+    extensions: list[str]
+    mime_types: list[str]
+    openaleph_only_extensions: list[str]
+    accept: str
+    max_bytes: int
+    ingest_file_image: str | None = None
+
+
+class CorpusStageOut(ResponseModel):
+    """One of OpenAleph's queues for the collection, jobs counted across its
+    batches (app/services/openaleph_status.py)."""
+    queue: str
+    label: str
+    pending: int
+    running: int
+    finished: int
+    failed: int
+
+
+class CorpusStatusOut(ResponseModel):
+    """How OpenAleph's reading of an investigation's corpus stands (ADR-0006)."""
+    investigation_id: str
+    collection_id: str | None = None
+    state: Literal["not_configured", "no_collection", "unreachable", "working", "idle"]
+    active: bool
+    stages: list[CorpusStageOut]
+    detail: str | None = None
+    checked_at: Timestamp
 
 
 # --- The corpus copy of confirmed records (ADR-0006, Wave B) -----------------------

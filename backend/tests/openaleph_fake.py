@@ -67,8 +67,18 @@ class FakeOpenAleph:
         self.analysis: dict[str, dict[str, list[str]]] = {}
         self.analyze_reply = 202
         self.fail: dict[str, int] = {}          # path -> HTTP status to answer instead
+        # Raised by ingest_upload instead of storing the file (OpenAleph down).
+        self.refuse_uploads: Exception | None = None
         self.requests: list[httpx.Request] = []
         self.uploads: list[tuple[str, Path, dict[str, Any]]] = []
+        # Files inside a container (archive, email): their bytes, by entity id;
+        # each child entity names its container in ``parent`` (add_child).
+        self.files: dict[str, bytes] = {}
+        # GET /entities/{id}/thread replies, by email entity id.
+        self.threads: dict[str, dict[str, Any]] = {}
+        # Full-text search hits (GET /search with ``q``) and more_like_this hits, by entity id.
+        self.search_hits: list[dict[str, Any]] = []
+        self.similar: dict[str, list[dict[str, Any]]] = {}
         self._pending_analysis: list[str] = []
         self.transport = httpx.MockTransport(self.handle)
 
@@ -83,6 +93,8 @@ class FakeOpenAleph:
 
     def ingest_upload(self, *, collection_id: str, file_path: Path, metadata: dict[str, Any],
                       sync: bool = False, index: bool = True) -> dict[str, Any]:
+        if self.refuse_uploads is not None:
+            raise self.refuse_uploads
         entity_id = f"{len(self.uploads) + 1}.upload"
         self.uploads.append((collection_id, Path(file_path), metadata))
         if entity_id not in self.entities:
@@ -111,6 +123,21 @@ class FakeOpenAleph:
             return self._entity(parts[3])
         if path == "/api/2/search":
             return self._search(request)
+        if parts[:3] == ["api", "2", "entities"] and len(parts) == 5 and parts[4] == "thread":
+            thread = self.threads.get(parts[3])
+            return httpx.Response(200, json=thread) if thread is not None else httpx.Response(400, json={"status": "error"})
+        if parts[:3] == ["api", "2", "entities"] and len(parts) == 5 and parts[4] == "more_like_this":
+            rows = self.similar.get(parts[3])
+            return httpx.Response(200, json={"results": rows, "total": len(rows)}) if rows is not None else httpx.Response(404)
+        if path == "/api/2/archive/resolve":
+            entity_id = request.url.params.get("entity", "")
+            if entity_id not in self.files:
+                return httpx.Response(404)
+            # Built on OpenAleph's public address, as OpenAleph's archive_url does.
+            return httpx.Response(200, json={"url": f"http://localhost:8080/api/2/archive?token={entity_id}"})
+        if path == "/api/2/archive":
+            data = self.files.get(request.url.params.get("token", ""))
+            return httpx.Response(200, content=data) if data is not None else httpx.Response(404)
         return httpx.Response(404, json={"status": "error", "message": f"fake has no {request.method} {path}"})
 
     def _entity(self, entity_id: str) -> httpx.Response:
@@ -146,11 +173,32 @@ class FakeOpenAleph:
 
     def _search(self, request: httpx.Request) -> httpx.Response:
         params = request.url.params
+        parent = params.get("filter:properties.parent")
+        if parent is not None:
+            rows = [row for row in self.entities.values() if parent in row["properties"].get("parent", [])]
+            offset, limit = int(params.get("offset", 0)), int(params.get("limit", 20))
+            return httpx.Response(200, json={"results": rows[offset:offset + limit], "total": len(rows)})
+        if params.get("filter:schema") != "Page" and params.get("q") not in (None, "*"):
+            return httpx.Response(200, json={"results": self.search_hits, "total": len(self.search_hits)})
         if params.get("filter:schema") == "Page":
             document_id = params.get("filter:properties.document", "")
             rows = self.pages.get(document_id, [])
             return httpx.Response(200, json={"results": rows, "total": len(rows)})
         return httpx.Response(200, json={"results": [], "total": 0})
+
+    def add_child(self, parent_id: str, entity_id: str, name: str, data: bytes | None, *,
+                  schema: str = "PlainText", **properties: Any) -> dict[str, Any]:
+        """A file ingest-file found inside ``parent_id`` (a Folder has no
+        bytes). Its text is its bytes, read as UTF-8, unless given."""
+        props: dict[str, Any] = {"parent": parent_id, "fileName": name}
+        if data is not None:
+            props.update(contentHash=f"hash-{entity_id}", fileSize=str(len(data)))
+            self.files[entity_id] = data
+            props.setdefault("bodyText", data.decode("utf-8", "replace"))
+        props.update(properties)
+        child = entity(entity_id, schema, status=None if schema == "Folder" else "success", **props)
+        self.entities[entity_id] = child
+        return child
 
     def calls(self, method: str, path: str) -> list[httpx.Request]:
         return [r for r in self.requests if r.method == method and r.url.path == path]

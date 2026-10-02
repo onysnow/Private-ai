@@ -8381,6 +8381,89 @@
         "title": "CoreCapabilitiesOut",
         "type": "object"
       },
+      "CorpusHitOut": {
+        "description": "A document (or a page of one) OpenAleph found, linked to its Workbench\ndocument when the Workbench holds it (app/services/openaleph_search.py).",
+        "properties": {
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "filename": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filename"
+          },
+          "highlights": {
+            "items": {
+              "items": {
+                "$ref": "#/components/schemas/HighlightSegmentOut"
+              },
+              "type": "array"
+            },
+            "title": "Highlights",
+            "type": "array"
+          },
+          "openaleph_entity_id": {
+            "title": "Openaleph Entity Id",
+            "type": "string"
+          },
+          "page_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Number"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "openaleph_entity_id",
+          "schema",
+          "title",
+          "document_id",
+          "filename",
+          "page_number",
+          "highlights",
+          "score"
+        ],
+        "title": "CorpusHitOut",
+        "type": "object"
+      },
       "CorpusPendingOut": {
         "description": "What the next push would change, and the records it cannot send (with why).",
         "properties": {
@@ -8497,6 +8580,168 @@
           "removals_waiting"
         ],
         "title": "CorpusPushOut",
+        "type": "object"
+      },
+      "CorpusSearchOut": {
+        "description": "Full-text search of the investigation's corpus in OpenAleph.",
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/CorpusHitOut"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "state": {
+            "enum": [
+              "ok",
+              "not_configured",
+              "no_collection",
+              "unreachable"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "query",
+          "state",
+          "detail",
+          "total",
+          "results"
+        ],
+        "title": "CorpusSearchOut",
+        "type": "object"
+      },
+      "CorpusStageOut": {
+        "description": "One of OpenAleph's queues for the collection, jobs counted across its\nbatches (app/services/openaleph_status.py).",
+        "properties": {
+          "failed": {
+            "title": "Failed",
+            "type": "integer"
+          },
+          "finished": {
+            "title": "Finished",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "pending": {
+            "title": "Pending",
+            "type": "integer"
+          },
+          "queue": {
+            "title": "Queue",
+            "type": "string"
+          },
+          "running": {
+            "title": "Running",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "queue",
+          "label",
+          "pending",
+          "running",
+          "finished",
+          "failed"
+        ],
+        "title": "CorpusStageOut",
+        "type": "object"
+      },
+      "CorpusStatusOut": {
+        "description": "How OpenAleph's reading of an investigation's corpus stands (ADR-0006).",
+        "properties": {
+          "active": {
+            "title": "Active",
+            "type": "boolean"
+          },
+          "checked_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Checked At",
+            "type": "string"
+          },
+          "collection_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collection Id"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/CorpusStageOut"
+            },
+            "title": "Stages",
+            "type": "array"
+          },
+          "state": {
+            "enum": [
+              "not_configured",
+              "no_collection",
+              "unreachable",
+              "working",
+              "idle"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "state",
+          "active",
+          "stages",
+          "checked_at"
+        ],
+        "title": "CorpusStatusOut",
         "type": "object"
       },
       "CorpusSyncNowOut": {
@@ -9479,6 +9724,28 @@
             ],
             "title": "Openaleph Document Id"
           },
+          "openaleph_schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Openaleph Schema"
+          },
+          "parent_document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Document Id"
+          },
           "sha256": {
             "title": "Sha256",
             "type": "string"
@@ -9502,6 +9769,44 @@
           "chunks"
         ],
         "title": "DocumentDetailOut",
+        "type": "object"
+      },
+      "DocumentEmailOut": {
+        "description": "An email document's headers and thread (app/services/email_documents.py).",
+        "properties": {
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "headers": {
+            "$ref": "#/components/schemas/EmailHeadersOut"
+          },
+          "thread": {
+            "items": {
+              "$ref": "#/components/schemas/EmailThreadMessageOut"
+            },
+            "title": "Thread",
+            "type": "array"
+          },
+          "thread_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Note"
+          }
+        },
+        "required": [
+          "document_id",
+          "headers",
+          "thread",
+          "thread_note"
+        ],
+        "title": "DocumentEmailOut",
         "type": "object"
       },
       "DocumentExtractionSettingsOut": {
@@ -9548,6 +9853,69 @@
           "ocr_runtime"
         ],
         "title": "DocumentExtractionSettingsOut",
+        "type": "object"
+      },
+      "DocumentFormatsOut": {
+        "description": "What an upload accepts now (app/services/document_formats.py).",
+        "properties": {
+          "accept": {
+            "title": "Accept",
+            "type": "string"
+          },
+          "extensions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Extensions",
+            "type": "array"
+          },
+          "ingest_file_image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ingest File Image"
+          },
+          "max_bytes": {
+            "title": "Max Bytes",
+            "type": "integer"
+          },
+          "mime_types": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Mime Types",
+            "type": "array"
+          },
+          "openaleph_only_extensions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Openaleph Only Extensions",
+            "type": "array"
+          },
+          "reader": {
+            "enum": [
+              "openaleph",
+              "workbench"
+            ],
+            "title": "Reader",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reader",
+          "extensions",
+          "mime_types",
+          "openaleph_only_extensions",
+          "accept",
+          "max_bytes"
+        ],
+        "title": "DocumentFormatsOut",
         "type": "object"
       },
       "DocumentOut": {
@@ -9624,6 +9992,28 @@
               }
             ],
             "title": "Openaleph Document Id"
+          },
+          "openaleph_schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Openaleph Schema"
+          },
+          "parent_document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Document Id"
           },
           "sha256": {
             "title": "Sha256",
@@ -9788,6 +10178,17 @@
             ],
             "title": "Openaleph Document Id"
           },
+          "openaleph_schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Openaleph Schema"
+          },
           "openaleph_sync": {
             "anyOf": [
               {
@@ -9797,6 +10198,17 @@
                 "type": "null"
               }
             ]
+          },
+          "parent_document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Document Id"
           },
           "sha256": {
             "title": "Sha256",
@@ -10311,6 +10723,158 @@
           "unresolved_external_count"
         ],
         "title": "DossierSummaryOut",
+        "type": "object"
+      },
+      "EmailHeadersOut": {
+        "description": "An email's headers as OpenAleph read them.",
+        "properties": {
+          "bcc": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Bcc",
+            "type": "array"
+          },
+          "cc": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Cc",
+            "type": "array"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "from": {
+            "items": {
+              "type": "string"
+            },
+            "title": "From",
+            "type": "array"
+          },
+          "in_reply_to": {
+            "items": {
+              "type": "string"
+            },
+            "title": "In Reply To",
+            "type": "array"
+          },
+          "message_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message Id"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          },
+          "to": {
+            "items": {
+              "type": "string"
+            },
+            "title": "To",
+            "type": "array"
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "cc",
+          "bcc",
+          "date",
+          "subject",
+          "message_id",
+          "in_reply_to"
+        ],
+        "title": "EmailHeadersOut",
+        "type": "object"
+      },
+      "EmailThreadMessageOut": {
+        "description": "One message of the thread, oldest first; ``document_id`` when the\nWorkbench holds it too.",
+        "properties": {
+          "current": {
+            "title": "Current",
+            "type": "boolean"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "openaleph_entity_id": {
+            "title": "Openaleph Entity Id",
+            "type": "string"
+          },
+          "sender": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sender"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          }
+        },
+        "required": [
+          "openaleph_entity_id",
+          "subject",
+          "sender",
+          "date",
+          "document_id",
+          "current"
+        ],
+        "title": "EmailThreadMessageOut",
         "type": "object"
       },
       "EnrichmentClusterOut": {
@@ -13374,6 +13938,25 @@
           "status"
         ],
         "title": "HealthOut",
+        "type": "object"
+      },
+      "HighlightSegmentOut": {
+        "description": "A piece of a snippet; ``match`` marks the words the search found.",
+        "properties": {
+          "match": {
+            "title": "Match",
+            "type": "boolean"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "match"
+        ],
+        "title": "HighlightSegmentOut",
         "type": "object"
       },
       "HypothesisTestRequest": {
@@ -18826,6 +19409,122 @@
           "connectors"
         ],
         "title": "SettingsStatusOut",
+        "type": "object"
+      },
+      "SimilarDocumentOut": {
+        "properties": {
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "filename": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filename"
+          },
+          "openaleph_entity_id": {
+            "title": "Openaleph Entity Id",
+            "type": "string"
+          },
+          "page_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Number"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "openaleph_entity_id",
+          "schema",
+          "title",
+          "document_id",
+          "filename",
+          "page_number",
+          "score"
+        ],
+        "title": "SimilarDocumentOut",
+        "type": "object"
+      },
+      "SimilarDocumentsOut": {
+        "description": "Documents whose text is like this one's (OpenAleph's more_like_this).",
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/SimilarDocumentOut"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "state": {
+            "enum": [
+              "ok",
+              "not_configured",
+              "no_collection",
+              "unreachable"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "document_id",
+          "state",
+          "detail",
+          "results"
+        ],
+        "title": "SimilarDocumentsOut",
         "type": "object"
       },
       "SortOrder": {
@@ -30378,6 +31077,45 @@
         "summary": "Seed Demo"
       }
     },
+    "/api/document-formats": {
+      "get": {
+        "description": "The kinds of file an upload accepts now: every format OpenAleph's\ningest-file reads while OpenAleph reads uploads, else the Workbench's\nown reader's list. ``accept`` is ready for a file picker.",
+        "operationId": "get_document_formats",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentFormatsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Document Formats"
+      }
+    },
     "/api/documents/upload": {
       "post": {
         "description": "Save the file, then read it as a background job.\n\nOn PostgreSQL (the product) this answers 202 as soon as the file is saved:\nthe document is ``queued`` and ``job`` says how to follow it\n(GET /api/jobs/{id}). In developer mode (SQLite) the job runs before the\nreply, off the event loop, so the answer is the read document as before.",
@@ -30412,6 +31150,16 @@
               }
             },
             "description": "Saved; the document is read by a background job (follow `job`)"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "The reader this deployment uses cannot read this kind of file (GET /api/document-formats)"
           },
           "422": {
             "content": {
@@ -30927,6 +31675,56 @@
         "summary": "Sync Openaleph Document"
       }
     },
+    "/api/documents/{document_id}/email": {
+      "get": {
+        "description": "An email document's headers (as OpenAleph read them) and its thread\nfrom OpenAleph, each message linked to its Workbench document when the\nWorkbench holds it. 404 for a document that is not an email.",
+        "operationId": "get_document_email",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentEmailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Document Email"
+      }
+    },
     "/api/documents/{document_id}/openaleph/analyze": {
       "post": {
         "description": "\"Find names again\": OpenAleph analyses the document again\n(POST /api/2/entities/{id}/analyze) and what it finds becomes proposals,\nas a background job (ADR-0006). Answers 202 with the job while it runs;\nin developer mode (SQLite) the job has finished when this answers.",
@@ -30975,6 +31773,118 @@
           }
         },
         "summary": "Analyze Openaleph Document"
+      }
+    },
+    "/api/documents/{document_id}/openaleph/children": {
+      "post": {
+        "description": "\"Look for files inside again\": list an archive's or an email's files\nin OpenAleph once more and add, as documents under it, those the\nWorkbench does not hold yet (ADR-0006, Wave A). A background job, like\n\"Find names again\".",
+        "operationId": "find_openaleph_children",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackgroundJobOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Find Openaleph Children"
+      }
+    },
+    "/api/documents/{document_id}/similar": {
+      "get": {
+        "description": "Documents of the same investigation whose text is like this one's,\nfrom OpenAleph's more_like_this (ADR-0006, Wave A), each linked to its\nWorkbench document. A document OpenAleph does not hold, or OpenAleph\nnot answering, is a ``state`` of the reply.",
+        "operationId": "get_similar_documents",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimilarDocumentsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Similar Documents"
       }
     },
     "/api/enrichment-sessions/{session_id}": {
@@ -33762,6 +34672,141 @@
           }
         },
         "summary": "List Openaleph Corpus Failures"
+      }
+    },
+    "/api/investigations/{investigation_id}/corpus/search": {
+      "get": {
+        "description": "Full-text search of the investigation's documents in OpenAleph, with\nhighlighted snippets, each hit linked to its Workbench document and page\n(ADR-0006, Wave A). OpenAleph off, holding nothing yet, or not answering\nis a ``state`` of the reply, so investigation search can show its other\ngroups.",
+        "operationId": "search_investigation_corpus",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "maxLength": 500,
+              "minLength": 1,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "maximum": 9000,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorpusSearchOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Search Investigation Corpus"
+      }
+    },
+    "/api/investigations/{investigation_id}/corpus/status": {
+      "get": {
+        "description": "How far OpenAleph has got with the investigation's files: jobs\nwaiting, running and finished per stage (reading, finding names,\nindexing...). A deployment without OpenAleph, or one OpenAleph does not\nanswer, says so in ``state`` rather than failing, so the documents panel\ncan keep asking while files are being read.",
+        "operationId": "get_corpus_status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorpusStatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Corpus Status"
       }
     },
     "/api/investigations/{investigation_id}/corpus/sync": {

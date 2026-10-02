@@ -153,12 +153,18 @@ import type {
   FindingCandidatesData,
   FindingCandidatesErrors,
   FindingCandidatesResponses,
+  FindOpenalephChildrenData,
+  FindOpenalephChildrenErrors,
+  FindOpenalephChildrenResponses,
   GetAiAnalysisCandidateEndpointData,
   GetAiAnalysisCandidateEndpointErrors,
   GetAiAnalysisCandidateEndpointResponses,
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceErrors,
   GetClaimReviewWorkspaceResponses,
+  GetCorpusStatusData,
+  GetCorpusStatusErrors,
+  GetCorpusStatusResponses,
   GetCorpusSyncData,
   GetCorpusSyncErrors,
   GetCorpusSyncResponses,
@@ -166,7 +172,13 @@ import type {
   GetDeckEndpointErrors,
   GetDeckEndpointResponses,
   GetDocumentData,
+  GetDocumentEmailData,
+  GetDocumentEmailErrors,
+  GetDocumentEmailResponses,
   GetDocumentErrors,
+  GetDocumentFormatsData,
+  GetDocumentFormatsErrors,
+  GetDocumentFormatsResponses,
   GetDocumentResponses,
   GetEntityDossierData,
   GetEntityDossierErrors,
@@ -225,6 +237,9 @@ import type {
   GetSecurityAuditSummaryData,
   GetSecurityAuditSummaryErrors,
   GetSecurityAuditSummaryResponses,
+  GetSimilarDocumentsData,
+  GetSimilarDocumentsErrors,
+  GetSimilarDocumentsResponses,
   GetWriteupEndpointData,
   GetWriteupEndpointErrors,
   GetWriteupEndpointResponses,
@@ -438,6 +453,9 @@ import type {
   SaveConnectorCredentialData,
   SaveConnectorCredentialErrors,
   SaveConnectorCredentialResponses,
+  SearchInvestigationCorpusData,
+  SearchInvestigationCorpusErrors,
+  SearchInvestigationCorpusResponses,
   SearchWorkbenchData,
   SearchWorkbenchErrors,
   SearchWorkbenchResponses,
@@ -585,14 +603,21 @@ import {
   zFindExtractionLineageEndpointResponse,
   zFindingCandidatesPath,
   zFindingCandidatesResponse,
+  zFindOpenalephChildrenPath,
+  zFindOpenalephChildrenResponse,
   zGetAiAnalysisCandidateEndpointPath,
   zGetAiAnalysisCandidateEndpointResponse,
   zGetClaimReviewWorkspacePath,
   zGetClaimReviewWorkspaceResponse,
+  zGetCorpusStatusPath,
+  zGetCorpusStatusResponse,
   zGetCorpusSyncPath,
   zGetCorpusSyncResponse,
   zGetDeckEndpointPath,
   zGetDeckEndpointResponse,
+  zGetDocumentEmailPath,
+  zGetDocumentEmailResponse,
+  zGetDocumentFormatsResponse,
   zGetDocumentPath,
   zGetDocumentResponse,
   zGetEntityDossierPath,
@@ -633,6 +658,9 @@ import {
   zGetSecurityAuditRetentionPreviewQuery,
   zGetSecurityAuditRetentionPreviewResponse,
   zGetSecurityAuditSummaryResponse,
+  zGetSimilarDocumentsPath,
+  zGetSimilarDocumentsQuery,
+  zGetSimilarDocumentsResponse,
   zGetWriteupEndpointPath,
   zGetWriteupEndpointResponse,
   zHealthResponse,
@@ -803,6 +831,9 @@ import {
   zSaveConnectorCredentialBody,
   zSaveConnectorCredentialPath,
   zSaveConnectorCredentialResponse,
+  zSearchInvestigationCorpusPath,
+  zSearchInvestigationCorpusQuery,
+  zSearchInvestigationCorpusResponse,
   zSearchWorkbenchQuery,
   zSearchWorkbenchResponse,
   zSeedDemoResponse,
@@ -1828,6 +1859,39 @@ export const seedDemo = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Document Formats
+ *
+ * The kinds of file an upload accepts now: every format OpenAleph's
+ * ingest-file reads while OpenAleph reads uploads, else the Workbench's
+ * own reader's list. ``accept`` is ready for a file picker.
+ */
+export const getDocumentFormats = <ThrowOnError extends boolean = false>(
+  options?: Options<GetDocumentFormatsData, ThrowOnError>,
+): RequestResult<
+  GetDocumentFormatsResponses,
+  GetDocumentFormatsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetDocumentFormatsResponses,
+    GetDocumentFormatsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDocumentFormatsResponse.parseAsync(data),
+    url: '/api/document-formats',
+    ...options,
+  });
+
+/**
  * Upload Document
  *
  * Save the file, then read it as a background job.
@@ -2113,6 +2177,39 @@ export const syncOpenalephDocument = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Document Email
+ *
+ * An email document's headers (as OpenAleph read them) and its thread
+ * from OpenAleph, each message linked to its Workbench document when the
+ * Workbench holds it. 404 for a document that is not an email.
+ */
+export const getDocumentEmail = <ThrowOnError extends boolean = false>(
+  options: Options<GetDocumentEmailData, ThrowOnError>,
+): RequestResult<
+  GetDocumentEmailResponses,
+  GetDocumentEmailErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetDocumentEmailResponses,
+    GetDocumentEmailErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetDocumentEmailPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDocumentEmailResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/email',
+    ...options,
+  });
+
+/**
  * Analyze Openaleph Document
  *
  * "Find names again": OpenAleph analyses the document again
@@ -2143,6 +2240,74 @@ export const analyzeOpenalephDocument = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zAnalyzeOpenalephDocumentResponse.parseAsync(data),
     url: '/api/documents/{document_id}/openaleph/analyze',
+    ...options,
+  });
+
+/**
+ * Find Openaleph Children
+ *
+ * "Look for files inside again": list an archive's or an email's files
+ * in OpenAleph once more and add, as documents under it, those the
+ * Workbench does not hold yet (ADR-0006, Wave A). A background job, like
+ * "Find names again".
+ */
+export const findOpenalephChildren = <ThrowOnError extends boolean = false>(
+  options: Options<FindOpenalephChildrenData, ThrowOnError>,
+): RequestResult<
+  FindOpenalephChildrenResponses,
+  FindOpenalephChildrenErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    FindOpenalephChildrenResponses,
+    FindOpenalephChildrenErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zFindOpenalephChildrenPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zFindOpenalephChildrenResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/openaleph/children',
+    ...options,
+  });
+
+/**
+ * Get Similar Documents
+ *
+ * Documents of the same investigation whose text is like this one's,
+ * from OpenAleph's more_like_this (ADR-0006, Wave A), each linked to its
+ * Workbench document. A document OpenAleph does not hold, or OpenAleph
+ * not answering, is a ``state`` of the reply.
+ */
+export const getSimilarDocuments = <ThrowOnError extends boolean = false>(
+  options: Options<GetSimilarDocumentsData, ThrowOnError>,
+): RequestResult<
+  GetSimilarDocumentsResponses,
+  GetSimilarDocumentsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetSimilarDocumentsResponses,
+    GetSimilarDocumentsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetSimilarDocumentsPath,
+          query: zGetSimilarDocumentsQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetSimilarDocumentsResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/similar',
     ...options,
   });
 
@@ -3617,6 +3782,76 @@ export const listOpenalephCorpusFailures = <
     responseValidator: async (data) =>
       await zListOpenalephCorpusFailuresResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/corpus/openaleph/failures',
+    ...options,
+  });
+
+/**
+ * Search Investigation Corpus
+ *
+ * Full-text search of the investigation's documents in OpenAleph, with
+ * highlighted snippets, each hit linked to its Workbench document and page
+ * (ADR-0006, Wave A). OpenAleph off, holding nothing yet, or not answering
+ * is a ``state`` of the reply, so investigation search can show its other
+ * groups.
+ */
+export const searchInvestigationCorpus = <ThrowOnError extends boolean = false>(
+  options: Options<SearchInvestigationCorpusData, ThrowOnError>,
+): RequestResult<
+  SearchInvestigationCorpusResponses,
+  SearchInvestigationCorpusErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    SearchInvestigationCorpusResponses,
+    SearchInvestigationCorpusErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zSearchInvestigationCorpusPath,
+          query: zSearchInvestigationCorpusQuery,
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSearchInvestigationCorpusResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/corpus/search',
+    ...options,
+  });
+
+/**
+ * Get Corpus Status
+ *
+ * How far OpenAleph has got with the investigation's files: jobs
+ * waiting, running and finished per stage (reading, finding names,
+ * indexing...). A deployment without OpenAleph, or one OpenAleph does not
+ * answer, says so in ``state`` rather than failing, so the documents panel
+ * can keep asking while files are being read.
+ */
+export const getCorpusStatus = <ThrowOnError extends boolean = false>(
+  options: Options<GetCorpusStatusData, ThrowOnError>,
+): RequestResult<
+  GetCorpusStatusResponses,
+  GetCorpusStatusErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetCorpusStatusResponses,
+    GetCorpusStatusErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCorpusStatusPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCorpusStatusResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/corpus/status',
     ...options,
   });
 

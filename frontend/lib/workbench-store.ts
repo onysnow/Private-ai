@@ -1,7 +1,7 @@
 // The few values every panel shares (Foundation Fixes fix 3): the selected
 // investigation, the selected canonical entity, and the requests one panel
 // makes of another -- a provenance trace, a claim to open, a dossier to
-// open, a relationship to open. Server data does not go here -- it lives in
+// open, a relationship to open, a document to open. Server data does not go here -- it lives in
 // TanStack Query.
 import {create} from 'zustand';
 
@@ -56,6 +56,10 @@ type WorkbenchState = {
   /** The relationship the graph panel was last asked to open. */
   relationship: {serial: number; request: RelationshipRequest} | null;
   openRelationship: (request: RelationshipRequest) => void;
+  /** The document the documents panel was last asked to open (a corpus
+   * search hit, a similar document), at the page that matched if known. */
+  document: {serial: number; documentId: string; pageNumber: number | null} | null;
+  openDocument: (documentId: string, pageNumber?: number | null) => void;
 };
 
 // Every request gets a serial no earlier request had, even after a new case
@@ -68,7 +72,7 @@ export const useWorkbenchStore = create<WorkbenchState>(set => ({
   investigationId: '',
   // A new case means a new trace, claim, dossier and relationship: nothing from the old one applies.
   setInvestigationId: id => set(state => (state.investigationId === id ? {investigationId: id}
-    : {investigationId: id, entityId: '', provenance: null, claim: null, dossier: null, relationship: null})),
+    : {investigationId: id, entityId: '', provenance: null, claim: null, dossier: null, relationship: null, document: null})),
   entityId: '',
   setEntityId: id => set({entityId: id}),
   provenance: null,
@@ -81,4 +85,6 @@ export const useWorkbenchStore = create<WorkbenchState>(set => ({
   openDossier: entityId => set({entityId, dossier: {serial: nextSerial(), entityId}}),
   relationship: null,
   openRelationship: request => set({relationship: {serial: nextSerial(), request}}),
+  document: null,
+  openDocument: (documentId, pageNumber = null) => set({document: {serial: nextSerial(), documentId, pageNumber}}),
 }));

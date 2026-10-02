@@ -337,6 +337,76 @@ def test_openaleph_corpus_replies(demo, monkeypatch):
     _same_through_model(list[r.ExtractionCandidateOut], explained)
 
 
+def test_document_email_replies(demo):
+    from app.models.domain import DocumentCorpusSync, Source
+    from app.services.documents import serialize_document
+    from app.services.email_documents import document_email
+
+    db, _inv, doc, _candidates, _accepted = demo
+    source = db.get(Source, doc.source_id)
+    source.metadata_json = {**(source.metadata_json or {}), "email": {"from": ["Jane Doe <jane@meridian.example>"], "subject": ["Transfer"]}}
+    db.add(DocumentCorpusSync(document_id=doc.id, investigation_id=doc.investigation_id, provider="openaleph", collection_id="7",
+                              provider_record_id="e1", status="synced", response_json={"schema": "Email"}))
+    db.commit()
+    thread = {"total": 1, "results": [{"id": "e1", "schema": "Email", "properties": {"subject": ["Transfer"], "date": ["2026-09-01"]}}]}
+    _same_through_model(r.DocumentEmailOut, document_email(db, doc.id, fetch_thread=lambda _id: thread))
+    _same_through_model(r.DocumentOut, serialize_document(db, doc))
+
+
+def test_corpus_search_and_similar_replies(demo, monkeypatch):
+    from app.core.config import settings
+    from app.models.domain import DocumentCorpusSync, InvestigationCorpusBinding
+    from app.services.openaleph_search import search_corpus, similar_documents
+
+    db, inv, doc, _candidates, _accepted = demo
+    monkeypatch.setattr(settings, "openaleph_enabled", True)
+    _same_through_model(r.CorpusSearchOut, search_corpus(db, inv.id, "Meridian"))
+    _same_through_model(r.SimilarDocumentsOut, similar_documents(db, doc.id))
+    db.add(InvestigationCorpusBinding(investigation_id=inv.id, provider="openaleph", collection_id="7", status="active"))
+    db.add(DocumentCorpusSync(document_id=doc.id, investigation_id=inv.id, provider="openaleph", collection_id="7",
+                              provider_record_id="e1", status="synced", response_json={}))
+    db.commit()
+    rows = [{"id": "e1-p2", "schema": "Page", "caption": "minutes", "score": 2.0, "properties": {"index": ["2"], "document": ["e1"]},
+             "highlight": {"content": ["The <em>Meridian</em> wire"]}},
+            {"id": "elsewhere", "schema": "PlainText", "caption": "other"}]
+    _same_through_model(r.CorpusSearchOut, search_corpus(db, inv.id, "Meridian", fetch=lambda _p, _q: {"results": rows, "total": 2}))
+    _same_through_model(r.SimilarDocumentsOut, similar_documents(db, doc.id, fetch=lambda _p, _q: {"results": rows[1:]}))
+
+
+def test_document_formats_replies(monkeypatch):
+    from app.core.config import settings
+    from app.services.document_formats import accepted_formats
+
+    for reader in ("openaleph", "local"):
+        monkeypatch.setattr(settings, "document_reader", reader)
+        _same_through_model(r.DocumentFormatsOut, accepted_formats())
+
+
+def test_corpus_status_replies(demo, monkeypatch):
+    import httpx
+
+    from app.core.config import settings
+    from app.services.openaleph_corpus import sync_document_to_openaleph
+    from app.services.openaleph_status import corpus_status
+    from openaleph_fake import IDLE, busy_status
+
+    db, inv, doc, _candidates, _accepted = demo
+    monkeypatch.setattr(settings, "openaleph_enabled", False)
+    _same_through_model(r.CorpusStatusOut, corpus_status(db, inv.id))
+    monkeypatch.setattr(settings, "openaleph_enabled", True)
+    _same_through_model(r.CorpusStatusOut, corpus_status(db, inv.id))
+    sync_document_to_openaleph(db, doc.id, client_factory=_FakeOpenAleph)
+    working = corpus_status(db, inv.id, fetch=lambda _collection: busy_status("ingest", "analyze"))
+    assert working["state"] == "working" and len(working["stages"]) == 2
+    _same_through_model(r.CorpusStatusOut, working)
+    _same_through_model(r.CorpusStatusOut, corpus_status(db, inv.id, fetch=lambda _collection: IDLE))
+
+    def down(_collection):
+        raise httpx.ConnectError("refused")
+
+    _same_through_model(r.CorpusStatusOut, corpus_status(db, inv.id, fetch=down))
+
+
 def test_corpus_sync_replies(monkeypatch):
     """The "Corpus sync" line before any push, after one, after a failure
     (ADR-0006, Wave B), and the "Sync now" reply around it."""

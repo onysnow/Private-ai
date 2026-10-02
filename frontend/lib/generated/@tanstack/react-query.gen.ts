@@ -56,11 +56,15 @@ import {
   externalRelationshipCandidates,
   findExtractionLineageEndpoint,
   findingCandidates,
+  findOpenalephChildren,
   getAiAnalysisCandidateEndpoint,
   getClaimReviewWorkspace,
+  getCorpusStatus,
   getCorpusSync,
   getDeckEndpoint,
   getDocument,
+  getDocumentEmail,
+  getDocumentFormats,
   getEntityDossier,
   getExtractionCandidateExplanation,
   getExtractionCandidateLineage,
@@ -80,6 +84,7 @@ import {
   getSecurityAudit,
   getSecurityAuditRetentionPreview,
   getSecurityAuditSummary,
+  getSimilarDocuments,
   getWriteupEndpoint,
   health,
   importOpenalephDocumentEntities,
@@ -152,6 +157,7 @@ import {
   revokeAppUserToken,
   rotateAppUserToken,
   saveConnectorCredential,
+  searchInvestigationCorpus,
   searchWorkbench,
   seedDemo,
   settingsStatus,
@@ -308,12 +314,18 @@ import type {
   FindingCandidatesData,
   FindingCandidatesError,
   FindingCandidatesResponse,
+  FindOpenalephChildrenData,
+  FindOpenalephChildrenError,
+  FindOpenalephChildrenResponse,
   GetAiAnalysisCandidateEndpointData,
   GetAiAnalysisCandidateEndpointError,
   GetAiAnalysisCandidateEndpointResponse,
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceError,
   GetClaimReviewWorkspaceResponse,
+  GetCorpusStatusData,
+  GetCorpusStatusError,
+  GetCorpusStatusResponse,
   GetCorpusSyncData,
   GetCorpusSyncError,
   GetCorpusSyncResponse,
@@ -321,7 +333,13 @@ import type {
   GetDeckEndpointError,
   GetDeckEndpointResponse,
   GetDocumentData,
+  GetDocumentEmailData,
+  GetDocumentEmailError,
+  GetDocumentEmailResponse,
   GetDocumentError,
+  GetDocumentFormatsData,
+  GetDocumentFormatsError,
+  GetDocumentFormatsResponse,
   GetDocumentResponse,
   GetEntityDossierData,
   GetEntityDossierError,
@@ -380,6 +398,9 @@ import type {
   GetSecurityAuditSummaryData,
   GetSecurityAuditSummaryError,
   GetSecurityAuditSummaryResponse,
+  GetSimilarDocumentsData,
+  GetSimilarDocumentsError,
+  GetSimilarDocumentsResponse,
   GetWriteupEndpointData,
   GetWriteupEndpointError,
   GetWriteupEndpointResponse,
@@ -593,6 +614,9 @@ import type {
   SaveConnectorCredentialData,
   SaveConnectorCredentialError,
   SaveConnectorCredentialResponse,
+  SearchInvestigationCorpusData,
+  SearchInvestigationCorpusError,
+  SearchInvestigationCorpusResponse,
   SearchWorkbenchData,
   SearchWorkbenchError,
   SearchWorkbenchResponse,
@@ -1524,6 +1548,38 @@ export const seedDemoMutation = (
   return mutationOptions;
 };
 
+export const getDocumentFormatsQueryKey = (
+  options?: Options<GetDocumentFormatsData>,
+) => createQueryKey('getDocumentFormats', options);
+
+/**
+ * Get Document Formats
+ *
+ * The kinds of file an upload accepts now: every format OpenAleph's
+ * ingest-file reads while OpenAleph reads uploads, else the Workbench's
+ * own reader's list. ``accept`` is ready for a file picker.
+ */
+export const getDocumentFormatsOptions = (
+  options?: Options<GetDocumentFormatsData>,
+) =>
+  queryOptions<
+    GetDocumentFormatsResponse,
+    GetDocumentFormatsError,
+    GetDocumentFormatsResponse,
+    ReturnType<typeof getDocumentFormatsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDocumentFormats({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDocumentFormatsQueryKey(options),
+  });
+
 /**
  * Upload Document
  *
@@ -1785,6 +1841,38 @@ export const syncOpenalephDocumentMutation = (
   return mutationOptions;
 };
 
+export const getDocumentEmailQueryKey = (
+  options: Options<GetDocumentEmailData>,
+) => createQueryKey('getDocumentEmail', options);
+
+/**
+ * Get Document Email
+ *
+ * An email document's headers (as OpenAleph read them) and its thread
+ * from OpenAleph, each message linked to its Workbench document when the
+ * Workbench holds it. 404 for a document that is not an email.
+ */
+export const getDocumentEmailOptions = (
+  options: Options<GetDocumentEmailData>,
+) =>
+  queryOptions<
+    GetDocumentEmailResponse,
+    GetDocumentEmailError,
+    GetDocumentEmailResponse,
+    ReturnType<typeof getDocumentEmailQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDocumentEmail({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDocumentEmailQueryKey(options),
+  });
+
 /**
  * Analyze Openaleph Document
  *
@@ -1816,6 +1904,71 @@ export const analyzeOpenalephDocumentMutation = (
   };
   return mutationOptions;
 };
+
+/**
+ * Find Openaleph Children
+ *
+ * "Look for files inside again": list an archive's or an email's files
+ * in OpenAleph once more and add, as documents under it, those the
+ * Workbench does not hold yet (ADR-0006, Wave A). A background job, like
+ * "Find names again".
+ */
+export const findOpenalephChildrenMutation = (
+  options?: Partial<Options<FindOpenalephChildrenData>>,
+): UseMutationOptions<
+  FindOpenalephChildrenResponse,
+  FindOpenalephChildrenError,
+  Options<FindOpenalephChildrenData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    FindOpenalephChildrenResponse,
+    FindOpenalephChildrenError,
+    Options<FindOpenalephChildrenData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await findOpenalephChildren({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getSimilarDocumentsQueryKey = (
+  options: Options<GetSimilarDocumentsData>,
+) => createQueryKey('getSimilarDocuments', options);
+
+/**
+ * Get Similar Documents
+ *
+ * Documents of the same investigation whose text is like this one's,
+ * from OpenAleph's more_like_this (ADR-0006, Wave A), each linked to its
+ * Workbench document. A document OpenAleph does not hold, or OpenAleph
+ * not answering, is a ``state`` of the reply.
+ */
+export const getSimilarDocumentsOptions = (
+  options: Options<GetSimilarDocumentsData>,
+) =>
+  queryOptions<
+    GetSimilarDocumentsResponse,
+    GetSimilarDocumentsError,
+    GetSimilarDocumentsResponse,
+    ReturnType<typeof getSimilarDocumentsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSimilarDocuments({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSimilarDocumentsQueryKey(options),
+  });
 
 export const enrichmentSessionDetailQueryKey = (
   options: Options<EnrichmentSessionDetailData>,
@@ -3385,6 +3538,130 @@ export const listOpenalephCorpusFailuresOptions = (
       return data;
     },
     queryKey: listOpenalephCorpusFailuresQueryKey(options),
+  });
+
+export const searchInvestigationCorpusQueryKey = (
+  options: Options<SearchInvestigationCorpusData>,
+) => createQueryKey('searchInvestigationCorpus', options);
+
+/**
+ * Search Investigation Corpus
+ *
+ * Full-text search of the investigation's documents in OpenAleph, with
+ * highlighted snippets, each hit linked to its Workbench document and page
+ * (ADR-0006, Wave A). OpenAleph off, holding nothing yet, or not answering
+ * is a ``state`` of the reply, so investigation search can show its other
+ * groups.
+ */
+export const searchInvestigationCorpusOptions = (
+  options: Options<SearchInvestigationCorpusData>,
+) =>
+  queryOptions<
+    SearchInvestigationCorpusResponse,
+    SearchInvestigationCorpusError,
+    SearchInvestigationCorpusResponse,
+    ReturnType<typeof searchInvestigationCorpusQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await searchInvestigationCorpus({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: searchInvestigationCorpusQueryKey(options),
+  });
+
+export const searchInvestigationCorpusInfiniteQueryKey = (
+  options: Options<SearchInvestigationCorpusData>,
+): QueryKey<Options<SearchInvestigationCorpusData>> =>
+  createQueryKey('searchInvestigationCorpus', options, true);
+
+/**
+ * Search Investigation Corpus
+ *
+ * Full-text search of the investigation's documents in OpenAleph, with
+ * highlighted snippets, each hit linked to its Workbench document and page
+ * (ADR-0006, Wave A). OpenAleph off, holding nothing yet, or not answering
+ * is a ``state`` of the reply, so investigation search can show its other
+ * groups.
+ */
+export const searchInvestigationCorpusInfiniteOptions = (
+  options: Options<SearchInvestigationCorpusData>,
+) => {
+  const opts = infiniteQueryOptions<
+    SearchInvestigationCorpusResponse,
+    SearchInvestigationCorpusError,
+    InfiniteData<SearchInvestigationCorpusResponse>,
+    QueryKey<Options<SearchInvestigationCorpusData>>,
+    | number
+    | Pick<
+        QueryKey<Options<SearchInvestigationCorpusData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<SearchInvestigationCorpusData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  offset: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await searchInvestigationCorpus({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: searchInvestigationCorpusInfiniteQueryKey(options),
+    },
+  );
+  return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const getCorpusStatusQueryKey = (
+  options: Options<GetCorpusStatusData>,
+) => createQueryKey('getCorpusStatus', options);
+
+/**
+ * Get Corpus Status
+ *
+ * How far OpenAleph has got with the investigation's files: jobs
+ * waiting, running and finished per stage (reading, finding names,
+ * indexing...). A deployment without OpenAleph, or one OpenAleph does not
+ * answer, says so in ``state`` rather than failing, so the documents panel
+ * can keep asking while files are being read.
+ */
+export const getCorpusStatusOptions = (options: Options<GetCorpusStatusData>) =>
+  queryOptions<
+    GetCorpusStatusResponse,
+    GetCorpusStatusError,
+    GetCorpusStatusResponse,
+    ReturnType<typeof getCorpusStatusQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCorpusStatus({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCorpusStatusQueryKey(options),
   });
 
 export const getCorpusSyncQueryKey = (options: Options<GetCorpusSyncData>) =>

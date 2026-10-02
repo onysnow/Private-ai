@@ -15,8 +15,11 @@ touched.
 
 from __future__ import annotations
 
+import io
 import os
 import time
+import zipfile
+from email.message import EmailMessage
 
 import httpx
 import pymupdf
@@ -152,6 +155,148 @@ def test_a_memo_read_by_openaleph_becomes_name_and_identifier_proposals(live):
     accepted = client.post(f"/api/extraction-candidates/{identifiers['email'].id}/review",
                            json={"decision": "accept", "target_entity_id": jane["record"]["id"]}).json()
     assert accepted["record"]["prop"] == "email" and accepted["record"]["origin"].startswith(f"document:{document['id']}#paragraph 4@chars:")
+
+
+def test_reading_progress_follows_openaleph_until_it_is_idle(live, tmp_path):
+    """Files go straight to OpenAleph here (not through a Workbench upload,
+    which in developer mode answers only once everything is read), so the
+    status route can be asked while OpenAleph works on them."""
+    client, _created = live
+    inv = _investigation(live, "Wave A progress")
+    assert client.get(f"/api/investigations/{inv}/corpus/status").json()["state"] == "no_collection"
+    ensured = client.post(f"/api/investigations/{inv}/corpus/openaleph/ensure")
+    assert ensured.status_code == 200, ensured.text
+    collection_id = _remember_collection(live, inv)
+    aleph = openaleph_corpus._client_factory()
+    for number in range(3):
+        memo = tmp_path / f"progress-{number}.txt"
+        memo.write_text(MEMO, encoding="utf-8")
+        aleph.ingest_upload(collection_id, memo, {"file_name": memo.name})
+
+    seen: list[dict] = []
+    deadline = time.monotonic() + 180
+    while time.monotonic() < deadline:
+        status = client.get(f"/api/investigations/{inv}/corpus/status").json()
+        seen.append(status)
+        if status["state"] == "idle" and any(row["state"] == "working" for row in seen):
+            break
+        time.sleep(0.25)
+    working = [row for row in seen if row["state"] == "working"]
+    assert working, [row["state"] for row in seen]
+    assert all(row["collection_id"] == collection_id and row["active"] for row in working)
+    labels = {stage["label"] for row in working for stage in row["stages"]}
+    assert "Reading files" in labels, labels
+    assert all(stage["pending"] + stage["running"] + stage["finished"] > 0 for row in working for stage in row["stages"])
+    final = seen[-1]
+    assert final["state"] == "idle" and final["stages"] == [] and final["active"] is False, final
+
+
+def _email(*, attachment: bool = True) -> bytes:
+    message = EmailMessage()
+    message["From"] = "Jane Doe <jane.doe@meridian.example>"
+    message["To"] = "Audit Desk <audit@kestrelwood.example>"
+    message["Cc"] = "Maria Fernandez <maria@kestrelwood.example>"
+    message["Subject"] = "Transfer to Meridian"
+    message["Date"] = "Tue, 01 Sep 2026 10:00:00 +0000"
+    message["Message-ID"] = "<transfer@meridian.example>"
+    message.set_content("Please find the ledger attached. Jonathan Whitaker approved the transfer.")
+    if attachment:
+        message.add_attachment(b"Ledger: GB82WEST12345698765432 paid 10,000 EUR to Meridian Holdings Ltd.",
+                               maintype="text", subtype="plain", filename="ledger.txt")
+    return message.as_bytes()
+
+
+def _reply() -> bytes:
+    message = EmailMessage()
+    message["From"] = "Audit Desk <audit@kestrelwood.example>"
+    message["To"] = "Jane Doe <jane.doe@meridian.example>"
+    message["Subject"] = "Re: Transfer to Meridian"
+    message["Date"] = "Wed, 02 Sep 2026 09:00:00 +0000"
+    message["Message-ID"] = "<reply@kestrelwood.example>"
+    message["In-Reply-To"] = "<transfer@meridian.example>"
+    message["References"] = "<transfer@meridian.example>"
+    message.set_content("Thanks Jane, Rebecca Thornton will review the ledger.")
+    return message.as_bytes()
+
+
+def _zip(**files: str) -> bytes:
+    bundle = io.BytesIO()
+    with zipfile.ZipFile(bundle, "w") as archive:
+        for name, text in files.items():
+            archive.writestr(name.replace("__", "/"), text)
+    return bundle.getvalue()
+
+
+def test_formats_only_openaleph_reads_are_accepted_and_read_by_it(live):
+    client, _created = live
+    formats = client.get("/api/document-formats").json()
+    assert formats["reader"] == "openaleph" and {"eml", "zip"} <= set(formats["openaleph_only_extensions"])
+    inv = _investigation(live, "Wave A formats")
+    email = _upload(live, inv, "transfer.eml", _email(), "message/rfc822")
+    assert email["job"]["message"].startswith("Read by OpenAleph (1 paragraph(s))"), email["job"]["message"]
+    bundle = _upload(live, inv, "bundle.zip", _zip(first="Jane Doe wrote to Meridian.", second="Angela Merkel replied."),
+                     "application/zip")
+    assert bundle["job"]["message"].startswith("Read by OpenAleph (no text)"), bundle["job"]["message"]
+    assert bundle["chunk_count"] == 0
+    refused = client.post("/api/documents/upload", data={"investigation_id": inv, "title": "setup"},
+                          files={"file": ("setup.exe", b"MZ\x90\x00", "application/octet-stream")})
+    assert refused.status_code == 415, refused.text
+
+
+def test_an_archives_files_and_an_emails_attachment_become_documents_under_them(live):
+    client, _created = live
+    inv = _investigation(live, "Wave A children")
+    bundle = _upload(live, inv, "bundle.zip", _zip(
+        letters__first="Jane Doe wrote to Meridian Holdings Ltd about the transfer.",
+        second="Angela Merkel met Emmanuel Macron to discuss the audit."), "application/zip")
+    assert bundle["job"]["message"] == "Read by OpenAleph (no text); 2 file(s) inside added as documents", bundle["job"]
+    email = _upload(live, inv, "transfer.eml", _email(), "message/rfc822")
+    assert email["job"]["message"].endswith("; 1 file(s) inside added as documents"), email["job"]["message"]
+
+    documents = {row["filename"]: row for row in client.get(f"/api/investigations/{inv}/documents").json()}
+    assert documents["bundle.zip"]["openaleph_schema"] == "Package" and documents["transfer.eml"]["openaleph_schema"] == "Email"
+    expected = {"letters/first": (bundle["id"], "Jane Doe"), "second": (bundle["id"], "Angela Merkel"),
+                "ledger.txt": (email["id"], "Meridian Holdings Ltd")}
+    for name, (parent_id, caption) in expected.items():
+        child = documents[name]
+        assert child["parent_document_id"] == parent_id and child["extraction_status"] == "complete", child
+        assert caption in [row.payload["caption"] for row in _proposals(child["id"], "entity")], name
+
+    # OpenAleph answers no thread for a message nothing replies to (5.3.1).
+    alone = client.get(f"/api/documents/{email['id']}/email").json()
+    assert alone["thread"] == [] and alone["thread_note"] == "OpenAleph found no other message in this email's thread"
+    reply = _upload(live, inv, "reply.eml", _reply(), "message/rfc822")
+    shown = client.get(f"/api/documents/{email['id']}/email").json()
+    assert shown["headers"]["subject"] == "Transfer to Meridian"
+    assert shown["headers"]["from"] == ["Jane Doe <jane.doe@meridian.example>"]
+    assert shown["headers"]["cc"] == ["Maria Fernandez <maria@kestrelwood.example>"]
+    assert [(m["subject"], m["document_id"], m["current"]) for m in shown["thread"]] == [
+        ("Transfer to Meridian", email["id"], True), ("Re: Transfer to Meridian", reply["id"], False)]
+
+
+def test_the_corpus_is_searched_with_highlights_and_similar_documents_are_found(live):
+    client, _created = live
+    inv = _investigation(live, "Wave A search")
+    memo = _upload(live, inv, "memo.txt", MEMO.encode(), "text/plain")
+    minutes = _upload(live, inv, "minutes.pdf", _pdf(
+        "Board minutes of Kestrelwood Holdings Limited.",
+        "Page two: Jonathan Whitaker approved the Zanzibar transfer to Meridian Holdings Ltd."), "application/pdf")
+    other = _upload(live, inv, "note.txt", b"Meridian Holdings Ltd paid Angela Merkel and Jane Doe again.", "text/plain")
+
+    found = client.get(f"/api/investigations/{inv}/corpus/search", params={"q": "Zanzibar"}).json()
+    assert found["state"] == "ok", found
+    assert len(found["results"]) == 1, found
+    (hit,) = found["results"]
+    assert hit["document_id"] == minutes["id"] and hit["page_number"] == 2, hit
+    assert any(piece["match"] and piece["text"] == "Zanzibar" for snippet in hit["highlights"] for piece in snippet), hit
+
+    meridian = client.get(f"/api/investigations/{inv}/corpus/search", params={"q": "Meridian"}).json()
+    assert {row["document_id"] for row in meridian["results"]} == {memo["id"], minutes["id"], other["id"]}, meridian
+
+    similar = client.get(f"/api/documents/{other['id']}/similar").json()
+    assert similar["state"] == "ok", similar
+    assert memo["id"] in [row["document_id"] for row in similar["results"]], similar
+    assert other["id"] not in [row["document_id"] for row in similar["results"]]
 
 
 def test_a_pdf_gets_its_names_on_their_pages(live):
