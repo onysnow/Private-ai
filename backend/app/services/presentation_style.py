@@ -39,6 +39,34 @@ CATEGORICAL_PALETTE: tuple[str, ...] = ("0072B2", "D55E00", "009E73", "CC79A7", 
 # themes' own near-black and paper do not on vermillion (4.43:1 at best).
 INK_DARK, INK_LIGHT = "000000", "FFFFFF"
 
+# The serif faces among the themes' and pairings' fonts below; every other
+# family there is a sans-serif face.
+SERIF_FONTS = frozenset({"Georgia", "Source Serif 4", "IBM Plex Serif", "Newsreader", "Libre Caslon Text", "Fraunces",
+                         "Literata", "Noto Serif", "Spectral"})
+
+
+def font_stack(family: str) -> str:
+    """A chart's font as a CSS font-family list: the theme's face, then the
+    generic family it belongs to, then sans-serif.
+
+    A chart drawn away from the browser (the render service's SVG, made a
+    PNG by vl-convert for the exports) can use only the fonts installed
+    where it is drawn, and resvg, under vl-convert, drops text whose
+    families all fail to match: a Dark Academia chart named only Calibri
+    came out of a server without Calibri with no words at all. The CSS
+    Fonts spec asks for a generic family at the end of every list for this
+    reason (https://www.w3.org/TR/css-fonts-4/#font-family-prop). vl-convert
+    1.9 carries Liberation Sans inside it (checked in the installed build),
+    so the closing sans-serif always finds a face, even on a host with no
+    fonts and no serif. The face is in single quotes because some names are
+    not CSS identifiers ("Source Serif 4"), and because ECharts copies the
+    list into a double-quoted SVG style attribute without escaping it: a
+    double quote ended the attribute and broke the SVG (checked with ECharts
+    6.1). The families come from the fixed tables in this module, never
+    from a request."""
+    generic = "serif, sans-serif" if family in SERIF_FONTS else "sans-serif"
+    return f"'{family}', {generic}"
+
 
 @dataclass(frozen=True)
 class Theme:

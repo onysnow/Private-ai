@@ -24,6 +24,7 @@ render_deck_pptx.
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 from datetime import date
 from typing import Any
 
@@ -35,8 +36,12 @@ from app.models.domain import Deck
 from app.services.presentation_style import (
     VISUAL_PRESETS, Theme, normalize_deck_style, normalize_visual_style, resolved_theme, resolved_visual_style,
 )
+from app.visuals.checker import CheckReport, check_visual
 from app.visuals.data_service import DataRow, VisualData
-from app.visuals.echarts import SINGLE_RECORD_MARK, prepare_rows, singular, source_line
+from app.visuals.echarts import (
+    KIND_LABELS, SINGLE_RECORD_MARK, BuiltChart, ChartDoesNotFit, UnsupportedChartKind, build_chart, format_value, ink_on, mark_colour,
+    part_colours, part_value_text, prepare_rows, singular, value_label,
+)
 from app.visuals.spec import ChartKind, VisualSpec, spec_errors
 
 MAX_BULLETS_PER_SLIDE = 8
@@ -109,6 +114,76 @@ def chart_bar_items(rows: list[DataRow], labels: dict[str, str] | None = None) -
     """Rows as the bar renderer's items: label, value and the records."""
     return [{"label": (labels or {}).get(row.label, row.label), "value": row.value, "evidence": [r.as_dict() for r in row.record_refs]}
             for row in rows]
+
+
+@dataclass
+class CheckedChart:
+    """A stored chart drawn again from its own data and checked once more,
+    ready for an export. `problem` says why it must not be drawn."""
+    spec: VisualSpec
+    data: VisualData
+    built: BuiltChart | None
+    report: CheckReport | None
+    problem: str | None
+
+
+def checked_chart(visual: dict, theme: Theme) -> CheckedChart:
+    """Draw a stored chart again from the rows the data service cooked (no
+    query runs at export time) in the export's theme, and check it before it
+    goes in. A chart that fails a hard rule is not drawn: its place says which
+    rules failed, in plain words ("Export refuses broken files", Visual
+    Editor design, "Keeping it honest"). The deck or brief itself still
+    exports."""
+    spec = VisualSpec.model_validate(visual["spec"])
+    data = VisualData.from_dict(visual["data"])
+    try:
+        built = build_chart(spec, data, theme)
+    except (UnsupportedChartKind, ChartDoesNotFit) as exc:
+        return CheckedChart(spec, data, None, None, f"Chart not drawn: {exc}.")
+    report = check_visual(spec, data, theme, built)
+    if not report.ok:
+        failed = "; ".join(f"rule {e.rule}: {e.message}" for e in report.errors)
+        return CheckedChart(spec, data, built, report, f"Chart not drawn: it fails the design checks ({failed}).")
+    return CheckedChart(spec, data, built, report, None)
+
+
+def _set_alt_text(shape: Any, text: str) -> None:
+    """A chart frame's or a picture's alt text (rule 13). python-pptx has no
+    setting for it; PowerPoint keeps it in the shape's cNvPr `descr`."""
+    for props in shape._element.xpath("./p:nvGraphicFramePr/p:cNvPr | ./p:nvPicPr/p:cNvPr"):
+        props.set("descr", text)
+
+
+def _set_fill_alpha(fill: Any, percent: int) -> None:
+    """Make a solid fill partly transparent (python-pptx has no setting for
+    it, its issue #62): DrawingML's <a:alpha> on the fill colour."""
+    from lxml import etree
+    from pptx.oxml.ns import qn
+    for colour in fill._xPr.xpath("./a:solidFill/a:srgbClr"):
+        for old in colour.findall(qn("a:alpha")):
+            colour.remove(old)
+        etree.SubElement(colour, qn("a:alpha")).set("val", str(percent * 1000))
+
+
+def _set_hole_size(plot: Any, percent: int) -> None:
+    """A doughnut's hole as a percentage of its diameter (c:holeSize, which
+    python-pptx writes at 50 and does not expose)."""
+    from pptx.oxml.ns import qn
+    hole = plot._element.find(qn("c:holeSize"))
+    if hole is not None:
+        hole.set("val", str(percent))
+
+
+_NUMBER_PREFIXES = {"USD": "$", "EUR": "€", "GBP": "£"}
+
+
+def _number_format(data: VisualData) -> str:
+    """The Excel number format for a chart's values: '$2.4M', '$285K' for an
+    amount (as the bar chart has always written them), '1,200' for a count."""
+    if data.unit_kind != "amount":
+        return "#,##0"
+    prefix = _NUMBER_PREFIXES.get((data.currency or data.unit or "").upper(), "")
+    return f'[>=1000000]{prefix}#,##0.0,,"M";[>=1000]{prefix}#,##0,"K";{prefix}#,##0'
 
 
 def normalize_visual(visual: Any) -> dict | None:
@@ -560,9 +635,10 @@ class _DeckRenderer:
             label_size = 15 if cell_h > 1.6 and cell_w > 3 else 13 if cell_h > 1.1 else 11
             self.text(slide, left + pad, top + 0.2 + cell_h * 0.5, cell_w - pad - 0.25, cell_h * 0.5 - 0.3, label, size=label_size, color=self.t.text, line_spacing=1.05)
 
-    def _bar_chart(self, slide: Any, x: float, y: float, w: float, h: float, visual: dict, style: dict) -> None:
+    def _bar_chart(self, slide: Any, x: float, y: float, w: float, h: float, visual: dict, style: dict) -> Any:
         """A native (editable) PowerPoint bar chart. The value axis always
-        includes zero -- no style can start a bar anywhere else."""
+        includes zero -- no style can start a bar anywhere else. Returns the
+        chart's frame on the slide."""
         from pptx.chart.data import CategoryChartData
         from pptx.enum.chart import XL_CHART_TYPE, XL_LABEL_POSITION
         from pptx.util import Pt
@@ -581,7 +657,8 @@ class _DeckRenderer:
         data.categories = [i["label"] for i in items]
         data.add_series(visual.get("title") or "Value", [i["value"] for i in items])
         chart_type = XL_CHART_TYPE.BAR_CLUSTERED if horizontal else XL_CHART_TYPE.COLUMN_CLUSTERED
-        chart = slide.shapes.add_chart(chart_type, self.Inches(x), self.Inches(y), self.Inches(w), self.Inches(h), data).chart
+        frame = slide.shapes.add_chart(chart_type, self.Inches(x), self.Inches(y), self.Inches(w), self.Inches(h), data)
+        chart = frame.chart
         chart.has_legend = False
         chart.has_title = False
         chart.font.name = self.t.body_font
@@ -631,30 +708,338 @@ class _DeckRenderer:
             category_axis.format.line.fill.background()
         category_axis.tick_labels.font.size = Pt(12)
         category_axis.tick_labels.font.color.rgb = self._rgb(self.t.text)
+        return frame
 
-    def _chart(self, slide: Any, x: float, y: float, w: float, h: float, visual: dict) -> None:
-        """A resolved chart (app/ai/chart_check.py) as a native, editable
-        PowerPoint bar chart drawn from the rows the data service cooked,
-        with the record count and single-record mark on each label (design
-        rules 16 and 20) and the source line underneath (rule 15). No image
-        is needed for bars, so the render service is never involved here."""
-        spec, data, rows = chart_rows(visual)
-        if spec.kind not in (ChartKind.bar, ChartKind.column) or not rows:
-            # Only bars have a native drawing so far; never draw another kind as bars.
-            self.text(slide, x, y, w, 0.6, f"Chart not available: {spec.kind.value} charts are not drawn in decks yet.", size=13, color=self.t.muted, italic=True)
-            return
-        decorated = chart_row_labels(data, rows)
-        items = chart_bar_items(rows, decorated)
-        horizontal = spec.kind == ChartKind.bar
+    # --- checked charts (app/visuals), one native drawing per kind -------------
+    def _chart(self, slide: Any, x: float, y: float, w: float, h: float, visual: dict) -> str:
+        """A resolved chart (app/ai/chart_check.py), drawn again from the rows
+        the data service cooked and checked once more in this deck's theme
+        before it goes in (a chart that now fails a hard rule is not drawn;
+        its place says which rules failed). Every kind python-pptx can write
+        is a native, editable PowerPoint chart (XL_CHART_TYPE: bar and
+        column, line, area, 100% bar, doughnut, XY scatter, and a histogram as
+        touching columns); a treemap, which PowerPoint charts cannot be made
+        as from python-pptx, goes in as the picture from the render service,
+        or as native bars with a line saying so when the service is down
+        (ADR-0005, line 2). Under every chart: the source line (rule 15);
+        on every chart frame: the alt text (rule 13). Returns the chart's
+        description for the speaker notes."""
+        checked = checked_chart(visual, self.t)
+        if checked.problem or checked.built is None:
+            self.text(slide, x, y, w, 1.6, checked.problem or "Chart not available.", size=13, color=self.t.alert, italic=True, line_spacing=1.1)
+            return ""
+        built = checked.built
+        # The chart's own title and subtitle (the finding, then the unit), as the app draws them.
+        self.text(slide, x, y, w, 0.32, checked.spec.title, size=13, color=self.t.muted, bold=True)
+        titles = built.option.get("title") or []
+        subtitle = str(titles[0].get("subtext") or "") if titles and isinstance(titles[0], dict) else ""
+        if subtitle:
+            self.text(slide, x, y + 0.3, w, 0.28, subtitle, size=11, color=self.t.muted)
+        top = y + (0.62 if subtitle else 0.4)
+        plot_h = h - (top - y) - 0.36
+        kind = built.kind
+        if kind in (ChartKind.bar, ChartKind.column):
+            frame = self._native_bars(slide, x, top, w, plot_h, checked)
+        elif kind in (ChartKind.line, ChartKind.area):
+            frame = self._native_line(slide, x, top, w, plot_h, checked)
+        elif kind == ChartKind.stacked_bar_100:
+            frame = self._native_whole_bar(slide, x, top, w, plot_h, checked)
+        elif kind == ChartKind.donut:
+            frame = self._native_donut(slide, x, top, w, plot_h, checked)
+        elif kind == ChartKind.histogram:
+            frame = self._native_histogram(slide, x, top, w, plot_h, checked)
+        elif kind == ChartKind.scatter:
+            frame = self._native_scatter(slide, x, top, w, plot_h, checked)
+        else:
+            frame = self._chart_picture(slide, x, top, w, plot_h, checked)
+        _set_alt_text(frame, built.alt_text)
+        self.text(slide, x, y + h - 0.32, w, 0.3, built.source_line, size=10, color=self.t.muted)
+        return built.description
+
+    def _new_chart(self, slide: Any, chart_type: Any, x: float, y: float, w: float, h: float, data: Any) -> Any:
+        """A native chart frame in the deck's type: no legend (every part is
+        labelled directly, rule 12), no chart title (the slide gives it)."""
+        from pptx.util import Pt
+        frame = slide.shapes.add_chart(chart_type, self.Inches(x), self.Inches(y), self.Inches(w), self.Inches(h), data)
+        chart = frame.chart
+        chart.has_legend = False
+        chart.has_title = False
+        chart.font.name = self.t.body_font
+        chart.font.size = Pt(12)
+        chart.font.color.rgb = self._rgb(self.t.text)
+        return frame
+
+    def _point_label(self, point: Any, text: str, *, position: Any = None, colour: str | None = None, bold: bool = False) -> None:
+        """Write `text` beside one mark as its own data label (the value, its
+        record count and the single-record mark, as the app's chart does)."""
+        from pptx.util import Pt
+        label = point.data_label
+        frame = label.text_frame
+        lines = text.split("\n")
+        frame.text = lines[0]
+        for line in lines[1:]:
+            frame.add_paragraph().text = line
+        for paragraph in frame.paragraphs:
+            for run in paragraph.runs:
+                run.font.size = Pt(11)
+                run.font.bold = bold
+                run.font.color.rgb = self._rgb(colour or self.t.text)
+        if position is not None:
+            label.position = position
+
+    def _style_value_axis(self, axis: Any, *, minimum: float | None, number_format: str, gridlines: bool, visible: bool = True) -> None:
+        from pptx.util import Pt
+        if minimum is not None:
+            axis.minimum_scale = minimum
+        axis.visible = visible
+        axis.has_major_gridlines = gridlines
+        if gridlines:
+            axis.major_gridlines.format.line.color.rgb = self._rgb(self.t.rule)
+        axis.tick_labels.number_format = number_format
+        axis.tick_labels.number_format_is_linked = False
+        axis.tick_labels.font.size = Pt(11)
+        axis.tick_labels.font.color.rgb = self._rgb(self.t.muted)
+        axis.format.line.fill.background()
+
+    def _style_category_axis(self, axis: Any, *, dark_zero_line: bool = True) -> None:
+        from pptx.util import Pt
+        if dark_zero_line:
+            # The dark zero line (BBC style), as in the app's drawing.
+            axis.format.line.color.rgb = self._rgb(self.t.text)
+            axis.format.line.width = Pt(1.5)
+        else:
+            axis.format.line.fill.background()
+        axis.tick_labels.font.size = Pt(12)
+        axis.tick_labels.font.color.rgb = self._rgb(self.t.text)
+
+    def _native_bars(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart, *, horizontal: bool | None = None) -> Any:
+        """bar and column: the native bar chart pass 2 drew, labels carrying
+        the record count and the single-record mark (rules 16 and 20).
+        `horizontal` overrides the kind (the treemap's fallback ranks its parts)."""
+        built, data = checked.built, checked.data
+        assert built is not None
+        decorated = chart_row_labels(data, built.rows)
+        if horizontal is None:
+            horizontal = built.kind == ChartKind.bar
         style = {
             "preset": "ranked",
-            "layout": {"orientation": "horizontal" if horizontal else "vertical", "axis_line": True},
-            "options": {"sort": "as_given", "value_labels": True, "gridlines": not horizontal, "thickness": "regular",
-                        "highlight": [decorated[label] for label in spec.highlight if label in decorated]},
+            "layout": {"orientation": "horizontal" if horizontal else "vertical", "axis_line": built.draw.axis_line},
+            "options": {"sort": "as_given", "value_labels": True, "gridlines": built.draw.gridlines and not horizontal, "thickness": built.draw.thickness,
+                        "highlight": [decorated[label] for label in built.highlighted_labels if label in decorated]},
         }
-        bar_visual = {"type": "bar", "title": spec.title, "unit": data.unit, "items": items}
-        self._bar_chart(slide, x, y, w, h - 0.36, bar_visual, style)
-        self.text(slide, x, y + h - 0.32, w, 0.3, source_line(data, rows), size=10, color=self.t.muted)
+        bar_visual = {"type": "bar", "unit": data.unit, "items": chart_bar_items(built.rows, decorated)}
+        return self._bar_chart(slide, x, y, w, h, bar_visual, style)
+
+    def _native_line(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart) -> Any:
+        """line and area: periods in order on a zero baseline; a point that
+        rests on one record drawn hollow (rule 20 by shape) and its period
+        marked; the last value written at the end of the line."""
+        from pptx.chart.data import CategoryChartData
+        from pptx.enum.chart import XL_CHART_TYPE, XL_LABEL_POSITION, XL_MARKER_STYLE
+        from pptx.util import Pt
+
+        built, data = checked.built, checked.data
+        assert built is not None
+        rows, draw = built.rows, built.draw
+        area = built.kind == ChartKind.area
+        colour = mark_colour(self.t)
+        decorated = chart_row_labels(data, rows)
+        chart_data = CategoryChartData()
+        chart_data.categories = [decorated[row.label] for row in rows]
+        chart_data.add_series(checked.spec.title, [row.value for row in rows])
+        frame = self._new_chart(slide, XL_CHART_TYPE.AREA if area else XL_CHART_TYPE.LINE_MARKERS, x, y, w, h, chart_data)
+        chart = frame.chart
+        series = chart.plots[0].series[0]
+        if area:
+            series.format.fill.solid()
+            series.format.fill.fore_color.rgb = self._rgb(colour)
+            _set_fill_alpha(series.format.fill, 30)   # python-pptx has no transparency setting (its issue #62)
+            series.format.line.color.rgb = self._rgb(colour)
+            series.format.line.width = Pt(2)
+        else:
+            series.smooth = draw.smooth
+            series.format.line.color.rgb = self._rgb(colour)
+            series.format.line.width = Pt({"thin": 1.5, "regular": 2.5, "thick": 4.0}[draw.line_width])
+            series.marker.style = XL_MARKER_STYLE.CIRCLE if draw.markers else XL_MARKER_STYLE.NONE
+            series.marker.size = 7
+            series.marker.format.fill.solid()
+            series.marker.format.fill.fore_color.rgb = self._rgb(colour)
+            series.marker.format.line.color.rgb = self._rgb(colour)
+            for index, row in enumerate(rows):
+                if row.record_count == 1:
+                    point = series.points[index]
+                    point.marker.style = XL_MARKER_STYLE.CIRCLE
+                    point.marker.size = 8
+                    point.marker.format.fill.background()   # hollow: rests on one record
+                    point.marker.format.line.color.rgb = self._rgb(colour)
+        highlighted = set(built.highlighted_labels)
+        for index, row in enumerate(rows):
+            if draw.value_labels or row.label in highlighted or index == len(rows) - 1:
+                self._point_label(series.points[index], value_label(row, data), position=None if area else XL_LABEL_POSITION.ABOVE,
+                                  bold=row.label in highlighted)
+        self._style_value_axis(chart.value_axis, minimum=min(0.0, min((row.value for row in rows), default=0.0)),
+                               number_format=_number_format(data), gridlines=draw.gridlines)
+        self._style_category_axis(chart.category_axis)
+        return frame
+
+    def _native_whole_bar(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart) -> Any:
+        """stacked_bar_100: PowerPoint's 100% stacked bar, one bar of one
+        series per part, each part labelled inside with its name and share in
+        black or white, whichever reads on its colour."""
+        from pptx.chart.data import CategoryChartData
+        from pptx.enum.chart import XL_CHART_TYPE
+
+        built, data = checked.built, checked.data
+        assert built is not None
+        colours = part_colours(built.rows, self.t, set(built.highlighted_labels))
+        chart_data = CategoryChartData()
+        chart_data.categories = [""]
+        for row in built.rows:
+            chart_data.add_series(row.label, [row.value])
+        frame = self._new_chart(slide, XL_CHART_TYPE.BAR_STACKED_100, x, y + h * 0.25, w, h * 0.5, chart_data)
+        chart = frame.chart
+        plot = chart.plots[0]
+        plot.gap_width = {"thin": 150, "regular": 60, "thick": 20}[built.draw.thickness]
+        for series, row, share, colour in zip(plot.series, built.rows, built.shares, colours):
+            series.format.fill.solid()
+            series.format.fill.fore_color.rgb = self._rgb(colour)
+            series.format.line.color.rgb = self._rgb(self.t.page)
+            self._point_label(series.points[0], f"{row.label}\n{part_value_text(row, share, data)}", colour=ink_on(colour),
+                              bold=row.label in built.highlighted_labels)
+        chart.value_axis.visible = False
+        chart.value_axis.has_major_gridlines = False
+        chart.category_axis.visible = False
+        return frame
+
+    def _native_donut(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart) -> Any:
+        """donut: PowerPoint's doughnut (never the exploded one), slices from
+        twelve o'clock, each labelled on the ring in black or white, the
+        whole written in the hole."""
+        from pptx.chart.data import CategoryChartData
+        from pptx.enum.chart import XL_CHART_TYPE
+
+        built, data = checked.built, checked.data
+        assert built is not None
+        colours = part_colours(built.rows, self.t, set(built.highlighted_labels))
+        chart_data = CategoryChartData()
+        chart_data.categories = [row.label for row in built.rows]
+        chart_data.add_series(checked.spec.title, [row.value for row in built.rows])
+        side = min(w, h)
+        left = x + (w - side) / 2
+        frame = self._new_chart(slide, XL_CHART_TYPE.DOUGHNUT, left, y, side, side, chart_data)
+        plot = frame.chart.plots[0]
+        plot.vary_by_categories = True
+        _set_hole_size(plot, 45)   # a thicker ring than the 50% default, so the labels fit on it
+        series = plot.series[0]
+        for index, (row, share, colour) in enumerate(zip(built.rows, built.shares, colours)):
+            point = series.points[index]
+            point.format.fill.solid()
+            point.format.fill.fore_color.rgb = self._rgb(colour)
+            point.format.line.color.rgb = self._rgb(self.t.page)
+            self._point_label(point, f"{row.label}\n{part_value_text(row, share, data)}", colour=ink_on(colour),
+                              bold=row.label in built.highlighted_labels)
+        if built.draw.centre_total and built.total is not None:
+            self.text(slide, left + side * 0.3, y + side * 0.42, side * 0.4, side * 0.16, format_value(built.total, data),
+                      size=18, color=self.t.text, font=self.t.heading_font, bold=True, align="center", anchor="middle")
+        return frame
+
+    def _native_histogram(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart) -> Any:
+        """histogram: touching columns (gap width 0), one per bin, the count
+        written on each, a hairline in the page colour between them."""
+        from pptx.chart.data import CategoryChartData
+        from pptx.enum.chart import XL_CHART_TYPE, XL_LABEL_POSITION
+        from pptx.util import Pt
+
+        built, data = checked.built, checked.data
+        assert built is not None
+        chart_data = CategoryChartData()
+        chart_data.categories = [row.label for row in built.rows]
+        chart_data.add_series(checked.spec.title, [row.value for row in built.rows])
+        frame = self._new_chart(slide, XL_CHART_TYPE.COLUMN_CLUSTERED, x, y, w, h, chart_data)
+        chart = frame.chart
+        plot = chart.plots[0]
+        plot.gap_width = 0
+        plot.vary_by_categories = False
+        series = plot.series[0]
+        series.format.fill.solid()
+        series.format.fill.fore_color.rgb = self._rgb(self.t.accent)
+        series.format.line.color.rgb = self._rgb(self.t.page)
+        series.format.line.width = Pt(0.75)
+        for index, row in enumerate(built.rows):
+            text = f"{int(row.value)}" + (f" {SINGLE_RECORD_MARK}" if row.record_count == 1 else "")
+            self._point_label(series.points[index], text, position=XL_LABEL_POSITION.OUTSIDE_END, bold=True)
+        self._style_value_axis(chart.value_axis, minimum=0, number_format="0", gridlines=built.draw.gridlines)
+        self._style_category_axis(chart.category_axis)
+        axis = chart.category_axis
+        axis.has_title = True
+        axis.axis_title.text_frame.text = (built.option.get("xAxis") or {}).get("name") or "Amount"
+        return frame
+
+    def _native_scatter(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart) -> Any:
+        """scatter: PowerPoint's XY scatter with markers only, the two
+        numbers' names on the axes, the named points labelled, a point that
+        rests on one record hollow."""
+        from pptx.chart.data import XyChartData
+        from pptx.enum.chart import XL_CHART_TYPE, XL_LABEL_POSITION, XL_MARKER_STYLE
+
+        built, data = checked.built, checked.data
+        assert built is not None
+        colour = mark_colour(self.t)
+        chart_data = XyChartData()
+        series_data = chart_data.add_series(checked.spec.title)
+        for row in built.rows:
+            series_data.add_data_point(row.x or 0.0, row.value)
+        frame = self._new_chart(slide, XL_CHART_TYPE.XY_SCATTER, x, y, w, h, chart_data)
+        chart = frame.chart
+        series = chart.plots[0].series[0]
+        series.marker.style = XL_MARKER_STYLE.CIRCLE
+        series.marker.size = 9
+        series.marker.format.fill.solid()
+        series.marker.format.fill.fore_color.rgb = self._rgb(colour)
+        series.marker.format.line.color.rgb = self._rgb(colour)
+        named = set(built.labelled_points) | set(built.highlighted_labels)
+        for index, row in enumerate(built.rows):
+            point = series.points[index]
+            if row.record_count == 1:
+                point.marker.style = XL_MARKER_STYLE.CIRCLE
+                point.marker.size = 9
+                point.marker.format.fill.background()   # hollow: rests on one record
+                point.marker.format.line.color.rgb = self._rgb(colour)
+            if row.label in named:
+                text = row.label + (f" {SINGLE_RECORD_MARK}" if row.record_count == 1 else "")
+                self._point_label(point, text, position=XL_LABEL_POSITION.RIGHT, bold=row.label in built.highlighted_labels)
+        names = data.measure_labels
+        x_axis, y_axis = chart.category_axis, chart.value_axis   # for an XY chart: the axis across, then the axis up
+        self._style_value_axis(x_axis, minimum=min(0.0, min((row.x or 0.0 for row in built.rows), default=0.0)),
+                               number_format="0" if data.x_unit_kind == "count" else "General", gridlines=False)
+        self._style_value_axis(y_axis, minimum=min(0.0, min((row.value for row in built.rows), default=0.0)),
+                               number_format=_number_format(data), gridlines=built.draw.gridlines)
+        for axis, title in ((x_axis, names.get("x", "x")), (y_axis, names.get("y", "y"))):
+            axis.has_title = True
+            axis.axis_title.text_frame.text = title
+        x_axis.format.line.color.rgb = self._rgb(self.t.text)
+        return frame
+
+    def _chart_picture(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart) -> Any:
+        """A kind PowerPoint cannot hold natively (the treemap): the image the
+        render service draws from the same option the app shows, fitted to
+        the space; when the service is down, the same parts as native ranked
+        bars with a line saying the image was not available."""
+        from io import BytesIO
+
+        from app.visuals.render_client import RenderUnavailable, render_png
+
+        built = checked.built
+        assert built is not None
+        try:
+            png = render_png(built.option, built.width, built.height)
+        except RenderUnavailable as exc:
+            note = f"{KIND_LABELS.get(built.kind, built.kind.value)} image not available ({exc}); the same parts are shown as bars."
+            self.text(slide, x, y, w, 0.5, note, size=10, color=self.t.alert, italic=True, line_spacing=1.05)
+            return self._native_bars(slide, x, y + 0.5, w, h - 0.5, checked, horizontal=True)
+        scale = min(w / built.width, h / built.height)
+        width_in, height_in = built.width * scale, built.height * scale
+        return slide.shapes.add_picture(BytesIO(png), self.Inches(x + (w - width_in) / 2), self.Inches(y), self.Inches(width_in), self.Inches(height_in))
 
     def _timeline(self, slide: Any, x: float, y: float, w: float, h: float, items: list[dict], style: dict) -> None:
         opts, layout = style["options"], style["layout"]
@@ -705,6 +1090,7 @@ class _DeckRenderer:
         kind = vis.get("type")
         # A chart visual has no preset layer: its look comes from the theme and its own spec.
         style: dict = resolved_visual_style(vis) if kind in VISUAL_PRESETS else {}
+        chart_description = ""
         if kind == "timeline":
             layout = style["layout"]
             if layout.get("direction") == "vertical":
@@ -724,7 +1110,7 @@ class _DeckRenderer:
         elif kind == CHART_VISUAL:
             if bullets:
                 self.bullets(slide, MARGIN_IN, 2.1, 5.3, 4.55, bullets, sizes=(22, 20, 18, 16, 15, 14))
-            self._chart(slide, 6.45 if bullets else MARGIN_IN, 2.0, 6.1 if bullets else 11.8, 4.7, vis)
+            chart_description = self._chart(slide, 6.45 if bullets else MARGIN_IN, 2.0, 6.1 if bullets else 11.8, 4.7, vis)
         elif kind == "figures":
             if style["layout"].get("arrangement") == "row":
                 if bullets:
@@ -740,9 +1126,14 @@ class _DeckRenderer:
             self._evidence_panel(slide, 8.15, 2.05, 4.45, 4.6, refs)
         for item in (visual or {}).get("items") or []:
             refs.extend(item.get("evidence") or [])
+        notes = slide_data.get("notes") or ""
         if kind == CHART_VISUAL:
             refs.extend(chart_record_refs(vis))
-        self.notes(slide, slide_data.get("notes") or "")
+            if chart_description:
+                # Rule 13's longer description travels with the deck: every
+                # value with the records behind it, readable without the chart.
+                notes = f"{notes}\n\nChart: {chart_description}".strip()
+        self.notes(slide, notes)
         self.footer(slide, refs, dark=False)
 
     def questions_slide(self, slide_data: dict) -> None:

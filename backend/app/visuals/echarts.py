@@ -48,8 +48,9 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Any
 
-from app.services.presentation_style import INK_DARK, INK_LIGHT, Theme, contrast_ratio
+from app.services.presentation_style import INK_DARK, INK_LIGHT, Theme, contrast_ratio, font_stack
 from app.visuals.data_service import DataRow, RecordRef, VisualData
+from app.visuals.layout import LABEL_GAP, TEXT_SLACK, block_width, place_on_line
 from app.visuals.spec import (
     COLOUR_PER_CATEGORY_KINDS, DRAWN_KINDS, PART_OF_WHOLE_KINDS, SERIES_FOR_KIND, ChartKind, Scale, SortOrder, VisualSpec,
 )
@@ -63,9 +64,10 @@ SINGLE_RECORD_MARK = "†"                   # design rule 20: a value resting o
 FILLED_SYMBOL, HOLLOW_SYMBOL = "circle", "emptyCircle"   # rule 20 for points: hollow = one record
 POINT_LABEL_LIMIT = 12                     # a scatter names every point up to this many
 GRAPHIC_CONTRAST = 3.0                     # WCAG 1.4.11: a line or a point against the page
+TREEMAP_LABEL_PADDING = 5                  # ECharts' own default for a treemap label, written out for the checker
 
 _CURRENCY_SYMBOLS = {"USD": "$", "EUR": "€", "GBP": "£", "JPY": "¥", "CHF": "CHF ", "CAD": "C$", "AUD": "A$"}
-_KIND_LABELS = {
+KIND_LABELS = {
     ChartKind.bar: "Bar chart", ChartKind.column: "Column chart", ChartKind.line: "Line chart", ChartKind.area: "Area chart",
     ChartKind.stacked_bar_100: "100% bar", ChartKind.donut: "Donut chart", ChartKind.treemap: "Treemap",
     ChartKind.histogram: "Histogram", ChartKind.scatter: "Scatter plot", ChartKind.timeline: "Timeline", ChartKind.sankey: "Flow diagram",
@@ -100,7 +102,10 @@ class DrawOptions:
     value_labels: bool = False      # line, area: write every value, not only the last
     smooth: bool = False            # line, area: a curve through the points (the checker warns: it can overshoot)
     centre_total: bool = True       # donut
-    outside_labels: bool = True     # donut: labels outside the ring with leader lines
+    # A donut's labels always sit outside the ring: a name and a share are
+    # wider than the ring is thick, so a label on a slice spilled over its
+    # neighbours (checked with the render service), and a thin slice could
+    # not hold one at all.
     binning: str = DEFAULT_BINNING  # histogram: the rule that sets the number of bins
     label_points: str = "auto"      # scatter: "auto" (every point when few, else outliers) | "outliers"
 
@@ -315,10 +320,22 @@ def _hex(colour: str) -> str:
 
 
 def _text_style(theme: Theme, size: int, *, colour: str | None = None, bold: bool = False, heading: bool = False) -> dict[str, Any]:
-    style: dict[str, Any] = {"fontFamily": theme.heading_font if heading else theme.body_font, "fontSize": size, "color": _hex(colour or theme.text)}
+    # A font list, not a bare name: without a generic family at its end, an
+    # export drawn on a host without the theme's face loses its words
+    # (presentation_style.font_stack says why).
+    family = font_stack(theme.heading_font if heading else theme.body_font)
+    style: dict[str, Any] = {"fontFamily": family, "fontSize": size, "color": _hex(colour or theme.text)}
     if bold:
         style["fontWeight"] = "bold"
     return style
+
+
+def label_room(texts: list[str], *, half: bool = False, size: int = MIN_FONT_PX) -> int:
+    """Pixels to leave beside the plot for the widest of `texts` (or half of
+    it, for a label centred on the plot's edge), padded for browser fonts
+    (layout.TEXT_SLACK) and a gap."""
+    widest = max((block_width(text, size) for text in texts), default=0.0) * TEXT_SLACK
+    return math.ceil((widest / 2 if half else widest) + LABEL_GAP)
 
 
 def mark_colour(theme: Theme) -> str:
@@ -450,9 +467,13 @@ def _bars(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
     # House style: only horizontal gridlines, so a horizontal bar chart (whose
     # value axis runs across) never has them.
     value_axis = _axis_value(theme, drawn, gridlines=p.draw.gridlines and not horizontal)
+    # The value is written past the end of each bar, and the longest bar
+    # reaches the plot's edge: `containLabel` keeps only axis labels in
+    # view, so the grid leaves room for the widest value (it was cut off).
+    right = max(24, label_room([value_label(row, data) for row in drawn])) if horizontal else 8
     option = {
         **frame,
-        "grid": {"left": 0, "right": 24 if horizontal else 8, "top": 84 if horizontal else 96, "bottom": 44, "containLabel": True},
+        "grid": {"left": 0, "right": right, "top": 84 if horizontal else 96, "bottom": 44, "containLabel": True},
         "xAxis": value_axis if horizontal else category_axis,
         "yAxis": category_axis if horizontal else value_axis,
         "series": [{"type": "bar", "name": p.spec.title, "barMaxWidth": _BAR_WIDTH[p.draw.thickness], "barCategoryGap": _BAR_GAP[p.draw.thickness], "data": points}],
@@ -472,11 +493,14 @@ def _lines(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
     area = p.spec.kind == ChartKind.area
     log = p.spec.scale == Scale.log and not area
     points = []
+    shown: list[str] = []   # the values written on the line, in order
     for i, row in enumerate(rows):
         picked = row.label in highlighted
         single = row.record_count == 1
         symbol = HOLLOW_SYMBOL if single else (FILLED_SYMBOL if draw.markers or picked else "none")
         show = draw.value_labels or picked or i == len(rows) - 1
+        if show:
+            shown.append(value_label(row, data))
         points.append({
             "name": row.label, "value": row.value, "symbol": symbol, "symbolSize": 11 if picked else 8,
             "itemStyle": {"color": _hex(colour), "borderColor": _hex(colour), "borderWidth": 2},
@@ -489,12 +513,20 @@ def _lines(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
     }
     if area:
         series["areaStyle"] = {"color": _hex(colour), "opacity": 0.22}
+    # The first and last points sit on the plot's edges and their labels are
+    # centred over them, so the grid leaves half a label's room on each side
+    # that has one (the end label was cut off at the right). With every
+    # value written on its point the value axis's own numbers say nothing
+    # more and would sit under the first label, so they go, as on a column
+    # chart.
+    right = max(24, label_room(shown[-1:], half=True)) if shown else 24
+    left = label_room(shown[:1], half=True) if draw.value_labels and shown else 0
     return {
         **frame,
         "tooltip": _tooltip(theme),
-        "grid": {"left": 0, "right": 48, "top": 96, "bottom": 44, "containLabel": True},
+        "grid": {"left": left, "right": right, "top": 96, "bottom": 44, "containLabel": True},
         "xAxis": _axis_category(theme, rows, highlighted, boundary_gap=False, all_labels=False),
-        "yAxis": _axis_value(theme, rows, gridlines=draw.gridlines, labels=True, log=log),
+        "yAxis": _axis_value(theme, rows, gridlines=draw.gridlines, labels=not draw.value_labels, log=log),
         "series": [series],
     }
 
@@ -513,24 +545,61 @@ def _part_label(row: DataRow, share: float, data: VisualData) -> str:
     return f"{row.label}\n{part_value_text(row, share, data)}"
 
 
+WHOLE_BAR_MARGIN = 8   # px between the 100% bar and the picture's sides
+
+
+def whole_bar_centres(values: list[float], width: int) -> list[float]:
+    """Where each part of a 100% bar has its middle, in px from the
+    picture's left edge (the bar spans the grid, WHOLE_BAR_MARGIN in from
+    each side)."""
+    total = math.fsum(values)
+    span = width - 2 * WHOLE_BAR_MARGIN
+    centres, before = [], 0.0
+    for value in values:
+        centres.append(WHOLE_BAR_MARGIN + ((before + value / 2) / total * span if total > 0 else 0.0))
+        before += value
+    return centres
+
+
+def _whole_bar_offsets(labels: list[str], centres: list[float], width: int) -> list[float]:
+    """How far to slide each part's label sideways: labels go above and
+    below the bar in turn, and on each side they are moved apart and into
+    the picture as little as they need (layout.place_on_line); a label over
+    a narrow part at either end otherwise ran off the picture. When one
+    side cannot hold its labels at all they stay centred, and the checker
+    reports the clash (rule 12)."""
+    offsets = [0.0] * len(labels)
+    for side in (0, 1):
+        idx = [i for i in range(len(labels)) if i % 2 == side]
+        widths = [block_width(labels[i], MIN_FONT_PX) * TEXT_SLACK for i in idx]
+        lefts = place_on_line([centres[i] for i in idx], widths, LABEL_GAP / 2, width - LABEL_GAP / 2)
+        if lefts is None:
+            continue
+        for i, left, w in zip(idx, lefts, widths):
+            offsets[i] = round(left + w / 2 - centres[i], 1)
+    return offsets
+
+
 def _whole_bar(p: _Parts, frame: dict[str, Any], shares: list[float], total: float) -> dict[str, Any]:
     """stacked_bar_100: one bar across the plot that adds up to the whole,
     each part a segment labelled with its name and share, labels above and
-    below in turn so narrow neighbours do not collide."""
+    below in turn and slid apart so narrow neighbours do not collide."""
     theme, data, rows, highlighted = p.theme, p.data, p.rows, p.highlighted
     colours = part_colours(rows, theme, highlighted)
+    labels = [_part_label(row, share, data) for row, share in zip(rows, shares)]
+    offsets = _whole_bar_offsets(labels, whole_bar_centres([row.value for row in rows], p.width), p.width)
     series = []
-    for i, (row, share, colour) in enumerate(zip(rows, shares, colours)):
+    for i, (row, colour, text, offset) in enumerate(zip(rows, colours, labels, offsets)):
         picked = row.label in highlighted
         series.append({
             "type": "bar", "stack": "whole", "name": row.label, "barWidth": _WHOLE_BAR_WIDTH[p.draw.thickness],
             "data": [{"name": row.label, "value": row.value, "itemStyle": {"color": _hex(colour), "borderColor": _hex(theme.page), "borderWidth": 1}}],
-            "label": {"show": True, "position": "top" if i % 2 == 0 else "bottom", "distance": 10, "formatter": _literal(_part_label(row, share, data)),
-                      "align": "center", "lineHeight": 16, **_text_style(theme, MIN_FONT_PX, bold=picked)},
+            "label": {"show": True, "position": "top" if i % 2 == 0 else "bottom", "distance": 10, "offset": [offset, 0],
+                      "formatter": _literal(text), "align": "center", "lineHeight": 16, **_text_style(theme, MIN_FONT_PX, bold=picked)},
         })
     return {
         **frame,
-        "grid": {"left": 8, "right": 8, "top": 150, "bottom": 120, "containLabel": False},
+        "grid": {"left": WHOLE_BAR_MARGIN, "right": WHOLE_BAR_MARGIN, "top": 150, "bottom": 120, "containLabel": False},
         "xAxis": {"type": "value", "min": 0, "max": total, "scale": False, "show": False, "splitLine": {"show": False}},
         "yAxis": {"type": "category", "data": [data.record_noun], "show": False},
         "series": series,
@@ -538,9 +607,9 @@ def _whole_bar(p: _Parts, frame: dict[str, Any], shares: list[float], total: flo
 
 
 def _donut(p: _Parts, frame: dict[str, Any], shares: list[float], total: float) -> dict[str, Any]:
-    """donut: slices from twelve o'clock, labelled outside with leader lines
-    (or on the ring), the whole in the centre; never pulled out (selected
-    mode off) and never a rose (angles only, no radius encoding)."""
+    """donut: slices from twelve o'clock, labelled outside with leader lines,
+    the whole in the centre; never pulled out (selected mode off) and never
+    a rose (angles only, no radius encoding)."""
     theme, data, rows, highlighted, draw = p.theme, p.data, p.rows, p.highlighted, p.draw
     colours = part_colours(rows, theme, highlighted)
     items = []
@@ -549,8 +618,6 @@ def _donut(p: _Parts, frame: dict[str, Any], shares: list[float], total: float) 
         label: dict[str, Any] = {"formatter": _literal(_part_label(row, share, data))}
         if picked:
             label["fontWeight"] = "bold"
-        if not draw.outside_labels:
-            label["color"] = _hex(ink_on(colour))
         items.append({"name": row.label, "value": row.value, "itemStyle": {"color": _hex(colour), "borderColor": _hex(theme.page), "borderWidth": 2},
                       "label": label})
     centre = ["50%", "56%"]
@@ -559,8 +626,8 @@ def _donut(p: _Parts, frame: dict[str, Any], shares: list[float], total: float) 
         "series": [{
             "type": "pie", "radius": ["40%", "64%"], "center": centre, "startAngle": 90, "clockwise": True,
             "selectedMode": False, "selectedOffset": 0, "avoidLabelOverlap": True, "emphasis": {"scale": False},
-            "label": {"show": True, "position": "outside" if draw.outside_labels else "inside", "lineHeight": 16, **_text_style(theme, MIN_FONT_PX)},
-            "labelLine": {"show": draw.outside_labels, "length": 14, "length2": 10, "lineStyle": {"color": _hex(theme.muted)}},
+            "label": {"show": True, "position": "outside", "lineHeight": 16, **_text_style(theme, MIN_FONT_PX)},
+            "labelLine": {"show": True, "length": 14, "length2": 10, "lineStyle": {"color": _hex(theme.muted)}},
             "data": items,
         }],
     }
@@ -592,7 +659,11 @@ def _treemap(p: _Parts, frame: dict[str, Any], shares: list[float]) -> dict[str,
         "series": [{
             "type": "treemap", "roam": False, "nodeClick": False, "breadcrumb": {"show": False}, "sort": "desc",
             "left": 0, "right": 0, "top": 84, "bottom": 40, "visibleMin": 0,
-            "label": {"show": True, "position": "insideTopLeft", "lineHeight": 16, "overflow": "break", **_text_style(theme, MIN_FONT_PX)},
+            # ECharts fits a treemap label inside its rectangle and drops the
+            # lines that do not fit; the checker works out what is left
+            # (layout.treemap_rects) from these same numbers, padding included.
+            "label": {"show": True, "position": "insideTopLeft", "padding": TREEMAP_LABEL_PADDING, "lineHeight": 16, "overflow": "break",
+                      **_text_style(theme, MIN_FONT_PX)},
             "upperLabel": {"show": False},
             "itemStyle": {"borderColor": _hex(theme.page), "borderWidth": 2, "gapWidth": 2},
             "data": items,
@@ -639,11 +710,14 @@ def _scatter(p: _Parts, frame: dict[str, Any], labelled: set[str]) -> dict[str, 
     x_count = data.x_unit_kind == "count"
     names = data.measure_labels
     points = []
+    named: list[str] = []   # the names written beside their points
     for row in rows:
         picked = row.label in highlighted
         single = f" {SINGLE_RECORD_MARK}" if row.record_count == 1 else ""
         tip = (f"{row.label}: {names.get('x', 'x')} {format_x(row, data)}; {names.get('y', 'y')} {format_value(row.value, data)}; "
                f"from {count_phrase(row, data)}{single}")
+        if row.label in labelled or picked:
+            named.append(row.label + single)
         points.append({
             "name": row.label, "value": [row.x, row.value],
             "symbol": HOLLOW_SYMBOL if row.record_count == 1 else FILLED_SYMBOL, "symbolSize": 15 if picked else 11,
@@ -664,10 +738,13 @@ def _scatter(p: _Parts, frame: dict[str, Any], labelled: set[str]) -> dict[str, 
         x_axis.update({"min": min(0.0, min((row.x or 0.0 for row in rows), default=0.0)), "scale": False})
         if x_count:
             x_axis["minInterval"] = 1
+    # Names are written to the right of their points; the grid leaves room
+    # for the widest, so a point at the far right keeps its name in view.
+    right = max(24, label_room(named) + 12)
     return {
         **frame,
         "tooltip": _tooltip(theme),
-        "grid": {"left": 8, "right": 140, "top": 96, "bottom": 70, "containLabel": True},
+        "grid": {"left": 8, "right": right, "top": 96, "bottom": 70, "containLabel": True},
         "xAxis": x_axis,
         "yAxis": y_axis,
         "series": [{"type": "scatter", "name": p.spec.title, "data": points, "labelLayout": {"moveOverlap": "shiftY"}}],
@@ -772,7 +849,7 @@ def _table_row(row: DataRow, data: VisualData) -> dict[str, Any]:
 
 def _words(spec: VisualSpec, data: VisualData, rows: list[DataRow], highlighted: set[str], kind: ChartKind, *,
            shares: list[float], total: float | None, bins: list[tuple[float, float]], labelled: set[str]) -> dict[str, Any]:
-    name = _KIND_LABELS.get(kind, kind.value)
+    name = KIND_LABELS.get(kind, kind.value)
     unit = data.unit or spec.unit or ""
     columns = ["Label", f"Value ({unit})", "Records"]
     if not rows:

@@ -6,7 +6,9 @@ the rows and the picture must not change; nudge a value and it must."""
 
 import copy
 import json
+import os
 import random
+from pathlib import Path
 
 import pytest
 
@@ -16,7 +18,8 @@ from app.visuals.data_service import DataRow, RecordRef, VisualData
 from app.visuals.echarts import (
     FILLED_SYMBOL, HOLLOW_SYMBOL, MIN_FONT_PX, OTHER_LABEL, SINGLE_RECORD_MARK, ChartDoesNotFit, DrawOptions, build_chart, ink_on, mark_colour,
 )
-from app.visuals.spec import parse_spec
+from app.visuals.layout import text_width
+from app.visuals.spec import DRAWN_KINDS, parse_spec
 
 DARK = theme_for("dark_academia")
 NEWSPRINT = theme_for("newsprint")
@@ -32,6 +35,12 @@ def category(values=(("Meridian Holdings Ltd", 2400000, 1), ("Arden Partners", 2
     amount = unit_kind == "amount"
     return VisualData("inv", query, {}, "USD" if amount else "claims", unit_kind, "category", "payments" if amount else "claims", rows,
                       "USD" if amount else None, sum(c for _, _, c in values))
+
+
+def parts() -> VisualData:
+    """Parts big enough for a treemap to name each one (40, 30, 20 and 10%)."""
+    return category((("Meridian Holdings Ltd", 1200000, 3), ("Arden Partners", 900000, 4), ("Harborline Civic Trust", 600000, 2),
+                     ("Orrin Ltd", 300000, 2)))
 
 
 def over_time(values=(("2023-11", 2400000, 1), ("2023-12", 0, 0), ("2024-01", 50000, 2), ("2024-02", 75000, 3))) -> VisualData:
@@ -79,7 +88,7 @@ KINDS = [
     ("area", "payments_over_time", over_time),
     ("stacked_bar_100", "payments_by_party", category),
     ("donut", "payments_by_party", category),
-    ("treemap", "payments_by_party", category),
+    ("treemap", "payments_by_party", parts),
     ("histogram", "payment_amounts", amounts),
     ("scatter", "payments_count_and_total_by_party", pairs),
 ]
@@ -184,13 +193,11 @@ def test_a_donut_has_four_slices_at_most_the_total_in_the_centre_and_nothing_pul
     assert built.alt_text.startswith("Donut chart: Meridian received most of the money. 3 parts of $2.7M. Largest: Meridian Holdings Ltd at 88.1%")
 
 
-def test_donut_labels_on_the_ring_take_black_or_white_ink():
-    built = build_chart(spec("donut", "payments_by_party"), category(), DARK, draw=DrawOptions(outside_labels=False, centre_total=False))
+def test_a_donut_without_its_centre_total_keeps_its_labels_outside():
+    built = build_chart(spec("donut", "payments_by_party"), category(), DARK, draw=DrawOptions(centre_total=False))
     pie = built.option["series"][0]
-    assert pie["label"]["position"] == "inside" and not any(t.get("id") == "centre" for t in built.option["title"])
-    for item in pie["data"]:
-        fill, ink = item["itemStyle"]["color"].lstrip("#"), item["label"]["color"].lstrip("#")
-        assert contrast_ratio(ink, fill) >= 4.5
+    assert pie["label"]["position"] == "outside" and not any(t.get("id") == "centre" for t in built.option["title"])
+    assert check_visual(spec("donut", "payments_by_party"), category(), DARK, built).ok
 
 
 def test_count_parts_name_their_records():
@@ -208,6 +215,63 @@ def test_a_treemap_writes_each_part_inside_in_ink_that_reads():
         assert item["label"]["color"].lstrip("#") == ink_on(fill)
         assert contrast_ratio(item["label"]["color"].lstrip("#"), fill) >= 4.5
     assert tree["data"][0]["tooltip"]["formatter"] == "Meridian Holdings Ltd: 88.1% · $2.4M · 1 payment †"
+
+
+def test_a_treemap_part_too_small_for_its_words_fails_rules_12_and_16():
+    # At 0.4% Harborline gets a sliver 14 px high that ECharts writes nothing
+    # in (layout.treemap_rects, checked against ECharts in test_visuals_layout.py).
+    lopsided = category((("Meridian Holdings Ltd", 2400000, 1), ("Alaric Voss", 295000, 2), ("Harborline Civic Trust", 12000, 2)))
+    report = check_visual(spec("treemap", "payments_by_party"), lopsided, DARK)
+    assert not report.ok and {e.rule for e in report.errors} == {12}
+    assert "'Harborline Civic Trust' is too small in a treemap to show its name" in report.errors[0].message
+    # At 1.5% its name fits on two lines, but not the share and count under it.
+    report = check_visual(spec("treemap", "payments_by_party"), category(), DARK)
+    assert [(e.rule, e.message.split(" is ")[0]) for e in report.errors] == [(16, "'Harborline Civic Trust'")]
+    assert check_visual(spec("treemap", "payments_by_party"), parts(), DARK).ok
+
+
+def test_a_treemap_part_that_shows_its_name_but_not_its_count_fails_rule_16():
+    # A picture so short that every rectangle holds one line: the names, not the counts.
+    short = build_chart(spec("treemap", "payments_by_party"), parts(), DARK, height=84 + 40 + 40)
+    report = check_visual(spec("treemap", "payments_by_party"), parts(), DARK, short)
+    assert {e.rule for e in report.errors} == {16}
+    assert all("too small in a treemap to show its share" in e.message for e in report.errors)
+
+
+def test_a_100_percent_bar_slides_its_labels_into_the_picture():
+    built = build_chart(spec("stacked_bar_100", "payments_by_party"), category(), DARK)
+    # Harborline's 1.5% ends the bar at the right edge: its label slides left to end inside the picture.
+    label = built.option["series"][2]["label"]
+    assert label["offset"][0] < 0
+    centre = 8 + (1 - 0.0147 / 2) * (built.width - 16)
+    assert centre + label["offset"][0] + text_width("1.5% · $40K · 2 payments", MIN_FONT_PX) / 2 <= built.width
+    assert check_visual(spec("stacked_bar_100", "payments_by_party"), category(), DARK, built).ok
+
+
+def test_a_100_percent_bar_whose_labels_cannot_fit_fails_rule_12():
+    crowd = category(tuple((f"The Long-named Holding Company of the Northern Region Number {i}", 1000, 2) for i in range(8)))
+    report = check_visual(spec("stacked_bar_100", "payments_by_party"), crowd, DARK)
+    assert any(e.rule == 12 and "run into each other" in e.message for e in report.errors)
+
+
+def test_values_written_closer_than_they_are_wide_are_flagged():
+    rows = [DataRow(f"M{i:02d}", 100000.0 + i, _refs(f"m{i}", 2), 2, f"{2022 + i // 12}-{i % 12 + 1:02d}") for i in range(24)]
+    months = VisualData("inv", "payments_over_time", {}, "USD", "amount", "time", "payments", rows, "USD", 48)
+    report = check_visual(spec("column", "payments_over_time"), months, DARK)
+    assert report.ok and any(w.rule == 14 and "may run" in w.message for w in report.warnings)
+    assert not any(w.rule == 14 for w in check_visual(spec("column", "payments_over_time"), over_time(), DARK).warnings)
+
+
+def test_end_labels_and_bar_values_have_room_inside_the_picture():
+    line = build_chart(spec("line", "payments_over_time"), over_time(), DARK)
+    end = line.option["series"][0]["data"][-1]["label"]["formatter"]
+    assert line.option["grid"]["right"] >= text_width(end, MIN_FONT_PX) / 2
+    bar = build_chart(spec("bar", "payments_by_party"), category(), DARK)
+    widest = max(text_width(p["label"]["formatter"], MIN_FONT_PX) for p in bar.option["series"][0]["data"])
+    assert bar.option["grid"]["right"] >= widest + 5   # ECharts writes a bar's label 5 px past its end
+    scatter = build_chart(spec("scatter", "payments_count_and_total_by_party"), pairs(), DARK)
+    names = [p["label"]["formatter"] for p in scatter.option["series"][0]["data"]]
+    assert scatter.option["grid"]["right"] >= max(text_width(n, MIN_FONT_PX) for n in names) + 12
 
 
 def test_a_histogram_draws_touching_bins_with_round_edges():
@@ -334,3 +398,75 @@ def test_a_nudge_inside_a_bin_leaves_the_histogram_as_it_was():
     nudged = copy.deepcopy(data)
     nudged.rows[3].value += 1   # 15,000 -> 15,001: still in $0–$500K
     assert build_chart(spec("histogram", "payment_amounts"), nudged, DARK).option == reference.option
+
+
+# --- the app's copy of each kind ------------------------------------------------------------
+# frontend/test-support/chart-kinds.json holds one stored chart of every drawn
+# kind (order slip, data, option, words) for the app's tests: the preview
+# shows each one, and test-echarts-kinds.test.ts draws each option with the
+# app's own registered ECharts parts. It must be what this drawing makes
+# today; after a deliberate change to the drawing, rewrite it with
+#   UPDATE_CHART_FIXTURES=1 TZ=UTC PYTHONPATH=. python -m pytest tests/test_visuals_kinds.py -k fixture
+
+CHART_FIXTURES = Path(__file__).resolve().parents[2] / "frontend" / "test-support" / "chart-kinds.json"
+
+
+def _fixture_orders() -> dict[str, tuple[str, VisualData]]:
+    def ref(*ids: str) -> list[RecordRef]:
+        return [RecordRef("relationship", i) for i in ids]
+
+    parties = [DataRow("Meridian Holdings Ltd", 2400000, ref("r1"), 1, "Meridian Holdings Ltd"),
+               DataRow("Alaric Voss", 295000, ref("r2", "r3"), 2, "Alaric Voss"),
+               DataRow("Harborline Civic Trust", 12000, ref("r4", "r5"), 2, "Harborline Civic Trust")]
+    by_party = VisualData("inv", "payments_by_party", {"direction": "received"}, "USD", "amount", "category", "payments", parties, "USD", 5)
+    # A treemap names every part only when each is big enough (rule 12).
+    shares = [DataRow("Meridian Holdings Ltd", 1200000, ref("t0", "t1", "t2"), 3, "Meridian Holdings Ltd"),
+              DataRow("Alaric Voss", 900000, ref("t3", "t4"), 2, "Alaric Voss"),
+              DataRow("Harborline Civic Trust", 600000, ref("t5", "t6"), 2, "Harborline Civic Trust"),
+              DataRow("Orrin Ltd", 300000, ref("t7"), 1, "Orrin Ltd")]
+    by_share = VisualData("inv", "payments_by_party", {"direction": "received"}, "USD", "amount", "category", "payments", shares, "USD", 8)
+    months = [DataRow("Nov 2023", 2400000, ref("r1"), 1, "2023-11"), DataRow("Dec 2023", 5000, ref("r4"), 1, "2023-12"),
+              DataRow("Jan 2024", 52000, ref("r2", "r5"), 2, "2024-01")]
+    by_month = VisualData("inv", "payments_over_time", {"granularity": "month"}, "USD", "amount", "time", "payments", months, "USD", 4)
+    paid = [DataRow(f"Payment {i}", float(v), ref(f"p{i}"), 1, f"Payment {i}") for i, v in enumerate((5000, 7000, 12000, 45000, 250000, 2400000))]
+    spread = VisualData("inv", "payment_amounts", {}, "USD", "amount", "distribution", "payments", paid, "USD", 6)
+    twos = [DataRow(r.label, r.value, r.record_refs, r.record_count, r.key, x=float(r.record_count)) for r in parties]
+    two_numbers = VisualData("inv", "payments_count_and_total_by_party", {"direction": "received"}, "USD", "amount", "pairs", "payments", twos,
+                             "USD", 5, x_unit="payments", x_unit_kind="count",
+                             measure_labels={"x": "Number of payments received", "y": "Total received (USD)"})
+    return {
+        "bar": ("Meridian received most of the money", by_party),
+        "column": ("Payments fell after the November transfer", by_month),
+        "line": ("Payments fell after the November transfer", by_month),
+        "area": ("Payments fell after the November transfer", by_month),
+        "stacked_bar_100": ("Meridian received most of the money", by_party),
+        "donut": ("Meridian received most of the money", by_party),
+        "treemap": ("Meridian received the largest share", by_share),
+        "histogram": ("Most payments were small", spread),
+        "scatter": ("Meridian took one large payment", two_numbers),
+    }
+
+
+def _fixture(kind: str, title: str, data: VisualData) -> dict:
+    order = parse_spec({"kind": kind, "title": title, "query": {"name": data.query}})
+    built = build_chart(order, data, theme_for(order.theme))
+    report = check_visual(order, data, theme_for(order.theme), built)
+    assert report.ok, (kind, report.errors)   # the app's copy is a chart that passed its check
+    return {"spec": order.model_dump(mode="json"), "data": data.as_dict(), "option": built.option, "text": built.text(),
+            "width": built.width, "height": built.height}
+
+
+def test_the_apps_chart_fixture_is_what_the_backend_draws():
+    made = {kind: _fixture(kind, title, data) for kind, (title, data) in _fixture_orders().items()}
+    # A round trip through JSON, as the file holds it.
+    made = json.loads(json.dumps(made, ensure_ascii=False, sort_keys=True))
+    assert set(made) == {kind.value for kind in DRAWN_KINDS}
+    if os.environ.get("UPDATE_CHART_FIXTURES") == "1":
+        CHART_FIXTURES.write_text(json.dumps(made, indent=1, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
+    stored = json.loads(CHART_FIXTURES.read_text(encoding="utf-8"))
+    for kind in made:
+        assert stored.get(kind) == made[kind], f"{kind}: the drawing drifted from {CHART_FIXTURES.name}; see the comment above to rewrite it"
+    # Each stored chart rebuilds from its own order slip and data.
+    for kind, fixture in stored.items():
+        order, data = parse_spec(fixture["spec"]), VisualData.from_dict(fixture["data"])
+        assert build_chart(order, data, theme_for(order.theme)).option == fixture["option"], kind

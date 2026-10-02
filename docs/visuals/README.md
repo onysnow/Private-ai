@@ -89,6 +89,18 @@ order slip  →  kitchen  →  checker  →  drawing  →  review
    longer description and the data table. Animation is off: the option is
    drawn on a server. The in-app preview and the exports read the same rows,
    so they cannot disagree.
+   Where the words land is worked out before ECharts draws them
+   (`backend/app/visuals/layout.py`), with ECharts' own numbers: the text
+   widths zrender uses without a canvas and a port of ECharts' squarified
+   treemap layout, both checked against the installed ECharts. The drawing
+   leaves room beside the plot for the end label of a line, the values past
+   the longest bars and the names beside a scatter plot's points, and slides
+   a 100% bar's labels apart and into the picture. The checker uses the same
+   numbers to judge what a reader will see (see rules 12, 14 and 16 below).
+   Fonts are written as a CSS font list ending in a generic family
+   (`presentation_style.font_stack`): the export's PNG is drawn where the
+   theme's face may not be installed, and with only `Calibri` named, every
+   word of a Dark Academia chart was dropped from the PNG.
 5. **The export bridge** (`render/` and
    `backend/app/visuals/render_client.py`). A small Node 22 service draws the
    option as SVG with ECharts' server-side renderer (ADR-0005, line 2);
@@ -113,15 +125,32 @@ order slip  →  kitchen  →  checker  →  drawing  →  review
   `app/ai/presentation_modules/PRESENTATION_DRAFT.md` and
   `OUTPUT_SCHEMAS["presentation_draft"]` in `app/ai/reasoning.py`). After the
   chart check it is `{"type": "chart", "spec", "data", "report", "text"}`.
-- **Deck** (`app/services/decks.py`): a native, editable PowerPoint bar chart
-  drawn from the cooked rows. Each category label carries the record count
-  and the `†` mark; the source line sits under the chart; every row's records
-  are numbered in the slide footer and on the Sources slides. No image is
-  needed for bars, so the render service is not involved.
-- **Brief** (`app/services/writeups.py`): the PNG from the export bridge with
-  the alt text as its caption, then the data table with a citation marker on
-  every row. When the render service is unreachable the brief says so and
-  shows the values as the bar table it always had.
+- **Both exports check again first.** A stored chart is rebuilt from its
+  stored order slip and data and checked again (`decks.checked_chart`), so
+  a chart stored before a rule tightened, or edited by hand, is replaced by
+  a note naming the failed rules instead of being drawn. The check's report
+  travels no further than this: the export draws only what passed.
+- **Deck** (`app/services/decks.py`): a native, editable PowerPoint chart
+  for every kind python-pptx can draw, styled from the deck theme: bar and
+  column as before; line (`LINE_MARKERS`) and area (`AREA`), with a hollow
+  marker on a point that rests on one record and the last value written at
+  the end; the 100% bar (`BAR_STACKED_100`, one series per part, each named
+  inside in black or white); the donut (`DOUGHNUT`, every slice named with
+  its share, the total in the centre); the histogram (`COLUMN_CLUSTERED`
+  with no gap between bins); the scatter plot (`XY_SCATTER`, each point
+  named, both axes titled). The treemap, which PowerPoint charts cannot
+  draw, is the PNG from the render service; when the service cannot be
+  reached the slide says so and shows the same parts as native bars. Every
+  chart has its title and unit above it, the source line under it, its alt
+  text on the shape (what a screen reader announces), its description in the
+  speaker notes, and its records numbered in the slide footer and on the
+  Sources slides.
+- **Brief** (`app/services/writeups.py`): for every kind, the PNG from the
+  export bridge with the alt text as its caption, then the data table (with
+  the share for the parts of a whole and both numbers for a scatter plot)
+  with a citation marker on every row, then the source line. When the
+  render service is unreachable the brief says so and shows the values as a
+  table instead.
 - **Preview** (`POST /api/investigations/{id}/visuals/preview`): the data,
   the ECharts option, the check report, the alt text, the description and the
   data table for one order slip, with no AI involved. `GET
@@ -155,11 +184,11 @@ for a kind pass 2 cannot draw yet.
 | 9 | Length and position first; never an order drawn in random colours | spec + option | error for random colours, and for a part-of-whole chart over periods (an order in category colours); warning for a ranking as donut/treemap |
 | 10 | Eight colours at most; fold the rest into "Other" | spec + data + option | error; warning past 20 bars |
 | 11 | Text contrast 4.5:1; neighbouring colours 3:1 or labelled directly | theme + option | error; a line or a point needs 3:1 against the page, text inside a part 4.5:1 against its fill |
-| 12 | Never rely on colour alone | spec + option | error (highlighted bars bold; highlighted points and parts labelled in bold; every part of a donut, treemap or 100% bar carries its name) |
+| 12 | Never rely on colour alone | spec + option + layout | error (highlighted bars bold; highlighted points and parts labelled in bold; every part of a donut, treemap or 100% bar carries its name, and the name must be seen: a treemap part too small to show it, or 100% bar labels that collide or leave the picture, fail) |
 | 13 | A title that states the finding; alt text, description and data table | spec + drawing | error |
-| 14 | Chart text at least 12 px | option | error |
+| 14 | Chart text at least 12 px | option + layout | error; warning when the values written over columns, bins or every point of a line are wider than the room each mark has |
 | 15 | A source line; every value links to a record | data + option | error |
-| 16 | Show how many records sit behind each group; flag groups more than 10× apart | data + option | error for missing counts (on the mark, or in each point's tooltip for line, area and scatter); warning for the spread |
+| 16 | Show how many records sit behind each group; flag groups more than 10× apart | data + option + layout | error for missing counts (on the mark, or in each point's tooltip for line, area and scatter, and for a treemap part too small to show its count); warning for the spread |
 | 17 | Shaded maps: rates not counts, 3–7 steps, fair-area projection | — | not checkable here (maps pass) |
 | 18 | Networks over ~20 nodes offer a grid view; crossings counted | — | not checkable here (networks pass) |
 | 19 | Never add up different currencies | spec + data | error for a wrong unit; warning for currencies left out; not applicable to counts |
@@ -185,9 +214,19 @@ cd render && npm ci && npm start     # listens on 0.0.0.0:8070
 
 The backend's default `RENDER_SERVICE_URL` is `http://127.0.0.1:8070`. `GET
 /health` says whether it is up; `npm test` runs its own tests, and
-`backend/tests/test_visuals_render.py` starts it on a free port for one live
-check (skipped when Node or `render/node_modules` is missing). See
+`backend/tests/test_visuals_render.py` starts it on a free port and draws a
+chart of every kind through it, checking that each PNG carries its words
+(skipped when Node or `render/node_modules` is missing). The service imports
+the whole `echarts` package, whose `index.js` registers every chart,
+component and feature, so it draws every kind with no change. The app
+registers only what it needs (`frontend/lib/echarts-setup.ts`). See
 `render/README.md`.
+
+The PNG's text is drawn by vl-convert with the fonts installed where the
+backend runs. vl-convert carries Liberation Sans inside it, so the generic
+`sans-serif` at the end of every chart's font list always finds a face;
+installing the themes' own fonts on the backend host (Carlito for Calibri,
+for example) makes the PNG match the deck more closely.
 
 ## Tests
 
@@ -203,9 +242,10 @@ TZ=UTC PYTHONPATH=. python -m pytest tests/test_visuals_*.py -q --no-cov
 | `test_visuals_stats.py` | Shares; bin counts against NumPy's estimators (when NumPy is importable); round edges against Vega's own output; every value in exactly one bin; Tukey's fences |
 | `test_visuals_checker.py` | A failing and a passing case for every rule above, for bars and for each rule a statistical kind adds |
 | `test_visuals_echarts.py` | The house style of bars, the words beside the chart, the metamorphic tests |
-| `test_visuals_kinds.py` | Every statistical kind in the house style and passing its check, its draw options, the kinds refused for a query they cannot draw, the metamorphic tests for every kind |
-| `test_visuals_render.py` | The bridge behind a mocked transport, vl-convert, one live run of the Node service |
-| `test_visuals_exports.py` | A chart in a deck (native chart) and in a brief (image, or table and a note) |
+| `test_visuals_kinds.py` | Every statistical kind in the house style and passing its check, its draw options, the kinds refused for a query they cannot draw, labels kept in the picture and the checks on what fits, the metamorphic tests for every kind, and that the app's copy of each kind (`frontend/test-support/chart-kinds.json`) is what the backend draws |
+| `test_visuals_layout.py` | Text widths and treemap rectangles equal to ECharts' own (and, with Node, to the installed ECharts), labels moved apart on a line, words wrapped at spaces |
+| `test_visuals_render.py` | The bridge behind a mocked transport, vl-convert drawing text in a font list, a live run of the Node service for every kind with its words in each PNG |
+| `test_visuals_exports.py` | Every kind in a deck (the native chart type, alt text, source line, notes; the treemap as the picture, or as bars when the service is down; a stored chart that now fails a rule is not drawn) and in a brief (image, caption and data table, or a table and a note) |
 | `test_visuals_routes.py` | The catalogue and preview routes, their response models, investigation scope |
 | `test_visuals_draft.py` | A draft whose model orders a chart: kept, re-asked, or removed with reasons |
 
@@ -213,8 +253,9 @@ TZ=UTC PYTHONPATH=. python -m pytest tests/test_visuals_*.py -q --no-cov
 
 Built: the drawing of the seven statistical kinds, the two queries they
 needed (`payment_amounts`, `payments_count_and_total_by_party`), the
-question-first chooser, and a checker that judges every rule for each kind
-and says which rules do not apply.
+question-first chooser, a checker that judges every rule for each kind
+and says which rules do not apply, and every kind in both exports (native
+PowerPoint charts, the treemap as a picture; a PNG in the brief).
 
 Left for later passes:
 

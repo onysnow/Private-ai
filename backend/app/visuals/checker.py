@@ -39,7 +39,13 @@ What each rule is judged from:
   (at most eight colours), 11 (marks against the page, text inside marks),
   12 (a non-colour cue), 13 (alt text, description, data table), 14 (text
   at least 12 px), 15 (the source line), 16 (counts on the chart or in each
-  point's tooltip), 20 (the single-record mark, or a hollow marker).
+  point's tooltip), 20 (the single-record mark, or a hollow marker);
+* where the words land (app/visuals/layout.py, ECharts' own text widths
+  and treemap layout): 12 (a treemap part too small to show its name, a
+  100% bar's labels that collide or leave the picture), 14 (values written
+  closer together than they are wide: a warning, since how far apart they
+  sit up and down depends on the axis ECharts picks), 16 (a treemap part
+  too small to show its count).
 """
 
 from __future__ import annotations
@@ -52,9 +58,10 @@ from typing import Any
 from app.services.presentation_style import Theme, contrast_ratio
 from app.visuals.data_service import DataRow, VisualData
 from app.visuals.echarts import (
-    GRAPHIC_CONTRAST, HOLLOW_SYMBOL, MIN_FONT_PX, SINGLE_RECORD_MARK, BuiltChart, UnsupportedChartKind, build_chart, count_phrase,
-    format_value, prepare_rows,
+    DEFAULT_HEIGHT, DEFAULT_WIDTH, GRAPHIC_CONTRAST, HOLLOW_SYMBOL, MIN_FONT_PX, SINGLE_RECORD_MARK, TREEMAP_LABEL_PADDING, BuiltChart,
+    UnsupportedChartKind, build_chart, count_phrase, format_value, prepare_rows,
 )
+from app.visuals.layout import LABEL_GAP, block_width, treemap_rects, wrapped_lines
 from app.visuals.spec import (
     COLOUR_PER_CATEGORY_KINDS, LENGTH_KINDS, LINE_KINDS, PART_OF_WHOLE_KINDS, POINT_KINDS, QUERY_CATALOG, SIZE_KINDS, STACKABLE_KINDS,
     ZERO_BASELINE_KINDS, ChartKind, Scale, SortOrder, VisualSpec,
@@ -211,6 +218,101 @@ class _Checker:
         """True when every mark carries its value, on the item or the series
         (a chart with no marks has none left unlabelled)."""
         return bool(self.series()) and all(label.get("show", False) for label in self.labels().values())
+
+    # --- where the words land (app/visuals/layout.py) -----------------------------
+    def picture_size(self) -> tuple[int, int]:
+        if self.built is not None:
+            return self.built.width, self.built.height
+        return DEFAULT_WIDTH, DEFAULT_HEIGHT
+
+    def treemap_fit(self) -> dict[str, tuple[bool, bool]]:
+        """Treemap part -> (its name is shown whole, its whole label is
+        shown). ECharts writes a treemap label inside its rectangle and
+        drops what does not fit, so a small part loses its name; the
+        rectangles are ECharts' own (layout.treemap_rects), the text box is
+        the rectangle less its border and the label's padding, as
+        echarts/lib/chart/treemap/TreemapView.js sizes it."""
+        series = next((s for s in self.series() if s.get("type") == "treemap"), None)
+        if series is None:
+            return {}
+        width, height = self.picture_size()
+        box_w = width - _px(series.get("left"), width) - _px(series.get("right"), width)
+        box_h = height - _px(series.get("top"), height) - _px(series.get("bottom"), height)
+        style = series.get("itemStyle") or {}
+        border, gap = float(style.get("borderWidth", 0)), float(style.get("gapWidth", 0))
+        label = series.get("label") or {}
+        padding = float(label.get("padding", TREEMAP_LABEL_PADDING))
+        size = float(label.get("fontSize", MIN_FONT_PX))
+        line_height = float(label.get("lineHeight", size + 4))
+        items = [item for item in series.get("data") or [] if isinstance(item, dict)]
+        rects = treemap_rects([_number(item.get("value")) or 0.0 for item in items], box_w, box_h, border=border, gap=gap)
+        out: dict[str, tuple[bool, bool]] = {}
+        for item, rect in zip(items, rects):
+            name = str(item.get("name"))
+            text = str((item.get("label") or {}).get("formatter", name))
+            text_w = rect.width - 2 * border - 2 * padding
+            text_h = rect.height - 2 * border - 2 * padding
+            visible = math.floor(text_h / line_height) if text_h > 0 and text_w > 0 else 0
+            name_lines = wrapped_lines(text.split("\n")[0], size, text_w) if visible else None
+            all_lines = wrapped_lines(text, size, text_w) if visible else None
+            out[name] = (name_lines is not None and len(name_lines) <= visible, all_lines is not None and len(all_lines) <= visible)
+        return out
+
+    def whole_bar_clashes(self) -> list[str]:
+        """What goes wrong with a 100% bar's labels, read from the option:
+        each label sits over its part's middle, moved by its offset, above
+        or below the bar; none may leave the picture or run into the next
+        one on its side."""
+        width, _ = self.picture_size()
+        parts = [s for s in self.series() if s.get("type") == "bar" and s.get("stack")]
+        grid = (self.option or {}).get("grid") or {}
+        left, right = _px(grid.get("left"), width), _px(grid.get("right"), width)
+        values = [_number(((s.get("data") or [{}])[0] or {}).get("value")) or 0.0 for s in parts]
+        total = math.fsum(values)
+        if total <= 0:
+            return []
+        span, before = width - left - right, 0.0
+        sides: dict[str, list[tuple[float, float, str]]] = {}
+        problems: list[str] = []
+        for series, value in zip(parts, values):
+            label = series.get("label") or {}
+            name = str(series.get("name"))
+            centre = left + (before + value / 2) / total * span
+            before += value
+            if not label.get("show", False):
+                continue
+            offset = label.get("offset") or [0, 0]
+            text_w = block_width(str(label.get("formatter", name)), float(label.get("fontSize", MIN_FONT_PX)))
+            middle = centre + float(offset[0])
+            box = (middle - text_w / 2, middle + text_w / 2, name)
+            if box[0] < 0 or box[1] > width:
+                problems.append(f"the label of '{name}' runs off the picture")
+            sides.setdefault(str(label.get("position", "top")), []).append(box)
+        for boxes in sides.values():
+            boxes.sort()
+            for (_l1, r1, a), (l2, _r2, b) in zip(boxes, boxes[1:]):
+                if l2 < r1:
+                    problems.append(f"the labels of '{a}' and '{b}' run into each other")
+        return problems
+
+    def crowded_values(self) -> int:
+        """How many marks have values written over them that need more room
+        than each mark has across the plot (0 when they fit): columns and
+        bins write their value above each one, and a line with every value
+        shown writes one above each point."""
+        kind = self.kind
+        shown = [(series, item) for series, item in self.items() if self.label_of(series, item).get("show", False)]
+        if kind not in (ChartKind.column, ChartKind.histogram, ChartKind.line, ChartKind.area) or len(shown) < 2:
+            return 0
+        if kind in (ChartKind.line, ChartKind.area) and len(shown) < len(self.items()):
+            return 0
+        width, _ = self.picture_size()
+        grid = (self.option or {}).get("grid") or {}
+        plot = width - _px(grid.get("left"), width) - _px(grid.get("right"), width)
+        n = len(self.items())
+        room = plot / n if kind in (ChartKind.column, ChartKind.histogram) else plot / (n - 1)
+        widest = max(block_width(str(self.label_of(s, i).get("formatter", "")), MIN_FONT_PX) for s, i in shown)
+        return n if widest + LABEL_GAP > room else 0
 
     def drawn_points(self) -> list[tuple[Any, ...]]:
         """(name, value) per mark; (name, x, y) for a scatter plot."""
@@ -534,6 +636,17 @@ class _Checker:
             for name, settings in self.labels().items():
                 if not settings.get("show", True) or name not in str(settings.get("formatter", "")):
                     self.error(12, f"'{name}' is told apart by its colour only; label it with its name")
+            # Asking for a label is not enough: what the reader sees is what
+            # fits (a treemap drops the words a small rectangle cannot hold,
+            # a 100% bar's labels can collide or leave the picture).
+            if kind == ChartKind.treemap:
+                for name, (name_shown, _whole) in self.treemap_fit().items():
+                    if not name_shown:
+                        self.error(12, f"'{name}' is too small in a treemap to show its name, so only its colour tells it apart; "
+                                       "a bar chart names every part, or a limit folds the smallest into Other")
+            if kind == ChartKind.stacked_bar_100:
+                for problem in self.whole_bar_clashes():
+                    self.error(12, f"{problem}, so a part is told apart by its colour only; a bar chart has room for every name")
         if self.spec.highlight and self.needs_option(12):
             picked = [name for name in self.spec.highlight if any(row.label == name for row in self.rows)]
             if kind in (ChartKind.bar, ChartKind.column, ChartKind.histogram):
@@ -577,6 +690,14 @@ class _Checker:
             small = sorted({size for size in _font_sizes(self.option) if size < MIN_FONT_PX})
             if small:
                 self.error(14, f"text of {', '.join(f'{s:g}px' for s in small)} is under the {MIN_FONT_PX}px minimum")
+            crowded = self.crowded_values()
+            if crowded:
+                if self.kind in (ChartKind.line, ChartKind.area):
+                    self.warn(14, f"the values written over all {crowded} points need more room than the points have; they may run into "
+                                  "each other. Write only the last value, or ask for fewer periods")
+                else:
+                    self.warn(14, f"the values written over the {crowded} {_mark_noun(self.kind)}s need more room than each has; they may run "
+                                  "into each other. Fewer periods (a coarser granularity) or a line chart reads better")
             self.passed(14)
 
     # 15. A source line; every value links to a record.
@@ -609,6 +730,10 @@ class _Checker:
             for row in drawn:
                 if not _states_count(texts.get(row.label, ""), row, data, kind):
                     self.error(16, f"the {where} for '{row.label}' does not say how many records sit behind it")
+            if kind == ChartKind.treemap:
+                for name, (name_shown, whole) in self.treemap_fit().items():
+                    if name_shown and not whole:
+                        self.error(16, f"'{name}' is too small in a treemap to show its share and how many records sit behind it")
         self.passed(16)
 
     # 19. Never add up different currencies.
@@ -650,6 +775,14 @@ def _number(value: Any) -> float | None:
         return float(value)
     except (TypeError, ValueError):
         return None
+
+
+def _px(value: Any, whole: float) -> float:
+    """An ECharts position (a number of px, or "N%" of the whole) in px."""
+    if isinstance(value, str) and value.endswith("%"):
+        share = _number(value[:-1])
+        return whole * share / 100 if share is not None else 0.0
+    return _number(value) or 0.0
 
 
 def _mark_noun(kind: ChartKind) -> str:

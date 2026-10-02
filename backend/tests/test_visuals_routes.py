@@ -137,7 +137,8 @@ KIND_ORDERS = {
     "area": {"kind": "area", "title": "Payments fell after the November transfer", "query": {"name": "payments_over_time"}},
     "stacked_bar_100": {"kind": "stacked_bar_100", "title": "Meridian received most of the money", "query": {"name": "payments_by_party"}},
     "donut": {"kind": "donut", "title": "Meridian received most of the money", "query": {"name": "payments_by_party"}, "limit": 3},
-    "treemap": {"kind": "treemap", "title": "Meridian received most of the money", "query": {"name": "payments_by_party"}},
+    # The payments are too lopsided for a treemap to name each part (rule 12); the kinds of link are not.
+    "treemap": {"kind": "treemap", "title": "Payments are most of the links", "query": {"name": "links_by_type"}},
     "histogram": {"kind": "histogram", "title": "Most payments were small", "query": {"name": "payment_amounts"}},
     "scatter": {"kind": "scatter", "title": "Meridian took one large payment", "query": {"name": "payments_count_and_total_by_party"}},
 }
