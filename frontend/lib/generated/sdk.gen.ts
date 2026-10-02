@@ -643,6 +643,7 @@ import {
   zCanonicalEntityResolutionBody,
   zCanonicalEntityResolutionPath,
   zCanonicalEntityResolutionResponse,
+  zCapabilitiesResponse,
   zConnectorSearchBody,
   zConnectorSearchPath,
   zConnectorSearchResponse,
@@ -713,6 +714,7 @@ import {
   zConvertLeadEndpointPath,
   zConvertLeadEndpointResponse,
   zCreateAppUserBody,
+  zCreateAppUserResponse,
   zCreateCanonicalRelationshipBody,
   zCreateCanonicalRelationshipResponse,
   zCreateClaimEndpointBody,
@@ -740,6 +742,7 @@ import {
   zCreateTimelineEventEndpointBody,
   zCreateTimelineEventEndpointResponse,
   zCreateWriteupEndpointBody,
+  zCreateWriteupEndpointResponse,
   zDecideCrossProviderClusterBody,
   zDecideCrossProviderClusterPath,
   zDecideCrossProviderClusterResponse,
@@ -752,9 +755,11 @@ import {
   zDeleteConnectorCredentialPath,
   zDeleteConnectorCredentialResponse,
   zDeleteDeckEndpointPath,
+  zDeleteDeckEndpointResponse,
   zDeleteInvestigationMembershipPath,
   zDeleteInvestigationMembershipResponse,
   zDeleteWriteupEndpointPath,
+  zDeleteWriteupEndpointResponse,
   zEnrichEntityMultiBody,
   zEnrichEntityMultiPath,
   zEnrichEntityMultiResponse,
@@ -765,6 +770,7 @@ import {
   zEnrichmentSessionDetailPath,
   zEnrichmentSessionDetailResponse,
   zEnsureOpenalephCorpusBindingPath,
+  zEnsureOpenalephCorpusBindingResponse,
   zEntityDuplicateCandidatesPath,
   zEntityDuplicateCandidatesResponse,
   zEntityMergeExecuteBody,
@@ -778,9 +784,12 @@ import {
   zEntityPostMergeReconciliationPath,
   zEntityPostMergeReconciliationResponse,
   zExportDeckPptxPath,
+  zExportDeckPptxResponse,
   zExportInvestigationPath,
   zExportInvestigationQuery,
+  zExportInvestigationResponse,
   zExportWriteupDocxPath,
+  zExportWriteupDocxResponse,
   zExternalRelationshipCandidatesPath,
   zExternalRelationshipCandidatesResponse,
   zFindExtractionLineageEndpointQuery,
@@ -788,9 +797,11 @@ import {
   zFindingCandidatesPath,
   zFindingCandidatesResponse,
   zGetAiAnalysisCandidateEndpointPath,
+  zGetAiAnalysisCandidateEndpointResponse,
   zGetClaimReviewWorkspacePath,
   zGetClaimReviewWorkspaceResponse,
   zGetDeckEndpointPath,
+  zGetDeckEndpointResponse,
   zGetDocumentPath,
   zGetDocumentResponse,
   zGetEntityDossierPath,
@@ -800,6 +811,7 @@ import {
   zGetExtractionCandidateLineagePath,
   zGetExtractionCandidateLineageResponse,
   zGetExtractionEntityMatchesPath,
+  zGetExtractionEntityMatchesResponse,
   zGetInvestigationFinancialFlowsPath,
   zGetInvestigationFinancialFlowsResponse,
   zGetInvestigationGraphPath,
@@ -813,6 +825,7 @@ import {
   zGetLeadPath,
   zGetLeadResponse,
   zGetOpenalephCorpusBindingPath,
+  zGetOpenalephCorpusBindingResponse,
   zGetOpenalephDocumentReviewStatusPath,
   zGetOpenalephDocumentReviewStatusResponse,
   zGetOpenalephDocumentSyncPath,
@@ -828,21 +841,28 @@ import {
   zGetSecurityAuditRetentionPreviewResponse,
   zGetSecurityAuditSummaryResponse,
   zGetWriteupEndpointPath,
+  zGetWriteupEndpointResponse,
+  zHealthResponse,
   zImportOpenalephDocumentEntitiesPath,
   zImportOpenalephDocumentEntitiesResponse,
   zImportOpenalephDocumentEvidencePath,
   zImportOpenalephDocumentEvidenceResponse,
   zInspectBackupBody,
+  zInspectBackupResponse,
   zInvestigationCaseSynthesisBody,
   zInvestigationCaseSynthesisPath,
+  zInvestigationCaseSynthesisResponse,
   zInvestigationDeletionPreviewPath,
   zInvestigationDeletionPreviewResponse,
   zInvestigationHypothesisTestBody,
   zInvestigationHypothesisTestPath,
+  zInvestigationHypothesisTestResponse,
   zInvestigationPresentationDraftBody,
   zInvestigationPresentationDraftPath,
+  zInvestigationPresentationDraftResponse,
   zInvestigationQuestionContextBody,
   zInvestigationQuestionContextPath,
+  zInvestigationQuestionContextResponse,
   zInvestigationVisualCatalogPath,
   zInvestigationVisualCatalogResponse,
   zInvestigationVisualPreviewBody,
@@ -857,6 +877,7 @@ import {
   zLinkLeadBody,
   zLinkLeadPath,
   zLinkLeadResponse,
+  zListAppUsersResponse,
   zListAssessmentsPath,
   zListAssessmentsResponse,
   zListClaimEvidenceEndpointPath,
@@ -873,6 +894,7 @@ import {
   zListCrossProviderDecisionsPath,
   zListCrossProviderDecisionsResponse,
   zListDecksEndpointPath,
+  zListDecksEndpointResponse,
   zListDocumentCandidatesEndpointPath,
   zListDocumentCandidatesEndpointQuery,
   zListDocumentCandidatesEndpointResponse,
@@ -898,6 +920,7 @@ import {
   zListExternalRelationshipReviewsResponse,
   zListInvestigationAiAnalysisCandidatesPath,
   zListInvestigationAiAnalysisCandidatesQuery,
+  zListInvestigationAiAnalysisCandidatesResponse,
   zListInvestigationEvidencePath,
   zListInvestigationEvidenceQuery,
   zListInvestigationEvidenceResponse,
@@ -913,6 +936,7 @@ import {
   zListLeadsQuery,
   zListLeadsResponse,
   zListOpenalephCorpusFailuresPath,
+  zListOpenalephCorpusFailuresResponse,
   zListPropertyConflictDecisionsPath,
   zListPropertyConflictDecisionsResponse,
   zListRelationshipEvidenceReviewsPath,
@@ -927,12 +951,17 @@ import {
   zListSourcesResponse,
   zListWriteupsEndpointPath,
   zListWriteupsEndpointQuery,
+  zListWriteupsEndpointResponse,
+  zOpenalephIntegrationStatusResponse,
+  zPresentationStylesResponse,
   zPreviewBackupRestoreBody,
   zPreviewBackupRestoreResponse,
   zPromoteAiAnalysisCandidateToDeckEndpointBody,
   zPromoteAiAnalysisCandidateToDeckEndpointPath,
+  zPromoteAiAnalysisCandidateToDeckEndpointResponse,
   zPromoteAiAnalysisCandidateToWriteupEndpointBody,
   zPromoteAiAnalysisCandidateToWriteupEndpointPath,
+  zPromoteAiAnalysisCandidateToWriteupEndpointResponse,
   zPromoteExternalRelationshipPath,
   zPromoteExternalRelationshipResponse,
   zPromoteStatementAssessmentBody,
@@ -942,8 +971,10 @@ import {
   zPruneSecurityAuditResponse,
   zPutInvestigationMembershipBody,
   zPutInvestigationMembershipPath,
+  zPutInvestigationMembershipResponse,
   zRefreshOpenalephDocumentReviewPath,
   zRefreshOpenalephDocumentReviewResponse,
+  zRelationshipSchemasResponse,
   zRemoveInvestigationPath,
   zRemoveInvestigationQuery,
   zRemoveInvestigationResponse,
@@ -956,6 +987,7 @@ import {
   zRetryJobEndpointResponse,
   zReviewAiAnalysisCandidateEndpointBody,
   zReviewAiAnalysisCandidateEndpointPath,
+  zReviewAiAnalysisCandidateEndpointResponse,
   zReviewExternalRelationshipBody,
   zReviewExternalRelationshipPath,
   zReviewExternalRelationshipResponse,
@@ -969,22 +1001,27 @@ import {
   zReviewRelationshipEvidenceEndpointPath,
   zReviewRelationshipEvidenceEndpointResponse,
   zRevokeAppUserTokenPath,
+  zRevokeAppUserTokenResponse,
   zRotateAppUserTokenPath,
+  zRotateAppUserTokenResponse,
   zSaveConnectorCredentialBody,
   zSaveConnectorCredentialPath,
   zSaveConnectorCredentialResponse,
   zSearchWorkbenchQuery,
   zSearchWorkbenchResponse,
+  zSeedDemoResponse,
   zSettingsStatusResponse,
   zSyncOpenalephDocumentPath,
   zSyncOpenalephDocumentResponse,
   zUpdateAppUserBody,
   zUpdateAppUserPath,
+  zUpdateAppUserResponse,
   zUpdateClaimEndpointBody,
   zUpdateClaimEndpointPath,
   zUpdateClaimEndpointResponse,
   zUpdateDeckEndpointBody,
   zUpdateDeckEndpointPath,
+  zUpdateDeckEndpointResponse,
   zUpdateEntityBody,
   zUpdateEntityPath,
   zUpdateEntityResponse,
@@ -996,6 +1033,7 @@ import {
   zUpdateReportingTaskEndpointResponse,
   zUpdateWriteupEndpointBody,
   zUpdateWriteupEndpointPath,
+  zUpdateWriteupEndpointResponse,
   zUploadDocumentBody,
   zUploadDocumentResponse,
 } from './zod.gen';
@@ -1043,6 +1081,8 @@ export const getAiAnalysisCandidateEndpoint = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetAiAnalysisCandidateEndpointResponse.parseAsync(data),
     url: '/api/ai-analysis-candidates/{candidate_id}',
     ...options,
   });
@@ -1076,6 +1116,8 @@ export const promoteAiAnalysisCandidateToDeckEndpoint = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPromoteAiAnalysisCandidateToDeckEndpointResponse.parseAsync(data),
     url: '/api/ai-analysis-candidates/{candidate_id}/promote-to-deck',
     ...options,
     headers: {
@@ -1117,6 +1159,10 @@ export const promoteAiAnalysisCandidateToWriteupEndpoint = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPromoteAiAnalysisCandidateToWriteupEndpointResponse.parseAsync(
+        data,
+      ),
     url: '/api/ai-analysis-candidates/{candidate_id}/promote-to-writeup',
     ...options,
     headers: {
@@ -1150,6 +1196,8 @@ export const reviewAiAnalysisCandidateEndpoint = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zReviewAiAnalysisCandidateEndpointResponse.parseAsync(data),
     url: '/api/ai-analysis-candidates/{candidate_id}/review',
     ...options,
     headers: {
@@ -1178,6 +1226,8 @@ export const inspectBackup = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zInspectBackupResponse.parseAsync(data),
     url: '/api/backups/inspect',
     ...options,
     headers: {
@@ -1268,6 +1318,8 @@ export const capabilities = <ThrowOnError extends boolean = false>(
             query: z.never().optional(),
           })
           .parseAsync(data),
+      responseValidator: async (data) =>
+        await zCapabilitiesResponse.parseAsync(data),
       url: '/api/capabilities',
       ...options,
     },
@@ -3627,6 +3679,8 @@ export const deleteDeckEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeleteDeckEndpointResponse.parseAsync(data),
     url: '/api/decks/{deck_id}',
     ...options,
   });
@@ -3654,6 +3708,8 @@ export const getDeckEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDeckEndpointResponse.parseAsync(data),
     url: '/api/decks/{deck_id}',
     ...options,
   });
@@ -3681,6 +3737,8 @@ export const updateDeckEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateDeckEndpointResponse.parseAsync(data),
     url: '/api/decks/{deck_id}',
     ...options,
     headers: {
@@ -3708,6 +3766,8 @@ export const exportDeckPptx = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zExportDeckPptxResponse.parseAsync(data),
     url: '/api/decks/{deck_id}/export.pptx',
     ...options,
   });
@@ -3731,6 +3791,7 @@ export const seedDemo = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) => await zSeedDemoResponse.parseAsync(data),
     url: '/api/demo/seed',
     ...options,
   });
@@ -4839,6 +4900,8 @@ export const getExtractionEntityMatches = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetExtractionEntityMatchesResponse.parseAsync(data),
     url: '/api/extraction-candidates/{candidate_id}/entity-matches',
     ...options,
   });
@@ -4955,6 +5018,7 @@ export const health = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) => await zHealthResponse.parseAsync(data),
     url: '/api/health',
     ...options,
   });
@@ -4982,6 +5046,8 @@ export const openalephIntegrationStatus = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zOpenalephIntegrationStatusResponse.parseAsync(data),
     url: '/api/integrations/openaleph/status',
     ...options,
   });
@@ -5101,6 +5167,8 @@ export const listInvestigationAiAnalysisCandidates = <
           query: zListInvestigationAiAnalysisCandidatesQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListInvestigationAiAnalysisCandidatesResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/ai-analysis-candidates',
     ...options,
   });
@@ -5135,6 +5203,8 @@ export const investigationCaseSynthesis = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zInvestigationCaseSynthesisResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/assistant/case-synthesis',
     ...options,
     headers: {
@@ -5170,6 +5240,8 @@ export const investigationQuestionContext = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zInvestigationQuestionContextResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/assistant/context',
     ...options,
     headers: {
@@ -5207,6 +5279,8 @@ export const investigationHypothesisTest = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zInvestigationHypothesisTestResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/assistant/hypothesis-test',
     ...options,
     headers: {
@@ -5249,6 +5323,8 @@ export const investigationPresentationDraft = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zInvestigationPresentationDraftResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/assistant/presentation-draft',
     ...options,
     headers: {
@@ -5363,6 +5439,8 @@ export const getOpenalephCorpusBinding = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetOpenalephCorpusBindingResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/corpus/openaleph',
     ...options,
   });
@@ -5392,6 +5470,8 @@ export const ensureOpenalephCorpusBinding = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zEnsureOpenalephCorpusBindingResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/corpus/openaleph/ensure',
     ...options,
   });
@@ -5427,6 +5507,8 @@ export const listOpenalephCorpusFailures = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListOpenalephCorpusFailuresResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/corpus/openaleph/failures',
     ...options,
   });
@@ -5454,6 +5536,8 @@ export const listDecksEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListDecksEndpointResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/decks',
     ...options,
   });
@@ -5591,6 +5675,8 @@ export const exportInvestigation = <ThrowOnError extends boolean = false>(
           query: zExportInvestigationQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zExportInvestigationResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/export',
     ...options,
   });
@@ -5918,6 +6004,8 @@ export const listWriteupsEndpoint = <ThrowOnError extends boolean = false>(
           query: zListWriteupsEndpointQuery.optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListWriteupsEndpointResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/writeups',
     ...options,
   });
@@ -6235,6 +6323,8 @@ export const presentationStyles = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPresentationStylesResponse.parseAsync(data),
     url: '/api/presentation-styles',
     ...options,
   });
@@ -6318,6 +6408,8 @@ export const relationshipSchemas = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRelationshipSchemasResponse.parseAsync(data),
     url: '/api/relationship-schemas',
     ...options,
   });
@@ -6821,6 +6913,8 @@ export const listAppUsers = <ThrowOnError extends boolean = false>(
             query: z.never().optional(),
           })
           .parseAsync(data),
+      responseValidator: async (data) =>
+        await zListAppUsersResponse.parseAsync(data),
       url: '/api/settings/security/users',
       ...options,
     },
@@ -6845,6 +6939,8 @@ export const createAppUser = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateAppUserResponse.parseAsync(data),
     url: '/api/settings/security/users',
     ...options,
     headers: {
@@ -6872,6 +6968,8 @@ export const updateAppUser = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateAppUserResponse.parseAsync(data),
     url: '/api/settings/security/users/{user_id}',
     ...options,
     headers: {
@@ -6936,6 +7034,8 @@ export const putInvestigationMembership = <
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPutInvestigationMembershipResponse.parseAsync(data),
     url: '/api/settings/security/users/{user_id}/investigations/{investigation_id}',
     ...options,
     headers: {
@@ -6967,6 +7067,8 @@ export const revokeAppUserToken = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRevokeAppUserTokenResponse.parseAsync(data),
     url: '/api/settings/security/users/{user_id}/token/revoke',
     ...options,
   });
@@ -6994,6 +7096,8 @@ export const rotateAppUserToken = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRotateAppUserTokenResponse.parseAsync(data),
     url: '/api/settings/security/users/{user_id}/token/rotate',
     ...options,
   });
@@ -7211,6 +7315,8 @@ export const createWriteupEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateWriteupEndpointResponse.parseAsync(data),
     url: '/api/writeups',
     ...options,
     headers: {
@@ -7242,6 +7348,8 @@ export const deleteWriteupEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeleteWriteupEndpointResponse.parseAsync(data),
     url: '/api/writeups/{writeup_id}',
     ...options,
   });
@@ -7269,6 +7377,8 @@ export const getWriteupEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetWriteupEndpointResponse.parseAsync(data),
     url: '/api/writeups/{writeup_id}',
     ...options,
   });
@@ -7296,6 +7406,8 @@ export const updateWriteupEndpoint = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateWriteupEndpointResponse.parseAsync(data),
     url: '/api/writeups/{writeup_id}',
     ...options,
     headers: {
@@ -7327,6 +7439,8 @@ export const exportWriteupDocx = <ThrowOnError extends boolean = false>(
           query: z.never().optional(),
         })
         .parseAsync(data),
+    responseValidator: async (data) =>
+      await zExportWriteupDocxResponse.parseAsync(data),
     url: '/api/writeups/{writeup_id}/export.docx',
     ...options,
   });

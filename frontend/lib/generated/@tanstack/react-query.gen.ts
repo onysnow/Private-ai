@@ -244,6 +244,7 @@ import type {
   CanonicalEntityResolutionError,
   CanonicalEntityResolutionResponse,
   CapabilitiesData,
+  CapabilitiesResponse,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchError,
@@ -367,6 +368,7 @@ import type {
   ConvertLeadEndpointResponse,
   CreateAppUserData,
   CreateAppUserError,
+  CreateAppUserResponse,
   CreateCanonicalRelationshipData,
   CreateCanonicalRelationshipError,
   CreateCanonicalRelationshipResponse,
@@ -405,6 +407,7 @@ import type {
   CreateTimelineEventEndpointResponse,
   CreateWriteupEndpointData,
   CreateWriteupEndpointError,
+  CreateWriteupEndpointResponse,
   DecideCrossProviderClusterData,
   DecideCrossProviderClusterError,
   DecideCrossProviderClusterResponse,
@@ -419,11 +422,13 @@ import type {
   DeleteConnectorCredentialResponse,
   DeleteDeckEndpointData,
   DeleteDeckEndpointError,
+  DeleteDeckEndpointResponse,
   DeleteInvestigationMembershipData,
   DeleteInvestigationMembershipError,
   DeleteInvestigationMembershipResponse,
   DeleteWriteupEndpointData,
   DeleteWriteupEndpointError,
+  DeleteWriteupEndpointResponse,
   EnrichEntityData,
   EnrichEntityError,
   EnrichEntityMultiData,
@@ -438,6 +443,7 @@ import type {
   EnrichmentSessionDetailResponse,
   EnsureOpenalephCorpusBindingData,
   EnsureOpenalephCorpusBindingError,
+  EnsureOpenalephCorpusBindingResponse,
   EntityDuplicateCandidatesData,
   EntityDuplicateCandidatesError,
   EntityDuplicateCandidatesResponse,
@@ -455,10 +461,13 @@ import type {
   EntityPostMergeReconciliationResponse,
   ExportDeckPptxData,
   ExportDeckPptxError,
+  ExportDeckPptxResponse,
   ExportInvestigationData,
   ExportInvestigationError,
+  ExportInvestigationResponse,
   ExportWriteupDocxData,
   ExportWriteupDocxError,
+  ExportWriteupDocxResponse,
   ExternalRelationshipCandidatesData,
   ExternalRelationshipCandidatesError,
   ExternalRelationshipCandidatesResponse,
@@ -470,11 +479,13 @@ import type {
   FindingCandidatesResponse,
   GetAiAnalysisCandidateEndpointData,
   GetAiAnalysisCandidateEndpointError,
+  GetAiAnalysisCandidateEndpointResponse,
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceError,
   GetClaimReviewWorkspaceResponse,
   GetDeckEndpointData,
   GetDeckEndpointError,
+  GetDeckEndpointResponse,
   GetDocumentData,
   GetDocumentError,
   GetDocumentResponse,
@@ -489,6 +500,7 @@ import type {
   GetExtractionCandidateLineageResponse,
   GetExtractionEntityMatchesData,
   GetExtractionEntityMatchesError,
+  GetExtractionEntityMatchesResponse,
   GetInvestigationFinancialFlowsData,
   GetInvestigationFinancialFlowsError,
   GetInvestigationFinancialFlowsResponse,
@@ -506,6 +518,7 @@ import type {
   GetLeadResponse,
   GetOpenalephCorpusBindingData,
   GetOpenalephCorpusBindingError,
+  GetOpenalephCorpusBindingResponse,
   GetOpenalephDocumentReviewStatusData,
   GetOpenalephDocumentReviewStatusError,
   GetOpenalephDocumentReviewStatusResponse,
@@ -530,7 +543,9 @@ import type {
   GetSecurityAuditSummaryResponse,
   GetWriteupEndpointData,
   GetWriteupEndpointError,
+  GetWriteupEndpointResponse,
   HealthData,
+  HealthResponse,
   ImportOpenalephDocumentEntitiesData,
   ImportOpenalephDocumentEntitiesError,
   ImportOpenalephDocumentEntitiesResponse,
@@ -539,17 +554,22 @@ import type {
   ImportOpenalephDocumentEvidenceResponse,
   InspectBackupData,
   InspectBackupError,
+  InspectBackupResponse,
   InvestigationCaseSynthesisData,
   InvestigationCaseSynthesisError,
+  InvestigationCaseSynthesisResponse,
   InvestigationDeletionPreviewData,
   InvestigationDeletionPreviewError,
   InvestigationDeletionPreviewResponse,
   InvestigationHypothesisTestData,
   InvestigationHypothesisTestError,
+  InvestigationHypothesisTestResponse,
   InvestigationPresentationDraftData,
   InvestigationPresentationDraftError,
+  InvestigationPresentationDraftResponse,
   InvestigationQuestionContextData,
   InvestigationQuestionContextError,
+  InvestigationQuestionContextResponse,
   InvestigationVisualCatalogData,
   InvestigationVisualCatalogError,
   InvestigationVisualCatalogResponse,
@@ -566,6 +586,7 @@ import type {
   LinkLeadError,
   LinkLeadResponse,
   ListAppUsersData,
+  ListAppUsersResponse,
   ListAssessmentsData,
   ListAssessmentsError,
   ListAssessmentsResponse,
@@ -586,6 +607,7 @@ import type {
   ListCrossProviderDecisionsResponse,
   ListDecksEndpointData,
   ListDecksEndpointError,
+  ListDecksEndpointResponse,
   ListDocumentCandidatesEndpointData,
   ListDocumentCandidatesEndpointError,
   ListDocumentCandidatesEndpointResponse,
@@ -618,6 +640,7 @@ import type {
   ListExternalRelationshipReviewsResponse,
   ListInvestigationAiAnalysisCandidatesData,
   ListInvestigationAiAnalysisCandidatesError,
+  ListInvestigationAiAnalysisCandidatesResponse,
   ListInvestigationEvidenceData,
   ListInvestigationEvidenceError,
   ListInvestigationEvidenceResponse,
@@ -637,6 +660,7 @@ import type {
   ListLeadsResponse,
   ListOpenalephCorpusFailuresData,
   ListOpenalephCorpusFailuresError,
+  ListOpenalephCorpusFailuresResponse,
   ListPropertyConflictDecisionsData,
   ListPropertyConflictDecisionsError,
   ListPropertyConflictDecisionsResponse,
@@ -654,15 +678,20 @@ import type {
   ListSourcesResponse,
   ListWriteupsEndpointData,
   ListWriteupsEndpointError,
+  ListWriteupsEndpointResponse,
   OpenalephIntegrationStatusData,
+  OpenalephIntegrationStatusResponse,
   PresentationStylesData,
+  PresentationStylesResponse,
   PreviewBackupRestoreData,
   PreviewBackupRestoreError,
   PreviewBackupRestoreResponse,
   PromoteAiAnalysisCandidateToDeckEndpointData,
   PromoteAiAnalysisCandidateToDeckEndpointError,
+  PromoteAiAnalysisCandidateToDeckEndpointResponse,
   PromoteAiAnalysisCandidateToWriteupEndpointData,
   PromoteAiAnalysisCandidateToWriteupEndpointError,
+  PromoteAiAnalysisCandidateToWriteupEndpointResponse,
   PromoteExternalRelationshipData,
   PromoteExternalRelationshipError,
   PromoteExternalRelationshipResponse,
@@ -674,10 +703,12 @@ import type {
   PruneSecurityAuditResponse,
   PutInvestigationMembershipData,
   PutInvestigationMembershipError,
+  PutInvestigationMembershipResponse,
   RefreshOpenalephDocumentReviewData,
   RefreshOpenalephDocumentReviewError,
   RefreshOpenalephDocumentReviewResponse,
   RelationshipSchemasData,
+  RelationshipSchemasResponse,
   RemoveInvestigationData,
   RemoveInvestigationError,
   RemoveInvestigationResponse,
@@ -692,6 +723,7 @@ import type {
   RetryJobEndpointResponse,
   ReviewAiAnalysisCandidateEndpointData,
   ReviewAiAnalysisCandidateEndpointError,
+  ReviewAiAnalysisCandidateEndpointResponse,
   ReviewExternalRelationshipData,
   ReviewExternalRelationshipError,
   ReviewExternalRelationshipResponse,
@@ -706,8 +738,10 @@ import type {
   ReviewRelationshipEvidenceEndpointResponse,
   RevokeAppUserTokenData,
   RevokeAppUserTokenError,
+  RevokeAppUserTokenResponse,
   RotateAppUserTokenData,
   RotateAppUserTokenError,
+  RotateAppUserTokenResponse,
   SaveConnectorCredentialData,
   SaveConnectorCredentialError,
   SaveConnectorCredentialResponse,
@@ -715,6 +749,7 @@ import type {
   SearchWorkbenchError,
   SearchWorkbenchResponse,
   SeedDemoData,
+  SeedDemoResponse,
   SettingsStatusData,
   SettingsStatusResponse,
   SyncOpenalephDocumentData,
@@ -722,11 +757,13 @@ import type {
   SyncOpenalephDocumentResponse,
   UpdateAppUserData,
   UpdateAppUserError,
+  UpdateAppUserResponse,
   UpdateClaimEndpointData,
   UpdateClaimEndpointError,
   UpdateClaimEndpointResponse,
   UpdateDeckEndpointData,
   UpdateDeckEndpointError,
+  UpdateDeckEndpointResponse,
   UpdateEntityData,
   UpdateEntityError,
   UpdateEntityResponse,
@@ -738,6 +775,7 @@ import type {
   UpdateReportingTaskEndpointResponse,
   UpdateWriteupEndpointData,
   UpdateWriteupEndpointError,
+  UpdateWriteupEndpointResponse,
   UploadDocumentData,
   UploadDocumentError,
   UploadDocumentResponse,
@@ -794,9 +832,9 @@ export const getAiAnalysisCandidateEndpointOptions = (
   options: Options<GetAiAnalysisCandidateEndpointData>,
 ) =>
   queryOptions<
-    unknown,
+    GetAiAnalysisCandidateEndpointResponse,
     GetAiAnalysisCandidateEndpointError,
-    unknown,
+    GetAiAnalysisCandidateEndpointResponse,
     ReturnType<typeof getAiAnalysisCandidateEndpointQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -821,12 +859,12 @@ export const getAiAnalysisCandidateEndpointOptions = (
 export const promoteAiAnalysisCandidateToDeckEndpointMutation = (
   options?: Partial<Options<PromoteAiAnalysisCandidateToDeckEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  PromoteAiAnalysisCandidateToDeckEndpointResponse,
   PromoteAiAnalysisCandidateToDeckEndpointError,
   Options<PromoteAiAnalysisCandidateToDeckEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    PromoteAiAnalysisCandidateToDeckEndpointResponse,
     PromoteAiAnalysisCandidateToDeckEndpointError,
     Options<PromoteAiAnalysisCandidateToDeckEndpointData>
   > = {
@@ -853,12 +891,12 @@ export const promoteAiAnalysisCandidateToDeckEndpointMutation = (
 export const promoteAiAnalysisCandidateToWriteupEndpointMutation = (
   options?: Partial<Options<PromoteAiAnalysisCandidateToWriteupEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  PromoteAiAnalysisCandidateToWriteupEndpointResponse,
   PromoteAiAnalysisCandidateToWriteupEndpointError,
   Options<PromoteAiAnalysisCandidateToWriteupEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    PromoteAiAnalysisCandidateToWriteupEndpointResponse,
     PromoteAiAnalysisCandidateToWriteupEndpointError,
     Options<PromoteAiAnalysisCandidateToWriteupEndpointData>
   > = {
@@ -880,12 +918,12 @@ export const promoteAiAnalysisCandidateToWriteupEndpointMutation = (
 export const reviewAiAnalysisCandidateEndpointMutation = (
   options?: Partial<Options<ReviewAiAnalysisCandidateEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  ReviewAiAnalysisCandidateEndpointResponse,
   ReviewAiAnalysisCandidateEndpointError,
   Options<ReviewAiAnalysisCandidateEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    ReviewAiAnalysisCandidateEndpointResponse,
     ReviewAiAnalysisCandidateEndpointError,
     Options<ReviewAiAnalysisCandidateEndpointData>
   > = {
@@ -907,12 +945,12 @@ export const reviewAiAnalysisCandidateEndpointMutation = (
 export const inspectBackupMutation = (
   options?: Partial<Options<InspectBackupData>>,
 ): UseMutationOptions<
-  unknown,
+  InspectBackupResponse,
   InspectBackupError,
   Options<InspectBackupData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    InspectBackupResponse,
     InspectBackupError,
     Options<InspectBackupData>
   > = {
@@ -992,9 +1030,9 @@ export const capabilitiesQueryKey = (options?: Options<CapabilitiesData>) =>
  */
 export const capabilitiesOptions = (options?: Options<CapabilitiesData>) =>
   queryOptions<
-    unknown,
+    CapabilitiesResponse,
     DefaultError,
-    unknown,
+    CapabilitiesResponse,
     ReturnType<typeof capabilitiesQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -3375,12 +3413,12 @@ export const consoleUsersIssueMutation = (
 export const deleteDeckEndpointMutation = (
   options?: Partial<Options<DeleteDeckEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  DeleteDeckEndpointResponse,
   DeleteDeckEndpointError,
   Options<DeleteDeckEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    DeleteDeckEndpointResponse,
     DeleteDeckEndpointError,
     Options<DeleteDeckEndpointData>
   > = {
@@ -3405,9 +3443,9 @@ export const getDeckEndpointQueryKey = (
  */
 export const getDeckEndpointOptions = (options: Options<GetDeckEndpointData>) =>
   queryOptions<
-    unknown,
+    GetDeckEndpointResponse,
     GetDeckEndpointError,
-    unknown,
+    GetDeckEndpointResponse,
     ReturnType<typeof getDeckEndpointQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -3428,12 +3466,12 @@ export const getDeckEndpointOptions = (options: Options<GetDeckEndpointData>) =>
 export const updateDeckEndpointMutation = (
   options?: Partial<Options<UpdateDeckEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  UpdateDeckEndpointResponse,
   UpdateDeckEndpointError,
   Options<UpdateDeckEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    UpdateDeckEndpointResponse,
     UpdateDeckEndpointError,
     Options<UpdateDeckEndpointData>
   > = {
@@ -3457,9 +3495,9 @@ export const exportDeckPptxQueryKey = (options: Options<ExportDeckPptxData>) =>
  */
 export const exportDeckPptxOptions = (options: Options<ExportDeckPptxData>) =>
   queryOptions<
-    unknown,
+    ExportDeckPptxResponse,
     ExportDeckPptxError,
-    unknown,
+    ExportDeckPptxResponse,
     ReturnType<typeof exportDeckPptxQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -3483,9 +3521,13 @@ export const exportDeckPptxOptions = (options: Options<ExportDeckPptxData>) =>
  */
 export const seedDemoMutation = (
   options?: Partial<Options<SeedDemoData>>,
-): UseMutationOptions<unknown, DefaultError, Options<SeedDemoData>> => {
+): UseMutationOptions<
+  SeedDemoResponse,
+  DefaultError,
+  Options<SeedDemoData>
+> => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    SeedDemoResponse,
     DefaultError,
     Options<SeedDemoData>
   > = {
@@ -4488,9 +4530,9 @@ export const getExtractionEntityMatchesOptions = (
   options: Options<GetExtractionEntityMatchesData>,
 ) =>
   queryOptions<
-    unknown,
+    GetExtractionEntityMatchesResponse,
     GetExtractionEntityMatchesError,
-    unknown,
+    GetExtractionEntityMatchesResponse,
     ReturnType<typeof getExtractionEntityMatchesQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -4598,9 +4640,9 @@ export const healthQueryKey = (options?: Options<HealthData>) =>
  */
 export const healthOptions = (options?: Options<HealthData>) =>
   queryOptions<
-    unknown,
+    HealthResponse,
     DefaultError,
-    unknown,
+    HealthResponse,
     ReturnType<typeof healthQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -4628,9 +4670,9 @@ export const openalephIntegrationStatusOptions = (
   options?: Options<OpenalephIntegrationStatusData>,
 ) =>
   queryOptions<
-    unknown,
+    OpenalephIntegrationStatusResponse,
     DefaultError,
-    unknown,
+    OpenalephIntegrationStatusResponse,
     ReturnType<typeof openalephIntegrationStatusQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -4741,9 +4783,9 @@ export const listInvestigationAiAnalysisCandidatesOptions = (
   options: Options<ListInvestigationAiAnalysisCandidatesData>,
 ) =>
   queryOptions<
-    unknown,
+    ListInvestigationAiAnalysisCandidatesResponse,
     ListInvestigationAiAnalysisCandidatesError,
-    unknown,
+    ListInvestigationAiAnalysisCandidatesResponse,
     ReturnType<typeof listInvestigationAiAnalysisCandidatesQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -4773,9 +4815,9 @@ export const listInvestigationAiAnalysisCandidatesInfiniteOptions = (
   options: Options<ListInvestigationAiAnalysisCandidatesData>,
 ) => {
   const opts = infiniteQueryOptions<
-    unknown,
+    ListInvestigationAiAnalysisCandidatesResponse,
     ListInvestigationAiAnalysisCandidatesError,
-    InfiniteData<unknown>,
+    InfiniteData<ListInvestigationAiAnalysisCandidatesResponse>,
     QueryKey<Options<ListInvestigationAiAnalysisCandidatesData>>,
     | number
     | Pick<
@@ -4824,12 +4866,12 @@ export const listInvestigationAiAnalysisCandidatesInfiniteOptions = (
 export const investigationCaseSynthesisMutation = (
   options?: Partial<Options<InvestigationCaseSynthesisData>>,
 ): UseMutationOptions<
-  unknown,
+  InvestigationCaseSynthesisResponse,
   InvestigationCaseSynthesisError,
   Options<InvestigationCaseSynthesisData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    InvestigationCaseSynthesisResponse,
     InvestigationCaseSynthesisError,
     Options<InvestigationCaseSynthesisData>
   > = {
@@ -4853,12 +4895,12 @@ export const investigationCaseSynthesisMutation = (
 export const investigationQuestionContextMutation = (
   options?: Partial<Options<InvestigationQuestionContextData>>,
 ): UseMutationOptions<
-  unknown,
+  InvestigationQuestionContextResponse,
   InvestigationQuestionContextError,
   Options<InvestigationQuestionContextData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    InvestigationQuestionContextResponse,
     InvestigationQuestionContextError,
     Options<InvestigationQuestionContextData>
   > = {
@@ -4884,12 +4926,12 @@ export const investigationQuestionContextMutation = (
 export const investigationHypothesisTestMutation = (
   options?: Partial<Options<InvestigationHypothesisTestData>>,
 ): UseMutationOptions<
-  unknown,
+  InvestigationHypothesisTestResponse,
   InvestigationHypothesisTestError,
   Options<InvestigationHypothesisTestData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    InvestigationHypothesisTestResponse,
     InvestigationHypothesisTestError,
     Options<InvestigationHypothesisTestData>
   > = {
@@ -4920,12 +4962,12 @@ export const investigationHypothesisTestMutation = (
 export const investigationPresentationDraftMutation = (
   options?: Partial<Options<InvestigationPresentationDraftData>>,
 ): UseMutationOptions<
-  unknown,
+  InvestigationPresentationDraftResponse,
   InvestigationPresentationDraftError,
   Options<InvestigationPresentationDraftData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    InvestigationPresentationDraftResponse,
     InvestigationPresentationDraftError,
     Options<InvestigationPresentationDraftData>
   > = {
@@ -5187,9 +5229,9 @@ export const getOpenalephCorpusBindingOptions = (
   options: Options<GetOpenalephCorpusBindingData>,
 ) =>
   queryOptions<
-    unknown,
+    GetOpenalephCorpusBindingResponse,
     GetOpenalephCorpusBindingError,
-    unknown,
+    GetOpenalephCorpusBindingResponse,
     ReturnType<typeof getOpenalephCorpusBindingQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -5210,12 +5252,12 @@ export const getOpenalephCorpusBindingOptions = (
 export const ensureOpenalephCorpusBindingMutation = (
   options?: Partial<Options<EnsureOpenalephCorpusBindingData>>,
 ): UseMutationOptions<
-  unknown,
+  EnsureOpenalephCorpusBindingResponse,
   EnsureOpenalephCorpusBindingError,
   Options<EnsureOpenalephCorpusBindingData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    EnsureOpenalephCorpusBindingResponse,
     EnsureOpenalephCorpusBindingError,
     Options<EnsureOpenalephCorpusBindingData>
   > = {
@@ -5248,9 +5290,9 @@ export const listOpenalephCorpusFailuresOptions = (
   options: Options<ListOpenalephCorpusFailuresData>,
 ) =>
   queryOptions<
-    unknown,
+    ListOpenalephCorpusFailuresResponse,
     ListOpenalephCorpusFailuresError,
-    unknown,
+    ListOpenalephCorpusFailuresResponse,
     ReturnType<typeof listOpenalephCorpusFailuresQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -5276,9 +5318,9 @@ export const listDecksEndpointOptions = (
   options: Options<ListDecksEndpointData>,
 ) =>
   queryOptions<
-    unknown,
+    ListDecksEndpointResponse,
     ListDecksEndpointError,
-    unknown,
+    ListDecksEndpointResponse,
     ReturnType<typeof listDecksEndpointQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -5566,9 +5608,9 @@ export const exportInvestigationOptions = (
   options: Options<ExportInvestigationData>,
 ) =>
   queryOptions<
-    unknown,
+    ExportInvestigationResponse,
     ExportInvestigationError,
-    unknown,
+    ExportInvestigationResponse,
     ReturnType<typeof exportInvestigationQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -6182,9 +6224,9 @@ export const listWriteupsEndpointOptions = (
   options: Options<ListWriteupsEndpointData>,
 ) =>
   queryOptions<
-    unknown,
+    ListWriteupsEndpointResponse,
     ListWriteupsEndpointError,
-    unknown,
+    ListWriteupsEndpointResponse,
     ReturnType<typeof listWriteupsEndpointQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -6481,9 +6523,9 @@ export const presentationStylesOptions = (
   options?: Options<PresentationStylesData>,
 ) =>
   queryOptions<
-    unknown,
+    PresentationStylesResponse,
     DefaultError,
-    unknown,
+    PresentationStylesResponse,
     ReturnType<typeof presentationStylesQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -6565,9 +6607,9 @@ export const relationshipSchemasOptions = (
   options?: Options<RelationshipSchemasData>,
 ) =>
   queryOptions<
-    unknown,
+    RelationshipSchemasResponse,
     DefaultError,
-    unknown,
+    RelationshipSchemasResponse,
     ReturnType<typeof relationshipSchemasQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -7059,9 +7101,9 @@ export const listAppUsersQueryKey = (options?: Options<ListAppUsersData>) =>
  */
 export const listAppUsersOptions = (options?: Options<ListAppUsersData>) =>
   queryOptions<
-    unknown,
+    ListAppUsersResponse,
     DefaultError,
-    unknown,
+    ListAppUsersResponse,
     ReturnType<typeof listAppUsersQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -7082,12 +7124,12 @@ export const listAppUsersOptions = (options?: Options<ListAppUsersData>) =>
 export const createAppUserMutation = (
   options?: Partial<Options<CreateAppUserData>>,
 ): UseMutationOptions<
-  unknown,
+  CreateAppUserResponse,
   CreateAppUserError,
   Options<CreateAppUserData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    CreateAppUserResponse,
     CreateAppUserError,
     Options<CreateAppUserData>
   > = {
@@ -7109,12 +7151,12 @@ export const createAppUserMutation = (
 export const updateAppUserMutation = (
   options?: Partial<Options<UpdateAppUserData>>,
 ): UseMutationOptions<
-  unknown,
+  UpdateAppUserResponse,
   UpdateAppUserError,
   Options<UpdateAppUserData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    UpdateAppUserResponse,
     UpdateAppUserError,
     Options<UpdateAppUserData>
   > = {
@@ -7163,12 +7205,12 @@ export const deleteInvestigationMembershipMutation = (
 export const putInvestigationMembershipMutation = (
   options?: Partial<Options<PutInvestigationMembershipData>>,
 ): UseMutationOptions<
-  unknown,
+  PutInvestigationMembershipResponse,
   PutInvestigationMembershipError,
   Options<PutInvestigationMembershipData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    PutInvestigationMembershipResponse,
     PutInvestigationMembershipError,
     Options<PutInvestigationMembershipData>
   > = {
@@ -7190,12 +7232,12 @@ export const putInvestigationMembershipMutation = (
 export const revokeAppUserTokenMutation = (
   options?: Partial<Options<RevokeAppUserTokenData>>,
 ): UseMutationOptions<
-  unknown,
+  RevokeAppUserTokenResponse,
   RevokeAppUserTokenError,
   Options<RevokeAppUserTokenData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    RevokeAppUserTokenResponse,
     RevokeAppUserTokenError,
     Options<RevokeAppUserTokenData>
   > = {
@@ -7217,12 +7259,12 @@ export const revokeAppUserTokenMutation = (
 export const rotateAppUserTokenMutation = (
   options?: Partial<Options<RotateAppUserTokenData>>,
 ): UseMutationOptions<
-  unknown,
+  RotateAppUserTokenResponse,
   RotateAppUserTokenError,
   Options<RotateAppUserTokenData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    RotateAppUserTokenResponse,
     RotateAppUserTokenError,
     Options<RotateAppUserTokenData>
   > = {
@@ -7412,12 +7454,12 @@ export const createTimelineEventEndpointMutation = (
 export const createWriteupEndpointMutation = (
   options?: Partial<Options<CreateWriteupEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  CreateWriteupEndpointResponse,
   CreateWriteupEndpointError,
   Options<CreateWriteupEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    CreateWriteupEndpointResponse,
     CreateWriteupEndpointError,
     Options<CreateWriteupEndpointData>
   > = {
@@ -7439,12 +7481,12 @@ export const createWriteupEndpointMutation = (
 export const deleteWriteupEndpointMutation = (
   options?: Partial<Options<DeleteWriteupEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  DeleteWriteupEndpointResponse,
   DeleteWriteupEndpointError,
   Options<DeleteWriteupEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    DeleteWriteupEndpointResponse,
     DeleteWriteupEndpointError,
     Options<DeleteWriteupEndpointData>
   > = {
@@ -7471,9 +7513,9 @@ export const getWriteupEndpointOptions = (
   options: Options<GetWriteupEndpointData>,
 ) =>
   queryOptions<
-    unknown,
+    GetWriteupEndpointResponse,
     GetWriteupEndpointError,
-    unknown,
+    GetWriteupEndpointResponse,
     ReturnType<typeof getWriteupEndpointQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -7494,12 +7536,12 @@ export const getWriteupEndpointOptions = (
 export const updateWriteupEndpointMutation = (
   options?: Partial<Options<UpdateWriteupEndpointData>>,
 ): UseMutationOptions<
-  unknown,
+  UpdateWriteupEndpointResponse,
   UpdateWriteupEndpointError,
   Options<UpdateWriteupEndpointData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    UpdateWriteupEndpointResponse,
     UpdateWriteupEndpointError,
     Options<UpdateWriteupEndpointData>
   > = {
@@ -7526,9 +7568,9 @@ export const exportWriteupDocxOptions = (
   options: Options<ExportWriteupDocxData>,
 ) =>
   queryOptions<
-    unknown,
+    ExportWriteupDocxResponse,
     ExportWriteupDocxError,
-    unknown,
+    ExportWriteupDocxResponse,
     ReturnType<typeof exportWriteupDocxQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {

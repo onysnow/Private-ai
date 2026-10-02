@@ -46,10 +46,17 @@ CHART_VISUAL = "chart"
 
 
 def _clean_refs(refs: Any) -> list[dict]:
+    """The {record_type, record_id} pairs whose two parts are non-empty text.
+    Every record id is text, so anything else (a deck the editor or a client
+    saved with a number there) points at nothing and is dropped, which keeps
+    the deck's declared shape (app/schemas/responses.py RecordRefOut) true."""
+    if not isinstance(refs, list):
+        return []
     return [
-        {"record_type": e.get("record_type"), "record_id": e.get("record_id")}
-        for e in (refs or [])
-        if isinstance(e, dict) and e.get("record_type") and e.get("record_id")
+        {"record_type": e["record_type"], "record_id": e["record_id"]}
+        for e in refs
+        if isinstance(e, dict) and isinstance(e.get("record_type"), str) and isinstance(e.get("record_id"), str)
+        and e["record_type"] and e["record_id"]
     ]
 
 

@@ -40,7 +40,9 @@ def extract_cited_refs(content_json: dict) -> list[dict]:
     refs: list[dict] = []
 
     def add(record_type: Any, record_id: Any) -> None:
-        if not record_type or not record_id:
+        # Record ids are text: a citation whose type or id is anything else
+        # (a client that saved a number there) points at nothing.
+        if not isinstance(record_type, str) or not isinstance(record_id, str) or not record_type or not record_id:
             return
         if record_type == "reporting_task":
             record_type = "task"

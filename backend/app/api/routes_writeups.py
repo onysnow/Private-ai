@@ -4,7 +4,7 @@ the uploaded-file Document model -- see app/services/writeups.py). CRUD plus
 STRUCT-0002.
 """
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.responses import StreamingResponse
 from io import BytesIO
 from sqlalchemy.orm import Session
@@ -13,13 +13,16 @@ from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
 from app.models.domain import Investigation, Writeup
 from app.schemas.api import WriteupCreate, WriteupUpdate
+from app.schemas.responses import DeletedOut, WriteupOut, WriteupsOut, file_response
 from app.services.assistant_context import describe_record_refs
 from app.services.writeups import create_writeup, delete_writeup, list_writeups, render_writeup_docx, serialize_writeup, update_writeup
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
+DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
-@router.post("/writeups", response_model=None)
+
+@router.post("/writeups", response_model=WriteupOut)
 def create_writeup_endpoint(body: WriteupCreate, db: Session = Depends(get_db)) -> Any:
     if db.get(Investigation, body.investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
@@ -33,7 +36,7 @@ def create_writeup_endpoint(body: WriteupCreate, db: Session = Depends(get_db)) 
     return serialize_writeup(row)
 
 
-@router.get("/investigations/{investigation_id}/writeups", response_model=None)
+@router.get("/investigations/{investigation_id}/writeups", response_model=WriteupsOut)
 def list_writeups_endpoint(investigation_id: str, status: str | None = None, db: Session = Depends(get_db)) -> Any:
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
@@ -44,7 +47,7 @@ def list_writeups_endpoint(investigation_id: str, status: str | None = None, db:
     return {"writeups": [serialize_writeup(row, include_content=False) for row in rows]}
 
 
-@router.get("/writeups/{writeup_id}", response_model=None)
+@router.get("/writeups/{writeup_id}", response_model=WriteupOut)
 def get_writeup_endpoint(writeup_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(Writeup, writeup_id)
     if row is None:
@@ -52,7 +55,7 @@ def get_writeup_endpoint(writeup_id: str, db: Session = Depends(get_db)) -> Any:
     return serialize_writeup(row)
 
 
-@router.patch("/writeups/{writeup_id}", response_model=None)
+@router.patch("/writeups/{writeup_id}", response_model=WriteupOut)
 def update_writeup_endpoint(writeup_id: str, body: WriteupUpdate, db: Session = Depends(get_db)) -> Any:
     row = db.get(Writeup, writeup_id)
     if row is None:
@@ -64,7 +67,7 @@ def update_writeup_endpoint(writeup_id: str, body: WriteupUpdate, db: Session = 
     return serialize_writeup(row)
 
 
-@router.delete("/writeups/{writeup_id}", response_model=None)
+@router.delete("/writeups/{writeup_id}", response_model=DeletedOut)
 def delete_writeup_endpoint(writeup_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(Writeup, writeup_id)
     if row is None:
@@ -73,7 +76,7 @@ def delete_writeup_endpoint(writeup_id: str, db: Session = Depends(get_db)) -> A
     return {"deleted": True}
 
 
-@router.get("/writeups/{writeup_id}/export.docx")
+@router.get("/writeups/{writeup_id}/export.docx", response_class=Response, responses=file_response(DOCX, "The write-up as a Word document"))
 def export_writeup_docx(writeup_id: str, db: Session = Depends(get_db)) -> StreamingResponse:
     row = db.get(Writeup, writeup_id)
     if row is None:
@@ -86,6 +89,6 @@ def export_writeup_docx(writeup_id: str, db: Session = Depends(get_db)) -> Strea
     filename = "".join(c for c in row.title if c.isalnum() or c in " _-").strip() or "writeup"
     return StreamingResponse(
         buf,
-        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        media_type=DOCX,
         headers={"Content-Disposition": f'attachment; filename="{filename}.docx"'},
     )

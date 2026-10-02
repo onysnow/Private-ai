@@ -102,6 +102,202 @@ export type AggregateProvenanceOut = {
 };
 
 /**
+ * AiAnalysisCandidateOut
+ *
+ * One proposal in full. `payload` is the model's output in its module's
+ * own schema (app/ai/reasoning.py OUTPUT_SCHEMAS), or the raw text of a run
+ * whose output could not be used; `trace` is what the model was sent
+ * (rows from before the trace was kept have none). A presentation draft
+ * also carries readable details for every record it cites and the slides
+ * a promotion would make; other modules leave both keys out.
+ */
+export type AiAnalysisCandidateOut = {
+  /**
+   * Accepted Record Id
+   */
+  accepted_record_id: string | null;
+  /**
+   * Accepted Record Type
+   */
+  accepted_record_type: string | null;
+  /**
+   * Checked Citation Count
+   */
+  checked_citation_count: number;
+  /**
+   * Checked Citation Ids
+   */
+  checked_citation_ids: Array<RecordRefOut>;
+  /**
+   * Citation Details
+   */
+  citation_details?: Array<CitationDetailOut> | null;
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Deck Preview
+   */
+  deck_preview?: Array<DeckSlideOut> | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Payload
+   */
+  payload: {
+    [key: string]: unknown;
+  };
+  /**
+   * Rejection Reason
+   */
+  rejection_reason: string | null;
+  /**
+   * Request
+   */
+  request: {
+    [key: string]: unknown;
+  };
+  /**
+   * Review Status
+   */
+  review_status: string;
+  /**
+   * Reviewed At
+   */
+  reviewed_at: string | null;
+  /**
+   * Reviewer Note
+   */
+  reviewer_note: string | null;
+  /**
+   * Trace
+   */
+  trace: {
+    [key: string]: unknown;
+  } | null;
+};
+
+/**
+ * AiAnalysisCandidateReviewOut
+ *
+ * The reply to a review decision on a proposal.
+ */
+export type AiAnalysisCandidateReviewOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Review Status
+   */
+  review_status: string;
+  /**
+   * Reviewed At
+   */
+  reviewed_at: string | null;
+  /**
+   * Reviewer Note
+   */
+  reviewer_note: string | null;
+};
+
+/**
+ * AiAnalysisCandidateSummaryOut
+ *
+ * A reasoning run's proposal as the review queue lists it, without its
+ * payload. `request` is what the reporter asked, as recorded when the run
+ * was made; its keys depend on the version that recorded it (record_refs
+ * arrived with presentation drafts, for one), so it stays open.
+ * `rejection_reason` is one of the automatic rejection reasons, "reviewer"
+ * for a human rejection, or null when not rejected.
+ */
+export type AiAnalysisCandidateSummaryOut = {
+  /**
+   * Accepted Record Id
+   */
+  accepted_record_id: string | null;
+  /**
+   * Accepted Record Type
+   */
+  accepted_record_type: string | null;
+  /**
+   * Checked Citation Count
+   */
+  checked_citation_count: number;
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Rejection Reason
+   */
+  rejection_reason: string | null;
+  /**
+   * Request
+   */
+  request: {
+    [key: string]: unknown;
+  };
+  /**
+   * Review Status
+   */
+  review_status: string;
+  /**
+   * Reviewed At
+   */
+  reviewed_at: string | null;
+  /**
+   * Reviewer Note
+   */
+  reviewer_note: string | null;
+};
+
+/**
+ * AiAnalysisCandidatesOut
+ */
+export type AiAnalysisCandidatesOut = {
+  /**
+   * Candidates
+   */
+  candidates: Array<AiAnalysisCandidateSummaryOut>;
+};
+
+/**
  * AiControlFlagOut
  */
 export type AiControlFlagOut = {
@@ -173,6 +369,32 @@ export type AiModuleStatusOut = {
    * Vendored Tas
    */
   vendored_tas: boolean;
+};
+
+/**
+ * AiReasoningRunOut
+ *
+ * The reply to a reasoning run. Run in the request (developer mode): the
+ * proposal it made for review, with the finished job. Queued (the Docker
+ * stack, HTTP 202): no proposal yet, and the job to follow; its `result`
+ * holds this same proposal when it is done.
+ */
+export type AiReasoningRunOut = {
+  /**
+   * Candidate Id
+   */
+  candidate_id: string | null;
+  job: BackgroundJobOut;
+  /**
+   * Payload
+   */
+  payload?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Review Status
+   */
+  review_status?: string | null;
 };
 
 /**
@@ -292,6 +514,146 @@ export type AppUserCreate = {
 };
 
 /**
+ * AppUserCreatedOut
+ *
+ * A new identity and its token, shown this once: only the token's digest is kept.
+ */
+export type AppUserCreatedOut = {
+  /**
+   * Display Name
+   */
+  display_name: string;
+  /**
+   * Global Role
+   */
+  global_role: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Token
+   */
+  token: string;
+  /**
+   * Token Notice
+   */
+  token_notice: string;
+};
+
+/**
+ * AppUserMembershipOut
+ */
+export type AppUserMembershipOut = {
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Role
+   */
+  role: string;
+};
+
+/**
+ * AppUserOut
+ *
+ * A persisted API identity: its token's history, never the token or its digest.
+ */
+export type AppUserOut = {
+  /**
+   * Disabled
+   */
+  disabled: boolean;
+  /**
+   * Disabled At
+   */
+  disabled_at: string | null;
+  /**
+   * Display Name
+   */
+  display_name: string;
+  /**
+   * Global Role
+   */
+  global_role: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Memberships
+   */
+  memberships: Array<AppUserMembershipOut>;
+  /**
+   * Token Created At
+   */
+  token_created_at: string;
+  /**
+   * Token Last Used At
+   */
+  token_last_used_at: string | null;
+  /**
+   * Token Revoked At
+   */
+  token_revoked_at: string | null;
+  /**
+   * Token Rotated At
+   */
+  token_rotated_at: string | null;
+  /**
+   * Token Status
+   */
+  token_status: 'active' | 'disabled' | 'revoked';
+};
+
+/**
+ * AppUserTokenRevokedOut
+ */
+export type AppUserTokenRevokedOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Token Revoked At
+   */
+  token_revoked_at: string;
+  /**
+   * Token Status
+   */
+  token_status: 'revoked';
+};
+
+/**
+ * AppUserTokenRotatedOut
+ *
+ * The replacement token, shown this once.
+ */
+export type AppUserTokenRotatedOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Token
+   */
+  token: string;
+  /**
+   * Token Created At
+   */
+  token_created_at: string;
+  /**
+   * Token Notice
+   */
+  token_notice: string;
+  /**
+   * Token Rotated At
+   */
+  token_rotated_at: string;
+};
+
+/**
  * AppUserUpdate
  */
 export type AppUserUpdate = {
@@ -307,6 +669,36 @@ export type AppUserUpdate = {
    * Global Role
    */
   global_role?: string | null;
+};
+
+/**
+ * AppUserUpdatedOut
+ */
+export type AppUserUpdatedOut = {
+  /**
+   * Disabled
+   */
+  disabled: boolean;
+  /**
+   * Disabled At
+   */
+  disabled_at: string | null;
+  /**
+   * Display Name
+   */
+  display_name: string;
+  /**
+   * Global Role
+   */
+  global_role: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Token Status
+   */
+  token_status: 'active' | 'disabled' | 'revoked';
 };
 
 /**
@@ -399,6 +791,28 @@ export type BackgroundJobOut = {
 };
 
 /**
+ * BackupInspectOut
+ *
+ * A checked archive's own manifest.json, echoed back as read (only its
+ * format, version, checksums and lineage are verified), and how many rows
+ * of each table it holds.
+ */
+export type BackupInspectOut = {
+  /**
+   * Manifest
+   */
+  manifest: {
+    [key: string]: unknown;
+  };
+  /**
+   * Record Counts
+   */
+  record_counts: {
+    [key: string]: number;
+  };
+};
+
+/**
  * BackupInvestigationOut
  */
 export type BackupInvestigationOut = {
@@ -482,6 +896,47 @@ export type BackupRestoreResultOut = {
   restored_counts: {
     [key: string]: number;
   };
+};
+
+/**
+ * BarItemOut
+ */
+export type BarItemOut = {
+  /**
+   * Evidence
+   */
+  evidence: Array<RecordRefOut>;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Value
+   */
+  value: number | number;
+};
+
+/**
+ * BarVisualOut
+ */
+export type BarVisualOut = {
+  /**
+   * Items
+   */
+  items: Array<BarItemOut>;
+  style?: VisualStyleOut | null;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Type
+   */
+  type: 'bar';
+  /**
+   * Unit
+   */
+  unit: string;
 };
 
 /**
@@ -828,6 +1283,30 @@ export type CanonicalStatementOut = {
 };
 
 /**
+ * CapabilitiesOut
+ */
+export type CapabilitiesOut = {
+  /**
+   * Ai Features Enabled
+   */
+  ai_features_enabled: boolean;
+  core: CoreCapabilitiesOut;
+  /**
+   * Mode
+   */
+  mode: 'integrated_preview' | 'core_preview';
+  /**
+   * Note
+   */
+  note: string;
+  platforms: PlatformsOut;
+  /**
+   * Product
+   */
+  product: string;
+};
+
+/**
  * CaseSynthesisRequest
  */
 export type CaseSynthesisRequest = {
@@ -886,6 +1365,49 @@ export type ChartKind =
   | 'sankey';
 
 /**
+ * ChartVisualOut
+ *
+ * A checked chart (app/ai/chart_check.py) as a deck keeps it: the order
+ * slip, the data the Workbench cooked from the records (every value with
+ * its records), the check report and the chart's words, as the draft or
+ * the deck editor stored them; and the drawing that passed, when the deck
+ * came from a checked draft. The deck insists only on a valid order slip
+ * and its data (app/services/decks.py normalize_chart_visual), so the
+ * report and the words are passed on as stored.
+ */
+export type ChartVisualOut = {
+  data: VisualDataOut;
+  /**
+   * Option
+   */
+  option?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Report
+   */
+  report: {
+    [key: string]: unknown;
+  };
+  /**
+   * Spec
+   */
+  spec: {
+    [key: string]: unknown;
+  };
+  /**
+   * Text
+   */
+  text: {
+    [key: string]: unknown;
+  };
+  /**
+   * Type
+   */
+  type: 'chart';
+};
+
+/**
  * CheckItemOut
  */
 export type CheckItemOut = {
@@ -925,6 +1447,59 @@ export type CheckReportOut = {
    * Warnings
    */
   warnings: Array<CheckItemOut>;
+};
+
+/**
+ * CitationDetailOut
+ *
+ * A cited record in words, for the review panel's evidence chips and an
+ * export's source list; `missing` when the record no longer resolves.
+ */
+export type CitationDetailOut = {
+  /**
+   * Detail
+   */
+  detail: string | null;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Locator
+   */
+  locator: string | null;
+  /**
+   * Missing
+   */
+  missing: boolean;
+  /**
+   * Quote
+   */
+  quote: string | null;
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type: string;
+  /**
+   * Source Title
+   */
+  source_title: string | null;
+  /**
+   * Source Url
+   */
+  source_url: string | null;
+  /**
+   * Trace Record Type
+   */
+  trace_record_type: string;
+  /**
+   * Type Label
+   */
+  type_label: string;
 };
 
 /**
@@ -1353,6 +1928,20 @@ export type ConfirmIn = {
 };
 
 /**
+ * ConnectorCredentialPut
+ *
+ * A connector's secret (PUT /settings/connectors/{provider}/credential).
+ * Optional here so a missing secret gets the same 400 a blank one does
+ * (app/services/settings.py save_connector_credential).
+ */
+export type ConnectorCredentialPut = {
+  /**
+   * Credential
+   */
+  credential?: string | null;
+};
+
+/**
  * ConnectorCredentialRemovedOut
  */
 export type ConnectorCredentialRemovedOut = {
@@ -1590,6 +2179,174 @@ export type ConnectorsOut = {
 };
 
 /**
+ * ContextCitationOut
+ *
+ * A record the model may cite, with where to trace it.
+ */
+export type ContextCitationOut = {
+  /**
+   * Locator
+   */
+  locator: string | null;
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type: string;
+  /**
+   * Source Id
+   */
+  source_id: string | null;
+  /**
+   * Source Url
+   */
+  source_url: string | null;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Trace Record Id
+   */
+  trace_record_id: string | null;
+  /**
+   * Trace Record Type
+   */
+  trace_record_type: string | null;
+};
+
+/**
+ * ContextGroupsOut
+ */
+export type ContextGroupsOut = {
+  /**
+   * Canonical
+   */
+  canonical: Array<ContextItemOut>;
+  /**
+   * Evidence
+   */
+  evidence: Array<ContextItemOut>;
+  /**
+   * Reporting
+   */
+  reporting: Array<ContextItemOut>;
+  /**
+   * Review
+   */
+  review: Array<ContextItemOut>;
+  /**
+   * Workflow
+   */
+  workflow: Array<ContextItemOut>;
+};
+
+/**
+ * ContextItemOut
+ *
+ * One search hit in the retrieval packet. `provenance` and `metadata`
+ * are the search hit's own (each record type adds its own keys).
+ */
+export type ContextItemOut = {
+  citation: ContextCitationOut;
+  /**
+   * Metadata
+   */
+  metadata: {
+    [key: string]: unknown;
+  };
+  /**
+   * Provenance
+   */
+  provenance: {
+    [key: string]: unknown;
+  };
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type: string;
+  /**
+   * Score
+   */
+  score: number;
+  /**
+   * Snippet
+   */
+  snippet: string;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * CoreCapabilitiesOut
+ *
+ * The parts of the core workbench this server runs; every one runs without AI.
+ */
+export type CoreCapabilitiesOut = {
+  /**
+   * Backup Restore
+   */
+  backup_restore: boolean;
+  /**
+   * Claims
+   */
+  claims: boolean;
+  /**
+   * Connectors
+   */
+  connectors: boolean;
+  /**
+   * Documents
+   */
+  documents: boolean;
+  /**
+   * Dossiers
+   */
+  dossiers: boolean;
+  /**
+   * Evidence
+   */
+  evidence: boolean;
+  /**
+   * Investigations
+   */
+  investigations: boolean;
+  /**
+   * Leads And Tasks
+   */
+  leads_and_tasks: boolean;
+  /**
+   * Provenance
+   */
+  provenance: boolean;
+  /**
+   * Relationships
+   */
+  relationships: boolean;
+  /**
+   * Search
+   */
+  search: boolean;
+  /**
+   * Sources
+   */
+  sources: boolean;
+  /**
+   * Timeline
+   */
+  timeline: boolean;
+};
+
+/**
  * CreateIn
  */
 export type CreateIn = {
@@ -1715,6 +2472,96 @@ export type DataTableRowOut = {
 };
 
 /**
+ * DeckOut
+ *
+ * A presentation deck. Every key is always sent, so the nullable ones have no default.
+ */
+export type DeckOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Slide Count
+   */
+  slide_count: number;
+  /**
+   * Slides
+   */
+  slides: Array<DeckSlideOut>;
+  /**
+   * Source Ai Candidate Id
+   */
+  source_ai_candidate_id: string | null;
+  style: DeckStyleOut;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Updated At
+   */
+  updated_at: string;
+};
+
+/**
+ * DeckSlideOut
+ *
+ * One slide as a deck stores it (app/services/decks.py _normalize_slides).
+ */
+export type DeckSlideOut = {
+  /**
+   * Bullets
+   */
+  bullets: Array<string>;
+  /**
+   * Evidence
+   */
+  evidence: Array<RecordRefOut>;
+  /**
+   * Heading
+   */
+  heading: string;
+  /**
+   * Kind
+   */
+  kind: 'title' | 'statement' | 'content' | 'questions';
+  /**
+   * Notes
+   */
+  notes: string;
+  /**
+   * Visual
+   */
+  visual:
+    | ({
+        type: 'figures';
+      } & FiguresVisualOut)
+    | ({
+        type: 'timeline';
+      } & TimelineVisualOut)
+    | ({
+        type: 'bar';
+      } & BarVisualOut)
+    | ({
+        type: 'chart';
+      } & ChartVisualOut)
+    | null;
+};
+
+/**
  * DeckStyle
  */
 export type DeckStyle = {
@@ -1726,6 +2573,106 @@ export type DeckStyle = {
    * Theme
    */
   theme?: string | null;
+};
+
+/**
+ * DeckStyleOut
+ *
+ * A deck's look: a theme id and a font-pair id from the style catalogue.
+ */
+export type DeckStyleOut = {
+  /**
+   * Fonts
+   */
+  fonts: string;
+  /**
+   * Theme
+   */
+  theme: string;
+};
+
+/**
+ * DeckThemeOut
+ *
+ * One deck theme: colours as six hex digits without '#', and its own fonts.
+ */
+export type DeckThemeOut = {
+  /**
+   * Accent
+   */
+  accent: string;
+  /**
+   * Accent Text
+   */
+  accent_text: string;
+  /**
+   * Alert
+   */
+  alert: string;
+  /**
+   * Bar Muted
+   */
+  bar_muted: string;
+  /**
+   * Body Font
+   */
+  body_font: string;
+  /**
+   * Cover Accent
+   */
+  cover_accent: string;
+  /**
+   * Cover Bg
+   */
+  cover_bg: string;
+  /**
+   * Cover Line
+   */
+  cover_line: string;
+  /**
+   * Cover Muted
+   */
+  cover_muted: string;
+  /**
+   * Cover Text
+   */
+  cover_text: string;
+  /**
+   * Description
+   */
+  description: string;
+  /**
+   * Heading Font
+   */
+  heading_font: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Muted
+   */
+  muted: string;
+  /**
+   * Page
+   */
+  page: string;
+  /**
+   * Panel
+   */
+  panel: string;
+  /**
+   * Rule
+   */
+  rule: string;
+  /**
+   * Text
+   */
+  text: string;
 };
 
 /**
@@ -1748,6 +2695,26 @@ export type DeckUpdate = {
    * Title
    */
   title?: string | null;
+};
+
+/**
+ * DecksOut
+ */
+export type DecksOut = {
+  /**
+   * Decks
+   */
+  decks: Array<DeckOut>;
+};
+
+/**
+ * DeletedOut
+ */
+export type DeletedOut = {
+  /**
+   * Deleted
+   */
+  deleted: boolean;
 };
 
 /**
@@ -1814,6 +2781,20 @@ export type DeletionUnsafePath = {
    * Storage Path
    */
   storage_path?: string | null;
+};
+
+/**
+ * DemoSeedOut
+ */
+export type DemoSeedOut = {
+  /**
+   * Created
+   */
+  created: boolean;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
 };
 
 /**
@@ -2809,6 +3790,36 @@ export type EntityIdentityHistoryOut = {
    * Unresolved Decision Count
    */
   unresolved_decision_count: number;
+};
+
+/**
+ * EntityMatchPreviewOut
+ *
+ * Canonical entities an entity proposal may be, before the reporter decides.
+ */
+export type EntityMatchPreviewOut = {
+  /**
+   * Candidate Id
+   */
+  candidate_id: string;
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Identity Rule
+   */
+  identity_rule: string;
+  /**
+   * Matches
+   */
+  matches: Array<EntityCandidateOut>;
+  provider_lead: ProviderLeadOut;
+  /**
+   * Schema
+   */
+  schema: string;
+  strong_match: EntityCandidateOut | null;
 };
 
 /**
@@ -3885,6 +4896,39 @@ export type ExtractionReviewOut = {
 };
 
 /**
+ * FigureItemOut
+ */
+export type FigureItemOut = {
+  /**
+   * Evidence
+   */
+  evidence: Array<RecordRefOut>;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Value
+   */
+  value: string;
+};
+
+/**
+ * FiguresVisualOut
+ */
+export type FiguresVisualOut = {
+  /**
+   * Items
+   */
+  items: Array<FigureItemOut>;
+  style?: VisualStyleOut | null;
+  /**
+   * Type
+   */
+  type: 'figures';
+};
+
+/**
  * FinancialLedgerOut
  */
 export type FinancialLedgerOut = {
@@ -4012,6 +5056,30 @@ export type FlagIn = {
 };
 
 /**
+ * FontPairOut
+ *
+ * A heading and body font; empty names mean "keep the theme's own".
+ */
+export type FontPairOut = {
+  /**
+   * Body
+   */
+  body: string;
+  /**
+   * Heading
+   */
+  heading: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Label
+   */
+  label: string;
+};
+
+/**
  * GraphNodeOut
  *
  * A canonical entity that is an endpoint of a shown edge.
@@ -4092,6 +5160,16 @@ export type HttpValidationError = {
    * Detail
    */
   detail?: Array<ValidationError>;
+};
+
+/**
+ * HealthOut
+ */
+export type HealthOut = {
+  /**
+   * Status
+   */
+  status: 'ok';
 };
 
 /**
@@ -4375,6 +5453,24 @@ export type InvestigationDeletionResult = {
    * Shared Document Files Preserved
    */
   shared_document_files_preserved: number;
+};
+
+/**
+ * InvestigationMembershipOut
+ */
+export type InvestigationMembershipOut = {
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Role
+   */
+  role: string;
+  /**
+   * User Id
+   */
+  user_id: string;
 };
 
 /**
@@ -5204,6 +6300,15 @@ export type OpenAlephBindingOut = {
 };
 
 /**
+ * OpenAlephCorpusBindingOut
+ *
+ * The investigation's OpenAleph collection, or null before one is set up.
+ */
+export type OpenAlephCorpusBindingOut = {
+  binding: OpenAlephBindingOut | null;
+};
+
+/**
  * OpenAlephDocumentSyncOut
  */
 export type OpenAlephDocumentSyncOut = {
@@ -5295,6 +6400,52 @@ export type OpenAlephEvidenceImportOut = {
 };
 
 /**
+ * OpenAlephOperationFailureOut
+ *
+ * A failed OpenAleph pipeline step, kept server-side so a 502 can be explained later.
+ */
+export type OpenAlephOperationFailureOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Document Id
+   */
+  document_id: string | null;
+  /**
+   * Error
+   */
+  error: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Operation
+   */
+  operation: string;
+};
+
+/**
+ * OpenAlephPlatformOut
+ */
+export type OpenAlephPlatformOut = {
+  /**
+   * Enabled
+   */
+  enabled: boolean;
+  /**
+   * Role
+   */
+  role: string;
+};
+
+/**
  * OpenAlephReviewRefreshOut
  */
 export type OpenAlephReviewRefreshOut = {
@@ -5363,6 +6514,43 @@ export type OpenAlephReviewStatusOut = {
    */
   ready_for_import: boolean;
   sync?: OpenAlephSyncOut | null;
+};
+
+/**
+ * OpenAlephStatusOut
+ *
+ * Whether the local OpenAleph corpus platform answers its search API.
+ * Every key is always sent, so the nullable one has no default.
+ */
+export type OpenAlephStatusOut = {
+  /**
+   * Api Usable
+   */
+  api_usable: boolean;
+  /**
+   * Base Url
+   */
+  base_url: string;
+  /**
+   * Configured
+   */
+  configured: boolean;
+  /**
+   * Detail
+   */
+  detail: string;
+  /**
+   * Http Status
+   */
+  http_status: number | null;
+  /**
+   * Reachable
+   */
+  reachable: boolean;
+  /**
+   * Ui Url
+   */
+  ui_url: string;
 };
 
 /**
@@ -5492,6 +6680,13 @@ export type PlanIn = {
 };
 
 /**
+ * PlatformsOut
+ */
+export type PlatformsOut = {
+  openaleph: OpenAlephPlatformOut;
+};
+
+/**
  * PostMergeReconciliationOut
  *
  * The duplicate pairs a merge left behind, for the reporter to review.
@@ -5555,6 +6750,26 @@ export type PresentationDraftRequest = {
    * Record Refs
    */
   record_refs: Array<RecordRef>;
+};
+
+/**
+ * PresentationStyleCatalogOut
+ *
+ * Everything the deck style panel and the in-app preview need; the .pptx
+ * export reads the same catalogue, so the two cannot drift apart.
+ */
+export type PresentationStyleCatalogOut = {
+  defaults: DeckStyleOut;
+  /**
+   * Font Pairs
+   */
+  font_pairs: Array<FontPairOut>;
+  /**
+   * Themes
+   */
+  themes: Array<DeckThemeOut>;
+  visual_options: VisualOptionsOut;
+  visual_presets: VisualPresetsOut;
 };
 
 /**
@@ -5763,6 +6978,26 @@ export type ProvenanceTraceOut = {
 };
 
 /**
+ * ProviderLeadOut
+ *
+ * What an outside provider said the name resolves to: a lead only, never a choice.
+ */
+export type ProviderLeadOut = {
+  /**
+   * Provider
+   */
+  provider: string | null;
+  /**
+   * Provider Entity Id
+   */
+  provider_entity_id: string | null;
+  /**
+   * Provider Resolved Entity Id
+   */
+  provider_resolved_entity_id: string | null;
+};
+
+/**
  * QueryRef
  *
  * One catalogued query and its parameters, as the AI writes them.
@@ -5778,6 +7013,44 @@ export type QueryRef = {
   params?: {
     [key: string]: string;
   };
+};
+
+/**
+ * QuestionContextOut
+ *
+ * The provenance-bearing packet a reasoning model would be given for a
+ * question. External connector results are a separate, unverified bucket
+ * and never among the citations.
+ */
+export type QuestionContextOut = {
+  /**
+   * Citations
+   */
+  citations: Array<ContextCitationOut>;
+  context: ContextGroupsOut;
+  /**
+   * External Leads
+   */
+  external_leads: Array<ContextItemOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Reasoning Contract
+   */
+  reasoning_contract: {
+    [key: string]: boolean;
+  };
+  retrieval: RetrievalSummaryOut;
+  /**
+   * Warnings
+   */
+  warnings: Array<string>;
 };
 
 /**
@@ -6299,6 +7572,46 @@ export type RelationshipReconciliationOut = {
 };
 
 /**
+ * RelationshipSchemaOut
+ *
+ * How the workbench draws one FollowTheMoney relationship schema: its two ends' properties and labels.
+ */
+export type RelationshipSchemaOut = {
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Source Label
+   */
+  source_label: string;
+  /**
+   * Source Prop
+   */
+  source_prop: string;
+  /**
+   * Target Label
+   */
+  target_label: string;
+  /**
+   * Target Prop
+   */
+  target_prop: string;
+};
+
+/**
+ * RelationshipSchemasOut
+ */
+export type RelationshipSchemasOut = {
+  /**
+   * Schemas
+   */
+  schemas: {
+    [key: string]: RelationshipSchemaOut;
+  };
+};
+
+/**
  * ReportingTaskCreate
  */
 export type ReportingTaskCreate = {
@@ -6526,6 +7839,36 @@ export type RestoreIn = {
    * Kind
    */
   kind: string;
+};
+
+/**
+ * RetrievalSummaryOut
+ */
+export type RetrievalSummaryOut = {
+  /**
+   * Counts
+   */
+  counts: {
+    [key: string]: number;
+  };
+  /**
+   * Group Counts
+   */
+  group_counts: {
+    [key: string]: number;
+  };
+  /**
+   * Query
+   */
+  query: string | null;
+  /**
+   * Returned Matches
+   */
+  returned_matches: number;
+  /**
+   * Total Matches
+   */
+  total_matches: number;
 };
 
 /**
@@ -6787,6 +8130,31 @@ export type SecurityAuditRetentionPreviewOut = {
    * Would Remove
    */
   would_remove: number;
+};
+
+/**
+ * SecurityAuditRetentionRequest
+ *
+ * Prune the security audit log (POST /settings/security/audit/retention).
+ *
+ * Strict, so `true` or "90" is refused rather than converted: the route
+ * refused anything but a whole number and text before this body was typed.
+ * The ranges and the confirmation text are checked by the audit log itself
+ * (app/core/audit_log.py), which answers 400 with the reason.
+ */
+export type SecurityAuditRetentionRequest = {
+  /**
+   * Confirmation
+   */
+  confirmation?: string;
+  /**
+   * Keep Days
+   */
+  keep_days?: number;
+  /**
+   * Max Records
+   */
+  max_records?: number;
 };
 
 /**
@@ -7678,6 +9046,24 @@ export type TimelineEventRowOut = {
 };
 
 /**
+ * TimelineItemOut
+ */
+export type TimelineItemOut = {
+  /**
+   * Date
+   */
+  date: string;
+  /**
+   * Evidence
+   */
+  evidence: Array<RecordRefOut>;
+  /**
+   * Label
+   */
+  label: string;
+};
+
+/**
  * TimelineOut
  */
 export type TimelineOut = {
@@ -7713,6 +9099,21 @@ export type TimelineOut = {
   verification_counts: {
     [key: string]: number;
   };
+};
+
+/**
+ * TimelineVisualOut
+ */
+export type TimelineVisualOut = {
+  /**
+   * Items
+   */
+  items: Array<TimelineItemOut>;
+  style?: VisualStyleOut | null;
+  /**
+   * Type
+   */
+  type: 'timeline';
 };
 
 /**
@@ -8005,6 +9406,50 @@ export type VisualDataRowOut = {
 };
 
 /**
+ * VisualOptionSpecOut
+ *
+ * What one option accepts. `values` lists the choices and is sent only for a choice.
+ */
+export type VisualOptionSpecOut = {
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Type
+   */
+  type: 'bool' | 'choice' | 'labels';
+  /**
+   * Values
+   */
+  values?: Array<string> | null;
+};
+
+/**
+ * VisualOptionsOut
+ */
+export type VisualOptionsOut = {
+  /**
+   * Bar
+   */
+  bar: {
+    [key: string]: VisualOptionSpecOut;
+  };
+  /**
+   * Figures
+   */
+  figures: {
+    [key: string]: VisualOptionSpecOut;
+  };
+  /**
+   * Timeline
+   */
+  timeline: {
+    [key: string]: VisualOptionSpecOut;
+  };
+};
+
+/**
  * VisualParamOut
  */
 export type VisualParamOut = {
@@ -8020,6 +9465,56 @@ export type VisualParamOut = {
    * Description
    */
   description: string;
+};
+
+/**
+ * VisualPresetOut
+ *
+ * A named layout for one visual type, with its option defaults.
+ */
+export type VisualPresetOut = {
+  /**
+   * Description
+   */
+  description: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Layout
+   */
+  layout: {
+    [key: string]: string | boolean;
+  };
+  /**
+   * Options
+   */
+  options: {
+    [key: string]: boolean | string | Array<string>;
+  };
+};
+
+/**
+ * VisualPresetsOut
+ */
+export type VisualPresetsOut = {
+  /**
+   * Bar
+   */
+  bar: Array<VisualPresetOut>;
+  /**
+   * Figures
+   */
+  figures: Array<VisualPresetOut>;
+  /**
+   * Timeline
+   */
+  timeline: Array<VisualPresetOut>;
 };
 
 /**
@@ -8187,6 +9682,24 @@ export type VisualStyle = {
 };
 
 /**
+ * VisualStyleOut
+ *
+ * A visual's chosen preset and the options it overrides.
+ */
+export type VisualStyleOut = {
+  /**
+   * Options
+   */
+  options: {
+    [key: string]: boolean | string | Array<string>;
+  };
+  /**
+   * Preset
+   */
+  preset: string;
+};
+
+/**
  * WriteupCreate
  */
 export type WriteupCreate = {
@@ -8211,6 +9724,112 @@ export type WriteupCreate = {
 };
 
 /**
+ * WriteupOut
+ *
+ * A write-up with its document: TipTap/ProseMirror JSON, as the editor saved it.
+ */
+export type WriteupOut = {
+  /**
+   * Cited Record Refs
+   */
+  cited_record_refs: Array<RecordRefOut>;
+  /**
+   * Content Json
+   */
+  content_json: {
+    [key: string]: unknown;
+  };
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Source Ai Candidate Id
+   */
+  source_ai_candidate_id: string | null;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Updated At
+   */
+  updated_at: string;
+  /**
+   * Word Count
+   */
+  word_count: number;
+};
+
+/**
+ * WriteupSummaryOut
+ *
+ * A write-up as the list shows it: the first 280 characters of its text instead of the document.
+ */
+export type WriteupSummaryOut = {
+  /**
+   * Cited Record Refs
+   */
+  cited_record_refs: Array<RecordRefOut>;
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Preview
+   */
+  preview: string;
+  /**
+   * Source Ai Candidate Id
+   */
+  source_ai_candidate_id: string | null;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Updated At
+   */
+  updated_at: string;
+  /**
+   * Word Count
+   */
+  word_count: number;
+};
+
+/**
  * WriteupUpdate
  */
 export type WriteupUpdate = {
@@ -8228,6 +9847,16 @@ export type WriteupUpdate = {
    * Title
    */
   title?: string | null;
+};
+
+/**
+ * WriteupsOut
+ */
+export type WriteupsOut = {
+  /**
+   * Writeups
+   */
+  writeups: Array<WriteupSummaryOut>;
 };
 
 /**
@@ -8304,8 +9933,11 @@ export type GetAiAnalysisCandidateEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AiAnalysisCandidateOut;
 };
+
+export type GetAiAnalysisCandidateEndpointResponse =
+  GetAiAnalysisCandidateEndpointResponses[keyof GetAiAnalysisCandidateEndpointResponses];
 
 export type PromoteAiAnalysisCandidateToDeckEndpointData = {
   body: PromoteToDeckRequest;
@@ -8333,8 +9965,11 @@ export type PromoteAiAnalysisCandidateToDeckEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: DeckOut;
 };
+
+export type PromoteAiAnalysisCandidateToDeckEndpointResponse =
+  PromoteAiAnalysisCandidateToDeckEndpointResponses[keyof PromoteAiAnalysisCandidateToDeckEndpointResponses];
 
 export type PromoteAiAnalysisCandidateToWriteupEndpointData = {
   body: PromoteToWriteupRequest;
@@ -8362,8 +9997,11 @@ export type PromoteAiAnalysisCandidateToWriteupEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: WriteupOut;
 };
+
+export type PromoteAiAnalysisCandidateToWriteupEndpointResponse =
+  PromoteAiAnalysisCandidateToWriteupEndpointResponses[keyof PromoteAiAnalysisCandidateToWriteupEndpointResponses];
 
 export type ReviewAiAnalysisCandidateEndpointData = {
   body: AiAnalysisCandidateReviewRequest;
@@ -8391,8 +10029,11 @@ export type ReviewAiAnalysisCandidateEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AiAnalysisCandidateReviewOut;
 };
+
+export type ReviewAiAnalysisCandidateEndpointResponse =
+  ReviewAiAnalysisCandidateEndpointResponses[keyof ReviewAiAnalysisCandidateEndpointResponses];
 
 export type InspectBackupData = {
   body: BodyInspectBackup;
@@ -8414,8 +10055,11 @@ export type InspectBackupResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: BackupInspectOut;
 };
+
+export type InspectBackupResponse =
+  InspectBackupResponses[keyof InspectBackupResponses];
 
 export type PreviewBackupRestoreData = {
   body: BodyPreviewBackupRestore;
@@ -8481,8 +10125,11 @@ export type CapabilitiesResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: CapabilitiesOut;
 };
+
+export type CapabilitiesResponse =
+  CapabilitiesResponses[keyof CapabilitiesResponses];
 
 export type CreateClaimEndpointData = {
   body: ClaimCreate;
@@ -10764,8 +12411,11 @@ export type DeleteDeckEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: DeletedOut;
 };
+
+export type DeleteDeckEndpointResponse =
+  DeleteDeckEndpointResponses[keyof DeleteDeckEndpointResponses];
 
 export type GetDeckEndpointData = {
   body?: never;
@@ -10793,8 +12443,11 @@ export type GetDeckEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: DeckOut;
 };
+
+export type GetDeckEndpointResponse =
+  GetDeckEndpointResponses[keyof GetDeckEndpointResponses];
 
 export type UpdateDeckEndpointData = {
   body: DeckUpdate;
@@ -10822,8 +12475,11 @@ export type UpdateDeckEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: DeckOut;
 };
+
+export type UpdateDeckEndpointResponse =
+  UpdateDeckEndpointResponses[keyof UpdateDeckEndpointResponses];
 
 export type ExportDeckPptxData = {
   body?: never;
@@ -10849,10 +12505,13 @@ export type ExportDeckPptxError =
 
 export type ExportDeckPptxResponses = {
   /**
-   * Successful Response
+   * The deck as an editable PowerPoint file
    */
-  200: unknown;
+  200: Blob | File;
 };
+
+export type ExportDeckPptxResponse =
+  ExportDeckPptxResponses[keyof ExportDeckPptxResponses];
 
 export type SeedDemoData = {
   body?: never;
@@ -10865,8 +12524,10 @@ export type SeedDemoResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: DemoSeedOut;
 };
+
+export type SeedDemoResponse = SeedDemoResponses[keyof SeedDemoResponses];
 
 export type UploadDocumentData = {
   body: BodyUploadDocument;
@@ -12051,8 +13712,11 @@ export type GetExtractionEntityMatchesResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: EntityMatchPreviewOut;
 };
+
+export type GetExtractionEntityMatchesResponse =
+  GetExtractionEntityMatchesResponses[keyof GetExtractionEntityMatchesResponses];
 
 export type GetExtractionCandidateExplanationData = {
   body?: never;
@@ -12161,8 +13825,10 @@ export type HealthResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: HealthOut;
 };
+
+export type HealthResponse = HealthResponses[keyof HealthResponses];
 
 export type OpenalephIntegrationStatusData = {
   body?: never;
@@ -12175,8 +13841,11 @@ export type OpenalephIntegrationStatusResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: OpenAlephStatusOut;
 };
+
+export type OpenalephIntegrationStatusResponse =
+  OpenalephIntegrationStatusResponses[keyof OpenalephIntegrationStatusResponses];
 
 export type ListInvestigationsData = {
   body?: never;
@@ -12304,8 +13973,11 @@ export type ListInvestigationAiAnalysisCandidatesResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AiAnalysisCandidatesOut;
 };
+
+export type ListInvestigationAiAnalysisCandidatesResponse =
+  ListInvestigationAiAnalysisCandidatesResponses[keyof ListInvestigationAiAnalysisCandidatesResponses];
 
 export type InvestigationCaseSynthesisData = {
   body: CaseSynthesisRequest;
@@ -12333,8 +14005,15 @@ export type InvestigationCaseSynthesisResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AiReasoningRunOut;
+  /**
+   * Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})
+   */
+  202: AiReasoningRunOut;
 };
+
+export type InvestigationCaseSynthesisResponse =
+  InvestigationCaseSynthesisResponses[keyof InvestigationCaseSynthesisResponses];
 
 export type InvestigationQuestionContextData = {
   body: InvestigationQuestionContextRequest;
@@ -12362,8 +14041,11 @@ export type InvestigationQuestionContextResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: QuestionContextOut;
 };
+
+export type InvestigationQuestionContextResponse =
+  InvestigationQuestionContextResponses[keyof InvestigationQuestionContextResponses];
 
 export type InvestigationHypothesisTestData = {
   body: HypothesisTestRequest;
@@ -12391,8 +14073,15 @@ export type InvestigationHypothesisTestResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AiReasoningRunOut;
+  /**
+   * Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})
+   */
+  202: AiReasoningRunOut;
 };
+
+export type InvestigationHypothesisTestResponse =
+  InvestigationHypothesisTestResponses[keyof InvestigationHypothesisTestResponses];
 
 export type InvestigationPresentationDraftData = {
   body: PresentationDraftRequest;
@@ -12420,8 +14109,15 @@ export type InvestigationPresentationDraftResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AiReasoningRunOut;
+  /**
+   * Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})
+   */
+  202: AiReasoningRunOut;
 };
+
+export type InvestigationPresentationDraftResponse =
+  InvestigationPresentationDraftResponses[keyof InvestigationPresentationDraftResponses];
 
 export type ListClaimsData = {
   body?: never;
@@ -12576,8 +14272,11 @@ export type GetOpenalephCorpusBindingResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: OpenAlephCorpusBindingOut;
 };
+
+export type GetOpenalephCorpusBindingResponse =
+  GetOpenalephCorpusBindingResponses[keyof GetOpenalephCorpusBindingResponses];
 
 export type EnsureOpenalephCorpusBindingData = {
   body?: never;
@@ -12605,8 +14304,11 @@ export type EnsureOpenalephCorpusBindingResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: OpenAlephCorpusBindingOut;
 };
+
+export type EnsureOpenalephCorpusBindingResponse =
+  EnsureOpenalephCorpusBindingResponses[keyof EnsureOpenalephCorpusBindingResponses];
 
 export type ListOpenalephCorpusFailuresData = {
   body?: never;
@@ -12632,10 +14334,15 @@ export type ListOpenalephCorpusFailuresError =
 
 export type ListOpenalephCorpusFailuresResponses = {
   /**
+   * Response List Openaleph Corpus Failures
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<OpenAlephOperationFailureOut>;
 };
+
+export type ListOpenalephCorpusFailuresResponse =
+  ListOpenalephCorpusFailuresResponses[keyof ListOpenalephCorpusFailuresResponses];
 
 export type ListDecksEndpointData = {
   body?: never;
@@ -12663,8 +14370,11 @@ export type ListDecksEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: DecksOut;
 };
+
+export type ListDecksEndpointResponse =
+  ListDecksEndpointResponses[keyof ListDecksEndpointResponses];
 
 export type InvestigationDeletionPreviewData = {
   body?: never;
@@ -12858,10 +14568,13 @@ export type ExportInvestigationError =
 
 export type ExportInvestigationResponses = {
   /**
-   * Successful Response
+   * A portable backup of the investigation (.jwbackup.zip)
    */
-  200: unknown;
+  200: Blob | File;
 };
+
+export type ExportInvestigationResponse =
+  ExportInvestigationResponses[keyof ExportInvestigationResponses];
 
 export type GetInvestigationFinancialFlowsData = {
   body?: never;
@@ -13312,8 +15025,11 @@ export type ListWriteupsEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: WriteupsOut;
 };
+
+export type ListWriteupsEndpointResponse =
+  ListWriteupsEndpointResponses[keyof ListWriteupsEndpointResponses];
 
 export type ListJobsEndpointData = {
   body?: never;
@@ -13661,8 +15377,11 @@ export type PresentationStylesResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: PresentationStyleCatalogOut;
 };
+
+export type PresentationStylesResponse =
+  PresentationStylesResponses[keyof PresentationStylesResponses];
 
 export type FindExtractionLineageEndpointData = {
   body?: never;
@@ -13747,8 +15466,11 @@ export type RelationshipSchemasResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: RelationshipSchemasOut;
 };
+
+export type RelationshipSchemasResponse =
+  RelationshipSchemasResponses[keyof RelationshipSchemasResponses];
 
 export type CreateCanonicalRelationshipData = {
   body: RelationshipCreate;
@@ -14045,12 +15767,7 @@ export type DeleteConnectorCredentialResponse =
   DeleteConnectorCredentialResponses[keyof DeleteConnectorCredentialResponses];
 
 export type SaveConnectorCredentialData = {
-  /**
-   * Body
-   */
-  body: {
-    [key: string]: unknown;
-  };
+  body: ConnectorCredentialPut;
   path: {
     /**
      * Provider
@@ -14166,12 +15883,7 @@ export type GetSecurityAuditResponse =
   GetSecurityAuditResponses[keyof GetSecurityAuditResponses];
 
 export type PruneSecurityAuditData = {
-  /**
-   * Body
-   */
-  body: {
-    [key: string]: unknown;
-  };
+  body: SecurityAuditRetentionRequest;
   path?: never;
   query?: never;
   url: '/api/settings/security/audit/retention';
@@ -14259,10 +15971,15 @@ export type ListAppUsersData = {
 
 export type ListAppUsersResponses = {
   /**
+   * Response List App Users
+   *
    * Successful Response
    */
-  200: unknown;
+  200: Array<AppUserOut>;
 };
+
+export type ListAppUsersResponse =
+  ListAppUsersResponses[keyof ListAppUsersResponses];
 
 export type CreateAppUserData = {
   body: AppUserCreate;
@@ -14284,8 +16001,11 @@ export type CreateAppUserResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AppUserCreatedOut;
 };
+
+export type CreateAppUserResponse =
+  CreateAppUserResponses[keyof CreateAppUserResponses];
 
 export type UpdateAppUserData = {
   body: AppUserUpdate;
@@ -14312,8 +16032,11 @@ export type UpdateAppUserResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AppUserUpdatedOut;
 };
+
+export type UpdateAppUserResponse =
+  UpdateAppUserResponses[keyof UpdateAppUserResponses];
 
 export type DeleteInvestigationMembershipData = {
   body?: never;
@@ -14381,8 +16104,11 @@ export type PutInvestigationMembershipResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: InvestigationMembershipOut;
 };
+
+export type PutInvestigationMembershipResponse =
+  PutInvestigationMembershipResponses[keyof PutInvestigationMembershipResponses];
 
 export type RevokeAppUserTokenData = {
   body?: never;
@@ -14410,8 +16136,11 @@ export type RevokeAppUserTokenResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AppUserTokenRevokedOut;
 };
+
+export type RevokeAppUserTokenResponse =
+  RevokeAppUserTokenResponses[keyof RevokeAppUserTokenResponses];
 
 export type RotateAppUserTokenData = {
   body?: never;
@@ -14439,8 +16168,11 @@ export type RotateAppUserTokenResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: AppUserTokenRotatedOut;
 };
+
+export type RotateAppUserTokenResponse =
+  RotateAppUserTokenResponses[keyof RotateAppUserTokenResponses];
 
 export type SettingsStatusData = {
   body?: never;
@@ -14617,8 +16349,11 @@ export type CreateWriteupEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: WriteupOut;
 };
+
+export type CreateWriteupEndpointResponse =
+  CreateWriteupEndpointResponses[keyof CreateWriteupEndpointResponses];
 
 export type DeleteWriteupEndpointData = {
   body?: never;
@@ -14646,8 +16381,11 @@ export type DeleteWriteupEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: DeletedOut;
 };
+
+export type DeleteWriteupEndpointResponse =
+  DeleteWriteupEndpointResponses[keyof DeleteWriteupEndpointResponses];
 
 export type GetWriteupEndpointData = {
   body?: never;
@@ -14675,8 +16413,11 @@ export type GetWriteupEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: WriteupOut;
 };
+
+export type GetWriteupEndpointResponse =
+  GetWriteupEndpointResponses[keyof GetWriteupEndpointResponses];
 
 export type UpdateWriteupEndpointData = {
   body: WriteupUpdate;
@@ -14704,8 +16445,11 @@ export type UpdateWriteupEndpointResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: WriteupOut;
 };
+
+export type UpdateWriteupEndpointResponse =
+  UpdateWriteupEndpointResponses[keyof UpdateWriteupEndpointResponses];
 
 export type ExportWriteupDocxData = {
   body?: never;
@@ -14731,7 +16475,10 @@ export type ExportWriteupDocxError =
 
 export type ExportWriteupDocxResponses = {
   /**
-   * Successful Response
+   * The write-up as a Word document
    */
-  200: unknown;
+  200: Blob | File;
 };
+
+export type ExportWriteupDocxResponse =
+  ExportWriteupDocxResponses[keyof ExportWriteupDocxResponses];

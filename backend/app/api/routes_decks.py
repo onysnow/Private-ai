@@ -3,7 +3,7 @@ CRUD and .pptx export live in app/services/decks.py; routes stay thin per
 STRUCT-0002.
 """
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.responses import StreamingResponse
 from io import BytesIO
 from sqlalchemy.orm import Session
@@ -12,20 +12,23 @@ from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
 from app.models.domain import Deck, Investigation
 from app.schemas.api import DeckUpdate
+from app.schemas.responses import DeckOut, DecksOut, DeletedOut, file_response
 from app.services.assistant_context import describe_record_refs
 from app.services.decks import deck_citation_refs, delete_deck, list_decks, render_deck_pptx, serialize_deck, update_deck
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
+PPTX = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
 
-@router.get("/investigations/{investigation_id}/decks", response_model=None)
+
+@router.get("/investigations/{investigation_id}/decks", response_model=DecksOut)
 def list_decks_endpoint(investigation_id: str, db: Session = Depends(get_db)) -> Any:
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     return {"decks": [serialize_deck(row) for row in list_decks(db, investigation_id)]}
 
 
-@router.get("/decks/{deck_id}", response_model=None)
+@router.get("/decks/{deck_id}", response_model=DeckOut)
 def get_deck_endpoint(deck_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(Deck, deck_id)
     if row is None:
@@ -33,7 +36,7 @@ def get_deck_endpoint(deck_id: str, db: Session = Depends(get_db)) -> Any:
     return serialize_deck(row)
 
 
-@router.patch("/decks/{deck_id}", response_model=None)
+@router.patch("/decks/{deck_id}", response_model=DeckOut)
 def update_deck_endpoint(deck_id: str, body: DeckUpdate, db: Session = Depends(get_db)) -> Any:
     row = db.get(Deck, deck_id)
     if row is None:
@@ -42,7 +45,7 @@ def update_deck_endpoint(deck_id: str, body: DeckUpdate, db: Session = Depends(g
     return serialize_deck(row)
 
 
-@router.delete("/decks/{deck_id}", response_model=None)
+@router.delete("/decks/{deck_id}", response_model=DeletedOut)
 def delete_deck_endpoint(deck_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(Deck, deck_id)
     if row is None:
@@ -51,7 +54,7 @@ def delete_deck_endpoint(deck_id: str, db: Session = Depends(get_db)) -> Any:
     return {"deleted": True}
 
 
-@router.get("/decks/{deck_id}/export.pptx")
+@router.get("/decks/{deck_id}/export.pptx", response_class=Response, responses=file_response(PPTX, "The deck as an editable PowerPoint file"))
 def export_deck_pptx(deck_id: str, db: Session = Depends(get_db)) -> StreamingResponse:
     row = db.get(Deck, deck_id)
     if row is None:
@@ -64,6 +67,6 @@ def export_deck_pptx(deck_id: str, db: Session = Depends(get_db)) -> StreamingRe
     filename = "".join(c for c in row.title if c.isalnum() or c in " _-").strip() or "deck"
     return StreamingResponse(
         buf,
-        media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        media_type=PPTX,
         headers={"Content-Disposition": f'attachment; filename="{filename}.pptx"'},
     )

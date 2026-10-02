@@ -145,6 +145,350 @@
         "title": "AggregateProvenanceOut",
         "type": "object"
       },
+      "AiAnalysisCandidateOut": {
+        "description": "One proposal in full. `payload` is the model's output in its module's\nown schema (app/ai/reasoning.py OUTPUT_SCHEMAS), or the raw text of a run\nwhose output could not be used; `trace` is what the model was sent\n(rows from before the trace was kept have none). A presentation draft\nalso carries readable details for every record it cites and the slides\na promotion would make; other modules leave both keys out.",
+        "properties": {
+          "accepted_record_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted Record Id"
+          },
+          "accepted_record_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted Record Type"
+          },
+          "checked_citation_count": {
+            "title": "Checked Citation Count",
+            "type": "integer"
+          },
+          "checked_citation_ids": {
+            "items": {
+              "$ref": "#/components/schemas/RecordRefOut"
+            },
+            "title": "Checked Citation Ids",
+            "type": "array"
+          },
+          "citation_details": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/CitationDetailOut"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Citation Details"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "deck_preview": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/DeckSlideOut"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deck Preview"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "module": {
+            "title": "Module",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          },
+          "rejection_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejection Reason"
+          },
+          "request": {
+            "additionalProperties": true,
+            "title": "Request",
+            "type": "object"
+          },
+          "review_status": {
+            "title": "Review Status",
+            "type": "string"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "reviewer_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewer Note"
+          },
+          "trace": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trace"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "module",
+          "request",
+          "review_status",
+          "confidence",
+          "reviewer_note",
+          "accepted_record_type",
+          "accepted_record_id",
+          "created_at",
+          "reviewed_at",
+          "checked_citation_count",
+          "rejection_reason",
+          "payload",
+          "checked_citation_ids",
+          "trace"
+        ],
+        "title": "AiAnalysisCandidateOut",
+        "type": "object"
+      },
+      "AiAnalysisCandidateReviewOut": {
+        "description": "The reply to a review decision on a proposal.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "module": {
+            "title": "Module",
+            "type": "string"
+          },
+          "review_status": {
+            "title": "Review Status",
+            "type": "string"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "reviewer_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewer Note"
+          }
+        },
+        "required": [
+          "id",
+          "module",
+          "review_status",
+          "reviewer_note",
+          "reviewed_at"
+        ],
+        "title": "AiAnalysisCandidateReviewOut",
+        "type": "object"
+      },
+      "AiAnalysisCandidateSummaryOut": {
+        "description": "A reasoning run's proposal as the review queue lists it, without its\npayload. `request` is what the reporter asked, as recorded when the run\nwas made; its keys depend on the version that recorded it (record_refs\narrived with presentation drafts, for one), so it stays open.\n`rejection_reason` is one of the automatic rejection reasons, \"reviewer\"\nfor a human rejection, or null when not rejected.",
+        "properties": {
+          "accepted_record_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted Record Id"
+          },
+          "accepted_record_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted Record Type"
+          },
+          "checked_citation_count": {
+            "title": "Checked Citation Count",
+            "type": "integer"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "module": {
+            "title": "Module",
+            "type": "string"
+          },
+          "rejection_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejection Reason"
+          },
+          "request": {
+            "additionalProperties": true,
+            "title": "Request",
+            "type": "object"
+          },
+          "review_status": {
+            "title": "Review Status",
+            "type": "string"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "reviewer_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewer Note"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "module",
+          "request",
+          "review_status",
+          "confidence",
+          "reviewer_note",
+          "accepted_record_type",
+          "accepted_record_id",
+          "created_at",
+          "reviewed_at",
+          "checked_citation_count",
+          "rejection_reason"
+        ],
+        "title": "AiAnalysisCandidateSummaryOut",
+        "type": "object"
+      },
+      "AiAnalysisCandidatesOut": {
+        "properties": {
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/AiAnalysisCandidateSummaryOut"
+            },
+            "title": "Candidates",
+            "type": "array"
+          }
+        },
+        "required": [
+          "candidates"
+        ],
+        "title": "AiAnalysisCandidatesOut",
+        "type": "object"
+      },
       "AiControlFlagOut": {
         "properties": {
           "allowed": {
@@ -241,6 +585,54 @@
           "vendored_tas"
         ],
         "title": "AiModuleStatusOut",
+        "type": "object"
+      },
+      "AiReasoningRunOut": {
+        "description": "The reply to a reasoning run. Run in the request (developer mode): the\nproposal it made for review, with the finished job. Queued (the Docker\nstack, HTTP 202): no proposal yet, and the job to follow; its `result`\nholds this same proposal when it is done.",
+        "properties": {
+          "candidate_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Id"
+          },
+          "job": {
+            "$ref": "#/components/schemas/BackgroundJobOut"
+          },
+          "payload": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payload"
+          },
+          "review_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Status"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "job"
+        ],
+        "title": "AiReasoningRunOut",
         "type": "object"
       },
       "AiReasoningStatusOut": {
@@ -427,6 +819,224 @@
         "title": "AppUserCreate",
         "type": "object"
       },
+      "AppUserCreatedOut": {
+        "description": "A new identity and its token, shown this once: only the token's digest is kept.",
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "global_role": {
+            "title": "Global Role",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "token": {
+            "title": "Token",
+            "type": "string"
+          },
+          "token_notice": {
+            "title": "Token Notice",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "global_role",
+          "token",
+          "token_notice"
+        ],
+        "title": "AppUserCreatedOut",
+        "type": "object"
+      },
+      "AppUserMembershipOut": {
+        "properties": {
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "role"
+        ],
+        "title": "AppUserMembershipOut",
+        "type": "object"
+      },
+      "AppUserOut": {
+        "description": "A persisted API identity: its token's history, never the token or its digest.",
+        "properties": {
+          "disabled": {
+            "title": "Disabled",
+            "type": "boolean"
+          },
+          "disabled_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Disabled At"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "global_role": {
+            "title": "Global Role",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "memberships": {
+            "items": {
+              "$ref": "#/components/schemas/AppUserMembershipOut"
+            },
+            "title": "Memberships",
+            "type": "array"
+          },
+          "token_created_at": {
+            "format": "date-time",
+            "title": "Token Created At",
+            "type": "string"
+          },
+          "token_last_used_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token Last Used At"
+          },
+          "token_revoked_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token Revoked At"
+          },
+          "token_rotated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token Rotated At"
+          },
+          "token_status": {
+            "enum": [
+              "active",
+              "disabled",
+              "revoked"
+            ],
+            "title": "Token Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "global_role",
+          "disabled",
+          "disabled_at",
+          "token_created_at",
+          "token_last_used_at",
+          "token_rotated_at",
+          "token_revoked_at",
+          "token_status",
+          "memberships"
+        ],
+        "title": "AppUserOut",
+        "type": "object"
+      },
+      "AppUserTokenRevokedOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "token_revoked_at": {
+            "format": "date-time",
+            "title": "Token Revoked At",
+            "type": "string"
+          },
+          "token_status": {
+            "const": "revoked",
+            "title": "Token Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "token_revoked_at",
+          "token_status"
+        ],
+        "title": "AppUserTokenRevokedOut",
+        "type": "object"
+      },
+      "AppUserTokenRotatedOut": {
+        "description": "The replacement token, shown this once.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "token": {
+            "title": "Token",
+            "type": "string"
+          },
+          "token_created_at": {
+            "format": "date-time",
+            "title": "Token Created At",
+            "type": "string"
+          },
+          "token_notice": {
+            "title": "Token Notice",
+            "type": "string"
+          },
+          "token_rotated_at": {
+            "format": "date-time",
+            "title": "Token Rotated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "token",
+          "token_created_at",
+          "token_rotated_at",
+          "token_notice"
+        ],
+        "title": "AppUserTokenRotatedOut",
+        "type": "object"
+      },
       "AppUserUpdate": {
         "properties": {
           "disabled": {
@@ -464,6 +1074,57 @@
           }
         },
         "title": "AppUserUpdate",
+        "type": "object"
+      },
+      "AppUserUpdatedOut": {
+        "properties": {
+          "disabled": {
+            "title": "Disabled",
+            "type": "boolean"
+          },
+          "disabled_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Disabled At"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "global_role": {
+            "title": "Global Role",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "token_status": {
+            "enum": [
+              "active",
+              "disabled",
+              "revoked"
+            ],
+            "title": "Token Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "global_role",
+          "disabled",
+          "disabled_at",
+          "token_status"
+        ],
+        "title": "AppUserUpdatedOut",
         "type": "object"
       },
       "ApplyIn": {
@@ -639,6 +1300,29 @@
         "title": "BackgroundJobOut",
         "type": "object"
       },
+      "BackupInspectOut": {
+        "description": "A checked archive's own manifest.json, echoed back as read (only its\nformat, version, checksums and lineage are verified), and how many rows\nof each table it holds.",
+        "properties": {
+          "manifest": {
+            "additionalProperties": true,
+            "title": "Manifest",
+            "type": "object"
+          },
+          "record_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Record Counts",
+            "type": "object"
+          }
+        },
+        "required": [
+          "manifest",
+          "record_counts"
+        ],
+        "title": "BackupInspectOut",
+        "type": "object"
+      },
       "BackupInvestigationOut": {
         "properties": {
           "description": {
@@ -769,6 +1453,81 @@
           "manifest"
         ],
         "title": "BackupRestoreResultOut",
+        "type": "object"
+      },
+      "BarItemOut": {
+        "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/RecordRefOut"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "label",
+          "evidence",
+          "value"
+        ],
+        "title": "BarItemOut",
+        "type": "object"
+      },
+      "BarVisualOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BarItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "style": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VisualStyleOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "const": "bar",
+            "title": "Type",
+            "type": "string"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "unit",
+          "items"
+        ],
+        "title": "BarVisualOut",
         "type": "object"
       },
       "Body_inspect_backup": {
@@ -1320,6 +2079,46 @@
         "title": "CanonicalStatementOut",
         "type": "object"
       },
+      "CapabilitiesOut": {
+        "properties": {
+          "ai_features_enabled": {
+            "title": "Ai Features Enabled",
+            "type": "boolean"
+          },
+          "core": {
+            "$ref": "#/components/schemas/CoreCapabilitiesOut"
+          },
+          "mode": {
+            "enum": [
+              "integrated_preview",
+              "core_preview"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "platforms": {
+            "$ref": "#/components/schemas/PlatformsOut"
+          },
+          "product": {
+            "title": "Product",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product",
+          "mode",
+          "ai_features_enabled",
+          "core",
+          "platforms",
+          "note"
+        ],
+        "title": "CapabilitiesOut",
+        "type": "object"
+      },
       "CaseSynthesisRequest": {
         "properties": {
           "include_external_leads": {
@@ -1424,6 +2223,55 @@
         "title": "ChartKind",
         "type": "string"
       },
+      "ChartVisualOut": {
+        "description": "A checked chart (app/ai/chart_check.py) as a deck keeps it: the order\nslip, the data the Workbench cooked from the records (every value with\nits records), the check report and the chart's words, as the draft or\nthe deck editor stored them; and the drawing that passed, when the deck\ncame from a checked draft. The deck insists only on a valid order slip\nand its data (app/services/decks.py normalize_chart_visual), so the\nreport and the words are passed on as stored.",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/VisualDataOut"
+          },
+          "option": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Option"
+          },
+          "report": {
+            "additionalProperties": true,
+            "title": "Report",
+            "type": "object"
+          },
+          "spec": {
+            "additionalProperties": true,
+            "title": "Spec",
+            "type": "object"
+          },
+          "text": {
+            "additionalProperties": true,
+            "title": "Text",
+            "type": "object"
+          },
+          "type": {
+            "const": "chart",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "spec",
+          "data",
+          "report",
+          "text"
+        ],
+        "title": "ChartVisualOut",
+        "type": "object"
+      },
       "CheckItemOut": {
         "properties": {
           "message": {
@@ -1485,6 +2333,105 @@
           "not_checked"
         ],
         "title": "CheckReportOut",
+        "type": "object"
+      },
+      "CitationDetailOut": {
+        "description": "A cited record in words, for the review panel's evidence chips and an\nexport's source list; `missing` when the record no longer resolves.",
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "locator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locator"
+          },
+          "missing": {
+            "title": "Missing",
+            "type": "boolean"
+          },
+          "quote": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quote"
+          },
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_type": {
+            "title": "Record Type",
+            "type": "string"
+          },
+          "source_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Title"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "trace_record_type": {
+            "title": "Trace Record Type",
+            "type": "string"
+          },
+          "type_label": {
+            "title": "Type Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_type",
+          "record_id",
+          "trace_record_type",
+          "type_label",
+          "label",
+          "quote",
+          "locator",
+          "source_title",
+          "source_url",
+          "detail",
+          "missing"
+        ],
+        "title": "CitationDetailOut",
         "type": "object"
       },
       "ClaimCreate": {
@@ -2140,6 +3087,24 @@
         "title": "ConfirmIn",
         "type": "object"
       },
+      "ConnectorCredentialPut": {
+        "description": "A connector's secret (PUT /settings/connectors/{provider}/credential).\nOptional here so a missing secret gets the same 400 a blank one does\n(app/services/settings.py save_connector_credential).",
+        "properties": {
+          "credential": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credential"
+          }
+        },
+        "title": "ConnectorCredentialPut",
+        "type": "object"
+      },
       "ConnectorCredentialRemovedOut": {
         "properties": {
           "configured": {
@@ -2468,6 +3433,262 @@
         "title": "ConnectorsOut",
         "type": "object"
       },
+      "ContextCitationOut": {
+        "description": "A record the model may cite, with where to trace it.",
+        "properties": {
+          "locator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locator"
+          },
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_type": {
+            "title": "Record Type",
+            "type": "string"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Id"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "trace_record_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trace Record Id"
+          },
+          "trace_record_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trace Record Type"
+          }
+        },
+        "required": [
+          "record_type",
+          "record_id",
+          "title",
+          "locator",
+          "source_id",
+          "source_url",
+          "trace_record_type",
+          "trace_record_id"
+        ],
+        "title": "ContextCitationOut",
+        "type": "object"
+      },
+      "ContextGroupsOut": {
+        "properties": {
+          "canonical": {
+            "items": {
+              "$ref": "#/components/schemas/ContextItemOut"
+            },
+            "title": "Canonical",
+            "type": "array"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/ContextItemOut"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "reporting": {
+            "items": {
+              "$ref": "#/components/schemas/ContextItemOut"
+            },
+            "title": "Reporting",
+            "type": "array"
+          },
+          "review": {
+            "items": {
+              "$ref": "#/components/schemas/ContextItemOut"
+            },
+            "title": "Review",
+            "type": "array"
+          },
+          "workflow": {
+            "items": {
+              "$ref": "#/components/schemas/ContextItemOut"
+            },
+            "title": "Workflow",
+            "type": "array"
+          }
+        },
+        "required": [
+          "canonical",
+          "evidence",
+          "reporting",
+          "workflow",
+          "review"
+        ],
+        "title": "ContextGroupsOut",
+        "type": "object"
+      },
+      "ContextItemOut": {
+        "description": "One search hit in the retrieval packet. `provenance` and `metadata`\nare the search hit's own (each record type adds its own keys).",
+        "properties": {
+          "citation": {
+            "$ref": "#/components/schemas/ContextCitationOut"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          },
+          "provenance": {
+            "additionalProperties": true,
+            "title": "Provenance",
+            "type": "object"
+          },
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_type": {
+            "title": "Record Type",
+            "type": "string"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          },
+          "snippet": {
+            "title": "Snippet",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_type",
+          "record_id",
+          "title",
+          "snippet",
+          "score",
+          "provenance",
+          "metadata",
+          "citation"
+        ],
+        "title": "ContextItemOut",
+        "type": "object"
+      },
+      "CoreCapabilitiesOut": {
+        "description": "The parts of the core workbench this server runs; every one runs without AI.",
+        "properties": {
+          "backup_restore": {
+            "title": "Backup Restore",
+            "type": "boolean"
+          },
+          "claims": {
+            "title": "Claims",
+            "type": "boolean"
+          },
+          "connectors": {
+            "title": "Connectors",
+            "type": "boolean"
+          },
+          "documents": {
+            "title": "Documents",
+            "type": "boolean"
+          },
+          "dossiers": {
+            "title": "Dossiers",
+            "type": "boolean"
+          },
+          "evidence": {
+            "title": "Evidence",
+            "type": "boolean"
+          },
+          "investigations": {
+            "title": "Investigations",
+            "type": "boolean"
+          },
+          "leads_and_tasks": {
+            "title": "Leads And Tasks",
+            "type": "boolean"
+          },
+          "provenance": {
+            "title": "Provenance",
+            "type": "boolean"
+          },
+          "relationships": {
+            "title": "Relationships",
+            "type": "boolean"
+          },
+          "search": {
+            "title": "Search",
+            "type": "boolean"
+          },
+          "sources": {
+            "title": "Sources",
+            "type": "boolean"
+          },
+          "timeline": {
+            "title": "Timeline",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "investigations",
+          "documents",
+          "sources",
+          "evidence",
+          "claims",
+          "relationships",
+          "search",
+          "dossiers",
+          "timeline",
+          "leads_and_tasks",
+          "provenance",
+          "connectors",
+          "backup_restore"
+        ],
+        "title": "CoreCapabilitiesOut",
+        "type": "object"
+      },
       "CreateIn": {
         "properties": {
           "kind": {
@@ -2665,6 +3886,163 @@
         "title": "DataTableRowOut",
         "type": "object"
       },
+      "DeckOut": {
+        "description": "A presentation deck. Every key is always sent, so the nullable ones have no default.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "slide_count": {
+            "title": "Slide Count",
+            "type": "integer"
+          },
+          "slides": {
+            "items": {
+              "$ref": "#/components/schemas/DeckSlideOut"
+            },
+            "title": "Slides",
+            "type": "array"
+          },
+          "source_ai_candidate_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Ai Candidate Id"
+          },
+          "style": {
+            "$ref": "#/components/schemas/DeckStyleOut"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "title",
+          "slides",
+          "slide_count",
+          "style",
+          "source_ai_candidate_id",
+          "created_by",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "DeckOut",
+        "type": "object"
+      },
+      "DeckSlideOut": {
+        "description": "One slide as a deck stores it (app/services/decks.py _normalize_slides).",
+        "properties": {
+          "bullets": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Bullets",
+            "type": "array"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/RecordRefOut"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "heading": {
+            "title": "Heading",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "title",
+              "statement",
+              "content",
+              "questions"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "notes": {
+            "title": "Notes",
+            "type": "string"
+          },
+          "visual": {
+            "anyOf": [
+              {
+                "discriminator": {
+                  "mapping": {
+                    "bar": "#/components/schemas/BarVisualOut",
+                    "chart": "#/components/schemas/ChartVisualOut",
+                    "figures": "#/components/schemas/FiguresVisualOut",
+                    "timeline": "#/components/schemas/TimelineVisualOut"
+                  },
+                  "propertyName": "type"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/FiguresVisualOut"
+                  },
+                  {
+                    "$ref": "#/components/schemas/TimelineVisualOut"
+                  },
+                  {
+                    "$ref": "#/components/schemas/BarVisualOut"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ChartVisualOut"
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visual"
+          }
+        },
+        "required": [
+          "kind",
+          "heading",
+          "bullets",
+          "evidence",
+          "notes",
+          "visual"
+        ],
+        "title": "DeckSlideOut",
+        "type": "object"
+      },
       "DeckStyle": {
         "properties": {
           "fonts": {
@@ -2691,6 +4069,129 @@
           }
         },
         "title": "DeckStyle",
+        "type": "object"
+      },
+      "DeckStyleOut": {
+        "description": "A deck's look: a theme id and a font-pair id from the style catalogue.",
+        "properties": {
+          "fonts": {
+            "title": "Fonts",
+            "type": "string"
+          },
+          "theme": {
+            "title": "Theme",
+            "type": "string"
+          }
+        },
+        "required": [
+          "theme",
+          "fonts"
+        ],
+        "title": "DeckStyleOut",
+        "type": "object"
+      },
+      "DeckThemeOut": {
+        "description": "One deck theme: colours as six hex digits without '#', and its own fonts.",
+        "properties": {
+          "accent": {
+            "title": "Accent",
+            "type": "string"
+          },
+          "accent_text": {
+            "title": "Accent Text",
+            "type": "string"
+          },
+          "alert": {
+            "title": "Alert",
+            "type": "string"
+          },
+          "bar_muted": {
+            "title": "Bar Muted",
+            "type": "string"
+          },
+          "body_font": {
+            "title": "Body Font",
+            "type": "string"
+          },
+          "cover_accent": {
+            "title": "Cover Accent",
+            "type": "string"
+          },
+          "cover_bg": {
+            "title": "Cover Bg",
+            "type": "string"
+          },
+          "cover_line": {
+            "title": "Cover Line",
+            "type": "string"
+          },
+          "cover_muted": {
+            "title": "Cover Muted",
+            "type": "string"
+          },
+          "cover_text": {
+            "title": "Cover Text",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "heading_font": {
+            "title": "Heading Font",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "muted": {
+            "title": "Muted",
+            "type": "string"
+          },
+          "page": {
+            "title": "Page",
+            "type": "string"
+          },
+          "panel": {
+            "title": "Panel",
+            "type": "string"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "description",
+          "cover_bg",
+          "cover_line",
+          "cover_text",
+          "cover_muted",
+          "cover_accent",
+          "accent",
+          "accent_text",
+          "alert",
+          "page",
+          "panel",
+          "rule",
+          "text",
+          "muted",
+          "bar_muted",
+          "heading_font",
+          "body_font"
+        ],
+        "title": "DeckThemeOut",
         "type": "object"
       },
       "DeckUpdate": {
@@ -2735,6 +4236,35 @@
           }
         },
         "title": "DeckUpdate",
+        "type": "object"
+      },
+      "DecksOut": {
+        "properties": {
+          "decks": {
+            "items": {
+              "$ref": "#/components/schemas/DeckOut"
+            },
+            "title": "Decks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "decks"
+        ],
+        "title": "DecksOut",
+        "type": "object"
+      },
+      "DeletedOut": {
+        "properties": {
+          "deleted": {
+            "title": "Deleted",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "deleted"
+        ],
+        "title": "DeletedOut",
         "type": "object"
       },
       "DeletionDocumentFile": {
@@ -2825,6 +4355,24 @@
           "error"
         ],
         "title": "DeletionUnsafePath",
+        "type": "object"
+      },
+      "DemoSeedOut": {
+        "properties": {
+          "created": {
+            "title": "Created",
+            "type": "boolean"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "created"
+        ],
+        "title": "DemoSeedOut",
         "type": "object"
       },
       "DisabledIn": {
@@ -4417,6 +5965,58 @@
           "unresolved_decision_count"
         ],
         "title": "EntityIdentityHistoryOut",
+        "type": "object"
+      },
+      "EntityMatchPreviewOut": {
+        "description": "Canonical entities an entity proposal may be, before the reporter decides.",
+        "properties": {
+          "candidate_id": {
+            "title": "Candidate Id",
+            "type": "string"
+          },
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "identity_rule": {
+            "title": "Identity Rule",
+            "type": "string"
+          },
+          "matches": {
+            "items": {
+              "$ref": "#/components/schemas/EntityCandidateOut"
+            },
+            "title": "Matches",
+            "type": "array"
+          },
+          "provider_lead": {
+            "$ref": "#/components/schemas/ProviderLeadOut"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "strong_match": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EntityCandidateOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "candidate_id",
+          "caption",
+          "schema",
+          "matches",
+          "strong_match",
+          "provider_lead",
+          "identity_rule"
+        ],
+        "title": "EntityMatchPreviewOut",
         "type": "object"
       },
       "EntityOut": {
@@ -6394,6 +7994,64 @@
         "title": "ExtractionReviewOut",
         "type": "object"
       },
+      "FigureItemOut": {
+        "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/RecordRefOut"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "evidence",
+          "value"
+        ],
+        "title": "FigureItemOut",
+        "type": "object"
+      },
+      "FiguresVisualOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/FigureItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "style": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VisualStyleOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": {
+            "const": "figures",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "items"
+        ],
+        "title": "FiguresVisualOut",
+        "type": "object"
+      },
       "FinancialLedgerOut": {
         "properties": {
           "currencies": {
@@ -6595,6 +8253,35 @@
         "title": "FlagIn",
         "type": "object"
       },
+      "FontPairOut": {
+        "description": "A heading and body font; empty names mean \"keep the theme's own\".",
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "heading": {
+            "title": "Heading",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "heading",
+          "body"
+        ],
+        "title": "FontPairOut",
+        "type": "object"
+      },
       "GraphNodeOut": {
         "description": "A canonical entity that is an endpoint of a shown edge.",
         "properties": {
@@ -6711,6 +8398,20 @@
           }
         },
         "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HealthOut": {
+        "properties": {
+          "status": {
+            "const": "ok",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "HealthOut",
         "type": "object"
       },
       "HypothesisTestRequest": {
@@ -7221,6 +8922,29 @@
           "missing_document_files"
         ],
         "title": "InvestigationDeletionResult",
+        "type": "object"
+      },
+      "InvestigationMembershipOut": {
+        "properties": {
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "user_id": {
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "investigation_id",
+          "role"
+        ],
+        "title": "InvestigationMembershipOut",
         "type": "object"
       },
       "InvestigationMembershipPut": {
@@ -8644,6 +10368,26 @@
         "title": "OpenAlephBindingOut",
         "type": "object"
       },
+      "OpenAlephCorpusBindingOut": {
+        "description": "The investigation's OpenAleph collection, or null before one is set up.",
+        "properties": {
+          "binding": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OpenAlephBindingOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "binding"
+        ],
+        "title": "OpenAlephCorpusBindingOut",
+        "type": "object"
+      },
       "OpenAlephDocumentSyncOut": {
         "properties": {
           "sync": {
@@ -8778,6 +10522,71 @@
         "title": "OpenAlephEvidenceImportOut",
         "type": "object"
       },
+      "OpenAlephOperationFailureOut": {
+        "description": "A failed OpenAleph pipeline step, kept server-side so a 502 can be explained later.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "error": {
+            "title": "Error",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "operation": {
+            "title": "Operation",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "document_id",
+          "operation",
+          "error",
+          "created_at"
+        ],
+        "title": "OpenAlephOperationFailureOut",
+        "type": "object"
+      },
+      "OpenAlephPlatformOut": {
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "enabled",
+          "role"
+        ],
+        "title": "OpenAlephPlatformOut",
+        "type": "object"
+      },
       "OpenAlephReviewRefreshOut": {
         "properties": {
           "document_id": {
@@ -8891,6 +10700,57 @@
           "provider_candidate_rejected"
         ],
         "title": "OpenAlephReviewStatusOut",
+        "type": "object"
+      },
+      "OpenAlephStatusOut": {
+        "description": "Whether the local OpenAleph corpus platform answers its search API.\nEvery key is always sent, so the nullable one has no default.",
+        "properties": {
+          "api_usable": {
+            "title": "Api Usable",
+            "type": "boolean"
+          },
+          "base_url": {
+            "title": "Base Url",
+            "type": "string"
+          },
+          "configured": {
+            "title": "Configured",
+            "type": "boolean"
+          },
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "http_status": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Http Status"
+          },
+          "reachable": {
+            "title": "Reachable",
+            "type": "boolean"
+          },
+          "ui_url": {
+            "title": "Ui Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "configured",
+          "base_url",
+          "ui_url",
+          "reachable",
+          "api_usable",
+          "http_status",
+          "detail"
+        ],
+        "title": "OpenAlephStatusOut",
         "type": "object"
       },
       "OpenAlephSyncOut": {
@@ -9075,6 +10935,18 @@
         "title": "PlanIn",
         "type": "object"
       },
+      "PlatformsOut": {
+        "properties": {
+          "openaleph": {
+            "$ref": "#/components/schemas/OpenAlephPlatformOut"
+          }
+        },
+        "required": [
+          "openaleph"
+        ],
+        "title": "PlatformsOut",
+        "type": "object"
+      },
       "PostMergeReconciliationOut": {
         "description": "The duplicate pairs a merge left behind, for the reporter to review.\nNothing is deleted: a decision only records which record is preferred.",
         "properties": {
@@ -9182,6 +11054,43 @@
           "record_refs"
         ],
         "title": "PresentationDraftRequest",
+        "type": "object"
+      },
+      "PresentationStyleCatalogOut": {
+        "description": "Everything the deck style panel and the in-app preview need; the .pptx\nexport reads the same catalogue, so the two cannot drift apart.",
+        "properties": {
+          "defaults": {
+            "$ref": "#/components/schemas/DeckStyleOut"
+          },
+          "font_pairs": {
+            "items": {
+              "$ref": "#/components/schemas/FontPairOut"
+            },
+            "title": "Font Pairs",
+            "type": "array"
+          },
+          "themes": {
+            "items": {
+              "$ref": "#/components/schemas/DeckThemeOut"
+            },
+            "title": "Themes",
+            "type": "array"
+          },
+          "visual_options": {
+            "$ref": "#/components/schemas/VisualOptionsOut"
+          },
+          "visual_presets": {
+            "$ref": "#/components/schemas/VisualPresetsOut"
+          }
+        },
+        "required": [
+          "defaults",
+          "themes",
+          "font_pairs",
+          "visual_presets",
+          "visual_options"
+        ],
+        "title": "PresentationStyleCatalogOut",
         "type": "object"
       },
       "PromoteToDeckRequest": {
@@ -9556,6 +11465,51 @@
         "title": "ProvenanceTraceOut",
         "type": "object"
       },
+      "ProviderLeadOut": {
+        "description": "What an outside provider said the name resolves to: a lead only, never a choice.",
+        "properties": {
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "provider_entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Entity Id"
+          },
+          "provider_resolved_entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Resolved Entity Id"
+          }
+        },
+        "required": [
+          "provider",
+          "provider_entity_id",
+          "provider_resolved_entity_id"
+        ],
+        "title": "ProviderLeadOut",
+        "type": "object"
+      },
       "QueryRef": {
         "additionalProperties": false,
         "description": "One catalogued query and its parameters, as the AI writes them.",
@@ -9576,6 +11530,65 @@
           "name"
         ],
         "title": "QueryRef",
+        "type": "object"
+      },
+      "QuestionContextOut": {
+        "description": "The provenance-bearing packet a reasoning model would be given for a\nquestion. External connector results are a separate, unverified bucket\nand never among the citations.",
+        "properties": {
+          "citations": {
+            "items": {
+              "$ref": "#/components/schemas/ContextCitationOut"
+            },
+            "title": "Citations",
+            "type": "array"
+          },
+          "context": {
+            "$ref": "#/components/schemas/ContextGroupsOut"
+          },
+          "external_leads": {
+            "items": {
+              "$ref": "#/components/schemas/ContextItemOut"
+            },
+            "title": "External Leads",
+            "type": "array"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "reasoning_contract": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "title": "Reasoning Contract",
+            "type": "object"
+          },
+          "retrieval": {
+            "$ref": "#/components/schemas/RetrievalSummaryOut"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "question",
+          "investigation_id",
+          "retrieval",
+          "context",
+          "external_leads",
+          "citations",
+          "reasoning_contract",
+          "warnings"
+        ],
+        "title": "QuestionContextOut",
         "type": "object"
       },
       "ReconciliationDecisionOut": {
@@ -10425,6 +12438,56 @@
         "title": "RelationshipReconciliationOut",
         "type": "object"
       },
+      "RelationshipSchemaOut": {
+        "description": "How the workbench draws one FollowTheMoney relationship schema: its two ends' properties and labels.",
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "source_label": {
+            "title": "Source Label",
+            "type": "string"
+          },
+          "source_prop": {
+            "title": "Source Prop",
+            "type": "string"
+          },
+          "target_label": {
+            "title": "Target Label",
+            "type": "string"
+          },
+          "target_prop": {
+            "title": "Target Prop",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_prop",
+          "target_prop",
+          "source_label",
+          "target_label",
+          "label"
+        ],
+        "title": "RelationshipSchemaOut",
+        "type": "object"
+      },
+      "RelationshipSchemasOut": {
+        "properties": {
+          "schemas": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/RelationshipSchemaOut"
+            },
+            "title": "Schemas",
+            "type": "object"
+          }
+        },
+        "required": [
+          "schemas"
+        ],
+        "title": "RelationshipSchemasOut",
+        "type": "object"
+      },
       "ReportingTaskCreate": {
         "properties": {
           "detail": {
@@ -10839,6 +12902,52 @@
         "title": "RestoreIn",
         "type": "object"
       },
+      "RetrievalSummaryOut": {
+        "properties": {
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "group_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Group Counts",
+            "type": "object"
+          },
+          "query": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Query"
+          },
+          "returned_matches": {
+            "title": "Returned Matches",
+            "type": "integer"
+          },
+          "total_matches": {
+            "title": "Total Matches",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query",
+          "total_matches",
+          "returned_matches",
+          "counts",
+          "group_counts"
+        ],
+        "title": "RetrievalSummaryOut",
+        "type": "object"
+      },
       "RolesIn": {
         "properties": {
           "confirm": {
@@ -11193,6 +13302,28 @@
           "file_bytes"
         ],
         "title": "SecurityAuditRetentionPreviewOut",
+        "type": "object"
+      },
+      "SecurityAuditRetentionRequest": {
+        "description": "Prune the security audit log (POST /settings/security/audit/retention).\n\nStrict, so `true` or \"90\" is refused rather than converted: the route\nrefused anything but a whole number and text before this body was typed.\nThe ranges and the confirmation text are checked by the audit log itself\n(app/core/audit_log.py), which answers 400 with the reason.",
+        "properties": {
+          "confirmation": {
+            "default": "",
+            "title": "Confirmation",
+            "type": "string"
+          },
+          "keep_days": {
+            "default": 90,
+            "title": "Keep Days",
+            "type": "integer"
+          },
+          "max_records": {
+            "default": 5000,
+            "title": "Max Records",
+            "type": "integer"
+          }
+        },
+        "title": "SecurityAuditRetentionRequest",
         "type": "object"
       },
       "SecurityAuditRetentionResultOut": {
@@ -12666,6 +14797,32 @@
         "title": "TimelineEventRowOut",
         "type": "object"
       },
+      "TimelineItemOut": {
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/RecordRefOut"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "evidence",
+          "date"
+        ],
+        "title": "TimelineItemOut",
+        "type": "object"
+      },
       "TimelineOut": {
         "properties": {
           "counts": {
@@ -12716,6 +14873,38 @@
           "offset"
         ],
         "title": "TimelineOut",
+        "type": "object"
+      },
+      "TimelineVisualOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "style": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VisualStyleOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": {
+            "const": "timeline",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "items"
+        ],
+        "title": "TimelineVisualOut",
         "type": "object"
       },
       "TraceClaimLinkOut": {
@@ -13206,6 +15395,76 @@
         "title": "VisualDataRowOut",
         "type": "object"
       },
+      "VisualOptionSpecOut": {
+        "description": "What one option accepts. `values` lists the choices and is sent only for a choice.",
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "bool",
+              "choice",
+              "labels"
+            ],
+            "title": "Type",
+            "type": "string"
+          },
+          "values": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Values"
+          }
+        },
+        "required": [
+          "type",
+          "label"
+        ],
+        "title": "VisualOptionSpecOut",
+        "type": "object"
+      },
+      "VisualOptionsOut": {
+        "properties": {
+          "bar": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/VisualOptionSpecOut"
+            },
+            "title": "Bar",
+            "type": "object"
+          },
+          "figures": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/VisualOptionSpecOut"
+            },
+            "title": "Figures",
+            "type": "object"
+          },
+          "timeline": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/VisualOptionSpecOut"
+            },
+            "title": "Timeline",
+            "type": "object"
+          }
+        },
+        "required": [
+          "bar",
+          "timeline",
+          "figures"
+        ],
+        "title": "VisualOptionsOut",
+        "type": "object"
+      },
       "VisualParamOut": {
         "properties": {
           "choices": {
@@ -13242,6 +15501,98 @@
           "description"
         ],
         "title": "VisualParamOut",
+        "type": "object"
+      },
+      "VisualPresetOut": {
+        "description": "A named layout for one visual type, with its option defaults.",
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "layout": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "title": "Layout",
+            "type": "object"
+          },
+          "options": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Options",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "description",
+          "layout",
+          "options"
+        ],
+        "title": "VisualPresetOut",
+        "type": "object"
+      },
+      "VisualPresetsOut": {
+        "properties": {
+          "bar": {
+            "items": {
+              "$ref": "#/components/schemas/VisualPresetOut"
+            },
+            "title": "Bar",
+            "type": "array"
+          },
+          "figures": {
+            "items": {
+              "$ref": "#/components/schemas/VisualPresetOut"
+            },
+            "title": "Figures",
+            "type": "array"
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/VisualPresetOut"
+            },
+            "title": "Timeline",
+            "type": "array"
+          }
+        },
+        "required": [
+          "bar",
+          "timeline",
+          "figures"
+        ],
+        "title": "VisualPresetsOut",
         "type": "object"
       },
       "VisualPreviewOut": {
@@ -13492,6 +15843,41 @@
         "title": "VisualStyle",
         "type": "object"
       },
+      "VisualStyleOut": {
+        "description": "A visual's chosen preset and the options it overrides.",
+        "properties": {
+          "options": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Options",
+            "type": "object"
+          },
+          "preset": {
+            "title": "Preset",
+            "type": "string"
+          }
+        },
+        "required": [
+          "preset",
+          "options"
+        ],
+        "title": "VisualStyleOut",
+        "type": "object"
+      },
       "WriteupCreate": {
         "properties": {
           "content_json": {
@@ -13525,6 +15911,173 @@
           "investigation_id"
         ],
         "title": "WriteupCreate",
+        "type": "object"
+      },
+      "WriteupOut": {
+        "description": "A write-up with its document: TipTap/ProseMirror JSON, as the editor saved it.",
+        "properties": {
+          "cited_record_refs": {
+            "items": {
+              "$ref": "#/components/schemas/RecordRefOut"
+            },
+            "title": "Cited Record Refs",
+            "type": "array"
+          },
+          "content_json": {
+            "additionalProperties": true,
+            "title": "Content Json",
+            "type": "object"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "source_ai_candidate_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Ai Candidate Id"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "word_count": {
+            "title": "Word Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "title",
+          "status",
+          "cited_record_refs",
+          "source_ai_candidate_id",
+          "created_by",
+          "created_at",
+          "updated_at",
+          "word_count",
+          "content_json"
+        ],
+        "title": "WriteupOut",
+        "type": "object"
+      },
+      "WriteupSummaryOut": {
+        "description": "A write-up as the list shows it: the first 280 characters of its text instead of the document.",
+        "properties": {
+          "cited_record_refs": {
+            "items": {
+              "$ref": "#/components/schemas/RecordRefOut"
+            },
+            "title": "Cited Record Refs",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "preview": {
+            "title": "Preview",
+            "type": "string"
+          },
+          "source_ai_candidate_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Ai Candidate Id"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "word_count": {
+            "title": "Word Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "title",
+          "status",
+          "cited_record_refs",
+          "source_ai_candidate_id",
+          "created_by",
+          "created_at",
+          "updated_at",
+          "word_count",
+          "preview"
+        ],
+        "title": "WriteupSummaryOut",
         "type": "object"
       },
       "WriteupUpdate": {
@@ -13565,6 +16118,22 @@
           }
         },
         "title": "WriteupUpdate",
+        "type": "object"
+      },
+      "WriteupsOut": {
+        "properties": {
+          "writeups": {
+            "items": {
+              "$ref": "#/components/schemas/WriteupSummaryOut"
+            },
+            "title": "Writeups",
+            "type": "array"
+          }
+        },
+        "required": [
+          "writeups"
+        ],
+        "title": "WriteupsOut",
         "type": "object"
       },
       "opsconsole__api__checks__RunIn": {
@@ -13690,7 +16259,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AiAnalysisCandidateOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -13738,7 +16309,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/DeckOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -13786,7 +16359,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/WriteupOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -13833,7 +16408,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AiAnalysisCandidateReviewOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -13869,7 +16446,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/BackupInspectOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -13972,7 +16551,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/CapabilitiesOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17346,7 +19927,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17381,7 +19964,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/DeckOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17426,7 +20011,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/DeckOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -17462,11 +20049,14 @@
         "responses": {
           "200": {
             "content": {
-              "application/json": {
-                "schema": {}
+              "application/vnd.openxmlformats-officedocument.presentationml.presentation": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "The deck as an editable PowerPoint file"
           },
           "422": {
             "content": {
@@ -17490,7 +20080,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/DemoSeedOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19080,7 +21672,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/EntityMatchPreviewOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19234,7 +21828,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/HealthOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19251,7 +21847,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/OpenAlephStatusOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19440,7 +22038,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AiAnalysisCandidatesOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19488,10 +22088,22 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AiReasoningRunOut"
+                }
               }
             },
             "description": "Successful Response"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiReasoningRunOut"
+                }
+              }
+            },
+            "description": "Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})"
           },
           "422": {
             "content": {
@@ -19536,7 +22148,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionContextOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19584,10 +22198,22 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AiReasoningRunOut"
+                }
               }
             },
             "description": "Successful Response"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiReasoningRunOut"
+                }
+              }
+            },
+            "description": "Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})"
           },
           "422": {
             "content": {
@@ -19632,10 +22258,22 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AiReasoningRunOut"
+                }
               }
             },
             "description": "Successful Response"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiReasoningRunOut"
+                }
+              }
+            },
+            "description": "Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})"
           },
           "422": {
             "content": {
@@ -19885,7 +22523,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/OpenAlephCorpusBindingOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19922,7 +22562,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/OpenAlephCorpusBindingOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -19960,7 +22602,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/OpenAlephOperationFailureOut"
+                  },
+                  "title": "Response List Openaleph Corpus Failures",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -19997,7 +22645,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/DecksOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -20308,11 +22958,14 @@
         "responses": {
           "200": {
             "content": {
-              "application/json": {
-                "schema": {}
+              "application/zip": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "A portable backup of the investigation (.jwbackup.zip)"
           },
           "422": {
             "content": {
@@ -21106,7 +23759,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/WriteupsOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -21620,7 +24275,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PresentationStyleCatalogOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -21732,7 +24389,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/RelationshipSchemasOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -22185,9 +24844,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "additionalProperties": true,
-                "title": "Body",
-                "type": "object"
+                "$ref": "#/components/schemas/ConnectorCredentialPut"
               }
             }
           },
@@ -22384,9 +25041,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "additionalProperties": true,
-                "title": "Body",
-                "type": "object"
+                "$ref": "#/components/schemas/SecurityAuditRetentionRequest"
               }
             }
           },
@@ -22496,7 +25151,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AppUserOut"
+                  },
+                  "title": "Response List App Users",
+                  "type": "array"
+                }
               }
             },
             "description": "Successful Response"
@@ -22520,7 +25181,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AppUserCreatedOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -22567,7 +25230,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AppUserUpdatedOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -22662,7 +25327,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/InvestigationMembershipOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -22699,7 +25366,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AppUserTokenRevokedOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -22736,7 +25405,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AppUserTokenRotatedOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -22977,7 +25648,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/WriteupOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -23014,7 +25687,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -23049,7 +25724,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/WriteupOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -23094,7 +25771,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/WriteupOut"
+                }
               }
             },
             "description": "Successful Response"
@@ -23130,11 +25809,14 @@
         "responses": {
           "200": {
             "content": {
-              "application/json": {
-                "schema": {}
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "The write-up as a Word document"
           },
           "422": {
             "content": {

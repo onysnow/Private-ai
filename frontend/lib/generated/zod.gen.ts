@@ -29,6 +29,52 @@ export const zAggregateClaimDependencyOut = z.object({
 });
 
 /**
+ * AiAnalysisCandidateReviewOut
+ *
+ * The reply to a review decision on a proposal.
+ */
+export const zAiAnalysisCandidateReviewOut = z.object({
+  id: z.string(),
+  module: z.string(),
+  review_status: z.string(),
+  reviewed_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  reviewer_note: z.string().nullable(),
+});
+
+/**
+ * AiAnalysisCandidateSummaryOut
+ *
+ * A reasoning run's proposal as the review queue lists it, without its
+ * payload. `request` is what the reporter asked, as recorded when the run
+ * was made; its keys depend on the version that recorded it (record_refs
+ * arrived with presentation drafts, for one), so it stays open.
+ * `rejection_reason` is one of the automatic rejection reasons, "reviewer"
+ * for a human rejection, or null when not rejected.
+ */
+export const zAiAnalysisCandidateSummaryOut = z.object({
+  accepted_record_id: z.string().nullable(),
+  accepted_record_type: z.string().nullable(),
+  checked_citation_count: z.number().int(),
+  confidence: z.number(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  id: z.string(),
+  investigation_id: z.string(),
+  module: z.string(),
+  rejection_reason: z.string().nullable(),
+  request: z.record(z.unknown()),
+  review_status: z.string(),
+  reviewed_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  reviewer_note: z.string().nullable(),
+});
+
+/**
+ * AiAnalysisCandidatesOut
+ */
+export const zAiAnalysisCandidatesOut = z.object({
+  candidates: z.array(zAiAnalysisCandidateSummaryOut),
+});
+
+/**
  * AiControlFlagOut
  */
 export const zAiControlFlagOut = z.object({
@@ -122,12 +168,95 @@ export const zAppUserCreate = z.object({
 });
 
 /**
+ * AppUserCreatedOut
+ *
+ * A new identity and its token, shown this once: only the token's digest is kept.
+ */
+export const zAppUserCreatedOut = z.object({
+  display_name: z.string(),
+  global_role: z.string(),
+  id: z.string(),
+  token: z.string(),
+  token_notice: z.string(),
+});
+
+/**
+ * AppUserMembershipOut
+ */
+export const zAppUserMembershipOut = z.object({
+  investigation_id: z.string(),
+  role: z.string(),
+});
+
+/**
+ * AppUserOut
+ *
+ * A persisted API identity: its token's history, never the token or its digest.
+ */
+export const zAppUserOut = z.object({
+  disabled: z.boolean(),
+  disabled_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  display_name: z.string(),
+  global_role: z.string(),
+  id: z.string(),
+  memberships: z.array(zAppUserMembershipOut),
+  token_created_at: z.string().datetime({ offset: true, local: true }),
+  token_last_used_at: z
+    .string()
+    .datetime({ offset: true, local: true })
+    .nullable(),
+  token_revoked_at: z
+    .string()
+    .datetime({ offset: true, local: true })
+    .nullable(),
+  token_rotated_at: z
+    .string()
+    .datetime({ offset: true, local: true })
+    .nullable(),
+  token_status: z.enum(['active', 'disabled', 'revoked']),
+});
+
+/**
+ * AppUserTokenRevokedOut
+ */
+export const zAppUserTokenRevokedOut = z.object({
+  id: z.string(),
+  token_revoked_at: z.string().datetime({ offset: true, local: true }),
+  token_status: z.literal('revoked'),
+});
+
+/**
+ * AppUserTokenRotatedOut
+ *
+ * The replacement token, shown this once.
+ */
+export const zAppUserTokenRotatedOut = z.object({
+  id: z.string(),
+  token: z.string(),
+  token_created_at: z.string().datetime({ offset: true, local: true }),
+  token_notice: z.string(),
+  token_rotated_at: z.string().datetime({ offset: true, local: true }),
+});
+
+/**
  * AppUserUpdate
  */
 export const zAppUserUpdate = z.object({
   disabled: z.boolean().nullish(),
   display_name: z.string().nullish(),
   global_role: z.string().nullish(),
+});
+
+/**
+ * AppUserUpdatedOut
+ */
+export const zAppUserUpdatedOut = z.object({
+  disabled: z.boolean(),
+  disabled_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  display_name: z.string(),
+  global_role: z.string(),
+  id: z.string(),
+  token_status: z.enum(['active', 'disabled', 'revoked']),
 });
 
 /**
@@ -163,6 +292,33 @@ export const zBackgroundJobOut = z.object({
   subject_id: z.string().nullable(),
   subject_type: z.string().nullable(),
   updated_at: z.string().datetime({ offset: true, local: true }),
+});
+
+/**
+ * AiReasoningRunOut
+ *
+ * The reply to a reasoning run. Run in the request (developer mode): the
+ * proposal it made for review, with the finished job. Queued (the Docker
+ * stack, HTTP 202): no proposal yet, and the job to follow; its `result`
+ * holds this same proposal when it is done.
+ */
+export const zAiReasoningRunOut = z.object({
+  candidate_id: z.string().nullable(),
+  job: zBackgroundJobOut,
+  payload: z.record(z.unknown()).nullish(),
+  review_status: z.string().nullish(),
+});
+
+/**
+ * BackupInspectOut
+ *
+ * A checked archive's own manifest.json, echoed back as read (only its
+ * format, version, checksums and lineage are verified), and how many rows
+ * of each table it holds.
+ */
+export const zBackupInspectOut = z.object({
+  manifest: z.record(z.unknown()),
+  record_counts: z.record(z.number().int()),
 });
 
 /**
@@ -379,6 +535,26 @@ export const zCheckReportOut = z.object({
 });
 
 /**
+ * CitationDetailOut
+ *
+ * A cited record in words, for the review panel's evidence chips and an
+ * export's source list; `missing` when the record no longer resolves.
+ */
+export const zCitationDetailOut = z.object({
+  detail: z.string().nullable(),
+  label: z.string(),
+  locator: z.string().nullable(),
+  missing: z.boolean(),
+  quote: z.string().nullable(),
+  record_id: z.string(),
+  record_type: z.string(),
+  source_title: z.string().nullable(),
+  source_url: z.string().nullable(),
+  trace_record_type: z.string(),
+  type_label: z.string(),
+});
+
+/**
  * ClaimCreate
  */
 export const zClaimCreate = z.object({
@@ -540,6 +716,17 @@ export const zConfirmIn = z.object({
 });
 
 /**
+ * ConnectorCredentialPut
+ *
+ * A connector's secret (PUT /settings/connectors/{provider}/credential).
+ * Optional here so a missing secret gets the same 400 a blank one does
+ * (app/services/settings.py save_connector_credential).
+ */
+export const zConnectorCredentialPut = z.object({
+  credential: z.string().nullish(),
+});
+
+/**
  * ConnectorCredentialRemovedOut
  */
 export const zConnectorCredentialRemovedOut = z.object({
@@ -639,6 +826,71 @@ export const zConnectorsOut = z.object({
 });
 
 /**
+ * ContextCitationOut
+ *
+ * A record the model may cite, with where to trace it.
+ */
+export const zContextCitationOut = z.object({
+  locator: z.string().nullable(),
+  record_id: z.string(),
+  record_type: z.string(),
+  source_id: z.string().nullable(),
+  source_url: z.string().nullable(),
+  title: z.string(),
+  trace_record_id: z.string().nullable(),
+  trace_record_type: z.string().nullable(),
+});
+
+/**
+ * ContextItemOut
+ *
+ * One search hit in the retrieval packet. `provenance` and `metadata`
+ * are the search hit's own (each record type adds its own keys).
+ */
+export const zContextItemOut = z.object({
+  citation: zContextCitationOut,
+  metadata: z.record(z.unknown()),
+  provenance: z.record(z.unknown()),
+  record_id: z.string(),
+  record_type: z.string(),
+  score: z.number(),
+  snippet: z.string(),
+  title: z.string(),
+});
+
+/**
+ * ContextGroupsOut
+ */
+export const zContextGroupsOut = z.object({
+  canonical: z.array(zContextItemOut),
+  evidence: z.array(zContextItemOut),
+  reporting: z.array(zContextItemOut),
+  review: z.array(zContextItemOut),
+  workflow: z.array(zContextItemOut),
+});
+
+/**
+ * CoreCapabilitiesOut
+ *
+ * The parts of the core workbench this server runs; every one runs without AI.
+ */
+export const zCoreCapabilitiesOut = z.object({
+  backup_restore: z.boolean(),
+  claims: z.boolean(),
+  connectors: z.boolean(),
+  documents: z.boolean(),
+  dossiers: z.boolean(),
+  evidence: z.boolean(),
+  investigations: z.boolean(),
+  leads_and_tasks: z.boolean(),
+  provenance: z.boolean(),
+  relationships: z.boolean(),
+  search: z.boolean(),
+  sources: z.boolean(),
+  timeline: z.boolean(),
+});
+
+/**
  * CreateIn
  */
 export const zCreateIn = z.object({
@@ -684,12 +936,56 @@ export const zDeckStyle = z.object({
 });
 
 /**
+ * DeckStyleOut
+ *
+ * A deck's look: a theme id and a font-pair id from the style catalogue.
+ */
+export const zDeckStyleOut = z.object({
+  fonts: z.string(),
+  theme: z.string(),
+});
+
+/**
+ * DeckThemeOut
+ *
+ * One deck theme: colours as six hex digits without '#', and its own fonts.
+ */
+export const zDeckThemeOut = z.object({
+  accent: z.string(),
+  accent_text: z.string(),
+  alert: z.string(),
+  bar_muted: z.string(),
+  body_font: z.string(),
+  cover_accent: z.string(),
+  cover_bg: z.string(),
+  cover_line: z.string(),
+  cover_muted: z.string(),
+  cover_text: z.string(),
+  description: z.string(),
+  heading_font: z.string(),
+  id: z.string(),
+  label: z.string(),
+  muted: z.string(),
+  page: z.string(),
+  panel: z.string(),
+  rule: z.string(),
+  text: z.string(),
+});
+
+/**
  * DeckUpdate
  */
 export const zDeckUpdate = z.object({
   slides_json: z.array(z.record(z.unknown())).nullish(),
   style_json: z.record(z.unknown()).nullish(),
   title: z.string().nullish(),
+});
+
+/**
+ * DeletedOut
+ */
+export const zDeletedOut = z.object({
+  deleted: z.boolean(),
 });
 
 /**
@@ -720,6 +1016,14 @@ export const zDeletionUnsafePath = z.object({
   document_id: z.string(),
   error: z.string(),
   storage_path: z.string().nullish(),
+});
+
+/**
+ * DemoSeedOut
+ */
+export const zDemoSeedOut = z.object({
+  created: z.boolean(),
+  investigation_id: z.string(),
 });
 
 /**
@@ -1491,6 +1795,18 @@ export const zFlagIn = z.object({
 });
 
 /**
+ * FontPairOut
+ *
+ * A heading and body font; empty names mean "keep the theme's own".
+ */
+export const zFontPairOut = z.object({
+  body: z.string(),
+  heading: z.string(),
+  id: z.string(),
+  label: z.string(),
+});
+
+/**
  * GraphNodeOut
  *
  * A canonical entity that is an endpoint of a shown edge.
@@ -1513,6 +1829,13 @@ export const zGraphReconciliationOut = z.object({
   suppressed_duplicate_count: z.number().int(),
   underlying_edge_count: z.number().int(),
   visible_edge_count: z.number().int(),
+});
+
+/**
+ * HealthOut
+ */
+export const zHealthOut = z.object({
+  status: z.literal('ok'),
 });
 
 /**
@@ -1622,6 +1945,15 @@ export const zInvestigationDeletionResult = z.object({
   investigation_id: z.string(),
   missing_document_files: z.number().int(),
   shared_document_files_preserved: z.number().int(),
+});
+
+/**
+ * InvestigationMembershipOut
+ */
+export const zInvestigationMembershipOut = z.object({
+  investigation_id: z.string(),
+  role: z.string(),
+  user_id: z.string(),
 });
 
 /**
@@ -1993,6 +2325,15 @@ export const zOpenAlephBindingOut = z.object({
 });
 
 /**
+ * OpenAlephCorpusBindingOut
+ *
+ * The investigation's OpenAleph collection, or null before one is set up.
+ */
+export const zOpenAlephCorpusBindingOut = z.object({
+  binding: zOpenAlephBindingOut.nullable(),
+});
+
+/**
  * OpenAlephEntityImportOut
  */
 export const zOpenAlephEntityImportOut = z.object({
@@ -2020,6 +2361,44 @@ export const zOpenAlephEvidenceImportOut = z.object({
   retrieved: z.number().int(),
   review_required: z.boolean(),
   skipped: z.number().int(),
+});
+
+/**
+ * OpenAlephOperationFailureOut
+ *
+ * A failed OpenAleph pipeline step, kept server-side so a 502 can be explained later.
+ */
+export const zOpenAlephOperationFailureOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  document_id: z.string().nullable(),
+  error: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  operation: z.string(),
+});
+
+/**
+ * OpenAlephPlatformOut
+ */
+export const zOpenAlephPlatformOut = z.object({
+  enabled: z.boolean(),
+  role: z.string(),
+});
+
+/**
+ * OpenAlephStatusOut
+ *
+ * Whether the local OpenAleph corpus platform answers its search API.
+ * Every key is always sent, so the nullable one has no default.
+ */
+export const zOpenAlephStatusOut = z.object({
+  api_usable: z.boolean(),
+  base_url: z.string(),
+  configured: z.boolean(),
+  detail: z.string(),
+  http_status: z.number().int().nullable(),
+  reachable: z.boolean(),
+  ui_url: z.string(),
 });
 
 /**
@@ -2126,6 +2505,25 @@ export const zPlanIn = z.object({
 });
 
 /**
+ * PlatformsOut
+ */
+export const zPlatformsOut = z.object({
+  openaleph: zOpenAlephPlatformOut,
+});
+
+/**
+ * CapabilitiesOut
+ */
+export const zCapabilitiesOut = z.object({
+  ai_features_enabled: z.boolean(),
+  core: zCoreCapabilitiesOut,
+  mode: z.enum(['integrated_preview', 'core_preview']),
+  note: z.string(),
+  platforms: zPlatformsOut,
+  product: z.string(),
+});
+
+/**
  * PostMergeReconciliationRequest
  */
 export const zPostMergeReconciliationRequest = z.object({
@@ -2229,6 +2627,32 @@ export const zPropertyConflictDecisionOut = z.object({
 });
 
 /**
+ * ProviderLeadOut
+ *
+ * What an outside provider said the name resolves to: a lead only, never a choice.
+ */
+export const zProviderLeadOut = z.object({
+  provider: z.string().nullable(),
+  provider_entity_id: z.string().nullable(),
+  provider_resolved_entity_id: z.string().nullable(),
+});
+
+/**
+ * EntityMatchPreviewOut
+ *
+ * Canonical entities an entity proposal may be, before the reporter decides.
+ */
+export const zEntityMatchPreviewOut = z.object({
+  candidate_id: z.string(),
+  caption: z.string(),
+  identity_rule: z.string(),
+  matches: z.array(zEntityCandidateOut),
+  provider_lead: zProviderLeadOut,
+  schema: z.string(),
+  strong_match: zEntityCandidateOut.nullable(),
+});
+
+/**
  * QueryRef
  *
  * One catalogued query and its parameters, as the AI writes them.
@@ -2290,6 +2714,15 @@ export const zRecordRefOut = z.object({
 });
 
 /**
+ * BarItemOut
+ */
+export const zBarItemOut = z.object({
+  evidence: z.array(zRecordRefOut),
+  label: z.string(),
+  value: z.union([z.number().int(), z.number()]),
+});
+
+/**
  * DataTableRowOut
  */
 export const zDataTableRowOut = z.object({
@@ -2306,6 +2739,15 @@ export const zDataTableRowOut = z.object({
 export const zDataTableOut = z.object({
   columns: z.array(z.string()),
   rows: z.array(zDataTableRowOut),
+});
+
+/**
+ * FigureItemOut
+ */
+export const zFigureItemOut = z.object({
+  evidence: z.array(zRecordRefOut),
+  label: z.string(),
+  value: z.string(),
 });
 
 /**
@@ -2459,6 +2901,26 @@ export const zRelationshipReconciliationOut = z.object({
 });
 
 /**
+ * RelationshipSchemaOut
+ *
+ * How the workbench draws one FollowTheMoney relationship schema: its two ends' properties and labels.
+ */
+export const zRelationshipSchemaOut = z.object({
+  label: z.string(),
+  source_label: z.string(),
+  source_prop: z.string(),
+  target_label: z.string(),
+  target_prop: z.string(),
+});
+
+/**
+ * RelationshipSchemasOut
+ */
+export const zRelationshipSchemasOut = z.object({
+  schemas: z.record(zRelationshipSchemaOut),
+});
+
+/**
  * ReportingTaskCreate
  */
 export const zReportingTaskCreate = z.object({
@@ -2547,6 +3009,35 @@ export const zRestoreIn = z.object({
 });
 
 /**
+ * RetrievalSummaryOut
+ */
+export const zRetrievalSummaryOut = z.object({
+  counts: z.record(z.number().int()),
+  group_counts: z.record(z.number().int()),
+  query: z.string().nullable(),
+  returned_matches: z.number().int(),
+  total_matches: z.number().int(),
+});
+
+/**
+ * QuestionContextOut
+ *
+ * The provenance-bearing packet a reasoning model would be given for a
+ * question. External connector results are a separate, unverified bucket
+ * and never among the citations.
+ */
+export const zQuestionContextOut = z.object({
+  citations: z.array(zContextCitationOut),
+  context: zContextGroupsOut,
+  external_leads: z.array(zContextItemOut),
+  investigation_id: z.string(),
+  question: z.string(),
+  reasoning_contract: z.record(z.boolean()),
+  retrieval: zRetrievalSummaryOut,
+  warnings: z.array(z.string()),
+});
+
+/**
  * RolesIn
  */
 export const zRolesIn = z.object({
@@ -2627,6 +3118,22 @@ export const zSecurityAuditRetentionPreviewOut = z.object({
   valid_records: z.number().int(),
   would_keep: z.number().int(),
   would_remove: z.number().int(),
+});
+
+/**
+ * SecurityAuditRetentionRequest
+ *
+ * Prune the security audit log (POST /settings/security/audit/retention).
+ *
+ * Strict, so `true` or "90" is refused rather than converted: the route
+ * refused anything but a whole number and text before this body was typed.
+ * The ranges and the confirmation text are checked by the audit log itself
+ * (app/core/audit_log.py), which answers 400 with the reason.
+ */
+export const zSecurityAuditRetentionRequest = z.object({
+  confirmation: z.string().optional().default(''),
+  keep_days: z.number().int().optional().default(90),
+  max_records: z.number().int().optional().default(5000),
 });
 
 /**
@@ -3285,6 +3792,15 @@ export const zTimelineEventRowOut = z.object({
 });
 
 /**
+ * TimelineItemOut
+ */
+export const zTimelineItemOut = z.object({
+  date: z.string(),
+  evidence: z.array(zRecordRefOut),
+  label: z.string(),
+});
+
+/**
  * TimelineOut
  */
 export const zTimelineOut = z.object({
@@ -3464,12 +3980,88 @@ export const zVisualDataOut = z.object({
 });
 
 /**
+ * ChartVisualOut
+ *
+ * A checked chart (app/ai/chart_check.py) as a deck keeps it: the order
+ * slip, the data the Workbench cooked from the records (every value with
+ * its records), the check report and the chart's words, as the draft or
+ * the deck editor stored them; and the drawing that passed, when the deck
+ * came from a checked draft. The deck insists only on a valid order slip
+ * and its data (app/services/decks.py normalize_chart_visual), so the
+ * report and the words are passed on as stored.
+ */
+export const zChartVisualOut = z.object({
+  data: zVisualDataOut,
+  option: z.record(z.unknown()).nullish(),
+  report: z.record(z.unknown()),
+  spec: z.record(z.unknown()),
+  text: z.record(z.unknown()),
+  type: z.literal('chart'),
+});
+
+/**
+ * VisualOptionSpecOut
+ *
+ * What one option accepts. `values` lists the choices and is sent only for a choice.
+ */
+export const zVisualOptionSpecOut = z.object({
+  label: z.string(),
+  type: z.enum(['bool', 'choice', 'labels']),
+  values: z.array(z.string()).nullish(),
+});
+
+/**
+ * VisualOptionsOut
+ */
+export const zVisualOptionsOut = z.object({
+  bar: z.record(zVisualOptionSpecOut),
+  figures: z.record(zVisualOptionSpecOut),
+  timeline: z.record(zVisualOptionSpecOut),
+});
+
+/**
  * VisualParamOut
  */
 export const zVisualParamOut = z.object({
   choices: z.array(z.string()).nullish(),
   default: z.string().nullish(),
   description: z.string(),
+});
+
+/**
+ * VisualPresetOut
+ *
+ * A named layout for one visual type, with its option defaults.
+ */
+export const zVisualPresetOut = z.object({
+  description: z.string(),
+  id: z.string(),
+  label: z.string(),
+  layout: z.record(z.union([z.string(), z.boolean()])),
+  options: z.record(z.union([z.boolean(), z.string(), z.array(z.string())])),
+});
+
+/**
+ * VisualPresetsOut
+ */
+export const zVisualPresetsOut = z.object({
+  bar: z.array(zVisualPresetOut),
+  figures: z.array(zVisualPresetOut),
+  timeline: z.array(zVisualPresetOut),
+});
+
+/**
+ * PresentationStyleCatalogOut
+ *
+ * Everything the deck style panel and the in-app preview need; the .pptx
+ * export reads the same catalogue, so the two cannot drift apart.
+ */
+export const zPresentationStyleCatalogOut = z.object({
+  defaults: zDeckStyleOut,
+  font_pairs: z.array(zFontPairOut),
+  themes: z.array(zDeckThemeOut),
+  visual_options: zVisualOptionsOut,
+  visual_presets: zVisualPresetsOut,
 });
 
 /**
@@ -3559,6 +4151,122 @@ export const zPromoteToDeckRequest = z.object({
 });
 
 /**
+ * VisualStyleOut
+ *
+ * A visual's chosen preset and the options it overrides.
+ */
+export const zVisualStyleOut = z.object({
+  options: z.record(z.union([z.boolean(), z.string(), z.array(z.string())])),
+  preset: z.string(),
+});
+
+/**
+ * BarVisualOut
+ */
+export const zBarVisualOut = z.object({
+  items: z.array(zBarItemOut),
+  style: zVisualStyleOut.nullish(),
+  title: z.string(),
+  type: z.literal('bar'),
+  unit: z.string(),
+});
+
+/**
+ * FiguresVisualOut
+ */
+export const zFiguresVisualOut = z.object({
+  items: z.array(zFigureItemOut),
+  style: zVisualStyleOut.nullish(),
+  type: z.literal('figures'),
+});
+
+/**
+ * TimelineVisualOut
+ */
+export const zTimelineVisualOut = z.object({
+  items: z.array(zTimelineItemOut),
+  style: zVisualStyleOut.nullish(),
+  type: z.literal('timeline'),
+});
+
+/**
+ * DeckSlideOut
+ *
+ * One slide as a deck stores it (app/services/decks.py _normalize_slides).
+ */
+export const zDeckSlideOut = z.object({
+  bullets: z.array(z.string()),
+  evidence: z.array(zRecordRefOut),
+  heading: z.string(),
+  kind: z.enum(['title', 'statement', 'content', 'questions']),
+  notes: z.string(),
+  visual: z
+    .discriminatedUnion('type', [
+      zFiguresVisualOut,
+      zTimelineVisualOut,
+      zBarVisualOut,
+      zChartVisualOut,
+    ])
+    .nullable(),
+});
+
+/**
+ * AiAnalysisCandidateOut
+ *
+ * One proposal in full. `payload` is the model's output in its module's
+ * own schema (app/ai/reasoning.py OUTPUT_SCHEMAS), or the raw text of a run
+ * whose output could not be used; `trace` is what the model was sent
+ * (rows from before the trace was kept have none). A presentation draft
+ * also carries readable details for every record it cites and the slides
+ * a promotion would make; other modules leave both keys out.
+ */
+export const zAiAnalysisCandidateOut = z.object({
+  accepted_record_id: z.string().nullable(),
+  accepted_record_type: z.string().nullable(),
+  checked_citation_count: z.number().int(),
+  checked_citation_ids: z.array(zRecordRefOut),
+  citation_details: z.array(zCitationDetailOut).nullish(),
+  confidence: z.number(),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  deck_preview: z.array(zDeckSlideOut).nullish(),
+  id: z.string(),
+  investigation_id: z.string(),
+  module: z.string(),
+  payload: z.record(z.unknown()),
+  rejection_reason: z.string().nullable(),
+  request: z.record(z.unknown()),
+  review_status: z.string(),
+  reviewed_at: z.string().datetime({ offset: true, local: true }).nullable(),
+  reviewer_note: z.string().nullable(),
+  trace: z.record(z.unknown()).nullable(),
+});
+
+/**
+ * DeckOut
+ *
+ * A presentation deck. Every key is always sent, so the nullable ones have no default.
+ */
+export const zDeckOut = z.object({
+  created_at: z.string().datetime({ offset: true, local: true }),
+  created_by: z.string().nullable(),
+  id: z.string(),
+  investigation_id: z.string(),
+  slide_count: z.number().int(),
+  slides: z.array(zDeckSlideOut),
+  source_ai_candidate_id: z.string().nullable(),
+  style: zDeckStyleOut,
+  title: z.string(),
+  updated_at: z.string().datetime({ offset: true, local: true }),
+});
+
+/**
+ * DecksOut
+ */
+export const zDecksOut = z.object({
+  decks: z.array(zDeckOut),
+});
+
+/**
  * WriteupCreate
  */
 export const zWriteupCreate = z.object({
@@ -3569,12 +4277,57 @@ export const zWriteupCreate = z.object({
 });
 
 /**
+ * WriteupOut
+ *
+ * A write-up with its document: TipTap/ProseMirror JSON, as the editor saved it.
+ */
+export const zWriteupOut = z.object({
+  cited_record_refs: z.array(zRecordRefOut),
+  content_json: z.record(z.unknown()),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  created_by: z.string().nullable(),
+  id: z.string(),
+  investigation_id: z.string(),
+  source_ai_candidate_id: z.string().nullable(),
+  status: z.string(),
+  title: z.string(),
+  updated_at: z.string().datetime({ offset: true, local: true }),
+  word_count: z.number().int(),
+});
+
+/**
+ * WriteupSummaryOut
+ *
+ * A write-up as the list shows it: the first 280 characters of its text instead of the document.
+ */
+export const zWriteupSummaryOut = z.object({
+  cited_record_refs: z.array(zRecordRefOut),
+  created_at: z.string().datetime({ offset: true, local: true }),
+  created_by: z.string().nullable(),
+  id: z.string(),
+  investigation_id: z.string(),
+  preview: z.string(),
+  source_ai_candidate_id: z.string().nullable(),
+  status: z.string(),
+  title: z.string(),
+  updated_at: z.string().datetime({ offset: true, local: true }),
+  word_count: z.number().int(),
+});
+
+/**
  * WriteupUpdate
  */
 export const zWriteupUpdate = z.object({
   content_json: z.record(z.unknown()).nullish(),
   status: z.string().nullish(),
   title: z.string().nullish(),
+});
+
+/**
+ * WriteupsOut
+ */
+export const zWriteupsOut = z.object({
+  writeups: z.array(zWriteupSummaryOut),
 });
 
 /**
@@ -3610,12 +4363,22 @@ export const zGetAiAnalysisCandidateEndpointPath = z.object({
   candidate_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zGetAiAnalysisCandidateEndpointResponse = zAiAnalysisCandidateOut;
+
 export const zPromoteAiAnalysisCandidateToDeckEndpointBody =
   zPromoteToDeckRequest;
 
 export const zPromoteAiAnalysisCandidateToDeckEndpointPath = z.object({
   candidate_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zPromoteAiAnalysisCandidateToDeckEndpointResponse = zDeckOut;
 
 export const zPromoteAiAnalysisCandidateToWriteupEndpointBody =
   zPromoteToWriteupRequest;
@@ -3624,6 +4387,11 @@ export const zPromoteAiAnalysisCandidateToWriteupEndpointPath = z.object({
   candidate_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zPromoteAiAnalysisCandidateToWriteupEndpointResponse = zWriteupOut;
+
 export const zReviewAiAnalysisCandidateEndpointBody =
   zAiAnalysisCandidateReviewRequest;
 
@@ -3631,7 +4399,18 @@ export const zReviewAiAnalysisCandidateEndpointPath = z.object({
   candidate_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zReviewAiAnalysisCandidateEndpointResponse =
+  zAiAnalysisCandidateReviewOut;
+
 export const zInspectBackupBody = zBodyInspectBackup;
+
+/**
+ * Successful Response
+ */
+export const zInspectBackupResponse = zBackupInspectOut;
 
 export const zPreviewBackupRestoreBody = zBodyPreviewBackupRestore;
 
@@ -3646,6 +4425,11 @@ export const zRestoreBackupBody = zBodyRestoreBackup;
  * Successful Response
  */
 export const zRestoreBackupResponse = zBackupRestoreResultOut;
+
+/**
+ * Successful Response
+ */
+export const zCapabilitiesResponse = zCapabilitiesOut;
 
 export const zCreateClaimEndpointBody = zClaimCreate;
 
@@ -4086,9 +4870,19 @@ export const zDeleteDeckEndpointPath = z.object({
   deck_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zDeleteDeckEndpointResponse = zDeletedOut;
+
 export const zGetDeckEndpointPath = z.object({
   deck_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zGetDeckEndpointResponse = zDeckOut;
 
 export const zUpdateDeckEndpointBody = zDeckUpdate;
 
@@ -4096,9 +4890,24 @@ export const zUpdateDeckEndpointPath = z.object({
   deck_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zUpdateDeckEndpointResponse = zDeckOut;
+
 export const zExportDeckPptxPath = z.object({
   deck_id: z.string(),
 });
+
+/**
+ * The deck as an editable PowerPoint file
+ */
+export const zExportDeckPptxResponse = z.string();
+
+/**
+ * Successful Response
+ */
+export const zSeedDemoResponse = zDemoSeedOut;
 
 export const zUploadDocumentBody = zBodyUploadDocument;
 
@@ -4493,6 +5302,11 @@ export const zGetExtractionEntityMatchesPath = z.object({
   candidate_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zGetExtractionEntityMatchesResponse = zEntityMatchPreviewOut;
+
 export const zGetExtractionCandidateExplanationPath = z.object({
   candidate_id: z.string(),
 });
@@ -4522,6 +5336,16 @@ export const zReviewExtractionCandidatePath = z.object({
  * Successful Response
  */
 export const zReviewExtractionCandidateResponse = zExtractionReviewOut;
+
+/**
+ * Successful Response
+ */
+export const zHealthResponse = zHealthOut;
+
+/**
+ * Successful Response
+ */
+export const zOpenalephIntegrationStatusResponse = zOpenAlephStatusOut;
 
 /**
  * Response List Investigations
@@ -4561,11 +5385,22 @@ export const zListInvestigationAiAnalysisCandidatesQuery = z.object({
   offset: z.number().int().gte(0).optional().default(0),
 });
 
+/**
+ * Successful Response
+ */
+export const zListInvestigationAiAnalysisCandidatesResponse =
+  zAiAnalysisCandidatesOut;
+
 export const zInvestigationCaseSynthesisBody = zCaseSynthesisRequest;
 
 export const zInvestigationCaseSynthesisPath = z.object({
   investigation_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zInvestigationCaseSynthesisResponse = zAiReasoningRunOut;
 
 export const zInvestigationQuestionContextBody =
   zInvestigationQuestionContextRequest;
@@ -4574,17 +5409,32 @@ export const zInvestigationQuestionContextPath = z.object({
   investigation_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zInvestigationQuestionContextResponse = zQuestionContextOut;
+
 export const zInvestigationHypothesisTestBody = zHypothesisTestRequest;
 
 export const zInvestigationHypothesisTestPath = z.object({
   investigation_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zInvestigationHypothesisTestResponse = zAiReasoningRunOut;
+
 export const zInvestigationPresentationDraftBody = zPresentationDraftRequest;
 
 export const zInvestigationPresentationDraftPath = z.object({
   investigation_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zInvestigationPresentationDraftResponse = zAiReasoningRunOut;
 
 export const zListClaimsPath = z.object({
   investigation_id: z.string(),
@@ -4638,17 +5488,41 @@ export const zGetOpenalephCorpusBindingPath = z.object({
   investigation_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zGetOpenalephCorpusBindingResponse = zOpenAlephCorpusBindingOut;
+
 export const zEnsureOpenalephCorpusBindingPath = z.object({
   investigation_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zEnsureOpenalephCorpusBindingResponse = zOpenAlephCorpusBindingOut;
 
 export const zListOpenalephCorpusFailuresPath = z.object({
   investigation_id: z.string(),
 });
 
+/**
+ * Response List Openaleph Corpus Failures
+ *
+ * Successful Response
+ */
+export const zListOpenalephCorpusFailuresResponse = z.array(
+  zOpenAlephOperationFailureOut,
+);
+
 export const zListDecksEndpointPath = z.object({
   investigation_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zListDecksEndpointResponse = zDecksOut;
 
 export const zInvestigationDeletionPreviewPath = z.object({
   investigation_id: z.string(),
@@ -4716,6 +5590,11 @@ export const zExportInvestigationPath = z.object({
 export const zExportInvestigationQuery = z.object({
   include_documents: z.boolean().optional().default(true),
 });
+
+/**
+ * A portable backup of the investigation (.jwbackup.zip)
+ */
+export const zExportInvestigationResponse = z.string();
 
 export const zGetInvestigationFinancialFlowsPath = z.object({
   investigation_id: z.string(),
@@ -4869,6 +5748,11 @@ export const zListWriteupsEndpointQuery = z.object({
   status: z.string().nullish(),
 });
 
+/**
+ * Successful Response
+ */
+export const zListWriteupsEndpointResponse = zWriteupsOut;
+
 export const zListJobsEndpointQuery = z.object({
   investigation_id: z.string().nullish(),
   status: z.string().nullish(),
@@ -4975,6 +5859,11 @@ export const zLinkLeadPath = z.object({
  */
 export const zLinkLeadResponse = zLeadLinkOut;
 
+/**
+ * Successful Response
+ */
+export const zPresentationStylesResponse = zPresentationStyleCatalogOut;
+
 export const zFindExtractionLineageEndpointQuery = z.object({
   record_type: z.string(),
   record_id: z.string(),
@@ -4995,6 +5884,11 @@ export const zGetRecordProvenanceTraceQuery = z.object({
  * Successful Response
  */
 export const zGetRecordProvenanceTraceResponse = zProvenanceTraceOut;
+
+/**
+ * Successful Response
+ */
+export const zRelationshipSchemasResponse = zRelationshipSchemasOut;
 
 export const zCreateCanonicalRelationshipBody = zRelationshipCreate;
 
@@ -5087,10 +5981,7 @@ export const zDeleteConnectorCredentialPath = z.object({
 export const zDeleteConnectorCredentialResponse =
   zConnectorCredentialRemovedOut;
 
-/**
- * Body
- */
-export const zSaveConnectorCredentialBody = z.record(z.unknown());
+export const zSaveConnectorCredentialBody = zConnectorCredentialPut;
 
 export const zSaveConnectorCredentialPath = z.object({
   provider: z.string(),
@@ -5124,10 +6015,7 @@ export const zGetSecurityAuditQuery = z.object({
  */
 export const zGetSecurityAuditResponse = zSecurityAuditViewOut;
 
-/**
- * Body
- */
-export const zPruneSecurityAuditBody = z.record(z.unknown());
+export const zPruneSecurityAuditBody = zSecurityAuditRetentionRequest;
 
 /**
  * Successful Response
@@ -5150,13 +6038,30 @@ export const zGetSecurityAuditRetentionPreviewResponse =
  */
 export const zGetSecurityAuditSummaryResponse = zSecurityAuditSummaryOut;
 
+/**
+ * Response List App Users
+ *
+ * Successful Response
+ */
+export const zListAppUsersResponse = z.array(zAppUserOut);
+
 export const zCreateAppUserBody = zAppUserCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateAppUserResponse = zAppUserCreatedOut;
 
 export const zUpdateAppUserBody = zAppUserUpdate;
 
 export const zUpdateAppUserPath = z.object({
   user_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zUpdateAppUserResponse = zAppUserUpdatedOut;
 
 export const zDeleteInvestigationMembershipPath = z.object({
   user_id: z.string(),
@@ -5175,13 +6080,28 @@ export const zPutInvestigationMembershipPath = z.object({
   investigation_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zPutInvestigationMembershipResponse = zInvestigationMembershipOut;
+
 export const zRevokeAppUserTokenPath = z.object({
   user_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zRevokeAppUserTokenResponse = zAppUserTokenRevokedOut;
+
 export const zRotateAppUserTokenPath = z.object({
   user_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zRotateAppUserTokenResponse = zAppUserTokenRotatedOut;
 
 /**
  * Successful Response
@@ -5231,13 +6151,28 @@ export const zCreateTimelineEventEndpointResponse = zTimelineEventRowOut;
 
 export const zCreateWriteupEndpointBody = zWriteupCreate;
 
+/**
+ * Successful Response
+ */
+export const zCreateWriteupEndpointResponse = zWriteupOut;
+
 export const zDeleteWriteupEndpointPath = z.object({
   writeup_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zDeleteWriteupEndpointResponse = zDeletedOut;
+
 export const zGetWriteupEndpointPath = z.object({
   writeup_id: z.string(),
 });
+
+/**
+ * Successful Response
+ */
+export const zGetWriteupEndpointResponse = zWriteupOut;
 
 export const zUpdateWriteupEndpointBody = zWriteupUpdate;
 
@@ -5245,6 +6180,16 @@ export const zUpdateWriteupEndpointPath = z.object({
   writeup_id: z.string(),
 });
 
+/**
+ * Successful Response
+ */
+export const zUpdateWriteupEndpointResponse = zWriteupOut;
+
 export const zExportWriteupDocxPath = z.object({
   writeup_id: z.string(),
 });
+
+/**
+ * The write-up as a Word document
+ */
+export const zExportWriteupDocxResponse = z.string();
