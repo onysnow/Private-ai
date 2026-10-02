@@ -149,9 +149,6 @@ class SchemaIntrospector:
         except Exception:
             return ""
 
-    def pk_columns(self, table: Table) -> list[Column[Any]]:
-        return list(table.primary_key.columns)
-
     # --- live side -----------------------------------------------------------------------
 
     def invalidate(self) -> None:

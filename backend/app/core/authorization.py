@@ -67,13 +67,6 @@ class InvestigationAuthorizationError(PermissionError):
     """Raised when a scoped principal attempts to mutate another investigation."""
 
 
-def ensure_scope_allows_ids(scope: AuthorizationScope | None, investigation_ids: Iterable[str]) -> None:
-    if scope is None or scope.unrestricted:
-        return
-    denied = sorted({value for value in investigation_ids if value and not scope.allows(value)})
-    if denied:
-        raise InvestigationAuthorizationError("Investigation access denied")
-
 def ensure_scope_can_mutate_ids(scope: AuthorizationScope | None, investigation_ids: Iterable[str]) -> None:
     if scope is None:
         return
@@ -151,10 +144,6 @@ def require_scope_global_admin(scope: AuthorizationScope) -> None:
     """Require workstation owner or global persisted admin authority."""
     if not scope.is_global_admin:
         raise HTTPException(status_code=403, detail="Global admin role required")
-
-
-def filter_visible_investigation_ids(scope: AuthorizationScope, ids: Iterable[str]) -> list[str]:
-    return [value for value in ids if scope.allows(value)]
 
 
 def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:

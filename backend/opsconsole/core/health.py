@@ -6,7 +6,6 @@ from __future__ import annotations
 import shutil
 import time
 from datetime import timedelta
-from pathlib import Path
 from typing import Any
 
 from sqlalchemy import exists, func, select, text
@@ -252,17 +251,3 @@ def health_board(ctx: ConsoleContext, *, only: set[str] | None = None) -> dict[s
             entry["ms"] = int((time.perf_counter() - started) * 1000)
             out.append(entry)
     return {"at": now_iso(), "overall": _worst([t["state"] for t in out]), "tiles": out}
-
-
-def storage_summary(path: Path) -> dict[str, Any]:
-    files = 0
-    size = 0
-    if path.exists():
-        for p in path.rglob("*"):
-            if p.is_file():
-                files += 1
-                try:
-                    size += p.stat().st_size
-                except OSError:
-                    pass
-    return {"path": str(path), "exists": path.exists(), "files": files, "bytes": size}

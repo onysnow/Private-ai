@@ -3,10 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 
-class RequestBodyTooLarge(RuntimeError):
-    pass
-
-
 @dataclass(frozen=True)
 class RequestLimitPolicy:
     default_bytes: int
