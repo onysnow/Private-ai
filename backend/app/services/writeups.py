@@ -441,13 +441,18 @@ def _render_chart(docx: Any, visual: dict, citation_index: dict[tuple[str, str],
 
     checked = checked_chart(visual, resolved_theme(None))
     spec, data = checked.spec, checked.data
-    p = _para(docx, space_before=6, space_after=2, keep_next=True)
-    _set_run(p.add_run(spec.title), size=10.5, color=DOCX_INK, font=DOCX_SANS, bold=True)
-    if spec.subtitle:
-        _set_run(p.add_run(f"  {spec.subtitle}"), size=9, color=DOCX_TAUPE, font=DOCX_SANS)
+
+    def heading() -> None:
+        # Written out only when no image is shown: the image already carries
+        # the title, subtitle and source line the checker passed.
+        p = _para(docx, space_before=6, space_after=2, keep_next=True)
+        _set_run(p.add_run(spec.title), size=10.5, color=DOCX_INK, font=DOCX_SANS, bold=True)
+        if spec.subtitle:
+            _set_run(p.add_run(f"  {spec.subtitle}"), size=9, color=DOCX_TAUPE, font=DOCX_SANS)
 
     built = checked.built
     if checked.problem or built is None:
+        heading()
         warn = _para(docx, space_after=4)
         _set_run(warn.add_run(checked.problem or "Chart not available."), size=9, color=DOCX_OXBLOOD, font=DOCX_SANS, italic=True)
         _spec, _data, rows = chart_rows(visual)
@@ -461,19 +466,20 @@ def _render_chart(docx: Any, visual: dict, citation_index: dict[tuple[str, str],
     except RenderUnavailable as exc:
         note = f"Chart image not available ({exc}); the values are shown as a table instead."
     if image is not None:
-        docx.add_picture(BytesIO(image), width=Inches(6.5))
-        caption = _para(docx, space_after=4)
-        _set_run(caption.add_run(built.alt_text), size=8.5, color=DOCX_TAUPE, font=DOCX_SANS, italic=True)
+        picture = docx.add_picture(BytesIO(image), width=Inches(6.5))
+        # Word's Alt Text field (wp:docPr/@descr), which screen readers announce.
+        picture._inline.docPr.set("descr", built.alt_text)
         _render_data_table(docx, built, data, citation_index)
+        return
+    heading()
+    warn = _para(docx, space_after=4)
+    _set_run(warn.add_run(note or "Chart image not available."), size=9, color=DOCX_OXBLOOD, font=DOCX_SANS, italic=True)
+    if built.kind.value in _BAR_TABLE_KINDS:
+        # A histogram's bars count records, so its table writes counts, not amounts.
+        unit = data.record_noun if built.kind.value == "histogram" else data.unit
+        _render_bar_table(docx, chart_bar_items(built.rows, chart_row_labels(data, built.rows)), unit, citation_index)
     else:
-        warn = _para(docx, space_after=4)
-        _set_run(warn.add_run(note or "Chart image not available."), size=9, color=DOCX_OXBLOOD, font=DOCX_SANS, italic=True)
-        if built.kind.value in _BAR_TABLE_KINDS:
-            # A histogram's bars count records, so its table writes counts, not amounts.
-            unit = data.record_noun if built.kind.value == "histogram" else data.unit
-            _render_bar_table(docx, chart_bar_items(built.rows, chart_row_labels(data, built.rows)), unit, citation_index)
-        else:
-            _render_data_table(docx, built, data, citation_index)
+        _render_data_table(docx, built, data, citation_index)
     source = _para(docx, space_before=2, space_after=4)
     _set_run(source.add_run(built.source_line), size=8.5, color=DOCX_TAUPE, font=DOCX_SANS)
 

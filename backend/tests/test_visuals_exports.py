@@ -4,6 +4,7 @@ and a line saying the image was not available (ADR-0005, line 2). Every
 value keeps its record citations either way."""
 
 import copy
+from collections import Counter
 from io import BytesIO
 
 import pytest
@@ -162,7 +163,11 @@ def test_writeup_export_embeds_the_png_when_the_bridge_answers(demo, monkeypatch
     assert len(docx.inline_shapes) == 1
     paragraphs = [p.text for p in docx.paragraphs]
     assert not any("not available" in p for p in paragraphs)
-    assert any(p.startswith("Bar chart: Meridian received all of the money") for p in paragraphs)  # the alt text as caption
+    # The image carries the title and source line, so the document does not
+    # repeat them; its description goes in Word's Alt Text field.
+    assert not any("Meridian received all of the money" in p for p in paragraphs)
+    assert not any(p.startswith("Source:") for p in paragraphs)
+    assert docx.inline_shapes[0]._inline.docPr.get("descr").startswith("Bar chart: Meridian received all of the money")
     cells = "\n".join(c.text for t in docx.tables for r in t.rows for c in r.cells)
     assert "Meridian Holdings Ltd · 1 payment †" in cells and "$2.4M" in cells and "[1]" in cells
 
@@ -537,9 +542,11 @@ def test_writeup_has_the_png_and_a_data_table_for_every_kind(every_kind, monkeyp
     assert any(cells[0].startswith("Alaric Voss") and cells[1] == "2" for cells in wide_rows)   # the scatter plot's x: two payments
     assert any(cells[2].endswith("%") for cells in wide_rows)   # a part's share of the whole
     assert all(cells[0] and cells[-1].isdigit() for cells in wide_rows)   # every row names its records' count
+    alt_texts = [shape._inline.docPr.get("descr") for shape in docx.inline_shapes]
     paragraphs = [p.text for p in docx.paragraphs]
     for chart in charts.values():
-        assert chart["text"]["alt_text"] in paragraphs
+        assert chart["text"]["alt_text"] in alt_texts
+        assert chart["spec"]["title"] not in paragraphs and chart["text"]["source_line"] not in paragraphs
 
 
 def test_writeup_tables_stand_in_for_every_kind_when_the_render_service_is_down(every_kind, monkeypatch):
@@ -555,6 +562,14 @@ def test_writeup_tables_stand_in_for_every_kind_when_the_render_service_is_down(
     assert not docx.inline_shapes
     paragraphs = [p.text for p in docx.paragraphs]
     assert sum("Chart image not available" in p for p in paragraphs) == len(charts)
+    # With no image, the title and source line are written out once each.
+    # (Two fixture charts share a title, so count per chart, not per title.)
+    titles = Counter(chart["spec"]["title"] for chart in charts.values())
+    sources = Counter(chart["text"]["source_line"] for chart in charts.values())
+    for title, times in titles.items():
+        assert sum(p.startswith(title) for p in paragraphs) == times
+    for source, times in sources.items():
+        assert paragraphs.count(source) == times
     cells = [c.text for t in docx.tables for r in t.rows for c in r.cells]
     # A histogram's bars count payments: its table writes the count, never money.
     first_bin = charts["histogram"]["text"]["data_table"]["rows"][0]
