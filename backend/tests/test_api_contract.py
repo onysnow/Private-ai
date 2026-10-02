@@ -374,6 +374,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             ("GET", "/api/provenance/extraction-lineage"): {"record_type": "evidence", "record_id": accepted["accepted_record_id"]},
             ("GET", "/api/provenance/trace"): {"record_type": "claim", "record_id": claim["id"]},
             ("GET", "/api/search"): {"q": "Meridian"},
+            ("GET", "/api/investigations/{investigation_id}/corpus/search"): {"q": "Meridian"},
             ("POST", "/api/console/backups/{bid}/restore/plan"): {"kind": "investigation_export"},
         },
     )

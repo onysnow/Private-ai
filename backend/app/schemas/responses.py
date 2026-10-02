@@ -1085,6 +1085,57 @@ class DocumentEmailOut(ResponseModel):
     thread_note: str | None
 
 
+class HighlightSegmentOut(ResponseModel):
+    """A piece of a snippet; ``match`` marks the words the search found."""
+    text: str
+    match: bool
+
+
+class CorpusHitOut(ResponseModel):
+    """A document (or a page of one) OpenAleph found, linked to its Workbench
+    document when the Workbench holds it (app/services/openaleph_search.py)."""
+    openaleph_entity_id: str
+    schema_: str = Field(alias="schema")
+    title: str
+    document_id: str | None
+    filename: str | None
+    page_number: int | None
+    highlights: list[list[HighlightSegmentOut]]
+    score: float | None
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class CorpusSearchOut(ResponseModel):
+    """Full-text search of the investigation's corpus in OpenAleph."""
+    investigation_id: str
+    query: str
+    state: Literal["ok", "not_configured", "no_collection", "unreachable"]
+    detail: str | None
+    total: int
+    results: list[CorpusHitOut]
+
+
+class SimilarDocumentOut(ResponseModel):
+    openaleph_entity_id: str
+    schema_: str = Field(alias="schema")
+    title: str
+    document_id: str | None
+    filename: str | None
+    page_number: int | None
+    score: float | None
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class SimilarDocumentsOut(ResponseModel):
+    """Documents whose text is like this one's (OpenAleph's more_like_this)."""
+    document_id: str
+    state: Literal["ok", "not_configured", "no_collection", "unreachable"]
+    detail: str | None
+    results: list[SimilarDocumentOut]
+
+
 class DocumentFormatsOut(ResponseModel):
     """What an upload accepts now (app/services/document_formats.py)."""
     reader: Literal["openaleph", "workbench"]

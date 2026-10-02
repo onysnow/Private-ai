@@ -2368,6 +2368,47 @@ export type CoreCapabilitiesOut = {
 };
 
 /**
+ * CorpusHitOut
+ *
+ * A document (or a page of one) OpenAleph found, linked to its Workbench
+ * document when the Workbench holds it (app/services/openaleph_search.py).
+ */
+export type CorpusHitOut = {
+  /**
+   * Document Id
+   */
+  document_id: string | null;
+  /**
+   * Filename
+   */
+  filename: string | null;
+  /**
+   * Highlights
+   */
+  highlights: Array<Array<HighlightSegmentOut>>;
+  /**
+   * Openaleph Entity Id
+   */
+  openaleph_entity_id: string;
+  /**
+   * Page Number
+   */
+  page_number: number | null;
+  /**
+   * Schema
+   */
+  schema: string;
+  /**
+   * Score
+   */
+  score: number | null;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
  * CorpusPendingOut
  *
  * What the next push would change, and the records it cannot send (with why).
@@ -2429,6 +2470,38 @@ export type CorpusPushOut = {
    * Unchanged
    */
   unchanged: number;
+};
+
+/**
+ * CorpusSearchOut
+ *
+ * Full-text search of the investigation's corpus in OpenAleph.
+ */
+export type CorpusSearchOut = {
+  /**
+   * Detail
+   */
+  detail: string | null;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Query
+   */
+  query: string;
+  /**
+   * Results
+   */
+  results: Array<CorpusHitOut>;
+  /**
+   * State
+   */
+  state: 'ok' | 'not_configured' | 'no_collection' | 'unreachable';
+  /**
+   * Total
+   */
+  total: number;
 };
 
 /**
@@ -5579,6 +5652,22 @@ export type HealthOut = {
    * Status
    */
   status: 'ok';
+};
+
+/**
+ * HighlightSegmentOut
+ *
+ * A piece of a snippet; ``match`` marks the words the search found.
+ */
+export type HighlightSegmentOut = {
+  /**
+   * Match
+   */
+  match: boolean;
+  /**
+   * Text
+   */
+  text: string;
 };
 
 /**
@@ -8830,6 +8919,64 @@ export type SettingsStatusOut = {
 };
 
 /**
+ * SimilarDocumentOut
+ */
+export type SimilarDocumentOut = {
+  /**
+   * Document Id
+   */
+  document_id: string | null;
+  /**
+   * Filename
+   */
+  filename: string | null;
+  /**
+   * Openaleph Entity Id
+   */
+  openaleph_entity_id: string;
+  /**
+   * Page Number
+   */
+  page_number: number | null;
+  /**
+   * Schema
+   */
+  schema: string;
+  /**
+   * Score
+   */
+  score: number | null;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * SimilarDocumentsOut
+ *
+ * Documents whose text is like this one's (OpenAleph's more_like_this).
+ */
+export type SimilarDocumentsOut = {
+  /**
+   * Detail
+   */
+  detail: string | null;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Results
+   */
+  results: Array<SimilarDocumentOut>;
+  /**
+   * State
+   */
+  state: 'ok' | 'not_configured' | 'no_collection' | 'unreachable';
+};
+
+/**
  * SortOrder
  */
 export type SortOrder = 'value_desc' | 'value_asc' | 'label' | 'time';
@@ -11948,6 +12095,47 @@ export type FindOpenalephChildrenResponses = {
 export type FindOpenalephChildrenResponse =
   FindOpenalephChildrenResponses[keyof FindOpenalephChildrenResponses];
 
+export type GetSimilarDocumentsData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: {
+    /**
+     * Limit
+     */
+    limit?: number;
+  };
+  url: '/api/documents/{document_id}/similar';
+};
+
+export type GetSimilarDocumentsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSimilarDocumentsError =
+  GetSimilarDocumentsErrors[keyof GetSimilarDocumentsErrors];
+
+export type GetSimilarDocumentsResponses = {
+  /**
+   * Successful Response
+   */
+  200: SimilarDocumentsOut;
+};
+
+export type GetSimilarDocumentsResponse =
+  GetSimilarDocumentsResponses[keyof GetSimilarDocumentsResponses];
+
 export type EnrichmentSessionDetailData = {
   body?: never;
   path: {
@@ -13750,6 +13938,55 @@ export type ListOpenalephCorpusFailuresResponses = {
 
 export type ListOpenalephCorpusFailuresResponse =
   ListOpenalephCorpusFailuresResponses[keyof ListOpenalephCorpusFailuresResponses];
+
+export type SearchInvestigationCorpusData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query: {
+    /**
+     * Q
+     */
+    q: string;
+    /**
+     * Limit
+     */
+    limit?: number;
+    /**
+     * Offset
+     */
+    offset?: number;
+  };
+  url: '/api/investigations/{investigation_id}/corpus/search';
+};
+
+export type SearchInvestigationCorpusErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SearchInvestigationCorpusError =
+  SearchInvestigationCorpusErrors[keyof SearchInvestigationCorpusErrors];
+
+export type SearchInvestigationCorpusResponses = {
+  /**
+   * Successful Response
+   */
+  200: CorpusSearchOut;
+};
+
+export type SearchInvestigationCorpusResponse =
+  SearchInvestigationCorpusResponses[keyof SearchInvestigationCorpusResponses];
 
 export type GetCorpusStatusData = {
   body?: never;

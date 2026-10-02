@@ -111,6 +111,16 @@ Workbench's search for `Mention` entities could never find anything.
   Workbench document with `parent_document_id`, read by a job of its own
   so it can be retried alone; a workbook's sheets (`Table` entities, no
   file of their own) are not included.
+- **Search finds pages only when asked.** `GET /search` returns whole
+  documents (a PDF as its `Pages` entity) unless `filter:schemata` names
+  `Page` as well; then the matching page comes back too, with its `index`
+  and its `document` (nested as an entity in a search reply). The
+  Workbench asks for `Document` and `Page`, shows a document by the page
+  that matched, and links every hit to its Workbench document; snippets are
+  OpenAleph's highlights (`<em>` around each match, HTML-escaped text),
+  turned into plain pieces so nothing is rendered as markup.
+  `GET /entities/{id}/more_like_this` gives similar documents, filtered to
+  the investigation's collection.
 - **A message nothing replies to has no thread.** `GET /entities/{id}/thread`
   answers no results for it (its docstring says the source is included);
   the Workbench says "no other message in this email's thread".

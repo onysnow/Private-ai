@@ -31,7 +31,7 @@ from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Investigation
 from app.schemas.responses import (
-    AiAnalysisCandidatesOut, AiModelFailedOut, AiOutputRejectedOut, AiReasoningRunOut, ClaimOut, ErrorOut, ConnectorFindingOut, ConnectorRunOut, CorpusStatusOut, DemoSeedOut, DocumentOut,
+    AiAnalysisCandidatesOut, AiModelFailedOut, AiOutputRejectedOut, AiReasoningRunOut, ClaimOut, ErrorOut, ConnectorFindingOut, ConnectorRunOut, CorpusSearchOut, CorpusStatusOut, DemoSeedOut, DocumentOut,
     EvidencePoolRow, FinancialLedgerOut, GraphOut, InvestigationDeletionPreview, InvestigationDeletionResult,
     InvestigationOut, LeadOut, LeadQueueOut, OpenAlephCorpusBindingOut, OpenAlephOperationFailureOut,
     QuestionContextOut, RelationshipOut, ReportingTaskOut, SourceOut, TimelineOut, ValidationErrorOut, file_response, upstream,
@@ -65,6 +65,7 @@ from app.services.openaleph_corpus import (
     record_openaleph_operation_failure,
     serialize_binding,
 )
+from app.services.openaleph_search import search_corpus
 from app.services.openaleph_status import corpus_status
 from app.services.relationships import (
     RELATIONSHIP_SCHEMAS,
@@ -117,6 +118,25 @@ def get_corpus_status(investigation_id: str, db: Session = Depends(get_db)) -> A
     can keep asking while files are being read."""
     try:
         return corpus_status(db, investigation_id)
+    except ValueError as exc:
+        raise HTTPException(404, str(exc))
+
+
+@router.get("/investigations/{investigation_id}/corpus/search", response_model=CorpusSearchOut)
+def search_investigation_corpus(
+    investigation_id: str,
+    q: str = Query(..., min_length=1, max_length=500),
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0, le=9000),
+    db: Session = Depends(get_db),
+) -> Any:
+    """Full-text search of the investigation's documents in OpenAleph, with
+    highlighted snippets, each hit linked to its Workbench document and page
+    (ADR-0006, Wave A). OpenAleph off, holding nothing yet, or not answering
+    is a ``state`` of the reply, so investigation search can show its other
+    groups."""
+    try:
+        return search_corpus(db, investigation_id, q, limit=limit, offset=offset)
     except ValueError as exc:
         raise HTTPException(404, str(exc))
 

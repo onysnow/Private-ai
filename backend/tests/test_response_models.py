@@ -352,6 +352,26 @@ def test_document_email_replies(demo):
     _same_through_model(r.DocumentOut, serialize_document(db, doc))
 
 
+def test_corpus_search_and_similar_replies(demo, monkeypatch):
+    from app.core.config import settings
+    from app.models.domain import DocumentCorpusSync, InvestigationCorpusBinding
+    from app.services.openaleph_search import search_corpus, similar_documents
+
+    db, inv, doc, _candidates, _accepted = demo
+    monkeypatch.setattr(settings, "openaleph_enabled", True)
+    _same_through_model(r.CorpusSearchOut, search_corpus(db, inv.id, "Meridian"))
+    _same_through_model(r.SimilarDocumentsOut, similar_documents(db, doc.id))
+    db.add(InvestigationCorpusBinding(investigation_id=inv.id, provider="openaleph", collection_id="7", status="active"))
+    db.add(DocumentCorpusSync(document_id=doc.id, investigation_id=inv.id, provider="openaleph", collection_id="7",
+                              provider_record_id="e1", status="synced", response_json={}))
+    db.commit()
+    rows = [{"id": "e1-p2", "schema": "Page", "caption": "minutes", "score": 2.0, "properties": {"index": ["2"], "document": ["e1"]},
+             "highlight": {"content": ["The <em>Meridian</em> wire"]}},
+            {"id": "elsewhere", "schema": "PlainText", "caption": "other"}]
+    _same_through_model(r.CorpusSearchOut, search_corpus(db, inv.id, "Meridian", fetch=lambda _p, _q: {"results": rows, "total": 2}))
+    _same_through_model(r.SimilarDocumentsOut, similar_documents(db, doc.id, fetch=lambda _p, _q: {"results": rows[1:]}))
+
+
 def test_document_formats_replies(monkeypatch):
     from app.core.config import settings
     from app.services.document_formats import accepted_formats

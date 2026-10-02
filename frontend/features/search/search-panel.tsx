@@ -16,6 +16,7 @@ import {searchWorkbenchOptions} from '../../lib/generated/@tanstack/react-query.
 import type {SearchHitOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import type {ProvenanceRequest} from '../../lib/workbench-store';
+import {CorpusResults} from './corpus-results';
 
 type Props = {
   /** Empty means "search every investigation this session may see". */
@@ -119,6 +120,7 @@ export function SearchPanel({investigationId}: Props): ReactElement {
           </div>;
         })}
       </div>
+      {submitted?.investigationId && <CorpusResults investigationId={submitted.investigationId} q={submitted.q}/>}
     </CardContent>
   </Card>;
 }

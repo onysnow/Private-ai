@@ -274,6 +274,31 @@ def test_an_archives_files_and_an_emails_attachment_become_documents_under_them(
         ("Transfer to Meridian", email["id"], True), ("Re: Transfer to Meridian", reply["id"], False)]
 
 
+def test_the_corpus_is_searched_with_highlights_and_similar_documents_are_found(live):
+    client, _created = live
+    inv = _investigation(live, "Wave A search")
+    memo = _upload(live, inv, "memo.txt", MEMO.encode(), "text/plain")
+    minutes = _upload(live, inv, "minutes.pdf", _pdf(
+        "Board minutes of Kestrelwood Holdings Limited.",
+        "Page two: Jonathan Whitaker approved the Zanzibar transfer to Meridian Holdings Ltd."), "application/pdf")
+    other = _upload(live, inv, "note.txt", b"Meridian Holdings Ltd paid Angela Merkel and Jane Doe again.", "text/plain")
+
+    found = client.get(f"/api/investigations/{inv}/corpus/search", params={"q": "Zanzibar"}).json()
+    assert found["state"] == "ok", found
+    assert len(found["results"]) == 1, found
+    (hit,) = found["results"]
+    assert hit["document_id"] == minutes["id"] and hit["page_number"] == 2, hit
+    assert any(piece["match"] and piece["text"] == "Zanzibar" for snippet in hit["highlights"] for piece in snippet), hit
+
+    meridian = client.get(f"/api/investigations/{inv}/corpus/search", params={"q": "Meridian"}).json()
+    assert {row["document_id"] for row in meridian["results"]} == {memo["id"], minutes["id"], other["id"]}, meridian
+
+    similar = client.get(f"/api/documents/{other['id']}/similar").json()
+    assert similar["state"] == "ok", similar
+    assert memo["id"] in [row["document_id"] for row in similar["results"]], similar
+    assert other["id"] not in [row["document_id"] for row in similar["results"]]
+
+
 def test_a_pdf_gets_its_names_on_their_pages(live):
     inv = _investigation(live, "Wave A pdf")
     document = _upload(live, inv, "minutes.pdf", _pdf(

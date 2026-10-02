@@ -2164,6 +2164,47 @@ export const zHealthOut = z.object({
 });
 
 /**
+ * HighlightSegmentOut
+ *
+ * A piece of a snippet; ``match`` marks the words the search found.
+ */
+export const zHighlightSegmentOut = z.object({
+  match: z.boolean(),
+  text: z.string(),
+});
+
+/**
+ * CorpusHitOut
+ *
+ * A document (or a page of one) OpenAleph found, linked to its Workbench
+ * document when the Workbench holds it (app/services/openaleph_search.py).
+ */
+export const zCorpusHitOut = z.object({
+  document_id: z.string().nullable(),
+  filename: z.string().nullable(),
+  highlights: z.array(z.array(zHighlightSegmentOut)),
+  openaleph_entity_id: z.string(),
+  page_number: z.number().int().nullable(),
+  schema: z.string(),
+  score: z.number().nullable(),
+  title: z.string(),
+});
+
+/**
+ * CorpusSearchOut
+ *
+ * Full-text search of the investigation's corpus in OpenAleph.
+ */
+export const zCorpusSearchOut = z.object({
+  detail: z.string().nullable(),
+  investigation_id: z.string(),
+  query: z.string(),
+  results: z.array(zCorpusHitOut),
+  state: z.enum(['ok', 'not_configured', 'no_collection', 'unreachable']),
+  total: z.number().int(),
+});
+
+/**
  * HypothesisTestRequest
  */
 export const zHypothesisTestRequest = z.object({
@@ -3676,6 +3717,31 @@ export const zSettingsStatusOut = z.object({
   limits: zSettingsLimitsOut,
   restore_api_enabled: z.boolean(),
   security: zSecurityAlertsOut,
+});
+
+/**
+ * SimilarDocumentOut
+ */
+export const zSimilarDocumentOut = z.object({
+  document_id: z.string().nullable(),
+  filename: z.string().nullable(),
+  openaleph_entity_id: z.string(),
+  page_number: z.number().int().nullable(),
+  schema: z.string(),
+  score: z.number().nullable(),
+  title: z.string(),
+});
+
+/**
+ * SimilarDocumentsOut
+ *
+ * Documents whose text is like this one's (OpenAleph's more_like_this).
+ */
+export const zSimilarDocumentsOut = z.object({
+  detail: z.string().nullable(),
+  document_id: z.string(),
+  results: z.array(zSimilarDocumentOut),
+  state: z.enum(['ok', 'not_configured', 'no_collection', 'unreachable']),
 });
 
 /**
@@ -5288,6 +5354,19 @@ export const zFindOpenalephChildrenPath = z.object({
  */
 export const zFindOpenalephChildrenResponse = zBackgroundJobOut;
 
+export const zGetSimilarDocumentsPath = z.object({
+  document_id: z.string(),
+});
+
+export const zGetSimilarDocumentsQuery = z.object({
+  limit: z.number().int().gte(1).lte(50).optional().default(10),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetSimilarDocumentsResponse = zSimilarDocumentsOut;
+
 export const zEnrichmentSessionDetailPath = z.object({
   session_id: z.string(),
 });
@@ -5809,6 +5888,21 @@ export const zListOpenalephCorpusFailuresPath = z.object({
 export const zListOpenalephCorpusFailuresResponse = z.array(
   zOpenAlephOperationFailureOut,
 );
+
+export const zSearchInvestigationCorpusPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zSearchInvestigationCorpusQuery = z.object({
+  q: z.string().min(1).max(500),
+  limit: z.number().int().gte(1).lte(100).optional().default(20),
+  offset: z.number().int().gte(0).lte(9000).optional().default(0),
+});
+
+/**
+ * Successful Response
+ */
+export const zSearchInvestigationCorpusResponse = zCorpusSearchOut;
 
 export const zGetCorpusStatusPath = z.object({
   investigation_id: z.string(),

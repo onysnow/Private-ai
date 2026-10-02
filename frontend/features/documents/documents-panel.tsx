@@ -38,6 +38,7 @@ import {useWorkbenchStore} from '../../lib/workbench-store';
 import {CorpusStatus} from './corpus-status';
 import {CONTAINER_SCHEMATA, nestDocuments} from './document-tree';
 import {EmailView} from './email-view';
+import {SimilarDocuments} from './similar-documents';
 import {IdentifierOwner} from './identifier-owner';
 import {SchemaQuestion} from './schema-question';
 
@@ -72,6 +73,8 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
   const queryClient = useQueryClient();
   const router = useRouter();
   const openProvenance = useWorkbenchStore(state => state.openProvenance);
+  // A document another panel asked to open (a corpus search hit, a similar document).
+  const documentRequest = useWorkbenchStore(state => state.document);
   const [docTitle, setDocTitle] = useState('');
   const [docFile, setDocFile] = useState<File | null>(null);
   const [docStatus, setDocStatus] = useState('');
@@ -89,6 +92,9 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
   const [bulkStatus, setBulkStatus] = useState('');
   // The email whose headers and thread are open.
   const [emailOpen, setEmailOpen] = useState<string | null>(null);
+  // The document whose similar documents are shown, and the one last opened from elsewhere.
+  const [similarOpen, setSimilarOpen] = useState<string | null>(null);
+  const [opened, setOpened] = useState<string | null>(null);
 
   // Proposals belong to the case they were loaded for: a late reply for
   // another case is dropped, and a new case starts with none.
@@ -361,6 +367,23 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
     }
   };
 
+  // Open a document asked for elsewhere: its proposals, scrolled into view,
+  // with the page that matched named (ADR-0006, Wave A).
+  const answeredRequest = useRef(0);
+  const openRequested = (request: {serial: number; documentId: string; pageNumber: number | null}) => {
+    if (request.serial === answeredRequest.current) return;
+    answeredRequest.current = request.serial;
+    const {documentId, pageNumber} = request;
+    const name = documents.find(d => d.id === documentId)?.filename ?? 'The document';
+    setOpened(documentId);
+    void loadCandidates(documentId).then(() => setDocStatus(`${name} opened${pageNumber ? ` at page ${pageNumber}` : ''}: its proposals are below.`));
+    document.getElementById(`document-${documentId}`)?.scrollIntoView?.({block: 'center'});
+  };
+  // The newest handler, so the effect below runs only when a request arrives.
+  const latestOpenRequested = useRef(openRequested);
+  useEffect(() => { latestOpenRequested.current = openRequested; });
+  useEffect(() => { if (documentRequest) latestOpenRequested.current(documentRequest); }, [documentRequest]);
+
   const entityCaption = (id: unknown, fallback: string) => entities.find(e => e.id === id)?.caption || text(id) || fallback;
 
   return <Card className="card" id="document-ingestion">
@@ -392,7 +415,8 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
       {nestDocuments(documents).map(({document: d, depth, parent}) => {
         const oa = openAleph[d.id];
         const container = Boolean(d.openaleph_schema && CONTAINER_SCHEMATA.includes(d.openaleph_schema));
-        return <div className="candidate" key={d.id} data-testid={`document-${d.id}`} style={depth ? {marginLeft: `${depth * 1.5}rem`} : undefined}>
+        return <div className="candidate" key={d.id} id={`document-${d.id}`} data-testid={`document-${d.id}`} aria-current={opened === d.id ? 'true' : undefined}
+          style={depth ? {marginLeft: `${depth * 1.5}rem`} : undefined}>
           {parent && <div><small>Inside {parent.filename}</small></div>}
           <b>{d.filename}</b> <small>{d.extraction_status} · {d.chunk_count} chunks · {Object.entries(d.candidate_counts || {}).map(([k, v]) => `${k}: ${v}`).join(' · ')}</small>
           {oa && <div>
@@ -408,10 +432,12 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
             {d.openaleph_document_id && d.extraction_status === 'complete' && <Button onClick={() => findNamesAgain(d)}>Find names again</Button>}
             {container && d.extraction_status === 'complete' && <Button onClick={() => findChildrenAgain(d)}>Look for files inside again</Button>}
             {d.openaleph_schema === 'Email' && <Button aria-expanded={emailOpen === d.id} onClick={() => setEmailOpen(cur => (cur === d.id ? null : d.id))}>Headers & thread</Button>}
+            {d.openaleph_document_id && <Button aria-expanded={similarOpen === d.id} onClick={() => setSimilarOpen(cur => (cur === d.id ? null : d.id))}>Similar documents</Button>}
             <Button onClick={() => openProvenance({title: d.filename, kind: 'document', sourceId: d.source_id, documentId: d.id})}>Trace document</Button>
             {d.extraction_status === 'failed' && <Button onClick={() => retryDocumentRead(d)}>Retry reading</Button>}
             {(d.extraction_status === 'queued' || d.extraction_status === 'extracting') && <Button onClick={() => retryDocumentRead(d)}>Check reading progress</Button>}
           </div>
+          {similarOpen === d.id && <SimilarDocuments documentId={d.id}/>}
           {emailOpen === d.id && <EmailView documentId={d.id} onOpenDocument={documentId => loadCandidates(documentId)}/>}
         </div>;
       })}

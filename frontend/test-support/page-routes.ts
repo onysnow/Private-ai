@@ -14,7 +14,7 @@
 //   const api = mockApi(pageRoutes({investigations: [investigation], leads: [leadFixture()]}));
 //   api.add({'POST /api/leads': {id: 'lead-2'}});           // a route the test's action needs
 //   api.add({...investigationRoutes('inv-restored')});       // a case opened later
-import type {CorpusStatusOut, DocumentFormatsOut, DossierExternalOut, DossierSummaryOut, InvestigationOut, PostMergeReconciliationOut} from '../lib/generated/types.gen';
+import type {CorpusSearchOut, CorpusStatusOut, DocumentFormatsOut, DossierExternalOut, DossierSummaryOut, InvestigationOut, PostMergeReconciliationOut} from '../lib/generated/types.gen';
 import type {Routes} from './mock-api';
 
 /** A reply as a test writes it: the generated shape, with whatever a test overrides. */
@@ -225,6 +225,12 @@ export function documentFormatsBody(overrides: Partial<DocumentFormatsOut> = {})
     reader: 'workbench', extensions: ['csv', 'docx', 'htm', 'html', 'md', 'pdf', 'txt'], mime_types: [], openaleph_only_extensions: [],
     accept: '.csv,.docx,.htm,.html,.md,.pdf,.txt', max_bytes: 52428800, ingest_file_image: null, ...overrides,
   };
+}
+
+/** OpenAleph's search of the case's corpus, in the generated CorpusSearchOut
+ * shape: nothing found unless a test says otherwise. */
+export function corpusSearchBody(investigationId: string, overrides: Partial<CorpusSearchOut> = {}): CorpusSearchOut {
+  return {investigation_id: investigationId, query: '', state: 'ok', detail: null, total: 0, results: [], ...overrides};
 }
 
 /** How OpenAleph's work on the case stands, in the generated CorpusStatusOut

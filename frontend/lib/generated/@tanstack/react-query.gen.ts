@@ -84,6 +84,7 @@ import {
   getSecurityAudit,
   getSecurityAuditRetentionPreview,
   getSecurityAuditSummary,
+  getSimilarDocuments,
   getWriteupEndpoint,
   health,
   importOpenalephDocumentEntities,
@@ -155,6 +156,7 @@ import {
   revokeAppUserToken,
   rotateAppUserToken,
   saveConnectorCredential,
+  searchInvestigationCorpus,
   searchWorkbench,
   seedDemo,
   settingsStatus,
@@ -395,6 +397,9 @@ import type {
   GetSecurityAuditSummaryData,
   GetSecurityAuditSummaryError,
   GetSecurityAuditSummaryResponse,
+  GetSimilarDocumentsData,
+  GetSimilarDocumentsError,
+  GetSimilarDocumentsResponse,
   GetWriteupEndpointData,
   GetWriteupEndpointError,
   GetWriteupEndpointResponse,
@@ -605,6 +610,9 @@ import type {
   SaveConnectorCredentialData,
   SaveConnectorCredentialError,
   SaveConnectorCredentialResponse,
+  SearchInvestigationCorpusData,
+  SearchInvestigationCorpusError,
+  SearchInvestigationCorpusResponse,
   SearchWorkbenchData,
   SearchWorkbenchError,
   SearchWorkbenchResponse,
@@ -1924,6 +1932,39 @@ export const findOpenalephChildrenMutation = (
   };
   return mutationOptions;
 };
+
+export const getSimilarDocumentsQueryKey = (
+  options: Options<GetSimilarDocumentsData>,
+) => createQueryKey('getSimilarDocuments', options);
+
+/**
+ * Get Similar Documents
+ *
+ * Documents of the same investigation whose text is like this one's,
+ * from OpenAleph's more_like_this (ADR-0006, Wave A), each linked to its
+ * Workbench document. A document OpenAleph does not hold, or OpenAleph
+ * not answering, is a ``state`` of the reply.
+ */
+export const getSimilarDocumentsOptions = (
+  options: Options<GetSimilarDocumentsData>,
+) =>
+  queryOptions<
+    GetSimilarDocumentsResponse,
+    GetSimilarDocumentsError,
+    GetSimilarDocumentsResponse,
+    ReturnType<typeof getSimilarDocumentsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSimilarDocuments({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSimilarDocumentsQueryKey(options),
+  });
 
 export const enrichmentSessionDetailQueryKey = (
   options: Options<EnrichmentSessionDetailData>,
@@ -3494,6 +3535,98 @@ export const listOpenalephCorpusFailuresOptions = (
     },
     queryKey: listOpenalephCorpusFailuresQueryKey(options),
   });
+
+export const searchInvestigationCorpusQueryKey = (
+  options: Options<SearchInvestigationCorpusData>,
+) => createQueryKey('searchInvestigationCorpus', options);
+
+/**
+ * Search Investigation Corpus
+ *
+ * Full-text search of the investigation's documents in OpenAleph, with
+ * highlighted snippets, each hit linked to its Workbench document and page
+ * (ADR-0006, Wave A). OpenAleph off, holding nothing yet, or not answering
+ * is a ``state`` of the reply, so investigation search can show its other
+ * groups.
+ */
+export const searchInvestigationCorpusOptions = (
+  options: Options<SearchInvestigationCorpusData>,
+) =>
+  queryOptions<
+    SearchInvestigationCorpusResponse,
+    SearchInvestigationCorpusError,
+    SearchInvestigationCorpusResponse,
+    ReturnType<typeof searchInvestigationCorpusQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await searchInvestigationCorpus({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: searchInvestigationCorpusQueryKey(options),
+  });
+
+export const searchInvestigationCorpusInfiniteQueryKey = (
+  options: Options<SearchInvestigationCorpusData>,
+): QueryKey<Options<SearchInvestigationCorpusData>> =>
+  createQueryKey('searchInvestigationCorpus', options, true);
+
+/**
+ * Search Investigation Corpus
+ *
+ * Full-text search of the investigation's documents in OpenAleph, with
+ * highlighted snippets, each hit linked to its Workbench document and page
+ * (ADR-0006, Wave A). OpenAleph off, holding nothing yet, or not answering
+ * is a ``state`` of the reply, so investigation search can show its other
+ * groups.
+ */
+export const searchInvestigationCorpusInfiniteOptions = (
+  options: Options<SearchInvestigationCorpusData>,
+) => {
+  const opts = infiniteQueryOptions<
+    SearchInvestigationCorpusResponse,
+    SearchInvestigationCorpusError,
+    InfiniteData<SearchInvestigationCorpusResponse>,
+    QueryKey<Options<SearchInvestigationCorpusData>>,
+    | number
+    | Pick<
+        QueryKey<Options<SearchInvestigationCorpusData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<SearchInvestigationCorpusData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  offset: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await searchInvestigationCorpus({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: searchInvestigationCorpusInfiniteQueryKey(options),
+    },
+  );
+  return opts as Omit<typeof opts, 'initialData'>;
+};
 
 export const getCorpusStatusQueryKey = (
   options: Options<GetCorpusStatusData>,

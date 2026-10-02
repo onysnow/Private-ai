@@ -11,7 +11,7 @@ its URL prefix is /investigations, so it belongs with group 8.
 from typing import Any
 import logging
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, Response, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Request, Response, UploadFile
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
@@ -26,11 +26,12 @@ from app.models.domain import BackgroundJob, Document, Investigation
 from app.schemas.responses import (
     BackgroundJobOut, DocumentDetailOut, DocumentEmailOut, DocumentFormatsOut, DocumentReadFailedOut, DocumentUploadOut, ErrorOut,
     ExtractionCandidateOut, OpenAlephDocumentSyncOut, OpenAlephEntityImportOut, OpenAlephEvidenceImportOut,
-    OpenAlephReviewRefreshOut, OpenAlephReviewStatusOut, ValidationErrorOut, upstream,
+    OpenAlephReviewRefreshOut, OpenAlephReviewStatusOut, SimilarDocumentsOut, ValidationErrorOut, upstream,
 )
 from app.services.document_formats import UnsupportedFormat, accepted_formats, check_upload
 from app.services.email_documents import document_email
 from app.services.openaleph_children import is_container
+from app.services.openaleph_search import similar_documents
 from app.services.documents import (
     get_document_detail, list_document_candidates, serialize_document, store_document,
 )
@@ -193,6 +194,18 @@ async def find_openaleph_children(document_id: str, request: Request, response: 
     if not job_out["finished"]:
         response.status_code = 202
     return job_out
+
+
+@router.get("/documents/{document_id}/similar", response_model=SimilarDocumentsOut)
+def get_similar_documents(document_id: str, limit: int = Query(default=10, ge=1, le=50), db: Session = Depends(get_db)) -> Any:
+    """Documents of the same investigation whose text is like this one's,
+    from OpenAleph's more_like_this (ADR-0006, Wave A), each linked to its
+    Workbench document. A document OpenAleph does not hold, or OpenAleph
+    not answering, is a ``state`` of the reply."""
+    try:
+        return similar_documents(db, document_id, limit=limit)
+    except ValueError as exc:
+        raise HTTPException(404, str(exc))
 
 
 @router.get("/documents/{document_id}/email", response_model=DocumentEmailOut)

@@ -76,6 +76,9 @@ class FakeOpenAleph:
         self.files: dict[str, bytes] = {}
         # GET /entities/{id}/thread replies, by email entity id.
         self.threads: dict[str, dict[str, Any]] = {}
+        # Full-text search hits (GET /search with ``q``) and more_like_this hits, by entity id.
+        self.search_hits: list[dict[str, Any]] = []
+        self.similar: dict[str, list[dict[str, Any]]] = {}
         self._pending_analysis: list[str] = []
         self.transport = httpx.MockTransport(self.handle)
 
@@ -123,6 +126,9 @@ class FakeOpenAleph:
         if parts[:3] == ["api", "2", "entities"] and len(parts) == 5 and parts[4] == "thread":
             thread = self.threads.get(parts[3])
             return httpx.Response(200, json=thread) if thread is not None else httpx.Response(400, json={"status": "error"})
+        if parts[:3] == ["api", "2", "entities"] and len(parts) == 5 and parts[4] == "more_like_this":
+            rows = self.similar.get(parts[3])
+            return httpx.Response(200, json={"results": rows, "total": len(rows)}) if rows is not None else httpx.Response(404)
         if path == "/api/2/archive/resolve":
             entity_id = request.url.params.get("entity", "")
             if entity_id not in self.files:
@@ -172,6 +178,8 @@ class FakeOpenAleph:
             rows = [row for row in self.entities.values() if parent in row["properties"].get("parent", [])]
             offset, limit = int(params.get("offset", 0)), int(params.get("limit", 20))
             return httpx.Response(200, json={"results": rows[offset:offset + limit], "total": len(rows)})
+        if params.get("filter:schema") != "Page" and params.get("q") not in (None, "*"):
+            return httpx.Response(200, json={"results": self.search_hits, "total": len(self.search_hits)})
         if params.get("filter:schema") == "Page":
             document_id = params.get("filter:properties.document", "")
             rows = self.pages.get(document_id, [])

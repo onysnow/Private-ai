@@ -237,6 +237,9 @@ import type {
   GetSecurityAuditSummaryData,
   GetSecurityAuditSummaryErrors,
   GetSecurityAuditSummaryResponses,
+  GetSimilarDocumentsData,
+  GetSimilarDocumentsErrors,
+  GetSimilarDocumentsResponses,
   GetWriteupEndpointData,
   GetWriteupEndpointErrors,
   GetWriteupEndpointResponses,
@@ -447,6 +450,9 @@ import type {
   SaveConnectorCredentialData,
   SaveConnectorCredentialErrors,
   SaveConnectorCredentialResponses,
+  SearchInvestigationCorpusData,
+  SearchInvestigationCorpusErrors,
+  SearchInvestigationCorpusResponses,
   SearchWorkbenchData,
   SearchWorkbenchErrors,
   SearchWorkbenchResponses,
@@ -649,6 +655,9 @@ import {
   zGetSecurityAuditRetentionPreviewQuery,
   zGetSecurityAuditRetentionPreviewResponse,
   zGetSecurityAuditSummaryResponse,
+  zGetSimilarDocumentsPath,
+  zGetSimilarDocumentsQuery,
+  zGetSimilarDocumentsResponse,
   zGetWriteupEndpointPath,
   zGetWriteupEndpointResponse,
   zHealthResponse,
@@ -816,6 +825,9 @@ import {
   zSaveConnectorCredentialBody,
   zSaveConnectorCredentialPath,
   zSaveConnectorCredentialResponse,
+  zSearchInvestigationCorpusPath,
+  zSearchInvestigationCorpusQuery,
+  zSearchInvestigationCorpusResponse,
   zSearchWorkbenchQuery,
   zSearchWorkbenchResponse,
   zSeedDemoResponse,
@@ -2256,6 +2268,40 @@ export const findOpenalephChildren = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zFindOpenalephChildrenResponse.parseAsync(data),
     url: '/api/documents/{document_id}/openaleph/children',
+    ...options,
+  });
+
+/**
+ * Get Similar Documents
+ *
+ * Documents of the same investigation whose text is like this one's,
+ * from OpenAleph's more_like_this (ADR-0006, Wave A), each linked to its
+ * Workbench document. A document OpenAleph does not hold, or OpenAleph
+ * not answering, is a ``state`` of the reply.
+ */
+export const getSimilarDocuments = <ThrowOnError extends boolean = false>(
+  options: Options<GetSimilarDocumentsData, ThrowOnError>,
+): RequestResult<
+  GetSimilarDocumentsResponses,
+  GetSimilarDocumentsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetSimilarDocumentsResponses,
+    GetSimilarDocumentsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetSimilarDocumentsPath,
+          query: zGetSimilarDocumentsQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetSimilarDocumentsResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/similar',
     ...options,
   });
 
@@ -3730,6 +3776,41 @@ export const listOpenalephCorpusFailures = <
     responseValidator: async (data) =>
       await zListOpenalephCorpusFailuresResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/corpus/openaleph/failures',
+    ...options,
+  });
+
+/**
+ * Search Investigation Corpus
+ *
+ * Full-text search of the investigation's documents in OpenAleph, with
+ * highlighted snippets, each hit linked to its Workbench document and page
+ * (ADR-0006, Wave A). OpenAleph off, holding nothing yet, or not answering
+ * is a ``state`` of the reply, so investigation search can show its other
+ * groups.
+ */
+export const searchInvestigationCorpus = <ThrowOnError extends boolean = false>(
+  options: Options<SearchInvestigationCorpusData, ThrowOnError>,
+): RequestResult<
+  SearchInvestigationCorpusResponses,
+  SearchInvestigationCorpusErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    SearchInvestigationCorpusResponses,
+    SearchInvestigationCorpusErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zSearchInvestigationCorpusPath,
+          query: zSearchInvestigationCorpusQuery,
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSearchInvestigationCorpusResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/corpus/search',
     ...options,
   });
 
