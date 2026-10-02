@@ -185,6 +185,20 @@ def test_a_kind_not_drawn_yet_is_removed_with_a_plain_reason(monkeypatch, demo):
         assert "not drawn yet" in row.trace["chart_check"]["removed"][0]["reason"]
 
 
+def test_a_kind_that_cannot_draw_its_query_goes_back_with_the_reason_and_a_fitting_kind_is_kept(monkeypatch, demo):
+    histogram_over_time = _chart(kind="histogram", title="Payments came in one burst", query={"name": "payments_over_time"})
+    fixed = _chart(kind="stacked_bar_100", title="Meridian received all of the money")
+    fake = _FakeLLMClient(_draft(demo, histogram_over_time), _draft(demo, fixed))
+    response = _run(monkeypatch, demo, fake)
+    assert response.status_code == 200, response.text
+    assert fake.calls == 2
+    assert "a histogram needs one value per record, such as payment_amounts" in fake.user_prompts[1]
+    visual = response.json()["payload"]["sections"][0]["visual"]
+    assert visual["spec"]["kind"] == "stacked_bar_100" and visual["report"]["ok"] is True
+    assert visual["report"]["not_applicable"]["8"].startswith("a stacked_bar_100 joins no points")
+    assert visual["text"]["data_table"]["rows"][0]["share"] == 100.0
+
+
 @pytest.mark.parametrize("bad_visual, fragment", [
     (_chart(query={"name": "payments_by_payee"}), "unknown query 'payments_by_payee'"),
     ({"type": "chart", "spec": {**_chart()["spec"], "values": [2400000]}}, "Extra inputs are not permitted"),

@@ -21,6 +21,24 @@ from typing import Any
 DEFAULT_THEME = "dark_academia"
 DEFAULT_FONTS = "theme"  # use the theme's own pairing
 
+# The colours of a chart that gives each part its own colour (a donut, a
+# treemap, a 100% bar): the Okabe-Ito palette (Okabe & Ito 2008, "Color
+# Universal Design", https://jfly.uni-koeln.de/color/), which the design
+# doc's rule 10 cites and which stays distinguishable for the common forms
+# of colour blindness. Seven colours, because rule 10 allows eight and the
+# eighth is the theme's grey for "Other". Black is left out (it reads as
+# text); the order puts the colours with the most contrast against a light
+# page first (4.65:1 down to 1.19:1 on Dark Academia's paper), since a
+# chart with few parts uses only the first ones (WCAG 1.4.11 asks 3:1 of a
+# graphic against what is next to it; the kinds that use this palette
+# label every part directly, which rule 11 accepts instead).
+CATEGORICAL_PALETTE: tuple[str, ...] = ("0072B2", "D55E00", "009E73", "CC79A7", "56B4E9", "E69F00", "F0E442")
+# Text written inside a coloured mark is black or white, whichever has more
+# contrast with the fill: one of the two reaches WCAG 1.4.3's 4.5:1 on
+# every colour above (5.19:1 at the least, white on blue), where the
+# themes' own near-black and paper do not on vermillion (4.43:1 at best).
+INK_DARK, INK_LIGHT = "000000", "FFFFFF"
+
 
 @dataclass(frozen=True)
 class Theme:
@@ -46,6 +64,8 @@ class Theme:
     bar_muted: str     # bars that are not highlighted
     heading_font: str
     body_font: str
+    # One colour per part, for the kinds that colour each part (see CATEGORICAL_PALETTE).
+    palette: tuple[str, ...] = CATEGORICAL_PALETTE
 
 
 THEMES: dict[str, Theme] = {t.id: t for t in (
@@ -171,7 +191,7 @@ def resolved_theme(style: Any) -> Theme:
     if not pair["heading"]:
         return base
     data = asdict(base)
-    data.update(heading_font=pair["heading"], body_font=pair["body"])
+    data.update(heading_font=pair["heading"], body_font=pair["body"], palette=base.palette)
     return Theme(**data)
 
 

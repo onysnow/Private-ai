@@ -1410,6 +1410,7 @@ export type {
   VisualParamOut,
   VisualPreviewOut,
   VisualQueryOut,
+  VisualQuestionOut,
   VisualSpec,
   VisualStyle,
   WriteupCreate,

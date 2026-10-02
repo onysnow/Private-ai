@@ -31,7 +31,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.domain import Claim, ClaimEvidenceLink, Document, Entity, Investigation, Lead, RelationshipEdge
-from app.visuals.spec import DRAWN_KINDS, QUERY_CATALOG, ChartKind, QueryRef, QuerySpec
+from app.visuals.spec import DRAWN_KINDS, QUERY_CATALOG, QUESTIONS, ChartKind, QueryRef, QuerySpec
 
 _MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
@@ -52,10 +52,15 @@ class DataRow:
     record_refs: list[RecordRef]
     record_count: int
     key: str = ""      # what the row is sorted by within its kind: a period for time series, the label otherwise
+    x: float | None = None   # the second number of a "pairs" row (a scatter plot's x); `value` is its y
 
     def as_dict(self) -> dict[str, Any]:
-        return {"label": self.label, "value": self.value, "record_refs": [r.as_dict() for r in self.record_refs],
-                "record_count": self.record_count, "key": self.key}
+        out: dict[str, Any] = {"label": self.label, "value": self.value, "record_refs": [r.as_dict() for r in self.record_refs],
+                               "record_count": self.record_count, "key": self.key}
+        if self.x is not None:
+            # Only pairs rows carry it, so every other row keeps its pass-2 shape.
+            out["x"] = self.x
+        return out
 
 
 @dataclass
@@ -66,16 +71,28 @@ class VisualData:
     params: dict[str, str]
     unit: str                 # "USD" for an amount, the record noun for a count
     unit_kind: str            # "amount" | "count"
-    series_kind: str          # "category" | "time"
+    series_kind: str          # one of spec.SERIES_KINDS
     record_noun: str
     rows: list[DataRow]
     currency: str | None = None
     record_count: int = 0     # records behind all rows together
     omitted: list[dict[str, Any]] = field(default_factory=list)
+    # A "pairs" query's second number (x): its unit and kind, and the names
+    # of both numbers ({"x": ..., "y": ...}) for the axes. Empty otherwise.
+    x_unit: str | None = None
+    x_unit_kind: str | None = None
+    measure_labels: dict[str, str] = field(default_factory=dict)
 
     def as_dict(self) -> dict[str, Any]:
         data = asdict(self)
         data["rows"] = [row.as_dict() for row in self.rows]
+        # Left out when the query has one number, so a stored pass-2 chart and
+        # a new one of the same query look the same.
+        for key in ("x_unit", "x_unit_kind"):
+            if data[key] is None:
+                del data[key]
+        if not data["measure_labels"]:
+            del data["measure_labels"]
         return data
 
     @classmethod
@@ -84,9 +101,11 @@ class VisualData:
             DataRow(label=str(r.get("label", "")), value=float(r.get("value", 0)),
                     record_refs=[RecordRef(str(ref["record_type"]), str(ref["record_id"])) for ref in (r.get("record_refs") or [])
                                  if isinstance(ref, dict) and ref.get("record_type") and ref.get("record_id")],
-                    record_count=int(r.get("record_count", 0)), key=str(r.get("key", "")))
+                    record_count=int(r.get("record_count", 0)), key=str(r.get("key", "")),
+                    x=float(r["x"]) if isinstance(r.get("x"), (int, float)) and not isinstance(r.get("x"), bool) else None)
             for r in (data.get("rows") or []) if isinstance(r, dict)
         ]
+        labels = data.get("measure_labels")
         return cls(
             investigation_id=str(data.get("investigation_id", "")), query=str(data.get("query", "")),
             params={str(k): str(v) for k, v in (data.get("params") or {}).items()},
@@ -94,6 +113,9 @@ class VisualData:
             series_kind=str(data.get("series_kind", "category")), record_noun=str(data.get("record_noun", "records")),
             rows=rows, currency=data.get("currency"), record_count=int(data.get("record_count", 0)),
             omitted=[o for o in (data.get("omitted") or []) if isinstance(o, dict)],
+            x_unit=str(data["x_unit"]) if data.get("x_unit") is not None else None,
+            x_unit_kind=str(data["x_unit_kind"]) if data.get("x_unit_kind") is not None else None,
+            measure_labels={str(k): str(v) for k, v in labels.items()} if isinstance(labels, dict) else {},
         )
 
     @property
@@ -219,6 +241,57 @@ def payments_by_party(db: Session, investigation_id: str, params: dict[str, str]
         investigation_id=investigation_id, query="payments_by_party", params=params,
         unit=currency or "", unit_kind="amount", series_kind="category", record_noun="payments",
         rows=rows, currency=currency, record_count=len(transactions), omitted=omitted,
+    )
+
+
+def payment_amounts(db: Session, investigation_id: str, params: dict[str, str]) -> VisualData:
+    """One row per payment: its amount, resting on that one Payment record.
+    A histogram bins these values (app/visuals/stats.py); a bar chart ranks
+    them. Labels name the payer, the beneficiary and the date, and are made
+    unique ("#2", "#3") when two payments would read the same, so every row
+    can be told apart on a chart and in its data table."""
+    transactions, currency, omitted = _ledger(db, investigation_id, params.get("currency"))
+    ordered = sorted(transactions, key=lambda t: (t.get("dateTime") or "", t.get("from") or "", t.get("to") or "", float(t["amount"]), t["relationship_id"]))
+    rows: list[DataRow] = []
+    seen: dict[str, int] = defaultdict(int)
+    for tx in ordered:
+        base = f"{tx['from'] or tx['from_entity_id']} → {tx['to'] or tx['to_entity_id']}, {tx.get('dateTime') or 'undated'}"
+        seen[base] += 1
+        label = base if seen[base] == 1 else f"{base} #{seen[base]}"
+        rows.append(DataRow(label, round(float(tx["amount"]), 2), [RecordRef("relationship", tx["relationship_id"])], 1, label))
+    rows.sort(key=lambda r: (-r.value, r.label.lower()))
+    return VisualData(
+        investigation_id=investigation_id, query="payment_amounts", params=params,
+        unit=currency or "", unit_kind="amount", series_kind="distribution", record_noun="payments",
+        rows=rows, currency=currency, record_count=len(rows), omitted=omitted,
+    )
+
+
+def payments_count_and_total_by_party(db: Session, investigation_id: str, params: dict[str, str]) -> VisualData:
+    """For each party, how many payments it received (or made) and their
+    total: x is the number of Payment records, y (`value`) their sum in one
+    currency. The records behind a row are exactly the payments counted."""
+    transactions, currency, omitted = _ledger(db, investigation_id, params.get("currency"))
+    received = params.get("direction", "received") == "received"
+    totals: dict[str, float] = defaultdict(float)
+    refs: dict[str, list[RecordRef]] = defaultdict(list)
+    labels: dict[str, str] = {}
+    for tx in transactions:
+        party_id = tx["to_entity_id"] if received else tx["from_entity_id"]
+        labels[party_id] = (tx["to"] if received else tx["from"]) or party_id
+        totals[party_id] += float(tx["amount"])
+        refs[party_id].append(RecordRef("relationship", tx["relationship_id"]))
+    rows = [DataRow(labels[pid], round(totals[pid], 2), sorted(set(refs[pid]), key=lambda r: r.record_id), len(refs[pid]), labels[pid],
+                    x=float(len(refs[pid])))
+            for pid in totals]
+    rows.sort(key=lambda r: (-r.value, r.label.lower()))
+    verb = "received" if received else "paid"
+    return VisualData(
+        investigation_id=investigation_id, query="payments_count_and_total_by_party", params=params,
+        unit=currency or "", unit_kind="amount", series_kind="pairs", record_noun="payments",
+        rows=rows, currency=currency, record_count=len(transactions), omitted=omitted,
+        x_unit="payments", x_unit_kind="count",
+        measure_labels={"x": f"Number of payments {verb}", "y": f"Total {verb}" + (f" ({currency})" if currency else "")},
     )
 
 
@@ -383,6 +456,8 @@ QUERIES: dict[str, QueryRunner] = {
     "evidence_by_stance": evidence_by_stance,
     "documents_by_status": documents_by_status,
     "leads_by_status": leads_by_status,
+    "payment_amounts": payment_amounts,
+    "payments_count_and_total_by_party": payments_count_and_total_by_party,
 }
 
 # The menu and the kitchen must agree, or an order could name a dish nobody cooks.
@@ -403,10 +478,11 @@ def run_query(db: Session, investigation_id: str, query: QueryRef) -> VisualData
 
 
 def describe_catalog(db: Session, investigation_id: str) -> dict[str, Any]:
-    """The menu the AI sees: every query, its parameters, and whether this
-    investigation has data for it (each query is run once with its
-    defaults). Also lists the chart kinds, and which of them can be drawn
-    today."""
+    """The menu the AI and the chart builder see: every query, its
+    parameters, whether this investigation has data for it (each query is
+    run once with its defaults), the kinds that can draw it and the
+    questions it answers; the questions (FT Visual Vocabulary) with the
+    kinds that answer each; all chart kinds, and which can be drawn today."""
     if db.get(Investigation, investigation_id) is None:
         raise QueryError("Investigation not found")
     queries = []
@@ -420,10 +496,18 @@ def describe_catalog(db: Session, investigation_id: str) -> dict[str, Any]:
             "series_kind": spec.series_kind, "unit_kind": spec.unit_kind, "record_noun": spec.record_noun,
             "has_data": any(row.value for row in data.rows), "record_count": data.record_count,
             "row_count": len(data.rows), "currencies": currencies,
+            "kinds": [kind.value for kind in spec.kinds if kind in DRAWN_KINDS],
+            "questions": list(spec.questions),
         })
     return {
         "investigation_id": investigation_id,
         "queries": queries,
+        "questions": [
+            {"id": q.id, "label": q.label, "description": q.description, "kinds": [k.value for k in q.kinds],
+             "drawn_kinds": [k.value for k in q.kinds if k in DRAWN_KINDS],
+             "queries": [name for name, spec in QUERY_CATALOG.items() if spec.series_kind in q.series_kinds]}
+            for q in QUESTIONS.values()
+        ],
         "kinds": [kind.value for kind in ChartKind],
         "drawn_kinds": sorted(kind.value for kind in DRAWN_KINDS),
     }

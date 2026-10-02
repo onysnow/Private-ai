@@ -105,12 +105,23 @@ def test_describe_catalog_lists_every_query_and_whether_it_has_data(demo):
     catalog = describe_catalog(db, inv_id)
     by_name = {q["name"]: q for q in catalog["queries"]}
     assert set(by_name) == {"payments_by_party", "payments_over_time", "events_over_time", "links_by_type", "claims_by_status",
-                            "entities_by_schema", "evidence_by_stance", "documents_by_status", "leads_by_status"}
+                            "entities_by_schema", "evidence_by_stance", "documents_by_status", "leads_by_status",
+                            "payment_amounts", "payments_count_and_total_by_party"}
     assert by_name["payments_by_party"]["has_data"] and by_name["payments_by_party"]["currencies"] == ["USD"]
     assert by_name["payments_by_party"]["params"]["direction"] == {"description": "Rank who received the money, or who paid it.", "choices": ["received", "paid"], "default": "received"}
     assert by_name["documents_by_status"]["has_data"] is False
-    assert catalog["drawn_kinds"] == ["bar", "column"]
-    assert "sankey" in catalog["kinds"]
+    assert catalog["drawn_kinds"] == ["area", "bar", "column", "donut", "histogram", "line", "scatter", "stacked_bar_100", "treemap"]
+    assert "sankey" in catalog["kinds"] and "sankey" not in catalog["drawn_kinds"]
+    # Each query says which drawn kinds can draw it and which questions it answers.
+    assert by_name["payments_by_party"]["kinds"] == ["bar", "column", "stacked_bar_100", "donut", "treemap"]
+    assert by_name["payments_by_party"]["questions"] == ["ranking", "part_of_whole"]
+    assert by_name["payments_over_time"]["kinds"] == ["line", "column", "area", "bar"]
+    assert by_name["payment_amounts"]["kinds"] == ["histogram", "bar", "column"] and by_name["payment_amounts"]["has_data"]
+    assert by_name["payments_count_and_total_by_party"]["kinds"] == ["scatter"]
+    questions = {q["id"]: q for q in catalog["questions"]}
+    assert questions["part_of_whole"]["kinds"] == ["stacked_bar_100", "donut", "treemap"]
+    assert "payments_by_party" in questions["part_of_whole"]["queries"] and "payments_over_time" not in questions["part_of_whole"]["queries"]
+    assert questions["flow"]["drawn_kinds"] == [] and questions["flow"]["queries"] == []
 
 
 def _add_payment(db, inv_id: str, payer: str, beneficiary: str, props: dict) -> str:
@@ -135,6 +146,41 @@ def test_currencies_are_never_added_together(demo):
 
     over_time = run_query(db, inv_id, QueryRef(name="payments_over_time", params={"currency": "EUR"}))
     assert [(r.key, r.value, r.record_count) for r in over_time.rows] == [("2024-01", 5000.0, 1), ("2024-02", 7000.0, 1)]
+
+
+def test_payment_amounts_lists_every_payment_once_in_one_currency(demo):
+    db, inv_id = demo
+    _add_payment(db, inv_id, "Meridian Holdings Ltd", "Harborline Civic Trust", {"amount": ["5000"], "currency": ["USD"], "date": ["2024-01-10"]})
+    _add_payment(db, inv_id, "Meridian Holdings Ltd", "Harborline Civic Trust", {"amount": ["5000"], "currency": ["USD"], "date": ["2024-01-10"]})
+    _add_payment(db, inv_id, "Meridian Holdings Ltd", "Harborline Civic Trust", {"amount": ["9000"], "currency": ["EUR"], "date": ["2024-02-10"]})
+    data = run_query(db, inv_id, QueryRef(name="payment_amounts"))
+    assert data.series_kind == "distribution" and data.currency == "USD" and data.unit_kind == "amount"
+    assert [(r.value, r.record_count) for r in data.rows] == [(2400000.0, 1), (5000.0, 1), (5000.0, 1)]
+    # Each row rests on exactly its own Payment record, and no two rows read the same.
+    assert len({r.label for r in data.rows}) == 3 and all(len(r.record_refs) == 1 for r in data.rows)
+    assert sorted(r.label for r in data.rows if r.value == 5000.0) == [
+        "Meridian Holdings Ltd → Harborline Civic Trust, 2024-01-10", "Meridian Holdings Ltd → Harborline Civic Trust, 2024-01-10 #2"]
+    assert data.record_count == 3
+    # The euro payment is reported, never added in (rule 19).
+    assert [(o["currency"], o["record_count"]) for o in data.omitted if o["reason"] == "other currency"] == [("EUR", 1)]
+
+
+def test_payments_count_and_total_gives_two_numbers_per_party(demo):
+    db, inv_id = demo
+    for amount in ("5000", "7000", "9000"):
+        _add_payment(db, inv_id, "Meridian Holdings Ltd", "Harborline Civic Trust", {"amount": [amount], "currency": ["USD"], "date": ["2024-01-10"]})
+    data = run_query(db, inv_id, QueryRef(name="payments_count_and_total_by_party"))
+    assert data.series_kind == "pairs" and data.x_unit_kind == "count" and data.x_unit == "payments"
+    assert [(r.label, r.x, r.value, r.record_count) for r in data.rows] == [
+        ("Meridian Holdings Ltd", 1.0, 2400000.0, 1), ("Harborline Civic Trust", 3.0, 21000.0, 3)]
+    assert data.measure_labels == {"x": "Number of payments received", "y": "Total received (USD)"}
+    paid = run_query(db, inv_id, QueryRef(name="payments_count_and_total_by_party", params={"direction": "paid"}))
+    assert {r.label: (r.x, r.value) for r in paid.rows} == {"Bellcastle Trading Group": (1.0, 2400000.0), "Meridian Holdings Ltd": (3.0, 21000.0)}
+    assert paid.measure_labels["y"] == "Total paid (USD)"
+    # x travels with the row through storage; rows without one keep their pass-2 shape.
+    assert VisualData.from_dict(data.as_dict()) == data
+    assert data.as_dict()["rows"][0]["x"] == 1.0 and "x" not in run_query(db, inv_id, QueryRef(name="links_by_type")).as_dict()["rows"][0]
+    assert "measure_labels" not in run_query(db, inv_id, QueryRef(name="links_by_type")).as_dict()
 
 
 def test_incomplete_payments_are_listed_not_guessed(demo):

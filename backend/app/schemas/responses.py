@@ -20,6 +20,16 @@ class ResponseModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+def _absent_when_none(value: Any) -> bool:
+    """A key the service adds only in some replies is left out, not sent as null."""
+    return value is None
+
+
+def _absent_when_empty(value: Any) -> bool:
+    """A collection the service adds only when it holds something is left out, not sent empty."""
+    return value is None or value == {} or value == []
+
+
 # --- Sources and evidence ---------------------------------------------------
 
 class SourceOut(ResponseModel):
@@ -100,23 +110,37 @@ class VisualParamOut(ResponseModel):
 
 
 class VisualQueryOut(ResponseModel):
-    """One entry of the query catalogue the AI orders from."""
+    """One entry of the query catalogue the AI and the chart builder order from."""
     name: str
     label: str
     description: str
     params: dict[str, VisualParamOut]
-    series_kind: str          # category | time
+    series_kind: str          # category | time | distribution | pairs
     unit_kind: str            # amount | count
     record_noun: str
     has_data: bool
     record_count: int
     row_count: int
     currencies: list[str]
+    kinds: list[str]          # the drawn kinds that can draw this query's rows, best first
+    questions: list[str]      # the questions (VisualQuestionOut.id) it can answer
+
+
+class VisualQuestionOut(ResponseModel):
+    """A question a chart answers (FT Visual Vocabulary): the kinds that
+    answer it, best first, and the queries that hold its relationship."""
+    id: str
+    label: str
+    description: str
+    kinds: list[str]
+    drawn_kinds: list[str]
+    queries: list[str]
 
 
 class VisualCatalogOut(ResponseModel):
     investigation_id: str
     queries: list[VisualQueryOut]
+    questions: list[VisualQuestionOut]
     kinds: list[str]
     drawn_kinds: list[str]
 
@@ -132,6 +156,8 @@ class VisualDataRowOut(ResponseModel):
     record_refs: list[RecordRefOut]
     record_count: int
     key: str
+    # A pairs row's second number (a scatter plot's x); `value` is its y.
+    x: float | None = Field(default=None, exclude_if=_absent_when_none)
 
 
 class VisualDataOut(ResponseModel):
@@ -147,6 +173,10 @@ class VisualDataOut(ResponseModel):
     currency: str | None = None
     record_count: int
     omitted: list[dict[str, Any]]
+    # A pairs query's second number: its unit, its kind, and both numbers' names ({"x", "y"}).
+    x_unit: str | None = Field(default=None, exclude_if=_absent_when_none)
+    x_unit_kind: str | None = Field(default=None, exclude_if=_absent_when_none)
+    measure_labels: dict[str, str] | None = Field(default=None, exclude_if=_absent_when_empty)
 
 
 class CheckItemOut(ResponseModel):
@@ -160,6 +190,8 @@ class CheckReportOut(ResponseModel):
     warnings: list[CheckItemOut]
     checked_rules: list[int]
     not_checked: dict[str, str]
+    # Rules about a different kind of chart, with the reason; never listed as checked.
+    not_applicable: dict[str, str] = Field(default_factory=dict)
 
 
 class DataTableRowOut(ResponseModel):
@@ -168,6 +200,11 @@ class DataTableRowOut(ResponseModel):
     formatted: str
     record_count: int
     record_refs: list[RecordRefOut]
+    # A part's share of the whole, in % (100% bar, donut, treemap).
+    share: float | None = Field(default=None, exclude_if=_absent_when_none)
+    # A scatter plot's x, and as written.
+    x: float | None = Field(default=None, exclude_if=_absent_when_none)
+    x_formatted: str | None = Field(default=None, exclude_if=_absent_when_none)
 
 
 class DataTableOut(ResponseModel):
@@ -354,11 +391,6 @@ class AggregateProvenanceOut(ResponseModel):
     statement_sources: list[str]
     evidence_count: int
     evidence: list[EvidenceWithSourceOut]
-
-
-def _absent_when_none(value: Any) -> bool:
-    """A key the service adds only in some replies is left out, not sent as null."""
-    return value is None
 
 
 class RelationshipOut(ResponseModel):

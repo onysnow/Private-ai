@@ -1,10 +1,13 @@
-# Investigation visuals (pass 2: the foundation, proven with bars)
+# Investigation visuals (passes 2 and 3: the foundation and the statistical charts)
 
 This is the code behind the design doc "Investigation Visuals & Presentation
 System" (pass 1: research) and the decisions in ADR-0005 (lines 1, 2, 5, 6).
-Pass 2 lays the foundation under every later visual and proves it end to end
-with one chart family, bars: a horizontal ranked `bar` and a vertical
-`column`.
+Pass 2 laid the foundation under every later visual and proved it end to end
+with bars: a horizontal ranked `bar` and a vertical `column`. Pass 3 draws
+the statistical kinds on the same foundation: `line`, `area`,
+`stacked_bar_100` (the 100% bar the design uses instead of small pies),
+`donut`, `treemap`, `histogram` and `scatter`. `timeline` and `sankey` wait
+for the money-flow and network pass.
 
 The promise, in one line: **the AI never types a number.** It writes a short
 order; the Workbench cooks every value from the investigation's own records,
@@ -24,11 +27,18 @@ order slip  →  kitchen  →  checker  →  drawing  →  review
    highlight, and a theme. The spec refuses anything else (`extra="forbid"`),
    so a model that tries to add `values` or `items` is turned away. Unknown
    query names and bad parameters get a plain message naming the catalogue.
-2. **The kitchen** (`backend/app/visuals/data_service.py`). Nine read-only
+   `QUESTIONS` is the chart chooser, after the FT Visual Vocabulary: ranking,
+   change over time, part of a whole, distribution, correlation and flow,
+   each with the kinds that answer it and the query shapes that hold that
+   relationship (`category`, `time`, `distribution`, `pairs`).
+2. **The kitchen** (`backend/app/visuals/data_service.py`). Eleven read-only
    queries, each scoped to one investigation: `payments_by_party`,
    `payments_over_time`, `events_over_time`, `links_by_type`,
    `claims_by_status`, `entities_by_schema`, `evidence_by_stance`,
-   `documents_by_status`, `leads_by_status`. Every row is
+   `documents_by_status`, `leads_by_status`, and for pass 3
+   `payment_amounts` (one row per payment, for a histogram) and
+   `payments_count_and_total_by_party` (two numbers per party, `x` the number
+   of payments and `value` their total, for a scatter plot). Every row is
    `{label, value, record_refs, record_count}`: the value is a sum or a count
    of real records, `record_refs` are the `{record_type, record_id}` pairs the
    citation layer already understands, and `record_count` says how many
@@ -38,21 +48,44 @@ order slip  →  kitchen  →  checker  →  drawing  →  review
    currency and lists the others under `omitted`. Records a query could not
    use (a payment with no amount, an event dated only to the year when
    months were asked for) are listed under `omitted` with the reason, never
-   guessed at. `describe_catalog()` is the menu the AI sees: each query, its
-   parameters, and whether this investigation has data for it.
+   guessed at. `describe_catalog()` is the menu the AI and the chart builder
+   see: each query, its parameters, whether this investigation has data for
+   it, the kinds that can draw it and the questions it answers.
+   The numbers a chart needs beyond a query's own sums and counts live
+   beside the kitchen in `backend/app/visuals/stats.py`: the shares of a
+   whole; histogram bins (the number of bins by Doane's rule, NumPy's
+   estimator, because payment amounts are skewed; Sturges as the style
+   alternative; round edges by Vega's bin transform); and the outliers a
+   crowded scatter plot names (Tukey's fences). The module's docstring
+   gives the sources and why Freedman–Diaconis is not offered.
 3. **The checker** (`backend/app/visuals/checker.py`). `check_visual(spec,
    data, theme)` returns a report with `ok`, `errors` and `warnings`; every
    item carries the design rule's number and a plain-words message. An error
    keeps the chart out of a draft; a warning travels with it so the reviewer
-   sees it. The rule map is below.
+   sees it. The report also says, rule by rule, what was judged for this
+   kind of chart: `checked_rules` (judged against this chart, reading what
+   its kind draws), `not_applicable` (rules about another kind of chart,
+   with the reason: a zero baseline for a donut, slices for a bar chart) and
+   `not_checked` (rules for a later pass, or the option-level rules of a
+   kind not drawn yet). The rule map is below.
 4. **The drawing** (`backend/app/visuals/echarts.py`). `build_chart()` turns
    spec + data + theme into an ECharts option in the house style (BBC
    cookbook, Datawrapper, Urban Institute): the title states the finding, the
-   subtitle gives the unit, only horizontal gridlines, a dark zero line,
-   values written on the bars with the record count and a `†` on a value
-   that rests on one record, no 3D, a zero baseline, at most eight colours,
-   a source line, text at least 12 px, colours and fonts from the deck theme
-   (`app/services/presentation_style.py`). It also writes the alt text, a
+   subtitle gives the unit, only horizontal gridlines where a chart has
+   axes, a dark zero line, values written on the marks with the record
+   count and a `†` on a value that rests on one record, no 3D, a zero
+   baseline for bars and areas, at most eight colours (seven Okabe–Ito
+   colours and a grey "Other" for the kinds that colour each part), a source
+   line, text at least 12 px, colours and fonts from the deck theme
+   (`app/services/presentation_style.py`). Per kind: a line or an area
+   writes its last value at the end and draws a point that rests on one
+   record hollow; a 100% bar and a donut write each part's name and share
+   (the donut has its total in the centre and never a pulled-out slice); a
+   treemap writes inside each part in black or white, whichever reads; a
+   histogram's bars touch; a scatter plot names every point when there are
+   few and the outliers when there are many. A kind that cannot draw a
+   query's rows (a histogram of periods, a scatter plot of one number) is
+   refused in plain words (`ChartDoesNotFit`). It also writes the alt text, a
    longer description and the data table. Animation is off: the option is
    drawn on a server. The in-app preview and the exports read the same rows,
    so they cannot disagree.
@@ -110,31 +143,35 @@ for a kind pass 2 cannot draw yet.
 
 | # | Rule | Judged from | Error or warning |
 |---|------|-------------|------------------|
-| 0 | The numbers drawn match the data (the design's first check, after VisEval) | option + data | error |
-| 1 | Bars and areas start at zero | option | error |
-| 2 | No log scale on bars or areas, or on data with zero or negative values | spec + data | error |
-| 3 | Never show a negative value as a size | spec + data | error for area/angle kinds, warning for bars |
-| 4 | Stack only bars and areas | spec | error (the "never total the same field twice" half waits for a second series, pass 3) |
-| 5 | Donut: four slices at most | spec + data | error (slices add up by construction) |
-| 6 | No second value axis | option | error |
-| 7 | No 3D, no upside-down axis, evenly spaced ticks | option + data | error; warning past 36 periods |
-| 8 | Never join unrelated categories with a line | spec + data | error |
-| 9 | Length and position first; never an order drawn in random colours | spec + option | error for random colours; warning for a ranking as donut/treemap |
+| 0 | The numbers drawn match the data (the design's first check, after VisEval) | option + data | error; for a histogram every record is counted into the drawn bins again, for a 100% bar or donut each written share is read back, a donut's centre total is compared with the parts; a warning for a smoothed line (it follows no record between points) |
+| 1 | Bars and areas start at zero | option | error; a 100% bar must also run to the whole; not applicable to line, donut, treemap, scatter |
+| 2 | No log scale on bars or areas, or on data with zero or negative values | spec + data | error (a scatter plot's x counts too) |
+| 3 | Never show a negative value as a size | spec + data | error for area/angle kinds, warning for bars; not applicable to line and scatter (positions) |
+| 4 | Stack only bars and areas; never total the same field twice | spec + data | error; a donut, treemap or 100% bar whose parts share records is refused (they would total those records twice) |
+| 5 | Donut: four slices at most, adding to 100% (±0.5) | spec + data + option | error; the shares written on a donut or 100% bar must add up to 100 within half a point; not applicable to other kinds |
+| 6 | No second value axis | option | error (a scatter plot's axis across and axis up are one each) |
+| 7 | No 3D, no upside-down axis, evenly spaced ticks | option + data | error; also no pulled-out slice and no rose, and a histogram's bins touch and share one width; warning past 36 periods |
+| 8 | Never join unrelated categories with a line | spec + data | error; not applicable to kinds without a line |
+| 9 | Length and position first; never an order drawn in random colours | spec + option | error for random colours, and for a part-of-whole chart over periods (an order in category colours); warning for a ranking as donut/treemap |
 | 10 | Eight colours at most; fold the rest into "Other" | spec + data + option | error; warning past 20 bars |
-| 11 | Text contrast 4.5:1; neighbouring colours 3:1 or labelled directly | theme + option | error |
-| 12 | Never rely on colour alone | spec + option | error (highlighted bars must also be bold) |
+| 11 | Text contrast 4.5:1; neighbouring colours 3:1 or labelled directly | theme + option | error; a line or a point needs 3:1 against the page, text inside a part 4.5:1 against its fill |
+| 12 | Never rely on colour alone | spec + option | error (highlighted bars bold; highlighted points and parts labelled in bold; every part of a donut, treemap or 100% bar carries its name) |
 | 13 | A title that states the finding; alt text, description and data table | spec + drawing | error |
 | 14 | Chart text at least 12 px | option | error |
 | 15 | A source line; every value links to a record | data + option | error |
-| 16 | Show how many records sit behind each group; flag groups more than 10× apart | data + option | error for missing counts; warning for the spread |
+| 16 | Show how many records sit behind each group; flag groups more than 10× apart | data + option | error for missing counts (on the mark, or in each point's tooltip for line, area and scatter); warning for the spread |
 | 17 | Shaded maps: rates not counts, 3–7 steps, fair-area projection | — | not checkable here (maps pass) |
 | 18 | Networks over ~20 nodes offer a grid view; crossings counted | — | not checkable here (networks pass) |
-| 19 | Never add up different currencies | spec + data | error for a wrong unit; warning for currencies left out |
-| 20 | A value resting on one record is visibly flagged | data + option | warning for the value; error if the mark is missing |
+| 19 | Never add up different currencies | spec + data | error for a wrong unit; warning for currencies left out; not applicable to counts |
+| 20 | A value resting on one record is visibly flagged | data + option | warning for the value; error if the mark is missing (`†` on bars, parts and bins; a hollow marker on lines and points) |
 
 The metamorphic tests from McNutt et al. (CHI 2020) live in
-`backend/tests/test_visuals_echarts.py`: shuffling the rows gives an
-identical option, nudging a value changes it.
+`backend/tests/test_visuals_echarts.py` (bars) and
+`backend/tests/test_visuals_kinds.py` (every statistical kind): shuffling the
+rows gives an identical option, nudging a value changes it. A histogram is
+the one kind where a small nudge rightly changes nothing (it counts records
+per bin), so its nudge carries a payment across a bin edge, and a separate
+test shows a nudge inside a bin leaves the picture as it was.
 
 ## Running the render service
 
@@ -161,29 +198,32 @@ TZ=UTC PYTHONPATH=. python -m pytest tests/test_visuals_*.py -q --no-cov
 
 | File | What it proves |
 |------|----------------|
-| `test_visuals_spec.py` | Valid orders parse; unknown queries, bad parameters, numbers and unknown themes are refused with plain messages |
-| `test_visuals_data_service.py` | Every query on the demo investigation; currencies never mixed; incomplete records listed; canonical order |
-| `test_visuals_checker.py` | A failing and a passing case for every rule above |
-| `test_visuals_echarts.py` | The house style, the words beside the chart, the metamorphic tests |
+| `test_visuals_spec.py` | Valid orders parse; unknown queries, bad parameters, numbers and unknown themes are refused with plain messages; the questions and the kinds each query fits |
+| `test_visuals_data_service.py` | Every query on the demo investigation; currencies never mixed; incomplete records listed; canonical order; payment amounts and the two numbers per party |
+| `test_visuals_stats.py` | Shares; bin counts against NumPy's estimators (when NumPy is importable); round edges against Vega's own output; every value in exactly one bin; Tukey's fences |
+| `test_visuals_checker.py` | A failing and a passing case for every rule above, for bars and for each rule a statistical kind adds |
+| `test_visuals_echarts.py` | The house style of bars, the words beside the chart, the metamorphic tests |
+| `test_visuals_kinds.py` | Every statistical kind in the house style and passing its check, its draw options, the kinds refused for a query they cannot draw, the metamorphic tests for every kind |
 | `test_visuals_render.py` | The bridge behind a mocked transport, vl-convert, one live run of the Node service |
 | `test_visuals_exports.py` | A chart in a deck (native chart) and in a brief (image, or table and a note) |
 | `test_visuals_routes.py` | The catalogue and preview routes, their response models, investigation scope |
 | `test_visuals_draft.py` | A draft whose model orders a chart: kept, re-asked, or removed with reasons |
 
-## What pass 3 adds
+## What pass 3 built, and what is left
 
-- Drawing for the kinds the spec, the kitchen and the checker already accept:
-  `line`, `area`, `stacked_bar_100`, `donut`, `treemap`, `histogram`,
-  `scatter`, `timeline`, `sankey`. Each needs a branch in
-  `build_chart()`, a deck renderer (native where python-pptx has the type,
-  an image otherwise) and nothing else: the order slip, the data service and
-  the checker do not change.
-- Queries with a second series (parts of a whole over time, a scatter's two
-  numbers per entity), and with them the second half of rule 4.
+Built: the drawing of the seven statistical kinds, the two queries they
+needed (`payment_amounts`, `payments_count_and_total_by_party`), the
+question-first chooser, and a checker that judges every rule for each kind
+and says which rules do not apply.
+
+Left for later passes:
+
+- `timeline` and `sankey` (the money-flow and network pass).
+- Parts of a whole over time (a stacked area), which needs a query with a
+  second series.
 - Reading the values back out of the rendered SVG (the image-level half of
   check 0).
-- A style layer for charts in the editor (presets and options), the way the
-  three older visuals have one.
-- The frontend: drawing the stored option with the app's ECharts, showing the
-  check report beside the chart, and the gallery comparison the design doc
-  asks for at the end of every pass.
+- The presets the editor design lists that need data this pass does not
+  have: small multiples and several donuts (more than one series), two-level
+  and drill-down treemaps (a hierarchy), bubbles (a third number), a
+  connected scatter plot, box and strip plots.

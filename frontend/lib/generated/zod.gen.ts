@@ -373,6 +373,7 @@ export const zCheckItemOut = z.object({
 export const zCheckReportOut = z.object({
   checked_rules: z.array(z.number().int()),
   errors: z.array(zCheckItemOut),
+  not_applicable: z.record(z.string()).optional(),
   not_checked: z.record(z.string()),
   ok: z.boolean(),
   warnings: z.array(zCheckItemOut),
@@ -2297,7 +2298,10 @@ export const zDataTableRowOut = z.object({
   label: z.string(),
   record_count: z.number().int(),
   record_refs: z.array(zRecordRefOut),
+  share: z.number().nullish(),
   value: z.number(),
+  x: z.number().nullish(),
+  x_formatted: z.string().nullish(),
 });
 
 /**
@@ -3442,6 +3446,7 @@ export const zVisualDataRowOut = z.object({
   record_count: z.number().int(),
   record_refs: z.array(zRecordRefOut),
   value: z.number(),
+  x: z.number().nullish(),
 });
 
 /**
@@ -3452,6 +3457,7 @@ export const zVisualDataRowOut = z.object({
 export const zVisualDataOut = z.object({
   currency: z.string().nullish(),
   investigation_id: z.string(),
+  measure_labels: z.record(z.string()).nullish(),
   omitted: z.array(z.record(z.unknown())),
   params: z.record(z.string()),
   query: z.string(),
@@ -3461,6 +3467,8 @@ export const zVisualDataOut = z.object({
   series_kind: z.string(),
   unit: z.string(),
   unit_kind: z.string(),
+  x_unit: z.string().nullish(),
+  x_unit_kind: z.string().nullish(),
 });
 
 /**
@@ -3494,20 +3502,37 @@ export const zVisualPreviewOut = z.object({
 /**
  * VisualQueryOut
  *
- * One entry of the query catalogue the AI orders from.
+ * One entry of the query catalogue the AI and the chart builder order from.
  */
 export const zVisualQueryOut = z.object({
   currencies: z.array(z.string()),
   description: z.string(),
   has_data: z.boolean(),
+  kinds: z.array(z.string()),
   label: z.string(),
   name: z.string(),
   params: z.record(zVisualParamOut),
+  questions: z.array(z.string()),
   record_count: z.number().int(),
   record_noun: z.string(),
   row_count: z.number().int(),
   series_kind: z.string(),
   unit_kind: z.string(),
+});
+
+/**
+ * VisualQuestionOut
+ *
+ * A question a chart answers (FT Visual Vocabulary): the kinds that
+ * answer it, best first, and the queries that hold its relationship.
+ */
+export const zVisualQuestionOut = z.object({
+  description: z.string(),
+  drawn_kinds: z.array(z.string()),
+  id: z.string(),
+  kinds: z.array(z.string()),
+  label: z.string(),
+  queries: z.array(z.string()),
 });
 
 /**
@@ -3518,6 +3543,7 @@ export const zVisualCatalogOut = z.object({
   investigation_id: z.string(),
   kinds: z.array(z.string()),
   queries: z.array(zVisualQueryOut),
+  questions: z.array(zVisualQuestionOut),
 });
 
 /**

@@ -37,7 +37,7 @@ from app.services.presentation_style import (
 )
 from app.visuals.data_service import DataRow, VisualData
 from app.visuals.echarts import SINGLE_RECORD_MARK, prepare_rows, singular, source_line
-from app.visuals.spec import DRAWN_KINDS, ChartKind, VisualSpec, spec_errors
+from app.visuals.spec import ChartKind, VisualSpec, spec_errors
 
 MAX_BULLETS_PER_SLIDE = 8
 SLIDE_KINDS = {"title", "statement", "content", "questions"}
@@ -639,8 +639,9 @@ class _DeckRenderer:
         rules 16 and 20) and the source line underneath (rule 15). No image
         is needed for bars, so the render service is never involved here."""
         spec, data, rows = chart_rows(visual)
-        if spec.kind not in DRAWN_KINDS or not rows:
-            self.text(slide, x, y, w, 0.6, f"Chart not available: {spec.kind.value} charts are not drawn yet.", size=13, color=self.t.muted, italic=True)
+        if spec.kind not in (ChartKind.bar, ChartKind.column) or not rows:
+            # Only bars have a native drawing so far; never draw another kind as bars.
+            self.text(slide, x, y, w, 0.6, f"Chart not available: {spec.kind.value} charts are not drawn in decks yet.", size=13, color=self.t.muted, italic=True)
             return
         decorated = chart_row_labels(data, rows)
         items = chart_bar_items(rows, decorated)

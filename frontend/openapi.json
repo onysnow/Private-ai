@@ -1458,6 +1458,13 @@
             "title": "Errors",
             "type": "array"
           },
+          "not_applicable": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Not Applicable",
+            "type": "object"
+          },
           "not_checked": {
             "additionalProperties": {
               "type": "string"
@@ -2650,9 +2657,42 @@
             "title": "Record Refs",
             "type": "array"
           },
+          "share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share"
+          },
           "value": {
             "title": "Value",
             "type": "number"
+          },
+          "x": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X"
+          },
+          "x_formatted": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X Formatted"
           }
         },
         "required": [
@@ -13079,11 +13119,19 @@
             },
             "title": "Queries",
             "type": "array"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/VisualQuestionOut"
+            },
+            "title": "Questions",
+            "type": "array"
           }
         },
         "required": [
           "investigation_id",
           "queries",
+          "questions",
           "kinds",
           "drawn_kinds"
         ],
@@ -13107,6 +13155,20 @@
           "investigation_id": {
             "title": "Investigation Id",
             "type": "string"
+          },
+          "measure_labels": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Measure Labels"
           },
           "omitted": {
             "items": {
@@ -13153,6 +13215,28 @@
           "unit_kind": {
             "title": "Unit Kind",
             "type": "string"
+          },
+          "x_unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X Unit"
+          },
+          "x_unit_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X Unit Kind"
           }
         },
         "required": [
@@ -13194,6 +13278,17 @@
           "value": {
             "title": "Value",
             "type": "number"
+          },
+          "x": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X"
           }
         },
         "required": [
@@ -13303,7 +13398,7 @@
         "type": "object"
       },
       "VisualQueryOut": {
-        "description": "One entry of the query catalogue the AI orders from.",
+        "description": "One entry of the query catalogue the AI and the chart builder order from.",
         "properties": {
           "currencies": {
             "items": {
@@ -13320,6 +13415,13 @@
             "title": "Has Data",
             "type": "boolean"
           },
+          "kinds": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Kinds",
+            "type": "array"
+          },
           "label": {
             "title": "Label",
             "type": "string"
@@ -13334,6 +13436,13 @@
             },
             "title": "Params",
             "type": "object"
+          },
+          "questions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Questions",
+            "type": "array"
           },
           "record_count": {
             "title": "Record Count",
@@ -13367,9 +13476,59 @@
           "has_data",
           "record_count",
           "row_count",
-          "currencies"
+          "currencies",
+          "kinds",
+          "questions"
         ],
         "title": "VisualQueryOut",
+        "type": "object"
+      },
+      "VisualQuestionOut": {
+        "description": "A question a chart answers (FT Visual Vocabulary): the kinds that\nanswer it, best first, and the queries that hold its relationship.",
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "drawn_kinds": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Drawn Kinds",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kinds": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Kinds",
+            "type": "array"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "queries": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Queries",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "description",
+          "kinds",
+          "drawn_kinds",
+          "queries"
+        ],
+        "title": "VisualQuestionOut",
         "type": "object"
       },
       "VisualSpec": {

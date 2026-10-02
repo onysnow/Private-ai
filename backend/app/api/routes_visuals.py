@@ -15,7 +15,7 @@ from app.schemas.responses import VisualCatalogOut, VisualPreviewOut
 from app.services.presentation_style import theme as theme_for
 from app.visuals.checker import check_visual
 from app.visuals.data_service import QueryError, describe_catalog, run_query
-from app.visuals.echarts import UnsupportedChartKind, build_chart
+from app.visuals.echarts import ChartDoesNotFit, UnsupportedChartKind, build_chart
 from app.visuals.spec import VisualSpec
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -47,7 +47,9 @@ def investigation_visual_preview(investigation_id: str, body: VisualSpec, db: Se
         built = build_chart(body, data, theme)
     except QueryError as exc:
         raise HTTPException(404, str(exc))
-    except UnsupportedChartKind as exc:
+    except (UnsupportedChartKind, ChartDoesNotFit) as exc:
+        # Not drawn yet, or a kind that cannot draw this query's rows at all
+        # (a scatter plot of one number): no chart exists to check.
         raise HTTPException(422, str(exc))
     report = check_visual(body, data, theme, built)
     return {
