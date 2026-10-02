@@ -52,3 +52,16 @@ if (typeof Element !== 'undefined') {
     Element.prototype.scrollIntoView = () => {};
   }
 }
+
+// How long findBy*/waitFor wait for the screen to settle (Testing Library's
+// default is 1 s). The page tests render all of app/page.tsx, whose first
+// render in a fresh worker took 4-5 s while other test suites shared the two
+// cores (measured 2026-10-02, with the generated client of 97fc9e0 as well as
+// the current one), though the same tests pass in 1-2 s on a quiet machine.
+// A longer wait changes nothing for a test that passes; one that fails just
+// takes longer to say so. Vitest's own per-test limit is in vitest.config.ts.
+// Only the DOM tests load Testing Library; the node-environment ones skip it.
+if (typeof document !== 'undefined') {
+  const {configure} = await import('@testing-library/react');
+  configure({asyncUtilTimeout: 5000});
+}

@@ -17,5 +17,8 @@ export default defineConfig({
     // (STRUCT-0015). Global default stays 'node'.
     environment: 'node',
     setupFiles: ['./test-setup.ts'],
+    // Vitest's default per-test limit is 5 s; a page test's first render on a
+    // busy machine came close to it (see the wait in test-setup.ts).
+    testTimeout: 30_000,
   },
 });
