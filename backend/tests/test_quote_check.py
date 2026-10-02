@@ -130,7 +130,7 @@ def test_a_draft_with_nothing_quoted_is_rejected(monkeypatch):
 
 
 def test_documents_are_quoted_from_their_chunks(tmp_path):
-    from app.services.documents import ingest_document
+    from tests.document_helpers import ingest_document
 
     with SessionLocal() as db:
         inv = client.post("/api/investigations", json={"name": "Doc quotes"}).json()

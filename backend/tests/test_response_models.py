@@ -60,7 +60,7 @@ def test_investigation_deletion(seeded):
 
 
 def test_deletion_preview_with_document_files(tmp_path):
-    from app.services.documents import ingest_document
+    from tests.document_helpers import ingest_document
 
     with SessionLocal() as db:
         inv = Investigation(name="With files")
@@ -91,7 +91,8 @@ def demo(tmp_path):
     tasks, timeline events, plus one read document so extraction lineage and
     document traces have something to follow."""
     from app.services.demo_seed import seed_demo_investigation
-    from app.services.documents import ingest_document, review_candidate
+    from app.services.documents import review_candidate
+    from tests.document_helpers import ingest_document
     from app.models.domain import ExtractionCandidate
 
     with SessionLocal() as db:

@@ -4,7 +4,7 @@ import pytest
 from app.core.config import settings
 from app.db.session import Base, SessionLocal, engine
 from app.models.domain import ExtractionCandidate, Investigation
-from app.services.documents import ingest_document
+from tests.document_helpers import ingest_document
 
 
 def _ingest(tmp_path, *, local_entities: bool):

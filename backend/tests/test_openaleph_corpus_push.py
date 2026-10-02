@@ -349,7 +349,8 @@ def _pushes(queue: RecordingQueue) -> list[str]:
 
 def test_every_change_to_confirmed_records_queues_a_push(queue, tmp_path):
     from app.models.domain import ConnectorFinding, ExtractionCandidate, ResolutionDecision, StatementAssessment
-    from app.services.documents import ingest_document, review_candidate
+    from app.services.documents import review_candidate
+    from tests.document_helpers import ingest_document
     from app.services.exports import build_investigation_export, restore_investigation_export
     from app.services.external_relationships import create_review, promote_review
     from app.services.promotion import promote_assessment

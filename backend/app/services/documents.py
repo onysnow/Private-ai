@@ -129,20 +129,6 @@ def _candidate_payloads(chunk: DocumentChunk, *, include_entities: bool = True) 
         yield ('entity', {'caption': caption, 'suggested_schema': schema, 'span': {'start_char': match.start(1), 'end_char': match.end(1)}, 'rationale': rationale}, 0.40)
 
 
-def ingest_document(db: Session, *, investigation_id: str, title: str, filename: str, mime_type: str | None, data: bytes, storage_dir: Path) -> Document:
-    """Store one uploaded document and read it, in one call.
-
-    The upload route runs the same two steps, ``store_document`` and then
-    ``extract_document`` as a background job; this is for callers that want
-    the finished document back directly (tests and scripts).
-    """
-    doc = store_document(
-        db, investigation_id=investigation_id, title=title, filename=filename,
-        mime_type=mime_type, data=data, storage_dir=storage_dir,
-    )
-    return extract_document(db, doc.id) or doc
-
-
 def store_document(db: Session, *, investigation_id: str, title: str, filename: str, mime_type: str | None, data: bytes, storage_dir: Path) -> Document:
     """Persist one uploaded document without racing investigation deletion.
 

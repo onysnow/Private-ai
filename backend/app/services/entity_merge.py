@@ -112,8 +112,9 @@ def execute_entity_merge(db: Session, source: Entity, target: Entity, *, preview
     # both run the reference-move loop -- producing two
     # CanonicalEntityMergeAudit rows for the same merge instead of the second
     # request failing closed on a stale digest. Same pattern already used by
-    # ingest_document/backup-restore/investigation-delete (app/db/locking.py);
-    # a no-op on SQLite, an advisory xact lock on PostgreSQL.
+    # store_document/extract_document/backup-restore/investigation-delete
+    # (app/db/locking.py); a no-op on SQLite, an advisory xact lock on
+    # PostgreSQL.
     lock_investigation_transaction(db, source.investigation_id)
     preview = preview_entity_merge(db, source, target)
     if preview["preview_digest"] != preview_digest:
