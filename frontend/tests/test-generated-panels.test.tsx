@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import type {ReactElement} from 'react';
 
-import {DeletionPanel} from '../features/deletion/deletion-panel';
+import {DeletionPanel, casefileOutcome} from '../features/deletion/deletion-panel';
 import {SourceCapturePanel} from '../features/source-capture/source-capture-panel';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -31,7 +31,7 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 const preview = {
   investigation_id: 'inv-1', investigation_name: 'Kestrelwood', record_counts: {investigations: 1, sources: 2}, record_total: 3,
   document_files: [], document_file_summary: {delete: 1, preserve_shared: 0, already_missing: 0, unsafe: 0},
-  unsafe_paths: [], can_delete: true, requires_confirmation: 'inv-1',
+  unsafe_paths: [], can_delete: true, requires_confirmation: 'inv-1', openaleph_collection: null,
 };
 
 describe('generated client wiring', () => {
@@ -62,7 +62,7 @@ describe('DeletionPanel', () => {
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(json(preview))
       .mockResolvedValueOnce(json({investigation_id: 'inv-1', deleted: true, deleted_record_counts: {investigations: 1}, deleted_record_total: 3,
-        document_files_deleted: 1, shared_document_files_preserved: 0, missing_document_files: 0}));
+        document_files_deleted: 1, shared_document_files_preserved: 0, missing_document_files: 0, openaleph_collection: null}));
     vi.stubGlobal('fetch', fetchMock);
     wrap(<DeletionPanel investigationId="inv-1" onDeleted={onDeleted}/>);
 
@@ -78,6 +78,24 @@ describe('DeletionPanel', () => {
     expect(onDeleted).toHaveBeenCalledWith(expect.objectContaining({deleted_record_total: 3}));
     expect(url(fetchMock.mock.calls[1])).toBe('http://api.test/api/investigations/inv-1?confirmation=inv-1');
     expect(init(fetchMock.mock.calls[1]).method).toBe('DELETE');
+  });
+
+  it('names the OpenAleph casefile that goes too, and says when one is left behind', async () => {
+    const user = userEvent.setup();
+    const casefile = {collection_id: '42', label: 'Kestrelwood'};
+    vi.stubGlobal('fetch', vi.fn()
+      .mockResolvedValueOnce(json({...preview, openaleph_collection: casefile}))
+      .mockResolvedValueOnce(json({investigation_id: 'inv-1', deleted: true, deleted_record_counts: {investigations: 1}, deleted_record_total: 3,
+        document_files_deleted: 1, shared_document_files_preserved: 0, missing_document_files: 0,
+        openaleph_collection: {...casefile, deleted: false, detail: 'OpenAleph could not be reached to delete its casefile (ConnectError); delete it in OpenAleph.'}})));
+    wrap(<DeletionPanel investigationId="inv-1" onDeleted={vi.fn()}/>);
+    await user.click(screen.getByRole('button', {name: 'Preview deletion'}));
+    expect(await screen.findByText('OpenAleph casefile “Kestrelwood” is deleted too.')).toBeInTheDocument();
+    await user.type(screen.getByPlaceholderText('Exact investigation ID'), 'inv-1');
+    await user.click(screen.getByRole('button', {name: 'Permanently delete investigation'}));
+    expect(await screen.findByText(/Casefile “Kestrelwood” is still in OpenAleph: OpenAleph could not be reached/)).toBeInTheDocument();
+    expect(casefileOutcome({...casefile, deleted: true, detail: null})).toBe(' OpenAleph is deleting casefile “Kestrelwood”.');
+    expect(casefileOutcome(null)).toBe('');
   });
 
   it('says why a deletion is blocked and keeps the delete control away', async () => {

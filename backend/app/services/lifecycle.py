@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import logging
 import shutil
 import uuid
 from collections import defaultdict
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -13,6 +14,50 @@ from app.db.session import Base
 from app.db.locking import lock_investigation_transaction
 from app.models.domain import Document, Investigation
 from app.services.security import resolve_storage_root
+
+logger = logging.getLogger("journalism.lifecycle")
+
+
+def _openaleph_collection(db: Session, investigation_id: str) -> dict[str, str] | None:
+    """The OpenAleph casefile that holds this investigation's corpus, if one was made."""
+    from app.services.openaleph_corpus import get_binding
+
+    binding = get_binding(db, investigation_id)
+    if binding is None:
+        return None
+    return {"collection_id": binding.collection_id, "label": binding.collection_label or binding.collection_id}
+
+
+def delete_openaleph_collection(collection: dict[str, str], *, client_factory: Callable[[], Any] | None = None) -> dict[str, Any]:
+    """Ask OpenAleph to delete an investigation's casefile, after the
+    investigation itself is gone.
+
+    ``sync=False`` (openaleph_client api.py delete_collection) has OpenAleph
+    queue the removal in its own worker and answer at once, so a large corpus
+    does not hold the request. A 404 means the casefile is already gone. Any
+    other failure is reported, not raised: the reporter's deletion has
+    already been committed and cannot be undone, so the answer says which
+    casefile is left in OpenAleph instead.
+    """
+    from app.core.config import settings
+    from app.services.openaleph_gateway import corpus_client, http_status
+
+    outcome: dict[str, Any] = {**collection, "deleted": False, "detail": None}
+    if not settings.openaleph_enabled:
+        outcome["detail"] = "OpenAleph is turned off here, so its casefile was not deleted; delete it in OpenAleph."
+        return outcome
+    try:
+        (client_factory or corpus_client)().delete_collection(collection["collection_id"], sync=False)
+    except Exception as exc:
+        if http_status(exc) == 404:
+            outcome["deleted"] = True
+            return outcome
+        logger.warning("could not delete the OpenAleph casefile", exc_info=True,
+                       extra={"collection_id": collection["collection_id"]})
+        outcome["detail"] = f"OpenAleph could not be reached to delete its casefile ({type(exc).__name__}); delete it in OpenAleph."
+        return outcome
+    outcome["deleted"] = True
+    return outcome
 
 
 def _contained_existing_path(root: Path, raw: str) -> Path:
@@ -121,10 +166,12 @@ def preview_investigation_deletion(db: Session, investigation_id: str, storage_r
         "unsafe_paths": unsafe_paths,
         "can_delete": not unsafe_paths,
         "requires_confirmation": investigation_id,
+        "openaleph_collection": _openaleph_collection(db, investigation_id),
     }
 
 
-def delete_investigation(db: Session, investigation_id: str, storage_root: str | Path, *, confirmation: str) -> dict[str, Any]:
+def delete_investigation(db: Session, investigation_id: str, storage_root: str | Path, *, confirmation: str,
+                         openaleph_client_factory: Callable[[], Any] | None = None) -> dict[str, Any]:
     if confirmation != investigation_id:
         raise ValueError("Deletion confirmation must exactly match the investigation ID")
 
@@ -199,7 +246,11 @@ def delete_investigation(db: Session, investigation_id: str, storage_root: str |
     except OSError:
         pass
 
+    collection = preview["openaleph_collection"]
     return {
+        "openaleph_collection": (
+            delete_openaleph_collection(collection, client_factory=openaleph_client_factory) if collection else None
+        ),
         "investigation_id": investigation_id,
         "deleted": True,
         "deleted_record_counts": deleted_counts,

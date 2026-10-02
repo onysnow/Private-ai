@@ -9,7 +9,6 @@ import {
 
 import { client } from '../client.gen';
 import {
-  alephSearch,
   analyzeOpenalephDocument,
   assessStatement,
   attachRelationshipEvidenceEndpoint,
@@ -176,9 +175,6 @@ import {
   uploadDocument,
 } from '../sdk.gen';
 import type {
-  AlephSearchData,
-  AlephSearchError,
-  AlephSearchResponse,
   AnalyzeOpenalephDocumentData,
   AnalyzeOpenalephDocumentError,
   AnalyzeOpenalephDocumentResponse,
@@ -1369,33 +1365,6 @@ export const connectorsOptions = (options?: Options<ConnectorsData>) =>
     },
     queryKey: connectorsQueryKey(options),
   });
-
-/**
- * Aleph Search
- */
-export const alephSearchMutation = (
-  options?: Partial<Options<AlephSearchData>>,
-): UseMutationOptions<
-  AlephSearchResponse,
-  AlephSearchError,
-  Options<AlephSearchData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    AlephSearchResponse,
-    AlephSearchError,
-    Options<AlephSearchData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await alephSearch({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
 
 /**
  * Connector Search

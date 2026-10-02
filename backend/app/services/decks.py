@@ -485,14 +485,19 @@ def normalize_visual(visual: Any) -> dict | None:
     return out
 
 
-def _normalize_slides(slides: list[dict] | None) -> list[dict]:
+def _normalize_slides(slides: list[Any] | None) -> list[dict]:
     normalized = []
+    # Stored and AI-written slides reach here unchecked, so a value of the
+    # wrong type is dropped rather than raised on: a deck must always open.
     for slide in slides or []:
-        kind = slide.get("kind") if slide.get("kind") in SLIDE_KINDS else "content"
+        if not isinstance(slide, dict):
+            continue
+        kind = slide.get("kind")
+        bullets = slide.get("bullets")
         normalized.append({
-            "kind": kind,
+            "kind": kind if isinstance(kind, str) and kind in SLIDE_KINDS else "content",
             "heading": str(slide.get("heading") or "Untitled slide")[:300],
-            "bullets": [str(b)[:500] for b in (slide.get("bullets") or [])][:MAX_BULLETS_PER_SLIDE],
+            "bullets": [str(b)[:500] for b in (bullets if isinstance(bullets, list) else [])][:MAX_BULLETS_PER_SLIDE],
             "evidence": _clean_refs(slide.get("evidence")),
             "notes": str(slide.get("notes") or "")[:20000],
             "visual": normalize_visual(slide.get("visual")),
@@ -520,12 +525,13 @@ def deck_citation_refs(slides: list[dict]) -> list[dict]:
 
 
 def serialize_deck(row: Deck) -> dict:
+    slides = _normalize_slides(row.slides_json)
     return {
         "id": row.id,
         "investigation_id": row.investigation_id,
         "title": row.title,
-        "slides": _normalize_slides(row.slides_json),
-        "slide_count": len(row.slides_json or []),
+        "slides": slides,
+        "slide_count": len(slides),
         "style": normalize_deck_style(row.style_json),
         "source_ai_candidate_id": row.source_ai_candidate_id,
         "created_by": row.created_by,

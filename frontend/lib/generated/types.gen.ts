@@ -529,20 +529,6 @@ export type AiTasSpecOut = {
 };
 
 /**
- * AlephSearchRequest
- */
-export type AlephSearchRequest = {
-  /**
-   * Investigation Id
-   */
-  investigation_id: string;
-  /**
-   * Query
-   */
-  query: string;
-};
-
-/**
  * ApiAccessStatusOut
  */
 export type ApiAccessStatusOut = {
@@ -3282,6 +3268,45 @@ export type DeckOut = {
 };
 
 /**
+ * DeckSlideIn
+ *
+ * One slide as the editor sends it back. The types are checked here so a
+ * malformed slide is answered with a 422 naming the field; the values are
+ * then cleaned by app/services/decks.py _normalize_slides (an unknown kind
+ * becomes "content", text is cut to length, the visual is re-checked).
+ */
+export type DeckSlideIn = {
+  /**
+   * Bullets
+   */
+  bullets?: Array<string>;
+  /**
+   * Evidence
+   */
+  evidence?: Array<{
+    [key: string]: unknown;
+  }>;
+  /**
+   * Heading
+   */
+  heading?: string | null;
+  /**
+   * Kind
+   */
+  kind?: string | null;
+  /**
+   * Notes
+   */
+  notes?: string | null;
+  /**
+   * Visual
+   */
+  visual?: {
+    [key: string]: unknown;
+  } | null;
+};
+
+/**
  * DeckSlideOut
  *
  * One slide as a deck stores it (app/services/decks.py _normalize_slides).
@@ -3451,9 +3476,7 @@ export type DeckUpdate = {
   /**
    * Slides Json
    */
-  slides_json?: Array<{
-    [key: string]: unknown;
-  }> | null;
+  slides_json?: Array<DeckSlideIn> | null;
   /**
    * Style Json
    */
@@ -3484,6 +3507,47 @@ export type DeletedOut = {
    * Deleted
    */
   deleted: boolean;
+};
+
+/**
+ * DeletionCollectionOut
+ *
+ * The OpenAleph casefile that holds the investigation's corpus.
+ */
+export type DeletionCollectionOut = {
+  /**
+   * Collection Id
+   */
+  collection_id: string;
+  /**
+   * Label
+   */
+  label: string;
+};
+
+/**
+ * DeletionCollectionResultOut
+ *
+ * Whether OpenAleph was asked to delete the casefile; ``detail`` says
+ * what is left there when it was not.
+ */
+export type DeletionCollectionResultOut = {
+  /**
+   * Collection Id
+   */
+  collection_id: string;
+  /**
+   * Deleted
+   */
+  deleted: boolean;
+  /**
+   * Detail
+   */
+  detail: string | null;
+  /**
+   * Label
+   */
+  label: string;
 };
 
 /**
@@ -6378,6 +6442,7 @@ export type InvestigationDeletionPreview = {
    * Investigation Name
    */
   investigation_name: string;
+  openaleph_collection: DeletionCollectionOut | null;
   /**
    * Record Counts
    */
@@ -6428,6 +6493,7 @@ export type InvestigationDeletionResult = {
    * Missing Document Files
    */
   missing_document_files: number;
+  openaleph_collection: DeletionCollectionResultOut | null;
   /**
    * Shared Document Files Preserved
    */
@@ -11813,42 +11879,6 @@ export type ConnectorsResponses = {
 };
 
 export type ConnectorsResponse = ConnectorsResponses[keyof ConnectorsResponses];
-
-export type AlephSearchData = {
-  body: AlephSearchRequest;
-  path?: never;
-  query?: never;
-  url: '/api/connectors/aleph/search';
-};
-
-export type AlephSearchErrors = {
-  /**
-   * The request's input does not match what the route declares
-   */
-  422: ValidationErrorOut;
-  /**
-   * The connector failed; the details are logged on the server
-   */
-  502: ErrorOut;
-  /**
-   * Refused: why, in a sentence
-   */
-  '4XX': ErrorOut;
-};
-
-export type AlephSearchError = AlephSearchErrors[keyof AlephSearchErrors];
-
-export type AlephSearchResponses = {
-  /**
-   * Response Aleph Search
-   *
-   * Successful Response
-   */
-  200: Array<ConnectorFindingOut>;
-};
-
-export type AlephSearchResponse =
-  AlephSearchResponses[keyof AlephSearchResponses];
 
 export type ConnectorSearchData = {
   body: ConnectorSearchRequest;

@@ -106,3 +106,90 @@ def test_commit_failure_restores_staged_file_and_database(tmp_path, monkeypatch)
     assert not (tmp_path / '.delete-staging').exists()
     monkeypatch.setattr(db, 'commit', real_commit)
     db.close(); engine.dispose()
+
+
+# --- the OpenAleph casefile goes with the investigation ------------------------
+
+class _AlephError(Exception):
+    """Shaped like openaleph_client's AlephException: the HTTP status on ``status``."""
+
+    def __init__(self, status: int):
+        super().__init__(f"HTTP {status}")
+        self.status = status
+
+
+class _Client:
+    def __init__(self, fail_with: int | None = None):
+        self.fail_with = fail_with
+        self.deleted: list[tuple[str, bool]] = []
+
+    def delete_collection(self, collection_id: str, sync: bool = False):
+        if self.fail_with is not None:
+            raise _AlephError(self.fail_with)
+        self.deleted.append((collection_id, sync))
+
+
+def _bind(db: Session, inv_id: str) -> None:
+    from app.models.domain import InvestigationCorpusBinding
+    db.add(InvestigationCorpusBinding(investigation_id=inv_id, provider='openaleph', collection_id='42',
+                                      foreign_id='fid-42', collection_label='Delete me', status='active'))
+    db.commit()
+
+
+@pytest.fixture
+def openaleph_on(monkeypatch):
+    from app.core.config import settings
+    monkeypatch.setattr(settings, 'openaleph_enabled', True)
+
+
+def test_the_casefile_is_named_in_the_preview_and_deleted_after_the_investigation(tmp_path, openaleph_on):
+    _engine, db = _db()
+    inv_id, _path = _seed(db, tmp_path)
+    _bind(db, inv_id)
+    assert preview_investigation_deletion(db, inv_id, tmp_path)['openaleph_collection'] == {'collection_id': '42', 'label': 'Delete me'}
+
+    client = _Client()
+    result = delete_investigation(db, inv_id, tmp_path, confirmation=inv_id, openaleph_client_factory=lambda: client)
+    assert client.deleted == [('42', False)]   # OpenAleph queues the removal in its own worker
+    assert result['openaleph_collection'] == {'collection_id': '42', 'label': 'Delete me', 'deleted': True, 'detail': None}
+    assert db.get(Investigation, inv_id) is None
+
+
+def test_a_casefile_already_gone_counts_as_deleted(tmp_path, openaleph_on):
+    _engine, db = _db()
+    inv_id, _path = _seed(db, tmp_path)
+    _bind(db, inv_id)
+    result = delete_investigation(db, inv_id, tmp_path, confirmation=inv_id, openaleph_client_factory=lambda: _Client(fail_with=404))
+    assert result['openaleph_collection']['deleted'] is True
+
+
+def test_openaleph_down_never_undoes_the_deletion_and_says_what_is_left(tmp_path, openaleph_on):
+    _engine, db = _db()
+    inv_id, _path = _seed(db, tmp_path)
+    _bind(db, inv_id)
+    result = delete_investigation(db, inv_id, tmp_path, confirmation=inv_id, openaleph_client_factory=lambda: _Client(fail_with=503))
+    assert result['deleted'] is True and db.get(Investigation, inv_id) is None
+    assert result['openaleph_collection']['deleted'] is False
+    assert 'delete it in OpenAleph' in result['openaleph_collection']['detail']
+
+
+def test_openaleph_turned_off_leaves_the_casefile_and_says_so(tmp_path, monkeypatch):
+    from app.core.config import settings
+    monkeypatch.setattr(settings, 'openaleph_enabled', False)
+    _engine, db = _db()
+    inv_id, _path = _seed(db, tmp_path)
+    _bind(db, inv_id)
+    client = _Client()
+    result = delete_investigation(db, inv_id, tmp_path, confirmation=inv_id, openaleph_client_factory=lambda: client)
+    assert client.deleted == []
+    assert result['openaleph_collection']['deleted'] is False
+    assert 'turned off' in result['openaleph_collection']['detail']
+
+
+def test_no_casefile_no_openaleph_call(tmp_path, openaleph_on):
+    _engine, db = _db()
+    inv_id, _path = _seed(db, tmp_path)
+    assert preview_investigation_deletion(db, inv_id, tmp_path)['openaleph_collection'] is None
+    client = _Client()
+    result = delete_investigation(db, inv_id, tmp_path, confirmation=inv_id, openaleph_client_factory=lambda: client)
+    assert result['openaleph_collection'] is None and client.deleted == []

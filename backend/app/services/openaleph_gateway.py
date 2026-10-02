@@ -67,7 +67,7 @@ def corpus_client() -> Any:
     return client
 
 
-def _status_code(exc: BaseException) -> int | None:
+def http_status(exc: BaseException) -> int | None:
     """The HTTP status inside an openaleph-client AlephException, if any."""
     status = getattr(exc, "status", None)
     return status if isinstance(status, int) else None
@@ -117,7 +117,7 @@ class CorpusGateway:
         try:
             reply = self.client.get_collection(collection_id)
         except Exception as exc:
-            if _status_code(exc) == 404:
+            if http_status(exc) == 404:
                 raise OpenAlephNotFound(f"OpenAleph has no collection {collection_id}") from exc
             raise
         return reply if isinstance(reply, dict) else {}
@@ -145,7 +145,7 @@ class CorpusGateway:
         try:
             self.client.delete_entity(entity_id)
         except Exception as exc:
-            if _status_code(exc) == 404:
+            if http_status(exc) == 404:
                 return False
             raise
         return True

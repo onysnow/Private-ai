@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import authorize_request_resource
 from app.connectors.registry import registry
 from app.db.session import get_db
-from app.schemas.api import AlephSearchRequest, ConnectorSearchRequest
+from app.schemas.api import ConnectorSearchRequest
 from app.schemas.responses import ConnectorFindingOut, ConnectorsOut, upstream
 from app.services.connectors import run_connector
 
@@ -30,9 +30,7 @@ def connectors() -> dict[str, Any]:
 
 @router.post("/connectors/{provider}/search", response_model=list[ConnectorFindingOut], responses=upstream("The connector", 502))
 async def connector_search(provider: str, body: ConnectorSearchRequest, db: Session = Depends(get_db)) -> Any:
+    # One route for every connector, Aleph included: an /connectors/aleph/search
+    # declared after this one could never be reached (Starlette matches routes
+    # in the order they are added).
     return await run_connector(provider, body, db)
-
-
-@router.post("/connectors/aleph/search", response_model=list[ConnectorFindingOut], responses=upstream("The connector", 502))
-async def aleph_search(body: AlephSearchRequest, db: Session = Depends(get_db)) -> Any:
-    return await run_connector("aleph", ConnectorSearchRequest(**body.model_dump()), db)

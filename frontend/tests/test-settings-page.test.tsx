@@ -112,7 +112,7 @@ describe('Settings: demo mode', () => {
     const preview = {
       investigation_id: 'inv-demo', investigation_name: 'Demo Investigation', record_counts: {entities: 9, claims: 3}, record_total: 12,
       document_files: [], document_file_summary: {delete: 2, preserve_shared: 0, already_missing: 0, unsafe: 0}, unsafe_paths: [],
-      can_delete: true, requires_confirmation: 'inv-demo',
+      can_delete: true, requires_confirmation: 'inv-demo', openaleph_collection: null,
     };
     const api = await renderSettings({
       [STATUS]: validSettingsStatus,
@@ -121,7 +121,7 @@ describe('Settings: demo mode', () => {
       'DELETE /api/investigations/inv-demo': () => {
         deleted = true;
         return {investigation_id: 'inv-demo', deleted: true, deleted_record_counts: {entities: 9, claims: 3}, deleted_record_total: 12,
-                document_files_deleted: 2, shared_document_files_preserved: 0, missing_document_files: 0};
+                document_files_deleted: 2, shared_document_files_preserved: 0, missing_document_files: 0, openaleph_collection: null};
       },
     });
     const user = userEvent.setup();
@@ -147,7 +147,7 @@ describe('Settings: demo mode', () => {
       'GET /api/investigations/inv-demo/deletion-preview': {
         investigation_id: 'inv-demo', investigation_name: 'Demo Investigation', record_counts: {}, record_total: 0, document_files: [],
         document_file_summary: {delete: 0, preserve_shared: 0, already_missing: 0, unsafe: 1},
-        unsafe_paths: [{document_id: 'doc-1', storage_path: '../outside', error: 'outside storage'}], can_delete: false, requires_confirmation: 'inv-demo',
+        unsafe_paths: [{document_id: 'doc-1', storage_path: '../outside', error: 'outside storage'}], can_delete: false, requires_confirmation: 'inv-demo', openaleph_collection: null,
       },
     });
     const user = userEvent.setup();

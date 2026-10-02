@@ -12,9 +12,6 @@ import {
 } from './client';
 import { client } from './client.gen';
 import type {
-  AlephSearchData,
-  AlephSearchErrors,
-  AlephSearchResponses,
   AnalyzeOpenalephDocumentData,
   AnalyzeOpenalephDocumentErrors,
   AnalyzeOpenalephDocumentResponses,
@@ -506,8 +503,6 @@ import type {
   UploadDocumentResponses,
 } from './types.gen';
 import {
-  zAlephSearchBody,
-  zAlephSearchResponse,
   zAnalyzeOpenalephDocumentPath,
   zAnalyzeOpenalephDocumentResponse,
   zAssessStatementBody,
@@ -1667,35 +1662,6 @@ export const connectors = <ThrowOnError extends boolean = false>(
       await zConnectorsResponse.parseAsync(data),
     url: '/api/connectors',
     ...options,
-  });
-
-/**
- * Aleph Search
- */
-export const alephSearch = <ThrowOnError extends boolean = false>(
-  options: Options<AlephSearchData, ThrowOnError>,
-): RequestResult<AlephSearchResponses, AlephSearchErrors, ThrowOnError> =>
-  (options.client ?? client).post<
-    AlephSearchResponses,
-    AlephSearchErrors,
-    ThrowOnError
-  >({
-    requestValidator: async (data) =>
-      await z
-        .object({
-          body: zAlephSearchBody,
-          path: z.never().optional(),
-          query: z.never().optional(),
-        })
-        .parseAsync(data),
-    responseValidator: async (data) =>
-      await zAlephSearchResponse.parseAsync(data),
-    url: '/api/connectors/aleph/search',
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
   });
 
 /**

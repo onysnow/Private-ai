@@ -198,14 +198,6 @@ export const zAiReasoningStatusOut = z.object({
 });
 
 /**
- * AlephSearchRequest
- */
-export const zAlephSearchRequest = z.object({
-  investigation_id: z.string(),
-  query: z.string(),
-});
-
-/**
  * ApiAccessStatusOut
  */
 export const zApiAccessStatusOut = z.object({
@@ -1264,6 +1256,23 @@ export const zCrossReferenceMatchOut = z.object({
 });
 
 /**
+ * DeckSlideIn
+ *
+ * One slide as the editor sends it back. The types are checked here so a
+ * malformed slide is answered with a 422 naming the field; the values are
+ * then cleaned by app/services/decks.py _normalize_slides (an unknown kind
+ * becomes "content", text is cut to length, the visual is re-checked).
+ */
+export const zDeckSlideIn = z.object({
+  bullets: z.array(z.string()).optional(),
+  evidence: z.array(z.record(z.unknown())).optional(),
+  heading: z.string().nullish(),
+  kind: z.string().nullish(),
+  notes: z.string().nullish(),
+  visual: z.record(z.unknown()).nullish(),
+});
+
+/**
  * DeckStyle
  */
 export const zDeckStyle = z.object({
@@ -1313,7 +1322,7 @@ export const zDeckThemeOut = z.object({
  * DeckUpdate
  */
 export const zDeckUpdate = z.object({
-  slides_json: z.array(z.record(z.unknown())).nullish(),
+  slides_json: z.array(zDeckSlideIn).nullish(),
   style_json: z.record(z.unknown()).nullish(),
   title: z.string().nullish(),
 });
@@ -1323,6 +1332,29 @@ export const zDeckUpdate = z.object({
  */
 export const zDeletedOut = z.object({
   deleted: z.boolean(),
+});
+
+/**
+ * DeletionCollectionOut
+ *
+ * The OpenAleph casefile that holds the investigation's corpus.
+ */
+export const zDeletionCollectionOut = z.object({
+  collection_id: z.string(),
+  label: z.string(),
+});
+
+/**
+ * DeletionCollectionResultOut
+ *
+ * Whether OpenAleph was asked to delete the casefile; ``detail`` says
+ * what is left there when it was not.
+ */
+export const zDeletionCollectionResultOut = z.object({
+  collection_id: z.string(),
+  deleted: z.boolean(),
+  detail: z.string().nullable(),
+  label: z.string(),
 });
 
 /**
@@ -2468,6 +2500,7 @@ export const zInvestigationDeletionPreview = z.object({
   document_files: z.array(zDeletionDocumentFile),
   investigation_id: z.string(),
   investigation_name: z.string(),
+  openaleph_collection: zDeletionCollectionOut.nullable(),
   record_counts: z.record(z.number().int()),
   record_total: z.number().int(),
   requires_confirmation: z.string(),
@@ -2484,6 +2517,7 @@ export const zInvestigationDeletionResult = z.object({
   document_files_deleted: z.number().int(),
   investigation_id: z.string(),
   missing_document_files: z.number().int(),
+  openaleph_collection: zDeletionCollectionResultOut.nullable(),
   shared_document_files_preserved: z.number().int(),
 });
 
@@ -5396,15 +5430,6 @@ export const zReviewFindingResponse = zConnectorFindingOut;
  * Successful Response
  */
 export const zConnectorsResponse = zConnectorsOut;
-
-export const zAlephSearchBody = zAlephSearchRequest;
-
-/**
- * Response Aleph Search
- *
- * Successful Response
- */
-export const zAlephSearchResponse = z.array(zConnectorFindingOut);
 
 export const zConnectorSearchBody = zConnectorSearchRequest;
 

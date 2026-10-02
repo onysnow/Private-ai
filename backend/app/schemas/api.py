@@ -139,10 +139,6 @@ class TimelineEventCreate(BaseModel):
     dataset: str = "reporter"
     origin: str | None = None
 
-class AlephSearchRequest(BaseModel):
-    investigation_id: str
-    query: str
-
 class ConnectorSearchRequest(BaseModel):
     investigation_id: str
     query: str
@@ -398,7 +394,20 @@ class PromoteToDeckRequest(BaseModel):
     visual_styles: dict[str, VisualStyle] = Field(default_factory=dict)
 
 
+class DeckSlideIn(BaseModel):
+    """One slide as the editor sends it back. The types are checked here so a
+    malformed slide is answered with a 422 naming the field; the values are
+    then cleaned by app/services/decks.py _normalize_slides (an unknown kind
+    becomes "content", text is cut to length, the visual is re-checked)."""
+    kind: str | None = None
+    heading: str | None = None
+    bullets: list[str] = Field(default_factory=list)
+    evidence: list[dict[str, Any]] = Field(default_factory=list)
+    notes: str | None = None
+    visual: dict[str, Any] | None = None
+
+
 class DeckUpdate(BaseModel):
     title: str | None = None
-    slides_json: list[dict] | None = None
+    slides_json: list[DeckSlideIn] | None = None
     style_json: dict | None = None

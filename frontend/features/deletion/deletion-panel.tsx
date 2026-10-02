@@ -20,6 +20,13 @@ type Props = {
   onDeleted: (result: InvestigationDeletionResult) => Promise<void> | void;
 };
 
+/** What happened to the investigation's OpenAleph casefile, as a sentence to
+ * add to the status line (empty when it had none). */
+export function casefileOutcome(casefile: InvestigationDeletionResult['openaleph_collection']): string {
+  if (!casefile) return '';
+  return casefile.deleted ? ` OpenAleph is deleting casefile “${casefile.label}”.` : ` Casefile “${casefile.label}” is still in OpenAleph: ${casefile.detail ?? 'delete it there.'}`;
+}
+
 export function DeletionPanel({investigationId, onDeleted}: Props): ReactElement {
   const [preview, setPreview] = useState<InvestigationDeletionPreview | null>(null);
   const [confirmation, setConfirmation] = useState('');
@@ -54,7 +61,7 @@ export function DeletionPanel({investigationId, onDeleted}: Props): ReactElement
       const result = await deleteMutation.mutateAsync({id: preview.investigation_id, confirmation});
       setPreview(null);
       setConfirmation('');
-      setStatus(`Deleted ${result.deleted_record_total} record(s) and ${result.document_files_deleted} owned document file(s); preserved ${result.shared_document_files_preserved} shared file(s).`);
+      setStatus(`Deleted ${result.deleted_record_total} record(s) and ${result.document_files_deleted} owned document file(s); preserved ${result.shared_document_files_preserved} shared file(s).${casefileOutcome(result.openaleph_collection)}`);
       await onDeleted(result);
     } catch (error) {
       setStatus(errorMessage(error, 'Investigation deletion failed'));
@@ -71,6 +78,7 @@ export function DeletionPanel({investigationId, onDeleted}: Props): ReactElement
       {preview && <div className="candidate">
         <b>{preview.investigation_name}</b>
         <div>{preview.record_total} record(s) · {preview.document_file_summary.delete} owned file(s) to delete · {preview.document_file_summary.preserve_shared} shared file(s) preserved · {preview.document_file_summary.already_missing} file(s) already missing</div>
+        {preview.openaleph_collection && <div>OpenAleph casefile “{preview.openaleph_collection.label}” is deleted too.</div>}
         {preview.unsafe_paths.map(x => <div key={x.document_id}><small><b>Blocked:</b> {x.error}</small></div>)}
         {preview.can_delete && <>
           <p><small>To delete, type this exact ID: <code>{preview.requires_confirmation}</code></small></p>

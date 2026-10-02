@@ -100,6 +100,19 @@ class DeletionFileSummary(ResponseModel):
     unsafe: int
 
 
+class DeletionCollectionOut(ResponseModel):
+    """The OpenAleph casefile that holds the investigation's corpus."""
+    collection_id: str
+    label: str
+
+
+class DeletionCollectionResultOut(DeletionCollectionOut):
+    """Whether OpenAleph was asked to delete the casefile; ``detail`` says
+    what is left there when it was not."""
+    deleted: bool
+    detail: str | None
+
+
 class InvestigationDeletionPreview(ResponseModel):
     investigation_id: str
     investigation_name: str
@@ -110,6 +123,7 @@ class InvestigationDeletionPreview(ResponseModel):
     unsafe_paths: list[DeletionUnsafePath]
     can_delete: bool
     requires_confirmation: str
+    openaleph_collection: DeletionCollectionOut | None
 
 
 class InvestigationDeletionResult(ResponseModel):
@@ -120,6 +134,7 @@ class InvestigationDeletionResult(ResponseModel):
     document_files_deleted: int
     shared_document_files_preserved: int
     missing_document_files: int
+    openaleph_collection: DeletionCollectionResultOut | None
 
 
 # --- Investigation visuals (app/visuals) -----------------------------------------

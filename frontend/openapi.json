@@ -852,24 +852,6 @@
         "title": "AiTasSpecOut",
         "type": "object"
       },
-      "AlephSearchRequest": {
-        "properties": {
-          "investigation_id": {
-            "title": "Investigation Id",
-            "type": "string"
-          },
-          "query": {
-            "title": "Query",
-            "type": "string"
-          }
-        },
-        "required": [
-          "investigation_id",
-          "query"
-        ],
-        "title": "AlephSearchRequest",
-        "type": "object"
-      },
       "ApiAccessStatusOut": {
         "properties": {
           "investigation_scope_configured": {
@@ -9713,6 +9695,73 @@
         "title": "DeckOut",
         "type": "object"
       },
+      "DeckSlideIn": {
+        "description": "One slide as the editor sends it back. The types are checked here so a\nmalformed slide is answered with a 422 naming the field; the values are\nthen cleaned by app/services/decks.py _normalize_slides (an unknown kind\nbecomes \"content\", text is cut to length, the visual is re-checked).",
+        "properties": {
+          "bullets": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Bullets",
+            "type": "array"
+          },
+          "evidence": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "heading": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heading"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "visual": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visual"
+          }
+        },
+        "title": "DeckSlideIn",
+        "type": "object"
+      },
       "DeckSlideOut": {
         "description": "One slide as a deck stores it (app/services/decks.py _normalize_slides).",
         "properties": {
@@ -9958,8 +10007,7 @@
             "anyOf": [
               {
                 "items": {
-                  "additionalProperties": true,
-                  "type": "object"
+                  "$ref": "#/components/schemas/DeckSlideIn"
                 },
                 "type": "array"
               },
@@ -10023,6 +10071,61 @@
           "deleted"
         ],
         "title": "DeletedOut",
+        "type": "object"
+      },
+      "DeletionCollectionOut": {
+        "description": "The OpenAleph casefile that holds the investigation's corpus.",
+        "properties": {
+          "collection_id": {
+            "title": "Collection Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "collection_id",
+          "label"
+        ],
+        "title": "DeletionCollectionOut",
+        "type": "object"
+      },
+      "DeletionCollectionResultOut": {
+        "description": "Whether OpenAleph was asked to delete the casefile; ``detail`` says\nwhat is left there when it was not.",
+        "properties": {
+          "collection_id": {
+            "title": "Collection Id",
+            "type": "string"
+          },
+          "deleted": {
+            "title": "Deleted",
+            "type": "boolean"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "collection_id",
+          "label",
+          "deleted",
+          "detail"
+        ],
+        "title": "DeletionCollectionResultOut",
         "type": "object"
       },
       "DeletionDocumentFile": {
@@ -15059,6 +15162,16 @@
             "title": "Investigation Name",
             "type": "string"
           },
+          "openaleph_collection": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeletionCollectionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "record_counts": {
             "additionalProperties": {
               "type": "integer"
@@ -15091,7 +15204,8 @@
           "document_file_summary",
           "unsafe_paths",
           "can_delete",
-          "requires_confirmation"
+          "requires_confirmation",
+          "openaleph_collection"
         ],
         "title": "InvestigationDeletionPreview",
         "type": "object"
@@ -15125,6 +15239,16 @@
             "title": "Missing Document Files",
             "type": "integer"
           },
+          "openaleph_collection": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeletionCollectionResultOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "shared_document_files_preserved": {
             "title": "Shared Document Files Preserved",
             "type": "integer"
@@ -15137,7 +15261,8 @@
           "deleted_record_total",
           "document_files_deleted",
           "shared_document_files_preserved",
-          "missing_document_files"
+          "missing_document_files",
+          "openaleph_collection"
         ],
         "title": "InvestigationDeletionResult",
         "type": "object"
@@ -24125,68 +24250,6 @@
           }
         },
         "summary": "Connectors"
-      }
-    },
-    "/api/connectors/aleph/search": {
-      "post": {
-        "operationId": "aleph_search",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AlephSearchRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ConnectorFindingOut"
-                  },
-                  "title": "Response Aleph Search",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationErrorOut"
-                }
-              }
-            },
-            "description": "The request's input does not match what the route declares"
-          },
-          "4XX": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorOut"
-                }
-              }
-            },
-            "description": "Refused: why, in a sentence"
-          },
-          "502": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorOut"
-                }
-              }
-            },
-            "description": "The connector failed; the details are logged on the server"
-          }
-        },
-        "summary": "Aleph Search"
       }
     },
     "/api/connectors/{provider}/search": {
