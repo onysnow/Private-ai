@@ -605,6 +605,10 @@ export type CanonicalDuplicateCandidateOut = {
    * Entity Id
    */
   entity_id: string;
+  /**
+   * Found By
+   */
+  found_by?: Array<string>;
   latest_decision?: CanonicalDecisionSummaryOut | null;
   /**
    * Schema
@@ -1590,15 +1594,64 @@ export type ConnectorsOut = {
 };
 
 /**
+ * CorpusCrossReferenceRunOut
+ *
+ * The last cross-referencing run of the collection and what it brought.
+ */
+export type CorpusCrossReferenceRunOut = {
+  /**
+   * Duplicates
+   */
+  duplicates: number;
+  /**
+   * Error
+   */
+  error: string | null;
+  /**
+   * Finished At
+   */
+  finished_at: string | null;
+  /**
+   * New
+   */
+  new: number;
+  /**
+   * Open
+   */
+  open: number;
+  /**
+   * Requested At
+   */
+  requested_at: string | null;
+  /**
+   * Results
+   */
+  results: number;
+  /**
+   * Status
+   */
+  status: 'never' | 'waiting' | 'running' | 'succeeded' | 'failed';
+  /**
+   * Updated
+   */
+  updated: number;
+};
+
+/**
  * CorpusPendingOut
  *
- * What the next push would change, and the records it cannot send (with why).
+ * What the next push would change -- records to send or remove, match
+ * judgements to send -- and the records it cannot send (with why).
  */
 export type CorpusPendingOut = {
   /**
    * Cannot Send
    */
   cannot_send: Array<string>;
+  /**
+   * Judgements
+   */
+  judgements: number;
   /**
    * To Remove
    */
@@ -1623,6 +1676,14 @@ export type CorpusPushOut = {
    * Finished At
    */
   finished_at: string | null;
+  /**
+   * Judgements Failed
+   */
+  judgements_failed: number;
+  /**
+   * Judgements Sent
+   */
+  judgements_sent: number;
   /**
    * Message
    */
@@ -1692,6 +1753,7 @@ export type CorpusSyncOut = {
    * Consecutive Failures
    */
   consecutive_failures: number;
+  cross_reference: CorpusCrossReferenceRunOut;
   /**
    * Enabled
    */
@@ -1795,6 +1857,177 @@ export type CrossProviderDecisionRequest = {
    * Rationale
    */
   rationale?: string | null;
+};
+
+/**
+ * CrossReferenceDecisionOut
+ *
+ * The latest reporter decision on a cross-reference, and its judgement in OpenAleph.
+ */
+export type CrossReferenceDecisionOut = {
+  /**
+   * Created At
+   */
+  created_at: string;
+  /**
+   * Decision
+   */
+  decision: 'same' | 'different' | 'unsure';
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Judgement
+   */
+  judgement: 'positive' | 'negative' | 'unsure';
+  /**
+   * Judgement Error
+   */
+  judgement_error: string | null;
+  /**
+   * Judgement Sent At
+   */
+  judgement_sent_at: string | null;
+  /**
+   * Judgement Status
+   */
+  judgement_status: 'pending' | 'sent' | 'failed' | 'superseded';
+  /**
+   * Note
+   */
+  note: string | null;
+};
+
+/**
+ * CrossReferenceDecisionRequest
+ *
+ * A reporter's decision on an OpenAleph cross-reference (ADR-0006, Wave B):
+ * "same" entity, "different", or "unsure" (the screen's "Not sure").
+ */
+export type CrossReferenceDecisionRequest = {
+  /**
+   * Decision
+   */
+  decision: 'same' | 'different' | 'unsure';
+  /**
+   * Note
+   */
+  note?: string | null;
+};
+
+/**
+ * CrossReferenceEntityOut
+ *
+ * Our confirmed entity in a cross-reference.
+ */
+export type CrossReferenceEntityOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
+ * CrossReferenceMatchOut
+ *
+ * The OpenAleph entity it was matched with, and where it is held.
+ */
+export type CrossReferenceMatchOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Collection Id
+   */
+  collection_id: string | null;
+  /**
+   * Collection Label
+   */
+  collection_label: string | null;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string | null;
+  /**
+   * Openaleph Id
+   */
+  openaleph_id: string;
+  /**
+   * Properties
+   */
+  properties: {
+    [key: string]: Array<string>;
+  };
+  /**
+   * Schema
+   */
+  schema: string;
+  /**
+   * Url
+   */
+  url: string;
+};
+
+/**
+ * CrossReferenceOut
+ *
+ * OpenAleph's cross-referencing says a confirmed entity may be the same as
+ * another entity: a proposal until a reporter decides.
+ */
+export type CrossReferenceOut = {
+  decision: CrossReferenceDecisionOut | null;
+  entity: CrossReferenceEntityOut;
+  /**
+   * First Seen At
+   */
+  first_seen_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Identity Finding Id
+   */
+  identity_finding_id: string | null;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Last Seen At
+   */
+  last_seen_at: string;
+  match: CrossReferenceMatchOut;
+  /**
+   * Matched Properties
+   */
+  matched_properties: Array<MatchedPropertyOut>;
+  /**
+   * Method
+   */
+  method: string | null;
+  /**
+   * Openaleph Entity Id
+   */
+  openaleph_entity_id: string;
+  /**
+   * Score
+   */
+  score: number;
+  /**
+   * Status
+   */
+  status: 'open' | 'decided';
 };
 
 /**
@@ -5172,6 +5405,35 @@ export type LineageSourceOut = {
    * Url
    */
   url?: string | null;
+};
+
+/**
+ * MatchedPropertyOut
+ *
+ * One kind of property both entities have, and how well it agrees
+ * (followthemoney's compare_scores).
+ */
+export type MatchedPropertyOut = {
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Ours
+   */
+  ours: Array<string>;
+  /**
+   * Property Type
+   */
+  property_type: string;
+  /**
+   * Score
+   */
+  score: number;
+  /**
+   * Theirs
+   */
+  theirs: Array<string>;
 };
 
 /**
@@ -10893,6 +11155,38 @@ export type ConsoleUsersIssueResponses = {
   200: unknown;
 };
 
+export type DecideInvestigationCrossReferenceData = {
+  body: CrossReferenceDecisionRequest;
+  path: {
+    /**
+     * Cross Reference Id
+     */
+    cross_reference_id: string;
+  };
+  query?: never;
+  url: '/api/cross-references/{cross_reference_id}/decision';
+};
+
+export type DecideInvestigationCrossReferenceErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type DecideInvestigationCrossReferenceError =
+  DecideInvestigationCrossReferenceErrors[keyof DecideInvestigationCrossReferenceErrors];
+
+export type DecideInvestigationCrossReferenceResponses = {
+  /**
+   * Successful Response
+   */
+  200: CrossReferenceOut;
+};
+
+export type DecideInvestigationCrossReferenceResponse =
+  DecideInvestigationCrossReferenceResponses[keyof DecideInvestigationCrossReferenceResponses];
+
 export type DeleteDeckEndpointData = {
   body?: never;
   path: {
@@ -12853,6 +13147,45 @@ export type SyncCorpusNowResponses = {
 
 export type SyncCorpusNowResponse =
   SyncCorpusNowResponses[keyof SyncCorpusNowResponses];
+
+export type ListInvestigationCrossReferencesData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * Status
+     */
+    status?: 'open' | 'decided' | 'all';
+  };
+  url: '/api/investigations/{investigation_id}/cross-references';
+};
+
+export type ListInvestigationCrossReferencesErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type ListInvestigationCrossReferencesError =
+  ListInvestigationCrossReferencesErrors[keyof ListInvestigationCrossReferencesErrors];
+
+export type ListInvestigationCrossReferencesResponses = {
+  /**
+   * Response List Investigation Cross References
+   *
+   * Successful Response
+   */
+  200: Array<CrossReferenceOut>;
+};
+
+export type ListInvestigationCrossReferencesResponse =
+  ListInvestigationCrossReferencesResponses[keyof ListInvestigationCrossReferencesResponses];
 
 export type ListDecksEndpointData = {
   body?: never;

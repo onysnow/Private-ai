@@ -24,12 +24,12 @@ POSTGRES_URL = os.environ.get("POSTGRES_TEST_URL", "")
 pytestmark = pytest.mark.skipif(not POSTGRES_URL.startswith("postgresql"), reason="needs POSTGRES_TEST_URL")
 
 
-def _queue_rows(engine, investigation_id: str) -> list[tuple[str, str, int, bool]]:
+def _queue_rows(engine, investigation_id: str, task: str = "workbench.corpus_push") -> list[tuple[str, str, int, bool]]:
     with engine.connect() as connection:
         rows = connection.execute(text(
             "SELECT status, queueing_lock, priority, scheduled_at > now() FROM procrastinate.procrastinate_jobs "
-            "WHERE task_name = 'workbench.corpus_push' AND args->>'investigation_id' = :inv ORDER BY id"
-        ), {"inv": investigation_id}).all()
+            "WHERE task_name = :task AND args->>'investigation_id' = :inv ORDER BY id"
+        ), {"inv": investigation_id, "task": task}).all()
     return [(str(r[0]), str(r[1]), int(r[2]), bool(r[3])) for r in rows]
 
 
@@ -67,6 +67,13 @@ def test_changes_queue_one_push_and_sync_now_runs_at_once(tmp_path, monkeypatch)
             assert sum(len(batch) for batch in fake.bulk_batches) == 2
             rows = _queue_rows(engine, inv)
             assert ("succeeded", f"{lock}:now", 1, False) in rows and ("todo", lock, 0, True) in rows
+            # The push changed the collection, so it queued cross-referencing
+            # (after the push delay) under that task's own locks.
+            xref_lock = f"workbench.corpus_cross_reference:{inv}"
+            deadline = time.monotonic() + 30
+            while time.monotonic() < deadline and not _queue_rows(engine, inv, "workbench.corpus_cross_reference"):
+                time.sleep(0.2)
+            assert _queue_rows(engine, inv, "workbench.corpus_cross_reference") == [("todo", xref_lock, 0, True)]
     finally:
         with engine.begin() as connection:
             # Procrastinate's delete trigger names its tables without a schema.

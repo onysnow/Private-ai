@@ -1,13 +1,21 @@
 """Corpus jobs: keep each investigation's OpenAleph collection in step with
 what its reporters have confirmed (ADR-0006, Wave B).
 
-A Procrastinate task on the Workbench's own queue does the work:
+Two Procrastinate tasks on the Workbench's own queue do the work:
 
-- the corpus push (``PUSH_TASK``) sends changed records and removes
-  merged-away ones (app/services/corpus_push.py).
+- the corpus push (``PUSH_TASK``) sends changed records, removes merged-away
+  ones (app/services/corpus_push.py) and sends reporters' cross-reference
+  decisions to OpenAleph as judgements (app/services/cross_references.py);
+- cross-referencing (``XREF_TASK``), queued by a push that changed the
+  collection: it waits until OpenAleph has indexed what was written (its
+  cross-referencing reads the search index, aleph/logic/xref.py
+  _query_entities), asks OpenAleph to cross-reference the collection, checks
+  back until OpenAleph's queue no longer holds the run, and stores the
+  matches as proposals. Each wait is a short job queued again, not a job
+  that sleeps, so a long run never holds one of the worker's two slots.
 
-It is queued from the service functions that confirm, edit, merge or link
-entities, after their commit (``request_corpus_sync``). Two Procrastinate
+The push is queued from the service functions that confirm, edit, merge or
+link entities, after their commit (``request_corpus_sync``). Two Procrastinate
 features make a burst of changes one push (procrastinate/tasks.py
 Task.configure; the vendored schema, alembic/sql/procrastinate_3.10.0_schema.sql):
 
@@ -47,6 +55,7 @@ import math
 import time
 from collections import deque
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from typing import Any, Callable
 
 import httpx
@@ -60,8 +69,18 @@ from app.models.domain import CorpusSyncState, Investigation
 logger = logging.getLogger("journalism.jobs")
 
 PUSH_TASK = "workbench.corpus_push"
+XREF_TASK = "workbench.corpus_cross_reference"
 OPERATION_PUSH = "corpus_push"
+OPERATION_XREF = "corpus_cross_reference"
 FIRST_RETRY_SECONDS = 30.0
+PHASE_START = "start"      # a new run: wait for OpenAleph to be idle, then ask
+PHASE_WAIT = "wait"        # still waiting to ask, since the run's start
+PHASE_COLLECT = "collect"  # asked: wait for the run to end, then read the matches
+
+
+class CrossReferenceTimeout(Exception):
+    """OpenAleph did not finish (or could not start) cross-referencing within
+    OPENALEPH_XREF_TIMEOUT_SECONDS; the next change or "Sync now" asks again."""
 
 
 @dataclass(frozen=True)
@@ -245,9 +264,32 @@ def record_failure(db: Session, investigation_id: str, operation: str, exc: Base
     return [FollowUp(retry.task, retry_delay(failures), retry.kwargs, retry=True)]
 
 
+def _xref_in_progress(state: CorpusSyncState, now: datetime) -> bool:
+    """A cross-referencing run is under way and not given up on: it checks for
+    changes it missed when it ends. One stuck past the timeout (its job lost)
+    no longer counts, so a new one can start."""
+    timeout = timedelta(seconds=settings.openaleph_xref_timeout_seconds)
+    return state.xref_status in {"waiting", "running"} and state.xref_requested_at is not None \
+        and now - state.xref_requested_at <= timeout
+
+
+def xref_due(state: CorpusSyncState, now: datetime) -> bool:
+    """Whether the collection holds changes no successful cross-referencing
+    run has seen: a run started (xref_requested_at) before the last change
+    (changed_at), or none succeeded yet."""
+    if state.changed_at is None or _xref_in_progress(state, now):
+        return False
+    if state.xref_status != "succeeded" or state.xref_requested_at is None:
+        return True
+    return state.changed_at > state.xref_requested_at
+
+
 def push_step(session_factory: sessionmaker[Session], investigation_id: str, *, gateway: Any) -> list[FollowUp]:
-    """One corpus push; returns what to run next."""
+    """One corpus push, then the reporters' pending match judgements; returns
+    what to run next (another push while removals wait, and cross-referencing
+    when the collection changed)."""
     from app.services.corpus_push import push_confirmed_records
+    from app.services.cross_references import send_pending_judgements
 
     if not settings.openaleph_enabled:
         return []
@@ -261,8 +303,10 @@ def push_step(session_factory: sessionmaker[Session], investigation_id: str, *, 
         db.commit()
         try:
             result = push_confirmed_records(db, investigation_id, gateway=gateway)
+            judgements = send_pending_judgements(db, investigation_id, gateway=gateway)
         except Exception as exc:
             return record_failure(db, investigation_id, OPERATION_PUSH, exc, FollowUp(PUSH_TASK, 0, args))
+        result.judgements_sent, result.judgements_failed = judgements["sent"], judgements["failed"]
         state = sync_state(db, investigation_id)
         now = utcnow_naive()
         state.push_status = "waiting" if result.removals_waiting else "succeeded"
@@ -273,17 +317,93 @@ def push_step(session_factory: sessionmaker[Session], investigation_id: str, *, 
         state.consecutive_failures = 0
         if result.changed:
             state.changed_at = now
+        due = bool(result.collection_id) and xref_due(state, now)
         db.commit()
         follow_ups: list[FollowUp] = []
         if result.removals_waiting:
             follow_ups.append(FollowUp(PUSH_TASK, settings.openaleph_corpus_poll_seconds, args))
+        if due:
+            follow_ups.append(FollowUp(XREF_TASK, settings.openaleph_corpus_push_delay_seconds,
+                                       {**args, "phase": PHASE_START}))
         return follow_ups
+
+
+def xref_step(session_factory: sessionmaker[Session], investigation_id: str, phase: str, *, gateway: Any) -> list[FollowUp]:
+    """One step of cross-referencing the investigation's collection.
+
+    "start" (then "wait"): wait while OpenAleph is still indexing the
+    collection or already cross-referencing it, then ask it to (POST .../xref).
+    "collect": wait while OpenAleph's queue still holds the run (GET .../status
+    lists active xref_collection jobs, openaleph_procrastinate
+    manage/status.py), then read the matches (GET .../xref) and store them as
+    proposals. OpenAleph's status cannot tell a finished run from a failed one
+    once neither is active, so a failed run shows as no new matches; its own
+    queue retries a failing run first (openaleph_procrastinate
+    ServiceSettings.max_retries, 5). Each wait gives up after
+    OPENALEPH_XREF_TIMEOUT_SECONDS.
+    """
+    from app.services.cross_references import import_cross_references
+    from app.services.openaleph_corpus import get_binding
+
+    if not settings.openaleph_enabled:
+        return []
+    start = {"investigation_id": investigation_id, "phase": PHASE_START}
+    wait = {"investigation_id": investigation_id, "phase": PHASE_WAIT}
+    collect = {"investigation_id": investigation_id, "phase": PHASE_COLLECT}
+    poll = settings.openaleph_corpus_poll_seconds
+    timeout = timedelta(seconds=settings.openaleph_xref_timeout_seconds)
+    minutes = max(1, round(settings.openaleph_xref_timeout_seconds / 60))
+    with session_factory() as db:
+        if not _wanted(db, investigation_id):
+            return []
+        binding = get_binding(db, investigation_id)
+        if binding is None:
+            return []  # nothing was ever sent
+        collection_id = binding.collection_id
+        try:
+            state = sync_state(db, investigation_id)
+            now = utcnow_naive()
+            if phase in (PHASE_START, PHASE_WAIT):
+                if phase == PHASE_START or state.xref_requested_at is None:
+                    state.xref_status, state.xref_requested_at, state.xref_error = "waiting", now, None
+                    db.commit()
+                if gateway.index_busy(collection_id) or gateway.cross_reference_running(collection_id):
+                    if now - state.xref_requested_at > timeout:
+                        raise CrossReferenceTimeout(f"OpenAleph was still busy with the collection after {minutes} minute(s)")
+                    return [FollowUp(XREF_TASK, poll, wait)]
+                gateway.start_cross_reference(collection_id)
+                state.xref_status, state.xref_requested_at = "running", utcnow_naive()
+                db.commit()
+                return [FollowUp(XREF_TASK, poll, collect)]
+            if phase != PHASE_COLLECT:
+                raise ValueError(f"Unknown cross-referencing phase {phase!r}")
+            if gateway.cross_reference_running(collection_id):
+                if state.xref_requested_at is not None and now - state.xref_requested_at > timeout:
+                    raise CrossReferenceTimeout(f"OpenAleph had not finished cross-referencing after {minutes} minute(s)")
+                return [FollowUp(XREF_TASK, poll, collect)]
+            counts = import_cross_references(db, investigation_id, gateway.cross_reference_results(collection_id))
+        except Exception as exc:
+            return record_failure(db, investigation_id, OPERATION_XREF, exc,
+                                  FollowUp(XREF_TASK, 0, collect if phase == PHASE_COLLECT else start))
+        state = sync_state(db, investigation_id)
+        state.xref_status = "succeeded"
+        state.xref_finished_at = utcnow_naive()
+        state.xref_error = None
+        state.xref_counts = counts
+        state.consecutive_failures = 0
+        missed = state.changed_at is not None and state.xref_requested_at is not None \
+            and state.changed_at > state.xref_requested_at
+        db.commit()
+        # A push made while OpenAleph was cross-referencing is not in this run.
+        return [FollowUp(XREF_TASK, settings.openaleph_corpus_push_delay_seconds, start)] if missed else []
 
 
 def run_step(session_factory: sessionmaker[Session], step: FollowUp, gateway: Any) -> list[FollowUp]:
     investigation_id = step.kwargs.get("investigation_id", "")
     if step.task == PUSH_TASK:
         return push_step(session_factory, investigation_id, gateway=gateway)
+    if step.task == XREF_TASK:
+        return xref_step(session_factory, investigation_id, step.kwargs.get("phase", PHASE_START), gateway=gateway)
     raise ValueError(f"Unknown corpus task {step.task!r}")
 
 
@@ -313,6 +433,21 @@ def register_tasks(app: Any, session_factory: sessionmaker[Session], engine: Eng
     def corpus_push(investigation_id: str) -> None:
         run(FollowUp(PUSH_TASK, 0, {"investigation_id": investigation_id}))
 
+    @app.task(name=XREF_TASK, queue=queue_name, retry=False)
+    def corpus_cross_reference(investigation_id: str, phase: str = PHASE_START) -> None:
+        run(FollowUp(XREF_TASK, 0, {"investigation_id": investigation_id, "phase": phase}))
+
+
+def _unfinished_cross_reference(session_factory: sessionmaker[Session], investigation_id: str) -> FollowUp | None:
+    """The step that carries on a cross-referencing run an earlier "Sync now"
+    left going (no worker carries it on in developer mode)."""
+    with session_factory() as db:
+        state = db.scalar(select(CorpusSyncState).where(CorpusSyncState.investigation_id == investigation_id))
+        if state is None or not _xref_in_progress(state, utcnow_naive()):
+            return None
+        phase = PHASE_COLLECT if state.xref_status == "running" else PHASE_WAIT
+        return FollowUp(XREF_TASK, 0, {"investigation_id": investigation_id, "phase": phase})
+
 
 def sync_now(
     session_factory: sessionmaker[Session],
@@ -321,20 +456,27 @@ def sync_now(
     gateway: Any = None,
     sleep: Callable[[float], None] = time.sleep,
     clock: Callable[[], float] = time.monotonic,
+    wait_seconds: float | None = None,
 ) -> None:
     """Run the corpus steps for one investigation here and now, waiting
     between them as the queue would (developer mode's "Sync now", and the
-    live test). A failure is recorded and not tried again; waiting stops at
-    OPENALEPH_XREF_TIMEOUT_SECONDS."""
+    live test). A failure is recorded and not tried again; waiting stops after
+    ``wait_seconds`` (OPENALEPH_SYNC_NOW_WAIT_SECONDS), and a cross-referencing
+    run still going then is carried on by the next call."""
     gateway = gateway if gateway is not None else gateway_factory()
-    deadline = clock() + max(1.0, settings.openaleph_xref_timeout_seconds)
+    wait = settings.openaleph_sync_now_wait_seconds if wait_seconds is None else wait_seconds
+    deadline = clock() + max(1.0, wait)
     work: deque[FollowUp] = deque([FollowUp(PUSH_TASK, 0, {"investigation_id": investigation_id})])
+    unfinished = _unfinished_cross_reference(session_factory, investigation_id)
+    if unfinished is not None:
+        work.append(unfinished)
     while work:
         step = work.popleft()
+        # Checked before every step, so a wait configured as 0 seconds cannot spin forever.
+        if clock() + step.delay > deadline:
+            logger.info("sync now stopped waiting", extra={"investigation_id": investigation_id, "task": step.task})
+            return
         if step.delay > 0:
-            if clock() + step.delay > deadline:
-                logger.info("sync now stopped waiting", extra={"investigation_id": investigation_id, "task": step.task})
-                return
             sleep(step.delay)
         for follow_up in run_step(session_factory, step, gateway):
             # As the queueing lock would: one waiting step per task.

@@ -100,6 +100,7 @@ import {
   createWriteupEndpoint,
   decideCrossProviderCluster,
   decideEntityPostMergeReconciliation,
+  decideInvestigationCrossReference,
   decidePropertyConflict,
   deleteConnectorCredential,
   deleteDeckEndpoint,
@@ -178,6 +179,7 @@ import {
   listExternalRelationshipPromotions,
   listExternalRelationshipReviews,
   listInvestigationAiAnalysisCandidates,
+  listInvestigationCrossReferences,
   listInvestigationEvidence,
   listInvestigationRelationships,
   listInvestigations,
@@ -413,6 +415,9 @@ import type {
   DecideEntityPostMergeReconciliationData,
   DecideEntityPostMergeReconciliationError,
   DecideEntityPostMergeReconciliationResponse,
+  DecideInvestigationCrossReferenceData,
+  DecideInvestigationCrossReferenceError,
+  DecideInvestigationCrossReferenceResponse,
   DecidePropertyConflictData,
   DecidePropertyConflictError,
   DecidePropertyConflictResponse,
@@ -623,6 +628,9 @@ import type {
   ListExternalRelationshipReviewsResponse,
   ListInvestigationAiAnalysisCandidatesData,
   ListInvestigationAiAnalysisCandidatesError,
+  ListInvestigationCrossReferencesData,
+  ListInvestigationCrossReferencesError,
+  ListInvestigationCrossReferencesResponse,
   ListInvestigationEvidenceData,
   ListInvestigationEvidenceError,
   ListInvestigationEvidenceResponse,
@@ -3378,6 +3386,33 @@ export const consoleUsersIssueMutation = (
 };
 
 /**
+ * Decide Investigation Cross Reference
+ */
+export const decideInvestigationCrossReferenceMutation = (
+  options?: Partial<Options<DecideInvestigationCrossReferenceData>>,
+): UseMutationOptions<
+  DecideInvestigationCrossReferenceResponse,
+  DecideInvestigationCrossReferenceError,
+  Options<DecideInvestigationCrossReferenceData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DecideInvestigationCrossReferenceResponse,
+    DecideInvestigationCrossReferenceError,
+    Options<DecideInvestigationCrossReferenceData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await decideInvestigationCrossReference({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
  * Delete Deck Endpoint
  */
 export const deleteDeckEndpointMutation = (
@@ -5324,6 +5359,34 @@ export const syncCorpusNowMutation = (
   };
   return mutationOptions;
 };
+
+export const listInvestigationCrossReferencesQueryKey = (
+  options: Options<ListInvestigationCrossReferencesData>,
+) => createQueryKey('listInvestigationCrossReferences', options);
+
+/**
+ * List Investigation Cross References
+ */
+export const listInvestigationCrossReferencesOptions = (
+  options: Options<ListInvestigationCrossReferencesData>,
+) =>
+  queryOptions<
+    ListInvestigationCrossReferencesResponse,
+    ListInvestigationCrossReferencesError,
+    ListInvestigationCrossReferencesResponse,
+    ReturnType<typeof listInvestigationCrossReferencesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listInvestigationCrossReferences({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listInvestigationCrossReferencesQueryKey(options),
+  });
 
 export const listDecksEndpointQueryKey = (
   options: Options<ListDecksEndpointData>,
