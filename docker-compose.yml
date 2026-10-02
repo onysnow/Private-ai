@@ -50,12 +50,61 @@ services:
       ES_JAVA_OPTS: ${OPENALEPH_ES_JAVA_OPTS:--Xms1g -Xmx1g}
     volumes:
       - openaleph-elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s' >/dev/null"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
 
   redis:
     image: redis:alpine
     command: ["redis-server", "--save", "3600", "10"]
     volumes:
       - openaleph-redis-data:/data
+
+  # One-shot: creates or upgrades OpenAleph's database (including its job
+  # queue) and search indexes. Its workers and API start only after it
+  # succeeds; without it they stop at once on a fresh install. `aleph upgrade`
+  # takes several minutes, so it is skipped when this OpenAleph version has
+  # already been set up and its index and queue table are present. Delete
+  # /data/.workbench-openaleph-setup-* in the openaleph-archive volume to force it.
+  openaleph-setup:
+    image: ghcr.io/openaleph/openaleph:${OPENALEPH_TAG:-5.3.1}
+    command:
+      - bash
+      - -c
+      - |
+        set -e
+        marker=/data/.workbench-openaleph-setup-${OPENALEPH_TAG:-5.3.1}
+        if [ -f "$$marker" ] && python - <<'PY'
+        import os, sys
+        import psycopg, requests
+        es = os.environ["ALEPH_ELASTICSEARCH_URI"].rstrip("/")
+        ready = requests.head(f"{es}/openaleph-collection-v1", timeout=10).ok
+        with psycopg.connect(os.environ["ALEPH_DATABASE_URI"]) as conn:
+            ready = ready and conn.execute("SELECT to_regclass('public.procrastinate_jobs')").fetchone()[0] is not None
+        sys.exit(0 if ready else 1)
+        PY
+        then
+          echo "OpenAleph is already set up for this version."
+        else
+          aleph upgrade
+          touch "$$marker"
+        fi
+    restart: "no"
+    environment: *openaleph-environment
+    tmpfs:
+      - /tmp
+    volumes:
+      - openaleph-archive:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   ingest:
     image: ghcr.io/openaleph/ingest-file:${OPENALEPH_TAG:-5.3.1}
@@ -67,6 +116,8 @@ services:
     volumes:
       - openaleph-archive:/data
     depends_on:
+      openaleph-setup:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:
@@ -79,6 +130,8 @@ services:
     tmpfs:
       - /tmp:mode=777
     depends_on:
+      openaleph-setup:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:
@@ -93,6 +146,8 @@ services:
     volumes:
       - openaleph-archive:/data
     depends_on:
+      openaleph-setup:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       elasticsearch:
@@ -112,6 +167,8 @@ services:
     volumes:
       - openaleph-archive:/data
     depends_on:
+      openaleph-setup:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       elasticsearch:

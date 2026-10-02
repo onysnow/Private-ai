@@ -49,6 +49,22 @@ def test_root_compose_declares_core_stack_with_openaleph_always_on():
     for name in {"postgres", "elasticsearch", "redis", "ingest", "analyze", "worker", "api", "ui"}:
         assert "profiles" not in services[name], f"{name} must boot with the default stack, not behind a profile"
     assert "api" not in services["backend"]["depends_on"], "the workbench must come up even while OpenAleph is still pulling/starting"
+    _assert_openaleph_setup_runs_first(services)
+
+
+def _assert_openaleph_setup_runs_first(services):
+    """Without `aleph upgrade` OpenAleph's workers stop at once on a fresh
+    install (its job queue tables do not exist yet; seen 2026-10-01)."""
+    setup = services["openaleph-setup"]
+    script = setup["command"][-1]
+    assert setup["command"][:2] == ["bash", "-c"] and setup["restart"] == "no"
+    assert "aleph upgrade" in script and 'touch "$$marker"' in script
+    assert "openaleph-archive:/data" in setup["volumes"], "the marker lives with OpenAleph's own data"
+    assert setup["depends_on"]["elasticsearch"]["condition"] == "service_healthy"
+    assert setup["depends_on"]["postgres"]["condition"] == "service_healthy"
+    assert "healthcheck" in services["elasticsearch"]
+    for name in ("ingest", "analyze", "worker", "api"):
+        assert services[name]["depends_on"]["openaleph-setup"]["condition"] == "service_completed_successfully", name
 
 
 def test_integrated_stack_uses_separate_postgres_ownership_boundaries():
@@ -75,7 +91,8 @@ def test_production_compose_has_no_dev_shortcuts():
     compose = yaml.safe_load(text)
     services = compose["services"]
     openaleph = {"postgres", "elasticsearch", "redis", "ingest", "analyze", "worker", "api", "ui"}
-    assert set(services) == {"workbench-db", "backend"} | openaleph, "workbench + OpenAleph, nothing dev-only (no adminer, no separate frontend: ADR-0004)"
+    assert set(services) == {"workbench-db", "backend", "openaleph-setup"} | openaleph, "workbench + OpenAleph, nothing dev-only (no adminer, no separate frontend: ADR-0004)"
+    _assert_openaleph_setup_runs_first(services)
     for name in openaleph:
         assert "profiles" not in services[name] and services[name].get("restart") == "unless-stopped", name
         if name != "ui":

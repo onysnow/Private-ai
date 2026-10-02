@@ -64,8 +64,8 @@ METHODS: dict[str, dict[str, Any]] = {
         "automated": True,
     },
     "openaleph_ingest_file": {
-        "label": "OpenAleph page text",
-        "description": "OpenAleph ingested the uploaded file and returned the text of one page; that page text is proposed verbatim as an evidence quote.",
+        "label": "OpenAleph document text",
+        "description": "OpenAleph read the uploaded file (with OCR for scanned pages) and returned its text: one page, or one paragraph for files without pages. That text is proposed verbatim as an evidence quote.",
         "automated": True,
     },
     "openaleph_ftm_analyze": {
@@ -152,7 +152,7 @@ def _chunk_method_reason(chunk_ref: dict | None) -> str | None:
     if method == "native_pdf":
         return f"The chunk text at {where} is the PDF's own embedded text layer."
     if method == "openaleph_ingest_file":
-        return f"The chunk text at {where} is page text returned by OpenAleph."
+        return f"The chunk text at {where} is text OpenAleph read from the file."
     return f"The chunk text at {where} was read directly from the file."
 
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from pathlib import Path
 from typing import Any, Callable
 
@@ -21,12 +22,55 @@ from app.models.domain import (
 PROVIDER = "openaleph"
 
 
+# Single-user session tokens, by OpenAleph base URL: (token, fetched_at).
+_single_user_tokens: dict[str, tuple[str, float]] = {}
+_TOKEN_REUSE_SECONDS = 3600.0  # OpenAleph's single-user sessions last ~9 days
+
+
+def _single_user_token(transport: httpx.BaseTransport | None = None) -> str | None:
+    """The session token OpenAleph hands out in single-user mode.
+
+    The Docker stack runs OpenAleph with ALEPH_SINGLE_USER=true: no accounts,
+    and GET /api/2/metadata returns a token for the one local user. Requests
+    without it are anonymous and may not create collections or upload
+    (checked against OpenAleph 5.3.1 on 2026-10-01).
+    """
+    base = settings.openaleph_base_url.rstrip("/")
+    cached = _single_user_tokens.get(base)
+    if cached and time.monotonic() - cached[1] < _TOKEN_REUSE_SECONDS:
+        return cached[0]
+    try:
+        with httpx.Client(timeout=max(settings.openaleph_probe_timeout_seconds, 5.0), transport=transport) as client:
+            response = client.get(f"{base}/api/2/metadata")
+            response.raise_for_status()
+            payload = response.json()
+    except (httpx.HTTPError, ValueError):
+        return None
+    token = payload.get("token") if isinstance(payload, dict) else None
+    if not isinstance(token, str) or not token:
+        return None
+    _single_user_tokens[base] = (token, time.monotonic())
+    return token
+
+
+def openaleph_auth_headers(transport: httpx.BaseTransport | None = None) -> dict[str, str]:
+    """Authorization for OpenAleph: the configured API key, else the
+    single-user session token, else nothing (anonymous)."""
+    if settings.openaleph_api_key:
+        return {"Authorization": f"ApiKey {settings.openaleph_api_key}"}
+    token = _single_user_token(transport)
+    return {"Authorization": f"Token {token}"} if token else {}
+
+
 def _client_factory() -> Any:
     try:
         from openaleph_client.api import AlephAPI
     except ImportError as exc:  # pragma: no cover - deployment dependency guard
         raise RuntimeError("openaleph-client is not installed") from exc
-    return AlephAPI(host=settings.openaleph_base_url, api_key=settings.openaleph_api_key or None)
+    client = AlephAPI(host=settings.openaleph_base_url, api_key=settings.openaleph_api_key or None)
+    if not settings.openaleph_api_key:
+        client.session.headers.update(openaleph_auth_headers())
+    return client
 
 
 def _foreign_id(investigation_id: str) -> str:
@@ -132,25 +176,25 @@ def ensure_openaleph_collection(
         raise RuntimeError("OpenAleph integration is disabled")
 
     client = client_factory()
-    foreign_id = _foreign_id(investigation_id)
-    collection = client.load_collection_by_foreign_id(
-        foreign_id,
-        config={
-            "label": investigation.name,
-            "summary": investigation.description or "Journalism Workbench investigation corpus",
-            "casefile": True,
-            "category": "other",
-        },
-    )
-    collection_id = str(collection.get("id") or "").strip()
+    # OpenAleph 5.3.1 answers 400 to a new collection that names its own
+    # foreign_id (checked 2026-10-01), so it picks one; the binding row is how
+    # the Workbench finds the collection again. A casefile is a private
+    # working collection, which is what an investigation's corpus is.
+    label = investigation.name if len(investigation.name or "") >= 2 else f"Investigation {investigation.name or investigation_id}"
+    collection = client.create_collection({
+        "label": label[:500],
+        "summary": investigation.description or "Journalism Workbench investigation corpus",
+        "casefile": True,
+    })
+    collection_id = str(collection.get("id") or collection.get("collection_id") or "").strip()
     if not collection_id:
         raise RuntimeError("OpenAleph did not return a collection ID")
     row = InvestigationCorpusBinding(
         investigation_id=investigation_id,
         provider=PROVIDER,
         collection_id=collection_id,
-        foreign_id=str(collection.get("foreign_id") or foreign_id),
-        collection_label=str(collection.get("label") or investigation.name),
+        foreign_id=str(collection.get("foreign_id") or _foreign_id(investigation_id)),
+        collection_label=str(collection.get("label") or label),
         status="active",
     )
     db.add(row)
@@ -336,9 +380,7 @@ def _openaleph_search(
     We use exact API filters for the collection and parent document so another
     document in the same investigation can never leak into this review queue.
     """
-    headers = {"User-Agent": "JournalismWorkbench/0.93"}
-    if settings.openaleph_api_key:
-        headers["Authorization"] = f"ApiKey {settings.openaleph_api_key}"
+    headers = {"User-Agent": "JournalismWorkbench/0.93", **openaleph_auth_headers(transport)}
     params: dict[str, str | int] = {
         "q": "*",
         "filter:collection_id": collection_id,
@@ -483,9 +525,7 @@ def _openaleph_mention_search(
     provider's resolved target is intentionally only metadata here: Workbench
     never turns it into a canonical identity decision without reporter review.
     """
-    headers = {"User-Agent": "JournalismWorkbench/0.93"}
-    if settings.openaleph_api_key:
-        headers["Authorization"] = f"ApiKey {settings.openaleph_api_key}"
+    headers = {"User-Agent": "JournalismWorkbench/0.93", **openaleph_auth_headers(transport)}
     params: dict[str, str | int] = {
         "q": "*",
         "filter:collection_id": collection_id,

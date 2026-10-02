@@ -13,6 +13,12 @@ class Settings(BaseSettings):
     openaleph_api_key: str = ""
     openaleph_probe_timeout_seconds: float = 3.0
     openaleph_auto_sync_documents: bool = False
+    # Who reads uploads (ADR-0004): auto = OpenAleph when the integration is
+    # enabled, else the Workbench's own reader; openaleph | local force one.
+    # OpenAleph falls back to the Workbench's reader when it cannot deliver.
+    document_reader: str = "auto"
+    openaleph_read_timeout_seconds: float = 900.0
+    openaleph_read_poll_seconds: float = 3.0
     enable_local_entity_suggestions: bool = True
     opensanctions_base_url: str = "https://api.opensanctions.org"
     opensanctions_api_key: str = ""

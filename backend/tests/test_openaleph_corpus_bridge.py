@@ -18,14 +18,12 @@ class FakeOpenAlephClient:
         self.collections = {}
         self.uploads = []
 
-    def load_collection_by_foreign_id(self, foreign_id, config=None):
-        if foreign_id not in self.collections:
-            self.collections[foreign_id] = {
-                "id": "oa-collection-1",
-                "foreign_id": foreign_id,
-                "label": (config or {}).get("label", foreign_id),
-            }
-        return self.collections[foreign_id]
+    def create_collection(self, data):
+        # OpenAleph 5.3.1 rejects a foreign_id on create and picks its own.
+        assert "foreign_id" not in data
+        collection = {"id": f"oa-collection-{len(self.collections) + 1}", "foreign_id": "oa-picked-foreign-id", "label": data["label"]}
+        self.collections[collection["id"]] = collection
+        return collection
 
     def ingest_upload(self, *, collection_id, file_path, metadata, sync=False, index=True):
         self.uploads.append((collection_id, Path(file_path), metadata, sync, index))
@@ -41,7 +39,8 @@ def test_openaleph_corpus_binding_and_document_sync(tmp_path, monkeypatch):
 
         binding = ensure_openaleph_collection(db, inv.id, client_factory=lambda: client)
         assert binding.collection_id == "oa-collection-1"
-        assert binding.foreign_id == f"journalism-workbench:{inv.id}"
+        assert binding.foreign_id == "oa-picked-foreign-id"
+        assert client.collections["oa-collection-1"]["label"] == "Example City investigation"
         assert db.query(InvestigationCorpusBinding).count() == 1
 
         # Idempotent binding: do not create a second OpenAleph collection mapping.

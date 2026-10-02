@@ -76,9 +76,11 @@ character positions; or OpenAleph's project slows or changes licence.
 - [x] Clear the CI type errors; add `tools/check_all.py` and a pre-commit hook
 - [x] Next.js static export served by the API at port 8000; retire `static/index.html`
 - [x] Launcher starts the Docker stack
-- [ ] Run the OpenAleph document path live end to end and add it to CI
+- [x] Run the OpenAleph document path live end to end (Docker stack, 2026-10-01: a 10-page scan and a text file, read by OpenAleph; OpenAleph stopped, read by the fallback)
+- [ ] Add a live OpenAleph run to CI
 - [x] Upload returns at once; Workbench jobs on Procrastinate (`app/jobs`)
-- [ ] Upload hands documents to OpenAleph first
-- [ ] Own parser and pattern name-finder become an OpenAleph-down fallback
+- [x] Upload hands documents to OpenAleph first (`app/services/openaleph_reader.py`)
+- [x] Own parser becomes the fallback when OpenAleph cannot read a file
+- [ ] Pattern name-finder becomes a fallback only: in the live run OpenAleph's ftm-analyze queued no analysis for the test files, so the name-finder still runs beside it (`ENABLE_LOCAL_ENTITY_SUGGESTIONS`, default true)
 - [ ] Ollama adapter and quote check
 - [ ] Response models, generated client, panel split

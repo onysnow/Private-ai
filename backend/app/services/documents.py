@@ -199,8 +199,13 @@ def store_document(db: Session, *, investigation_id: str, title: str, filename: 
             pass
 
 
-def extract_document(db: Session, document_id: str) -> Document | None:
-    """Read a stored document into locator-preserving chunks and proposals.
+def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], list[str]] | None = None) -> Document | None:
+    """Turn a stored document into locator-preserving chunks and proposals.
+
+    ``text`` is text already read elsewhere (OpenAleph; see
+    app/services/openaleph_reader.py) as ``(chunks, issues)``; a chunk may
+    carry a ``provenance`` dict, which every proposal made from it records.
+    Without it the Workbench reads the file itself.
 
     Returns None when the document (or its investigation) was deleted before
     this ran. Extraction failures remain a valid committed document state: the
@@ -220,11 +225,15 @@ def extract_document(db: Session, document_id: str) -> Document | None:
     doc.extraction_status = 'extracting'
     doc.extraction_error = None
     try:
-        chunks, issues = read_chunks(Path(doc.storage_path))
-        for ordinal, item in enumerate(chunks, 1):
+        chunks, issues = text if text is not None else read_chunks(Path(doc.storage_path))
+        for ordinal, raw in enumerate(chunks, 1):
+            item = dict(raw)
+            provenance = item.pop('provenance', None)
             chunk = DocumentChunk(document_id=doc.id, ordinal=ordinal, **item)
             db.add(chunk); db.flush()
             for typ, payload, conf in _candidate_payloads(chunk, include_entities=settings.enable_local_entity_suggestions):
+                if provenance:
+                    payload = {**payload, 'provenance': provenance}
                 db.add(ExtractionCandidate(investigation_id=doc.investigation_id, document_id=doc.id, chunk_id=chunk.id, candidate_type=typ, payload=payload, confidence=conf))
         doc.extraction_status = 'complete'
         doc.extraction_issues = issues or None

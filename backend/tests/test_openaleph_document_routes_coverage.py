@@ -219,6 +219,9 @@ def test_upload_auto_syncs_to_openaleph_when_enabled(monkeypatch):
     inv = _new_investigation('OpenAleph route coverage: upload auto-sync')
     monkeypatch.setattr('app.api.routes_documents.settings.openaleph_enabled', True)
     monkeypatch.setattr('app.api.routes_documents.settings.openaleph_auto_sync_documents', True)
+    # The Workbench reads the file and then sends it on (OpenAleph reading
+    # uploads itself is covered in test_openaleph_reader.py).
+    monkeypatch.setattr('app.api.routes_documents.settings.document_reader', 'local')
     canned = {'status': 'synced', 'auto': True}
     # The upload's background job (app/jobs/handlers.py) does the sync.
     synced = []

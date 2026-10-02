@@ -81,10 +81,19 @@ the screen it builds, because browser calls reach the containerized API through
 Docker's port publishing rather than loopback. Override `API_AUTH_TOKEN` in your
 shell or `.env` if you want a different local token.
 
-Uploading a document saves it and answers at once; reading it (and OCR for
-scans) runs as a background job on the Procrastinate queue inside the API, and
-the screen shows its progress. A read that fails can be retried from the
-document's **Retry reading** button. `GET /api/jobs` lists jobs.
+Uploading a document saves it and answers at once; reading it runs as a
+background job on the Procrastinate queue inside the API, and the screen shows
+its progress. **OpenAleph reads the file** (text layers, OCR for scans, office
+formats) and the Workbench takes its text back page by page, or paragraph by
+paragraph for files without pages. When OpenAleph cannot (it is still
+starting, it rejects or fails the file, it takes longer than
+`OPENALEPH_READ_TIMEOUT_SECONDS`, or it returns no text) the Workbench's own
+reader reads the file instead, and the job says why. A read that fails can be
+retried from the document's **Retry reading** button. `GET /api/jobs` lists jobs.
+
+On the first start, the `openaleph-setup` step creates OpenAleph's database and
+search indexes before its workers start; that takes several minutes. Later
+starts skip it unless the OpenAleph version changes.
 
 Elasticsearch wants about 1 GB of heap (`OPENALEPH_ES_JAVA_OPTS`). This repo has
 one git submodule ([`topic-authority-system`](https://github.com/onysnow/topic-authority-system)
@@ -105,11 +114,17 @@ get through. If setup fails, check
 For front-end work, `cd frontend && npm run dev` serves the screen with hot reload
 at `http://localhost:3000`, talking to the API at `http://localhost:8000`.
 
-To have uploads flow into the OpenAleph corpus automatically and let OpenAleph's `ftm-analyze` own entity extraction:
+Name proposals come from OpenAleph's `ftm-analyze` when it returns them, and
+from the Workbench's own name-finder while `ENABLE_LOCAL_ENTITY_SUGGESTIONS`
+is true (the default). To leave names to OpenAleph alone:
 
 ```bash
-OPENALEPH_AUTO_SYNC_DOCUMENTS=true ENABLE_LOCAL_ENTITY_SUGGESTIONS=false docker compose up --build
+ENABLE_LOCAL_ENTITY_SUGGESTIONS=false docker compose up --build
 ```
+
+`DOCUMENT_READER=local` makes the Workbench read every file itself (then
+`OPENALEPH_AUTO_SYNC_DOCUMENTS=true` still sends each file to OpenAleph after
+reading it).
 
 ## Inspecting the backend
 
