@@ -42,9 +42,10 @@ from app.services.presentation_style import (
 from app.visuals.checker import CheckReport, check_visual
 from app.visuals.data_service import DataRow, VisualData
 from app.visuals.echarts import (
-    KIND_LABELS, SINGLE_RECORD_MARK, BuiltChart, ChartDoesNotFit, UnsupportedChartKind, build_chart, format_value, ink_on, mark_colour,
-    part_colours, part_value_text, prepare_rows, singular, value_label,
+    DEFAULT_HEIGHT, DEFAULT_WIDTH, KIND_LABELS, MIN_FONT_PX, SINGLE_RECORD_MARK, BuiltChart, ChartDoesNotFit, UnsupportedChartKind, build_chart,
+    format_value, mark_colour, part_colours, part_value_text, prepare_rows, singular,
 )
+from app.visuals.layout import TEXT_SLACK, block_width, place_on_line
 from app.visuals.spec import ChartKind, VisualSpec, spec_errors
 from app.visuals.style import normalize_chart_style, styled_chart
 
@@ -52,6 +53,10 @@ MAX_BULLETS_PER_SLIDE = 8
 SLIDE_KINDS = {"title", "statement", "content", "questions"}
 VISUAL_LIMITS = {"figures": 4, "timeline": 8, "bar": 8}
 CHART_VISUAL = "chart"
+# The kinds a deck draws as native PowerPoint charts; the others (the
+# treemap) go in as the render service's picture.
+NATIVE_KINDS = frozenset({ChartKind.bar, ChartKind.column, ChartKind.line, ChartKind.area, ChartKind.stacked_bar_100,
+                          ChartKind.donut, ChartKind.histogram, ChartKind.scatter})
 
 
 def _clean_refs(refs: Any) -> list[dict]:
@@ -134,16 +139,21 @@ def chart_rows(visual: dict) -> tuple[VisualSpec, VisualData, list[DataRow]]:
     return spec, data, prepare_rows(spec, data)
 
 
-def chart_row_labels(data: VisualData, rows: list[DataRow]) -> dict[str, str]:
+def chart_row_labels(data: VisualData, rows: list[DataRow], *, separator: str = " · ") -> dict[str, str]:
     """Each row's label with how many records sit behind it (design rule
     16) and the mark for a value resting on one record (rule 20), for the
-    exports, which write both on the category label."""
+    exports, which write both on the category label. A chart whose labels
+    sit side by side under it puts the count on a line of its own
+    (`separator` "\\n"), so a period's label stays level instead of being
+    turned on its side to fit."""
     labels: dict[str, str] = {}
     for row in rows:
         label = row.label
         if data.unit_kind == "amount":
-            label += f" · {row.record_count} {data.record_noun if row.record_count != 1 else singular(data.record_noun)}"
-        if row.record_count == 1:
+            label += f"{separator}{row.record_count} {data.record_noun if row.record_count != 1 else singular(data.record_noun)}"
+            if row.record_count == 1:
+                label += f" {SINGLE_RECORD_MARK}"
+        elif row.record_count == 1:
             label += f" {SINGLE_RECORD_MARK}"
         labels[row.label] = label
     return labels
@@ -166,20 +176,21 @@ class CheckedChart:
     problem: str | None
 
 
-def checked_chart(visual: dict, theme: Theme) -> CheckedChart:
+def checked_chart(visual: dict, theme: Theme, *, width: int = DEFAULT_WIDTH, height: int = DEFAULT_HEIGHT) -> CheckedChart:
     """Draw a stored chart again from the rows the data service cooked (no
     query runs at export time) in the export's theme, and check it before it
     goes in. A chart that fails a hard rule is not drawn: its place says which
     rules failed, in plain words ("Export refuses broken files", Visual
     Editor design, "Keeping it honest"). The deck or brief itself still
-    exports."""
+    exports. `width` and `height` are the picture's design size: a picture
+    drawn for a slide is drawn, and checked, at the slide's own scale."""
     spec = VisualSpec.model_validate(visual["spec"])
     data = VisualData.from_dict(visual["data"])
     try:
         # The chart's own style (preset and options) on top of its order slip;
         # the rows are drawn as the data service cooked them.
         spec, draw = styled_chart(spec, data, visual.get("style"))
-        built = build_chart(spec, data, theme, draw=draw)
+        built = build_chart(spec, data, theme, width=width, height=height, draw=draw)
     except (UnsupportedChartKind, ChartDoesNotFit) as exc:
         return CheckedChart(spec, data, None, None, f"Chart not drawn: {exc}.")
     report = check_visual(spec, data, theme, built)
@@ -216,6 +227,70 @@ def _set_hole_size(plot: Any, percent: int) -> None:
         hole.set("val", str(percent))
 
 
+def _pin_plot_area(chart: Any, x: float, y: float, w: float, h: float) -> None:
+    """Fix the plot area's inner rectangle (the bars or the ring, without
+    axis labels) at these fractions of the chart frame
+    (c:plotArea/c:layout/c:manualLayout, layoutTarget inner, edge mode), so
+    a label can be moved to a place worked out beforehand. python-pptx has
+    no setting for it."""
+    from lxml import etree
+    from pptx.oxml.ns import qn
+    plot_area = chart._chartSpace.find(qn("c:chart")).find(qn("c:plotArea"))
+    layout = plot_area.find(qn("c:layout"))
+    if layout is None:
+        layout = etree.Element(qn("c:layout"))
+        plot_area.insert(0, layout)   # CT_PlotArea: layout comes first
+    for child in list(layout):
+        layout.remove(child)
+    manual = etree.SubElement(layout, qn("c:manualLayout"))
+    for tag, value in (("c:layoutTarget", "inner"), ("c:xMode", "edge"), ("c:yMode", "edge"),
+                       ("c:x", x), ("c:y", y), ("c:w", w), ("c:h", h)):
+        etree.SubElement(manual, qn(tag)).set("val", value if isinstance(value, str) else f"{value:.5f}")
+
+
+def _move_data_label(label: Any, dx: float, dy: float) -> None:
+    """Move a data label from its default place by (dx, dy), fractions of
+    the chart frame's width and height (c:dLbl/c:layout/c:manualLayout in
+    its default factor mode: the offset PowerPoint saves when a label is
+    dragged). python-pptx has no setting for it."""
+    from lxml import etree
+    from pptx.oxml.ns import qn
+    dlbl = label._get_or_add_dLbl()
+    layout = dlbl.find(qn("c:layout"))
+    if layout is None:
+        layout = etree.Element(qn("c:layout"))
+        dlbl.find(qn("c:idx")).addnext(layout)   # CT_DLbl: idx, then layout, then tx
+    for child in list(layout):
+        layout.remove(child)
+    manual = etree.SubElement(layout, qn("c:manualLayout"))
+    etree.SubElement(manual, qn("c:x")).set("val", f"{dx:.5f}")
+    etree.SubElement(manual, qn("c:y")).set("val", f"{dy:.5f}")
+
+
+_C15 = "http://schemas.microsoft.com/office/drawing/2012/chart"
+_LEADER_LINES_EXT = "{CE6537A1-D6FC-4f65-9D91-7224C49458BB}"   # PowerPoint 2013's data-label extension
+
+
+def _show_leader_lines(series: Any, colour: str) -> None:
+    """Draw a leader line from each mark to its moved label, as PowerPoint
+    2013 and later write it for any chart type (c15:showLeaderLines in the
+    series' data labels' extension list; LibreOffice reads it too). The
+    pie family's own c:showLeaderLines stays as python-pptx writes it.
+    python-pptx has no setting for it."""
+    from lxml import etree
+    from pptx.oxml.ns import qn
+    dlbls = series._element.get_or_add_dLbls()
+    ext_list = dlbls.find(qn("c:extLst"))
+    if ext_list is None:
+        ext_list = etree.SubElement(dlbls, qn("c:extLst"))   # CT_DLbls: extLst comes last
+    ext = etree.SubElement(ext_list, qn("c:ext"), nsmap={"c15": _C15})
+    ext.set("uri", _LEADER_LINES_EXT)
+    etree.SubElement(ext, f"{{{_C15}}}showLeaderLines").set("val", "1")
+    leader_lines = etree.SubElement(ext, f"{{{_C15}}}leaderLines")
+    line = etree.SubElement(etree.SubElement(leader_lines, qn("c:spPr")), qn("a:ln"), w="6350")
+    etree.SubElement(etree.SubElement(line, qn("a:solidFill")), qn("a:srgbClr"), val=colour)
+
+
 _NUMBER_PREFIXES = {"USD": "$", "EUR": "€", "GBP": "£"}
 
 
@@ -226,6 +301,153 @@ def _number_format(data: VisualData) -> str:
         return "#,##0"
     prefix = _NUMBER_PREFIXES.get((data.currency or data.unit or "").upper(), "")
     return f'[>=1000000]{prefix}#,##0.0,,"M";[>=1000]{prefix}#,##0,"K";{prefix}#,##0'
+
+
+# --- where a native chart's labels go ---------------------------------------------------
+# PowerPoint writes a data label in the middle of its mark unless the label
+# is moved (c:dLbl/c:layout/c:manualLayout, the offset PowerPoint itself
+# saves when a label is dragged), and LibreOffice wraps a long label into a
+# narrow column. A 100% bar's small parts and a donut's thin slices then
+# carry labels that run over each other. So the parts' labels are laid out
+# here the way the app's drawing lays them out -- a 100% bar's above and
+# below the bar in turn, a donut's outside the ring on its own side -- and
+# each label is moved there from its default place, as written, unwrapped.
+# Sizes are in points, from the chart frame's top-left corner.
+NATIVE_LABEL_SIZES = (11, 10, 9)   # pt, the largest that lets every label fit
+NATIVE_LINE = 1.25                 # a label line's height, as a multiple of its size
+NATIVE_LABEL_GAP = 6.0             # pt between two labels, and between a label and its mark
+WHOLE_BAR_THICKNESS = {"thin": 22.0, "regular": 34.0, "thick": 50.0}   # pt
+DONUT_HOLE = 45                    # percent of the diameter: a thicker ring than the 50% default
+DONUT_LEADER = (10.0, 8.0)         # pt: out from the ring, then across to the label (ECharts' length, length2)
+DONUT_MIN_DIAMETER = 96.0          # pt; a smaller ring is not drawn as a donut
+
+
+@dataclass(frozen=True)
+class PlacedLabel:
+    """A data label's box (its centre, width and height) and the point it is
+    moved from: the middle of its mark, where PowerPoint puts it."""
+    x: float
+    y: float
+    width: float
+    height: float
+    anchor_x: float
+    anchor_y: float
+
+
+def label_box(text: str, size: float) -> tuple[float, float]:
+    """The width and height a label of these lines takes at `size` pt, with
+    the slack the app's drawing allows (layout.TEXT_SLACK)."""
+    return block_width(text, size) * TEXT_SLACK, (text.count("\n") + 1) * size * NATIVE_LINE
+
+
+def whole_bar_layout(labels: list[str], values: list[float], width: float, height: float,
+                     thickness: float) -> tuple[float, float, list[PlacedLabel]] | None:
+    """A native 100% bar in a frame `width` x `height` pt: the bar across the
+    frame's middle, `thickness` tall, and each part's label above or below
+    it in turn, as the app draws it (echarts._whole_bar_offsets): centred on
+    its part, then moved apart and into the frame as little as the line
+    needs (layout.place_on_line). A label must still stand over or under
+    some of its own part, so it is never read as its neighbour's; when one
+    line a side cannot manage that, two lines a side. Returns (font size,
+    the bar's top, the labels in the parts' order), or None when no size
+    fits."""
+    total = math.fsum(values)
+    spans, before = [], 0.0
+    for value in values:
+        start = before / total * width if total > 0 else 0.0
+        before += value
+        spans.append((start, before / total * width if total > 0 else width))
+    centres = [(start + end) / 2 for start, end in spans]
+    bar_top = (height - thickness) / 2
+    middle = bar_top + thickness / 2
+    for per_side in (1, 2):
+        lines = 2 * per_side
+        for size in NATIVE_LABEL_SIZES:
+            boxes = [label_box(text, size) for text in labels]
+            line_height = max((h for _, h in boxes), default=0.0)
+            if per_side * (line_height + NATIVE_LABEL_GAP) > bar_top:
+                continue
+            placed: dict[int, PlacedLabel] = {}
+            for line in range(lines):
+                idx = [i for i in range(len(labels)) if i % lines == line]
+                widths = [boxes[i][0] for i in idx]
+                lefts = place_on_line([centres[i] for i in idx], widths, 0.0, width, NATIVE_LABEL_GAP)
+                if lefts is None or any(left > spans[i][1] or left + w < spans[i][0] for i, left, w in zip(idx, lefts, widths)):
+                    break
+                # Even lines above the bar, odd ones below; the second line a side further out.
+                reach = NATIVE_LABEL_GAP + line_height / 2 + (line // 2) * (line_height + NATIVE_LABEL_GAP)
+                y = bar_top - reach if line % 2 == 0 else bar_top + thickness + reach
+                for i, left, w in zip(idx, lefts, widths):
+                    placed[i] = PlacedLabel(left + w / 2, y, w, boxes[i][1], centres[i], middle)
+            else:
+                return size, bar_top, [placed[i] for i in range(len(labels))]
+    return None
+
+
+def donut_layout(labels: list[str], values: list[float], width: float, height: float
+                 ) -> tuple[float, float, float, list[PlacedLabel]] | None:
+    """A native donut in a frame `width` x `height` pt, labelled as the app
+    draws it: outside the ring on a leader line, on the ring's right for
+    the slices on its right half and on its left for the others (slices
+    clockwise from twelve o'clock). The labels of a side stand in a column
+    clear of the ring, each at its slice's height, moved apart up and down
+    as little as they need; the ring is as large as the frame's height and
+    the two columns allow, and sits off centre when one side has more to
+    say. Returns (font size, the ring's diameter, its centre's x, the
+    labels in the slices' order), or None when no size leaves a ring of
+    DONUT_MIN_DIAMETER."""
+    total = math.fsum(values)
+    angles, before = [], 0.0
+    for value in values:
+        angles.append(2 * math.pi * ((before + value / 2) / total if total > 0 else 0.0))
+        before += value
+    right = [math.sin(angle) >= 0 for angle in angles]
+    out, across = DONUT_LEADER
+    cy = height / 2
+    for size in NATIVE_LABEL_SIZES:
+        boxes = [label_box(text, size) for text in labels]
+        left_w = max((w for (w, _), r in zip(boxes, right) if not r), default=0.0)
+        right_w = max((w for (w, _), r in zip(boxes, right) if r), default=0.0)
+        left_room = left_w + across if left_w else 0.0
+        right_room = right_w + across if right_w else 0.0
+        diameter = min(height - 2 * NATIVE_LABEL_GAP, width - left_room - right_room - 2 * NATIVE_LABEL_GAP)
+        if diameter < DONUT_MIN_DIAMETER:
+            continue
+        radius = diameter / 2
+        # The spare width split evenly either side of ring and columns.
+        spare = width - left_room - right_room - diameter
+        cx = spare / 2 + left_room + radius
+        middle = radius * (1 + DONUT_HOLE / 100) / 2   # where PowerPoint writes a doughnut's label: mid-ring
+        ys: dict[int, float] = {}
+        for side in (True, False):
+            members = sorted((i for i in range(len(labels)) if right[i] == side), key=lambda i: -math.cos(angles[i]))
+            heights = [boxes[i][1] for i in members]
+            tops = place_on_line([cy - (radius + out) * math.cos(angles[i]) for i in members], heights, 0.0, height, 2.0)
+            if tops is None:
+                break
+            for i, top, h in zip(members, tops, heights):
+                ys[i] = top + h / 2
+        else:
+            placed = [PlacedLabel(cx + radius + across + w / 2 if right[i] else cx - radius - across - w / 2, ys[i], w, h,
+                                  cx + middle * math.sin(angle), cy - middle * math.cos(angle))
+                      for i, (angle, (w, h)) in enumerate(zip(angles, boxes))]
+            return size, diameter, cx, placed
+    return None
+
+
+PICTURE_TEXT_PT = 10.5   # the slide size of a picture's smallest text; the native charts' labels are 11 pt
+PICTURE_SCALE = 3.0      # PNG pixels per design pixel: about 250 dpi on the slide
+
+
+def picture_size(width_in: float, height_in: float) -> tuple[int, int]:
+    """The design size a chart picture is drawn at for a slide region: the
+    region's own shape, at a scale where the drawing's smallest text (12 px,
+    rule 14) reads as PICTURE_TEXT_PT on the slide, and never wider than
+    the app's design size. Drawn at 960 x 540 and shrunk into half a slide,
+    a treemap's labels came out at 5.5 pt."""
+    px_per_inch = 72 * MIN_FONT_PX / PICTURE_TEXT_PT
+    design_w = min(DEFAULT_WIDTH, round(width_in * px_per_inch))
+    return design_w, round(design_w * height_in / width_in)
 
 
 def normalize_visual(visual: Any) -> dict | None:
@@ -767,15 +989,24 @@ class _DeckRenderer:
         column, line, area, 100% bar, doughnut, XY scatter, and a histogram as
         touching columns); a treemap, which PowerPoint charts cannot be made
         as from python-pptx, goes in as the picture from the render service,
-        or as native bars with a line saying so when the service is down
-        (ADR-0005, line 2). Under every chart: the source line (rule 15);
-        on every chart frame: the alt text (rule 13). Returns the chart's
-        description for the speaker notes."""
+        drawn and checked at the slide's own scale with its title and source
+        line in it, or as native bars with a line saying why when there is no
+        picture (ADR-0005, line 2). Under every native chart: the source line
+        (rule 15); on every chart frame: the alt text (rule 13). Returns the
+        chart's description for the speaker notes."""
         checked = checked_chart(visual, self.t)
         if checked.problem or checked.built is None:
             self.text(slide, x, y, w, 1.6, checked.problem or "Chart not available.", size=13, color=self.t.alert, italic=True, line_spacing=1.1)
             return ""
         built = checked.built
+        kind = built.kind
+        missing: str | None = None
+        if kind not in NATIVE_KINDS:
+            picture = self._chart_picture(slide, x, y, w, h, visual)
+            if not isinstance(picture, str):
+                _set_alt_text(picture, built.alt_text)
+                return built.description
+            missing = picture
         # The chart's own title and subtitle (the finding, then the unit), as the app draws them.
         self.text(slide, x, y, w, 0.32, checked.spec.title, size=13, color=self.t.muted, bold=True)
         titles = built.option.get("title") or []
@@ -784,7 +1015,6 @@ class _DeckRenderer:
             self.text(slide, x, y + 0.3, w, 0.28, subtitle, size=11, color=self.t.muted)
         top = y + (0.62 if subtitle else 0.4)
         plot_h = h - (top - y) - 0.36
-        kind = built.kind
         if kind in (ChartKind.bar, ChartKind.column):
             frame = self._native_bars(slide, x, top, w, plot_h, checked)
         elif kind in (ChartKind.line, ChartKind.area):
@@ -798,7 +1028,7 @@ class _DeckRenderer:
         elif kind == ChartKind.scatter:
             frame = self._native_scatter(slide, x, top, w, plot_h, checked)
         else:
-            frame = self._chart_picture(slide, x, top, w, plot_h, checked)
+            frame = self._parts_as_bars(slide, x, top, w, plot_h, checked, missing or "")
         _set_alt_text(frame, built.alt_text)
         self.text(slide, x, y + h - 0.32, w, 0.3, built.source_line, size=10, color=self.t.muted)
         return built.description
@@ -816,9 +1046,14 @@ class _DeckRenderer:
         chart.font.color.rgb = self._rgb(self.t.text)
         return frame
 
-    def _point_label(self, point: Any, text: str, *, position: Any = None, colour: str | None = None, bold: bool = False) -> None:
+    def _point_label(self, point: Any, text: str, *, position: Any = None, colour: str | None = None, bold: bool = False,
+                     size: float = 11, moved: tuple[float, float] | None = None) -> None:
         """Write `text` beside one mark as its own data label (the value, its
-        record count and the single-record mark, as the app's chart does)."""
+        record count and the single-record mark, as the app's chart does),
+        its lines as written: never wrapped into a narrower column, as
+        LibreOffice otherwise does (a:bodyPr wrap="none"). `moved` shifts it
+        from its default place, in fractions of the chart frame
+        (_move_data_label)."""
         from pptx.util import Pt
         label = point.data_label
         frame = label.text_frame
@@ -828,11 +1063,14 @@ class _DeckRenderer:
             frame.add_paragraph().text = line
         for paragraph in frame.paragraphs:
             for run in paragraph.runs:
-                run.font.size = Pt(11)
+                run.font.size = Pt(size)
                 run.font.bold = bold
                 run.font.color.rgb = self._rgb(colour or self.t.text)
+        frame.word_wrap = False
         if position is not None:
             label.position = position
+        if moved is not None:
+            _move_data_label(label, *moved)
 
     def _style_value_axis(self, axis: Any, *, minimum: float | None, number_format: str, gridlines: bool, visible: bool = True) -> None:
         from pptx.util import Pt
@@ -865,9 +1103,10 @@ class _DeckRenderer:
         `horizontal` overrides the kind (the treemap's fallback ranks its parts)."""
         built, data = checked.built, checked.data
         assert built is not None
-        decorated = chart_row_labels(data, built.rows)
         if horizontal is None:
             horizontal = built.kind == ChartKind.bar
+        # Columns stand side by side, so a column's count goes on a line of its own.
+        decorated = chart_row_labels(data, built.rows, separator=" · " if horizontal else "\n")
         style = {
             "preset": "ranked",
             "layout": {"orientation": "horizontal" if horizontal else "vertical", "axis_line": built.draw.axis_line},
@@ -880,7 +1119,10 @@ class _DeckRenderer:
     def _native_line(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart) -> Any:
         """line and area: periods in order on a zero baseline; a point that
         rests on one record drawn hollow (rule 20 by shape) and its period
-        marked; the last value written at the end of the line."""
+        marked; the last value written at the end of the line. Each period's
+        label carries its record count on a line of its own (the app's chart
+        has it in the point's tooltip), so a value written on a point is the
+        value alone."""
         from pptx.chart.data import CategoryChartData
         from pptx.enum.chart import XL_CHART_TYPE, XL_LABEL_POSITION, XL_MARKER_STYLE
         from pptx.util import Pt
@@ -890,7 +1132,7 @@ class _DeckRenderer:
         rows, draw = built.rows, built.draw
         area = built.kind == ChartKind.area
         colour = mark_colour(self.t)
-        decorated = chart_row_labels(data, rows)
+        decorated = chart_row_labels(data, rows, separator="\n")
         chart_data = CategoryChartData()
         chart_data.categories = [decorated[row.label] for row in rows]
         chart_data.add_series(checked.spec.title, [row.value for row in rows])
@@ -922,37 +1164,63 @@ class _DeckRenderer:
         highlighted = set(built.highlighted_labels)
         for index, row in enumerate(rows):
             if draw.value_labels or row.label in highlighted or index == len(rows) - 1:
-                self._point_label(series.points[index], value_label(row, data), position=None if area else XL_LABEL_POSITION.ABOVE,
+                self._point_label(series.points[index], format_value(row.value, data), position=None if area else XL_LABEL_POSITION.ABOVE,
                                   bold=row.label in highlighted)
         self._style_value_axis(chart.value_axis, minimum=min(0.0, min((row.value for row in rows), default=0.0)),
                                number_format=_number_format(data), gridlines=draw.gridlines)
         self._style_category_axis(chart.category_axis)
         return frame
 
+    def _parts_as_bars(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart, note: str) -> Any:
+        """Parts of a whole that cannot be drawn as their own kind here, as
+        native bars ranked largest first, under a line that says why."""
+        lines = max(1, math.ceil(block_width(note, 10) * TEXT_SLACK / (w * 72)))
+        note_h = lines * 10 * 1.2 / 72 + 0.12
+        self.text(slide, x, y, w, note_h, note, size=10, color=self.t.alert, italic=True, line_spacing=1.05)
+        return self._native_bars(slide, x, y + note_h, w, h - note_h, checked, horizontal=True)
+
+    def _part_labels(self, checked: CheckedChart) -> list[str]:
+        built = checked.built
+        assert built is not None
+        return [f"{row.label}\n{part_value_text(row, share, checked.data)}" for row, share in zip(built.rows, built.shares)]
+
     def _native_whole_bar(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart) -> Any:
         """stacked_bar_100: PowerPoint's 100% stacked bar, one bar of one
-        series per part, each part labelled inside with its name and share in
-        black or white, whichever reads on its colour."""
+        series per part, across the middle of its space. Each part's name and
+        share go above and below the bar in turn, as the app draws them, moved
+        apart so small neighbours do not run over each other
+        (whole_bar_layout); when no size lets them, the parts are shown as
+        ranked bars with a line saying so."""
         from pptx.chart.data import CategoryChartData
         from pptx.enum.chart import XL_CHART_TYPE
 
-        built, data = checked.built, checked.data
+        built = checked.built
         assert built is not None
+        labels = self._part_labels(checked)
+        width, height = w * 72, h * 72
+        thickness = WHOLE_BAR_THICKNESS[built.draw.thickness]
+        layout = whole_bar_layout(labels, [row.value for row in built.rows], width, height, thickness)
+        if layout is None:
+            return self._parts_as_bars(slide, x, y, w, h, checked, "The parts' names do not fit beside a 100% bar this size; "
+                                                                    "the same parts are shown as bars.")
+        size, bar_top, placed = layout
         colours = part_colours(built.rows, self.t, set(built.highlighted_labels))
         chart_data = CategoryChartData()
         chart_data.categories = [""]
         for row in built.rows:
             chart_data.add_series(row.label, [row.value])
-        frame = self._new_chart(slide, XL_CHART_TYPE.BAR_STACKED_100, x, y + h * 0.25, w, h * 0.5, chart_data)
+        frame = self._new_chart(slide, XL_CHART_TYPE.BAR_STACKED_100, x, y, w, h, chart_data)
         chart = frame.chart
         plot = chart.plots[0]
-        plot.gap_width = {"thin": 150, "regular": 60, "thick": 20}[built.draw.thickness]
-        for series, row, share, colour in zip(plot.series, built.rows, built.shares, colours):
+        plot.gap_width = 0   # the bar fills the band pinned for it
+        _pin_plot_area(chart, 0.0, bar_top / height, 1.0, thickness / height)
+        for series, row, text, label, colour in zip(plot.series, built.rows, labels, placed, colours):
             series.format.fill.solid()
             series.format.fill.fore_color.rgb = self._rgb(colour)
             series.format.line.color.rgb = self._rgb(self.t.page)
-            self._point_label(series.points[0], f"{row.label}\n{part_value_text(row, share, data)}", colour=ink_on(colour),
-                              bold=row.label in built.highlighted_labels)
+            self._point_label(series.points[0], text, bold=row.label in built.highlighted_labels, size=size,
+                              moved=((label.x - label.anchor_x) / width, (label.y - label.anchor_y) / height))
+            _show_leader_lines(series, self.t.muted)
         chart.value_axis.visible = False
         chart.value_axis.has_major_gridlines = False
         chart.category_axis.visible = False
@@ -960,34 +1228,47 @@ class _DeckRenderer:
 
     def _native_donut(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart) -> Any:
         """donut: PowerPoint's doughnut (never the exploded one), slices from
-        twelve o'clock, each labelled on the ring in black or white, the
-        whole written in the hole."""
+        twelve o'clock, each labelled outside the ring on its own side as the
+        app draws it (donut_layout; PowerPoint and LibreOffice draw the
+        leader line), the whole written in the hole. When the ring would be
+        too small to leave room for the labels, the parts are shown as
+        ranked bars with a line saying so."""
         from pptx.chart.data import CategoryChartData
         from pptx.enum.chart import XL_CHART_TYPE
 
         built, data = checked.built, checked.data
         assert built is not None
+        labels = self._part_labels(checked)
+        width, height = w * 72, h * 72
+        layout = donut_layout(labels, [row.value for row in built.rows], width, height)
+        if layout is None:
+            return self._parts_as_bars(slide, x, y, w, h, checked, "The slices' names do not fit around a donut this size; "
+                                                                    "the same parts are shown as bars.")
+        size, diameter, centre, placed = layout
         colours = part_colours(built.rows, self.t, set(built.highlighted_labels))
         chart_data = CategoryChartData()
         chart_data.categories = [row.label for row in built.rows]
         chart_data.add_series(checked.spec.title, [row.value for row in built.rows])
-        side = min(w, h)
-        left = x + (w - side) / 2
-        frame = self._new_chart(slide, XL_CHART_TYPE.DOUGHNUT, left, y, side, side, chart_data)
-        plot = frame.chart.plots[0]
+        frame = self._new_chart(slide, XL_CHART_TYPE.DOUGHNUT, x, y, w, h, chart_data)
+        chart = frame.chart
+        _pin_plot_area(chart, (centre - diameter / 2) / width, (height - diameter) / 2 / height, diameter / width, diameter / height)
+        plot = chart.plots[0]
         plot.vary_by_categories = True
-        _set_hole_size(plot, 45)   # a thicker ring than the 50% default, so the labels fit on it
+        _set_hole_size(plot, DONUT_HOLE)
         series = plot.series[0]
-        for index, (row, share, colour) in enumerate(zip(built.rows, built.shares, colours)):
+        for index, (row, text, label, colour) in enumerate(zip(built.rows, labels, placed, colours)):
             point = series.points[index]
             point.format.fill.solid()
             point.format.fill.fore_color.rgb = self._rgb(colour)
             point.format.line.color.rgb = self._rgb(self.t.page)
-            self._point_label(point, f"{row.label}\n{part_value_text(row, share, data)}", colour=ink_on(colour),
-                              bold=row.label in built.highlighted_labels)
+            self._point_label(point, text, bold=row.label in built.highlighted_labels, size=size,
+                              moved=((label.x - label.anchor_x) / width, (label.y - label.anchor_y) / height))
+        _show_leader_lines(series, self.t.muted)
         if built.draw.centre_total and built.total is not None:
-            self.text(slide, left + side * 0.3, y + side * 0.42, side * 0.4, side * 0.16, format_value(built.total, data),
-                      size=18, color=self.t.text, font=self.t.heading_font, bold=True, align="center", anchor="middle")
+            hole = diameter * DONUT_HOLE / 100 / 72   # inches
+            self.text(slide, x + centre / 72 - hole / 2, y + h / 2 - 0.2, hole, 0.4, format_value(built.total, data),
+                      size=max(11, min(18, round(hole * 72 / 4.5))), color=self.t.text, font=self.t.heading_font, bold=True,
+                      align="center", anchor="middle")
         return frame
 
     def _native_histogram(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart) -> Any:
@@ -1067,26 +1348,31 @@ class _DeckRenderer:
         x_axis.format.line.color.rgb = self._rgb(self.t.text)
         return frame
 
-    def _chart_picture(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart) -> Any:
-        """A kind PowerPoint cannot hold natively (the treemap): the image the
-        render service draws from the same option the app shows, fitted to
-        the space; when the service is down, the same parts as native ranked
-        bars with a line saying the image was not available."""
+    def _chart_picture(self, slide: Any, x: float, y: float, w: float, h: float, visual: dict) -> Any:
+        """A kind PowerPoint cannot hold natively (the treemap): the picture
+        the render service draws, filling the chart's whole space with the
+        chart's title, unit and source line in it, as the app draws them.
+        It is drawn for the slide -- at a design size where its smallest
+        text reads at PICTURE_TEXT_PT (picture_size) -- and checked again at
+        that size, since a part that can name itself at 960 x 540 may not
+        at half a slide. Returns the picture, or why there is none: the
+        chart fails at this size, or the render service cannot be reached."""
         from io import BytesIO
 
         from app.visuals.render_client import RenderUnavailable, render_png
 
-        built = checked.built
-        assert built is not None
+        design_w, design_h = picture_size(w, h)
+        sized = checked_chart(visual, self.t, width=design_w, height=design_h)
+        label = KIND_LABELS.get(sized.spec.kind, sized.spec.kind.value)
+        if sized.built is None or sized.report is None or not sized.report.ok:
+            first = sized.report.errors[0] if sized.report and sized.report.errors else None
+            reason = f"rule {first.rule}: {first.message.split(';')[0]}" if first else (sized.problem or "it cannot be drawn")
+            return f"{label} not drawn at this size ({reason}). The same parts are shown as bars."
         try:
-            png = render_png(built.option, built.width, built.height)
+            png = render_png(sized.built.option, design_w, design_h, scale=PICTURE_SCALE)
         except RenderUnavailable as exc:
-            note = f"{KIND_LABELS.get(built.kind, built.kind.value)} image not available ({exc}); the same parts are shown as bars."
-            self.text(slide, x, y, w, 0.5, note, size=10, color=self.t.alert, italic=True, line_spacing=1.05)
-            return self._native_bars(slide, x, y + 0.5, w, h - 0.5, checked, horizontal=True)
-        scale = min(w / built.width, h / built.height)
-        width_in, height_in = built.width * scale, built.height * scale
-        return slide.shapes.add_picture(BytesIO(png), self.Inches(x + (w - width_in) / 2), self.Inches(y), self.Inches(width_in), self.Inches(height_in))
+            return f"{label} image not available ({exc}); the same parts are shown as bars."
+        return slide.shapes.add_picture(BytesIO(png), self.Inches(x), self.Inches(y), self.Inches(w), self.Inches(h))
 
     def _timeline(self, slide: Any, x: float, y: float, w: float, h: float, items: list[dict], style: dict) -> None:
         opts, layout = style["options"], style["layout"]

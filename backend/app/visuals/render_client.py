@@ -54,10 +54,11 @@ def svg_to_png(svg: str, *, scale: float = PNG_SCALE) -> bytes:
     return png
 
 
-def render_png(option: dict[str, Any], width: int, height: int, *, settings: Settings = default_settings,
+def render_png(option: dict[str, Any], width: int, height: int, *, scale: float = PNG_SCALE, settings: Settings = default_settings,
                transport: httpx.BaseTransport | None = None) -> bytes:
-    """The whole bridge: option -> SVG (render service) -> PNG (vl-convert)."""
-    return svg_to_png(render_svg(option, width, height, settings=settings, transport=transport))
+    """The whole bridge: option -> SVG (render service) -> PNG (vl-convert),
+    `scale` PNG pixels to a design pixel."""
+    return svg_to_png(render_svg(option, width, height, settings=settings, transport=transport), scale=scale)
 
 
 def render_service_status(*, settings: Settings = default_settings, transport: httpx.BaseTransport | None = None) -> dict[str, Any]:

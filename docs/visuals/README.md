@@ -144,15 +144,33 @@ order slip  →  kitchen  →  checker  →  drawing  →  review
   for every kind python-pptx can draw, styled from the deck theme: bar and
   column as before; line (`LINE_MARKERS`) and area (`AREA`), with a hollow
   marker on a point that rests on one record and the last value written at
-  the end; the 100% bar (`BAR_STACKED_100`, one series per part, each named
-  inside in black or white); the donut (`DOUGHNUT`, every slice named with
-  its share, the total in the centre); the histogram (`COLUMN_CLUSTERED`
+  the end; the 100% bar (`BAR_STACKED_100`, one series per part); the donut
+  (`DOUGHNUT`, the total in the centre); the histogram (`COLUMN_CLUSTERED`
   with no gap between bins); the scatter plot (`XY_SCATTER`, each point
-  named, both axes titled). The treemap, which PowerPoint charts cannot
-  draw, is the PNG from the render service; when the service cannot be
-  reached the slide says so and shows the same parts as native bars. Every
-  chart has its title and unit above it, the source line under it, its alt
-  text on the shape (what a screen reader announces), its description in the
+  named, both axes titled). A period's or a column's record count goes on a
+  line of its own under its name, so the labels stay level, and a value
+  written on a line's point is the value alone. PowerPoint writes a data
+  label in the middle of its mark and LibreOffice wraps a long one into a
+  narrow column, so the small parts of a 100% bar and the thin slices of a
+  donut had labels running over each other: their labels are now laid out
+  the way the app draws them (`decks.whole_bar_layout`: above and below the
+  bar in turn, moved apart with `layout.place_on_line` but always over or
+  under their own part, two lines a side when one is not enough;
+  `decks.donut_layout`: in a column on each side of the ring, at their
+  slice's height), each moved there from its default place with the manual
+  layout PowerPoint itself saves for a dragged label, unwrapped, with a
+  leader line back to its mark; the font steps down from 11 to 9 pt before
+  the parts are shown as ranked bars with a line saying why. The treemap,
+  which PowerPoint charts cannot draw, is the PNG from the render service,
+  filling the chart's space with its title and source line in it. It is
+  drawn at the slide's own scale (`decks.picture_size`: a design size where
+  its 12 px text reads at 10.5 pt; drawn at 960 x 540 and shrunk into half a
+  slide, it read at 5.5 pt) and checked again at that size; a treemap whose
+  small parts cannot name themselves there, or one the render service
+  cannot draw, is shown as ranked native bars under a line saying why. (The
+  app's slide preview still shows the 960 x 540 drawing.) Every chart has
+  its title and unit above it, the source line under it, its alt text on
+  the shape (what a screen reader announces), its description in the
   speaker notes, and its records numbered in the slide footer and on the
   Sources slides.
 - **Brief** (`app/services/writeups.py`): for every kind, the PNG from the
@@ -315,7 +333,7 @@ TZ=UTC PYTHONPATH=. python -m pytest tests/test_visuals_*.py -q --no-cov
 | `test_visuals_kinds.py` | Every statistical kind in the house style and passing its check, its draw options, the kinds refused for a query they cannot draw, labels kept in the picture and the checks on what fits, the metamorphic tests for every kind, and that the app's copy of each kind (`frontend/test-support/chart-kinds.json`) is what the backend draws |
 | `test_visuals_layout.py` | Text widths and treemap rectangles equal to ECharts' own (and, with Node, to the installed ECharts), labels moved apart on a line, words wrapped at spaces |
 | `test_visuals_render.py` | The bridge behind a mocked transport, vl-convert drawing text in a font list, a live run of the Node service for every kind with its words in each PNG |
-| `test_visuals_exports.py` | Every kind in a deck (the native chart type, alt text, source line, notes; the treemap as the picture, or as bars when the service is down; a stored chart that now fails a rule is not drawn) and in a brief (image, caption and data table, or a table and a note) |
+| `test_visuals_exports.py` | Every kind in a deck (the native chart type, alt text, source line, notes; the treemap as the picture drawn at the slide's scale, or as bars when it cannot name its parts there or the service is down; a stored chart that now fails a rule is not drawn), the native labels of a 100% bar and a donut (never on each other, over or under their own part, clear of the ring, moved, unwrapped, with leader lines), and every kind in a brief (image, caption and data table, or a table and a note) |
 | `test_visuals_routes.py` | The catalogue, preview and restyle routes, their response models, investigation scope |
 | `test_visuals_style.py` | The presets a chart can take, the options of each kind, a style that never changes the data and is checked again, the warnings, what is refused by having no control |
 | `test_visuals_draft.py` | A draft whose model orders a chart: kept, re-asked, or removed with reasons |
