@@ -218,6 +218,25 @@ def contract(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[tuple[
         governor.reset()
 
 
+def _identifier_proposal(document_id: str) -> str:
+    """An email proposal on the seeded document, the way OpenAleph's analysis
+    import stores one (payload kind, value and span)."""
+    from app.db.session import SessionLocal
+    from app.models.domain import Document, DocumentChunk, ExtractionCandidate
+
+    with SessionLocal() as db:
+        document = db.get(Document, document_id)
+        assert document is not None
+        chunk = db.query(DocumentChunk).filter(DocumentChunk.document_id == document_id).first()
+        row = ExtractionCandidate(investigation_id=document.investigation_id, document_id=document_id, chunk_id=chunk.id if chunk else None,
+                                  candidate_type="identifier", confidence=1.0,
+                                  payload={"kind": "email", "value": "desk@meridian.example", "span": None,
+                                           "rationale": "Seeded for the contract test"})
+        db.add(row)
+        db.commit()
+        return row.id
+
+
 def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, reasoning: Any) -> Seeded:
     """The demo investigation and one of everything else the API can read."""
     def ok(response: httpx.Response) -> Any:
@@ -245,6 +264,9 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     quoted = next(row for row in proposals if row["candidate_type"] == "evidence")["id"]
     ok(client.post(f"/api/extraction-candidates/{quoted}/review", json={"decision": "accept", "note": "checked"}))
     accepted = next(row for row in ok(client.get(f"/api/documents/{document['id']}/candidates")) if row["id"] == quoted)
+    # An email proposal as OpenAleph's analysis makes it (app/services/openaleph_analysis.py);
+    # the fallback reader used here has no analysis, so it is written directly.
+    identifier = _identifier_proposal(document["id"])
 
     # Connector findings, a statement assessment, an external relationship review, an enrichment session.
     findings = ok(client.post("/api/connectors/fake-a/search", json={"investigation_id": inv, "query": "Meridian"}))
@@ -303,6 +325,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
                 ("POST", "/api/ai-analysis-candidates/{candidate_id}/promote-to-deck"),
                 ("POST", "/api/ai-analysis-candidates/{candidate_id}/promote-to-writeup"),
                 ("POST", "/api/ai-analysis-candidates/{candidate_id}/review"))},
+            ("GET", "/api/extraction-candidates/{candidate_id}/identifier-targets"): {"candidate_id": identifier},
             **{(method, path): {"candidate_id": proposal} for method, path in (
                 ("GET", "/api/extraction-candidates/{candidate_id}/entity-matches"),
                 ("GET", "/api/extraction-candidates/{candidate_id}/explanation"),

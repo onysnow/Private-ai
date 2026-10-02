@@ -1051,13 +1051,14 @@ class OpenAlephReviewRefreshOut(ResponseModel):
 # Every key is always sent (null when unknown), as for BackgroundJobOut.
 
 class OpenAlephOperationFailureOut(ResponseModel):
-    """A failed OpenAleph operation, kept for the reporter and the operator."""
+    """A failed OpenAleph operation, kept for the reporter and the operator
+    (and so a 502 can be explained later)."""
     id: str
     investigation_id: str
     document_id: str | None
     operation: str
     error: str
-    created_at: datetime
+    created_at: Timestamp
 
 
 class CorpusPendingOut(ResponseModel):
@@ -2342,6 +2343,9 @@ class DeckThemeOut(ResponseModel):
     bar_muted: str
     heading_font: str
     body_font: str
+    # The categorical colours (six hex digits) the charts that need several
+    # hues draw with, in order (app/services/presentation_style.py).
+    palette: list[str]
 
 
 class FontPairOut(ResponseModel):
@@ -2685,16 +2689,6 @@ class EntityMatchPreviewOut(ResponseModel):
 class OpenAlephCorpusBindingOut(ResponseModel):
     """The investigation's OpenAleph collection, or null before one is set up."""
     binding: OpenAlephBindingOut | None
-
-
-class OpenAlephOperationFailureOut(ResponseModel):
-    """A failed OpenAleph pipeline step, kept server-side so a 502 can be explained later."""
-    id: str
-    investigation_id: str
-    document_id: str | None
-    operation: str
-    error: str
-    created_at: Timestamp
 
 
 class DemoSeedOut(ResponseModel):

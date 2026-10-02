@@ -1095,6 +1095,7 @@ export const zDeckThemeOut = z.object({
   label: z.string(),
   muted: z.string(),
   page: z.string(),
+  palette: z.array(z.string()),
   panel: z.string(),
   rule: z.string(),
   text: z.string(),
@@ -2652,6 +2653,54 @@ export const zOpenAlephEvidenceImportOut = z.object({
   retrieved: z.number().int(),
   review_required: z.boolean(),
   skipped: z.number().int(),
+});
+
+/**
+ * OpenAlephOperationFailureOut
+ *
+ * A failed OpenAleph operation, kept for the reporter and the operator
+ * (and so a 502 can be explained later).
+ */
+export const zOpenAlephOperationFailureOut = z.object({
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  document_id: z.string().nullable(),
+  error: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  operation: z.string(),
+});
+
+/**
+ * CorpusSyncOut
+ *
+ * The "Corpus sync" line: is OpenAleph in step with what reporters confirmed?
+ */
+export const zCorpusSyncOut = z.object({
+  background: z.boolean(),
+  collection_id: z.string().nullable(),
+  collection_label: z.string().nullable(),
+  consecutive_failures: z.number().int(),
+  enabled: z.boolean(),
+  failures: z.array(zOpenAlephOperationFailureOut),
+  investigation_id: z.string(),
+  pending: zCorpusPendingOut,
+  push: zCorpusPushOut,
+  pushed_records: z.number().int(),
+});
+
+/**
+ * CorpusSyncNowOut
+ *
+ * The answer to "Sync now": queued for the worker, or run here and finished.
+ */
+export const zCorpusSyncNowOut = z.object({
+  queued: z.boolean(),
+  ran: z.boolean(),
+  sync: zCorpusSyncOut,
 });
 
 /**
@@ -4704,67 +4753,6 @@ export const zWriteupsOut = z.object({
   writeups: z.array(zWriteupSummaryOut),
 });
 
-/**
- * OpenAlephOperationFailureOut
- *
- * A failed OpenAleph pipeline step, kept server-side so a 502 can be explained later.
- */
-export const zAppSchemasResponsesOpenAlephOperationFailureOut1 = z.object({
-  created_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    ),
-  document_id: z.string().nullable(),
-  error: z.string(),
-  id: z.string(),
-  investigation_id: z.string(),
-  operation: z.string(),
-});
-
-/**
- * OpenAlephOperationFailureOut
- *
- * A failed OpenAleph operation, kept for the reporter and the operator.
- */
-export const zAppSchemasResponsesOpenAlephOperationFailureOut2 = z.object({
-  created_at: z.string().datetime({ offset: true, local: true }),
-  document_id: z.string().nullable(),
-  error: z.string(),
-  id: z.string(),
-  investigation_id: z.string(),
-  operation: z.string(),
-});
-
-/**
- * CorpusSyncOut
- *
- * The "Corpus sync" line: is OpenAleph in step with what reporters confirmed?
- */
-export const zCorpusSyncOut = z.object({
-  background: z.boolean(),
-  collection_id: z.string().nullable(),
-  collection_label: z.string().nullable(),
-  consecutive_failures: z.number().int(),
-  enabled: z.boolean(),
-  failures: z.array(zAppSchemasResponsesOpenAlephOperationFailureOut2),
-  investigation_id: z.string(),
-  pending: zCorpusPendingOut,
-  push: zCorpusPushOut,
-  pushed_records: z.number().int(),
-});
-
-/**
- * CorpusSyncNowOut
- *
- * The answer to "Sync now": queued for the worker, or run here and finished.
- */
-export const zCorpusSyncNowOut = z.object({
-  queued: z.boolean(),
-  ran: z.boolean(),
-  sync: zCorpusSyncOut,
-});
-
 export const zGetAiAnalysisCandidateEndpointPath = z.object({
   candidate_id: z.string(),
 });
@@ -5692,7 +5680,7 @@ export const zListOpenalephCorpusFailuresPath = z.object({
  * Successful Response
  */
 export const zListOpenalephCorpusFailuresResponse = z.array(
-  zAppSchemasResponsesOpenAlephOperationFailureOut1,
+  zOpenAlephOperationFailureOut,
 );
 
 export const zGetCorpusSyncPath = z.object({

@@ -2477,7 +2477,7 @@ export type CorpusSyncOut = {
   /**
    * Failures
    */
-  failures: Array<AppSchemasResponsesOpenAlephOperationFailureOut2>;
+  failures: Array<OpenAlephOperationFailureOut>;
   /**
    * Investigation Id
    */
@@ -2809,6 +2809,10 @@ export type DeckThemeOut = {
    * Page
    */
   page: string;
+  /**
+   * Palette
+   */
+  palette: Array<string>;
   /**
    * Panel
    */
@@ -6663,6 +6667,41 @@ export type OpenAlephEvidenceImportOut = {
 };
 
 /**
+ * OpenAlephOperationFailureOut
+ *
+ * A failed OpenAleph operation, kept for the reporter and the operator
+ * (and so a 502 can be explained later).
+ */
+export type OpenAlephOperationFailureOut = {
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Document Id
+   */
+  document_id: string | null;
+  /**
+   * Error
+   */
+  error: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Operation
+   */
+  operation: string;
+};
+
+/**
  * OpenAlephPlatformOut
  */
 export type OpenAlephPlatformOut = {
@@ -10094,72 +10133,6 @@ export type WriteupsOut = {
   writeups: Array<WriteupSummaryOut>;
 };
 
-/**
- * OpenAlephOperationFailureOut
- *
- * A failed OpenAleph pipeline step, kept server-side so a 502 can be explained later.
- */
-export type AppSchemasResponsesOpenAlephOperationFailureOut1 = {
-  /**
-   * Created At
-   *
-   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
-   */
-  created_at: string;
-  /**
-   * Document Id
-   */
-  document_id: string | null;
-  /**
-   * Error
-   */
-  error: string;
-  /**
-   * Id
-   */
-  id: string;
-  /**
-   * Investigation Id
-   */
-  investigation_id: string;
-  /**
-   * Operation
-   */
-  operation: string;
-};
-
-/**
- * OpenAlephOperationFailureOut
- *
- * A failed OpenAleph operation, kept for the reporter and the operator.
- */
-export type AppSchemasResponsesOpenAlephOperationFailureOut2 = {
-  /**
-   * Created At
-   */
-  created_at: string;
-  /**
-   * Document Id
-   */
-  document_id: string | null;
-  /**
-   * Error
-   */
-  error: string;
-  /**
-   * Id
-   */
-  id: string;
-  /**
-   * Investigation Id
-   */
-  investigation_id: string;
-  /**
-   * Operation
-   */
-  operation: string;
-};
-
 export type GetAiAnalysisCandidateEndpointData = {
   body?: never;
   path: {
@@ -13435,7 +13408,7 @@ export type ListOpenalephCorpusFailuresResponses = {
    *
    * Successful Response
    */
-  200: Array<AppSchemasResponsesOpenAlephOperationFailureOut1>;
+  200: Array<OpenAlephOperationFailureOut>;
 };
 
 export type ListOpenalephCorpusFailuresResponse =

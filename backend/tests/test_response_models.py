@@ -1055,11 +1055,13 @@ def test_extraction_identity_preview_reply(demo, monkeypatch):
     monkeypatch.setattr(settings, "openaleph_enabled", True)
     sync_document_to_openaleph(db, doc.id, client_factory=_FakeOpenAleph)
 
-    def mentions(*, collection_id, document_record_id):
-        return [{"id": "oa-mention-1", "schema": "Mention", "properties": {"name": ["Meridian Holdings Ltd"], "detectedSchema": ["Company"],
-                                                                         "resolved": ["oa-company-9"]}}]
+    def analysed(entity_id):
+        # ftm-analyze's results on the document entity (ADR-0006): a company it found.
+        # (One the local finder did not propose, so the import adds it rather than
+        # folding it into the existing proposal.)
+        return {"id": entity_id, "schema": "PlainText", "properties": {"companiesMentioned": ["harbor trust ltd"], "detectedLanguage": ["eng"]}}
 
-    import_openaleph_entity_candidates(db, doc.id, searcher=mentions)
+    import_openaleph_entity_candidates(db, doc.id, fetch_entity=analysed)
     provider_row = db.query(ExtractionCandidate).filter(ExtractionCandidate.document_id == doc.id, ExtractionCandidate.candidate_type == "entity",
                                                         ExtractionCandidate.id != local.id).order_by(ExtractionCandidate.created_at.desc()).first()
     lead = get_extraction_entity_matches(provider_row.id, db)

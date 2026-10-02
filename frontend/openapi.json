@@ -8285,7 +8285,7 @@
           },
           "failures": {
             "items": {
-              "$ref": "#/components/schemas/app__schemas__responses__OpenAlephOperationFailureOut__2"
+              "$ref": "#/components/schemas/OpenAlephOperationFailureOut"
             },
             "title": "Failures",
             "type": "array"
@@ -8824,6 +8824,13 @@
             "title": "Page",
             "type": "string"
           },
+          "palette": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Palette",
+            "type": "array"
+          },
           "panel": {
             "title": "Panel",
             "type": "string"
@@ -8856,7 +8863,8 @@
           "muted",
           "bar_muted",
           "heading_font",
-          "body_font"
+          "body_font",
+          "palette"
         ],
         "title": "DeckThemeOut",
         "type": "object"
@@ -15430,6 +15438,54 @@
         "title": "OpenAlephEvidenceImportOut",
         "type": "object"
       },
+      "OpenAlephOperationFailureOut": {
+        "description": "A failed OpenAleph operation, kept for the reporter and the operator\n(and so a 502 can be explained later).",
+        "properties": {
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "error": {
+            "title": "Error",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "operation": {
+            "title": "Operation",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "document_id",
+          "operation",
+          "error",
+          "created_at"
+        ],
+        "title": "OpenAlephOperationFailureOut",
+        "type": "object"
+      },
       "OpenAlephPlatformOut": {
         "properties": {
           "enabled": {
@@ -21162,101 +21218,6 @@
           "writeups"
         ],
         "title": "WriteupsOut",
-        "type": "object"
-      },
-      "app__schemas__responses__OpenAlephOperationFailureOut__1": {
-        "description": "A failed OpenAleph pipeline step, kept server-side so a 502 can be explained later.",
-        "properties": {
-          "created_at": {
-            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
-            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
-            "title": "Created At",
-            "type": "string"
-          },
-          "document_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Document Id"
-          },
-          "error": {
-            "title": "Error",
-            "type": "string"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "investigation_id": {
-            "title": "Investigation Id",
-            "type": "string"
-          },
-          "operation": {
-            "title": "Operation",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "investigation_id",
-          "document_id",
-          "operation",
-          "error",
-          "created_at"
-        ],
-        "title": "OpenAlephOperationFailureOut",
-        "type": "object"
-      },
-      "app__schemas__responses__OpenAlephOperationFailureOut__2": {
-        "description": "A failed OpenAleph operation, kept for the reporter and the operator.",
-        "properties": {
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "document_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Document Id"
-          },
-          "error": {
-            "title": "Error",
-            "type": "string"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "investigation_id": {
-            "title": "Investigation Id",
-            "type": "string"
-          },
-          "operation": {
-            "title": "Operation",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "investigation_id",
-          "document_id",
-          "operation",
-          "error",
-          "created_at"
-        ],
-        "title": "OpenAlephOperationFailureOut",
         "type": "object"
       },
       "opsconsole__api__checks__RunIn": {
@@ -33542,7 +33503,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/app__schemas__responses__OpenAlephOperationFailureOut__1"
+                    "$ref": "#/components/schemas/OpenAlephOperationFailureOut"
                   },
                   "title": "Response List Openaleph Corpus Failures",
                   "type": "array"
