@@ -298,6 +298,12 @@ class VisualSpec(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     kind: ChartKind
+    # The question the chart answers (QUESTIONS, after the FT Visual
+    # Vocabulary). Optional, so orders stored before it existed still parse;
+    # when it is given, the kind must be one that answers it and the query
+    # must hold that relationship, so the choice of chart is checked rather
+    # than taken on trust.
+    question: str | None = Field(default=None, description="The question the chart answers: ranking, change_over_time, part_of_whole, distribution, correlation or flow.")
     title: str = Field(min_length=1, max_length=200, description="States the finding, e.g. 'Meridian received most of the money'.")
     subtitle: str | None = Field(default=None, max_length=300)
     unit: str | None = Field(default=None, max_length=40, description="Optional unit label; the data's own unit always wins.")
@@ -344,7 +350,27 @@ class VisualSpec(BaseModel):
             raise ValueError(f"sort 'time' needs a time query; {self.query.name!r} is grouped by category")
         if self.limit is not None and query.series_kind == "time":
             raise ValueError("limit cannot cut a time series; it only folds ranked categories into 'Other'")
+        # An unknown question is a malformed order. A kind or query that does
+        # not answer a known question is a choice the model can fix, so it
+        # is refused when the chart is drawn (echarts.check_fit), which asks
+        # the model again with the reason.
+        if self.question is not None and self.question not in QUESTIONS:
+            raise ValueError(f"unknown question {self.question!r}; the questions are: {', '.join(QUESTIONS)}")
         return self
+
+    def question_problem(self) -> str | None:
+        """Why this order's kind or query does not answer its question, or
+        None when it does (or names no question)."""
+        question = QUESTIONS.get(self.question or "")
+        if question is None:
+            return None
+        if self.kind not in question.kinds:
+            kinds = ", ".join(k.value for k in question.kinds)
+            return f"a {self.kind.value} does not answer '{question.label.lower()}'; the kinds that do: {kinds}"
+        if self.query.catalog_entry.series_kind not in question.series_kinds:
+            fits = [name for name, q in QUERY_CATALOG.items() if q.series_kind in question.series_kinds]
+            return f"the query {self.query.name!r} cannot answer '{question.label.lower()}'; the queries that can: {', '.join(fits) or 'none yet'}"
+        return None
 
     @property
     def catalog_entry(self) -> QuerySpec:

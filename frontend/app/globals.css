@@ -60,7 +60,11 @@
   }
 }
 
-.shell{max-width:1180px;margin:auto;padding:36px 24px}.top{display:flex;justify-content:space-between;align-items:center}.badge{background:#26272b;border:1px solid #352315;border-radius:999px;padding:7px 11px;color:#caaf9c}.hero{padding:56px 0 32px}.hero h1{font-family:var(--font-heading);font-size:56px;max-width:820px;line-height:1.05;margin:12px 0}.hero p{font-size:19px;line-height:1.6;color:#927e5d;max-width:760px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{background:#1a2328;border:1px solid #352315;border-radius:14px;padding:20px;min-height:160px}.card h3{margin-top:0;font-family:var(--font-heading)}.muted{color:#927e5d}.accent{color:#b98d34}.workflow{margin-top:30px;background:#1a2328;border:1px solid #352315;border-radius:14px;padding:22px}.steps{display:flex;gap:10px;flex-wrap:wrap}.step{padding:10px 14px;background:#26272b;border-radius:10px}@media(max-width:800px){.grid{grid-template-columns:1fr}.hero h1{font-size:40px}}
+/* No plain .grid rule below: the app lays out with Tailwind's `grid`
+   utility, and an unlayered .grid {grid-template-columns: repeat(3,1fr);
+   gap: 16px} written after @tailwind utilities beat every grid-cols-* and
+   gap-* next to it (the style panel's selects came out 18px wide). */
+.shell{max-width:1180px;margin:auto;padding:36px 24px}.top{display:flex;justify-content:space-between;align-items:center}.badge{background:#26272b;border:1px solid #352315;border-radius:999px;padding:7px 11px;color:#caaf9c}.hero{padding:56px 0 32px}.hero h1{font-family:var(--font-heading);font-size:56px;max-width:820px;line-height:1.05;margin:12px 0}.hero p{font-size:19px;line-height:1.6;color:#927e5d;max-width:760px}.card{background:#1a2328;border:1px solid #352315;border-radius:14px;padding:20px;min-height:160px}.card h3{margin-top:0;font-family:var(--font-heading)}.muted{color:#927e5d}.accent{color:#b98d34}.workflow{margin-top:30px;background:#1a2328;border:1px solid #352315;border-radius:14px;padding:22px}.steps{display:flex;gap:10px;flex-wrap:wrap}.step{padding:10px 14px;background:#26272b;border-radius:10px}@media(max-width:800px){.hero h1{font-size:40px}}
 select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 /* flex:1 alone has flex-basis:0%, so inputs kept shrinking toward zero to stay
    on one line instead of wrapping -- in a half-width page-grid-2 card, three

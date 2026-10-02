@@ -36,7 +36,13 @@ from app.core.config import Settings, settings as default_settings
 from app.core.time import utcnow_naive
 from app.models.domain import AIAnalysisCandidate
 from app.services.assistant_context import build_question_context, build_selected_record_context
-from app.visuals.spec import spec_errors
+from app.visuals.spec import DRAWN_KINDS, QUESTIONS, spec_errors
+
+# The chart kinds a draft may order, grouped by the question each answers
+# (QUESTIONS, after the FT Visual Vocabulary), and read from the drawing's
+# own list so the schema the model sees never falls behind what is drawn.
+CHART_SCHEMA_QUESTIONS = "|".join(q.id for q in QUESTIONS.values() if any(k in DRAWN_KINDS for k in q.kinds))
+CHART_SCHEMA_KINDS = "|".join(dict.fromkeys(k.value for q in QUESTIONS.values() for k in q.kinds if k in DRAWN_KINDS))
 
 TAS_SPEC_ROOT = Path(__file__).resolve().parent / "tas_spec"
 # App-local reasoning module content -- not part of the vendored TAS spec,
@@ -137,9 +143,12 @@ OUTPUT_SCHEMAS = {
                           "  {\"type\": \"figures\", \"items\": [{\"value\": \"string, e.g. '$2.4M'\", \"label\": \"string\", \"evidence\": [{\"record_type\": \"string\", \"record_id\": \"string\", \"quote\": \"string\"}]}]}  (1-4 items)\n"
                           "  {\"type\": \"timeline\", \"items\": [{\"date\": \"string, ISO date or as precise as the evidence states\", \"label\": \"string\", \"evidence\": [...]}]}  (2-8 items, chronological)\n"
                           "  {\"type\": \"bar\", \"title\": \"string\", \"unit\": \"string, e.g. 'USD'\", \"items\": [{\"label\": \"string\", \"value\": number, \"evidence\": [...]}]}  (2-8 items, comparable quantities only)\n"
-                          "  {\"type\": \"chart\", \"spec\": {\"kind\": \"bar|column\", \"title\": \"string - a sentence that states the finding\", \"subtitle\": \"string, optional\", "
-                          "\"query\": {\"name\": \"string - a query name from the packet's visual_catalog\", \"params\": {\"name\": \"string value\"}}, "
-                          "\"sort\": \"value_desc|value_asc|label|time, optional\", \"limit\": \"integer, optional\", \"highlight\": [\"label strings, optional\"]}}  "
+                          f"  {{\"type\": \"chart\", \"spec\": {{\"question\": \"{CHART_SCHEMA_QUESTIONS} - the question the chart answers\", "
+                          f"\"kind\": \"{CHART_SCHEMA_KINDS} - one of the kinds that answer the question\", "
+                          "\"title\": \"string - a sentence that states the finding\", \"subtitle\": \"string, optional\", "
+                          "\"query\": {\"name\": \"string - a query from the packet's visual_catalog that answers the question and has data\", \"params\": {\"name\": \"string value\"}}, "
+                          "\"sort\": \"value_desc|value_asc|label|time, optional, never for a histogram or scatter\", "
+                          "\"limit\": \"integer, optional, never for a histogram or scatter\", \"highlight\": [\"label strings, optional\"]}}  "
                           "(a chart the Workbench draws from the investigation's own records: you name the query, it supplies every number; never write a value)",
             }
         ],

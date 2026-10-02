@@ -552,7 +552,12 @@ class _Checker:
             if self.data.series_kind == "time":
                 self.error(9, f"periods are an order; a {kind.value} gives each one its own colour, which reads as unrelated groups. "
                               "Use a column or line chart for change over time")
-            elif spec.effective_sort() in (SortOrder.value_desc, SortOrder.value_asc):
+            elif spec.effective_sort() in (SortOrder.value_desc, SortOrder.value_asc) and spec.question != "part_of_whole":
+                # Parts sorted by size may be a ranking in disguise. An order
+                # that says it answers "part of a whole" has said what it is
+                # for (the FT Visual Vocabulary's own advice is to switch to
+                # bars only when the sizes alone matter), so the warning is
+                # for orders that name no question or ask for a ranking.
                 self.warn(9, f"a ranking reads better as bars than as a {kind.value}: lengths are easier to compare than angles or areas")
         if self.needs_option(9):
             colours = set(self.item_colours())

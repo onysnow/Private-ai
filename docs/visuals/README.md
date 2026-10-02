@@ -30,7 +30,10 @@ order slip  →  kitchen  →  checker  →  drawing  →  review
    `QUESTIONS` is the chart chooser, after the FT Visual Vocabulary: ranking,
    change over time, part of a whole, distribution, correlation and flow,
    each with the kinds that answer it and the query shapes that hold that
-   relationship (`category`, `time`, `distribution`, `pairs`).
+   relationship (`category`, `time`, `distribution`, `pairs`). An order may
+   name its `question`; an unknown one is a malformed order, and a kind or
+   query that does not answer it is refused when the chart is drawn
+   (`ChartDoesNotFit`), which sends the model back with the kinds that do.
 2. **The kitchen** (`backend/app/visuals/data_service.py`). Eleven read-only
    queries, each scoped to one investigation: `payments_by_party`,
    `payments_over_time`, `events_over_time`, `links_by_type`,
@@ -125,6 +128,13 @@ order slip  →  kitchen  →  checker  →  drawing  →  review
   `app/ai/presentation_modules/PRESENTATION_DRAFT.md` and
   `OUTPUT_SCHEMAS["presentation_draft"]` in `app/ai/reasoning.py`). After the
   chart check it is `{"type": "chart", "spec", "data", "report", "text"}`.
+  The model is told to choose by the question the data answers, then a
+  query listed under that question, then one of the question's kinds, and
+  to write a title that states the finding in words. Its packet's
+  `visual_catalog` (`chart_check.visual_catalog_for_prompt`) lists the
+  questions with their kinds and queries, and every query with the kinds
+  that can draw it. The kinds and questions in the output schema are read
+  from the drawing's own lists, so the schema cannot fall behind it.
 - **Both exports check again first.** A stored chart is rebuilt from its
   stored order slip and data and checked again (`decks.checked_chart`), so
   a chart stored before a rule tightened, or edited by hand, is replaced by
@@ -134,15 +144,33 @@ order slip  →  kitchen  →  checker  →  drawing  →  review
   for every kind python-pptx can draw, styled from the deck theme: bar and
   column as before; line (`LINE_MARKERS`) and area (`AREA`), with a hollow
   marker on a point that rests on one record and the last value written at
-  the end; the 100% bar (`BAR_STACKED_100`, one series per part, each named
-  inside in black or white); the donut (`DOUGHNUT`, every slice named with
-  its share, the total in the centre); the histogram (`COLUMN_CLUSTERED`
+  the end; the 100% bar (`BAR_STACKED_100`, one series per part); the donut
+  (`DOUGHNUT`, the total in the centre); the histogram (`COLUMN_CLUSTERED`
   with no gap between bins); the scatter plot (`XY_SCATTER`, each point
-  named, both axes titled). The treemap, which PowerPoint charts cannot
-  draw, is the PNG from the render service; when the service cannot be
-  reached the slide says so and shows the same parts as native bars. Every
-  chart has its title and unit above it, the source line under it, its alt
-  text on the shape (what a screen reader announces), its description in the
+  named, both axes titled). A period's or a column's record count goes on a
+  line of its own under its name, so the labels stay level, and a value
+  written on a line's point is the value alone. PowerPoint writes a data
+  label in the middle of its mark and LibreOffice wraps a long one into a
+  narrow column, so the small parts of a 100% bar and the thin slices of a
+  donut had labels running over each other: their labels are now laid out
+  the way the app draws them (`decks.whole_bar_layout`: above and below the
+  bar in turn, moved apart with `layout.place_on_line` but always over or
+  under their own part, two lines a side when one is not enough;
+  `decks.donut_layout`: in a column on each side of the ring, at their
+  slice's height), each moved there from its default place with the manual
+  layout PowerPoint itself saves for a dragged label, unwrapped, with a
+  leader line back to its mark; the font steps down from 11 to 9 pt before
+  the parts are shown as ranked bars with a line saying why. The treemap,
+  which PowerPoint charts cannot draw, is the PNG from the render service,
+  filling the chart's space with its title and source line in it. It is
+  drawn at the slide's own scale (`decks.picture_size`: a design size where
+  its 12 px text reads at 10.5 pt; drawn at 960 x 540 and shrunk into half a
+  slide, it read at 5.5 pt) and checked again at that size; a treemap whose
+  small parts cannot name themselves there, or one the render service
+  cannot draw, is shown as ranked native bars under a line saying why. (The
+  app's slide preview still shows the 960 x 540 drawing.) Every chart has
+  its title and unit above it, the source line under it, its alt text on
+  the shape (what a screen reader announces), its description in the
   speaker notes, and its records numbered in the slide footer and on the
   Sources slides.
 - **Brief** (`app/services/writeups.py`): for every kind, the PNG from the
@@ -151,12 +179,72 @@ order slip  →  kitchen  →  checker  →  drawing  →  review
   with a citation marker on every row, then the source line. When the
   render service is unreachable the brief says so and shows the values as a
   table instead.
+- **The chart builder** (`frontend/features/charts/chart-builder-panel.tsx`,
+  "Charts from the records" on the workbench page): a reporter makes a
+  checked chart with no AI involved. It writes the same order slip the AI
+  writes and chooses the same way: first the question the chart answers
+  (the catalogue's questions; flow is shown but not drawn yet), then the
+  data that answers it (only the queries listed under that question, with
+  their parameters; a query with no records is listed but cannot be
+  picked), then one of the question's kinds that can draw that data, best
+  first, and a title that states the finding. The preview route cooks,
+  draws and checks it: the panel shows the chart (ECharts loaded on
+  demand), its source line, description and data table, every record
+  behind a value as a link to the provenance trace, and the check report,
+  with every failed rule and every warning by its number and name and the
+  checker's own words. A kind that cannot draw the data comes back as the
+  route's 422 reason. The catalogue runs every query once, so it is asked
+  for only when the builder is opened. Nothing is stored.
+- **Styling a chart** (`app/visuals/style.py`; the catalogue in
+  `app/services/presentation_style.py`: `CHART_FAMILIES`, `CHART_PRESETS`,
+  `CHART_OPTIONS`, after "Presets and options per chart type" in the Visual
+  Editor design). A chart's style is a preset of its family plus option
+  overrides, kept on the stored chart as `"style": {"preset", "options"}`. A
+  preset may move the chart to another kind of its family (a ranking as bars
+  or columns; parts of a whole as a 100% bar, a donut or a treemap), and is
+  offered only when that kind answers the order's question and can draw its
+  data. Options sort the parts, fold the smallest into "Other", pick some out
+  (the others turn grey), and change how the marks are drawn (thickness,
+  markers, a centre total, the binning rule, which points are named); an
+  option can belong to some kinds or query shapes only. Style never changes
+  the data: the rows stay as the data service cooked them, and the styled
+  order slip is drawn and checked again, all twenty rules. What the design
+  refuses has no control at all, so it cannot be picked: an axis above zero,
+  3D, a second value axis, a pulled-out slice, gaps between a histogram's
+  bins. A smoothed curve and a log scale are allowed with a warning beside
+  their control, and a donut with more than four slices is warned about
+  beside "Fold into Other after" (the check then refuses it, rule 5). `POST
+  /api/investigations/{id}/visuals/restyle` takes a stored chart, a style and
+  the deck's look, and answers with the chart drawn and checked again, the
+  style as it will be kept, the presets the chart can take, every option's
+  value and the warnings; nothing is stored. In the app, the presentation
+  preview's style panel shows these controls for a chart slide, asks for the
+  restyle on every change, draws the reply on the slide and shows its check
+  report; "Promote to deck" sends the styles. A deck checks its charts again
+  itself whenever its slides or its look change (`decks.recheck_charts`, on
+  create and update), so the stored drawing, words and report are the ones
+  the export draws, and a chart a style has broken is exported as the note
+  naming its failed rules.
 - **Preview** (`POST /api/investigations/{id}/visuals/preview`): the data,
   the ECharts option, the check report, the alt text, the description and the
   data table for one order slip, with no AI involved. `GET
   /api/investigations/{id}/visuals/catalog` is the menu. Both routes are
   scoped to the investigation like the rest of the API, and both have
   declared response models (`app/schemas/responses.py`).
+- **In the app** (`frontend/components/presentation/chart-visual.tsx`): the
+  presentation preview draws the stored option itself for every kind, at
+  its design size scaled to fit, without the app's dark chart theme. The
+  ECharts parts the kinds need are registered in
+  `frontend/lib/echarts-setup.ts`, tree-shaken: the pie series (a donut),
+  treemap and scatter series, and two features the backend's options rely
+  on that ECharts 6 moved out of its core, `LegacyGridContainLabel` (the
+  axis-label layout the render service uses, so preview and export lay out
+  alike) and `LabelLayout` (a scatter plot's overlapping names). ECharts is
+  loaded on demand (`next/dynamic`), so it stays out of the page's first
+  load. The data table shows a part's share and a scatter plot's second
+  number. `frontend/tests/test-echarts-kinds.test.ts` draws every kind's
+  option with the app's own registered parts, because ECharts skips a
+  series whose chart type was never registered without a word.
 - The citation layer sees the chart's records because they are ordinary
   `{record_type, record_id}` pairs inside the stored data: the candidate's
   `citation_details`, the deck's source numbering and the write-up's
@@ -245,8 +333,9 @@ TZ=UTC PYTHONPATH=. python -m pytest tests/test_visuals_*.py -q --no-cov
 | `test_visuals_kinds.py` | Every statistical kind in the house style and passing its check, its draw options, the kinds refused for a query they cannot draw, labels kept in the picture and the checks on what fits, the metamorphic tests for every kind, and that the app's copy of each kind (`frontend/test-support/chart-kinds.json`) is what the backend draws |
 | `test_visuals_layout.py` | Text widths and treemap rectangles equal to ECharts' own (and, with Node, to the installed ECharts), labels moved apart on a line, words wrapped at spaces |
 | `test_visuals_render.py` | The bridge behind a mocked transport, vl-convert drawing text in a font list, a live run of the Node service for every kind with its words in each PNG |
-| `test_visuals_exports.py` | Every kind in a deck (the native chart type, alt text, source line, notes; the treemap as the picture, or as bars when the service is down; a stored chart that now fails a rule is not drawn) and in a brief (image, caption and data table, or a table and a note) |
-| `test_visuals_routes.py` | The catalogue and preview routes, their response models, investigation scope |
+| `test_visuals_exports.py` | Every kind in a deck (the native chart type, alt text, source line, notes; the treemap as the picture drawn at the slide's scale, or as bars when it cannot name its parts there or the service is down; a stored chart that now fails a rule is not drawn), the native labels of a 100% bar and a donut (never on each other, over or under their own part, clear of the ring, moved, unwrapped, with leader lines), and every kind in a brief (image, caption and data table, or a table and a note) |
+| `test_visuals_routes.py` | The catalogue, preview and restyle routes, their response models, investigation scope |
+| `test_visuals_style.py` | The presets a chart can take, the options of each kind, a style that never changes the data and is checked again, the warnings, what is refused by having no control |
 | `test_visuals_draft.py` | A draft whose model orders a chart: kept, re-asked, or removed with reasons |
 
 ## What pass 3 built, and what is left
@@ -254,8 +343,15 @@ TZ=UTC PYTHONPATH=. python -m pytest tests/test_visuals_*.py -q --no-cov
 Built: the drawing of the seven statistical kinds, the two queries they
 needed (`payment_amounts`, `payments_count_and_total_by_party`), the
 question-first chooser, a checker that judges every rule for each kind
-and says which rules do not apply, and every kind in both exports (native
-PowerPoint charts, the treemap as a picture; a PNG in the brief).
+and says which rules do not apply, every kind in both exports (native
+PowerPoint charts, the treemap as a picture; a PNG in the brief), every
+kind in the app's preview, the AI's order slip chosen by question, chart
+presets and options checked again on every change, and the chart builder a
+reporter uses without the AI. The app's side is tested in
+`frontend/tests/test-chart-builder.test.tsx`,
+`frontend/tests/test-chart-style.test.tsx`,
+`frontend/tests/test-chart-visual.test.tsx` and
+`frontend/tests/test-echarts-kinds.test.ts`.
 
 Left for later passes:
 

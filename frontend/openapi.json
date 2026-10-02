@@ -2345,6 +2345,272 @@
         "title": "ChartKind",
         "type": "string"
       },
+      "ChartOptionSpecOut": {
+        "description": "What one chart option accepts. `kinds` and `series`, when sent, say\nwhich chart kinds and query shapes it is for; `warning`, when sent, is\nshown beside it while it is on.",
+        "properties": {
+          "kinds": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kinds"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "series": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Series"
+          },
+          "type": {
+            "enum": [
+              "bool",
+              "choice",
+              "labels"
+            ],
+            "title": "Type",
+            "type": "string"
+          },
+          "values": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Values"
+          },
+          "warning": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Warning"
+          }
+        },
+        "required": [
+          "type",
+          "label"
+        ],
+        "title": "ChartOptionSpecOut",
+        "type": "object"
+      },
+      "ChartPresetOut": {
+        "description": "A named look for one chart family: the kind it draws and its option defaults.",
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "options": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Options",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "description",
+          "kind",
+          "options"
+        ],
+        "title": "ChartPresetOut",
+        "type": "object"
+      },
+      "ChartRestyleOut": {
+        "description": "A stored chart drawn again in a style and a deck theme, and checked\nagain (app/visuals/style.py): the preview's reply, plus the style as it\nwill be kept (`preset` empty for the chart as it was ordered), the\npresets this chart can take, the one that draws it as ordered, every\noption its kind offers with its value, and the warnings to show beside\nthe controls.",
+        "properties": {
+          "alt_text": {
+            "title": "Alt Text",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/VisualDataOut"
+          },
+          "data_table": {
+            "$ref": "#/components/schemas/DataTableOut"
+          },
+          "default_preset": {
+            "title": "Default Preset",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "height": {
+            "title": "Height",
+            "type": "integer"
+          },
+          "option": {
+            "additionalProperties": true,
+            "title": "Option",
+            "type": "object"
+          },
+          "options": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Options",
+            "type": "object"
+          },
+          "presets": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Presets",
+            "type": "array"
+          },
+          "report": {
+            "$ref": "#/components/schemas/CheckReportOut"
+          },
+          "source_line": {
+            "title": "Source Line",
+            "type": "string"
+          },
+          "spec": {
+            "additionalProperties": true,
+            "title": "Spec",
+            "type": "object"
+          },
+          "style": {
+            "$ref": "#/components/schemas/VisualStyleOut"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/StyleWarningOut"
+            },
+            "title": "Warnings",
+            "type": "array"
+          },
+          "width": {
+            "title": "Width",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "spec",
+          "data",
+          "option",
+          "report",
+          "alt_text",
+          "description",
+          "data_table",
+          "source_line",
+          "width",
+          "height",
+          "style",
+          "presets",
+          "default_preset",
+          "options",
+          "warnings"
+        ],
+        "title": "ChartRestyleOut",
+        "type": "object"
+      },
+      "ChartRestyleRequest": {
+        "description": "A stored chart (its `spec` and cooked `data`, as a draft or a deck\nholds it), the style to try on it, and the deck's theme and fonts\n(app/visuals/style.py). Nothing is stored.",
+        "properties": {
+          "chart": {
+            "additionalProperties": true,
+            "title": "Chart",
+            "type": "object"
+          },
+          "deck_style": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeckStyle"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "style": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VisualStyle"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "chart"
+        ],
+        "title": "ChartRestyleRequest",
+        "type": "object"
+      },
       "ChartVisualOut": {
         "description": "A checked chart (app/ai/chart_check.py) as a deck keeps it: the order\nslip, the data the Workbench cooked from the records (every value with\nits records), the check report and the chart's words, as the draft or\nthe deck editor stored them; and the drawing that passed, when the deck\ncame from a checked draft. The deck insists only on a valid order slip\nand its data (app/services/decks.py normalize_chart_visual), so the\nreport and the words are passed on as stored.",
         "properties": {
@@ -2372,6 +2638,16 @@
             "additionalProperties": true,
             "title": "Spec",
             "type": "object"
+          },
+          "style": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VisualStyleOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "text": {
             "additionalProperties": true,
@@ -15870,6 +16146,33 @@
       "PresentationStyleCatalogOut": {
         "description": "Everything the deck style panel and the in-app preview need; the .pptx\nexport reads the same catalogue, so the two cannot drift apart.",
         "properties": {
+          "chart_families": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Chart Families",
+            "type": "object"
+          },
+          "chart_options": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/ChartOptionSpecOut"
+              },
+              "type": "object"
+            },
+            "title": "Chart Options",
+            "type": "object"
+          },
+          "chart_presets": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/ChartPresetOut"
+              },
+              "type": "array"
+            },
+            "title": "Chart Presets",
+            "type": "object"
+          },
           "defaults": {
             "$ref": "#/components/schemas/DeckStyleOut"
           },
@@ -15899,7 +16202,10 @@
           "themes",
           "font_pairs",
           "visual_presets",
-          "visual_options"
+          "visual_options",
+          "chart_families",
+          "chart_presets",
+          "chart_options"
         ],
         "title": "PresentationStyleCatalogOut",
         "type": "object"
@@ -19046,6 +19352,25 @@
         "title": "StatementPromotionRequest",
         "type": "object"
       },
+      "StyleWarningOut": {
+        "description": "A warning the style panel shows beside one option's control.",
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "option": {
+            "title": "Option",
+            "type": "string"
+          }
+        },
+        "required": [
+          "option",
+          "message"
+        ],
+        "title": "StyleWarningOut",
+        "type": "object"
+      },
       "TaskWorkflowEventOut": {
         "properties": {
           "created_at": {
@@ -20726,6 +21051,18 @@
           },
           "query": {
             "$ref": "#/components/schemas/QueryRef"
+          },
+          "question": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The question the chart answers: ranking, change_over_time, part_of_whole, distribution, correlation or flow.",
+            "title": "Question"
           },
           "scale": {
             "$ref": "#/components/schemas/Scale",
@@ -34796,6 +35133,74 @@
           }
         },
         "summary": "Investigation Visual Preview"
+      }
+    },
+    "/api/investigations/{investigation_id}/visuals/restyle": {
+      "post": {
+        "description": "Draw a stored chart again in a style and a deck theme, and check it\nagain: what the style panel shows for a chart. The chart's rows are\ndrawn as given and never changed, and nothing is stored; a deck that is\nsaved or exported checks its charts once more itself. The reply is the\npreview's, plus the style as it will be kept, the presets this chart can\ntake, every option its kind offers with its value, and the warnings to\nshow beside the controls.",
+        "operationId": "investigation_visual_restyle",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChartRestyleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChartRestyleOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Investigation Visual Restyle"
+                }
+              }
+            },
+            "description": "The input does not match the route, or the chart cannot be drawn in this style"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Investigation Visual Restyle"
       }
     },
     "/api/investigations/{investigation_id}/writeups": {

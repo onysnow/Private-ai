@@ -8,10 +8,14 @@ Three layers, nearest wins (see the "Visual Editor & Chart Styles" design):
 Everything here is presentation only. Nothing in a style can change a
 value, a date, a label or a citation, and the catalogue deliberately has no
 control for the misleading options the design refuses: a bar axis that
-starts above zero, 3D, a second value axis. The deck renderer
-(app/services/decks.py) and the in-app preview
-(frontend/components/presentation/slide-canvas.tsx) both read the catalogue
-served by GET /api/presentation-styles, so they cannot drift apart.
+starts above zero, 3D, a second value axis, a pulled-out slice, a gap
+between histogram bins. The deck renderer (app/services/decks.py) and the
+in-app preview (frontend/components/presentation/slide-canvas.tsx) both
+read the catalogue served by GET /api/presentation-styles, so they cannot
+drift apart. Checked charts (a "chart" visual) have presets and options of
+their own, per chart family (CHART_PRESETS, CHART_OPTIONS below), applied by
+app/visuals/style.py; a styled chart is drawn and checked again before it
+is shown or exported.
 """
 from __future__ import annotations
 
@@ -199,6 +203,109 @@ VISUAL_PRESETS: dict[str, list[dict]] = {
 }
 
 
+# --- chart visuals (visuals pass 3) -------------------------------------------------------
+# The presets and options of a checked chart (a "chart" visual, drawn by
+# app/visuals/echarts.py), per family, after "Presets and options per chart
+# type" in the Visual Editor design. app/visuals/style.py applies them; a
+# styled chart is drawn and checked again before it is shown or exported.
+#
+# What the design refuses has no control here, so it cannot be picked: an
+# axis that starts above zero (Datawrapper), 3D (Infogram), a second value
+# axis (Datawrapper), a pulled-out slice, a gap between histogram bins. What
+# it allows with a warning carries the warning beside its control: a
+# smoothed curve, a log scale; a donut past four slices is warned about by
+# the restyle reply and refused by the checker (rule 5). The presets the
+# design lists that need more than one series or a hierarchy (small
+# multiples, stacked areas, several donuts, two-level treemaps, bubbles,
+# box plots) wait for queries that hold them.
+#
+# An option may name the `kinds` it is for (a donut's centre total) and the
+# query `series` it is for (sorting means nothing for periods, whose order
+# is time; folding into "Other" cannot cut a time series).
+CHART_FAMILIES: dict[str, str] = {
+    "bar": "bars", "column": "bars", "line": "lines", "area": "lines",
+    "stacked_bar_100": "parts", "donut": "parts", "treemap": "parts", "histogram": "histogram", "scatter": "scatter",
+}
+_RANKED_SERIES = ["category", "distribution"]
+_CHART_SORT = {"type": "choice", "label": "Sort", "values": ["as_ordered", "value_desc", "value_asc", "label"], "series": _RANKED_SERIES}
+_CHART_HIGHLIGHT = {"type": "labels", "label": "Highlight (the others turn grey)"}
+_GRIDLINES = {"type": "bool", "label": "Gridlines"}
+_LOG_WARNING = "A log scale has no zero and is easy to misread; the check refuses it for data with a zero or a negative value (rule 2)."
+CHART_OPTIONS: dict[str, dict[str, dict]] = {
+    "bars": {
+        "sort": _CHART_SORT,
+        "thickness": {"type": "choice", "label": "Bar thickness", "values": ["thin", "regular", "thick"]},
+        "axis_line": {"type": "bool", "label": "Zero line"},
+        # Only horizontal gridlines (house style): a horizontal bar chart has none.
+        "gridlines": {**_GRIDLINES, "kinds": ["column"]},
+        "highlight": _CHART_HIGHLIGHT,
+    },
+    "lines": {
+        "line_width": {"type": "choice", "label": "Line width", "values": ["thin", "regular", "thick"]},
+        "markers": {"type": "bool", "label": "A marker on every point"},
+        "value_labels": {"type": "bool", "label": "Write every value"},
+        "smooth": {"type": "bool", "label": "Smooth curve",
+                   "warning": "A smoothed curve passes through values no record holds between the points; the check notes it (check 0)."},
+        "log_scale": {"type": "bool", "label": "Log scale", "kinds": ["line"], "warning": _LOG_WARNING},
+        "gridlines": _GRIDLINES,
+        "highlight": _CHART_HIGHLIGHT,
+    },
+    "parts": {
+        "sort": _CHART_SORT,
+        "other_after": {"type": "choice", "label": "Fold into Other after", "values": ["all", "1", "2", "3", "4", "5", "6", "7"],
+                        "series": _RANKED_SERIES},
+        "thickness": {"type": "choice", "label": "Bar thickness", "values": ["thin", "regular", "thick"], "kinds": ["stacked_bar_100"]},
+        "centre_total": {"type": "bool", "label": "Total in the centre", "kinds": ["donut"]},
+        "highlight": _CHART_HIGHLIGHT,
+    },
+    "histogram": {
+        "binning": {"type": "choice", "label": "Number of bins", "values": ["doane", "sturges"]},
+        "gridlines": _GRIDLINES,
+        "highlight": _CHART_HIGHLIGHT,
+    },
+    "scatter": {
+        "label_points": {"type": "choice", "label": "Name", "values": ["auto", "outliers"]},
+        "log_scale": {"type": "bool", "label": "Log scales", "warning": _LOG_WARNING},
+        "gridlines": _GRIDLINES,
+        "highlight": _CHART_HIGHLIGHT,
+    },
+}
+# Each preset is a kind of its family plus option defaults; the first preset
+# with the chart's own kind is how the chart looks as it was ordered.
+CHART_PRESETS: dict[str, list[dict]] = {
+    "bars": [
+        {"id": "horizontal", "label": "Horizontal", "description": "Bars across, in the order the chart was made.", "kind": "bar", "options": {}},
+        {"id": "ranked", "label": "Ranked", "description": "Largest first, so the ranking reads top-down.", "kind": "bar", "options": {"sort": "value_desc"}},
+        {"id": "column", "label": "Column", "description": "Columns up from a zero line.", "kind": "column", "options": {}},
+        {"id": "minimal", "label": "Labels without axis", "description": "Thin bars and their values; no zero line.", "kind": "bar",
+         "options": {"thickness": "thin", "axis_line": False}},
+    ],
+    "lines": [
+        {"id": "line", "label": "Line", "description": "The last value written at the end of the line.", "kind": "line", "options": {}},
+        {"id": "line_values", "label": "Line with values", "description": "Every value written above its point.", "kind": "line",
+         "options": {"value_labels": True}},
+        {"id": "area", "label": "Area", "description": "The line filled down to zero, for a total built up over time.", "kind": "area", "options": {}},
+    ],
+    "parts": [
+        {"id": "bar_100", "label": "100% bar", "description": "One bar that adds up to the whole, every part named.", "kind": "stacked_bar_100",
+         "options": {}},
+        {"id": "donut", "label": "Donut with centre total", "description": "Four slices at most: the three largest and Other, the total in the centre.",
+         "kind": "donut", "options": {"other_after": "3", "centre_total": True}},
+        {"id": "treemap", "label": "Treemap", "description": "Rectangles sized by value, for many parts of similar size.", "kind": "treemap",
+         "options": {}},
+    ],
+    "histogram": [
+        {"id": "histogram", "label": "Histogram", "description": "Touching bins, the number of records in each.", "kind": "histogram", "options": {}},
+    ],
+    "scatter": [
+        {"id": "basic", "label": "Basic", "description": "Every point named when there are few, the outliers when there are many.", "kind": "scatter",
+         "options": {"label_points": "auto"}},
+        {"id": "labelled_outliers", "label": "Labelled outliers", "description": "Only the points outside Tukey's fences are named.", "kind": "scatter",
+         "options": {"label_points": "outliers"}},
+    ],
+}
+
+
 def theme(theme_id: str | None) -> Theme:
     return THEMES.get(theme_id or "", THEMES[DEFAULT_THEME])
 
@@ -271,6 +378,9 @@ def catalog() -> dict:
         "font_pairs": [{"id": key, **value} for key, value in FONT_PAIRS.items()],
         "visual_presets": VISUAL_PRESETS,
         "visual_options": VISUAL_OPTIONS,
+        "chart_families": CHART_FAMILIES,
+        "chart_presets": CHART_PRESETS,
+        "chart_options": CHART_OPTIONS,
     }
 
 

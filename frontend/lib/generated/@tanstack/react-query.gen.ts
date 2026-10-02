@@ -92,6 +92,7 @@ import {
   investigationQuestionContext,
   investigationVisualCatalog,
   investigationVisualPreview,
+  investigationVisualRestyle,
   leadQueue,
   linkClaimEvidenceEndpoint,
   linkLead,
@@ -415,6 +416,9 @@ import type {
   InvestigationVisualPreviewData,
   InvestigationVisualPreviewError,
   InvestigationVisualPreviewResponse,
+  InvestigationVisualRestyleData,
+  InvestigationVisualRestyleError,
+  InvestigationVisualRestyleResponse,
   LeadQueueData,
   LeadQueueError,
   LeadQueueResponse,
@@ -4331,6 +4335,41 @@ export const investigationVisualPreviewMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await investigationVisualPreview({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Investigation Visual Restyle
+ *
+ * Draw a stored chart again in a style and a deck theme, and check it
+ * again: what the style panel shows for a chart. The chart's rows are
+ * drawn as given and never changed, and nothing is stored; a deck that is
+ * saved or exported checks its charts once more itself. The reply is the
+ * preview's, plus the style as it will be kept, the presets this chart can
+ * take, every option its kind offers with its value, and the warnings to
+ * show beside the controls.
+ */
+export const investigationVisualRestyleMutation = (
+  options?: Partial<Options<InvestigationVisualRestyleData>>,
+): UseMutationOptions<
+  InvestigationVisualRestyleResponse,
+  InvestigationVisualRestyleError,
+  Options<InvestigationVisualRestyleData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    InvestigationVisualRestyleResponse,
+    InvestigationVisualRestyleError,
+    Options<InvestigationVisualRestyleData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await investigationVisualRestyle({
         ...options,
         ...fnOptions,
         throwOnError: true,

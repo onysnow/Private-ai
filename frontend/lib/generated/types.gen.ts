@@ -1392,6 +1392,155 @@ export type ChartKind =
   | 'sankey';
 
 /**
+ * ChartOptionSpecOut
+ *
+ * What one chart option accepts. `kinds` and `series`, when sent, say
+ * which chart kinds and query shapes it is for; `warning`, when sent, is
+ * shown beside it while it is on.
+ */
+export type ChartOptionSpecOut = {
+  /**
+   * Kinds
+   */
+  kinds?: Array<string> | null;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Series
+   */
+  series?: Array<string> | null;
+  /**
+   * Type
+   */
+  type: 'bool' | 'choice' | 'labels';
+  /**
+   * Values
+   */
+  values?: Array<string> | null;
+  /**
+   * Warning
+   */
+  warning?: string | null;
+};
+
+/**
+ * ChartPresetOut
+ *
+ * A named look for one chart family: the kind it draws and its option defaults.
+ */
+export type ChartPresetOut = {
+  /**
+   * Description
+   */
+  description: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Options
+   */
+  options: {
+    [key: string]: boolean | string | Array<string>;
+  };
+};
+
+/**
+ * ChartRestyleOut
+ *
+ * A stored chart drawn again in a style and a deck theme, and checked
+ * again (app/visuals/style.py): the preview's reply, plus the style as it
+ * will be kept (`preset` empty for the chart as it was ordered), the
+ * presets this chart can take, the one that draws it as ordered, every
+ * option its kind offers with its value, and the warnings to show beside
+ * the controls.
+ */
+export type ChartRestyleOut = {
+  /**
+   * Alt Text
+   */
+  alt_text: string;
+  data: VisualDataOut;
+  data_table: DataTableOut;
+  /**
+   * Default Preset
+   */
+  default_preset: string;
+  /**
+   * Description
+   */
+  description: string;
+  /**
+   * Height
+   */
+  height: number;
+  /**
+   * Option
+   */
+  option: {
+    [key: string]: unknown;
+  };
+  /**
+   * Options
+   */
+  options: {
+    [key: string]: boolean | string | Array<string>;
+  };
+  /**
+   * Presets
+   */
+  presets: Array<string>;
+  report: CheckReportOut;
+  /**
+   * Source Line
+   */
+  source_line: string;
+  /**
+   * Spec
+   */
+  spec: {
+    [key: string]: unknown;
+  };
+  style: VisualStyleOut;
+  /**
+   * Warnings
+   */
+  warnings: Array<StyleWarningOut>;
+  /**
+   * Width
+   */
+  width: number;
+};
+
+/**
+ * ChartRestyleRequest
+ *
+ * A stored chart (its `spec` and cooked `data`, as a draft or a deck
+ * holds it), the style to try on it, and the deck's theme and fonts
+ * (app/visuals/style.py). Nothing is stored.
+ */
+export type ChartRestyleRequest = {
+  /**
+   * Chart
+   */
+  chart: {
+    [key: string]: unknown;
+  };
+  deck_style?: DeckStyle | null;
+  style?: VisualStyle | null;
+};
+
+/**
  * ChartVisualOut
  *
  * A checked chart (app/ai/chart_check.py) as a deck keeps it: the order
@@ -1422,6 +1571,7 @@ export type ChartVisualOut = {
   spec: {
     [key: string]: unknown;
   };
+  style?: VisualStyleOut | null;
   /**
    * Text
    */
@@ -6952,6 +7102,26 @@ export type PresentationDraftRequest = {
  * export reads the same catalogue, so the two cannot drift apart.
  */
 export type PresentationStyleCatalogOut = {
+  /**
+   * Chart Families
+   */
+  chart_families: {
+    [key: string]: string;
+  };
+  /**
+   * Chart Options
+   */
+  chart_options: {
+    [key: string]: {
+      [key: string]: ChartOptionSpecOut;
+    };
+  };
+  /**
+   * Chart Presets
+   */
+  chart_presets: {
+    [key: string]: Array<ChartPresetOut>;
+  };
   defaults: DeckStyleOut;
   /**
    * Font Pairs
@@ -8862,6 +9032,22 @@ export type StatementPromotionRequest = {
 };
 
 /**
+ * StyleWarningOut
+ *
+ * A warning the style panel shows beside one option's control.
+ */
+export type StyleWarningOut = {
+  /**
+   * Message
+   */
+  message: string;
+  /**
+   * Option
+   */
+  option: string;
+};
+
+/**
  * TaskWorkflowEventOut
  */
 export type TaskWorkflowEventOut = {
@@ -9832,6 +10018,12 @@ export type VisualSpec = {
    */
   limit?: number | null;
   query: QueryRef;
+  /**
+   * Question
+   *
+   * The question the chart answers: ranking, change_over_time, part_of_whole, distribution, correlation or flow.
+   */
+  question?: string | null;
   scale?: Scale;
   sort?: SortOrder | null;
   /**
@@ -14128,6 +14320,44 @@ export type InvestigationVisualPreviewResponses = {
 
 export type InvestigationVisualPreviewResponse =
   InvestigationVisualPreviewResponses[keyof InvestigationVisualPreviewResponses];
+
+export type InvestigationVisualRestyleData = {
+  body: ChartRestyleRequest;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/visuals/restyle';
+};
+
+export type InvestigationVisualRestyleErrors = {
+  /**
+   * Response 422 Investigation Visual Restyle
+   *
+   * The input does not match the route, or the chart cannot be drawn in this style
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type InvestigationVisualRestyleError =
+  InvestigationVisualRestyleErrors[keyof InvestigationVisualRestyleErrors];
+
+export type InvestigationVisualRestyleResponses = {
+  /**
+   * Successful Response
+   */
+  200: ChartRestyleOut;
+};
+
+export type InvestigationVisualRestyleResponse =
+  InvestigationVisualRestyleResponses[keyof InvestigationVisualRestyleResponses];
 
 export type ListWriteupsEndpointData = {
   body?: never;

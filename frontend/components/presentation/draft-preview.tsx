@@ -10,9 +10,11 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 import type {KeyboardEvent, ReactElement} from 'react';
 import {ChevronLeft, ChevronRight} from 'lucide-react';
 
-import type {AiCitationRef, ChartVisual, CitationDetail, DeckSlide, DeckStyle, JsonObject, JsonValue, PresentationDraftPayload, PresentationSection, PresentationStyleCatalog, PresentationVisual, QuotedRef, VisualStyle} from '../../lib/api-types';
+import type {AiCitationRef, CitationDetail, DeckSlide, DeckStyle, JsonObject, JsonValue, PresentationDraftPayload, PresentationSection, PresentationStyleCatalog, PresentationVisual, QuotedRef, VisualStyle} from '../../lib/api-types';
+import type {ChartRestyleOut} from '../../lib/generated/types.gen';
 import {Button} from '@/components/ui/button';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import {asChart, chartFromPreview, isObj, refs, str} from './chart-data';
 import {DECK, SlideCanvas, SlideStyleProvider, SourcesCanvas, buildCitationLookup, displayDate, formatValue, isStyledVisual, refKey, resolveTheme} from './slide-canvas';
 
 // ECharts loads only when a brief actually holds a chart.
@@ -22,33 +24,10 @@ import type {CitationLookup} from './slide-canvas';
 
 export type TraceHandler = (detail: CitationDetail) => void;
 
-const isObj = (v: JsonValue | undefined): v is JsonObject => typeof v === 'object' && v !== null && !Array.isArray(v);
-const str = (v: JsonValue | undefined) => (typeof v === 'string' ? v : '');
-const refs = (v: JsonValue | undefined): AiCitationRef[] => (Array.isArray(v) ? v.filter(isObj).filter(r => typeof r.record_type === 'string' && typeof r.record_id === 'string').map(r => ({record_type: r.record_type as string, record_id: r.record_id as string})) : []);
-
 const quotedRefs = (v: JsonValue | undefined): QuotedRef[] => (Array.isArray(v) ? v.filter(isObj)
   .filter(r => typeof r.record_type === 'string' && typeof r.record_id === 'string' && typeof r.matched_text === 'string')
   .map(r => ({record_type: r.record_type as string, record_id: r.record_id as string, matched_text: r.matched_text as string,
     locator: typeof r.locator === 'string' ? r.locator : null})) : []);
-
-/** A chart is stored resolved (backend app/ai/chart_check.py): its rows,
- * the checked drawing and its words. Anything less is not drawn. */
-function asChart(v: JsonObject): ChartVisual | null {
-  const data = v.data, option = v.option, text = v.text, spec = v.spec;
-  if (!isObj(data) || !Array.isArray(data.rows) || !isObj(option) || !isObj(text) || !isObj(spec)) return null;
-  const table = isObj(text.data_table) ? text.data_table : null;
-  if (!table || !Array.isArray(table.columns) || !Array.isArray(table.rows)) return null;
-  const rows = data.rows.filter(isObj).filter(r => typeof r.label === 'string' && typeof r.value === 'number')
-    .map(r => ({...r, label: r.label as string, value: r.value as number, record_refs: refs(r.record_refs), record_count: typeof r.record_count === 'number' ? r.record_count : 0}));
-  const tableRows = table.rows.filter(isObj).filter(r => typeof r.label === 'string' && typeof r.value === 'number')
-    .map(r => ({label: r.label as string, value: r.value as number, formatted: str(r.formatted), record_count: typeof r.record_count === 'number' ? r.record_count : 0, record_refs: refs(r.record_refs)}));
-  return {
-    type: 'chart', spec, option, data: {...data, rows},
-    width: typeof v.width === 'number' ? v.width : undefined, height: typeof v.height === 'number' ? v.height : undefined,
-    text: {alt_text: str(text.alt_text), description: str(text.description), source_line: str(text.source_line),
-      data_table: {columns: table.columns.map(c => str(c)), rows: tableRows}},
-  };
-}
 
 function asVisual(v: JsonValue | undefined): PresentationVisual | null {
   if (isObj(v) && v.type === 'chart') return asChart(v);
@@ -178,13 +157,22 @@ function BriefView({draft, lookup, onTrace}: {draft: PresentationDraftPayload, l
 type Frame = {kind: 'slide', slide: DeckSlide, contentIndex: number} | {kind: 'sources'};
 
 /** Attach each section's chosen style to its content slide's visual (the Nth
- *  content slide is section N-1, as in backend deck_slides_from_payload). */
-export function applyVisualStyles(slides: DeckSlide[], visualStyles: Record<string, VisualStyle>): DeckSlide[] {
+ *  content slide is section N-1, as in backend deck_slides_from_payload).
+ *  A checked chart is not restyled here: the backend draws it again in the
+ *  style and checks it again, and its reply (`chartLooks`, POST
+ *  /api/investigations/{id}/visuals/restyle) replaces the slide's chart. */
+export function applyVisualStyles(slides: DeckSlide[], visualStyles: Record<string, VisualStyle>, chartLooks: Record<string, ChartRestyleOut> = {}): DeckSlide[] {
   let section = -1;
   return slides.map(slide => {
     if ((slide.kind || 'content') !== 'content') return slide;
     section += 1;
-    const style = visualStyles[String(section)];
+    const key = String(section);
+    if (slide.visual?.type === 'chart') {
+      const look = chartLooks[key];
+      const drawn = look ? chartFromPreview(look) : null;
+      return look && drawn ? {...slide, visual: {...drawn, style: look.style}} : slide;
+    }
+    const style = visualStyles[key];
     return isStyledVisual(slide.visual) && style ? {...slide, visual: {...slide.visual, style}} : slide;
   });
 }
@@ -197,11 +185,15 @@ export type DraftPreviewProps = {
   onDeckStyleChange?: (style: DeckStyle) => void,
   visualStyles?: Record<string, VisualStyle>,
   onVisualStyleChange?: (section: string, style: VisualStyle) => void,
+  /** Each charted section's chart as the backend drew and checked it in the
+   * picked style and theme, and why it could not be, by section index. */
+  chartLooks?: Record<string, ChartRestyleOut>,
+  chartProblems?: Record<string, string>,
 };
 
-export function DraftPreview({payload, slides: baseSlides, citationDetails, onTrace, catalog, deckStyle, onDeckStyleChange, visualStyles, onVisualStyleChange}: DraftPreviewProps): ReactElement {
+export function DraftPreview({payload, slides: baseSlides, citationDetails, onTrace, catalog, deckStyle, onDeckStyleChange, visualStyles, onVisualStyleChange, chartLooks, chartProblems}: DraftPreviewProps): ReactElement {
   const draft = useMemo(() => asDraft(payload), [payload]);
-  const slides = useMemo(() => applyVisualStyles(baseSlides, visualStyles || {}), [baseSlides, visualStyles]);
+  const slides = useMemo(() => applyVisualStyles(baseSlides, visualStyles || {}, chartLooks), [baseSlides, visualStyles, chartLooks]);
   const theme = useMemo(() => resolveTheme(catalog, deckStyle), [catalog, deckStyle]);
   const lookup = useMemo(() => buildCitationLookup(slides, citationDetails), [slides, citationDetails]);
   const frames = useMemo<Frame[]>(() => {
@@ -261,6 +253,8 @@ export function DraftPreview({payload, slides: baseSlides, citationDetails, onTr
         catalog={catalog} deckStyle={deckStyle} onDeckStyle={onDeckStyleChange}
         visual={activeVisual} sectionLabel={active?.kind === 'slide' ? active.slide.heading : undefined}
         onVisualStyle={style => { if (activeSection !== null) onVisualStyleChange(activeSection, style); }}
+        chartLook={activeSection !== null ? chartLooks?.[activeSection] ?? null : null}
+        chartProblem={activeSection !== null ? chartProblems?.[activeSection] ?? null : null}
       />}
       </div>
     </TabsContent>

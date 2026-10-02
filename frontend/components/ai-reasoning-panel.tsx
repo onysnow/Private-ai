@@ -14,6 +14,9 @@ import type {ChangeEvent,ReactElement} from 'react';
 import type {AiAnalysisCandidate,AiAnalysisCandidateSummary,AiModuleName,AiReasoningStatus,BackgroundJob,DeckStyle,JsonObject,JsonValue,PresentationStyleCatalog,VisualStyle} from '../lib/api-types';
 import {ApiPayloadError,isAiAnalysisCandidate,isAiAnalysisCandidateReview,isAiReasoningRunResult,isBackgroundJob,isDeck,isPresentationStyleCatalog,isWriteup,parseAiAnalysisCandidateList} from '../lib/api-validate';
 import {ApiClient,ApiHttpError,errorMessage} from '../lib/api-client';
+import {checkedReply} from '../lib/api-generated';
+import type {ChartRestyleOut} from '../lib/generated/types.gen';
+import {zChartRestyleOut} from '../lib/generated/zod.gen';
 import {describeJob,waitForJob} from '../lib/jobs';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
@@ -92,6 +95,13 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
   const [deckStyle,setDeckStyle]=useState<DeckStyle>({theme:'dark_academia',fonts:'theme'});
   const [visualStyles,setVisualStyles]=useState<Record<string,VisualStyle>>({});
   const catalogRequested=useRef(false);
+  // A checked chart in the draft, drawn again and checked again by the
+  // backend in the style and theme picked (POST .../visuals/restyle), by
+  // section index; the key of the last request per section drops a reply
+  // that a newer pick has overtaken.
+  const [chartLooks,setChartLooks]=useState<Record<string,ChartRestyleOut>>({});
+  const [chartProblems,setChartProblems]=useState<Record<string,string>>({});
+  const lookKeys=useRef<Record<string,string>>({});
 
   // Belt and braces: the backend already folds enabled/provider/key/spec into
   // endpoints_callable, but never offer a run button on a disabled deployment.
@@ -122,9 +132,38 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
       .catch(()=>{catalogRequested.current=false}); // the preview still works in the default look
   },[api,selected]);
 
+  // Every chart is asked for again when its style or the deck's theme
+  // changes; the reply shows on the slide and in the style panel, with its
+  // check report. Nothing is stored: promotion sends the styles, and the
+  // deck checks its charts once more itself.
+  useEffect(()=>{
+    if(selected?.module!=='presentation_draft'||!styleCatalog||!investigationId)return;
+    const candidateId=selected.id;
+    asArr(selected.payload?.sections).forEach((raw,index)=>{
+      const chart=asObj(asObj(raw)?.visual);
+      if(!chart||chart.type!=='chart')return;
+      const section=String(index);
+      const style=visualStyles[section]??null;
+      const key=JSON.stringify([candidateId,style,deckStyle]);
+      if(lookKeys.current[section]===key)return;
+      lookKeys.current[section]=key;
+      const latest=()=>lookKeys.current[section]===key;
+      api.parsed(`/api/investigations/${investigationId}/visuals/restyle`,checkedReply(zChartRestyleOut),{method:'POST',body:{chart,style,deck_style:deckStyle}})
+        .then(look=>{
+          if(!latest())return;
+          setChartLooks(prev=>({...prev,[section]:look}));
+          setChartProblems(prev=>Object.fromEntries(Object.entries(prev).filter(([k])=>k!==section)));
+        })
+        .catch((error:unknown)=>{
+          // A 422's detail says in plain words why the chart cannot be drawn this way; the slide keeps its last drawing.
+          if(latest())setChartProblems(prev=>({...prev,[section]:error instanceof ApiHttpError?error.detail:errorMessage(error,'Could not draw this chart in that style')}));
+        });
+    });
+  },[api,investigationId,selected,styleCatalog,deckStyle,visualStyles]);
+
   const open=async(id:string)=>{
     setPromoteStatus('');setPromoted(null);setPromoteTitle('');
-    if(selected?.id!==id)setVisualStyles({});
+    if(selected?.id!==id){setVisualStyles({});setChartLooks({});setChartProblems({});lookKeys.current={}}
     try{setSelected(await api.object(`/api/ai-analysis-candidates/${id}`,'AI analysis candidate',isAiAnalysisCandidate))}
     catch(error){setSelected(null);setReviewStatus(errorMessage(error,'Could not load the candidate'))}
   };
@@ -251,7 +290,8 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
             {isPresentationDraft&&payload&&<div className="mt-3">
               <DraftPreview payload={payload} slides={selected.deck_preview||[]} citationDetails={selected.citation_details||[]} onTrace={onTraceRecord}
                 catalog={styleCatalog} deckStyle={deckStyle} onDeckStyleChange={setDeckStyle}
-                visualStyles={visualStyles} onVisualStyleChange={(section,style)=>setVisualStyles(prev=>({...prev,[section]:style}))}/>
+                visualStyles={visualStyles} onVisualStyleChange={(section,style)=>setVisualStyles(prev=>({...prev,[section]:style}))}
+                chartLooks={chartLooks} chartProblems={chartProblems}/>
             </div>}
             {claims.map((raw,i)=>{const cl=asObj(raw);if(!cl)return null;return <div className="candidate" key={asStr(cl.claim_id)||String(i)}>
               <b>{asStr(cl.claim_id)||`Claim ${i+1}`}</b> <small>{asStr(cl.classification)} · confidence {asStr(cl.confidence)}</small>

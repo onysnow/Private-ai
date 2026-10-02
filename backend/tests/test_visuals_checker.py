@@ -176,6 +176,10 @@ def test_rule_9_no_random_colours_on_an_order():
     assert 9 in _rules(_check_with_option(_spec(), GOOD, rainbow).errors)
     assert 9 not in _rules(check_visual(_spec(highlight=["Meridian Holdings Ltd"]), GOOD, DARK).errors)
     assert 9 in _rules(check_visual(_spec(kind="treemap", sort="value_desc"), GOOD, DARK).warnings)
+    # Parts in size order are a ranking in disguise only when the order says
+    # nothing else: one that answers "part of a whole" gets no such warning.
+    assert 9 not in _rules(check_visual(_spec(kind="donut", question="part_of_whole"), GOOD, DARK).warnings)
+    assert 9 in _rules(check_visual(_spec(kind="donut"), GOOD, DARK).warnings)
 
 
 def test_rule_10_eight_colours_at_most():

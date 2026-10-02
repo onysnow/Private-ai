@@ -3,12 +3,17 @@
 // pairing, and -- when the slide has a visual -- that visual's layout preset
 // and options. Everything here is presentation only; the catalogue (GET
 // /api/presentation-styles) offers no control that could change a value or
-// start a bar above zero, so there is nothing misleading to pick.
+// start a bar above zero, so there is nothing misleading to pick. A checked
+// chart's presets and options come per chart family, and every change is
+// drawn and checked again by the backend before it shows (ChartControls).
 import type {ReactElement} from 'react';
 import {RotateCcw} from 'lucide-react';
 
-import type {DeckStyle, PresentationStyleCatalog, PresentationVisual, VisualOptionSpec, VisualOptionValue, VisualStyle, StyledVisual} from '../../lib/api-types';
+import type {ChartVisual, DeckStyle, PresentationStyleCatalog, PresentationVisual, VisualOptionSpec, VisualOptionValue, VisualStyle, StyledVisual} from '../../lib/api-types';
+import type {ChartRestyleOut} from '../../lib/generated/types.gen';
 import {Button} from '@/components/ui/button';
+import {kindName} from './chart-data';
+import {CheckReportView} from './check-report';
 import {resolveVisualStyle, isStyledVisual} from './slide-canvas';
 
 const CHOICE_LABEL: Record<string, string> = {
@@ -16,7 +21,55 @@ const CHOICE_LABEL: Record<string, string> = {
   thin: 'Thin', regular: 'Regular', thick: 'Thick',
   ring: 'Ring', dot: 'Dot',
   alert: 'Alert colour', accent: 'Accent colour', text: 'Text colour',
+  // A checked chart's choices (backend app/services/presentation_style.py CHART_OPTIONS).
+  as_ordered: 'As ordered', value_desc: 'Largest first', value_asc: 'Smallest first', label: 'By name',
+  all: 'Never: every part', doane: "Doane's rule (for skewed amounts)", sturges: "Sturges' rule",
+  auto: 'Every point when few, else the outliers', outliers: 'Only the outliers',
 };
+
+/** A checked chart's presets and options (app/visuals/style.py on the
+ * backend). What the chart can take, the value of every option and the
+ * warnings come from the restyle reply, which draws the chart again in the
+ * chosen style and checks it again; the report shows under the controls. */
+function ChartControls({catalog, chart, look, problem, sectionLabel, onVisualStyle}: {
+  catalog: PresentationStyleCatalog, chart: ChartVisual, look: ChartRestyleOut | null, problem: string | null, sectionLabel?: string,
+  onVisualStyle: (style: VisualStyle) => void,
+}): ReactElement {
+  const spec = look?.spec ?? chart.spec;
+  const kind = typeof spec.kind === 'string' ? spec.kind : '';
+  const family = catalog.chart_families?.[kind] ?? '';
+  const presets = (catalog.chart_presets?.[family] ?? []).filter(p => !look || look.presets.includes(p.id));
+  const specs = catalog.chart_options?.[family] ?? {};
+  const style = look?.style ?? {preset: '', options: {}};
+  const activePreset = style.preset || look?.default_preset || '';
+  const labels = chart.data.rows.map(row => row.label);
+  const setOption = (name: string, value: VisualOptionValue) => onVisualStyle({preset: style.preset || undefined, options: {...style.options, [name]: value}});
+  return <div className="grid gap-3 border-t border-border pt-4" data-testid="chart-style">
+    <div className="flex items-center justify-between gap-2">
+      <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{kindName(kind)}{sectionLabel ? ` · ${sectionLabel}` : ''}</div>
+      <Button type="button" size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={() => onVisualStyle({})} aria-label="Reset chart style"><RotateCcw className="mr-1 h-3.5 w-3.5"/>Reset</Button>
+    </div>
+    <div className="grid grid-cols-2 gap-1.5" role="radiogroup" aria-label="Chart preset">
+      {presets.map(p => <button key={p.id} type="button" role="radio" aria-checked={activePreset === p.id} title={p.description}
+        onClick={() => onVisualStyle({preset: p.id, options: {}})}
+        className={`rounded-md border px-2 py-1.5 text-left text-xs leading-tight transition-colors ${activePreset === p.id ? 'border-primary bg-primary/15 text-foreground' : 'border-border text-muted-foreground hover:text-foreground'}`}>{p.label}</button>)}
+    </div>
+    {look ? Object.entries(look.options).map(([name, value]) => {
+      const option = specs[name];
+      if (!option) return null;
+      const warnings = look.warnings.filter(w => w.option === name);
+      return <div key={name} className="grid gap-1">
+        <OptionControl name={name} spec={option} value={value} labels={labels} onChange={next => setOption(name, next)}/>
+        {/* Allowed but risky: the warning shows in place ("Keeping it honest"). */}
+        {warnings.map(w => <p key={w.message} role="note" className="text-xs leading-snug" style={{color: 'hsl(var(--destructive))'}}>⚠ {w.message}</p>)}
+      </div>;
+    }) : !problem && <p className="text-xs text-muted-foreground">Loading this chart&apos;s options…</p>}
+    {look?.warnings.filter(w => !(w.option in look.options && specs[w.option])).map(w => <p key={w.message} role="note" className="text-xs leading-snug" style={{color: 'hsl(var(--destructive))'}}>⚠ {w.message}</p>)}
+    {problem && <p role="alert" className="text-xs leading-snug">{problem}</p>}
+    {look && <div className="text-xs leading-snug"><CheckReportView report={look.report} kindName={kindName(kind)}/></div>}
+    <p className="text-xs leading-snug text-muted-foreground">Style changes how a chart looks, never its numbers. No control here can start an axis above zero, add 3D or a second value axis, pull a slice out, or open gaps between a histogram&apos;s bins, and the chart is checked again after every change.</p>
+  </div>;
+}
 const KIND_LABEL: Record<StyledVisual['type'], string> = {bar: 'Bar chart', timeline: 'Timeline', figures: 'Headline figures'};
 
 const selectClass = 'h-8 w-full rounded-md border border-input bg-transparent px-2 text-sm text-foreground';
@@ -53,15 +106,19 @@ export type StylePanelProps = {
   catalog: PresentationStyleCatalog,
   deckStyle: DeckStyle,
   onDeckStyle: (style: DeckStyle) => void,
-  /** The active slide's visual; only the three styled visuals take presets
-   * and options (a chart's look comes from the deck theme). */
+  /** The active slide's visual: the three drawn visuals take the presets and
+   * options of their type; a checked chart those of its family, with the
+   * restyle reply (`chartLook`) saying what it can take and how it checks. */
   visual: PresentationVisual | null,
   onVisualStyle: (style: VisualStyle) => void,
   sectionLabel?: string,
+  chartLook?: ChartRestyleOut | null,
+  chartProblem?: string | null,
 };
 
-export function StylePanel({catalog, deckStyle, onDeckStyle, visual: active, onVisualStyle, sectionLabel}: StylePanelProps): ReactElement {
+export function StylePanel({catalog, deckStyle, onDeckStyle, visual: active, onVisualStyle, sectionLabel, chartLook, chartProblem}: StylePanelProps): ReactElement {
   const visual = isStyledVisual(active) ? active : null;
+  const chart = active?.type === 'chart' ? active : null;
   const resolved = visual ? resolveVisualStyle(visual, catalog.visual_presets) : null;
   const presets = visual ? catalog.visual_presets[visual.type] : [];
   const specs = visual ? catalog.visual_options[visual.type] : {};
@@ -100,6 +157,7 @@ export function StylePanel({catalog, deckStyle, onDeckStyle, visual: active, onV
       </div>
       {Object.entries(specs).map(([name, spec]) => <OptionControl key={name} name={name} spec={spec} value={resolved.options[name]} labels={labels} onChange={value => setOption(name, value)}/>)}
       <p className="text-xs leading-snug text-muted-foreground">Style changes how a chart looks, never its numbers. Bars always start at zero.</p>
-    </div> : <p className="border-t border-border pt-4 text-xs text-muted-foreground">This slide has no chart. Pick a slide with a chart to style it.</p>}
+    </div> : chart ? <ChartControls catalog={catalog} chart={chart} look={chartLook ?? null} problem={chartProblem ?? null} sectionLabel={sectionLabel} onVisualStyle={onVisualStyle}/>
+      : <p className="border-t border-border pt-4 text-xs text-muted-foreground">This slide has no chart. Pick a slide with a chart to style it.</p>}
   </aside>;
 }

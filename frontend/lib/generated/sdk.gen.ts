@@ -261,6 +261,9 @@ import type {
   InvestigationVisualPreviewData,
   InvestigationVisualPreviewErrors,
   InvestigationVisualPreviewResponses,
+  InvestigationVisualRestyleData,
+  InvestigationVisualRestyleErrors,
+  InvestigationVisualRestyleResponses,
   LeadQueueData,
   LeadQueueErrors,
   LeadQueueResponses,
@@ -658,6 +661,9 @@ import {
   zInvestigationVisualPreviewBody,
   zInvestigationVisualPreviewPath,
   zInvestigationVisualPreviewResponse,
+  zInvestigationVisualRestyleBody,
+  zInvestigationVisualRestylePath,
+  zInvestigationVisualRestyleResponse,
   zLeadQueuePath,
   zLeadQueueQuery,
   zLeadQueueResponse,
@@ -4125,6 +4131,49 @@ export const investigationVisualPreview = <
     responseValidator: async (data) =>
       await zInvestigationVisualPreviewResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/visuals/preview',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Investigation Visual Restyle
+ *
+ * Draw a stored chart again in a style and a deck theme, and check it
+ * again: what the style panel shows for a chart. The chart's rows are
+ * drawn as given and never changed, and nothing is stored; a deck that is
+ * saved or exported checks its charts once more itself. The reply is the
+ * preview's, plus the style as it will be kept, the presets this chart can
+ * take, every option its kind offers with its value, and the warnings to
+ * show beside the controls.
+ */
+export const investigationVisualRestyle = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<InvestigationVisualRestyleData, ThrowOnError>,
+): RequestResult<
+  InvestigationVisualRestyleResponses,
+  InvestigationVisualRestyleErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    InvestigationVisualRestyleResponses,
+    InvestigationVisualRestyleErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zInvestigationVisualRestyleBody,
+          path: zInvestigationVisualRestylePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zInvestigationVisualRestyleResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/visuals/restyle',
     ...options,
     headers: {
       'Content-Type': 'application/json',

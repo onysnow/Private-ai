@@ -605,6 +605,35 @@ export const zChartKind = z.enum([
 ]);
 
 /**
+ * ChartOptionSpecOut
+ *
+ * What one chart option accepts. `kinds` and `series`, when sent, say
+ * which chart kinds and query shapes it is for; `warning`, when sent, is
+ * shown beside it while it is on.
+ */
+export const zChartOptionSpecOut = z.object({
+  kinds: z.array(z.string()).nullish(),
+  label: z.string(),
+  series: z.array(z.string()).nullish(),
+  type: z.enum(['bool', 'choice', 'labels']),
+  values: z.array(z.string()).nullish(),
+  warning: z.string().nullish(),
+});
+
+/**
+ * ChartPresetOut
+ *
+ * A named look for one chart family: the kind it draws and its option defaults.
+ */
+export const zChartPresetOut = z.object({
+  description: z.string(),
+  id: z.string(),
+  kind: z.string(),
+  label: z.string(),
+  options: z.record(z.union([z.boolean(), z.string(), z.array(z.string())])),
+});
+
+/**
  * CheckItemOut
  */
 export const zCheckItemOut = z.object({
@@ -3901,6 +3930,16 @@ export const zStatementPromotionRequest = z.object({
 });
 
 /**
+ * StyleWarningOut
+ *
+ * A warning the style panel shows beside one option's control.
+ */
+export const zStyleWarningOut = z.object({
+  message: z.string(),
+  option: z.string(),
+});
+
+/**
  * TaskWorkflowEventOut
  */
 export const zTaskWorkflowEventOut = z.object({
@@ -4316,26 +4355,6 @@ export const zVisualDataOut = z.object({
 });
 
 /**
- * ChartVisualOut
- *
- * A checked chart (app/ai/chart_check.py) as a deck keeps it: the order
- * slip, the data the Workbench cooked from the records (every value with
- * its records), the check report and the chart's words, as the draft or
- * the deck editor stored them; and the drawing that passed, when the deck
- * came from a checked draft. The deck insists only on a valid order slip
- * and its data (app/services/decks.py normalize_chart_visual), so the
- * report and the words are passed on as stored.
- */
-export const zChartVisualOut = z.object({
-  data: zVisualDataOut,
-  option: z.record(z.unknown()).nullish(),
-  report: z.record(z.unknown()),
-  spec: z.record(z.unknown()),
-  text: z.record(z.unknown()),
-  type: z.literal('chart'),
-});
-
-/**
  * VisualOptionSpecOut
  *
  * What one option accepts. `values` lists the choices and is sent only for a choice.
@@ -4393,6 +4412,9 @@ export const zVisualPresetsOut = z.object({
  * export reads the same catalogue, so the two cannot drift apart.
  */
 export const zPresentationStyleCatalogOut = z.object({
+  chart_families: z.record(z.string()),
+  chart_options: z.record(z.record(zChartOptionSpecOut)),
+  chart_presets: z.record(z.array(zChartPresetOut)),
   defaults: zDeckStyleOut,
   font_pairs: z.array(zFontPairOut),
   themes: z.array(zDeckThemeOut),
@@ -4478,6 +4500,7 @@ export const zVisualSpec = z.object({
   kind: zChartKind,
   limit: z.number().int().gte(1).lte(50).nullish(),
   query: zQueryRef,
+  question: z.string().nullish(),
   scale: zScale.optional().default('linear'),
   sort: zSortOrder.nullish(),
   stack: z.boolean().optional().default(false),
@@ -4493,6 +4516,19 @@ export const zVisualSpec = z.object({
 export const zVisualStyle = z.object({
   options: z.record(z.unknown()).optional(),
   preset: z.string().nullish(),
+});
+
+/**
+ * ChartRestyleRequest
+ *
+ * A stored chart (its `spec` and cooked `data`, as a draft or a deck
+ * holds it), the style to try on it, and the deck's theme and fonts
+ * (app/visuals/style.py). Nothing is stored.
+ */
+export const zChartRestyleRequest = z.object({
+  chart: z.record(z.unknown()),
+  deck_style: zDeckStyle.nullish(),
+  style: zVisualStyle.nullish(),
 });
 
 /**
@@ -4523,6 +4559,55 @@ export const zBarVisualOut = z.object({
   title: z.string(),
   type: z.literal('bar'),
   unit: z.string(),
+});
+
+/**
+ * ChartRestyleOut
+ *
+ * A stored chart drawn again in a style and a deck theme, and checked
+ * again (app/visuals/style.py): the preview's reply, plus the style as it
+ * will be kept (`preset` empty for the chart as it was ordered), the
+ * presets this chart can take, the one that draws it as ordered, every
+ * option its kind offers with its value, and the warnings to show beside
+ * the controls.
+ */
+export const zChartRestyleOut = z.object({
+  alt_text: z.string(),
+  data: zVisualDataOut,
+  data_table: zDataTableOut,
+  default_preset: z.string(),
+  description: z.string(),
+  height: z.number().int(),
+  option: z.record(z.unknown()),
+  options: z.record(z.union([z.boolean(), z.string(), z.array(z.string())])),
+  presets: z.array(z.string()),
+  report: zCheckReportOut,
+  source_line: z.string(),
+  spec: z.record(z.unknown()),
+  style: zVisualStyleOut,
+  warnings: z.array(zStyleWarningOut),
+  width: z.number().int(),
+});
+
+/**
+ * ChartVisualOut
+ *
+ * A checked chart (app/ai/chart_check.py) as a deck keeps it: the order
+ * slip, the data the Workbench cooked from the records (every value with
+ * its records), the check report and the chart's words, as the draft or
+ * the deck editor stored them; and the drawing that passed, when the deck
+ * came from a checked draft. The deck insists only on a valid order slip
+ * and its data (app/services/decks.py normalize_chart_visual), so the
+ * report and the words are passed on as stored.
+ */
+export const zChartVisualOut = z.object({
+  data: zVisualDataOut,
+  option: z.record(z.unknown()).nullish(),
+  report: z.record(z.unknown()),
+  spec: z.record(z.unknown()),
+  style: zVisualStyleOut.nullish(),
+  text: z.record(z.unknown()),
+  type: z.literal('chart'),
 });
 
 /**
@@ -5889,6 +5974,17 @@ export const zInvestigationVisualPreviewPath = z.object({
  * Successful Response
  */
 export const zInvestigationVisualPreviewResponse = zVisualPreviewOut;
+
+export const zInvestigationVisualRestyleBody = zChartRestyleRequest;
+
+export const zInvestigationVisualRestylePath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zInvestigationVisualRestyleResponse = zChartRestyleOut;
 
 export const zListWriteupsEndpointPath = z.object({
   investigation_id: z.string(),

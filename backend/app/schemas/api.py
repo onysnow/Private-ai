@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -372,6 +372,15 @@ class DeckStyle(BaseModel):
 class VisualStyle(BaseModel):
     preset: str | None = None
     options: dict = Field(default_factory=dict)
+
+
+class ChartRestyleRequest(BaseModel):
+    """A stored chart (its `spec` and cooked `data`, as a draft or a deck
+    holds it), the style to try on it, and the deck's theme and fonts
+    (app/visuals/style.py). Nothing is stored."""
+    chart: dict[str, Any]
+    style: VisualStyle | None = None
+    deck_style: DeckStyle | None = None
 
 
 class PromoteToDeckRequest(BaseModel):

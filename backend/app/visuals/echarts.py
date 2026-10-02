@@ -256,10 +256,14 @@ def _fold(rows: list[DataRow], keep: int) -> list[DataRow]:
 
 
 def check_fit(spec: VisualSpec, data: VisualData) -> None:
-    """Refuse an order whose kind cannot draw the query's rows at all, in
-    plain words that name what would fit (ChartDoesNotFit). A line over
+    """Refuse an order whose kind or query does not answer the question it
+    names, or whose kind cannot draw the query's rows at all, in plain
+    words that name what would fit (ChartDoesNotFit). A line over
     categories can be drawn and is left to the checker (rule 8)."""
     kind = spec.kind
+    answer = spec.question_problem()
+    if answer:
+        raise ChartDoesNotFit(answer)
     needs = SERIES_FOR_KIND.get(kind)
     if needs and data.series_kind not in needs:
         wanted = {"distribution": "one value per record, such as payment_amounts", "pairs": "two numbers per party, such as payments_count_and_total_by_party"}
