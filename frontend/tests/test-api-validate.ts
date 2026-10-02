@@ -1,122 +1,12 @@
 // Validator coverage for lib/api-validate.ts (STRUCT-0015): the runtime
 // guards that are supposed to catch a malformed backend response before it's
 // trusted as typed. Each test feeds a payload missing/wrong-typing a
-// required field and confirms the guard rejects it (returns false) or the
-// parse/json helper throws ApiPayloadError, rather than silently passing a
-// bad shape through.
+// required field and confirms the parse helper throws ApiPayloadError,
+// rather than silently passing a bad shape through. (The validators of the
+// replies that moved onto the generated API client went with them; the
+// generated Zod checks cover those, tests/test-generated-panels.test.tsx.)
 import {describe, expect, it} from 'vitest';
-import {
-  ApiPayloadError,
-  isCanonicalEntity,
-  isInvestigation,
-  isSettingsStatus,
-  isTimelineEvent,
-  jsonArray,
-  jsonObject,
-  parseEntityList,
-  parseInvestigationList,
-  parseSearchBody,
-} from '../lib/api-validate';
-
-const validInvestigation = {id: 'inv-1', name: 'Example Investigation'};
-const validEntity = {id: 'ent-1', caption: 'Example Entity', schema: 'Person', properties: {}};
-const validTimelineEvent = {
-  id: 't-1', kind: 'event', title: 'Something happened', date_start: '2026-01-01',
-  precision: 'day', verification_status: 'unverified', provenance: {}, refs: {},
-};
-describe('isInvestigation', () => {
-  it('accepts a well-formed investigation', () => {
-    expect(isInvestigation(validInvestigation)).toBe(true);
-  });
-  it('rejects a missing id', () => {
-    const {id: _id, ...rest} = validInvestigation;
-    expect(isInvestigation(rest)).toBe(false);
-  });
-  it('rejects a non-string name', () => {
-    expect(isInvestigation({...validInvestigation, name: 42})).toBe(false);
-  });
-  it('rejects null and arrays', () => {
-    expect(isInvestigation(null)).toBe(false);
-    expect(isInvestigation([validInvestigation])).toBe(false);
-  });
-});
-
-describe('isCanonicalEntity', () => {
-  it('accepts a well-formed entity', () => {
-    expect(isCanonicalEntity(validEntity)).toBe(true);
-  });
-  it('rejects a missing schema', () => {
-    const {schema: _schema, ...rest} = validEntity;
-    expect(isCanonicalEntity(rest)).toBe(false);
-  });
-  it('rejects properties that are not an object', () => {
-    expect(isCanonicalEntity({...validEntity, properties: 'not-an-object'})).toBe(false);
-  });
-});
-
-describe('isTimelineEvent', () => {
-  it('accepts a well-formed event', () => {
-    expect(isTimelineEvent(validTimelineEvent)).toBe(true);
-  });
-  it('rejects a missing verification_status', () => {
-    const {verification_status: _vs, ...rest} = validTimelineEvent;
-    expect(isTimelineEvent(rest)).toBe(false);
-  });
-  it('rejects provenance that is not an object', () => {
-    expect(isTimelineEvent({...validTimelineEvent, provenance: 'not-an-object'})).toBe(false);
-  });
-});
-
-describe('isSettingsStatus', () => {
-  it('rejects a payload missing the connectors object entirely', () => {
-    expect(isSettingsStatus({})).toBe(false);
-  });
-});
-
-describe('jsonObject / jsonArray (response-shape guarding)', () => {
-  const endpoint = '/api/test';
-
-  it('throws ApiPayloadError when the response body is not valid JSON', async () => {
-    const response = new Response('not json', {status: 200});
-    await expect(jsonObject(response, endpoint, 'investigation', isInvestigation)).rejects.toThrow(ApiPayloadError);
-  });
-
-  it('throws ApiPayloadError when the parsed JSON does not match the guard', async () => {
-    const response = new Response(JSON.stringify({unexpected: 'shape'}), {status: 200});
-    await expect(jsonObject(response, endpoint, 'investigation', isInvestigation)).rejects.toThrow(ApiPayloadError);
-  });
-
-  it('returns the parsed value when it matches the guard', async () => {
-    const response = new Response(JSON.stringify(validInvestigation), {status: 200});
-    await expect(jsonObject(response, endpoint, 'investigation', isInvestigation)).resolves.toEqual(validInvestigation);
-  });
-
-  it('jsonArray rejects a non-array payload', async () => {
-    const response = new Response(JSON.stringify({not: 'an array'}), {status: 200});
-    await expect(jsonArray(response, endpoint, 'investigations', isInvestigation)).rejects.toThrow(ApiPayloadError);
-  });
-
-  it('jsonArray rejects an array containing one malformed item', async () => {
-    const response = new Response(JSON.stringify([validInvestigation, {id: 'bad-only'}]), {status: 200});
-    await expect(jsonArray(response, endpoint, 'investigations', isInvestigation)).rejects.toThrow(ApiPayloadError);
-  });
-});
-
-describe('parseInvestigationList / parseEntityList', () => {
-  const endpoint = '/api/test';
-
-  it('parses a valid investigation array', () => {
-    expect(parseInvestigationList([validInvestigation], endpoint)).toEqual([validInvestigation]);
-  });
-
-  it('throws on a malformed investigation in the array', () => {
-    expect(() => parseInvestigationList([{name: 'missing id'}], endpoint)).toThrow(ApiPayloadError);
-  });
-
-  it('throws on a malformed entity in the array', () => {
-    expect(() => parseEntityList([{id: 'e', caption: 'c'}], endpoint)).toThrow(ApiPayloadError);
-  });
-});
+import {ApiPayloadError, parseSearchBody} from '../lib/api-validate';
 
 describe('parseSearchBody', () => {
   const endpoint = '/api/search';
@@ -132,35 +22,5 @@ describe('parseSearchBody', () => {
 
   it('throws when results is not an array', () => {
     expect(() => parseSearchBody({results: 'nope', counts: {}, group_counts: {}}, endpoint)).toThrow(ApiPayloadError);
-  });
-});
-
-describe('isSettingsStatus with the optional security block (STRUCT-0035)', () => {
-  it('accepts a payload without it, with a valid one, and rejects a malformed one', async () => {
-    const {isSettingsStatus, isSecurityAlerts} = await import('../lib/api-validate');
-    const base = {
-      environment: 'test', database: 'sqlite', document_storage_dir: '/d', limits: {}, restore_api_enabled: false,
-      document_extraction: {pdf_ocr_enabled: false, pdf_ocr_language: 'eng', pdf_ocr_dpi: 200, pdf_ocr_min_native_chars: 20, local_entity_suggestions_enabled: true, entity_extraction_owner: 'workbench_local', ocr_runtime: {available: false, requested_languages: [], missing_languages: [], detail: 'off'}},
-      access: {remote_api_enabled: false, mode: 'local_only', token_configured: false}, cors_allowed_origins: [], connectors: {},
-    };
-    expect(isSettingsStatus(base)).toBe(true);
-    const security = {window_hours: 24, since: '2026-09-22T00:00:00+00:00', total_denials: 2, by_event: {access_denied: 2}, remote_hosts: [{client_host: '203.0.113.9', count: 2}], recent: [], attention_threshold: 20, needs_attention: false, records_scanned: 9, malformed_lines: 0, read_error: false};
-    expect(isSecurityAlerts(security)).toBe(true);
-    expect(isSettingsStatus({...base, security})).toBe(true);
-    expect(isSettingsStatus({...base, security: {...security, needs_attention: 'no'}})).toBe(false);
-  });
-});
-
-describe('isSettingsStatus with document_extraction.ocr_runtime.detail', () => {
-  it('accepts null (the healthy-OCR default returned by backend/app/services/pdf_ocr.py), a string, but rejects other types', async () => {
-    const {isSettingsStatus} = await import('../lib/api-validate');
-    const base = {
-      environment: 'test', database: 'sqlite', document_storage_dir: '/d', limits: {}, restore_api_enabled: false,
-      document_extraction: {pdf_ocr_enabled: false, pdf_ocr_language: 'eng', pdf_ocr_dpi: 200, pdf_ocr_min_native_chars: 20, local_entity_suggestions_enabled: true, entity_extraction_owner: 'workbench_local', ocr_runtime: {available: false, requested_languages: [], missing_languages: [], detail: null as unknown as string}},
-      access: {remote_api_enabled: false, mode: 'local_only', token_configured: false}, cors_allowed_origins: [], connectors: {},
-    };
-    expect(isSettingsStatus(base)).toBe(true);
-    expect(isSettingsStatus({...base, document_extraction: {...base.document_extraction, ocr_runtime: {...base.document_extraction.ocr_runtime, detail: 'tesseract not found'}}})).toBe(true);
-    expect(isSettingsStatus({...base, document_extraction: {...base.document_extraction, ocr_runtime: {...base.document_extraction.ocr_runtime, detail: 42 as unknown as string}}})).toBe(false);
   });
 });

@@ -2,7 +2,7 @@
 // STRUCT-0040 / issue #40: coverage for CaseTimeline.
 //
 // components/charts/chart.tsx is mocked so these tests assert what this
-// component owns: building timeline lanes/data from TimelineEvent records,
+// component owns: building timeline lanes/data from timeline event records,
 // excluding unparseable dates (and counting them), and distinguishing
 // ranged vs. point events -- not echarts's own canvas rendering.
 import {cleanup, render, screen} from '@testing-library/react';
@@ -18,19 +18,16 @@ vi.mock('../components/charts/chart', () => ({
 }));
 
 import {CaseTimeline} from '../components/charts/case-timeline';
-import type {TimelineEvent} from '../lib/api-types';
+import type {CaseTimelineEvent} from '../components/charts/case-timeline';
 
 afterEach(() => {
   cleanup();
   chartSpy.mockClear();
 });
 
-function event(overrides: Partial<TimelineEvent> & Pick<TimelineEvent, 'id' | 'kind' | 'title' | 'date_start'>): TimelineEvent {
+function event(overrides: Partial<CaseTimelineEvent> & Pick<CaseTimelineEvent, 'id' | 'kind' | 'title' | 'date_start'>): CaseTimelineEvent {
   return {
-    precision: 'day',
     verification_status: 'asserted',
-    provenance: {},
-    refs: {},
     ...overrides,
   };
 }

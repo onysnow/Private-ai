@@ -19,10 +19,9 @@ import {Textarea} from './ui/textarea';
 import {Badge} from './ui/badge';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from './ui/select';
 
-// The board asks only for what it draws, so a lead fits whether it came
-// through the generated API client (LeadOut) or the hand-written types
-// (LeadItem). The feature that loads the queue (features/leads) makes the
-// changes the callbacks report.
+// The board asks only for what it draws, so a lead from the generated API
+// client (LeadOut) fits as it is. The feature that loads the queue
+// (features/leads) makes the changes the callbacks report.
 export type LeadLinkCard = {id?: string | null; type?: string | null; target_id?: string | null; label?: string | null; note?: string | null};
 export type TaskCard = {id: string; title?: string | null; status?: string | null; history?: unknown[] | null};
 export type LeadCard = {
