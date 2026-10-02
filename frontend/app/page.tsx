@@ -17,6 +17,7 @@ import {PanelErrorBoundary} from '../components/panel-error-boundary';
 import {ApiAccessPanel} from '../features/api-access/api-access-panel';
 import {useApiAccess} from '../features/api-access/use-api-access';
 import {BackupPanel} from '../features/backups/backup-panel';
+import {ChartBuilderPanel} from '../features/charts/chart-builder-panel';
 import {ClaimsPanel} from '../features/claims/claims-panel';
 import {ConnectorsPanel} from '../features/connectors/connectors-panel';
 import {DeletionPanel} from '../features/deletion/deletion-panel';
@@ -162,6 +163,10 @@ function Workbench(): ReactElement {
     <div className="section-group"><h4 className="group-label">Document workflow</h4><div className="section-stack">
       <PanelErrorBoundary name="Document ingestion & extraction"><DocumentsPanel investigationId={inv}/></PanelErrorBoundary>
       <PanelErrorBoundary name="Questions & reporting leads"><LeadsPanel investigationId={inv}/></PanelErrorBoundary>
+    </div></div>
+    {/* A chart from the records without the AI; keyed by case, so a new case starts a new chart. */}
+    <div className="section-group"><h4 className="group-label">Charts from the records</h4><div className="section-stack">
+      <PanelErrorBoundary name="Chart builder"><ChartBuilderPanel key={inv} investigationId={inv}/></PanelErrorBoundary>
     </div></div>
     <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation}/>
     <div className="section-group"><h4 className="group-label">Investigation maintenance</h4><div className="page-grid-2">

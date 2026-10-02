@@ -10,9 +10,10 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 import type {KeyboardEvent, ReactElement} from 'react';
 import {ChevronLeft, ChevronRight} from 'lucide-react';
 
-import type {AiCitationRef, ChartVisual, CitationDetail, DeckSlide, DeckStyle, JsonObject, JsonValue, PresentationDraftPayload, PresentationSection, PresentationStyleCatalog, PresentationVisual, QuotedRef, VisualStyle} from '../../lib/api-types';
+import type {AiCitationRef, CitationDetail, DeckSlide, DeckStyle, JsonObject, JsonValue, PresentationDraftPayload, PresentationSection, PresentationStyleCatalog, PresentationVisual, QuotedRef, VisualStyle} from '../../lib/api-types';
 import {Button} from '@/components/ui/button';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import {asChart, isObj, refs, str} from './chart-data';
 import {DECK, SlideCanvas, SlideStyleProvider, SourcesCanvas, buildCitationLookup, displayDate, formatValue, isStyledVisual, refKey, resolveTheme} from './slide-canvas';
 
 // ECharts loads only when a brief actually holds a chart.
@@ -22,37 +23,10 @@ import type {CitationLookup} from './slide-canvas';
 
 export type TraceHandler = (detail: CitationDetail) => void;
 
-const isObj = (v: JsonValue | undefined): v is JsonObject => typeof v === 'object' && v !== null && !Array.isArray(v);
-const str = (v: JsonValue | undefined) => (typeof v === 'string' ? v : '');
-const refs = (v: JsonValue | undefined): AiCitationRef[] => (Array.isArray(v) ? v.filter(isObj).filter(r => typeof r.record_type === 'string' && typeof r.record_id === 'string').map(r => ({record_type: r.record_type as string, record_id: r.record_id as string})) : []);
-
 const quotedRefs = (v: JsonValue | undefined): QuotedRef[] => (Array.isArray(v) ? v.filter(isObj)
   .filter(r => typeof r.record_type === 'string' && typeof r.record_id === 'string' && typeof r.matched_text === 'string')
   .map(r => ({record_type: r.record_type as string, record_id: r.record_id as string, matched_text: r.matched_text as string,
     locator: typeof r.locator === 'string' ? r.locator : null})) : []);
-
-/** A chart is stored resolved (backend app/ai/chart_check.py): its rows,
- * the checked drawing and its words. Anything less is not drawn. */
-function asChart(v: JsonObject): ChartVisual | null {
-  const data = v.data, option = v.option, text = v.text, spec = v.spec;
-  if (!isObj(data) || !Array.isArray(data.rows) || !isObj(option) || !isObj(text) || !isObj(spec)) return null;
-  const table = isObj(text.data_table) ? text.data_table : null;
-  if (!table || !Array.isArray(table.columns) || !Array.isArray(table.rows)) return null;
-  const rows = data.rows.filter(isObj).filter(r => typeof r.label === 'string' && typeof r.value === 'number')
-    .map(r => ({...r, label: r.label as string, value: r.value as number, record_refs: refs(r.record_refs), record_count: typeof r.record_count === 'number' ? r.record_count : 0}));
-  const tableRows = table.rows.filter(isObj).filter(r => typeof r.label === 'string' && typeof r.value === 'number')
-    .map(r => ({label: r.label as string, value: r.value as number, formatted: str(r.formatted), record_count: typeof r.record_count === 'number' ? r.record_count : 0, record_refs: refs(r.record_refs),
-      // Only the kinds that write them: a part's share, a scatter plot's second number.
-      ...(typeof r.share === 'number' ? {share: r.share} : {}),
-      ...(typeof r.x === 'number' ? {x: r.x} : {}),
-      ...(typeof r.x_formatted === 'string' ? {x_formatted: r.x_formatted} : {})}));
-  return {
-    type: 'chart', spec, option, data: {...data, rows},
-    width: typeof v.width === 'number' ? v.width : undefined, height: typeof v.height === 'number' ? v.height : undefined,
-    text: {alt_text: str(text.alt_text), description: str(text.description), source_line: str(text.source_line),
-      data_table: {columns: table.columns.map(c => str(c)), rows: tableRows}},
-  };
-}
 
 function asVisual(v: JsonValue | undefined): PresentationVisual | null {
   if (isObj(v) && v.type === 'chart') return asChart(v);

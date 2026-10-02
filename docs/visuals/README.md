@@ -161,6 +161,22 @@ order slip  →  kitchen  →  checker  →  drawing  →  review
   with a citation marker on every row, then the source line. When the
   render service is unreachable the brief says so and shows the values as a
   table instead.
+- **The chart builder** (`frontend/features/charts/chart-builder-panel.tsx`,
+  "Charts from the records" on the workbench page): a reporter makes a
+  checked chart with no AI involved. It writes the same order slip the AI
+  writes and chooses the same way: first the question the chart answers
+  (the catalogue's questions; flow is shown but not drawn yet), then the
+  data that answers it (only the queries listed under that question, with
+  their parameters; a query with no records is listed but cannot be
+  picked), then one of the question's kinds that can draw that data, best
+  first, and a title that states the finding. The preview route cooks,
+  draws and checks it: the panel shows the chart (ECharts loaded on
+  demand), its source line, description and data table, every record
+  behind a value as a link to the provenance trace, and the check report,
+  with every failed rule and every warning by its number and name and the
+  checker's own words. A kind that cannot draw the data comes back as the
+  route's 422 reason. The catalogue runs every query once, so it is asked
+  for only when the builder is opened. Nothing is stored.
 - **Preview** (`POST /api/investigations/{id}/visuals/preview`): the data,
   the ECharts option, the check report, the alt text, the description and the
   data table for one order slip, with no AI involved. `GET
@@ -278,8 +294,10 @@ TZ=UTC PYTHONPATH=. python -m pytest tests/test_visuals_*.py -q --no-cov
 Built: the drawing of the seven statistical kinds, the two queries they
 needed (`payment_amounts`, `payments_count_and_total_by_party`), the
 question-first chooser, a checker that judges every rule for each kind
-and says which rules do not apply, and every kind in both exports (native
-PowerPoint charts, the treemap as a picture; a PNG in the brief).
+and says which rules do not apply, every kind in both exports (native
+PowerPoint charts, the treemap as a picture; a PNG in the brief), every
+kind in the app's preview, the AI's order slip chosen by question, and the
+chart builder a reporter uses without the AI.
 
 Left for later passes:
 
