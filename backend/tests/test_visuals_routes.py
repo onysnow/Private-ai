@@ -4,6 +4,7 @@ scope that every route in this app keeps."""
 
 from typing import Any
 
+import pytest
 from fastapi.encoders import jsonable_encoder
 from fastapi.testclient import TestClient
 from pydantic import TypeAdapter
@@ -50,7 +51,9 @@ def test_catalog_lists_the_menu_for_this_investigation():
     assert by_name["payments_by_party"]["has_data"] is True
     assert by_name["payments_by_party"]["params"]["currency"]["choices"] is None
     assert by_name["documents_by_status"]["has_data"] is False
-    assert body["drawn_kinds"] == ["bar", "column"]
+    assert body["drawn_kinds"] == ["area", "bar", "column", "donut", "histogram", "line", "scatter", "stacked_bar_100", "treemap"]
+    assert [q["id"] for q in body["questions"]] == ["ranking", "change_over_time", "part_of_whole", "distribution", "correlation", "flow"]
+    assert by_name["payment_amounts"]["questions"] == ["ranking", "distribution"]
     assert client.get("/api/investigations/nope/visuals/catalog").status_code == 404
 
 
@@ -107,6 +110,78 @@ def test_response_models_keep_every_field():
             "source_line": built.source_line, "width": built.width, "height": built.height,
         }
         _same_through_model(r.VisualPreviewOut, reply)
+
+
+def _demo_with_payments() -> str:
+    """The demo investigation with more payments, so every statistical kind
+    has something to draw: amounts to bin, parties to rank and plot, months
+    to follow."""
+    from app.models.domain import Entity
+    from app.services.relationships import create_relationship
+
+    with SessionLocal() as db:
+        inv, _ = seed_demo_investigation(db)
+        ids = {e.caption: e.id for e in db.query(Entity).filter_by(investigation_id=inv.id).all()}
+        for payer, payee, amount, date in (
+            ("Meridian Holdings Ltd", "Harborline Civic Trust", "5000", "2023-12-02"), ("Meridian Holdings Ltd", "Harborline Civic Trust", "7000", "2024-01-15"),
+            ("Meridian Holdings Ltd", "Alaric Voss", "45000", "2024-01-20"), ("Bellcastle Trading Group", "Alaric Voss", "250000", "2024-02-03"),
+            ("Meridian Holdings Ltd", "Priya Kavanagh", "12000", "2024-02-11"),
+        ):
+            create_relationship(db, investigation_id=inv.id, schema="Payment", source_entity_id=ids[payer], target_entity_id=ids[payee],
+                                properties={"amount": [amount], "currency": ["USD"], "date": [date]})
+        return inv.id
+
+
+KIND_ORDERS = {
+    "line": {"kind": "line", "title": "Payments fell after the November transfer", "query": {"name": "payments_over_time"}},
+    "area": {"kind": "area", "title": "Payments fell after the November transfer", "query": {"name": "payments_over_time"}},
+    "stacked_bar_100": {"kind": "stacked_bar_100", "title": "Meridian received most of the money", "query": {"name": "payments_by_party"}},
+    "donut": {"kind": "donut", "title": "Meridian received most of the money", "query": {"name": "payments_by_party"}, "limit": 3},
+    # The payments are too lopsided for a treemap to name each part (rule 12); the kinds of link are not.
+    "treemap": {"kind": "treemap", "title": "Payments are most of the links", "query": {"name": "links_by_type"}},
+    "histogram": {"kind": "histogram", "title": "Most payments were small", "query": {"name": "payment_amounts"}},
+    "scatter": {"kind": "scatter", "title": "Meridian took one large payment", "query": {"name": "payments_count_and_total_by_party"}},
+}
+
+
+def test_preview_draws_and_checks_every_statistical_kind():
+    inv_id = _demo_with_payments()
+    for kind, order in KIND_ORDERS.items():
+        response = client.post(f"/api/investigations/{inv_id}/visuals/preview", json=order)
+        assert response.status_code == 200, (kind, response.text)
+        body = response.json()
+        assert body["spec"]["kind"] == kind and body["report"]["ok"] is True, (kind, body["report"]["errors"])
+        assert body["option"]["series"] and body["data_table"]["rows"] and body["alt_text"]
+        assert set(body["report"]["not_applicable"]).isdisjoint({str(r) for r in body["report"]["checked_rules"]})
+    scatter = client.post(f"/api/investigations/{inv_id}/visuals/preview", json=KIND_ORDERS["scatter"]).json()
+    assert scatter["data"]["measure_labels"]["x"] == "Number of payments received" and "x" in scatter["data"]["rows"][0]
+    assert "x_formatted" in scatter["data_table"]["rows"][0]
+    donut = client.post(f"/api/investigations/{inv_id}/visuals/preview", json=KIND_ORDERS["donut"]).json()
+    assert sum(row["share"] for row in donut["data_table"]["rows"]) == pytest.approx(100, abs=0.5)
+
+
+def test_preview_refuses_a_kind_that_cannot_draw_the_query():
+    inv_id = _demo_id()
+    response = client.post(f"/api/investigations/{inv_id}/visuals/preview", json={**SPEC, "kind": "histogram"})
+    assert response.status_code == 422 and "a histogram needs one value per record" in response.text
+    pairs = client.post(f"/api/investigations/{inv_id}/visuals/preview", json={**KIND_ORDERS["scatter"], "kind": "bar"})
+    assert pairs.status_code == 422 and "draw it as a scatter plot" in pairs.text
+
+
+def test_response_models_keep_every_field_for_every_kind():
+    inv_id = _demo_with_payments()
+    with SessionLocal() as db:
+        for order in KIND_ORDERS.values():
+            spec = parse_spec(order)
+            data = run_query(db, inv_id, spec.query)
+            theme = theme_for(spec.theme)
+            built = build_chart(spec, data, theme)
+            report = check_visual(spec, data, theme, built)
+            _same_through_model(r.VisualPreviewOut, {
+                "spec": spec.model_dump(mode="json"), "data": data.as_dict(), "option": built.option, "report": report.as_dict(),
+                "alt_text": built.alt_text, "description": built.description, "data_table": built.data_table,
+                "source_line": built.source_line, "width": built.width, "height": built.height,
+            })
 
 
 def test_operation_ids_follow_the_route_names():

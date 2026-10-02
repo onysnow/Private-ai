@@ -5,6 +5,7 @@ packages are missing)."""
 
 import json
 import os
+import re
 import shutil
 import socket
 import subprocess
@@ -15,7 +16,7 @@ import httpx
 import pytest
 
 from app.core.config import Settings
-from app.services.presentation_style import theme as theme_for
+from app.services.presentation_style import font_stack, theme as theme_for
 from app.visuals.data_service import DataRow, RecordRef, VisualData
 from app.visuals.echarts import build_chart
 from app.visuals.render_client import RenderUnavailable, render_png, render_service_status, render_svg, svg_to_png
@@ -97,9 +98,13 @@ def _node() -> str | None:
     return None
 
 
-@pytest.mark.skipif(_node() is None, reason="node is not installed")
-@pytest.mark.skipif(not (RENDER_DIR / "node_modules" / "echarts").exists(), reason="render/node_modules is missing: run `npm ci` in render/")
-def test_the_live_render_service_draws_a_house_style_chart():
+@pytest.fixture()
+def live_service():
+    """render/server.mjs on a free port, for as long as the test runs."""
+    if _node() is None:
+        pytest.skip("node is not installed")
+    if not (RENDER_DIR / "node_modules" / "echarts").exists():
+        pytest.skip("render/node_modules is missing: run `npm ci` in render/")
     port = _free_port()
     process = subprocess.Popen([_node() or "node", "server.mjs"], cwd=RENDER_DIR, env={**os.environ, "PORT": str(port), "HOST": "127.0.0.1"},
                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
@@ -113,16 +118,70 @@ def test_the_live_render_service_draws_a_house_style_chart():
             time.sleep(0.1)
         else:
             raise AssertionError("render service did not come up")
-        built = _built()
-        svg = render_svg(built.option, built.width, built.height, settings=settings)
-        assert svg.startswith("<svg") and 'width="960"' in svg
-        assert "Meridian received most of the money" in svg
-        assert "Meridian Holdings Ltd" in svg and "$2.4M" in svg
-        png = svg_to_png(svg)
-        assert png.startswith(b"\x89PNG")
+        yield settings
     finally:
         process.terminate()
         try:
             process.wait(timeout=10)
         except subprocess.TimeoutExpired:
             process.kill()
+
+
+def test_the_live_render_service_draws_a_house_style_chart(live_service):
+    built = _built()
+    svg = render_svg(built.option, built.width, built.height, settings=live_service)
+    assert svg.startswith("<svg") and 'width="960"' in svg
+    assert "Meridian received most of the money" in svg
+    assert "Meridian Holdings Ltd" in svg and "$2.4M" in svg
+    png = svg_to_png(svg)
+    assert png.startswith(b"\x89PNG")
+
+
+def _kind_data() -> dict[str, tuple[str, VisualData]]:
+    parties = [DataRow("Meridian Holdings Ltd", 2400000, [RecordRef("relationship", "r1")], 1, "Meridian Holdings Ltd"),
+               DataRow("Alaric Voss", 295000, [RecordRef("relationship", "r2"), RecordRef("relationship", "r3")], 2, "Alaric Voss"),
+               DataRow("Harborline Civic Trust", 12000, [RecordRef("relationship", "r4"), RecordRef("relationship", "r5")], 2, "Harborline Civic Trust")]
+    category = VisualData("inv", "payments_by_party", {}, "USD", "amount", "category", "payments", parties, "USD", 5)
+    months = [DataRow("Nov 2023", 2400000, [RecordRef("relationship", "r1")], 1, "2023-11"),
+              DataRow("Dec 2023", 5000, [RecordRef("relationship", "r4")], 1, "2023-12"),
+              DataRow("Jan 2024", 52000, [RecordRef("relationship", "r2"), RecordRef("relationship", "r5")], 2, "2024-01")]
+    time_data = VisualData("inv", "payments_over_time", {}, "USD", "amount", "time", "payments", months, "USD", 4)
+    amounts = [DataRow(f"Payment {i}", v, [RecordRef("relationship", f"p{i}")], 1, f"Payment {i}") for i, v in enumerate((5000, 7000, 12000, 45000, 250000, 2400000))]
+    distribution = VisualData("inv", "payment_amounts", {}, "USD", "amount", "distribution", "payments", amounts, "USD", 6)
+    pairs = [DataRow(row.label, row.value, row.record_refs, row.record_count, row.key, x=float(row.record_count)) for row in parties]
+    pair_data = VisualData("inv", "payments_count_and_total_by_party", {}, "USD", "amount", "pairs", "payments", pairs, "USD", 5,
+                           x_unit="payments", x_unit_kind="count", measure_labels={"x": "Number of payments received", "y": "Total received (USD)"})
+    return {"line": ("payments_over_time", time_data), "area": ("payments_over_time", time_data), "stacked_bar_100": ("payments_by_party", category),
+            "donut": ("payments_by_party", category), "treemap": ("payments_by_party", category), "histogram": ("payment_amounts", distribution),
+            "scatter": ("payments_count_and_total_by_party", pair_data)}
+
+
+def test_the_live_render_service_draws_every_statistical_kind(live_service):
+    """render/server.mjs imports the whole `echarts` package (its index.js
+    registers every chart, component and feature), so each kind's option
+    draws as it does in the app: the title, the parts' names and the values
+    come back in the SVG, and vl-convert turns each into a PNG."""
+    for kind, (query, data) in _kind_data().items():
+        spec = parse_spec({"kind": kind, "title": "Meridian received most of the money", "query": {"name": query}})
+        built = build_chart(spec, data, theme_for("dark_academia"))
+        svg = render_svg(built.option, built.width, built.height, settings=live_service)
+        assert svg.startswith("<svg") and "Meridian received most of the money" in svg, kind
+        expected = {"line": "$52K", "area": "$52K", "histogram": "$500K", "scatter": "Meridian Holdings Ltd"}.get(kind, "Alaric Voss")
+        assert expected in svg.replace("&#36;", "$"), (kind, expected)
+        png = svg_to_png(svg)
+        assert png.startswith(b"\x89PNG"), kind
+        # The words reach the picture: with them taken out it comes out different.
+        # (Named only "Calibri", every word was dropped on a host without Calibri.)
+        assert png != svg_to_png(_without_text(svg)), kind
+
+
+def _without_text(svg: str) -> str:
+    return re.sub(r"<text\b[^>]*>.*?</text>", "", svg, flags=re.S)
+
+
+def test_vl_convert_draws_text_set_in_a_font_this_host_may_lack():
+    # The font list the drawing writes (presentation_style.font_stack), as
+    # ECharts writes it into the SVG: the theme's face, then generic families.
+    words = (f'<svg xmlns="http://www.w3.org/2000/svg" width="300" height="60"><text x="10" y="40" '
+             f'style="font-size:24px;font-family:{font_stack("Calibri")};" fill="#000">Meridian $2.4M</text></svg>')
+    assert svg_to_png(words, scale=1.0) != svg_to_png(_without_text(words), scale=1.0)

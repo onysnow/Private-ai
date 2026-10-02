@@ -58,7 +58,7 @@ def test_bar_chart_follows_the_house_style():
     assert option["backgroundColor"] == "#F7F2E8"
     assert option["title"][0]["text"] == "Meridian received most of the money"
     assert option["title"][0]["subtext"] == "Amounts in USD"
-    assert option["title"][0]["textStyle"]["fontFamily"] == "Georgia"
+    assert option["title"][0]["textStyle"]["fontFamily"] == "'Georgia', serif, sans-serif"
     assert option["title"][1]["text"].startswith("Source: 7 payments")
     assert f"{SINGLE_RECORD_MARK} rests on one record" in option["title"][1]["text"]
     # Zero baseline, no vertical gridlines, a dark zero line on the category axis.
@@ -111,10 +111,40 @@ def test_theme_colours_and_fonts_come_from_the_style_layer():
     option = build_option(_spec(theme="ledger"), RANKED, theme_for("ledger"))
     assert option["backgroundColor"] == "#FBFCFD"
     assert option["color"] == ["#13837A"]
-    assert option["title"][0]["textStyle"]["fontFamily"] == "IBM Plex Serif"
-    assert option["textStyle"]["fontFamily"] == "IBM Plex Sans"
+    assert option["title"][0]["textStyle"]["fontFamily"] == "'IBM Plex Serif', serif, sans-serif"
+    assert option["textStyle"]["fontFamily"] == "'IBM Plex Sans', sans-serif"
     paired = resolved_theme({"theme": "dark_academia", "fonts": "modern"})
-    assert build_option(_spec(), RANKED, paired)["title"][0]["textStyle"]["fontFamily"] == "Newsreader"
+    assert build_option(_spec(), RANKED, paired)["title"][0]["textStyle"]["fontFamily"] == "'Newsreader', serif, sans-serif"
+
+
+def test_every_font_a_chart_names_ends_in_a_generic_family():
+    # The export's PNG is drawn where the theme's face may not be installed;
+    # a list that ends in a generic family still finds one (font_stack).
+    themes = [theme_for(name) for name in ("dark_academia", "newsprint", "ledger", "high_contrast")]
+    themes += [resolved_theme({"theme": "dark_academia", "fonts": pair}) for pair in ("classic", "modern", "technical", "traditional",
+                                                                                     "expressive", "bookish", "multilingual", "editorial")]
+    parts = _data([("A", 30, 3), ("B", 20, 2)])
+    pairs = _data([("A", 30, 3), ("B", 20, 2)], series_kind="pairs", query="payments_count_and_total_by_party")
+    pairs.rows = [DataRow(r.label, r.value, r.record_refs, r.record_count, key=r.key, x=float(r.record_count)) for r in pairs.rows]
+    for theme in themes:
+        for kind, data in (("bar", parts), ("donut", parts), ("scatter", pairs)):
+            families = set(_font_families(build_option(_spec(kind=kind, query={"name": data.query}), data, theme)))
+            assert families, theme.id
+            for family in families:
+                assert family.endswith(", sans-serif") and family.startswith("'"), (theme.id, kind, family)
+                assert '"' not in family   # it goes into a double-quoted SVG attribute unescaped
+
+
+def _font_families(node):
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if key == "fontFamily":
+                yield value
+            else:
+                yield from _font_families(value)
+    elif isinstance(node, list):
+        for item in node:
+            yield from _font_families(item)
 
 
 def test_words_beside_the_chart():
@@ -144,7 +174,7 @@ def test_format_value_is_compact_and_honest():
 
 def test_kinds_not_drawn_yet_raise_a_clear_error():
     with pytest.raises(UnsupportedChartKind, match="not drawn yet"):
-        build_chart(parse_spec({"kind": "line", "title": "Events rose in 2020", "query": {"name": "events_over_time"}}), OVER_TIME, DARK)
+        build_chart(parse_spec({"kind": "sankey", "title": "The money flowed to Meridian", "query": {"name": "payments_by_party"}}), RANKED, DARK)
 
 
 # --- metamorphic tests (McNutt et al. 2020) ------------------------------------------

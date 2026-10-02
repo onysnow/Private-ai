@@ -52,7 +52,10 @@ def _check_with_option(spec: VisualSpec, data: VisualData, mutate) -> CheckRepor
 def test_the_house_style_chart_passes_every_rule_it_can_check():
     report = check_visual(_spec(), GOOD, DARK)
     assert report.ok and report.errors == []
-    assert set(report.checked_rules) == set(range(0, 17)) | {19, 20}
+    # Rules 5 (slices) and 8 (lines) are about other kinds of chart: a bar
+    # chart is not judged on them, so they are not listed as checked.
+    assert set(report.checked_rules) == (set(range(0, 17)) | {19, 20}) - {5, 8}
+    assert set(report.not_applicable) == {5, 8}
     assert set(report.not_checked) == {17, 18}
     assert report.as_dict()["not_checked"] == {"17": NOT_CHECKABLE_HERE[17], "18": NOT_CHECKABLE_HERE[18]}
 
@@ -286,13 +289,16 @@ def test_rule_20_values_resting_on_one_record_are_flagged():
 
 def test_a_kind_that_is_not_drawn_yet_is_checked_on_spec_and_data_only():
     over_time = _data([("2020", 5, 1), ("2021", 7, 2)], series_kind="time", query="payments_over_time")
-    report = check_visual(_spec(kind="line", query="payments_over_time"), over_time, DARK)
+    report = check_visual(_spec(kind="sankey", query="payments_over_time"), over_time, DARK)
     assert report.ok
     # Rule 12 needs the option only when something is highlighted.
-    assert {6, 7, 9, 10, 13, 14, 15, 16, 20} <= set(report.not_checked)
+    assert {0, 6, 7, 9, 10, 13, 14, 15, 16, 20} <= set(report.not_checked)
     assert "not drawn yet" in report.not_checked[6]
-    # Rule 1 (a zero baseline) is for bars and areas; a line passes it without the option.
-    assert {1, 2, 3, 4, 5, 8, 11, 19} <= set(report.checked_rules)
+    # What the order slip, the data and the theme can tell is judged ...
+    assert {2, 3, 4, 11, 19} <= set(report.checked_rules)
+    # ... and rules about other kinds of chart are not applicable, not "checked".
+    assert {1, 5, 8} <= set(report.not_applicable)
+    assert not set(report.not_applicable) & set(report.checked_rules)
 
 
 def test_report_serializes_for_storage():
@@ -309,3 +315,193 @@ def test_kinds_are_the_design_docs_list():
     assert isinstance(DARK, Theme)
     with pytest.raises(ValueError):
         parse_spec({"kind": "pie", "title": "A finding stated", "query": {"name": "links_by_type"}})
+
+
+# --- the statistical kinds (pass 3): each rule a kind adds, failing and passing -----------
+
+def _time_data() -> VisualData:
+    rows = [DataRow("Nov 2023", 2400000, [RecordRef("relationship", "a")], 1, "2023-11"),
+            DataRow("Dec 2023", 0, [], 0, "2023-12"),
+            DataRow("Jan 2024", 50000, [RecordRef("relationship", "b"), RecordRef("relationship", "c")], 2, "2024-01")]
+    return VisualData("inv", "payments_over_time", {}, "USD", "amount", "time", "payments", rows, "USD", 3)
+
+
+def _amounts() -> VisualData:
+    values = (5000, 7000, 12000, 15000, 18000, 22000, 30000, 45000, 250000, 2400000)
+    rows = [DataRow(f"Payment {i}", float(v), [RecordRef("relationship", f"p{i}")], 1, f"Payment {i}") for i, v in enumerate(values)]
+    return VisualData("inv", "payment_amounts", {}, "USD", "amount", "distribution", "payments", rows, "USD", len(rows))
+
+
+def _pairs() -> VisualData:
+    rows = [DataRow("Meridian", 2400000, [RecordRef("relationship", "a")], 1, "Meridian", x=1.0),
+            DataRow("Arden", 285000, [RecordRef("relationship", f"b{n}") for n in range(4)], 4, "Arden", x=4.0)]
+    return VisualData("inv", "payments_count_and_total_by_party", {}, "USD", "amount", "pairs", "payments", rows, "USD", 5,
+                      x_unit="payments", x_unit_kind="count", measure_labels={"x": "Number of payments received", "y": "Total received (USD)"})
+
+
+def _damaged(spec: VisualSpec, data: VisualData, mutate) -> CheckReport:
+    """Build the house-style chart, let the test damage the drawing, check."""
+    built = build_chart(spec, data, DARK)
+    built.option = copy.deepcopy(built.option)
+    mutate(built)
+    return check_visual(spec, data, DARK, built)
+
+
+def test_rule_0_reads_back_shares_the_donut_total_and_histogram_counts():
+    donut = _spec(kind="donut")
+
+    def wrong_share(built):
+        built.option["series"][0]["data"][0]["label"]["formatter"] = "Meridian Holdings Ltd\n90.0% · $2.4M · 3 payments"
+    report = _damaged(donut, GOOD, wrong_share)
+    assert 0 in _rules(report.errors) and "90.0%" in next(e.message for e in report.errors if e.rule == 0)
+
+    def wrong_total(built):
+        next(t for t in built.option["title"] if t.get("id") == "centre")["text"] = "$9M"
+    assert 0 in _rules(_damaged(donut, GOOD, wrong_total).errors)
+    assert 0 not in _rules(check_visual(donut, GOOD, DARK).errors)
+
+    histogram = _spec(kind="histogram", query="payment_amounts")
+
+    def miscount(built):
+        built.option["series"][0]["data"][0]["value"] = 8.0
+        built.rows[0].value = 8.0   # the drawing and its rows agree; the records do not
+    report = _damaged(histogram, _amounts(), miscount)
+    assert 0 in _rules(report.errors) and "do not count the records" in " ".join(e.message for e in report.errors if e.rule == 0)
+    assert check_visual(histogram, _amounts(), DARK).ok
+
+
+def test_rule_0_warns_that_a_smoothed_line_follows_no_record():
+    line = _spec(kind="line", query="payments_over_time")
+    assert 0 in _rules(_damaged(line, _time_data(), lambda b: b.option["series"][0].update(smooth=True)).warnings)
+    assert 0 not in _rules(check_visual(line, _time_data(), DARK).warnings)
+
+
+def test_rule_1_holds_areas_and_100_percent_bars_and_not_lines():
+    def lift(built):
+        built.option["yAxis"]["min"] = 10000
+    assert 1 in _rules(_damaged(_spec(kind="area", query="payments_over_time"), _time_data(), lift).errors)
+    line = check_visual(_spec(kind="line", query="payments_over_time"), _time_data(), DARK)
+    assert 1 in line.not_applicable and 1 not in line.checked_rules
+
+    def short_whole(built):
+        built.option["xAxis"]["max"] = 1000000
+    assert 1 in _rules(_damaged(_spec(kind="stacked_bar_100"), GOOD, short_whole).errors)
+
+
+def test_rule_4_refuses_parts_that_share_records():
+    overlapping = _data([("Supports", 2, 2), ("Contradicts", 1, 1)], unit_kind="count", query="evidence_by_stance")
+    overlapping.rows[1].record_refs = [overlapping.rows[0].record_refs[0]]   # one evidence record under both stances
+    report = check_visual(_spec(kind="donut", query="evidence_by_stance"), overlapping, DARK)
+    assert 4 in _rules(report.errors) and "more than one part" in next(e.message for e in report.errors if e.rule == 4)
+    # Bars compare groups and total nothing, so the same records may sit under two bars.
+    assert 4 not in _rules(check_visual(_spec(kind="bar", query="evidence_by_stance"), overlapping, DARK).errors)
+    assert 4 not in _rules(check_visual(_spec(kind="donut"), GOOD, DARK).errors)
+
+
+def test_rule_5_shares_written_on_a_100_percent_bar_add_to_100():
+    def off(built):
+        built.option["series"][0]["label"]["formatter"] = "Meridian Holdings Ltd\n80.0% · $2.4M · 3 payments"
+    report = _damaged(_spec(kind="stacked_bar_100"), GOOD, off)
+    assert 5 in _rules(report.errors) and "add up to" in next(e.message for e in report.errors if e.rule == 5)
+    assert 5 not in _rules(check_visual(_spec(kind="stacked_bar_100"), GOOD, DARK).errors)
+    assert 5 in check_visual(_spec(kind="treemap"), GOOD, DARK).not_applicable
+
+
+def test_rule_6_lets_a_scatter_plot_keep_one_axis_each_way():
+    scatter = _spec(kind="scatter", query="payments_count_and_total_by_party")
+    assert 6 not in _rules(check_visual(scatter, _pairs(), DARK).errors)
+
+    def second_y(built):
+        built.option["yAxis"] = [built.option["yAxis"], {"type": "value"}]
+    assert 6 in _rules(_damaged(scatter, _pairs(), second_y).errors)
+
+
+def test_rule_7_no_pulled_out_slices_no_rose_and_no_gaps_between_bins():
+    def pull(built):
+        built.option["series"][0]["data"][0]["selected"] = True
+    assert 7 in _rules(_damaged(_spec(kind="donut"), GOOD, pull).errors)
+
+    def rose(built):
+        built.option["series"][0]["roseType"] = "radius"
+    assert 7 in _rules(_damaged(_spec(kind="donut"), GOOD, rose).errors)
+
+    histogram = _spec(kind="histogram", query="payment_amounts")
+
+    def gaps(built):
+        built.option["series"][0]["barCategoryGap"] = "20%"
+    assert 7 in _rules(_damaged(histogram, _amounts(), gaps).errors)
+
+    def uneven(built):
+        built.bins = [(0.0, 500000.0), (500000.0, 750000.0)] + built.bins[2:]
+    assert 7 in _rules(_damaged(histogram, _amounts(), uneven).errors)
+    assert 7 not in _rules(check_visual(histogram, _amounts(), DARK).errors)
+
+
+def test_rule_9_refuses_parts_of_a_whole_drawn_over_time():
+    report = check_visual(_spec(kind="donut", query="payments_over_time"), _time_data(), DARK)
+    assert 9 in _rules(report.errors) and "periods are an order" in next(e.message for e in report.errors if e.rule == 9)
+
+    def two_colours(built):
+        built.option["series"][0]["data"][0]["itemStyle"]["color"] = "#ff0000"
+    assert 9 in _rules(_damaged(_spec(kind="line", query="payments_over_time"), _time_data(), two_colours).errors)
+
+
+def test_rule_11_lines_need_3_to_1_and_text_inside_a_part_4_5_to_1():
+    def faint_line(built):
+        for item in built.option["series"][0]["data"]:
+            item["itemStyle"]["color"] = "#B98D34"   # Dark Academia's brass: 2.72:1 on its paper
+    assert 11 in _rules(_damaged(_spec(kind="line", query="payments_over_time"), _time_data(), faint_line).errors)
+
+    def grey_ink(built):
+        built.option["series"][0]["data"][0]["label"]["color"] = "#777777"
+    report = _damaged(_spec(kind="treemap"), GOOD, grey_ink)
+    assert 11 in _rules(report.errors) and "inside 'Meridian Holdings Ltd'" in next(e.message for e in report.errors if e.rule == 11)
+    assert 11 not in _rules(check_visual(_spec(kind="treemap"), GOOD, DARK).errors)
+
+
+def test_rule_12_every_part_carries_its_name_and_a_highlight_is_bold():
+    def nameless(built):
+        built.option["series"][0]["data"][1]["label"]["formatter"] = "10.5% · $285K · 2 payments"
+    assert 12 in _rules(_damaged(_spec(kind="donut"), GOOD, nameless).errors)
+
+    picked = _spec(kind="scatter", query="payments_count_and_total_by_party", highlight=["Arden"])
+    assert 12 not in _rules(check_visual(picked, _pairs(), DARK).errors)
+
+    def plain(built):
+        for item in built.option["series"][0]["data"]:
+            item["label"]["fontWeight"] = "normal"
+    assert 12 in _rules(_damaged(picked, _pairs(), plain).errors)
+
+
+def test_rule_16_points_say_their_record_counts_in_their_tooltips():
+    def silent(built):
+        for item in built.option["series"][0]["data"]:
+            item["tooltip"]["formatter"] = item["name"]
+    report = _damaged(_spec(kind="line", query="payments_over_time"), _time_data(), silent)
+    assert 16 in _rules(report.errors) and "the point for" in next(e.message for e in report.errors if e.rule == 16)
+
+    def no_count(built):
+        built.option["series"][1]["label"]["formatter"] = "Arden Partners\n10.5% · $285K"
+    assert 16 in _rules(_damaged(_spec(kind="stacked_bar_100"), GOOD, no_count).errors)
+
+
+def test_rule_19_does_not_apply_to_counts():
+    claims = _data([("Supported", 2, 2), ("Disputed", 1, 1)], unit_kind="count", query="claims_by_status")
+    report = check_visual(_spec(kind="donut", query="claims_by_status"), claims, DARK)
+    assert 19 in report.not_applicable and 19 not in report.checked_rules
+    assert 19 in check_visual(_spec(kind="donut"), GOOD, DARK).checked_rules
+
+
+def test_rule_20_points_resting_on_one_record_are_hollow():
+    def filled(built):
+        for item in built.option["series"][0]["data"]:
+            item["symbol"] = "circle"
+    report = _damaged(_spec(kind="scatter", query="payments_count_and_total_by_party"), _pairs(), filled)
+    assert 20 in _rules(report.errors) and "not hollow" in next(e.message for e in report.errors if e.rule == 20)
+    assert 20 not in _rules(check_visual(_spec(kind="scatter", query="payments_count_and_total_by_party"), _pairs(), DARK).errors)
+
+
+def test_report_lists_rules_about_other_kinds_as_not_applicable():
+    report = check_visual(_spec(kind="scatter", query="payments_count_and_total_by_party"), _pairs(), DARK)
+    assert {1, 3, 5, 8} <= set(report.not_applicable)
+    assert report.as_dict()["not_applicable"]["5"].startswith("a scatter has no slices")

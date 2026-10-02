@@ -1461,6 +1461,12 @@ export type CheckReportOut = {
    */
   errors: Array<CheckItemOut>;
   /**
+   * Not Applicable
+   */
+  not_applicable?: {
+    [key: string]: string;
+  };
+  /**
    * Not Checked
    */
   not_checked: {
@@ -2469,9 +2475,21 @@ export type DataTableRowOut = {
    */
   record_refs: Array<RecordRefOut>;
   /**
+   * Share
+   */
+  share?: number | null;
+  /**
    * Value
    */
   value: number;
+  /**
+   * X
+   */
+  x?: number | null;
+  /**
+   * X Formatted
+   */
+  x_formatted?: string | null;
 };
 
 /**
@@ -9281,6 +9299,10 @@ export type VisualCatalogOut = {
    * Queries
    */
   queries: Array<VisualQueryOut>;
+  /**
+   * Questions
+   */
+  questions: Array<VisualQuestionOut>;
 };
 
 /**
@@ -9297,6 +9319,12 @@ export type VisualDataOut = {
    * Investigation Id
    */
   investigation_id: string;
+  /**
+   * Measure Labels
+   */
+  measure_labels?: {
+    [key: string]: string;
+  } | null;
   /**
    * Omitted
    */
@@ -9337,6 +9365,14 @@ export type VisualDataOut = {
    * Unit Kind
    */
   unit_kind: string;
+  /**
+   * X Unit
+   */
+  x_unit?: string | null;
+  /**
+   * X Unit Kind
+   */
+  x_unit_kind?: string | null;
 };
 
 /**
@@ -9363,6 +9399,10 @@ export type VisualDataRowOut = {
    * Value
    */
   value: number;
+  /**
+   * X
+   */
+  x?: number | null;
 };
 
 /**
@@ -9524,7 +9564,7 @@ export type VisualPreviewOut = {
 /**
  * VisualQueryOut
  *
- * One entry of the query catalogue the AI orders from.
+ * One entry of the query catalogue the AI and the chart builder order from.
  */
 export type VisualQueryOut = {
   /**
@@ -9540,6 +9580,10 @@ export type VisualQueryOut = {
    */
   has_data: boolean;
   /**
+   * Kinds
+   */
+  kinds: Array<string>;
+  /**
    * Label
    */
   label: string;
@@ -9553,6 +9597,10 @@ export type VisualQueryOut = {
   params: {
     [key: string]: VisualParamOut;
   };
+  /**
+   * Questions
+   */
+  questions: Array<string>;
   /**
    * Record Count
    */
@@ -9573,6 +9621,39 @@ export type VisualQueryOut = {
    * Unit Kind
    */
   unit_kind: string;
+};
+
+/**
+ * VisualQuestionOut
+ *
+ * A question a chart answers (FT Visual Vocabulary): the kinds that
+ * answer it, best first, and the queries that hold its relationship.
+ */
+export type VisualQuestionOut = {
+  /**
+   * Description
+   */
+  description: string;
+  /**
+   * Drawn Kinds
+   */
+  drawn_kinds: Array<string>;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kinds
+   */
+  kinds: Array<string>;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Queries
+   */
+  queries: Array<string>;
 };
 
 /**

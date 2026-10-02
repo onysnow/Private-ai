@@ -1222,6 +1222,7 @@ export type {
   VisualPresetsOut,
   VisualPreviewOut,
   VisualQueryOut,
+  VisualQuestionOut,
   VisualSpec,
   VisualStyle,
   VisualStyleOut,
