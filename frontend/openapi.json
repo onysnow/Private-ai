@@ -2600,6 +2600,42 @@
         "title": "ChartRestyleRequest",
         "type": "object"
       },
+      "ChartToSave": {
+        "description": "A chart built by hand, to keep in a deck or a write-up: only the order\nslip (app/visuals/spec.py), never numbers -- the server cooks, draws and\nchecks it from the investigation's records (app/services/saved_charts.py).",
+        "properties": {
+          "heading": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The slide's heading in a deck; the chart's title when left out.",
+            "title": "Heading"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/VisualSpec"
+          },
+          "style": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VisualStyle"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "spec"
+        ],
+        "title": "ChartToSave",
+        "type": "object"
+      },
       "ChartVisualOut": {
         "description": "A checked chart (app/ai/chart_check.py) as a deck keeps it: the order\nslip, the data the Workbench cooked from the records (every value with\nits records), the check report and the chart's words, as the draft or\nthe deck editor stored them; and the drawing that passed, when the deck\ncame from a checked draft. The deck insists only on a valid order slip\nand its data (app/services/decks.py normalize_chart_visual), so the\nreport and the words are passed on as stored.",
         "properties": {
@@ -31712,6 +31748,74 @@
         "summary": "Update Deck Endpoint"
       }
     },
+    "/api/decks/{deck_id}/charts": {
+      "post": {
+        "description": "Keep a chart built in the chart builder as a new slide at the end of the deck.",
+        "operationId": "add_chart_to_deck_endpoint",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "deck_id",
+            "required": true,
+            "schema": {
+              "title": "Deck Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChartToSave"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeckOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Add Chart To Deck Endpoint"
+                }
+              }
+            },
+            "description": "The order slip is not valid, or the chart cannot be drawn or fails the design checks"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Add Chart To Deck Endpoint"
+      }
+    },
     "/api/decks/{deck_id}/export.pptx": {
       "get": {
         "operationId": "export_deck_pptx",
@@ -39692,6 +39796,74 @@
           }
         },
         "summary": "Update Writeup Endpoint"
+      }
+    },
+    "/api/writeups/{writeup_id}/charts": {
+      "post": {
+        "description": "Keep a chart built in the chart builder at the end of the write-up.",
+        "operationId": "add_chart_to_writeup_endpoint",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "writeup_id",
+            "required": true,
+            "schema": {
+              "title": "Writeup Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChartToSave"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WriteupOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Add Chart To Writeup Endpoint"
+                }
+              }
+            },
+            "description": "The order slip is not valid, or the chart cannot be drawn or fails the design checks"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Add Chart To Writeup Endpoint"
       }
     },
     "/api/writeups/{writeup_id}/export.docx": {

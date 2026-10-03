@@ -2,6 +2,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
+from app.visuals.spec import VisualSpec
+
 class InvestigationCreate(BaseModel):
     name: str
     description: str | None = None
@@ -374,6 +376,15 @@ class DeckStyle(BaseModel):
 class VisualStyle(BaseModel):
     preset: str | None = None
     options: dict = Field(default_factory=dict)
+
+
+class ChartToSave(BaseModel):
+    """A chart built by hand, to keep in a deck or a write-up: only the order
+    slip (app/visuals/spec.py), never numbers -- the server cooks, draws and
+    checks it from the investigation's records (app/services/saved_charts.py)."""
+    spec: VisualSpec
+    heading: str | None = Field(default=None, max_length=300, description="The slide's heading in a deck; the chart's title when left out.")
+    style: VisualStyle | None = None
 
 
 class ChartRestyleRequest(BaseModel):

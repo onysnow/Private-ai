@@ -12,6 +12,12 @@ import {
 } from './client';
 import { client } from './client.gen';
 import type {
+  AddChartToDeckEndpointData,
+  AddChartToDeckEndpointErrors,
+  AddChartToDeckEndpointResponses,
+  AddChartToWriteupEndpointData,
+  AddChartToWriteupEndpointErrors,
+  AddChartToWriteupEndpointResponses,
   AnalyzeOpenalephDocumentData,
   AnalyzeOpenalephDocumentErrors,
   AnalyzeOpenalephDocumentResponses,
@@ -503,6 +509,12 @@ import type {
   UploadDocumentResponses,
 } from './types.gen';
 import {
+  zAddChartToDeckEndpointBody,
+  zAddChartToDeckEndpointPath,
+  zAddChartToDeckEndpointResponse,
+  zAddChartToWriteupEndpointBody,
+  zAddChartToWriteupEndpointPath,
+  zAddChartToWriteupEndpointResponse,
   zAnalyzeOpenalephDocumentPath,
   zAnalyzeOpenalephDocumentResponse,
   zAssessStatementBody,
@@ -1816,6 +1828,41 @@ export const updateDeckEndpoint = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zUpdateDeckEndpointResponse.parseAsync(data),
     url: '/api/decks/{deck_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Add Chart To Deck Endpoint
+ *
+ * Keep a chart built in the chart builder as a new slide at the end of the deck.
+ */
+export const addChartToDeckEndpoint = <ThrowOnError extends boolean = false>(
+  options: Options<AddChartToDeckEndpointData, ThrowOnError>,
+): RequestResult<
+  AddChartToDeckEndpointResponses,
+  AddChartToDeckEndpointErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    AddChartToDeckEndpointResponses,
+    AddChartToDeckEndpointErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAddChartToDeckEndpointBody,
+          path: zAddChartToDeckEndpointPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAddChartToDeckEndpointResponse.parseAsync(data),
+    url: '/api/decks/{deck_id}/charts',
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -5940,6 +5987,41 @@ export const updateWriteupEndpoint = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zUpdateWriteupEndpointResponse.parseAsync(data),
     url: '/api/writeups/{writeup_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Add Chart To Writeup Endpoint
+ *
+ * Keep a chart built in the chart builder at the end of the write-up.
+ */
+export const addChartToWriteupEndpoint = <ThrowOnError extends boolean = false>(
+  options: Options<AddChartToWriteupEndpointData, ThrowOnError>,
+): RequestResult<
+  AddChartToWriteupEndpointResponses,
+  AddChartToWriteupEndpointErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    AddChartToWriteupEndpointResponses,
+    AddChartToWriteupEndpointErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAddChartToWriteupEndpointBody,
+          path: zAddChartToWriteupEndpointPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAddChartToWriteupEndpointResponse.parseAsync(data),
+    url: '/api/writeups/{writeup_id}/charts',
     ...options,
     headers: {
       'Content-Type': 'application/json',

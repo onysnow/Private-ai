@@ -11,10 +11,18 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
 from app.models.domain import Deck, Investigation
-from app.schemas.api import DeckUpdate
-from app.schemas.responses import DeckOut, DecksOut, DeletedOut, file_response
+from app.schemas.api import ChartToSave, DeckUpdate
+from app.services.saved_charts import ChartRefused, add_chart_to_deck
+from app.schemas.responses import ErrorOut, ValidationErrorOut, DeckOut, DecksOut, DeletedOut, file_response
 from app.services.assistant_context import describe_record_refs
 from app.services.decks import deck_citation_refs, delete_deck, list_decks, render_deck_pptx, serialize_deck, update_deck
+
+
+def _refused(exc: ChartRefused) -> HTTPException:
+    """A 422 that names each rule the chart broke, as the preview showed them."""
+    broken = "; ".join(f"rule {e['rule']}: {e['message']}" if e.get("rule") is not None else str(e.get("message")) for e in exc.errors)
+    return HTTPException(422, f"{exc.reason}: {broken}" if broken and broken != exc.reason else exc.reason)
+
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
@@ -70,3 +78,18 @@ def export_deck_pptx(deck_id: str, db: Session = Depends(get_db)) -> StreamingRe
         media_type=PPTX,
         headers={"Content-Disposition": f'attachment; filename="{filename}.pptx"'},
     )
+
+
+@router.post("/decks/{deck_id}/charts", response_model=DeckOut, responses={
+    422: {"model": ValidationErrorOut | ErrorOut, "description": "The order slip is not valid, or the chart cannot be drawn or fails the design checks"},
+})
+def add_chart_to_deck_endpoint(deck_id: str, body: ChartToSave, db: Session = Depends(get_db)) -> Any:
+    """Keep a chart built in the chart builder as a new slide at the end of the deck."""
+    row = db.get(Deck, deck_id)
+    if row is None:
+        raise HTTPException(404, "Deck not found")
+    try:
+        row = add_chart_to_deck(db, row, body.spec, heading=body.heading, style=body.style.model_dump() if body.style else None)
+    except ChartRefused as exc:
+        raise _refused(exc)
+    return serialize_deck(row)

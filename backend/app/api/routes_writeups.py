@@ -12,10 +12,18 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
 from app.models.domain import Investigation, Writeup
-from app.schemas.api import WriteupCreate, WriteupUpdate
-from app.schemas.responses import DeletedOut, WriteupOut, WriteupsOut, file_response
+from app.schemas.api import ChartToSave, WriteupCreate, WriteupUpdate
+from app.services.saved_charts import ChartRefused, add_chart_to_writeup
+from app.schemas.responses import ErrorOut, ValidationErrorOut, DeletedOut, WriteupOut, WriteupsOut, file_response
 from app.services.assistant_context import describe_record_refs
 from app.services.writeups import create_writeup, delete_writeup, list_writeups, render_writeup_docx, serialize_writeup, update_writeup
+
+
+def _refused(exc: ChartRefused) -> HTTPException:
+    """A 422 that names each rule the chart broke, as the preview showed them."""
+    broken = "; ".join(f"rule {e['rule']}: {e['message']}" if e.get("rule") is not None else str(e.get("message")) for e in exc.errors)
+    return HTTPException(422, f"{exc.reason}: {broken}" if broken and broken != exc.reason else exc.reason)
+
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
@@ -92,3 +100,18 @@ def export_writeup_docx(writeup_id: str, db: Session = Depends(get_db)) -> Strea
         media_type=DOCX,
         headers={"Content-Disposition": f'attachment; filename="{filename}.docx"'},
     )
+
+
+@router.post("/writeups/{writeup_id}/charts", response_model=WriteupOut, responses={
+    422: {"model": ValidationErrorOut | ErrorOut, "description": "The order slip is not valid, or the chart cannot be drawn or fails the design checks"},
+})
+def add_chart_to_writeup_endpoint(writeup_id: str, body: ChartToSave, db: Session = Depends(get_db)) -> Any:
+    """Keep a chart built in the chart builder at the end of the write-up."""
+    row = db.get(Writeup, writeup_id)
+    if row is None:
+        raise HTTPException(404, "Write-up not found")
+    try:
+        row = add_chart_to_writeup(db, row, body.spec, style=body.style.model_dump() if body.style else None)
+    except ChartRefused as exc:
+        raise _refused(exc)
+    return serialize_writeup(row)

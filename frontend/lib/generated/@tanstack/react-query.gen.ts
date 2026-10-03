@@ -9,6 +9,8 @@ import {
 
 import { client } from '../client.gen';
 import {
+  addChartToDeckEndpoint,
+  addChartToWriteupEndpoint,
   analyzeOpenalephDocument,
   assessStatement,
   attachRelationshipEvidenceEndpoint,
@@ -175,6 +177,12 @@ import {
   uploadDocument,
 } from '../sdk.gen';
 import type {
+  AddChartToDeckEndpointData,
+  AddChartToDeckEndpointError,
+  AddChartToDeckEndpointResponse,
+  AddChartToWriteupEndpointData,
+  AddChartToWriteupEndpointError,
+  AddChartToWriteupEndpointResponse,
   AnalyzeOpenalephDocumentData,
   AnalyzeOpenalephDocumentError,
   AnalyzeOpenalephDocumentResponse,
@@ -1490,6 +1498,35 @@ export const updateDeckEndpointMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await updateDeckEndpoint({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Add Chart To Deck Endpoint
+ *
+ * Keep a chart built in the chart builder as a new slide at the end of the deck.
+ */
+export const addChartToDeckEndpointMutation = (
+  options?: Partial<Options<AddChartToDeckEndpointData>>,
+): UseMutationOptions<
+  AddChartToDeckEndpointResponse,
+  AddChartToDeckEndpointError,
+  Options<AddChartToDeckEndpointData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AddChartToDeckEndpointResponse,
+    AddChartToDeckEndpointError,
+    Options<AddChartToDeckEndpointData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await addChartToDeckEndpoint({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -6054,6 +6091,35 @@ export const updateWriteupEndpointMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await updateWriteupEndpoint({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Add Chart To Writeup Endpoint
+ *
+ * Keep a chart built in the chart builder at the end of the write-up.
+ */
+export const addChartToWriteupEndpointMutation = (
+  options?: Partial<Options<AddChartToWriteupEndpointData>>,
+): UseMutationOptions<
+  AddChartToWriteupEndpointResponse,
+  AddChartToWriteupEndpointError,
+  Options<AddChartToWriteupEndpointData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AddChartToWriteupEndpointResponse,
+    AddChartToWriteupEndpointError,
+    Options<AddChartToWriteupEndpointData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await addChartToWriteupEndpoint({
         ...options,
         ...fnOptions,
         throwOnError: true,

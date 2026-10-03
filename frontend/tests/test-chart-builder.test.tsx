@@ -24,6 +24,7 @@ vi.mock('next/dynamic', () => ({
 }));
 
 import {ChartBuilderPanel, queriesFor, suggestedKinds, traceRequest} from '../features/charts/chart-builder-panel';
+import {parseDestination} from '../features/charts/keep-chart';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import type {JsonObject} from '../lib/api-types';
@@ -42,6 +43,15 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); reactEChartsCoreSpy.mockClea
 
 const CATALOG = 'GET /api/investigations/inv-1/visuals/catalog';
 const PREVIEW = 'POST /api/investigations/inv-1/visuals/preview';
+const DECKS = 'GET /api/investigations/inv-1/decks';
+const WRITEUPS = 'GET /api/investigations/inv-1/writeups';
+
+const when = '2026-10-03T01:00:00';
+const deck = (overrides: Record<string, unknown> = {}) => ({id: 'dk-1', investigation_id: 'inv-1', title: 'Where the money went', slides: [], slide_count: 3,
+  style: {theme: 'paper', fonts: 'editorial'}, source_ai_candidate_id: null, created_by: null, created_at: when, updated_at: when, ...overrides});
+const writeup = (overrides: Record<string, unknown> = {}) => ({id: 'wu-1', investigation_id: 'inv-1', title: 'The consulting fee', status: 'draft',
+  cited_record_refs: [], source_ai_candidate_id: null, created_by: null, created_at: when, updated_at: when, word_count: 120, ...overrides});
+const lists = {[DECKS]: {decks: [deck()]}, [WRITEUPS]: {writeups: [{...writeup(), preview: 'The fee was paid in two parts.'}]}};
 
 const direction = {description: 'Rank who received the money, or who paid it.', choices: ['received', 'paid'], default: 'received'};
 const currency = {description: 'ISO 4217 currency code.', choices: null, default: null};
@@ -126,7 +136,7 @@ describe('ChartBuilderPanel', () => {
   });
 
   it('previews the chart with its check report, and each value traces to its records', async () => {
-    const {api, user} = await openBuilder({[PREVIEW]: previewReply()});
+    const {api, user} = await openBuilder({[PREVIEW]: previewReply(), ...lists});
     await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
     await user.click(screen.getByRole('button', {name: 'Donut'}));
@@ -167,11 +177,79 @@ describe('ChartBuilderPanel', () => {
     await user.click(screen.getByRole('button', {name: 'Preview chart'}));
 
     expect(await screen.findByText('Fails 2 design rules')).toBeInTheDocument();
+    expect(screen.queryByText('4. Keep this chart')).not.toBeInTheDocument();   // only a chart that passes is kept
     const failed = within(screen.getByRole('list', {name: 'Failed rules'})).getAllByRole('listitem').map(li => li.textContent);
     expect(failed).toEqual([
       "Rule 12 · Never rely on colour alone: 'Harborline Civic Trust' is too small in a treemap to show its name, so only its colour tells it apart",
       "Rule 13 · A title that states the finding, alt text, a description and a data table: the title 'Payments' names the data; it must state the finding in a sentence (at least 3 words)",
     ]);
+  });
+
+  it('keeps a chart that passes in a deck, sending only the order slip', async () => {
+    const DECK_CHARTS = 'POST /api/decks/dk-1/charts';
+    const {api, user} = await openBuilder({[PREVIEW]: previewReply(), ...lists, [DECK_CHARTS]: deck({slide_count: 4})});
+    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
+    await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
+    await user.click(screen.getByRole('button', {name: 'Donut'}));
+    await user.type(screen.getByRole('textbox', {name: 'Title'}), 'Meridian received most of the money');
+    await user.click(screen.getByRole('button', {name: 'Preview chart'}));
+    expect(await screen.findByText('4. Keep this chart')).toBeInTheDocument();
+
+    const keep = screen.getByRole('button', {name: 'Keep chart'});
+    expect(keep).toBeDisabled();
+    screen.getByRole('combobox', {name: 'Keep in'}).focus();
+    await user.keyboard('{ArrowDown}');
+    await user.click(await screen.findByRole('option', {name: 'Deck: Where the money went'}));
+    await user.type(screen.getByRole('textbox', {name: 'Slide heading'}), 'Who got paid');
+    await user.click(keep);
+
+    expect(await screen.findByText('Added to deck “Where the money went” as slide 4.')).toBeInTheDocument();
+    expect(api.lastBody(DECK_CHARTS)).toEqual({heading: 'Who got paid', spec: {kind: 'donut', question: 'part_of_whole',
+      title: 'Meridian received most of the money', query: {name: 'payments_by_party', params: {direction: 'received'}}}});
+    expect(api.calls(DECKS).length).toBeGreaterThan(1);   // the deck list is read again
+    expect(api.unmatched()).toEqual([]);
+  });
+
+  it('starts a new write-up with the chart, titled by the finding', async () => {
+    const NEW = 'POST /api/writeups';
+    const CHARTS = 'POST /api/writeups/wu-2/charts';
+    const title = 'Meridian received most of the money';
+    const {api, user} = await openBuilder({[PREVIEW]: previewReply(), ...lists,
+      [NEW]: writeup({id: 'wu-2', title, content_json: {type: 'doc', content: []}}),
+      [CHARTS]: writeup({id: 'wu-2', title, content_json: {type: 'doc', content: []}})});
+    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
+    await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
+    await user.click(screen.getByRole('button', {name: 'Donut'}));
+    await user.type(screen.getByRole('textbox', {name: 'Title'}), title);
+    await user.click(screen.getByRole('button', {name: 'Preview chart'}));
+    await screen.findByText('4. Keep this chart');
+    screen.getByRole('combobox', {name: 'Keep in'}).focus();
+    await user.keyboard('{ArrowDown}');
+    await user.click(await screen.findByRole('option', {name: 'A new write-up'}));
+    expect(screen.queryByRole('textbox', {name: 'Slide heading'})).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Keep chart'}));
+
+    expect(await screen.findByText(`Started write-up “${title}” with this chart.`)).toBeInTheDocument();
+    expect(api.lastBody(NEW)).toEqual({investigation_id: 'inv-1', title});
+    expect((api.lastBody(CHARTS) as {spec: {title: string}}).spec.title).toBe(title);
+    expect(api.unmatched()).toEqual([]);
+  });
+
+  it('says why the server would not keep a chart', async () => {
+    const DECK_CHARTS = 'POST /api/decks/dk-1/charts';
+    const {user} = await openBuilder({[PREVIEW]: previewReply(), ...lists,
+      [DECK_CHARTS]: {status: 422, body: {detail: "the chart failed the design checks: rule 4: the parts share records"}}});
+    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
+    await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
+    await user.click(screen.getByRole('button', {name: 'Donut'}));
+    await user.type(screen.getByRole('textbox', {name: 'Title'}), 'Meridian received most of the money');
+    await user.click(screen.getByRole('button', {name: 'Preview chart'}));
+    await screen.findByText('4. Keep this chart');
+    screen.getByRole('combobox', {name: 'Keep in'}).focus();
+    await user.keyboard('{ArrowDown}');
+    await user.click(await screen.findByRole('option', {name: 'Deck: Where the money went'}));
+    await user.click(screen.getByRole('button', {name: 'Keep chart'}));
+    expect(await screen.findByText(/the chart failed the design checks: rule 4: the parts share records/)).toBeInTheDocument();
   });
 
   it('says in plain words why a kind cannot draw the data', async () => {
@@ -199,5 +277,14 @@ describe('the builder\'s choices', () => {
     expect(traceRequest({record_type: 'entity', record_id: 'e1'}, 'x')).toEqual({title: 'x', kind: 'entity', entityId: 'e1'});
     expect(traceRequest({record_type: 'document', record_id: 'd1'}, 'x')).toEqual({title: 'x', kind: 'document', documentId: 'd1'});
     expect(traceRequest({record_type: 'timeline_event', record_id: 't1'}, 'x')).toBeNull();
+  });
+
+  it('reads the place to keep a chart from the picker', () => {
+    expect(parseDestination('deck:dk-1')).toEqual({kind: 'deck', id: 'dk-1'});
+    expect(parseDestination('writeup:a:b')).toEqual({kind: 'writeup', id: 'a:b'});
+    expect(parseDestination('new-writeup')).toEqual({kind: 'new-writeup'});
+    expect(parseDestination('')).toBeNull();
+    expect(parseDestination('deck:')).toBeNull();
+    expect(parseDestination('slide:1')).toBeNull();
   });
 });

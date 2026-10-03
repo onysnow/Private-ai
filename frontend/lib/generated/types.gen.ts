@@ -1531,6 +1531,24 @@ export type ChartRestyleRequest = {
 };
 
 /**
+ * ChartToSave
+ *
+ * A chart built by hand, to keep in a deck or a write-up: only the order
+ * slip (app/visuals/spec.py), never numbers -- the server cooks, draws and
+ * checks it from the investigation's records (app/services/saved_charts.py).
+ */
+export type ChartToSave = {
+  /**
+   * Heading
+   *
+   * The slide's heading in a deck; the chart's title when left out.
+   */
+  heading?: string | null;
+  spec: VisualSpec;
+  style?: VisualStyle | null;
+};
+
+/**
  * ChartVisualOut
  *
  * A checked chart (app/ai/chart_check.py) as a deck keeps it: the order
@@ -12066,6 +12084,44 @@ export type UpdateDeckEndpointResponses = {
 export type UpdateDeckEndpointResponse =
   UpdateDeckEndpointResponses[keyof UpdateDeckEndpointResponses];
 
+export type AddChartToDeckEndpointData = {
+  body: ChartToSave;
+  path: {
+    /**
+     * Deck Id
+     */
+    deck_id: string;
+  };
+  query?: never;
+  url: '/api/decks/{deck_id}/charts';
+};
+
+export type AddChartToDeckEndpointErrors = {
+  /**
+   * Response 422 Add Chart To Deck Endpoint
+   *
+   * The order slip is not valid, or the chart cannot be drawn or fails the design checks
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AddChartToDeckEndpointError =
+  AddChartToDeckEndpointErrors[keyof AddChartToDeckEndpointErrors];
+
+export type AddChartToDeckEndpointResponses = {
+  /**
+   * Successful Response
+   */
+  200: DeckOut;
+};
+
+export type AddChartToDeckEndpointResponse =
+  AddChartToDeckEndpointResponses[keyof AddChartToDeckEndpointResponses];
+
 export type ExportDeckPptxData = {
   body?: never;
   path: {
@@ -17166,6 +17222,44 @@ export type UpdateWriteupEndpointResponses = {
 
 export type UpdateWriteupEndpointResponse =
   UpdateWriteupEndpointResponses[keyof UpdateWriteupEndpointResponses];
+
+export type AddChartToWriteupEndpointData = {
+  body: ChartToSave;
+  path: {
+    /**
+     * Writeup Id
+     */
+    writeup_id: string;
+  };
+  query?: never;
+  url: '/api/writeups/{writeup_id}/charts';
+};
+
+export type AddChartToWriteupEndpointErrors = {
+  /**
+   * Response 422 Add Chart To Writeup Endpoint
+   *
+   * The order slip is not valid, or the chart cannot be drawn or fails the design checks
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AddChartToWriteupEndpointError =
+  AddChartToWriteupEndpointErrors[keyof AddChartToWriteupEndpointErrors];
+
+export type AddChartToWriteupEndpointResponses = {
+  /**
+   * Successful Response
+   */
+  200: WriteupOut;
+};
+
+export type AddChartToWriteupEndpointResponse =
+  AddChartToWriteupEndpointResponses[keyof AddChartToWriteupEndpointResponses];
 
 export type ExportWriteupDocxData = {
   body?: never;

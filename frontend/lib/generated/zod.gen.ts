@@ -4920,6 +4920,19 @@ export const zChartRestyleRequest = z.object({
 });
 
 /**
+ * ChartToSave
+ *
+ * A chart built by hand, to keep in a deck or a write-up: only the order
+ * slip (app/visuals/spec.py), never numbers -- the server cooks, draws and
+ * checks it from the investigation's records (app/services/saved_charts.py).
+ */
+export const zChartToSave = z.object({
+  heading: z.string().max(300).nullish(),
+  spec: zVisualSpec,
+  style: zVisualStyle.nullish(),
+});
+
+/**
  * PromoteToDeckRequest
  */
 export const zPromoteToDeckRequest = z.object({
@@ -5484,6 +5497,17 @@ export const zUpdateDeckEndpointPath = z.object({
  * Successful Response
  */
 export const zUpdateDeckEndpointResponse = zDeckOut;
+
+export const zAddChartToDeckEndpointBody = zChartToSave;
+
+export const zAddChartToDeckEndpointPath = z.object({
+  deck_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zAddChartToDeckEndpointResponse = zDeckOut;
 
 export const zExportDeckPptxPath = z.object({
   deck_id: z.string(),
@@ -6906,6 +6930,17 @@ export const zUpdateWriteupEndpointPath = z.object({
  * Successful Response
  */
 export const zUpdateWriteupEndpointResponse = zWriteupOut;
+
+export const zAddChartToWriteupEndpointBody = zChartToSave;
+
+export const zAddChartToWriteupEndpointPath = z.object({
+  writeup_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zAddChartToWriteupEndpointResponse = zWriteupOut;
 
 export const zExportWriteupDocxPath = z.object({
   writeup_id: z.string(),

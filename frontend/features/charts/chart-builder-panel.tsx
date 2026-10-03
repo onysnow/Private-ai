@@ -10,7 +10,8 @@
 // that data. POST /api/investigations/{id}/visuals/preview cooks every value
 // from the records, draws the chart and checks it against the design rules;
 // the panel shows the chart, its words and every rule it fails, by number,
-// in plain words. Nothing is stored.
+// in plain words. A chart that passes can be kept in a deck or a write-up
+// (keep-chart.tsx); the server draws and checks it again when it is kept.
 //
 // The catalogue runs every query once, so it is asked for only when the
 // builder is opened. ECharts loads on demand (next/dynamic), as on every
@@ -32,6 +33,7 @@ import {investigationVisualCatalogOptions, investigationVisualPreviewMutation} f
 import type {VisualCatalogOut, VisualQueryOut, VisualQuestionOut, VisualSpec} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import type {ProvenanceRequest} from '../../lib/workbench-store';
+import {KeepChart} from './keep-chart';
 
 const ChartFigure = dynamic(() => import('../../components/presentation/chart-visual').then(m => m.ChartFigure),
   {ssr: false, loading: () => <p className="muted">Loading chart…</p>});
@@ -192,6 +194,7 @@ export function ChartBuilderPanel({investigationId}: Props): ReactElement {
                 onClick={() => openProvenance(request)}>{index + 1}</Button>
               : <span key={`${ref.record_type}:${ref.record_id}`}>{index + 1} </span>;
           })}</span>}/>}
+          {drawn && report?.ok && spec && <KeepChart investigationId={investigationId} spec={spec}/>}
         </div>}
       </>}
     </CardContent>
