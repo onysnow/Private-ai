@@ -92,7 +92,7 @@ KIND_LABELS = {
     ChartKind.bar: "Bar chart", ChartKind.column: "Column chart", ChartKind.line: "Line chart", ChartKind.area: "Area chart",
     ChartKind.stacked_bar_100: "100% bar", ChartKind.donut: "Donut chart", ChartKind.treemap: "Treemap",
     ChartKind.histogram: "Histogram", ChartKind.scatter: "Scatter plot", ChartKind.timeline: "Timeline", ChartKind.sankey: "Flow diagram",
-    ChartKind.map: "Map", ChartKind.heatmap: "Grid",
+    ChartKind.map: "Map", ChartKind.heatmap: "Grid", ChartKind.before_after: "Before and after",
 }
 _AXIS_LABEL_WIDTH = 220                    # px: a category name longer than this is cut short (the data table has it whole)
 BOLD_SLACK = math.ceil(_AXIS_LABEL_WIDTH * 0.1)   # px: how much wider a bold name may run than its regular-weight cut
@@ -134,6 +134,9 @@ class DrawOptions:
     label_points: str = "auto"      # scatter: "auto" (every point when few, else outliers) | "outliers"
     stages: bool = False            # sankey: the parties at each place in the chain of payments grouped into one stage
     with_timeline: bool = False     # map: the dated events at the places drawn beside it, as a second picture
+    picture_layout: str = "slider"  # before and after: "slider" (the app; exports place the two side by side), "side_by_side" or "stacked"
+    divider: str = "50"             # before and after, as a slider: where the divider starts, in % of the width
+    date_captions: bool = True      # before and after: each picture's date written under it (the subtitle always states both)
 
 
 @dataclass
@@ -247,7 +250,7 @@ def value_label(row: DataRow, data: VisualData) -> str:
 
 def source_line(data: VisualData, rows: list[DataRow], kind: ChartKind | None = None) -> str:
     parts = [f"Source: {data.record_count} {data.record_noun if data.record_count != 1 else singular(data.record_noun)} in this investigation's records ({data.query})"]
-    if kind not in (ChartKind.timeline, ChartKind.map, ChartKind.heatmap) and any(row.record_count == 1 for row in rows):
+    if kind not in (ChartKind.timeline, ChartKind.map, ChartKind.heatmap, ChartKind.before_after) and any(row.record_count == 1 for row in rows):
         # (A timeline's mark is one event and a map's one place, always one record, and a grid's
         # cell counts the claims themselves: nothing to flag.)
         parts.append(f"{SINGLE_RECORD_MARK} hollow markers rest on one record" if kind in (ChartKind.line, ChartKind.area, ChartKind.scatter)
@@ -306,7 +309,8 @@ def check_fit(spec: VisualSpec, data: VisualData) -> None:
         wanted = {"distribution": "one value per record, such as payment_amounts", "pairs": "two numbers per party, such as payments_count_and_total_by_party",
                   "flows": "money moving between parties, such as payment_flows", "events": "dated events, such as events_in_order",
                   "places": "records with coordinates, such as places_on_map",
-                  "grid": "a grid of two graded scales, such as claims_by_strength"}
+                  "grid": "a grid of two graded scales, such as claims_by_strength",
+                  "pictures": "two dated pictures, such as pictures_compared"}
         raise ChartDoesNotFit(f"a {kind.value} needs {' or '.join(wanted[n] for n in needs)}; the query {data.query!r} has {data.series_kind} rows")
     if data.series_kind == "pairs" and kind != ChartKind.scatter:
         raise ChartDoesNotFit(f"the query {data.query!r} holds two numbers per party; draw it as a scatter plot")
@@ -323,6 +327,15 @@ def check_fit(spec: VisualSpec, data: VisualData) -> None:
         raise ChartDoesNotFit(f"the query {data.query!r} holds a grid of two graded scales; draw it as a grid (heatmap)")
     if kind == ChartKind.heatmap and (spec.sort is not None or spec.limit is not None or spec.scale == Scale.log):
         raise ChartDoesNotFit("a grid puts each cell where its two grades meet; sort, limit and a log scale do not apply, so leave them out")
+    if data.series_kind == "pictures" and kind != ChartKind.before_after:
+        raise ChartDoesNotFit(f"the query {data.query!r} holds pictures; compare two of them as before and after")
+    if kind == ChartKind.before_after:
+        if spec.sort is not None or spec.limit is not None or spec.scale == Scale.log:
+            raise ChartDoesNotFit("before and after are two pictures in the order they were taken; sort, limit and a log scale do not apply, "
+                                  "so leave them out")
+        if len(data.rows) != 2:
+            raise ChartDoesNotFit(f"before and after compares two pictures; the query found {len(data.rows)}: name the two with its "
+                                  "before and after parameters")
     if data.series_kind == "places" and kind != ChartKind.map:
         raise ChartDoesNotFit(f"the query {data.query!r} holds places; draw them on a map")
     if kind == ChartKind.map and (spec.sort is not None or spec.limit is not None or spec.scale == Scale.log):
@@ -376,6 +389,9 @@ def prepare_rows(spec: VisualSpec, data: VisualData, draw: DrawOptions | None = 
     if spec.kind == ChartKind.heatmap:
         # A cell's place is its meaning: the rows keep the grid's own order.
         return sorted(data.rows, key=lambda r: r.key)
+    if spec.kind == ChartKind.before_after:
+        # Before, then after, as the order names them (the checker holds them to the order they were taken).
+        return list(data.rows)
     rows = _sort_rows(list(data.rows), spec.effective_sort())
     if data.series_kind in ("category", "distribution") or (data.series_kind == "flows" and spec.kind != ChartKind.sankey):
         keep = spec.limit if spec.limit is not None else (MAX_COLOURS - 1 if spec.kind in COLOUR_PER_CATEGORY_KINDS else None)
@@ -1100,6 +1116,11 @@ def status_words(row: DataRow) -> str:
     return f"{words}, graded {row.grade}" if row.grade else words
 
 
+def date_words(text: str | None) -> str:
+    """A date as recorded, in words: '4 Mar 2021', 'Mar 2021', '2021'."""
+    return _date_words(text)
+
+
 def _date_words(text: str | None) -> str:
     bounds = date_bounds(text)
     if bounds is None:
@@ -1268,6 +1289,30 @@ def _map(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
     return {**frame, "map": {"places": places, "flavor": "grayscale", "attribution": MAP_ATTRIBUTION, "top": MAP_TOP, "bottom": MAP_BOTTOM}}
 
 
+# Before and after (the design doc's "before-and-after images"): two dated
+# pictures of one place, the earlier first. The option carries the pictures
+# (their documents) and how they are laid out; the app draws them in the
+# frame's area as a slider (react-compare-slider), side by side or stacked,
+# and the exports place them natively, side by side or stacked, each with
+# its date (Bellingcat, Rafah: "a dated before-and-after pair is evidence").
+PICTURES_TOP, PICTURES_BOTTOM = 96, 44
+PICTURE_LAYOUTS = ("slider", "side_by_side", "stacked")
+
+
+def picture_caption(role: str, row: DataRow) -> str:
+    return f"{role} · taken {_date_words(row.start)}"
+
+
+def _before_after(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
+    layout = p.draw.picture_layout if p.draw.picture_layout in PICTURE_LAYOUTS else "slider"
+    items = [{"role": role.lower(), "document_id": row.picture, "label": row.label, "taken": row.start,
+              "caption": picture_caption(role, row) if p.draw.date_captions else None}
+             for role, row in zip(("Before", "After"), p.rows)]
+    divider = int(p.draw.divider) if str(p.draw.divider).isdigit() else 50
+    return {**frame, "pictures": {"layout": layout, "divider": max(10, min(90, divider)), "items": items,
+                                  "top": PICTURES_TOP, "bottom": PICTURES_BOTTOM}}
+
+
 # The grid (heatmap): the design doc's claim-strength grid. Each cell is
 # shaded by how many claims sit in it, in HEATMAP_STEPS equal steps of the
 # largest count from the page colour to the theme's accent (Axis Maps,
@@ -1375,6 +1420,10 @@ def _lower_first(text: str) -> str:
 
 
 def _subtitle(spec: VisualSpec, data: VisualData, kind: ChartKind) -> str:
+    if kind == ChartKind.before_after and len(data.rows) == 2:
+        # Both dates are always stated (Bellingcat: the caption states the claim and both dates).
+        dates = f"Before: taken {_date_words(data.rows[0].start)}. After: taken {_date_words(data.rows[1].start)}"
+        return f"{spec.subtitle}. {dates}" if spec.subtitle else dates
     if spec.subtitle:
         return spec.subtitle
     unit = data.unit or spec.unit or ""
@@ -1568,6 +1617,8 @@ def build_chart(spec: VisualSpec, data: VisualData, theme: Theme, *, width: int 
             _beside_words(words, beside_rows, place_of)
     elif kind == ChartKind.heatmap:
         option = _heatmap(parts, frame)
+    elif kind == ChartKind.before_after:
+        option = _before_after(parts, frame)
     else:
         option = _scatter(parts, frame, labelled)
     if "beside" not in option:
@@ -1644,6 +1695,15 @@ def _words(spec: VisualSpec, data: VisualData, rows: list[DataRow], highlighted:
             table_row["formatted"] = f"{int(row.value):,}"
             table_row["across"], table_row["down"] = row.across, row.down
             lines.append(f"{row.label}: {heatmap_cell_text(row, data)}.")
+    elif kind == ChartKind.before_after:
+        before, after = rows[0], rows[-1]
+        alt = (f"{name}: {spec.title}. Before: {before.label}, taken {_date_words(before.start)}. "
+               f"After: {after.label}, taken {_date_words(after.start)}.")
+        columns = ["Picture", "Taken", "Records"]
+        for row, table_row in zip(rows, table_rows):
+            table_row["formatted"] = _date_words(row.start)
+            table_row["start"] = row.start
+            lines.append(f"{row.label}: taken {_date_words(row.start)}.")
     elif kind == ChartKind.map:
         shown = ", ".join(row.label for row in rows[:8]) + (f", and {count - 8} more" if count > 8 else "")
         alt = f"{name}: {spec.title}. {count} place{'s' if count != 1 else ''}: {shown}."

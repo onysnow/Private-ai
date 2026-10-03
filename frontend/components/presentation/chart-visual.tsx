@@ -20,6 +20,8 @@ import type {ChartVisual} from '../../lib/api-types';
 // A map chart's places are drawn with MapLibre (chart-map.tsx), loaded only
 // when there is a map to draw.
 const ChartMap = dynamic(() => import('./chart-map').then(m => m.ChartMap), {ssr: false});
+// A picture pair is drawn with its pictures (chart-pictures.tsx), loaded only when there is one.
+const ChartPictures = dynamic(() => import('./chart-pictures').then(m => m.ChartPictures), {ssr: false});
 
 const DESIGN_WIDTH = 960;
 const DESIGN_HEIGHT = 540;
@@ -62,7 +64,9 @@ export function ScaledChart({visual, fill = false}: {visual: ChartVisual, fill?:
           repaint it. */}
       {visual.option && typeof visual.option === 'object' && 'map' in visual.option
         ? <ChartMap option={visual.option as Record<string, unknown>} width={design.width} height={design.height} ariaLabel={visual.text.alt_text}/>
-        : <Chart option={visual.option as EChartsOption} height={design.height} ariaLabel={visual.text.alt_text} theme={null}/>}
+        : visual.option && typeof visual.option === 'object' && 'pictures' in visual.option
+          ? <ChartPictures option={visual.option as Record<string, unknown>} width={design.width} height={design.height} ariaLabel={visual.text.alt_text}/>
+          : <Chart option={visual.option as EChartsOption} height={design.height} ariaLabel={visual.text.alt_text} theme={null}/>}
     </div>
   </div>;
 }
@@ -84,7 +88,7 @@ export function tableCells(rows: TableRow[], row: TableRow): {key: string, text:
   if (rows.some(r => r.x_formatted !== undefined)) cells.push({key: 'x', text: row.x_formatted ?? '', numeric: true});
   const events = rows.some(r => r.status !== undefined);
   // A timeline's value is when, a map's is where: words, not a number.
-  cells.push({key: 'value', text: row.formatted, numeric: !events && !rows.some(r => r.latitude !== undefined)});
+  cells.push({key: 'value', text: row.formatted, numeric: !events && !rows.some(r => r.latitude !== undefined || r.start !== undefined)});
   if (rows.some(r => r.share !== undefined)) cells.push({key: 'share', text: row.share === undefined ? '' : `${row.share.toFixed(1)}%`, numeric: true});
   if (events) cells.push({key: 'status', text: row.status ?? '', numeric: false});
   cells.push({key: 'records', text: String(row.record_count), numeric: true});
@@ -110,7 +114,7 @@ export function ChartFigure({visual, renderCitations}: {visual: ChartVisual, ren
         <tbody>{table.rows.map(row => <tr key={row.label}>
           {/* A timeline's event and a map's place are one record by what they are (rules 16 and 20 do not apply), so they carry no mark. */}
           <td className="border-b py-1 pr-3">{row.label}{row.record_count === 1 && row.status === undefined && row.latitude === undefined
-            ? <span title="Rests on a single record"> †</span> : null}</td>
+            && row.start === undefined ? <span title="Rests on a single record"> †</span> : null}</td>
           {tableCells(table.rows, row).map(cell => <td key={cell.key} className="border-b py-1 pr-3 tabular-nums">{cell.text}</td>)}
           {renderCitations ? <td className="border-b py-1">{renderCitations(row.record_refs)}</td> : null}
         </tr>)}</tbody>

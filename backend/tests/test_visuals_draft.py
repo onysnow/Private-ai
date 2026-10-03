@@ -240,7 +240,7 @@ def test_the_model_sees_the_questions_and_every_kind_it_may_order(monkeypatch, d
         catalog = visual_catalog_for_prompt(db, demo["investigation_id"])
     assert [q["id"] for q in catalog["questions"]] == ["ranking", "change_over_time", "part_of_whole", "distribution", "correlation", "flow", "place", "confidence"]
     by_question = {q["id"]: q for q in catalog["questions"]}
-    assert by_question["place"] == {**by_question["place"], "kinds": ["map"], "queries": ["places_on_map"]}
+    assert by_question["place"] == {**by_question["place"], "kinds": ["map", "before_after"], "queries": ["places_on_map", "pictures_compared"]}
     assert by_question["confidence"] == {**by_question["confidence"], "kinds": ["heatmap"], "queries": ["claims_by_strength"]}
     assert by_question["distribution"] == {**by_question["distribution"], "kinds": ["histogram"], "queries": ["payment_amounts"]}
     by_query = {q["name"]: q for q in catalog["queries"]}

@@ -654,6 +654,54 @@ ADR-0005 line 18 holds the decisions and the numbers behind them.
   `frontend/test-support/chart-kinds.json`, `frontend/tests/test-claims.test.tsx`., `backend/tests/test_timeline_grade.py`,
   `frontend/tests/test-timeline-grade.test.tsx`.
 
+## Pass 6: before and after
+
+The design doc's "before-and-after images" (question `place`; data:
+evidence image attachments; drawn with a slider; exported as two pictures
+side by side), after Bellingcat's "Satellite Imagery Shows Vast
+Destruction in Rafah": a dated pair is evidence, and the caption states
+the claim and both dates.
+
+- **Pictures as documents.** A PNG or JPEG uploads as a document, kept as
+  the picture it is and read for text with the OCR the Workbench runs on
+  scanned PDF pages (`app/services/image_reader.py`; PyMuPDF + Tesseract).
+  Its kind is read from its bytes with Pillow, never from its name; WebP is
+  not taken, because OpenAleph's ingest does not read it and the Workbench
+  reads nothing OpenAleph cannot (ADR-0006). `GET /api/documents/{id}/picture`
+  sends the bytes with their own type, `nosniff` and a `default-src 'none'`
+  policy.
+- **A picture as evidence.** An evidence record can name its picture
+  (`document_id`, a picture of the same investigation) and the date it was
+  taken as its source states it (`captured_on`: a year, a month or a day;
+  migration `c4e7a1b9d235`). The caption is its quote. In the app:
+  "Picture evidence" on a picture document. Backups carry both, and the
+  lineage check names a picture an evidence record points at that is
+  missing.
+- **The pair** (kind `before_after`, query `pictures_compared`): the dated
+  pictures held as evidence; `before` and `after` pick two (the catalogue
+  lists them as `picks`, for the AI and the chart builder). The subtitle
+  always states both dates. Checks: 0 each picture is its record's, with
+  its record's date; 7 the earlier comes first (dates that overlap cannot
+  show a before and an after); 12 both dates written, and a caption, when
+  shown, gives its record's date; 13, 14, 15 as for any chart; the rest do
+  not apply.
+- **Presets and options** (the design doc's: Slider, Side by side, Stacked;
+  the divider's position; the date captions). The slider is
+  react-compare-slider 4.0.0 (MIT, no dependencies, an ARIA slider moved
+  with the arrow keys; Cloud Four, "Building an accessible image comparison
+  web component", on why the control must work from the keyboard). Pictures
+  are shown whole, never cropped.
+- **Exports.** A deck places the two pictures natively, side by side (a
+  slider) or stacked, each fitted to its half with its date under it, and
+  the source line; a brief does the same in a table, then lists them with
+  their records. A picture is read only from a document of the deck's or
+  brief's own investigation (a stored slide names it by id, which is not
+  trusted on its own); one that cannot be read is named with the reason.
+- Tests: `backend/tests/test_visuals_pictures.py`,
+  `frontend/tests/test-chart-pictures.test.tsx`,
+  `frontend/tests/test-picture-evidence.test.tsx`, the `before_after`
+  fixture in `frontend/test-support/chart-kinds.json`.
+
 ## Pass 6: the writing practices
 
 The design doc's "Briefs, decks and summaries" practices that were Partly or

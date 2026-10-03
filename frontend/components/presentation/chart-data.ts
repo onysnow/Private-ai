@@ -12,6 +12,7 @@ import type {ChartKind, VisualPreviewOut} from '../../lib/generated/types.gen';
 export const KIND_NAMES: Record<ChartKind, string> = {
   bar: 'Bar chart', column: 'Column chart', line: 'Line chart', area: 'Area chart', stacked_bar_100: '100% bar', donut: 'Donut',
   treemap: 'Treemap', histogram: 'Histogram', scatter: 'Scatter plot', timeline: 'Timeline', sankey: 'Flow diagram', map: 'Map', heatmap: 'Grid',
+  before_after: 'Before and after',
 };
 
 /** Kinds come as plain strings from the catalogue and stored charts; only a kind the order slip knows counts. */
@@ -36,6 +37,7 @@ export function asChart(v: JsonObject): ChartVisual | null {
       // Only the kinds that write them: a part's share, a scatter plot's second number, a flow's two parties, an event's status, a place's coordinates.
       ...(typeof r.share === 'number' ? {share: r.share} : {}),
       ...(typeof r.status === 'string' ? {status: r.status} : {}),
+      ...(typeof r.start === 'string' ? {start: r.start} : {}),
       ...(typeof r.source === 'string' && typeof r.target === 'string' ? {source: r.source, target: r.target} : {}),
       ...(typeof r.x === 'number' ? {x: r.x} : {}),
       ...(typeof r.x_formatted === 'string' ? {x_formatted: r.x_formatted} : {}),

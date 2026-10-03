@@ -25,6 +25,7 @@ from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Document, IngestionBatch, Investigation
 from app.schemas.api import IngestionBatchCreate
+from app.schemas.responses import file_response
 from app.schemas.responses import (
     BackgroundJobOut, DocumentDetailOut, DocumentEmailOut, DocumentFormatsOut, DocumentReadFailedOut, DocumentUploadOut,
     DocumentTranslationOut, DuplicateDocumentOut, ErrorOut, IngestionBatchesOut, IngestionBatchOut,
@@ -47,6 +48,7 @@ from app.services.openaleph_corpus import (
     import_openaleph_evidence_candidates, record_openaleph_operation_failure,
     refresh_openaleph_review_candidates, serialize_sync, sync_document_to_openaleph,
 )
+from app.services.image_reader import NotAPicture, stored_picture
 from app.services.security import resolve_storage_root
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -378,6 +380,26 @@ def get_document(document_id: str, db: Session = Depends(get_db)) -> Any:
     if row is None:
         raise HTTPException(404, "Document not found")
     return get_document_detail(db, row)
+
+
+@router.get("/documents/{document_id}/picture", response_class=Response,
+            responses=file_response("image/png", "The picture this document is, as uploaded (PNG or JPEG)"))
+def get_document_picture(document_id: str, db: Session = Depends(get_db)) -> Response:
+    """The picture a document is (app/services/image_reader.py), for the app to
+    show beside its evidence. Its type is read from its bytes; it is sent so
+    a browser shows it and never runs it as anything else."""
+    row = db.get(Document, document_id)
+    if row is None:
+        raise HTTPException(404, "Document not found")
+    try:
+        data, picture = stored_picture(row.storage_path, resolve_storage_root(settings.document_storage_dir))
+    except NotAPicture as exc:
+        raise HTTPException(415, f"This document is not a picture: {exc}") from exc
+    except OSError as exc:
+        raise HTTPException(404, "The document's stored file is not available") from exc
+    return Response(content=data, media_type=picture.mime_type, headers={
+        "X-Content-Type-Options": "nosniff", "Content-Security-Policy": "default-src 'none'", "Cache-Control": "private, max-age=300",
+        "Content-Disposition": "inline"})
 
 
 @router.get("/documents/{document_id}/translation", response_model=DocumentTranslationOut)

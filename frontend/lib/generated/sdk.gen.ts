@@ -215,6 +215,9 @@ import type {
   GetDocumentFormatsData,
   GetDocumentFormatsErrors,
   GetDocumentFormatsResponses,
+  GetDocumentPictureData,
+  GetDocumentPictureErrors,
+  GetDocumentPictureResponses,
   GetDocumentResponses,
   GetDocumentTableData,
   GetDocumentTableErrors,
@@ -737,6 +740,8 @@ import {
   zGetDocumentEmailResponse,
   zGetDocumentFormatsResponse,
   zGetDocumentPath,
+  zGetDocumentPicturePath,
+  zGetDocumentPictureResponse,
   zGetDocumentResponse,
   zGetDocumentTablePath,
   zGetDocumentTableQuery,
@@ -2584,6 +2589,39 @@ export const findOpenalephChildren = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zFindOpenalephChildrenResponse.parseAsync(data),
     url: '/api/documents/{document_id}/openaleph/children',
+    ...options,
+  });
+
+/**
+ * Get Document Picture
+ *
+ * The picture a document is (app/services/image_reader.py), for the app to
+ * show beside its evidence. Its type is read from its bytes; it is sent so
+ * a browser shows it and never runs it as anything else.
+ */
+export const getDocumentPicture = <ThrowOnError extends boolean = false>(
+  options: Options<GetDocumentPictureData, ThrowOnError>,
+): RequestResult<
+  GetDocumentPictureResponses,
+  GetDocumentPictureErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetDocumentPictureResponses,
+    GetDocumentPictureErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetDocumentPicturePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDocumentPictureResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/picture',
     ...options,
   });
 

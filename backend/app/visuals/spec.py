@@ -51,6 +51,7 @@ class ChartKind(str, Enum):
     sankey = "sankey"
     map = "map"                      # places on the self-hosted base map (pass 5)
     heatmap = "heatmap"              # a grid of two graded scales, each cell shaded by its count (pass 6)
+    before_after = "before_after"    # two dated pictures of one place, the earlier and the later (pass 6)
 
 
 # What app/visuals/echarts.py draws. The sankey and the timeline came with
@@ -61,7 +62,7 @@ class ChartKind(str, Enum):
 DRAWN_KINDS: frozenset[ChartKind] = frozenset({
     ChartKind.bar, ChartKind.column, ChartKind.line, ChartKind.area, ChartKind.stacked_bar_100, ChartKind.donut,
     ChartKind.treemap, ChartKind.histogram, ChartKind.scatter, ChartKind.sankey, ChartKind.timeline, ChartKind.map,
-    ChartKind.heatmap,
+    ChartKind.heatmap, ChartKind.before_after,
 })
 
 # Kinds that show a value as a length (rule 9: the easiest to read) ...
@@ -94,7 +95,7 @@ POINT_KINDS: frozenset[ChartKind] = frozenset({ChartKind.line, ChartKind.area, C
 # a `latitude` and a `longitude`, for a map; "grid": one row per cell of
 # two graded scales, `across` and `down`, every cell present (an empty one
 # too, since a cell's place says what it means), for a heatmap.
-SERIES_KINDS = ("category", "time", "distribution", "pairs", "flows", "events", "places", "grid")
+SERIES_KINDS = ("category", "time", "distribution", "pairs", "flows", "events", "places", "grid", "pictures")
 KINDS_FOR_SERIES: dict[str, tuple[ChartKind, ...]] = {
     "category": (ChartKind.bar, ChartKind.column, ChartKind.stacked_bar_100, ChartKind.donut, ChartKind.treemap),
     "time": (ChartKind.line, ChartKind.column, ChartKind.area, ChartKind.bar),
@@ -104,6 +105,7 @@ KINDS_FOR_SERIES: dict[str, tuple[ChartKind, ...]] = {
     "events": (ChartKind.timeline,),
     "places": (ChartKind.map,),
     "grid": (ChartKind.heatmap,),
+    "pictures": (ChartKind.before_after,),
 }
 # The shapes a kind needs; any other shape cannot be drawn by it at all (a
 # histogram of periods, a scatter plot of one number). A line over
@@ -116,6 +118,7 @@ SERIES_FOR_KIND: dict[ChartKind, tuple[str, ...]] = {
     ChartKind.timeline: ("events",),
     ChartKind.map: ("places",),
     ChartKind.heatmap: ("grid",),
+    ChartKind.before_after: ("pictures",),
 }
 
 
@@ -165,6 +168,8 @@ _CURRENCY = ParamSpec("ISO 4217 currency code, e.g. USD. Each currency is its ow
 _GRANULARITY = ParamSpec("How to group dates.", choices=("month", "year"), default="month")
 # A date as the timeline records it: a year, a month or a day (app/services/timeline.py).
 _PARTIAL_DATE = r"^\d{4}(-\d{2}(-\d{2})?)?$"
+# A record's id as the Workbench makes them (uuid4 text).
+_RECORD_ID = r"^[0-9a-fA-F-]{8,64}$"
 # The verification statuses a timeline event can carry (app/services/timeline.py:
 # the reporter's own five, and the two it gives the dates it reads from records).
 EVENT_STATUSES = ("asserted", "verified", "approximate", "disputed", "unresolved", "reporter_reviewed", "system_recorded")
@@ -203,6 +208,14 @@ QUERY_CATALOG: dict[str, QuerySpec] = {q.name: q for q in (
         "Every record with a latitude and a longitude (addresses, properties), where its record puts it: one row per place, for a map. "
         "Nothing is looked up; a record without coordinates is not on the map.",
         {}, series_kind="places", unit_kind="count", record_noun="places",
+    ),
+    QuerySpec(
+        "pictures_compared", "Pictures compared",
+        "The pictures held as evidence with the date each was taken, as its source states it: before and after pick the two to "
+        "compare (evidence ids), the earlier first. A picture with no date is left out and listed.",
+        {"before": ParamSpec("The evidence id of the earlier picture.", pattern=_RECORD_ID),
+         "after": ParamSpec("The evidence id of the later picture.", pattern=_RECORD_ID)},
+        series_kind="pictures", unit_kind="count", record_noun="pictures",
     ),
     QuerySpec(
         "claims_by_strength", "Claims by confidence grade",
@@ -295,8 +308,12 @@ QUESTIONS: dict[str, Question] = {q.id: q for q in (
     # The FT Visual Vocabulary's "Spatial": "used only when precise locations
     # or geographical patterns in data are more important to the reader than
     # anything else".
-    Question("place", "Place", "Where things are: the addresses and properties the records place on the globe.",
-             (ChartKind.map,), ("places",)),
+    # The design doc puts before-and-after pictures under "Place": what
+    # changed at one place, in two dated pictures (Bellingcat, "Satellite
+    # Imagery Shows Vast Destruction in Rafah": a dated pair is evidence).
+    Question("place", "Place", "Where things are: the addresses and properties the records place on the globe; "
+             "or what changed at a place, in two dated pictures of it.",
+             (ChartKind.map, ChartKind.before_after), ("places", "pictures")),
     # Not an FT Visual Vocabulary category: the design doc's "Confidence"
     # (the claim-strength grid), after the IPCC AR5 evidence-by-agreement
     # grid the claims are graded on (ADR-0005, line 5).

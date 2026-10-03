@@ -60,6 +60,7 @@
     "maplibre-gl": "^6.11.2",
     "next": "15.5.25",
     "react": "19.3.0",
+    "react-compare-slider": "4.0.0",
     "react-dom": "19.3.0",
     "react-hook-form": "^7.88.0",
     "sigma": "^3.0.3",

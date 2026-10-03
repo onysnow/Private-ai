@@ -60,8 +60,9 @@ def test_each_question_names_the_kinds_and_query_shapes_that_answer_it():
     assert QUERY_CATALOG["events_in_order"].kinds == (ChartKind.timeline,)
     assert QUERY_CATALOG["payment_amounts"].kinds[0] == ChartKind.histogram
     assert QUERY_CATALOG["payments_count_and_total_by_party"].kinds == (ChartKind.scatter,)
-    # The FT Visual Vocabulary's "Spatial": where things are, on a map.
-    assert QUESTIONS["place"].kinds == (ChartKind.map,) and QUESTIONS["place"].series_kinds == ("places",)
+    # The FT Visual Vocabulary's "Spatial": where things are, on a map; and, as the design doc puts it, what changed at a place.
+    assert QUESTIONS["place"].kinds == (ChartKind.map, ChartKind.before_after) and QUESTIONS["place"].series_kinds == ("places", "pictures")
+    assert QUERY_CATALOG["pictures_compared"].kinds == (ChartKind.before_after,)
     assert QUERY_CATALOG["places_on_map"].questions == ("place",)
     assert QUERY_CATALOG["places_on_map"].kinds == (ChartKind.map,)
     # The design doc's claim-strength grid: the claims on the IPCC evidence-by-agreement grid.

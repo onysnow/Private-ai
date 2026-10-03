@@ -484,6 +484,62 @@ def _render_places_table(docx: Any, rows: list[Any], citation_index: dict[tuple[
     _set_widths(table, [4.0, 2.5])
 
 
+def _render_pictures_table(docx: Any, rows: list[Any], citation_index: dict[tuple[str, str], int]) -> None:
+    """Pictures that cannot be shown as a pair: each with its records and
+    the date it was taken."""
+    from app.visuals.echarts import date_words
+
+    table = docx.add_table(rows=0, cols=2)
+    _row_rules(table)
+    for row in rows:
+        cells = table.add_row().cells
+        p = cells[0].paragraphs[0]
+        _set_run(p.add_run(row.label), size=9.5, color=DOCX_INK, font=DOCX_SANS)
+        marker = _refs_marker([r.as_dict() for r in row.record_refs], citation_index)
+        if marker:
+            _set_run(p.add_run(" " + marker), size=8, color=DOCX_BRASS, font=DOCX_SANS, superscript=True)
+        _set_run(cells[1].paragraphs[0].add_run(f"taken {date_words(row.start)}"), size=9.5, color=DOCX_INK, font=DOCX_SANS, bold=True)
+    _set_widths(table, [4.0, 2.5])
+
+
+def _render_picture_pair(docx: Any, built: Any, investigation_id: str) -> None:
+    """Before and after in a brief: the title, the subtitle with both dates,
+    then the two pictures side by side (stacked when the chart is), each
+    captioned with its date when the captions are on. Pictures are read only
+    from the brief's own investigation."""
+    from io import BytesIO
+
+    from docx.shared import Inches
+
+    from app.services.image_reader import investigation_picture
+
+    option = built.option.get("pictures") or {}
+    titles = built.option.get("title") or []
+    p = _para(docx, space_before=6, space_after=2, keep_next=True)
+    _set_run(p.add_run(str(titles[0].get("text") or "") if titles else ""), size=10.5, color=DOCX_INK, font=DOCX_SANS, bold=True)
+    subtitle = str(titles[0].get("subtext") or "") if titles else ""
+    if subtitle:
+        _set_run(_para(docx, space_after=4, keep_next=True).add_run(subtitle), size=9, color=DOCX_TAUPE, font=DOCX_SANS)
+    stacked = option.get("layout") == "stacked"
+    items = option.get("items") or []
+    table = docx.add_table(rows=len(items) if stacked else 1, cols=1 if stacked else len(items))
+    for i, item in enumerate(items):
+        cell = table.cell(i, 0) if stacked else table.cell(0, i)
+        found = investigation_picture(investigation_id, item.get("document_id"))
+        para = cell.paragraphs[0]
+        if isinstance(found, str):
+            _set_run(para.add_run(f"The {item.get('role')} picture is not shown: {found}."), size=9, color=DOCX_OXBLOOD, font=DOCX_SANS, italic=True)
+        else:
+            png, _picture = found
+            run = para.add_run()
+            shape = run.add_picture(BytesIO(png), width=Inches(6.4 if stacked else 3.1))
+            shape._inline.docPr.set("descr", f"{str(item.get('role') or '').capitalize()}: {item.get('label')}, taken {item.get('taken')}")
+        if item.get("caption"):
+            _set_run(cell.add_paragraph().add_run(str(item["caption"])), size=9, color=DOCX_INK, font=DOCX_SANS, bold=True)
+    source = _para(docx, space_before=2, space_after=4)
+    _set_run(source.add_run(built.source_line), size=8.5, color=DOCX_TAUPE, font=DOCX_SANS)
+
+
 def _render_beside_events(docx: Any, built: Any, citation_index: dict[tuple[str, str], int]) -> None:
     """A map with its timeline: the events beside the map, each with its
     place, after the places (rule 13: every mark the pictures draw is listed)."""
@@ -492,7 +548,7 @@ def _render_beside_events(docx: Any, built: Any, citation_index: dict[tuple[str,
         _render_events_table(docx, built.beside_rows, citation_index, built.place_of)
 
 
-def _render_chart(docx: Any, visual: dict, citation_index: dict[tuple[str, str], int]) -> None:
+def _render_chart(docx: Any, visual: dict, citation_index: dict[tuple[str, str], int], investigation_id: str = "") -> None:
     """A resolved chart (app/ai/chart_check.py), drawn again from its own
     rows and checked once more (app/services/decks.py checked_chart): the
     image from the export bridge for every kind when the render service
@@ -532,10 +588,17 @@ def _render_chart(docx: Any, visual: dict, citation_index: dict[tuple[str, str],
         elif spec.kind.value == "map":
             # Likewise every place: list them with where they are.
             _render_places_table(docx, rows, citation_index)
+        elif spec.kind.value == "before_after":
+            # And every picture: list them with when each was taken.
+            _render_pictures_table(docx, rows, citation_index)
         else:
             _render_bar_table(docx, chart_bar_items(rows, chart_row_labels(data, rows)), data.unit, citation_index)
         return
 
+    if built.kind.value == "before_after":
+        _render_picture_pair(docx, built, investigation_id)
+        _render_data_table(docx, built, data, citation_index)
+        return
     image: bytes | None = None
     note: str | None = None
     try:
@@ -563,13 +626,13 @@ def _render_chart(docx: Any, visual: dict, citation_index: dict[tuple[str, str],
     _set_run(source.add_run(built.source_line), size=8.5, color=DOCX_TAUPE, font=DOCX_SANS)
 
 
-def _render_visual(docx: Any, visual: dict, citation_index: dict[tuple[str, str], int]) -> None:
+def _render_visual(docx: Any, visual: dict, citation_index: dict[tuple[str, str], int], investigation_id: str = "") -> None:
     from docx.shared import Inches
     from app.services.decks import display_date
 
     kind = visual.get("type")
     if kind == "chart":
-        _render_chart(docx, visual, citation_index)
+        _render_chart(docx, visual, citation_index, investigation_id)
         _para(docx, space_after=4)
         return
     items = visual.get("items") or []
@@ -692,7 +755,7 @@ def render_writeup_docx(row: Writeup, citation_details: list[dict] | None = None
         elif node_type == "callout":
             _render_callout(docx, node, citation_index)
         elif node_type == "evidenceVisual":
-            _render_visual(docx, (node.get("attrs") or {}).get("visual") or {}, citation_index)
+            _render_visual(docx, (node.get("attrs") or {}).get("visual") or {}, citation_index, row.investigation_id)
         elif node_type in {"bulletList", "orderedList"}:
             style = "List Bullet" if node_type == "bulletList" else "List Number"
             for item in node.get("content") or []:

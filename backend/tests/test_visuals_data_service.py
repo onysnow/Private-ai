@@ -131,11 +131,11 @@ def test_describe_catalog_lists_every_query_and_whether_it_has_data(demo):
     assert set(by_name) == {"payments_by_party", "payments_over_time", "events_over_time", "links_by_type", "claims_by_status",
                             "entities_by_schema", "evidence_by_stance", "documents_by_status", "leads_by_status",
                             "payment_amounts", "payments_count_and_total_by_party", "payment_flows", "events_in_order",
-                            "places_on_map", "claims_by_strength"}
+                            "places_on_map", "claims_by_strength", "pictures_compared"}
     assert by_name["payments_by_party"]["has_data"] and by_name["payments_by_party"]["currencies"] == ["USD"]
     assert by_name["payments_by_party"]["params"]["direction"] == {"description": "Rank who received the money, or who paid it.", "choices": ["received", "paid"], "default": "received"}
     assert by_name["documents_by_status"]["has_data"] is False
-    assert catalog["drawn_kinds"] == ["area", "bar", "column", "donut", "heatmap", "histogram", "line", "map", "sankey", "scatter", "stacked_bar_100", "timeline", "treemap"]
+    assert catalog["drawn_kinds"] == ["area", "bar", "before_after", "column", "donut", "heatmap", "histogram", "line", "map", "sankey", "scatter", "stacked_bar_100", "timeline", "treemap"]
     assert sorted(catalog["kinds"]) == catalog["drawn_kinds"]
     # Each query says which drawn kinds can draw it and which questions it answers.
     assert by_name["payments_by_party"]["kinds"] == ["bar", "column", "stacked_bar_100", "donut", "treemap"]

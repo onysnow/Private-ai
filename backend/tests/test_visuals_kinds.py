@@ -457,7 +457,12 @@ def _fixture_orders() -> dict[str, tuple[str, VisualData]]:
                      across=e, down=a)
              for i, e in enumerate(("limited", "medium", "robust")) for j, a in enumerate(("low", "medium", "high"))]
     grid = VisualData("inv", "claims_by_strength", {}, "claims", "count", "grid", "claims", cells, record_count=3)
+    taken = [DataRow("The market hall, intact", 1.0, [RecordRef("evidence", "p1")], 1, "2023-10-03|p1", start="2023-10-03", picture="doc-1"),
+             DataRow("The market hall, destroyed", 1.0, [RecordRef("evidence", "p2")], 1, "2023-11-14|p2", start="2023-11-14", picture="doc-2")]
+    pictures = VisualData("inv", "pictures_compared", {"before": "p1", "after": "p2"}, "pictures", "count", "pictures", "pictures", taken,
+                          record_count=2)
     return {
+        "before_after": ("The market hall was destroyed within six weeks", pictures),
         "heatmap": ("Most claims rest on robust, agreeing evidence", grid),
         "map": ("The money ended up in a villa in Cyprus", places),
         "timeline": ("The payment came two years after Bellcastle took control", events),

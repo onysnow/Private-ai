@@ -40,6 +40,7 @@ import {CONTAINER_SCHEMATA, nestDocuments} from './document-tree';
 import {EmailView} from './email-view';
 import {SimilarDocuments} from './similar-documents';
 import {isTable, TableMapper} from './table-mapper';
+import {isPicture, PictureEvidence} from './picture-evidence';
 import {DocumentTranslation} from './document-translation';
 import {IdentifierOwner} from './identifier-owner';
 import {SchemaQuestion} from './schema-question';
@@ -109,6 +110,7 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
   // The email whose headers and thread are open.
   const [emailOpen, setEmailOpen] = useState<string | null>(null);
   const [mapOpen, setMapOpen] = useState<string | null>(null);
+  const [pictureOpen, setPictureOpen] = useState<string | null>(null);
   const [translationOpen, setTranslationOpen] = useState<string | null>(null);
   // The document whose similar documents are shown, and the one last opened from elsewhere.
   const [similarOpen, setSimilarOpen] = useState<string | null>(null);
@@ -472,6 +474,8 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
             {d.openaleph_document_id && <Button aria-expanded={translationOpen === d.id} onClick={() => setTranslationOpen(cur => (cur === d.id ? null : d.id))}>Translation</Button>}
             {d.openaleph_document_id && <Button aria-expanded={similarOpen === d.id} onClick={() => setSimilarOpen(cur => (cur === d.id ? null : d.id))}>Similar documents</Button>}
             {isTable(d.filename) && <Button aria-expanded={mapOpen === d.id} onClick={() => setMapOpen(cur => (cur === d.id ? null : d.id))}>Map columns to entities</Button>}
+            {isPicture(d.filename) && d.extraction_status === 'complete' && <Button aria-expanded={pictureOpen === d.id}
+              onClick={() => setPictureOpen(cur => (cur === d.id ? null : d.id))}>Picture evidence</Button>}
             <Button onClick={() => openProvenance({title: d.filename, kind: 'document', sourceId: d.source_id, documentId: d.id})}>Trace document</Button>
             {d.extraction_status === 'failed' && <Button onClick={() => retryDocumentRead(d)}>Retry reading</Button>}
             {(d.extraction_status === 'queued' || d.extraction_status === 'extracting') && <Button onClick={() => retryDocumentRead(d)}>Check reading progress</Button>}
@@ -479,6 +483,7 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
           {similarOpen === d.id && <SimilarDocuments documentId={d.id}/>}
           {translationOpen === d.id && <DocumentTranslation documentId={d.id}/>}
           {mapOpen === d.id && <TableMapper documentId={d.id} onProposed={() => loadCandidates(d.id)}/>}
+          {pictureOpen === d.id && <PictureEvidence investigationId={investigationId} documentId={d.id} sourceId={d.source_id} filename={d.filename}/>}
           {emailOpen === d.id && <EmailView documentId={d.id} onOpenDocument={documentId => loadCandidates(documentId)}/>}
         </div>;
       })}

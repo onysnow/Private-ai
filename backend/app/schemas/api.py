@@ -47,6 +47,10 @@ class EvidenceCreate(BaseModel):
     quote: str | None = None
     locator: str | None = None
     notes: str | None = None
+    # A picture as evidence: an uploaded picture document of the same
+    # investigation, and when it was taken as its source states it.
+    document_id: str | None = None
+    captured_on: str | None = Field(default=None, pattern=r"^\d{4}(-\d{2}(-\d{2})?)?$")
 
 class ClaimEvidenceLinkCreate(BaseModel):
     evidence_id: str

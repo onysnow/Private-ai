@@ -74,7 +74,7 @@ def test_the_generated_list_matches_the_ingest_file_image_the_stack_runs():
 
 
 def test_openaleph_reads_everything_the_workbench_reads_and_more():
-    assert LOCAL_EXTENSIONS == {"txt", "md", "csv", "html", "htm", "pdf", "docx"}
+    assert LOCAL_EXTENSIONS == {"txt", "md", "csv", "html", "htm", "pdf", "docx", "png", "jpg", "jpeg"}
     assert LOCAL_EXTENSIONS <= openaleph_formats.EXTENSIONS
     assert {"eml", "msg", "mbox", "pst", "zip", "7z", "tar", "xlsx", "pptx", "odt", "jpg", "tiff"} <= openaleph_formats.EXTENSIONS
     assert {"message/rfc822", "application/zip", "application/pdf"} <= openaleph_formats.MIME_TYPES
@@ -107,7 +107,7 @@ def test_the_upload_check_follows_the_reader(fake, monkeypatch):
     with pytest.raises(UnsupportedFormat) as refused:
         check_upload("transfer.eml", "message/rfc822")
     assert str(refused.value) == (
-        "The Workbench's own reader reads .csv, .docx, .htm, .html, .md, .pdf, .txt files; it cannot read .eml files, "
+        "The Workbench's own reader reads .csv, .docx, .htm, .html, .jpeg, .jpg, .md, .pdf, .png, .txt files; it cannot read .eml files, "
         "so this file was not uploaded. OpenAleph reads them, but this deployment does not read uploads with OpenAleph.")
     assert needs_openaleph("transfer.eml") and not needs_openaleph("memo.TXT")
 
@@ -124,7 +124,7 @@ def test_the_formats_route_lists_what_uploads_accept_now(fake, monkeypatch):
     monkeypatch.setattr(settings, "document_reader", "local")
     local = client.get("/api/document-formats").json()
     assert local["reader"] == "workbench" and local["mime_types"] == [] and local["openaleph_only_extensions"] == []
-    assert local["accept"] == ".csv,.docx,.htm,.html,.md,.pdf,.txt"
+    assert local["accept"] == ".csv,.docx,.htm,.html,.jpeg,.jpg,.md,.pdf,.png,.txt"
     assert local["ingest_file_image"] is None
     r.DocumentFormatsOut.model_validate(with_openaleph)
     r.DocumentFormatsOut.model_validate(local)

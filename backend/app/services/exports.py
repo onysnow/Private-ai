@@ -218,6 +218,12 @@ def _lineage_integrity(records: dict[str, list[dict[str, Any]]]) -> dict[str, An
         if parent_id is not None and parent_id not in documents:
             errors.append(f"document {doc_id} references missing parent document {parent_id}")
 
+    for evidence in records.get("evidence", []):
+        # A picture as evidence points at its picture document.
+        picture = evidence.get("document_id")
+        if picture is not None and picture not in documents:
+            errors.append(f"evidence {evidence.get('id')} references missing picture document {picture}")
+
     for chunk_id, chunk in chunks.items():
         if not chunk_id:
             errors.append("document chunk missing id")

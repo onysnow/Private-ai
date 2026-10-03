@@ -42,7 +42,8 @@ const ChartFigure = dynamic(() => import('../../components/presentation/chart-vi
 // choice" (the currency with the most payments) has a name of its own.
 const QUERY_DEFAULT = '__default__';
 // The catalogue's parameters by what they ask (backend/app/visuals/spec.py).
-const PARAM_LABELS: Record<string, string> = {direction: 'Direction', granularity: 'Group dates by', currency: 'Currency'};
+const PARAM_LABELS: Record<string, string> = {direction: 'Direction', granularity: 'Group dates by', currency: 'Currency',
+  before: 'Before (the earlier picture)', after: 'After (the later picture)'};
 
 type Props = {investigationId: string};
 
@@ -101,7 +102,11 @@ export function ChartBuilderPanel({investigationId}: Props): ReactElement {
   const chooseQuery = (name: string, among: VisualQueryOut[] = queries, within: VisualQuestionOut | undefined = question) => {
     const next = among.find(q => q.name === name);
     setQueryName(name);
-    setParams(Object.fromEntries(Object.entries(next?.params ?? {}).map(([key, param]) => [key, param.default ?? QUERY_DEFAULT])));
+    const picks = next?.picks ?? [];
+    setParams(Object.fromEntries(Object.entries(next?.params ?? {}).map(([key, param]) => [key,
+      // Two pictures to compare start as the earliest and the latest; either can be changed.
+      key === 'before' && picks.length > 1 ? picks[0].evidence_id
+        : key === 'after' && picks.length > 1 ? picks[picks.length - 1].evidence_id : param.default ?? QUERY_DEFAULT])));
     setKind(suggestedKinds(within, next)[0] ?? '');
     preview.reset();
   };
@@ -155,7 +160,13 @@ export function ChartBuilderPanel({investigationId}: Props): ReactElement {
                   {q.label}{q.has_data ? ` · ${q.record_count} ${q.record_noun}` : ' · no records yet'}
                 </SelectItem>)}</SelectContent>
               </Select>
-              {query && Object.entries(query.params).map(([key, param]) => param.choices?.length
+              {query && (query.picks ?? []).length > 1 && ['before', 'after'].map(key => <Select key={key} value={params[key] ?? ''}
+                onValueChange={value => setParam(key, value)}>
+                <SelectTrigger className="w-auto" aria-label={PARAM_LABELS[key]} title={query.params[key]?.description}><SelectValue/></SelectTrigger>
+                <SelectContent>{(query.picks ?? []).map(pick => <SelectItem key={pick.evidence_id} value={pick.evidence_id}>
+                  {pick.caption} · taken {pick.taken}</SelectItem>)}</SelectContent>
+              </Select>)}
+              {query && !(query.picks ?? []).length && Object.entries(query.params).map(([key, param]) => param.choices?.length
                 ? <Select key={key} value={params[key] ?? param.default ?? ''} onValueChange={value => setParam(key, value)}>
                   <SelectTrigger className="w-auto" aria-label={PARAM_LABELS[key] ?? key} title={param.description}><SelectValue/></SelectTrigger>
                   <SelectContent>{param.choices.map(choice => <SelectItem key={choice} value={choice}>{choice}</SelectItem>)}</SelectContent>

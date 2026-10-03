@@ -69,6 +69,9 @@ class DataRow:
     # A "places" row: the dated events at the place, each an "events" row,
     # earliest first (for the map with its timeline beside it).
     events: list[DataRow] | None = None
+    # A "pictures" row: the uploaded picture (a document) its evidence record
+    # is; `start` is the date it was taken.
+    picture: str | None = None
 
     def as_dict(self) -> dict[str, Any]:
         out: dict[str, Any] = {"label": self.label, "value": self.value, "record_refs": [r.as_dict() for r in self.record_refs],
@@ -80,8 +83,11 @@ class DataRow:
             # Likewise only flows rows.
             out["source"], out["target"] = self.source, self.target
         if self.start is not None:
-            # And only events rows (an end only when the event has one).
-            out["start"], out["status"] = self.start, self.status
+            # And only events rows (an end only when the event has one), and
+            # pictures rows, whose date taken has no verification status.
+            out["start"] = self.start
+            if self.status is not None:
+                out["status"] = self.status
             if self.end is not None:
                 out["end"] = self.end
             if self.grade is not None:
@@ -94,6 +100,9 @@ class DataRow:
         if self.across is not None and self.down is not None:
             # And only grid rows.
             out["across"], out["down"] = self.across, self.down
+        if self.picture is not None:
+            # And only pictures rows (with the date each was taken, as `start`).
+            out["picture"] = self.picture
         return out
 
 
@@ -168,6 +177,8 @@ def _row_from_dict(r: dict[str, Any]) -> DataRow:
                   latitude=_coordinate(r, "latitude"), longitude=_coordinate(r, "longitude"),
                   across=str(r["across"]) if isinstance(r.get("across"), str) and isinstance(r.get("down"), str) else None,
                   down=str(r["down"]) if isinstance(r.get("across"), str) and isinstance(r.get("down"), str) else None)
+    if isinstance(r.get("picture"), str):
+        row.picture = r["picture"]
     if row.latitude is not None and isinstance(r.get("events"), list):
         row.events = [_row_from_dict(e) for e in r["events"] if isinstance(e, dict) and isinstance(e.get("start"), str)]
     return row
@@ -616,6 +627,47 @@ def places_on_map(db: Session, investigation_id: str, params: dict[str, str]) ->
     )
 
 
+def pictures_compared(db: Session, investigation_id: str, params: dict[str, str]) -> VisualData:
+    """The pictures held as evidence (an evidence record with a picture
+    document) with the date each was taken, earliest first, each one record
+    cited as itself. `before` and `after` keep the two to compare, in that
+    order; a picture with no date, or none of this investigation, cannot be
+    one of them. A picture with no date is listed under ``omitted``."""
+    from app.models.domain import Evidence, Source
+
+    pictures = db.execute(select(Evidence, Source).join(Source, Evidence.source_id == Source.id).where(
+        Source.investigation_id == investigation_id, Evidence.document_id.is_not(None)).order_by(Evidence.id)).all()
+    omitted: list[dict[str, Any]] = []
+    dated: dict[str, tuple[date, Evidence, Source]] = {}
+    for evidence, source in pictures:
+        bounds = date_bounds(evidence.captured_on)
+        if bounds is None:
+            omitted.append({"reason": "date not known", "record_type": "evidence", "record_id": evidence.id,
+                            "detail": f"{evidence.quote or source.title}: no date taken recorded"})
+            continue
+        dated[evidence.id] = (bounds[0], evidence, source)
+    picked = [params[key] for key in ("before", "after") if params.get(key)]
+    if picked:
+        if len(picked) != 2:
+            raise QueryError("pictures_compared needs both before and after, or neither")
+        missing = [i for i in picked if i not in dated]
+        if missing:
+            raise QueryError(f"no dated picture of this investigation has the evidence id {missing[0]}")
+        chosen = [dated[i] for i in picked]
+    else:
+        chosen = sorted(dated.values(), key=lambda item: (item[0], item[1].id))
+    captions = [str(evidence.quote or source.title).strip() for _day, evidence, source in chosen]
+    rows: list[DataRow] = []
+    for (day, evidence, _source), caption in zip(chosen, captions):
+        label = caption if captions.count(caption) == 1 else f"{caption} ({evidence.captured_on})"
+        if any(row.label == label for row in rows):
+            label = f"{label} [{evidence.id[:8]}]"
+        rows.append(DataRow(label, 1.0, [RecordRef("evidence", evidence.id)], 1, f"{day.isoformat()}|{evidence.id}",
+                            start=evidence.captured_on, picture=evidence.document_id))
+    return VisualData(investigation_id=investigation_id, query="pictures_compared", params=params, unit="pictures", unit_kind="count",
+                      series_kind="pictures", record_noun="pictures", rows=rows, record_count=len(rows), omitted=omitted)
+
+
 def links_by_type(db: Session, investigation_id: str, params: dict[str, str]) -> VisualData:
     from app.services.relationships import RELATIONSHIP_SCHEMAS, investigation_relationships
 
@@ -724,6 +776,7 @@ QUERIES: dict[str, QueryRunner] = {
     "events_over_time": events_over_time,
     "events_in_order": events_in_order,
     "places_on_map": places_on_map,
+    "pictures_compared": pictures_compared,
     "claims_by_strength": claims_by_strength,
     "links_by_type": links_by_type,
     "claims_by_status": claims_by_status,
@@ -770,10 +823,14 @@ def describe_catalog(db: Session, investigation_id: str) -> dict[str, Any]:
             "params": {key: {"description": p.description, "choices": list(p.choices) if p.choices else None, "default": p.default}
                        for key, p in spec.params.items()},
             "series_kind": spec.series_kind, "unit_kind": spec.unit_kind, "record_noun": spec.record_noun,
-            "has_data": any(row.value for row in data.rows), "record_count": data.record_count,
+            # Two pictures make a pair; one is nothing to compare.
+            "has_data": len(data.rows) >= 2 if spec.series_kind == "pictures" else any(row.value for row in data.rows),
+            "record_count": data.record_count,
             "row_count": len(data.rows), "currencies": currencies,
             "kinds": [kind.value for kind in spec.kinds if kind in DRAWN_KINDS],
             "questions": list(spec.questions),
+            **({"picks": [{"evidence_id": row.record_refs[0].record_id, "caption": row.label, "taken": row.start}
+                          for row in data.rows]} if spec.series_kind == "pictures" else {}),
         })
     return {
         "investigation_id": investigation_id,

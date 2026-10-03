@@ -225,7 +225,7 @@ VISUAL_PRESETS: dict[str, list[dict]] = {
 CHART_FAMILIES: dict[str, str] = {
     "bar": "bars", "column": "bars", "line": "lines", "area": "lines",
     "stacked_bar_100": "parts", "donut": "parts", "treemap": "parts", "histogram": "histogram", "scatter": "scatter",
-    "sankey": "flows", "timeline": "timeline", "map": "map", "heatmap": "grid",
+    "sankey": "flows", "timeline": "timeline", "map": "map", "heatmap": "grid", "before_after": "pictures",
 }
 # Rows a sort applies to: groups, records, and flows ranked as bars.
 _RANKED_SERIES = ["category", "distribution", "flows"]
@@ -292,6 +292,14 @@ CHART_OPTIONS: dict[str, dict[str, dict]] = {
         "highlight": {"type": "labels", "label": "Highlight places (drawn larger)"},
         "with_timeline": {"type": "bool", "label": "Put the timeline of the events at the places beside the map", "kinds": ["map"]},
     },
+    # Two dated pictures (the design doc's presets for before-and-after
+    # images: slider, side by side, stacked; options: the divider's position
+    # and the date captions). Nothing here changes a picture or its date.
+    "pictures": {
+        "picture_layout": {"type": "choice", "label": "Layout", "values": ["slider", "side_by_side", "stacked"]},
+        "divider": {"type": "choice", "label": "Where the slider's divider starts (% across)", "values": ["25", "33", "50", "67", "75"]},
+        "date_captions": {"type": "bool", "label": "Each picture's date under it (the subtitle states both dates either way)"},
+    },
     # A grid's cells sit where their grades meet and are shaded by their
     # counts; a picked cell is outlined and its count written bold.
     "grid": {
@@ -344,6 +352,18 @@ CHART_PRESETS: dict[str, list[dict]] = {
     "grid": [
         {"id": "grid", "label": "Grid", "description": "One cell per pair of grades, shaded by how many sit there, each count written in its cell.",
          "kind": "heatmap", "options": {}},
+    ],
+    # The design doc's presets for before-and-after images. No source the
+    # research found covers presets for them, so these are its own design; a
+    # slider is the app's (react-compare-slider); exports place the pictures
+    # side by side, as the design's export column says.
+    "pictures": [
+        {"id": "slider", "label": "Slider", "description": "One picture over the other, a divider to drag between them (side by side in exports).",
+         "kind": "before_after", "options": {"picture_layout": "slider"}},
+        {"id": "side_by_side", "label": "Side by side", "description": "The earlier picture on the left, the later on the right.",
+         "kind": "before_after", "options": {"picture_layout": "side_by_side"}},
+        {"id": "stacked", "label": "Stacked", "description": "The earlier picture above, the later below, for wide pictures.",
+         "kind": "before_after", "options": {"picture_layout": "stacked"}},
     ],
     "map": [
         {"id": "map", "label": "Map", "description": "Each place where its record puts it, named beside its dot, on the self-hosted base map.",

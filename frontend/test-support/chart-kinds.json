@@ -680,6 +680,190 @@
   },
   "width": 960
  },
+ "before_after": {
+  "data": {
+   "currency": null,
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {
+    "after": "p2",
+    "before": "p1"
+   },
+   "query": "pictures_compared",
+   "record_count": 2,
+   "record_noun": "pictures",
+   "rows": [
+    {
+     "key": "2023-10-03|p1",
+     "label": "The market hall, intact",
+     "picture": "doc-1",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "p1",
+       "record_type": "evidence"
+      }
+     ],
+     "start": "2023-10-03",
+     "value": 1.0
+    },
+    {
+     "key": "2023-11-14|p2",
+     "label": "The market hall, destroyed",
+     "picture": "doc-2",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "p2",
+       "record_type": "evidence"
+      }
+     ],
+     "start": "2023-11-14",
+     "value": 1.0
+    }
+   ],
+   "series_kind": "pictures",
+   "unit": "pictures",
+   "unit_kind": "count"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Before and after: The market hall was destroyed within six weeks. Before: The market hall, intact, taken 3 Oct 2023. After: The market hall, destroyed, taken 14 Nov 2023.",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#B98D34"
+   ],
+   "pictures": {
+    "bottom": 44,
+    "divider": 50,
+    "items": [
+     {
+      "caption": "Before · taken 3 Oct 2023",
+      "document_id": "doc-1",
+      "label": "The market hall, intact",
+      "role": "before",
+      "taken": "2023-10-03"
+     },
+     {
+      "caption": "After · taken 14 Nov 2023",
+      "document_id": "doc-2",
+      "label": "The market hall, destroyed",
+      "role": "after",
+      "taken": "2023-11-14"
+     }
+    ],
+    "layout": "slider",
+    "top": 96
+   },
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Before: taken 3 Oct 2023. After: taken 14 Nov 2023",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "The market hall was destroyed within six weeks",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 2 pictures in this investigation's records (pictures_compared)",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ]
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "before_after",
+   "limit": null,
+   "query": {
+    "name": "pictures_compared",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "The market hall was destroyed within six weeks",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Before and after: The market hall was destroyed within six weeks. Before: The market hall, intact, taken 3 Oct 2023. After: The market hall, destroyed, taken 14 Nov 2023.",
+   "data_table": {
+    "columns": [
+     "Picture",
+     "Taken",
+     "Records"
+    ],
+    "rows": [
+     {
+      "formatted": "3 Oct 2023",
+      "label": "The market hall, intact",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "p1",
+        "record_type": "evidence"
+       }
+      ],
+      "start": "2023-10-03",
+      "value": 1.0
+     },
+     {
+      "formatted": "14 Nov 2023",
+      "label": "The market hall, destroyed",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "p2",
+        "record_type": "evidence"
+       }
+      ],
+      "start": "2023-11-14",
+      "value": 1.0
+     }
+    ]
+   },
+   "description": "Before and after: The market hall was destroyed within six weeks. Before: The market hall, intact, taken 3 Oct 2023. After: The market hall, destroyed, taken 14 Nov 2023. The market hall, intact: taken 3 Oct 2023. The market hall, destroyed: taken 14 Nov 2023. Source: 2 pictures in this investigation's records (pictures_compared).",
+   "source_line": "Source: 2 pictures in this investigation's records (pictures_compared)"
+  },
+  "width": 960
+ },
  "column": {
   "data": {
    "currency": "USD",

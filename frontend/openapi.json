@@ -2489,7 +2489,8 @@
           "timeline",
           "sankey",
           "map",
-          "heatmap"
+          "heatmap",
+          "before_after"
         ],
         "title": "ChartKind",
         "type": "string"
@@ -13456,6 +13457,29 @@
       },
       "EvidenceCreate": {
         "properties": {
+          "captured_on": {
+            "anyOf": [
+              {
+                "pattern": "^\\d{4}(-\\d{2}(-\\d{2})?)?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured On"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
           "locator": {
             "anyOf": [
               {
@@ -13502,6 +13526,28 @@
       },
       "EvidenceOut": {
         "properties": {
+          "captured_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured On"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
           "id": {
             "title": "Id",
             "type": "string"
@@ -24720,6 +24766,20 @@
             ],
             "title": "End"
           },
+          "events": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/VisualEventRowOut"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Events"
+          },
           "grade": {
             "anyOf": [
               {
@@ -24760,6 +24820,17 @@
               }
             ],
             "title": "Longitude"
+          },
+          "picture": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Picture"
           },
           "record_count": {
             "title": "Record Count",
@@ -24840,6 +24911,81 @@
           "key"
         ],
         "title": "VisualDataRowOut",
+        "type": "object"
+      },
+      "VisualEventRowOut": {
+        "description": "A dated event at a place: an events row, without anything nested in it\n(a schema that holds itself loses its type in the generated client).",
+        "properties": {
+          "end": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End"
+          },
+          "grade": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grade"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "record_count": {
+            "title": "Record Count",
+            "type": "integer"
+          },
+          "record_refs": {
+            "items": {
+              "$ref": "#/components/schemas/RecordRefOut"
+            },
+            "title": "Record Refs",
+            "type": "array"
+          },
+          "start": {
+            "title": "Start",
+            "type": "string"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "label",
+          "value",
+          "record_refs",
+          "record_count",
+          "key",
+          "start"
+        ],
+        "title": "VisualEventRowOut",
         "type": "object"
       },
       "VisualOptionSpecOut": {
@@ -24948,6 +25094,30 @@
           "description"
         ],
         "title": "VisualParamOut",
+        "type": "object"
+      },
+      "VisualPictureOut": {
+        "description": "A dated picture held as evidence, which a picture pair can compare.",
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "evidence_id": {
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "taken": {
+            "title": "Taken",
+            "type": "string"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "caption",
+          "taken"
+        ],
+        "title": "VisualPictureOut",
         "type": "object"
       },
       "VisualPresetOut": {
@@ -25139,6 +25309,20 @@
             },
             "title": "Params",
             "type": "object"
+          },
+          "picks": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/VisualPictureOut"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Picks"
           },
           "questions": {
             "items": {
@@ -35905,6 +36089,57 @@
           }
         },
         "summary": "Find Openaleph Children"
+      }
+    },
+    "/api/documents/{document_id}/picture": {
+      "get": {
+        "description": "The picture a document is (app/services/image_reader.py), for the app to\nshow beside its evidence. Its type is read from its bytes; it is sent so\na browser shows it and never runs it as anything else.",
+        "operationId": "get_document_picture",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/png": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The picture this document is, as uploaded (PNG or JPEG)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Document Picture"
       }
     },
     "/api/documents/{document_id}/similar": {

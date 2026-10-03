@@ -30,12 +30,13 @@ function draw(fixture: Fixture): string {
 
 describe('every chart kind draws with the app\'s registered ECharts parts', () => {
   it('has a fixture for each drawn kind', () => {
-    expect(Object.keys(fixtures).sort()).toEqual(['area', 'bar', 'column', 'donut', 'heatmap', 'histogram', 'line', 'map', 'sankey', 'scatter',
-      'stacked_bar_100', 'timeline', 'treemap']);
+    expect(Object.keys(fixtures).sort()).toEqual(['area', 'bar', 'before_after', 'column', 'donut', 'heatmap', 'histogram', 'line', 'map', 'sankey',
+      'scatter', 'stacked_bar_100', 'timeline', 'treemap']);
   });
 
-  // A map's places are MapLibre's (components/presentation/chart-map.tsx); ECharts draws its frame.
-  it.each(Object.keys(kinds).filter(kind => kind !== 'map'))('draws a %s with its title, its labels and its source line', kind => {
+  // A map's places are MapLibre's (components/presentation/chart-map.tsx) and a picture pair's pictures
+  // are pictures (chart-pictures.tsx); ECharts draws their frames, checked below.
+  it.each(Object.keys(kinds).filter(kind => kind !== 'map' && kind !== 'before_after'))('draws a %s with its title, its labels and its source line', kind => {
     const svg = draw(fixtures[kind]);
     expect(svg.startsWith('<svg')).toBe(true);
     const text = svg.replace(/&#36;/g, '$').replace(/&#39;/g, "'");
@@ -56,6 +57,15 @@ describe('every chart kind draws with the app\'s registered ECharts parts', () =
     expect(text).toContain('Map data © OpenStreetMap contributors');
     expect(map.places.map(p => p.name)).toEqual(['Meridian registered office', 'Villa Kyrenia']);
     expect([map.top, map.bottom]).toEqual([84, 44]);
+  });
+
+  it('draws a picture pair\'s frame -- its title, both dates and source line -- and leaves the pictures to the page', () => {
+    const {pictures, ...frame} = fixtures.before_after.option as Record<string, unknown> & {pictures: {items: {document_id: string}[]}};
+    const text = draw({...fixtures.before_after, option: frame}).replace(/&#39;/g, "'");
+    expect(text).toContain('The market hall was destroyed within six weeks');
+    expect(text).toContain('Before: taken 3 Oct 2023. After: taken 14 Nov 2023');
+    expect(text).toContain("Source: 2 pictures in this investigation's records (pictures_compared)");
+    expect(pictures.items.map(item => item.document_id)).toEqual(['doc-1', 'doc-2']);
   });
 
   it('writes each event\'s date and status beside it on a timeline', () => {

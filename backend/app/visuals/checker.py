@@ -75,12 +75,12 @@ from dataclasses import dataclass, field, replace
 from typing import Any
 
 from app.services.presentation_style import Theme, contrast_ratio
-from app.visuals.data_service import DataRow, VisualData
+from app.visuals.data_service import DataRow, VisualData, date_bounds
 from app.visuals.echarts import (
     DEFAULT_HEIGHT, DEFAULT_WIDTH, GRAPHIC_CONTRAST, HOLLOW_SYMBOL, MIN_FONT_PX, SINGLE_RECORD_MARK, TIMELINE_ROW_MIN, TREEMAP_LABEL_PADDING,
     MAP_LABEL_PX, MAP_PLACE_COLOUR, BuiltChart, heatmap_axes, UnsupportedChartKind, build_chart, count_phrase, format_value, prepare_rows, timeline_marks,
     timeline_row_room, timeline_text, BESIDE_TITLE, beside_highlight, beside_width, timeline_plot_room, TIMELINE_PLOT_MIN,
-    timeline_row_need,
+    timeline_row_need, date_words, picture_caption,
 )
 from app.visuals.layout import LABEL_GAP, block_width, treemap_rects, wrapped_lines
 from app.visuals.spec import (
@@ -380,6 +380,8 @@ class _Checker:
 
     # --- the rules -----------------------------------------------------------------
     def run(self) -> CheckReport:
+        if self.kind == ChartKind.before_after:
+            return self._run_pictures()
         rows = self.rows
         values = [row.value for row in rows]
         # Nothing to draw is caught first; the other rules assume rows.
@@ -389,6 +391,52 @@ class _Checker:
                      self.rule_8, self.rule_9, self.rule_10, self.rule_11, self.rule_12, self.rule_13, self.rule_14, self.rule_15,
                      self.rule_16, self.rule_19, self.rule_20):
             rule()
+        return CheckReport(ok=not self.errors, errors=self.errors, warnings=self.warnings, checked_rules=sorted(self.checked),
+                           not_checked=self.not_checked, not_applicable=self.not_applicable)
+
+    # --- before and after: two dated pictures, not values on axes ----------------------
+    def _run_pictures(self) -> CheckReport:
+        """A picture pair is held to what a pair of pictures can get wrong:
+        each is its record's picture with its record's date (0), the
+        earlier comes first (7), both dates are written (12; Bellingcat:
+        "the caption states the claim and both dates"), and the title, words,
+        text size and source line hold as for any chart (13, 14, 15). The
+        rules about axes, values, colours and counts do not apply."""
+        rows = self.rows
+        if len(rows) != 2:
+            self.error(15, f"before and after needs two dated pictures; the query found {len(rows)}")
+        pictures = ((self.option or {}).get("pictures") or {}).get("items") or []
+        if self.needs_option(0):
+            drawn = [(p.get("document_id"), p.get("taken")) for p in pictures if isinstance(p, dict)]
+            recorded = [(row.picture, row.start) for row in rows]
+            if drawn != recorded:
+                self.error(0, f"the pictures drawn are not their records' pictures and dates: drawn {drawn}, records {recorded}")
+            self.passed(0)
+        if len(rows) == 2:
+            first, second = date_bounds(rows[0].start), date_bounds(rows[1].start)
+            if first is None or second is None:
+                self.error(7, "a picture has no date taken; before and after compares two dated pictures")
+            elif not first[1] < second[0]:
+                self.error(7, f"'{rows[0].label}' (taken {rows[0].start}) is not before '{rows[1].label}' (taken {rows[1].start}): "
+                              "the earlier picture goes first, and two pictures whose dates overlap cannot show a before and an after")
+            else:
+                self.passed(7)
+        if self.needs_option(12):
+            subtitle = str((self.titles()[0] if self.titles() else {}).get("subtext") or "")
+            for role, row in zip(("Before", "After"), rows):
+                if f"{role}: taken {date_words(row.start)}" not in subtitle:
+                    self.error(12, f"the date {role.lower()} was taken is not written under the title")
+            for picture, row, role in zip(pictures, rows, ("Before", "After")):
+                caption = picture.get("caption") if isinstance(picture, dict) else None
+                if caption is not None and caption != picture_caption(role, row):
+                    self.error(12, f"the {role.lower()} picture's caption does not give its record's date")
+            self.passed(12)
+        for rule in (self.rule_13, self.rule_14, self.rule_15):
+            rule()
+        reason = "two pictures have no axis, values, colours or counts to judge"
+        for number in (1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 16, 19):
+            self.does_not_apply(number, reason)
+        self.does_not_apply(20, "each picture is one record, cited as itself")
         return CheckReport(ok=not self.errors, errors=self.errors, warnings=self.warnings, checked_rules=sorted(self.checked),
                            not_checked=self.not_checked, not_applicable=self.not_applicable)
 

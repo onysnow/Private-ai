@@ -619,6 +619,7 @@ export const zChartKind = z.enum([
   'sankey',
   'map',
   'heatmap',
+  'before_after',
 ]);
 
 /**
@@ -1996,6 +1997,11 @@ export const zErrorOut = z.object({
  * EvidenceCreate
  */
 export const zEvidenceCreate = z.object({
+  captured_on: z
+    .string()
+    .regex(/^\d{4}(-\d{2}(-\d{2})?)?$/)
+    .nullish(),
+  document_id: z.string().nullish(),
   locator: z.string().nullish(),
   notes: z.string().nullish(),
   quote: z.string().nullish(),
@@ -2006,6 +2012,8 @@ export const zEvidenceCreate = z.object({
  * EvidenceOut
  */
 export const zEvidenceOut = z.object({
+  captured_on: z.string().nullish(),
+  document_id: z.string().nullish(),
   id: z.string(),
   locator: z.string().nullish(),
   notes: z.string().nullish(),
@@ -5394,17 +5402,37 @@ export const zValidationErrorOut = z.object({
 });
 
 /**
+ * VisualEventRowOut
+ *
+ * A dated event at a place: an events row, without anything nested in it
+ * (a schema that holds itself loses its type in the generated client).
+ */
+export const zVisualEventRowOut = z.object({
+  end: z.string().nullish(),
+  grade: z.string().nullish(),
+  key: z.string(),
+  label: z.string(),
+  record_count: z.number().int(),
+  record_refs: z.array(zRecordRefOut),
+  start: z.string(),
+  status: z.string().nullish(),
+  value: z.number(),
+});
+
+/**
  * VisualDataRowOut
  */
 export const zVisualDataRowOut = z.object({
   across: z.string().nullish(),
   down: z.string().nullish(),
   end: z.string().nullish(),
+  events: z.array(zVisualEventRowOut).nullish(),
   grade: z.string().nullish(),
   key: z.string(),
   label: z.string(),
   latitude: z.number().nullish(),
   longitude: z.number().nullish(),
+  picture: z.string().nullish(),
   record_count: z.number().int(),
   record_refs: z.array(zRecordRefOut),
   source: z.string().nullish(),
@@ -5464,6 +5492,17 @@ export const zVisualParamOut = z.object({
   choices: z.array(z.string()).nullish(),
   default: z.string().nullish(),
   description: z.string(),
+});
+
+/**
+ * VisualPictureOut
+ *
+ * A dated picture held as evidence, which a picture pair can compare.
+ */
+export const zVisualPictureOut = z.object({
+  caption: z.string(),
+  evidence_id: z.string(),
+  taken: z.string(),
 });
 
 /**
@@ -5537,6 +5576,7 @@ export const zVisualQueryOut = z.object({
   label: z.string(),
   name: z.string(),
   params: z.record(zVisualParamOut),
+  picks: z.array(zVisualPictureOut).nullish(),
   questions: z.array(z.string()),
   record_count: z.number().int(),
   record_noun: z.string(),
@@ -6459,6 +6499,15 @@ export const zFindOpenalephChildrenPath = z.object({
  * Successful Response
  */
 export const zFindOpenalephChildrenResponse = zBackgroundJobOut;
+
+export const zGetDocumentPicturePath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * The picture this document is, as uploaded (PNG or JPEG)
+ */
+export const zGetDocumentPictureResponse = z.string();
 
 export const zGetSimilarDocumentsPath = z.object({
   document_id: z.string(),

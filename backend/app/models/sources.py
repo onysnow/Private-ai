@@ -29,3 +29,8 @@ class Evidence(Base):
     quote: Mapped[str | None] = mapped_column(Text, nullable=True)
     locator: Mapped[str | None] = mapped_column(String(255), nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # A picture as evidence (before-and-after images): the uploaded picture
+    # this record is, and the day, month or year it was taken, as its source
+    # states it (YYYY, YYYY-MM or YYYY-MM-DD). The quote is its caption.
+    document_id: Mapped[str | None] = mapped_column(ForeignKey("documents.id"), nullable=True, index=True)
+    captured_on: Mapped[str | None] = mapped_column(String(10), nullable=True)

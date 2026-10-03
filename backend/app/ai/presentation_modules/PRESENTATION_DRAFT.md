@@ -100,7 +100,12 @@ forms for every section, every time.
         bank in Riga): `map`, only over `places_on_map`, which holds the
         records that carry their own latitude and longitude. A map takes no
         `sort` or `limit`; its `highlight` names places, which are drawn
-        larger.
+        larger. What changed at one place, in two dated pictures of it
+        (a building before and after it was destroyed): `before_after`,
+        only over `pictures_compared`, with `before` and `after` set to
+        two evidence ids from that query's `picks`, the earlier picture
+        first. It takes no `sort`, `limit` or `highlight`; the title states
+        what changed, and the dates come from the records.
       - `confidence` -- how sure the investigation is: how much evidence
         the claims rest on against how far it agrees (the IPCC grid the
         reporter grades each claim on): `heatmap`, only over

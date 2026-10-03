@@ -43,6 +43,7 @@ fails the request (`_no_network`), so nothing here can reach the network.
 
 from __future__ import annotations
 
+import io
 import socket
 import time
 import types
@@ -332,6 +333,14 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     # the fallback reader used here has no analysis, so it is written directly.
     identifier = _identifier_proposal(document["id"])
     email = _email_document(document["id"])
+    # A picture, which an evidence record can be (before and after; app/services/image_reader.py).
+    from PIL import Image
+
+    drawn = io.BytesIO()
+    Image.new("RGB", (8, 6), "grey").save(drawn, format="PNG")
+    picture_bytes = drawn.getvalue()
+    picture = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Market hall"}, files={
+        "file": ("hall.png", picture_bytes, "image/png")}))
     # A ledger, which can be mapped to entities (app/services/table_mappings.py).
     ledger = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Ledger"}, files={
         "file": ("ledger.csv", b"Payer,Payee,Amount\nMeridian Holdings Ltd,Bellcastle Trading Group,2400000\n", "text/csv")}))
@@ -407,6 +416,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
                 ("POST", "/api/ai-analysis-candidates/{candidate_id}/review"))},
             ("GET", "/api/extraction-candidates/{candidate_id}/identifier-targets"): {"candidate_id": identifier},
             ("GET", "/api/documents/{document_id}/email"): {"document_id": email},
+            ("GET", "/api/documents/{document_id}/picture"): {"document_id": picture["id"]},
             **{(method, path): {"document_id": ledger["id"]} for method, path in (
                 ("GET", "/api/documents/{document_id}/table"),
                 ("POST", "/api/documents/{document_id}/table-mappings/preview"),

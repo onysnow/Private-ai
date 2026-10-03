@@ -77,6 +77,7 @@ import {
   getDocument,
   getDocumentEmail,
   getDocumentFormats,
+  getDocumentPicture,
   getDocumentTable,
   getDocumentTranslation,
   getEntityDossier,
@@ -406,6 +407,9 @@ import type {
   GetDocumentFormatsData,
   GetDocumentFormatsError,
   GetDocumentFormatsResponse,
+  GetDocumentPictureData,
+  GetDocumentPictureError,
+  GetDocumentPictureResponse,
   GetDocumentResponse,
   GetDocumentTableData,
   GetDocumentTableError,
@@ -2193,6 +2197,38 @@ export const findOpenalephChildrenMutation = (
   };
   return mutationOptions;
 };
+
+export const getDocumentPictureQueryKey = (
+  options: Options<GetDocumentPictureData>,
+) => createQueryKey('getDocumentPicture', options);
+
+/**
+ * Get Document Picture
+ *
+ * The picture a document is (app/services/image_reader.py), for the app to
+ * show beside its evidence. Its type is read from its bytes; it is sent so
+ * a browser shows it and never runs it as anything else.
+ */
+export const getDocumentPictureOptions = (
+  options: Options<GetDocumentPictureData>,
+) =>
+  queryOptions<
+    GetDocumentPictureResponse,
+    GetDocumentPictureError,
+    GetDocumentPictureResponse,
+    ReturnType<typeof getDocumentPictureQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDocumentPicture({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDocumentPictureQueryKey(options),
+  });
 
 export const getSimilarDocumentsQueryKey = (
   options: Options<GetSimilarDocumentsData>,

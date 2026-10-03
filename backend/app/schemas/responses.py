@@ -69,6 +69,8 @@ class EvidenceOut(ResponseModel):
     quote: str | None = None
     locator: str | None = None
     notes: str | None = None
+    document_id: str | None = None     # the picture this record is, if it is one
+    captured_on: str | None = None     # when that picture was taken, as its source states it
 
 
 class EvidencePoolRow(ResponseModel):
@@ -145,6 +147,13 @@ class VisualParamOut(ResponseModel):
     default: str | None = None
 
 
+class VisualPictureOut(ResponseModel):
+    """A dated picture held as evidence, which a picture pair can compare."""
+    evidence_id: str
+    caption: str
+    taken: str                # the date it was taken, as its source states it
+
+
 class VisualQueryOut(ResponseModel):
     """One entry of the query catalogue the AI and the chart builder order from."""
     name: str
@@ -160,6 +169,8 @@ class VisualQueryOut(ResponseModel):
     currencies: list[str]
     kinds: list[str]          # the drawn kinds that can draw this query's rows, best first
     questions: list[str]      # the questions (VisualQuestionOut.id) it can answer
+    # pictures_compared: the dated pictures its before and after can pick.
+    picks: list[VisualPictureOut] | None = Field(default=None, exclude_if=_absent_when_none)
 
 
 class VisualQuestionOut(ResponseModel):
@@ -186,6 +197,20 @@ class RecordRefOut(ResponseModel):
     record_id: str
 
 
+class VisualEventRowOut(ResponseModel):
+    """A dated event at a place: an events row, without anything nested in it
+    (a schema that holds itself loses its type in the generated client)."""
+    label: str
+    value: float
+    record_refs: list[RecordRefOut]
+    record_count: int
+    key: str
+    start: str
+    end: str | None = Field(default=None, exclude_if=_absent_when_none)
+    status: str | None = Field(default=None, exclude_if=_absent_when_none)
+    grade: str | None = Field(default=None, exclude_if=_absent_when_none)
+
+
 class VisualDataRowOut(ResponseModel):
     label: str
     value: float
@@ -209,6 +234,10 @@ class VisualDataRowOut(ResponseModel):
     # A grid row's column and row: the two grades it sits at (a heatmap).
     across: str | None = Field(default=None, exclude_if=_absent_when_none)
     down: str | None = Field(default=None, exclude_if=_absent_when_none)
+    # A places row's dated events (a map with its timeline).
+    events: list[VisualEventRowOut] | None = Field(default=None, exclude_if=_absent_when_none)
+    # A pictures row's picture: the document its evidence record is (before and after); `start` is when it was taken.
+    picture: str | None = Field(default=None, exclude_if=_absent_when_none)
 
 
 class VisualDataOut(ResponseModel):

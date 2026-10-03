@@ -55,7 +55,8 @@ def visual_catalog_for_prompt(db: Session, investigation_id: str) -> dict[str, A
         ],
         "queries": [
             {"name": q["name"], "description": q["description"], "params": {k: {"choices": p["choices"], "default": p["default"]} for k, p in q["params"].items()},
-             "has_data": q["has_data"], "record_count": q["record_count"], "currencies": q["currencies"], "kinds": q["kinds"], "questions": q["questions"]}
+             "has_data": q["has_data"], "record_count": q["record_count"], "currencies": q["currencies"], "kinds": q["kinds"], "questions": q["questions"],
+             **({"picks": q["picks"]} if q.get("picks") else {})}
             for q in catalog["queries"]
         ],
     }

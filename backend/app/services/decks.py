@@ -155,9 +155,9 @@ def chart_row_labels(data: VisualData, rows: list[DataRow], *, separator: str = 
     (`separator` "\\n"), so a period's label stays level instead of being
     turned on its side to fit. An event on a timeline is one record by
     what it is (rules 16 and 20 do not apply), so its label stays as it is;
-    likewise a place on a map, and a grid's cell, whose count is its
-    records."""
-    if data.series_kind in ("events", "places", "grid"):
+    likewise a place on a map, a picture of a pair, and a grid's cell,
+    whose count is its records."""
+    if data.series_kind in ("events", "places", "grid", "pictures"):
         return {row.label: row.label for row in rows}
     labels: dict[str, str] = {}
     for row in rows:
@@ -514,7 +514,8 @@ def _slide_drawing(visual: dict, theme: Theme, has_bullets: bool) -> dict | None
         kind = ChartKind(visual["spec"]["kind"])
     except (KeyError, TypeError, ValueError):
         return None
-    if kind in NATIVE_KINDS:
+    if kind in NATIVE_KINDS or kind == ChartKind.before_after:
+        # A picture pair goes in as its two pictures (_picture_pair); the preview draws them from the chart itself.
         return None
     _x, _y, width_in, height_in = chart_region(has_bullets)
     sized, note = slide_picture(visual, theme, width_in, height_in)
@@ -744,10 +745,11 @@ def sort_bar_items(items: list[dict], order: str) -> list[dict]:
 
 class _DeckRenderer:
     def __init__(self, title: str, citation_details: dict[tuple[str, str], dict], citation_numbers: dict[tuple[str, str], int],
-                 theme: Theme | None = None):
+                 theme: Theme | None = None, investigation_id: str = ""):
         from pptx import Presentation
         from pptx.util import Inches
 
+        self.investigation_id = investigation_id   # the only investigation whose pictures this deck may show
         self.t = theme or resolved_theme(None)
         self.Inches = Inches
         self.title = title
@@ -1106,6 +1108,9 @@ class _DeckRenderer:
         built = checked.built
         kind = built.kind
         missing: str | None = None
+        if kind == ChartKind.before_after:
+            self._picture_pair(slide, x, y, w, h, checked)
+            return built.description
         if kind not in NATIVE_KINDS:
             picture = self._chart_picture(slide, x, y, w, h, visual)
             if not isinstance(picture, str):
@@ -1495,6 +1500,49 @@ class _DeckRenderer:
         x_axis.format.line.color.rgb = self._rgb(self.t.text)
         return frame
 
+    def _picture_pair(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart) -> None:
+        """Before and after: the chart's title and the subtitle with both
+        dates, then the two pictures side by side (a slider in the app is
+        side by side here) or stacked, each fitted to its half and captioned
+        with its date when the captions are on, and the source line. Each
+        picture is read only from this deck's own investigation; one that
+        cannot be read is named with the reason in its place."""
+        from io import BytesIO
+
+        from app.services.image_reader import investigation_picture
+
+        built = checked.built
+        assert built is not None
+        option = built.option.get("pictures") or {}
+        self.text(slide, x, y, w, 0.32, checked.spec.title, size=13, color=self.t.muted, bold=True)
+        titles = built.option.get("title") or []
+        subtitle = str(titles[0].get("subtext") or "") if titles and isinstance(titles[0], dict) else ""
+        self.text(slide, x, y + 0.3, w, 0.28, subtitle, size=11, color=self.t.muted)
+        top, bottom = y + 0.66, y + h - 0.36
+        stacked = option.get("layout") == "stacked"
+        gap = 0.15
+        cell_w = w if stacked else (w - gap) / 2
+        cell_h = ((bottom - top) - gap) / 2 if stacked else bottom - top
+        for i, item in enumerate(option.get("items") or []):
+            cx, cy = (x, top + i * (cell_h + gap)) if stacked else (x + i * (cell_w + gap), top)
+            caption = item.get("caption")
+            room = cell_h - (0.3 if caption else 0)
+            found = investigation_picture(self.investigation_id, item.get("document_id"))
+            drawn_h = room
+            if isinstance(found, str):
+                self.text(slide, cx, cy, cell_w, room, f"The {item.get('role')} picture is not shown: {found}.", size=12,
+                          color=self.t.alert, italic=True)
+            else:
+                png, picture = found
+                scale = min(cell_w / picture.width, room / picture.height)
+                pw, drawn_h = picture.width * scale, picture.height * scale
+                shape = slide.shapes.add_picture(BytesIO(png), self.Inches(cx + (cell_w - pw) / 2), self.Inches(cy), self.Inches(pw), self.Inches(drawn_h))
+                _set_alt_text(shape, f"{str(item.get('role') or '').capitalize()}: {item.get('label')}, taken {item.get('taken')}")
+            if caption:
+                # Right under its picture, where the eye goes from the picture.
+                self.text(slide, cx, cy + drawn_h + 0.04, cell_w, 0.28, caption, size=12, color=self.t.text, bold=True, align="center")
+        self.text(slide, x, y + h - 0.32, w, 0.3, built.source_line, size=10, color=self.t.muted)
+
     def _chart_picture(self, slide: Any, x: float, y: float, w: float, h: float, visual: dict) -> Any:
         """A kind PowerPoint cannot hold natively (the treemap): the picture
         the render service draws, filling the chart's whole space with the
@@ -1675,7 +1723,7 @@ def render_deck_pptx(row: Deck, citation_details: list[dict] | None = None) -> A
     refs = deck_citation_refs(slides)
     numbers = {(r["record_type"], r["record_id"]): i + 1 for i, r in enumerate(refs)}
     details = {(d["record_type"], d["record_id"]): d for d in (citation_details or [])}
-    renderer = _DeckRenderer(row.title, details, numbers, resolved_theme(getattr(row, "style_json", None)))
+    renderer = _DeckRenderer(row.title, details, numbers, resolved_theme(getattr(row, "style_json", None)), investigation_id=row.investigation_id)
 
     title_slide = next((s for s in slides if s["kind"] == "title"), None)
     renderer.title_slide(

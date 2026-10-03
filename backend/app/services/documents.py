@@ -11,13 +11,15 @@ from app.services.identifier_proposals import accept_identifier
 from app.services.security import contained_path, resolve_storage_root
 from app.services.resolution import BASIS_SAME, candidate_entities
 from app.services.pdf_ocr import extract_pdf_chunks
+from app.services.image_reader import IMAGE_EXTENSIONS, extract_image_chunks
 from app.services.document_reader import read_chunks
 from app.services.entity_signals import norm_name, read_name, read_passage, split_title
 from app.core.config import settings
 from app.db.locking import lock_investigation_transaction
 from app.jobs.corpus import request_corpus_sync
 
-SUPPORTED_EXTENSIONS = {'.txt', '.md', '.csv', '.html', '.htm', '.pdf', '.docx'}
+# Pictures are documents too (app/services/image_reader.py): kept as pictures, their text read by OCR.
+SUPPORTED_EXTENSIONS = {'.txt', '.md', '.csv', '.html', '.htm', '.pdf', '.docx'} | set(IMAGE_EXTENSIONS)
 NAME_RE = re.compile(r"\b([A-Z][A-Za-z'’.-]+(?:\s+(?:[A-Z][A-Za-z'’.-]+|of|the|and|&)){1,5})\b")
 ORG_SUFFIX = re.compile(r"\b(Inc\.?|LLC|Ltd\.?|Corporation|Corp\.?|Company|Co\.?|Department|Commission|Authority|University|Foundation|Association|Committee|Council|Bank)\b", re.I)
 SENTENCE_SPLIT_RE = re.compile(r'(?<=[.!?])\s+')
@@ -47,6 +49,8 @@ def extract_chunks(path: Path) -> tuple[list[dict], list[str]]:
         raise ValueError(f"Unsupported document type: {ext or 'unknown'}")
     rows: list[dict] = []
     issues: list[str] = []
+    if ext in IMAGE_EXTENSIONS:
+        return extract_image_chunks(path, enable_ocr=settings.enable_pdf_ocr, language=settings.pdf_ocr_language, dpi=settings.pdf_ocr_dpi)
     if ext == '.pdf':
         result = extract_pdf_chunks(
             path,

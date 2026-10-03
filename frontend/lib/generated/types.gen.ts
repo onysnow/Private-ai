@@ -1450,7 +1450,8 @@ export type ChartKind =
   | 'timeline'
   | 'sankey'
   | 'map'
-  | 'heatmap';
+  | 'heatmap'
+  | 'before_after';
 
 /**
  * ChartOptionSpecOut
@@ -5439,6 +5440,14 @@ export type ErrorOut = {
  */
 export type EvidenceCreate = {
   /**
+   * Captured On
+   */
+  captured_on?: string | null;
+  /**
+   * Document Id
+   */
+  document_id?: string | null;
+  /**
    * Locator
    */
   locator?: string | null;
@@ -5460,6 +5469,14 @@ export type EvidenceCreate = {
  * EvidenceOut
  */
 export type EvidenceOut = {
+  /**
+   * Captured On
+   */
+  captured_on?: string | null;
+  /**
+   * Document Id
+   */
+  document_id?: string | null;
   /**
    * Id
    */
@@ -12079,6 +12096,10 @@ export type VisualDataRowOut = {
    */
   end?: string | null;
   /**
+   * Events
+   */
+  events?: Array<VisualEventRowOut> | null;
+  /**
    * Grade
    */
   grade?: string | null;
@@ -12098,6 +12119,10 @@ export type VisualDataRowOut = {
    * Longitude
    */
   longitude?: number | null;
+  /**
+   * Picture
+   */
+  picture?: string | null;
   /**
    * Record Count
    */
@@ -12130,6 +12155,51 @@ export type VisualDataRowOut = {
    * X
    */
   x?: number | null;
+};
+
+/**
+ * VisualEventRowOut
+ *
+ * A dated event at a place: an events row, without anything nested in it
+ * (a schema that holds itself loses its type in the generated client).
+ */
+export type VisualEventRowOut = {
+  /**
+   * End
+   */
+  end?: string | null;
+  /**
+   * Grade
+   */
+  grade?: string | null;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Record Count
+   */
+  record_count: number;
+  /**
+   * Record Refs
+   */
+  record_refs: Array<RecordRefOut>;
+  /**
+   * Start
+   */
+  start: string;
+  /**
+   * Status
+   */
+  status?: string | null;
+  /**
+   * Value
+   */
+  value: number;
 };
 
 /**
@@ -12192,6 +12262,26 @@ export type VisualParamOut = {
    * Description
    */
   description: string;
+};
+
+/**
+ * VisualPictureOut
+ *
+ * A dated picture held as evidence, which a picture pair can compare.
+ */
+export type VisualPictureOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Evidence Id
+   */
+  evidence_id: string;
+  /**
+   * Taken
+   */
+  taken: string;
 };
 
 /**
@@ -12324,6 +12414,10 @@ export type VisualQueryOut = {
   params: {
     [key: string]: VisualParamOut;
   };
+  /**
+   * Picks
+   */
+  picks?: Array<VisualPictureOut> | null;
   /**
    * Questions
    */
@@ -14567,6 +14661,42 @@ export type FindOpenalephChildrenResponses = {
 
 export type FindOpenalephChildrenResponse =
   FindOpenalephChildrenResponses[keyof FindOpenalephChildrenResponses];
+
+export type GetDocumentPictureData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/picture';
+};
+
+export type GetDocumentPictureErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetDocumentPictureError =
+  GetDocumentPictureErrors[keyof GetDocumentPictureErrors];
+
+export type GetDocumentPictureResponses = {
+  /**
+   * The picture this document is, as uploaded (PNG or JPEG)
+   */
+  200: Blob | File;
+};
+
+export type GetDocumentPictureResponse =
+  GetDocumentPictureResponses[keyof GetDocumentPictureResponses];
 
 export type GetSimilarDocumentsData = {
   body?: never;
