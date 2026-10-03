@@ -669,3 +669,25 @@ def test_a_run_that_finishes_at_once_still_starts_as_running(host: Any, monkeypa
     monkeypatch.setattr(threading.Thread, "start", real_start)
     assert started["status"] == "running" and started["live"] is True
     assert _wait_run(client, "/api/console/tests/runs", started["id"])["status"] == "failed"
+
+
+def test_a_cancel_reply_describes_the_run_as_the_cancel_found_it(host: Any, monkeypatch: Any) -> None:
+    """A run that stops the moment it is cancelled must still answer the
+    cancel as live: the worker is made to finish inside cancel() itself."""
+    client, handle, parts = host
+    parts["runner"].blocking = True
+    blocked = client.post("/api/console/tests/run").json()
+    supervisor = handle.ctx.supervisor
+    entry = supervisor._live[blocked["id"]]
+    real_cancel = type(entry[0]).cancel
+
+    def cancel_and_wait(run: Any) -> None:
+        real_cancel(run)
+        entry[1].join(timeout=10)
+
+    monkeypatch.setattr(type(entry[0]), "cancel", cancel_and_wait)
+    cancelled = client.post(f"/api/console/tests/runs/{blocked['id']}/cancel").json()
+    monkeypatch.setattr(type(entry[0]), "cancel", real_cancel)
+    parts["runner"].blocking = False
+    assert cancelled["live"] is True
+    assert _wait_run(client, "/api/console/tests/runs", blocked["id"])["status"] == "cancelled"

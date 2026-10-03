@@ -160,9 +160,12 @@ class TaskSupervisor:
             entry = self._live.get(run_id)
         if entry is None:
             raise LookupError("run is not in progress")
-        entry[0].cancel()
         entry[0].log("[console] cancel requested")
-        return self.status(run_id)
+        # The reply describes the run as the cancel found it, still live; a
+        # run that stops at once would otherwise already read as finished.
+        requested = self.status(run_id)
+        entry[0].cancel()
+        return requested
 
     def status(self, run_id: str, *, tail: int = 60) -> dict[str, Any]:
         row = self.store.run_get(run_id)
