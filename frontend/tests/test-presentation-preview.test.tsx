@@ -237,6 +237,18 @@ describe('styles: themes, presets and options', () => {
     expect(within(timeline).getByText('Nov 2023')).toBeInTheDocument();
   });
 
+  it('writes a headline figure\'s number at the size its option asks, as the export does', () => {
+    const sizes = ['large', 'medium', 'small'].map(size => {
+      const {unmount} = renderSlide({type: 'figures', items: [{value: '$2.4M', label: 'to Bellcastle', evidence: ev}],
+        style: {preset: 'cards', options: {number_size: size}}});
+      const pt = parseFloat(screen.getByText('$2.4M').style.fontSize);
+      unmount();
+      return pt;
+    });
+    expect(sizes[0]).toBeGreaterThan(sizes[1]);
+    expect(sizes[1]).toBeGreaterThan(sizes[2]);
+  });
+
   it('style panel: theme, preset, option and highlight changes call back with the new style', async () => {
     const user = userEvent.setup();
     const onDeck = vi.fn();

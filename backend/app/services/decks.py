@@ -39,7 +39,7 @@ from sqlalchemy.orm import Session
 from app.core.time import utcnow_naive
 from app.models.domain import Deck
 from app.services.presentation_style import (
-    VISUAL_PRESETS, Theme, normalize_deck_style, normalize_visual_style, resolved_theme, resolved_visual_style,
+    FIGURE_NUMBER_SIZES, VISUAL_PRESETS, Theme, normalize_deck_style, normalize_visual_style, resolved_theme, resolved_visual_style,
 )
 from app.visuals.checker import CheckReport, check_visual
 from app.visuals.data_service import DataRow, VisualData
@@ -1004,7 +1004,8 @@ class _DeckRenderer:
             if opts.get("accent_edge", True):
                 self.rect(slide, left, top + 0.18, 0.06, cell_h - 0.36, self.t.alert)
             pad = 0.35 if (opts.get("card_fill", True) or opts.get("accent_edge", True)) else 0.05
-            value_size = _fit_size([item["value"]], cell_w - pad - 0.25, min(cell_h * 0.5, 1.0), (54, 48, 44, 40, 36, 32, 28, 24), char_w=0.55, line_spacing=1.0)
+            ladder = FIGURE_NUMBER_SIZES.get(str(opts.get("number_size", "large")), FIGURE_NUMBER_SIZES["large"])
+            value_size = _fit_size([item["value"]], cell_w - pad - 0.25, min(cell_h * 0.5, 1.0), ladder, char_w=0.55, line_spacing=1.0)
             self.text(slide, left + pad, top + 0.15, cell_w - pad - 0.25, cell_h * 0.5, item["value"], size=value_size, color=value_color, font=self.t.heading_font, anchor="bottom")
             marks = self._cite_marks(item["evidence"])
             label = item["label"] + ("  " + marks if marks else "")

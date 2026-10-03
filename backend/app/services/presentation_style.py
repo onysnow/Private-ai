@@ -161,6 +161,8 @@ VISUAL_OPTIONS: dict[str, dict[str, dict]] = {
         "show_line": {"type": "bool", "label": "Connecting line"},
     },
     "figures": {
+        # The design doc's options for headline figures: number size, card fill, accent edge.
+        "number_size": {"type": "choice", "label": "Number size", "values": ["large", "medium", "small"]},
         "card_fill": {"type": "bool", "label": "Card background"},
         "accent_edge": {"type": "bool", "label": "Accent edge"},
         "value_color": {"type": "choice", "label": "Number colour", "values": ["alert", "accent", "text"]},
@@ -169,6 +171,14 @@ VISUAL_OPTIONS: dict[str, dict[str, dict]] = {
 
 # Each preset is a layout plus option defaults. The first preset of each
 # type is the default and reproduces the v2 look.
+# A headline figure's number takes the largest size of its ladder that fits
+# its card; a smaller number size starts lower down the same ladder.
+FIGURE_NUMBER_SIZES: dict[str, tuple[int, ...]] = {
+    "large": (54, 48, 44, 40, 36, 32, 28, 24),
+    "medium": (40, 36, 32, 28, 24),
+    "small": (28, 24, 20),
+}
+
 VISUAL_PRESETS: dict[str, list[dict]] = {
     "bar": [
         {"id": "horizontal", "label": "Horizontal", "description": "Horizontal bars in the order drafted, values on the bars.",
@@ -194,11 +204,11 @@ VISUAL_PRESETS: dict[str, list[dict]] = {
     ],
     "figures": [
         {"id": "cards", "label": "Cards", "description": "Stacked cards beside the bullets.",
-         "layout": {"arrangement": "stack"}, "options": {"card_fill": True, "accent_edge": True, "value_color": "alert"}},
+         "layout": {"arrangement": "stack"}, "options": {"number_size": "large", "card_fill": True, "accent_edge": True, "value_color": "alert"}},
         {"id": "big_numbers", "label": "Big numbers", "description": "Large numbers with thin rules, no cards.",
-         "layout": {"arrangement": "stack"}, "options": {"card_fill": False, "accent_edge": False, "value_color": "accent"}},
+         "layout": {"arrangement": "stack"}, "options": {"number_size": "large", "card_fill": False, "accent_edge": False, "value_color": "accent"}},
         {"id": "row", "label": "Row of stats", "description": "Side-by-side figures in a band under the bullets.",
-         "layout": {"arrangement": "row"}, "options": {"card_fill": True, "accent_edge": False, "value_color": "alert"}},
+         "layout": {"arrangement": "row"}, "options": {"number_size": "large", "card_fill": True, "accent_edge": False, "value_color": "alert"}},
     ],
 }
 

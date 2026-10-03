@@ -180,6 +180,22 @@ def test_promote_with_styles_saves_them_and_the_export_follows(monkeypatch):
     assert fills == [theme.bar_muted, theme.accent, theme.bar_muted]
 
 
+def test_a_headline_figures_number_size_sets_how_large_its_number_is_written(monkeypatch):
+    """The design doc's options for headline figures: number size, card fill,
+    accent edge. A smaller size starts lower down the same ladder."""
+    seeded = _accepted_candidate(monkeypatch)
+    sizes = {}
+    for size in ("large", "medium", "small"):
+        deck = client.post(f"/api/ai-analysis-candidates/{seeded['candidate_id']}/promote-to-deck", json={
+            "visual_styles": {"0": {"preset": "cards", "options": {"number_size": size}}}}).json()
+        # The figure's number is the run that is the value alone (the slide's headline and bullets say more).
+        runs = [run for slide in _export(deck["id"]).slides for shape in slide.shapes if shape.has_text_frame
+                for p in shape.text_frame.paragraphs for run in p.runs if run.text == "$2.4M"]
+        sizes[size] = runs[0].font.size.pt
+    assert sizes["large"] > sizes["medium"] > sizes["small"]
+    assert sizes["large"] in ps.FIGURE_NUMBER_SIZES["large"] and sizes["small"] in ps.FIGURE_NUMBER_SIZES["small"]
+
+
 def test_presets_and_options_never_change_values_or_start_bars_above_zero(monkeypatch):
     seeded = _accepted_candidate(monkeypatch)
     seen = []

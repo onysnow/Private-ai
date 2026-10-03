@@ -40,7 +40,7 @@ export const DECK = {
 const FALLBACK_PRESETS: Record<VisualKind, VisualPreset[]> = {
   bar: [{id: 'horizontal', label: 'Horizontal', description: '', layout: {orientation: 'horizontal', axis_line: true}, options: {sort: 'as_given', value_labels: true, gridlines: false, thickness: 'regular', highlight: []}}],
   timeline: [{id: 'track', label: 'Horizontal track', description: '', layout: {direction: 'horizontal', compact: false}, options: {marker: 'ring', show_line: true}}],
-  figures: [{id: 'cards', label: 'Cards', description: '', layout: {arrangement: 'stack'}, options: {card_fill: true, accent_edge: true, value_color: 'alert'}}],
+  figures: [{id: 'cards', label: 'Cards', description: '', layout: {arrangement: 'stack'}, options: {number_size: 'large', card_fill: true, accent_edge: true, value_color: 'alert'}}],
 };
 
 const hex = (value: string): string => `#${value.replace(/^#/, '')}`;
@@ -209,6 +209,10 @@ function EvidencePanel({refs, lookup}: {refs: AiCitationRef[], lookup: CitationL
 
 type Region = [number, number, number, number];
 
+// A headline figure's number: the largest size of its ladder that fits its card
+// (backend app/services/presentation_style.py FIGURE_NUMBER_SIZES).
+const FIGURE_NUMBER_SIZES: Record<string, number[]> = {large: [54, 48, 44, 40, 36, 32, 28, 24], medium: [40, 36, 32, 28, 24], small: [28, 24, 20]};
+
 function Figures({visual, style, lookup, region}: {visual: Extract<PresentationVisual, {type: 'figures'}>, style: ResolvedVisualStyle, lookup: CitationLookup, region: Region}): ReactElement {
   const {c, serif, sans} = useTheme();
   const [x, y, w, h] = region;
@@ -225,7 +229,8 @@ function Figures({visual, style, lookup, region}: {visual: Extract<PresentationV
     const left = row ? x + i * (cellW + gap) : x;
     const top = row ? y : y + i * (cellH + gap);
     const pad = filled || edge ? 0.35 : 0.05;
-    const valueSize = fitSize([item.value], cellW - pad - 0.25, Math.min(cellH * 0.5, 1.0), [54, 48, 44, 40, 36, 32, 28, 24], {charW: 0.55, lineSpacing: 1.0});
+    const valueSize = fitSize([item.value], cellW - pad - 0.25, Math.min(cellH * 0.5, 1.0), FIGURE_NUMBER_SIZES[String(options.number_size)] ?? FIGURE_NUMBER_SIZES.large,
+      {charW: 0.55, lineSpacing: 1.0});
     const divider = !filled && i > 0 ? (row ? {borderLeft: `1px solid ${c('rule')}`} : {borderTop: `1px solid ${c('rule')}`}) : {};
     return <div key={i} style={{...box(left, top, cellW, cellH), ...divider, background: filled ? c('panel') : 'transparent', borderRadius: filled ? pt(10) : 0, padding: `${pt(12)} ${pt(Math.max(4, pad * 72 - 8))}`, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: pt(6)}}>
       {edge && <div style={{position: 'absolute', left: 0, top: '8%', bottom: '8%', width: pt(4), background: c('alert')}}/>}

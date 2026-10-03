@@ -702,6 +702,22 @@ the claim and both dates.
   `frontend/tests/test-picture-evidence.test.tsx`, the `before_after`
   fixture in `frontend/test-support/chart-kinds.json`.
 
+## Pass 6: headline figures
+
+The design doc's headline-number tiles (question "Size"; any cited value;
+slide shapes in PowerPoint). They are the draft's `figures` visual, drawn
+as native shapes in decks and in the preview. Two things completed them:
+
+- **The value is the quote's.** An item's quotes must state its number or
+  date, to the precision it is written (`app/ai/value_check.py`): "$2.4M"
+  is stated by "2,400,000" or "2.43 million", not by "2,500,000"; "2023-11"
+  by "14 November 2023". An item whose quotes do not state its value is
+  removed with the reason, as a quote not found is (bars and timeline items
+  too).
+- **The design's options:** number size (large, medium, small: each a
+  ladder of sizes, the largest that fits its card is used;
+  `FIGURE_NUMBER_SIZES`), card fill and accent edge.
+
 ## Pass 6: the writing practices
 
 The design doc's "Briefs, decks and summaries" practices that were Partly or
