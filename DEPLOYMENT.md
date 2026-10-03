@@ -66,6 +66,33 @@ Then, from the app: Settings → Security → create persisted users for each re
 `access.mode = shared_bearer` or `persisted_users`, and that
 `security.total_denials` is 0.
 
+### Optional: machine translation (`translate` profile)
+
+OpenAleph can translate documents that are not in your language, on this
+machine, with Argos (ADR-0006, Wave C). The Workbench then shows the
+translation beside the original (a document's "Translation" button). It is
+off by default. To turn it on, add to `.env`:
+
+```bash
+OPENALEPH_TRANSLATE_DEFER=true
+FTM_TRANSLATE_TARGET_LANGUAGE=eng   # three-letter code: eng, fra, deu...
+```
+
+and start with the profile:
+
+```bash
+docker compose -f docker-compose.prod.yml --profile translate up -d
+```
+
+Both settings go together: without the profile, documents queue for a
+translator that is not running. The target must be the three-letter code
+FollowTheMoney stores as a document's detected language; a two-letter `en`
+never matches, so English documents would be translated too. The first
+document in a new language pair downloads that pair (and a small sentence
+splitter) from the internet into the `translate-models` and `translate-cache`
+volumes; after that, translation needs no network. Translations are a reading
+aid: quotes, evidence and claims are always taken from the original.
+
 ## 4. Upgrade
 
 ```bash
@@ -125,7 +152,8 @@ backup (below) and start the previous tag.
 - The auth-failure limiter persists to the data volume, so a lockout in progress
   survives a restart. It is still per-process: if you ever run more than one backend
   replica, rate-limit at the proxy as well.
-- Data lives in six named volumes: `workbench-pgdata` (workbench Postgres),
+- Data lives in six named volumes (eight with the `translate` profile, whose
+  `translate-models` and `translate-cache` only hold downloaded language models): `workbench-pgdata` (workbench Postgres),
   `workbench-data` (documents, audit log, connector secrets, limiter state), and
   OpenAleph's `openaleph-pgdata`, `openaleph-elasticsearch-data`, `openaleph-redis-data`,
   `openaleph-archive`. Back up the two Postgres volumes and `workbench-data` /

@@ -63,10 +63,31 @@ def _assert_ingest_keeps_document_text(services):
     stays the shared one, and no other service needs it."""
     ingest = services["ingest"]["environment"]
     assert ingest["OPENALEPH_PROCRASTINATE_DEHYDRATE_ENTITIES"] == "false"
-    shared = services["analyze"]["environment"]
+    shared = services["worker"]["environment"]
     assert {key: value for key, value in ingest.items() if key != "OPENALEPH_PROCRASTINATE_DEHYDRATE_ENTITIES"} == shared
     for name in ("analyze", "worker", "api", "openaleph-setup"):
         assert "OPENALEPH_PROCRASTINATE_DEHYDRATE_ENTITIES" not in services[name]["environment"], name
+    _assert_translation_is_optional(services, shared)
+
+
+def _assert_translation_is_optional(services, shared):
+    """ADR-0006, Wave C: machine translation is the `translate` profile. The
+    analyze service hands documents on only when OPENALEPH_TRANSLATE_DEFER is
+    set (off by default), with a three-letter target (ftm-analyze compares it
+    with detectedLanguage); the worker splits sentences with MiniSBD and keeps
+    what it downloads in volumes, so it translates offline afterwards."""
+    analyze = services["analyze"]["environment"]
+    assert analyze["OPENALEPH_TRANSLATE_DEFER"] == "${OPENALEPH_TRANSLATE_DEFER:-false}"
+    assert analyze["FTM_TRANSLATE_TARGET_LANGUAGE"] == "${FTM_TRANSLATE_TARGET_LANGUAGE:-eng}"
+    assert {k: v for k, v in analyze.items() if not k.endswith(("TRANSLATE_DEFER", "TRANSLATE_TARGET_LANGUAGE"))} == shared
+    translate = services["translate"]
+    assert translate["profiles"] == ["translate"]
+    assert translate["image"] == "ghcr.io/openaleph/ftm-translate:${FTM_TRANSLATE_TAG:-5.3.0-argos}"
+    assert translate["command"] == "procrastinate worker -q translate"
+    assert translate["environment"]["FTM_TRANSLATE_TARGET_LANGUAGE"] == analyze["FTM_TRANSLATE_TARGET_LANGUAGE"]
+    assert translate["environment"]["ARGOS_CHUNK_TYPE"] == "MINISBD"
+    assert set(translate["volumes"]) == {"translate-models:/root/.local/share/argos-translate", "translate-cache:/root/.cache"}
+    assert translate["depends_on"]["openaleph-setup"]["condition"] == "service_completed_successfully"
 
 
 def _assert_render_service(services, *, production: bool):
@@ -124,7 +145,8 @@ def test_production_compose_has_no_dev_shortcuts():
     compose = yaml.safe_load(text)
     services = compose["services"]
     openaleph = {"postgres", "elasticsearch", "redis", "ingest", "analyze", "worker", "api", "ui"}
-    assert set(services) == {"workbench-db", "backend", "openaleph-setup", "render"} | openaleph, "workbench + render + OpenAleph, nothing dev-only (no adminer, no separate frontend: ADR-0004)"
+    # `translate` is OpenAleph's optional translation worker, behind its own profile (ADR-0006, Wave C).
+    assert set(services) == {"workbench-db", "backend", "openaleph-setup", "render", "translate"} | openaleph, "workbench + render + OpenAleph, nothing dev-only (no adminer, no separate frontend: ADR-0004)"
     _assert_openaleph_setup_runs_first(services)
     _assert_render_service(services, production=True)
     _assert_ingest_keeps_document_text(services)
@@ -143,7 +165,8 @@ def test_production_compose_has_no_dev_shortcuts():
         assert mapping.startswith("${BIND_ADDRESS:-127.0.0.1}:"), mapping
     assert not any(v.startswith("./") for v in services["backend"].get("volumes", [])), "no source bind-mount in production"
     assert "workbench-data:/app/data" in services["backend"]["volumes"]
-    assert set(compose["volumes"]) == {"workbench-pgdata", "workbench-data", "openaleph-pgdata", "openaleph-elasticsearch-data", "openaleph-redis-data", "openaleph-archive"}
+    assert set(compose["volumes"]) == {"workbench-pgdata", "workbench-data", "openaleph-pgdata", "openaleph-elasticsearch-data", "openaleph-redis-data", "openaleph-archive",
+                                       "translate-models", "translate-cache"}  # downloaded language models (translate profile)
 
     env = services["backend"]["environment"]
     for required in ("POSTGRES_PASSWORD", "API_AUTH_TOKEN", "PUBLIC_ORIGIN", "PUBLIC_OPENALEPH_URL", "OPENALEPH_SECRET_KEY", "OPENALEPH_DB_PASSWORD"):

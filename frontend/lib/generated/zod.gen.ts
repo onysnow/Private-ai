@@ -5118,6 +5118,41 @@ export const zProvenanceTraceOut = z.object({
 });
 
 /**
+ * TranslationPartOut
+ *
+ * One page (or the whole document) in OpenAleph's original text and its machine translation.
+ */
+export const zTranslationPartOut = z.object({
+  locator: z.string(),
+  original: z.string(),
+  page_number: z.number().int().nullable(),
+  translated: z.string().nullable(),
+});
+
+/**
+ * DocumentTranslationOut
+ *
+ * A document's machine translation from OpenAleph's optional translation
+ * service (app/services/openaleph_translation.py). Languages are the
+ * three-letter codes FollowTheMoney stores. ``state``: translated,
+ * not_translated, not_in_openaleph, not_configured or unreachable.
+ */
+export const zDocumentTranslationOut = z.object({
+  detail: z.string().nullable(),
+  detected_languages: z.array(z.string()),
+  document_id: z.string(),
+  parts: z.array(zTranslationPartOut),
+  state: z.enum([
+    'translated',
+    'not_translated',
+    'not_in_openaleph',
+    'not_configured',
+    'unreachable',
+  ]),
+  translated_language: z.string().nullable(),
+});
+
+/**
  * UnsafeDocumentReferenceOut
  */
 export const zUnsafeDocumentReferenceOut = z.object({
@@ -6240,6 +6275,15 @@ export const zPreviewTableMappingPath = z.object({
  * Successful Response
  */
 export const zPreviewTableMappingResponse = zTableMappingPreviewOut;
+
+export const zGetDocumentTranslationPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetDocumentTranslationResponse = zDocumentTranslationOut;
 
 export const zEnrichmentSessionDetailPath = z.object({
   session_id: z.string(),

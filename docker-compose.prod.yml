@@ -147,9 +147,54 @@ services:
     image: ghcr.io/openaleph/ftm-analyze:${OPENALEPH_TAG:-5.3.1}
     restart: unless-stopped
     command: procrastinate worker -q analyze
-    environment: *openaleph-environment
+    environment:
+      <<: *openaleph-environment
+      # ADR-0006, optional translation: with OPENALEPH_TRANSLATE_DEFER=true,
+      # ftm-analyze hands every document whose detected language differs from
+      # FTM_TRANSLATE_TARGET_LANGUAGE to the `translate` service (profile
+      # "translate"; ftm_analyze/tasks.py should_translate). The target is the
+      # three-letter code FollowTheMoney stores in detectedLanguage (eng, deu,
+      # fra...): a two-letter code would never equal it, so every document,
+      # English ones included, would be sent. Set both only together with
+      # `--profile translate`, or jobs wait in the translate queue unread.
+      OPENALEPH_TRANSLATE_DEFER: ${OPENALEPH_TRANSLATE_DEFER:-false}
+      FTM_TRANSLATE_TARGET_LANGUAGE: ${FTM_TRANSLATE_TARGET_LANGUAGE:-eng}
     tmpfs:
       - /tmp:mode=777
+    depends_on:
+      openaleph-setup:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  translate:
+    # Optional machine translation (ADR-0006, Wave C): `docker compose --profile
+    # translate up -d` with OPENALEPH_TRANSLATE_DEFER=true. ftm-translate puts
+    # the translation on each page (translatedText) and adds it to the
+    # document's search text; the Workbench shows it beside the original.
+    # Argos downloads a language pair the first time it is needed (internet
+    # access from this container) and keeps it in the translate-models volume.
+    # Sentences are split with MiniSBD, whose model is downloaded once into
+    # translate-cache; the default for these packages, Stanza, fetches its
+    # resources index from GitHub every time a translator starts
+    # (argostranslate/sbd.py StanzaSentencizer), so translation would stop
+    # whenever the internet is out of reach.
+    image: ghcr.io/openaleph/ftm-translate:${FTM_TRANSLATE_TAG:-5.3.0-argos}
+    profiles: ["translate"]
+    restart: unless-stopped
+    command: procrastinate worker -q translate
+    environment:
+      <<: *openaleph-environment
+      FTM_TRANSLATE_ENGINE: argos
+      FTM_TRANSLATE_TARGET_LANGUAGE: ${FTM_TRANSLATE_TARGET_LANGUAGE:-eng}
+      ARGOS_CHUNK_TYPE: MINISBD
+    tmpfs:
+      - /tmp:mode=777
+    volumes:
+      - translate-models:/root/.local/share/argos-translate
+      - translate-cache:/root/.cache
     depends_on:
       openaleph-setup:
         condition: service_completed_successfully
@@ -287,3 +332,5 @@ volumes:
   openaleph-elasticsearch-data:
   openaleph-redis-data:
   openaleph-archive:
+  translate-models:
+  translate-cache:

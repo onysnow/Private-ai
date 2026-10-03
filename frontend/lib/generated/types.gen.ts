@@ -4069,6 +4069,46 @@ export type DocumentReadFailureOut = {
 };
 
 /**
+ * DocumentTranslationOut
+ *
+ * A document's machine translation from OpenAleph's optional translation
+ * service (app/services/openaleph_translation.py). Languages are the
+ * three-letter codes FollowTheMoney stores. ``state``: translated,
+ * not_translated, not_in_openaleph, not_configured or unreachable.
+ */
+export type DocumentTranslationOut = {
+  /**
+   * Detail
+   */
+  detail: string | null;
+  /**
+   * Detected Languages
+   */
+  detected_languages: Array<string>;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Parts
+   */
+  parts: Array<TranslationPartOut>;
+  /**
+   * State
+   */
+  state:
+    | 'translated'
+    | 'not_translated'
+    | 'not_in_openaleph'
+    | 'not_configured'
+    | 'unreachable';
+  /**
+   * Translated Language
+   */
+  translated_language: string | null;
+};
+
+/**
  * DocumentUploadOut
  *
  * The reply to an upload: the saved document, the job that reads it
@@ -11361,6 +11401,30 @@ export type TraceLeadOut = {
 };
 
 /**
+ * TranslationPartOut
+ *
+ * One page (or the whole document) in OpenAleph's original text and its machine translation.
+ */
+export type TranslationPartOut = {
+  /**
+   * Locator
+   */
+  locator: string;
+  /**
+   * Original
+   */
+  original: string;
+  /**
+   * Page Number
+   */
+  page_number: number | null;
+  /**
+   * Translated
+   */
+  translated: string | null;
+};
+
+/**
  * UnsafeDocumentReferenceOut
  */
 export type UnsafeDocumentReferenceOut = {
@@ -14019,6 +14083,42 @@ export type PreviewTableMappingResponses = {
 
 export type PreviewTableMappingResponse =
   PreviewTableMappingResponses[keyof PreviewTableMappingResponses];
+
+export type GetDocumentTranslationData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/translation';
+};
+
+export type GetDocumentTranslationErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetDocumentTranslationError =
+  GetDocumentTranslationErrors[keyof GetDocumentTranslationErrors];
+
+export type GetDocumentTranslationResponses = {
+  /**
+   * Successful Response
+   */
+  200: DocumentTranslationOut;
+};
+
+export type GetDocumentTranslationResponse =
+  GetDocumentTranslationResponses[keyof GetDocumentTranslationResponses];
 
 export type EnrichmentSessionDetailData = {
   body?: never;

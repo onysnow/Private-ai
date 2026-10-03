@@ -11023,6 +11023,72 @@
         "title": "DocumentReadFailureOut",
         "type": "object"
       },
+      "DocumentTranslationOut": {
+        "description": "A document's machine translation from OpenAleph's optional translation\nservice (app/services/openaleph_translation.py). Languages are the\nthree-letter codes FollowTheMoney stores. ``state``: translated,\nnot_translated, not_in_openaleph, not_configured or unreachable.",
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "detected_languages": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Detected Languages",
+            "type": "array"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "parts": {
+            "items": {
+              "$ref": "#/components/schemas/TranslationPartOut"
+            },
+            "title": "Parts",
+            "type": "array"
+          },
+          "state": {
+            "enum": [
+              "translated",
+              "not_translated",
+              "not_in_openaleph",
+              "not_configured",
+              "unreachable"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "translated_language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Translated Language"
+          }
+        },
+        "required": [
+          "document_id",
+          "state",
+          "detail",
+          "detected_languages",
+          "translated_language",
+          "parts"
+        ],
+        "title": "DocumentTranslationOut",
+        "type": "object"
+      },
       "DocumentUploadOut": {
         "description": "The reply to an upload: the saved document, the job that reads it\n(already finished in developer mode), and its OpenAleph state.",
         "properties": {
@@ -23415,6 +23481,49 @@
         "title": "TraceLeadOut",
         "type": "object"
       },
+      "TranslationPartOut": {
+        "description": "One page (or the whole document) in OpenAleph's original text and its machine translation.",
+        "properties": {
+          "locator": {
+            "title": "Locator",
+            "type": "string"
+          },
+          "original": {
+            "title": "Original",
+            "type": "string"
+          },
+          "page_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Number"
+          },
+          "translated": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Translated"
+          }
+        },
+        "required": [
+          "locator",
+          "page_number",
+          "original",
+          "translated"
+        ],
+        "title": "TranslationPartOut",
+        "type": "object"
+      },
       "UnsafeDocumentReferenceOut": {
         "properties": {
           "document_id": {
@@ -34865,6 +34974,56 @@
           }
         },
         "summary": "Preview Table Mapping"
+      }
+    },
+    "/api/documents/{document_id}/translation": {
+      "get": {
+        "description": "OpenAleph's machine translation of the document, page by page beside the\noriginal, when the optional translation service made one (ADR-0006, Wave C).",
+        "operationId": "get_document_translation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentTranslationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Document Translation"
       }
     },
     "/api/enrichment-sessions/{session_id}": {

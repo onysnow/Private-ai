@@ -3428,3 +3428,24 @@ class EntitySetSentOut(ResponseModel):
     added: int
     removed: int
     waiting_for_sync: int
+
+
+class TranslationPartOut(ResponseModel):
+    """One page (or the whole document) in OpenAleph's original text and its machine translation."""
+    locator: str
+    page_number: int | None
+    original: str
+    translated: str | None
+
+
+class DocumentTranslationOut(ResponseModel):
+    """A document's machine translation from OpenAleph's optional translation
+    service (app/services/openaleph_translation.py). Languages are the
+    three-letter codes FollowTheMoney stores. ``state``: translated,
+    not_translated, not_in_openaleph, not_configured or unreachable."""
+    document_id: str
+    state: Literal["translated", "not_translated", "not_in_openaleph", "not_configured", "unreachable"]
+    detail: str | None
+    detected_languages: list[str]
+    translated_language: str | None
+    parts: list[TranslationPartOut]

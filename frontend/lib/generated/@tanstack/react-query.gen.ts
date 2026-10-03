@@ -74,6 +74,7 @@ import {
   getDocumentEmail,
   getDocumentFormats,
   getDocumentTable,
+  getDocumentTranslation,
   getEntityDossier,
   getExtractionCandidateExplanation,
   getExtractionCandidateLineage,
@@ -390,6 +391,9 @@ import type {
   GetDocumentTableData,
   GetDocumentTableError,
   GetDocumentTableResponse,
+  GetDocumentTranslationData,
+  GetDocumentTranslationError,
+  GetDocumentTranslationResponse,
   GetEntityDossierData,
   GetEntityDossierError,
   GetEntityDossierResponse,
@@ -2204,6 +2208,37 @@ export const previewTableMappingMutation = (
   };
   return mutationOptions;
 };
+
+export const getDocumentTranslationQueryKey = (
+  options: Options<GetDocumentTranslationData>,
+) => createQueryKey('getDocumentTranslation', options);
+
+/**
+ * Get Document Translation
+ *
+ * OpenAleph's machine translation of the document, page by page beside the
+ * original, when the optional translation service made one (ADR-0006, Wave C).
+ */
+export const getDocumentTranslationOptions = (
+  options: Options<GetDocumentTranslationData>,
+) =>
+  queryOptions<
+    GetDocumentTranslationResponse,
+    GetDocumentTranslationError,
+    GetDocumentTranslationResponse,
+    ReturnType<typeof getDocumentTranslationQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDocumentTranslation({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDocumentTranslationQueryKey(options),
+  });
 
 export const enrichmentSessionDetailQueryKey = (
   options: Options<EnrichmentSessionDetailData>,

@@ -27,7 +27,7 @@ from app.models.domain import BackgroundJob, Document, IngestionBatch, Investiga
 from app.schemas.api import IngestionBatchCreate
 from app.schemas.responses import (
     BackgroundJobOut, DocumentDetailOut, DocumentEmailOut, DocumentFormatsOut, DocumentReadFailedOut, DocumentUploadOut,
-    DuplicateDocumentOut, ErrorOut, IngestionBatchesOut, IngestionBatchOut,
+    DocumentTranslationOut, DuplicateDocumentOut, ErrorOut, IngestionBatchesOut, IngestionBatchOut,
     ExtractionCandidateOut, OpenAlephDocumentSyncOut, OpenAlephEntityImportOut, OpenAlephEvidenceImportOut,
     OpenAlephReviewRefreshOut, OpenAlephReviewStatusOut, SimilarDocumentsOut, ValidationErrorOut, upstream,
 )
@@ -35,6 +35,7 @@ from app.services.document_formats import UnsupportedFormat, accepted_formats, c
 from app.services.email_documents import document_email
 from app.services.openaleph_children import is_container
 from app.services.openaleph_search import similar_documents
+from app.services.openaleph_translation import document_translation
 from app.services.documents import (
     get_document_detail, list_document_candidates, serialize_document, sha256_bytes, store_document,
 )
@@ -377,6 +378,16 @@ def get_document(document_id: str, db: Session = Depends(get_db)) -> Any:
     if row is None:
         raise HTTPException(404, "Document not found")
     return get_document_detail(db, row)
+
+
+@router.get("/documents/{document_id}/translation", response_model=DocumentTranslationOut)
+def get_document_translation(document_id: str, db: Session = Depends(get_db)) -> Any:
+    """OpenAleph's machine translation of the document, page by page beside the
+    original, when the optional translation service made one (ADR-0006, Wave C)."""
+    row = db.get(Document, document_id)
+    if row is None:
+        raise HTTPException(404, "Document not found")
+    return document_translation(db, row)
 
 
 @router.get("/documents/{document_id}/candidates", response_model=list[ExtractionCandidateOut])

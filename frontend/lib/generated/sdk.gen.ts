@@ -207,6 +207,9 @@ import type {
   GetDocumentTableData,
   GetDocumentTableErrors,
   GetDocumentTableResponses,
+  GetDocumentTranslationData,
+  GetDocumentTranslationErrors,
+  GetDocumentTranslationResponses,
   GetEntityDossierData,
   GetEntityDossierErrors,
   GetEntityDossierResponses,
@@ -710,6 +713,8 @@ import {
   zGetDocumentTablePath,
   zGetDocumentTableQuery,
   zGetDocumentTableResponse,
+  zGetDocumentTranslationPath,
+  zGetDocumentTranslationResponse,
   zGetEntityDossierPath,
   zGetEntityDossierResponse,
   zGetExtractionCandidateExplanationPath,
@@ -2601,6 +2606,38 @@ export const previewTableMapping = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Get Document Translation
+ *
+ * OpenAleph's machine translation of the document, page by page beside the
+ * original, when the optional translation service made one (ADR-0006, Wave C).
+ */
+export const getDocumentTranslation = <ThrowOnError extends boolean = false>(
+  options: Options<GetDocumentTranslationData, ThrowOnError>,
+): RequestResult<
+  GetDocumentTranslationResponses,
+  GetDocumentTranslationErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetDocumentTranslationResponses,
+    GetDocumentTranslationErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetDocumentTranslationPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDocumentTranslationResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/translation',
+    ...options,
   });
 
 /**
