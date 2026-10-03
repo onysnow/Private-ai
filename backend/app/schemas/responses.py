@@ -1735,13 +1735,19 @@ class ConnectorFindingOut(ResponseModel):
 
 
 class EntityCandidateOut(ResponseModel):
-    """A canonical entity that may be what a finding describes, with a name-match score."""
+    """A canonical entity that may be what a finding describes, with how alike
+    the names are (app/services/resolution.py candidate_entities): ``score``
+    is the stronger of FollowTheMoney's name similarity and the share of
+    words in common; ``basis`` says which tier it falls in."""
     model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
 
     entity_id: str
     caption: str
     schema_: str = Field(alias="schema")
     score: float
+    name_similarity: float | None = Field(default=None, description="FollowTheMoney's name comparison, when the two kinds can be the same thing.")
+    basis: Literal["same_name", "similar_name", "shared_words"] | None = Field(
+        default=None, description="same_name must be answered before accepting; the others are listed. None for a record already established.")
 
 
 class ResolutionDecisionOut(ResponseModel):

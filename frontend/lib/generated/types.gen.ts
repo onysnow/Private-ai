@@ -1086,6 +1086,12 @@ export type CanonicalDecisionSummaryOut = {
  */
 export type CanonicalDuplicateCandidateOut = {
   /**
+   * Basis
+   *
+   * same_name must be answered before accepting; the others are listed. None for a record already established.
+   */
+  basis?: 'same_name' | 'similar_name' | 'shared_words' | null;
+  /**
    * Caption
    */
   caption: string;
@@ -1098,6 +1104,12 @@ export type CanonicalDuplicateCandidateOut = {
    */
   found_by?: Array<string>;
   latest_decision?: CanonicalDecisionSummaryOut | null;
+  /**
+   * Name Similarity
+   *
+   * FollowTheMoney's name comparison, when the two kinds can be the same thing.
+   */
+  name_similarity?: number | null;
   /**
    * Schema
    */
@@ -4670,9 +4682,18 @@ export type EntityAliasResolutionOut = {
 /**
  * EntityCandidateOut
  *
- * A canonical entity that may be what a finding describes, with a name-match score.
+ * A canonical entity that may be what a finding describes, with how alike
+ * the names are (app/services/resolution.py candidate_entities): ``score``
+ * is the stronger of FollowTheMoney's name similarity and the share of
+ * words in common; ``basis`` says which tier it falls in.
  */
 export type EntityCandidateOut = {
+  /**
+   * Basis
+   *
+   * same_name must be answered before accepting; the others are listed. None for a record already established.
+   */
+  basis?: 'same_name' | 'similar_name' | 'shared_words' | null;
   /**
    * Caption
    */
@@ -4681,6 +4702,12 @@ export type EntityCandidateOut = {
    * Entity Id
    */
   entity_id: string;
+  /**
+   * Name Similarity
+   *
+   * FollowTheMoney's name comparison, when the two kinds can be the same thing.
+   */
+  name_similarity?: number | null;
   /**
    * Schema
    */

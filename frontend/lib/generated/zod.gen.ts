@@ -481,10 +481,12 @@ export const zCanonicalDecisionSummaryOut = z.object({
  * CanonicalDuplicateCandidateOut
  */
 export const zCanonicalDuplicateCandidateOut = z.object({
+  basis: z.enum(['same_name', 'similar_name', 'shared_words']).nullish(),
   caption: z.string(),
   entity_id: z.string(),
   found_by: z.array(z.string()).optional(),
   latest_decision: zCanonicalDecisionSummaryOut.nullish(),
+  name_similarity: z.number().nullish(),
   schema: z.string(),
   score: z.number(),
 });
@@ -1754,11 +1756,16 @@ export const zEntityAliasResolutionOut = z.object({
 /**
  * EntityCandidateOut
  *
- * A canonical entity that may be what a finding describes, with a name-match score.
+ * A canonical entity that may be what a finding describes, with how alike
+ * the names are (app/services/resolution.py candidate_entities): ``score``
+ * is the stronger of FollowTheMoney's name similarity and the share of
+ * words in common; ``basis`` says which tier it falls in.
  */
 export const zEntityCandidateOut = z.object({
+  basis: z.enum(['same_name', 'similar_name', 'shared_words']).nullish(),
   caption: z.string(),
   entity_id: z.string(),
+  name_similarity: z.number().nullish(),
   schema: z.string(),
   score: z.number(),
 });

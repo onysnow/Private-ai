@@ -21,7 +21,8 @@ beforeEach(() => connectGeneratedClient(new ApiClient('http://api.test')));
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
 const wrap = (node: ReactElement) => render(<QueryProvider>{node}</QueryProvider>);
-const record = (entity_id: string, caption: string, score: number, schema = 'Company') => ({entity_id, caption, schema, score});
+const record = (entity_id: string, caption: string, score: number, schema = 'Company', basis: 'same_name' | 'similar_name' | 'shared_words' = score >= 0.9 ? 'same_name' : 'shared_words') =>
+  ({entity_id, caption, schema, score, name_similarity: basis === 'shared_words' ? null : score, basis});
 const localReply = (matches: ReturnType<typeof record>[], strong: ReturnType<typeof record> | null = null) => ({
   candidate_id: 'cand-1', caption: 'Meridian Holdings Ltd', schema: 'Company', matches, strong_match: strong,
   provider_lead: {provider: null, provider_entity_id: null, provider_resolved_entity_id: null}, identity_rule: 'Reporter decides.'});
@@ -110,6 +111,11 @@ describe('identity helpers', () => {
   it('merges a record found both ways into one option', () => {
     const options = sameAsOptions([record('e1', 'Meridian Holdings Ltd', 0.95)],
       [hit('ours.sig', 'Meridian Holdings Ltd', {workbench_entity_id: 'e1', in_this_investigation: true})] as never, 'e1');
-    expect(options).toEqual([{entityId: 'e1', caption: 'Meridian Holdings Ltd', schema: 'Company', why: 'strong name match; OpenAleph also matched it'}]);
+    expect(options).toEqual([{entityId: 'e1', caption: 'Meridian Holdings Ltd', schema: 'Company', why: 'the same name; OpenAleph also matched it'}]);
+  });
+
+  it('lists a similar name even when it shares few words', () => {
+    const options = sameAsOptions([record('e1', 'Aleksandr Petrov', 0.81, 'Person', 'similar_name'), record('e2', 'Petrov Holdings', 0.33)], [], null);
+    expect(options.map(o => [o.entityId, o.why])).toEqual([['e1', 'a similar name']]);
   });
 });

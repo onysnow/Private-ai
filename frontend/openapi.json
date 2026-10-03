@@ -1824,6 +1824,23 @@
       },
       "CanonicalDuplicateCandidateOut": {
         "properties": {
+          "basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "same_name",
+                  "similar_name",
+                  "shared_words"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "same_name must be answered before accepting; the others are listed. None for a record already established.",
+            "title": "Basis"
+          },
           "caption": {
             "title": "Caption",
             "type": "string"
@@ -1848,6 +1865,18 @@
                 "type": "null"
               }
             ]
+          },
+          "name_similarity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "FollowTheMoney's name comparison, when the two kinds can be the same thing.",
+            "title": "Name Similarity"
           },
           "schema": {
             "title": "Schema",
@@ -12001,8 +12030,25 @@
         "type": "object"
       },
       "EntityCandidateOut": {
-        "description": "A canonical entity that may be what a finding describes, with a name-match score.",
+        "description": "A canonical entity that may be what a finding describes, with how alike\nthe names are (app/services/resolution.py candidate_entities): ``score``\nis the stronger of FollowTheMoney's name similarity and the share of\nwords in common; ``basis`` says which tier it falls in.",
         "properties": {
+          "basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "same_name",
+                  "similar_name",
+                  "shared_words"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "same_name must be answered before accepting; the others are listed. None for a record already established.",
+            "title": "Basis"
+          },
           "caption": {
             "title": "Caption",
             "type": "string"
@@ -12010,6 +12056,18 @@
           "entity_id": {
             "title": "Entity Id",
             "type": "string"
+          },
+          "name_similarity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "FollowTheMoney's name comparison, when the two kinds can be the same thing.",
+            "title": "Name Similarity"
           },
           "schema": {
             "title": "Schema",

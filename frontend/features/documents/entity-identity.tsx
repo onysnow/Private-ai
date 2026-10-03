@@ -3,10 +3,12 @@
 // before it is accepted.
 //
 // Two lookups, read when the name is shown:
-// - the investigation's own records whose names share words with it
-//   (GET /api/extraction-candidates/{id}/entity-matches; the score is the
-//   share of words in common, plus a little for the same type, and the
-//   server calls 0.9 or more a strong match);
+// - the investigation's own records whose names are alike
+//   (GET /api/extraction-candidates/{id}/entity-matches; backend
+//   app/services/resolution.py): each has a ``basis`` -- the same name
+//   (FollowTheMoney's name comparison 0.9 or more, which reads "Ltd" and
+//   "Limited" as one and ignores word order and titles), a similar name, or
+//   words in common -- and the first same name is the strong match;
 // - what OpenAleph holds that looks like it, across every collection the
 //   reader may see (GET .../openaleph-matches, POST /api/2/match, ADR-0006).
 //   A match in this investigation's own collection names the record it was
@@ -26,8 +28,10 @@ import {Button} from '@/components/ui/button';
 import {getExtractionEntityMatchesOptions, getExtractionOpenalephMatchesOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {EntityCandidateOut, OpenAlephMatchOut} from '../../lib/generated/types.gen';
 
-/** Records sharing at least half their words with the name are offered. */
+/** A record that only shares words with the name is offered when it shares at least half of them. */
 export const LISTED_SCORE = 0.5;
+
+const WHY: Record<string, string> = {same_name: 'the same name', similar_name: 'a similar name', shared_words: 'shares most of its words'};
 
 export type IdentityChoice = {kind: 'new'} | {kind: 'same', entityId: string};
 
@@ -46,9 +50,8 @@ type Option = {entityId: string, caption: string, schema: string, why: string};
  * collection that the name comparison did not find. */
 export function sameAsOptions(local: EntityCandidateOut[], remote: OpenAlephMatchOut[], strongMatchId: string | null): Option[] {
   const options: Option[] = local
-    .filter(row => row.score >= LISTED_SCORE || row.entity_id === strongMatchId)
-    .map(row => ({entityId: row.entity_id, caption: row.caption, schema: row.schema,
-      why: row.entity_id === strongMatchId ? 'strong name match' : 'shares most of its words'}));
+    .filter(row => row.basis === 'same_name' || row.basis === 'similar_name' || row.score >= LISTED_SCORE || row.entity_id === strongMatchId)
+    .map(row => ({entityId: row.entity_id, caption: row.caption, schema: row.schema, why: WHY[row.basis ?? 'shared_words']}));
   for (const row of remote) {
     if (!row.workbench_entity_id) continue;
     const listed = options.find(option => option.entityId === row.workbench_entity_id);

@@ -9,7 +9,7 @@ from app.models.domain import Document, DocumentChunk, DocumentCorpusSync, Extra
 from app.services.ftm import make_ftm_entity
 from app.services.identifier_proposals import accept_identifier
 from app.services.security import contained_path, resolve_storage_root
-from app.services.resolution import candidate_entities
+from app.services.resolution import BASIS_SAME, candidate_entities
 from app.services.pdf_ocr import extract_pdf_chunks
 from app.services.document_reader import read_chunks
 from app.services.entity_signals import norm_name, read_name, read_passage, split_title
@@ -421,13 +421,17 @@ def preview_entity_candidate_matches(db: Session, candidate: ExtractionCandidate
     payload = candidate.payload or {}
     caption = str(payload.get('caption') or '').strip()
     schema = str(payload.get('suggested_schema') or 'Thing')
-    matches = candidate_entities(db, doc.investigation_id, caption, schema)
+    # A kind the text did not show (the pattern finder's low band, or a name
+    # OpenAleph gave no kind) is only a guess: compare as any legal entity.
+    guessed = payload.get('schema_question') is True or (candidate.confidence or 0) < 0.5
+    matches = candidate_entities(db, doc.investigation_id, caption, schema, schema_is_guess=guessed)
     raw_provenance = payload.get('provenance')
     provenance: dict = raw_provenance if isinstance(raw_provenance, dict) else {}
     return {
         'candidate_id': candidate.id, 'caption': caption, 'schema': schema,
         'matches': matches,
-        'strong_match': next((row for row in matches if row['score'] >= 0.9), None),
+        # The same name (resolution.py SAME_NAME): accepting waits for the reporter's same-or-new answer.
+        'strong_match': next((row for row in matches if row['basis'] == BASIS_SAME), None),
         'provider_lead': {
             'provider': provenance.get('provider'),
             'provider_entity_id': provenance.get('provider_entity_id'),

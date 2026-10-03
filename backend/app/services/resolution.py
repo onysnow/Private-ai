@@ -1,6 +1,10 @@
 import re
 from typing import Any
 
+from followthemoney import model
+from followthemoney.compare import compare_names
+from followthemoney.exc import InvalidData
+from followthemoney.schema import Schema
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.models.domain import Entity, RelationshipEdge, CanonicalResolutionDecision
@@ -9,19 +13,69 @@ from app.services.entity_aliases import resolve_active_entity
 def _norm(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", " ", (text or "").lower()).strip()
 
-def candidate_entities(db: Session, investigation_id: str, caption: str, schema: str | None) -> list[dict]:
+
+# How alike two names are (design doc "Document Ingestion & Review System
+# Design", Phase 4: a scored decision in place of a binary guard). Two
+# measures, the stronger kept:
+# - FollowTheMoney's own name comparison (followthemoney.compare
+#   compare_names, the comparison OpenAleph's matching is built on): it
+#   reads "Ltd" and "Limited" as one, ignores word order ("Voss, Alaric") and
+#   personal titles, forgives small spelling slips, and only compares records
+#   whose kinds can be the same thing -- a Company is never a Person
+#   (model.common_schema). It is strict about extra words, so
+# - the share of words two names have in common still lists a name that is
+#   part of another ("Bellcastle Trading" in "Bellcastle Trading Group").
+# Tiers, conservative by default (a wrong merge costs more in an
+# investigation than a missed one, as the design doc notes): the same name
+# (FtM 0.9 or more, or the same words) must be answered "same" or "new"
+# before a proposal is accepted; a similar name (FtM 0.7 or more) or most
+# words shared is listed; nothing is ever linked without the reporter.
+SAME_NAME = 0.9
+SIMILAR_NAME = 0.7
+BASIS_SAME, BASIS_SIMILAR, BASIS_WORDS = "same_name", "similar_name", "shared_words"
+
+
+def _proxy(schema: Schema, caption: str) -> Any:
+    proxy = model.make_entity(schema)
+    proxy.id = "candidate"
+    proxy.add("name", caption, quiet=True)
+    return proxy
+
+
+def candidate_entities(db: Session, investigation_id: str, caption: str, schema: str | None, *,
+                       schema_is_guess: bool = False) -> list[dict]:
+    """The investigation's records that may be what ``caption`` names, best
+    first. ``schema_is_guess``: the proposal's kind is only a guess (the
+    pattern finder's 0.40, or a name OpenAleph gave no kind), so it is
+    compared as "some legal entity" and a guessed Person still finds the
+    Company of the same name."""
     needle = set(_norm(caption).split())
+    wanted = None if schema_is_guess else model.get(schema or "")
+    query_schema = wanted if wanted is not None and wanted.matchable else model.get("LegalEntity")
+    assert query_schema is not None
     relationship_ids = select(RelationshipEdge.relationship_entity_id).where(RelationshipEdge.investigation_id == investigation_id)
     rows = db.scalars(select(Entity).where(Entity.investigation_id == investigation_id, Entity.merged_into_entity_id.is_(None), ~Entity.id.in_(relationship_ids))).all()
     scored: list[dict[str, Any]] = []
     for row in rows:
+        row_schema = model.get(row.schema)
+        similarity: float | None = None
+        if row_schema is not None:
+            try:
+                common = model.common_schema(query_schema, row_schema)
+            except InvalidData:
+                continue   # kinds that can never be the same thing
+            if common.matchable and caption.strip() and (row.caption or "").strip():
+                similarity = compare_names(common, _proxy(common, caption), _proxy(common, row.caption))
         hay = set(_norm(row.caption).split())
         overlap = len(needle & hay) / max(1, len(needle | hay))
-        exact = 1.0 if _norm(row.caption) == _norm(caption) and caption else 0.0
-        schema_bonus = 0.15 if schema and row.schema == schema else 0.0
-        score = min(1.0, max(overlap, exact) + schema_bonus)
-        if score > 0:
-            scored.append({"entity_id": row.id, "caption": row.caption, "schema": row.schema, "score": round(score, 4)})
+        same_words = bool(needle) and needle == hay
+        score = max(overlap, similarity or 0.0, 1.0 if same_words else 0.0)
+        if score <= 0:
+            continue
+        basis = (BASIS_SAME if same_words or (similarity or 0) >= SAME_NAME
+                 else BASIS_SIMILAR if (similarity or 0) >= SIMILAR_NAME else BASIS_WORDS)
+        scored.append({"entity_id": row.id, "caption": row.caption, "schema": row.schema, "score": round(score, 4),
+                       "name_similarity": None if similarity is None else round(similarity, 4), "basis": basis})
     return sorted(scored, key=lambda x: x["score"], reverse=True)[:10]
 
 
