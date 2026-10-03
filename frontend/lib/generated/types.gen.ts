@@ -1444,7 +1444,8 @@ export type ChartKind =
   | 'histogram'
   | 'scatter'
   | 'timeline'
-  | 'sankey';
+  | 'sankey'
+  | 'map';
 
 /**
  * ChartOptionSpecOut
@@ -3383,6 +3384,14 @@ export type DataTableRowOut = {
    * Label
    */
   label: string;
+  /**
+   * Latitude
+   */
+  latitude?: number | null;
+  /**
+   * Longitude
+   */
+  longitude?: number | null;
   /**
    * Record Count
    */
@@ -11918,6 +11927,14 @@ export type VisualDataRowOut = {
    */
   label: string;
   /**
+   * Latitude
+   */
+  latitude?: number | null;
+  /**
+   * Longitude
+   */
+  longitude?: number | null;
+  /**
    * Record Count
    */
   record_count: number;
@@ -12227,7 +12244,7 @@ export type VisualSpec = {
   /**
    * Question
    *
-   * The question the chart answers: ranking, change_over_time, part_of_whole, distribution, correlation or flow.
+   * The question the chart answers: ranking, change_over_time, part_of_whole, distribution, correlation, flow or place.
    */
   question?: string | null;
   scale?: Scale;

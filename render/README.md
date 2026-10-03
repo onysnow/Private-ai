@@ -23,7 +23,7 @@ else is refused.
 |---|---|---|
 | `GET /health` | — | `{"ok": true, "echarts": "6.1.0", "node": "v22…"}` |
 | `POST /echarts` | `{"option": {…}, "width": 960, "height": 540}` | `image/svg+xml` |
-| `POST /map` | `{"places": [{"longitude": -0.13, "latitude": 51.51, "label": "…"}], "width": 960, "height": 540}` | `image/png`, at twice the size |
+| `POST /map` | `{"places": [{"longitude": -0.13, "latitude": 51.51, "label": "…", "radius": 10, "picked": true}], "width": 960, "height": 540}` | `image/png`, at twice the size |
 
 `width` and `height` are pixels, whole numbers from 1 to 4000, and default to
 960 × 540. A body that is not JSON, has no `option`, or asks for an absurd
@@ -36,7 +36,12 @@ back as its empty first frame.
 places), 503 when no base map is installed, and 500 when MapLibre Native
 cannot draw. The view fits every place with 60 px to spare, worked out in
 Web Mercator (MapLibre Native takes a centre and a zoom, not bounds), and
-never zooms more than two levels past the base map's own.
+never zooms more than two levels past the base map's own. Each place is a
+dot of `radius` px (7 unless given; the backend draws a picked place at 10
+and sets `picked`, which sets its name larger) named beside it. The dot is
+an image on a symbol layer, not a circle layer, so the base map's own labels
+give way to it instead of being drawn underneath (symbols take part in
+MapLibre's label placement; circles do not); the app draws the same dot.
 
 MapLibre Native's Linux build (6.4.1) is made for Ubuntu 24.04 (glibc 2.38,
 ICU 74), so the image runs on Ubuntu 24.04 with Node copied in, and draws
@@ -56,6 +61,11 @@ npm ci
 npm start            # listens on 0.0.0.0:8070; PORT and HOST override
 npm test             # node --test
 ```
+
+`npm test` skips the live map draw (`map.live.test.mjs`) unless MapLibre
+Native loads, an X display is up and a base map is installed; run it as the
+image runs the service:
+`BASEMAP_DIR=/path/to/basemap xvfb-run -a node --test map.live.test.mjs`.
 
 Maps outside Docker need MapLibre Native's libraries (on Ubuntu 24.04:
 `libopengl0 libglx0 libgl1-mesa-dri libcurl4t64 libuv1t64 libjpeg-turbo8

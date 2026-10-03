@@ -2070,6 +2070,199 @@
   },
   "width": 960
  },
+ "map": {
+  "data": {
+   "currency": null,
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {},
+   "query": "places_on_map",
+   "record_count": 2,
+   "record_noun": "places",
+   "rows": [
+    {
+     "key": "meridian registered office|office",
+     "label": "Meridian registered office",
+     "latitude": 51.5072,
+     "longitude": -0.1276,
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "office",
+       "record_type": "entity"
+      }
+     ],
+     "value": 1.0
+    },
+    {
+     "key": "villa kyrenia|villa",
+     "label": "Villa Kyrenia",
+     "latitude": 35.3364,
+     "longitude": 33.3199,
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "villa",
+       "record_type": "entity"
+      }
+     ],
+     "value": 1.0
+    }
+   ],
+   "series_kind": "places",
+   "unit": "places",
+   "unit_kind": "count"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Map: The money ended up in a villa in Cyprus. 2 places: Meridian registered office, Villa Kyrenia.",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#8A2F1E"
+   ],
+   "map": {
+    "attribution": "Map data © OpenStreetMap contributors",
+    "bottom": 44,
+    "flavor": "grayscale",
+    "places": [
+     {
+      "colour": "#8A2F1E",
+      "label": {
+       "fontSize": 13,
+       "fontWeight": "normal",
+       "text": "Meridian registered office"
+      },
+      "latitude": 51.5072,
+      "longitude": -0.1276,
+      "name": "Meridian registered office",
+      "radius": 7
+     },
+     {
+      "colour": "#8A2F1E",
+      "label": {
+       "fontSize": 13,
+       "fontWeight": "normal",
+       "text": "Villa Kyrenia"
+      },
+      "latitude": 35.3364,
+      "longitude": 33.3199,
+      "name": "Villa Kyrenia",
+      "radius": 7
+     }
+    ],
+    "top": 84
+   },
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Each place where its record puts it; nothing is looked up",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "The money ended up in a villa in Cyprus",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 2 places in this investigation's records (places_on_map) · Map data © OpenStreetMap contributors",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ]
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "map",
+   "limit": null,
+   "query": {
+    "name": "places_on_map",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "The money ended up in a villa in Cyprus",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Map: The money ended up in a villa in Cyprus. 2 places: Meridian registered office, Villa Kyrenia.",
+   "data_table": {
+    "columns": [
+     "Place",
+     "Where",
+     "Records"
+    ],
+    "rows": [
+     {
+      "formatted": "51.5072° N, 0.1276° W",
+      "label": "Meridian registered office",
+      "latitude": 51.5072,
+      "longitude": -0.1276,
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "office",
+        "record_type": "entity"
+       }
+      ],
+      "value": 1.0
+     },
+     {
+      "formatted": "35.3364° N, 33.3199° E",
+      "label": "Villa Kyrenia",
+      "latitude": 35.3364,
+      "longitude": 33.3199,
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "villa",
+        "record_type": "entity"
+       }
+      ],
+      "value": 1.0
+     }
+    ]
+   },
+   "description": "Map: The money ended up in a villa in Cyprus. 2 places: Meridian registered office, Villa Kyrenia. Meridian registered office: 51.5072° N, 0.1276° W. Villa Kyrenia: 35.3364° N, 33.3199° E. Source: 2 places in this investigation's records (places_on_map) · Map data © OpenStreetMap contributors.",
+   "source_line": "Source: 2 places in this investigation's records (places_on_map) · Map data © OpenStreetMap contributors"
+  },
+  "width": 960
+ },
  "sankey": {
   "data": {
    "currency": "USD",

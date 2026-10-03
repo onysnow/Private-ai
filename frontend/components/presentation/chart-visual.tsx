@@ -9,12 +9,17 @@
 //
 // Loaded with next/dynamic by its callers: ECharts stays out of the page's
 // first load.
+import dynamic from 'next/dynamic';
 import {useEffect, useRef, useState} from 'react';
 import type {ReactElement} from 'react';
 import type {EChartsOption} from 'echarts';
 
 import {Chart} from '../charts/chart';
 import type {ChartVisual} from '../../lib/api-types';
+
+// A map chart's places are drawn with MapLibre (chart-map.tsx), loaded only
+// when there is a map to draw.
+const ChartMap = dynamic(() => import('./chart-map').then(m => m.ChartMap), {ssr: false});
 
 const DESIGN_WIDTH = 960;
 const DESIGN_HEIGHT = 540;
@@ -55,7 +60,9 @@ export function ScaledChart({visual, fill = false}: {visual: ChartVisual, fill?:
       {/* The option carries the deck theme's colours and fonts, which the
           checker judged for contrast; the app's dark chart theme must not
           repaint it. */}
-      <Chart option={visual.option as EChartsOption} height={design.height} ariaLabel={visual.text.alt_text} theme={null}/>
+      {visual.option && typeof visual.option === 'object' && 'map' in visual.option
+        ? <ChartMap option={visual.option as Record<string, unknown>} width={design.width} height={design.height} ariaLabel={visual.text.alt_text}/>
+        : <Chart option={visual.option as EChartsOption} height={design.height} ariaLabel={visual.text.alt_text} theme={null}/>}
     </div>
   </div>;
 }
@@ -65,7 +72,8 @@ type TableRow = ChartVisual['text']['data_table']['rows'][number];
 /** A data-table row's cells in the order the backend lists its columns
  * (backend/app/visuals/echarts.py): the label, a flow's payer and recipient
  * when the chart shows flows, a scatter plot's second number when the chart
- * has one, the value (a timeline's: when the event happened), a part's
+ * has one, the value (a timeline's: when the event happened; a map's: where
+ * the place is), a part's
  * share when the chart shows parts of a whole, an event's verification
  * status on a timeline, and the number of records behind the value. */
 export function tableCells(rows: TableRow[], row: TableRow): {key: string, text: string, numeric: boolean}[] {
@@ -75,7 +83,8 @@ export function tableCells(rows: TableRow[], row: TableRow): {key: string, text:
   }
   if (rows.some(r => r.x_formatted !== undefined)) cells.push({key: 'x', text: row.x_formatted ?? '', numeric: true});
   const events = rows.some(r => r.status !== undefined);
-  cells.push({key: 'value', text: row.formatted, numeric: !events});
+  // A timeline's value is when, a map's is where: words, not a number.
+  cells.push({key: 'value', text: row.formatted, numeric: !events && !rows.some(r => r.latitude !== undefined)});
   if (rows.some(r => r.share !== undefined)) cells.push({key: 'share', text: row.share === undefined ? '' : `${row.share.toFixed(1)}%`, numeric: true});
   if (events) cells.push({key: 'status', text: row.status ?? '', numeric: false});
   cells.push({key: 'records', text: String(row.record_count), numeric: true});
@@ -99,8 +108,9 @@ export function ChartFigure({visual, renderCitations}: {visual: ChartVisual, ren
           {renderCitations ? <th className="border-b py-1 font-semibold">Sources</th> : null}
         </tr></thead>
         <tbody>{table.rows.map(row => <tr key={row.label}>
-          {/* A timeline's event is one record by what it is (rules 16 and 20 do not apply), so it carries no mark. */}
-          <td className="border-b py-1 pr-3">{row.label}{row.record_count === 1 && row.status === undefined ? <span title="Rests on a single record"> †</span> : null}</td>
+          {/* A timeline's event and a map's place are one record by what they are (rules 16 and 20 do not apply), so they carry no mark. */}
+          <td className="border-b py-1 pr-3">{row.label}{row.record_count === 1 && row.status === undefined && row.latitude === undefined
+            ? <span title="Rests on a single record"> †</span> : null}</td>
           {tableCells(table.rows, row).map(cell => <td key={cell.key} className="border-b py-1 pr-3 tabular-nums">{cell.text}</td>)}
           {renderCitations ? <td className="border-b py-1">{renderCitations(row.record_refs)}</td> : null}
         </tr>)}</tbody>

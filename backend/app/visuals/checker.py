@@ -59,6 +59,12 @@ every event is named on the axis and its date and status written beside
 it; rule 14 that every row is tall enough for its text. Each mark is one
 event, which is one record, so rules 16 and 20 (records behind a value)
 do not apply to it.
+
+A map is read through its places (option "map", drawn by MapLibre): rule 0
+compares each place's coordinates with its record's; rule 12 asks that
+every place is named; rule 11 that the dots stand 3:1 against the base
+map. A map has no axes, so the axis rules do not apply; and, as on a
+timeline, one place is one record (16, 20).
 """
 
 from __future__ import annotations
@@ -72,7 +78,8 @@ from app.services.presentation_style import Theme, contrast_ratio
 from app.visuals.data_service import DataRow, VisualData
 from app.visuals.echarts import (
     DEFAULT_HEIGHT, DEFAULT_WIDTH, GRAPHIC_CONTRAST, HOLLOW_SYMBOL, MIN_FONT_PX, SINGLE_RECORD_MARK, TIMELINE_ROW_MIN, TREEMAP_LABEL_PADDING,
-    BuiltChart, UnsupportedChartKind, build_chart, count_phrase, format_value, prepare_rows, timeline_marks, timeline_row_room, timeline_text,
+    MAP_LABEL_PX, MAP_PLACE_COLOUR, BuiltChart, UnsupportedChartKind, build_chart, count_phrase, format_value, prepare_rows, timeline_marks,
+    timeline_row_room, timeline_text,
 )
 from app.visuals.layout import LABEL_GAP, block_width, treemap_rects, wrapped_lines
 from app.visuals.spec import (
@@ -88,6 +95,10 @@ RECORD_COUNT_SPREAD = 10      # rule 16 (our own threshold)
 TEXT_CONTRAST, LARGE_TEXT_CONTRAST = 4.5, 3.0   # rule 11 (WCAG 1.4.3)
 MIN_TITLE_WORDS = 3           # rule 13: "Payments" names the data; a finding takes a sentence
 MAX_FLOW_PARTIES = 20         # rule 10, flow diagrams: past this, the bands cross too often to follow (our own threshold)
+# The grayscale base map's lightest and darkest fills a place's dot sits on
+# (@protomaps/basemaps 5.7.2, namedFlavor("grayscale"): water #a3a3a3, earth
+# #cccccc, buildings #e0e0e0); rule 11 holds a map's dots to 3:1 against each.
+BASEMAP_FILLS = ("a3a3a3", "cccccc", "e0e0e0")
 
 NOT_CHECKABLE_HERE = {
     17: "shaded maps are judged in the maps pass",
@@ -211,6 +222,11 @@ class _Checker:
         """A mark's label settings: the item's own over its series' (a 100%
         bar's segments carry their label on the series, one per part)."""
         return {**(series.get("label") or {}), **(item.get("label") or {})}
+
+    def places(self) -> list[dict[str, Any]]:
+        """A map's places, as the option hands them to MapLibre."""
+        drawn = ((self.option or {}).get("map") or {}).get("places") or []
+        return [place for place in drawn if isinstance(place, dict)]
 
     def links(self) -> list[dict[str, Any]]:
         """A flow diagram's bands (its marks that carry values); its
@@ -376,12 +392,23 @@ class _Checker:
         return [row for row in self.rows if row.value != 0 or row.record_count]
 
     # 0. The numbers match (the design's first check, after VisEval).
+    def _map_coordinates(self) -> None:
+        """Rule 0 for a map: every place drawn where its record puts it."""
+        placed = sorted(((str(p.get("name")), _number(p.get("longitude")), _number(p.get("latitude"))) for p in self.places()), key=str)
+        recorded = sorted(((row.label, row.longitude, row.latitude) for row in self.rows), key=str)
+        if placed != recorded:
+            self.error(0, f"the places drawn do not match their records: drawn {placed}, records {recorded}")
+
     def rule_0(self) -> None:
         if self.option is None:
             self.not_checked[0] = f"needs the drawn option; chart kind {self.kind.value!r} is not drawn yet"
             return
         if self.kind == ChartKind.timeline:
             self._timeline_dates()
+            self.passed(0)
+            return
+        if self.kind == ChartKind.map:
+            self._map_coordinates()
             self.passed(0)
             return
         expected: list[tuple[Any, ...]]
@@ -539,6 +566,9 @@ class _Checker:
 
     # 6. No second value axis.
     def rule_6(self) -> None:
+        if self.kind == ChartKind.map:
+            self.does_not_apply(6, "a map has no value axis")
+            return
         if not self.needs_option(6):
             return
         per_side = [sum(1 for a in self.axes_of(key) if a.get("type") in ("value", "log")) for key in ("xAxis", "yAxis")]
@@ -676,6 +706,13 @@ class _Checker:
                         self.error(11, f"the line and points ({colour}) are {ratio:.2f}:1 against the page; marks that carry values need 3:1")
             if kind in COLOUR_PER_CATEGORY_KINDS:
                 self._part_contrast()
+            if kind == ChartKind.map:
+                # A dot carries a place: 3:1 against every fill of the base map (WCAG 1.4.11).
+                for colour in sorted({str(p.get("colour") or MAP_PLACE_COLOUR) for p in self.places()}):
+                    for fill in BASEMAP_FILLS:
+                        ratio = contrast_ratio(colour.lstrip("#"), fill)
+                        if ratio < GRAPHIC_CONTRAST:
+                            self.error(11, f"the places' dots ({colour}) are {ratio:.2f}:1 against the base map's #{fill}; marks need 3:1")
             if kind == ChartKind.sankey:
                 # A band's width carries its value, read against the page; the
                 # amount is written on it too, so the bands may be pale, but the
@@ -735,6 +772,17 @@ class _Checker:
                 label = self.label_of(series, node)
                 if not label.get("show", True) or not str(label.get("formatter", "")).strip():
                     self.error(12, f"the party drawn as '{node.get('name')}' is not named on the chart")
+        if kind == ChartKind.map and self.needs_option(12):
+            for place in self.places():
+                label = place.get("label") or {}
+                if str(label.get("text", "")).strip() != str(place.get("name")):
+                    self.error(12, f"the place '{place.get('name')}' is not named on the map")
+                if _number(label.get("fontSize")) is None or (_number(label.get("fontSize")) or 0) < MAP_LABEL_PX - 1:
+                    self.error(12, f"the name of '{place.get('name')}' has no readable size")
+            picked_places = set(self.spec.highlight)
+            for place in self.places():
+                if place.get("name") in picked_places and (place.get("label") or {}).get("fontWeight") != "bold":
+                    self.error(12, f"'{place.get('name')}' is picked out by the size of its dot only; its name must also be bold")
         if kind == ChartKind.timeline and self.needs_option(12):
             named = self.category_axis_labels()
             written = self.label_text()
@@ -743,7 +791,7 @@ class _Checker:
                     self.error(12, f"the event '{row.label}' is not named on the timeline's axis")
                 if written.get(row.label) != timeline_text(row):
                     self.error(12, f"the date and status of '{row.label}' are not written beside it")
-        if self.spec.highlight and self.needs_option(12):
+        if self.spec.highlight and kind != ChartKind.map and self.needs_option(12):
             picked = [name for name in self.spec.highlight if any(row.label == name for row in self.rows)]
             if kind in (ChartKind.bar, ChartKind.column, ChartKind.histogram):
                 axis_items = self.category_axis_labels()
@@ -818,6 +866,9 @@ class _Checker:
         if kind == ChartKind.timeline:
             self.does_not_apply(16, "each mark on a timeline is one event, which is one record; there is no group of records to count")
             return
+        if kind == ChartKind.map:
+            self.does_not_apply(16, "each dot on a map is one place, which is one record; there is no group of records to count")
+            return
         drawn = self.drawn_rows()
         counts = [row.record_count for row in drawn if row.record_count]
         if len(counts) > 1 and max(counts) > RECORD_COUNT_SPREAD * min(counts):
@@ -859,6 +910,9 @@ class _Checker:
     def rule_20(self) -> None:
         if self.kind == ChartKind.timeline:
             self.does_not_apply(20, "each mark on a timeline is one event, which is one record; resting on one record is what an event is")
+            return
+        if self.kind == ChartKind.map:
+            self.does_not_apply(20, "each dot on a map is one place, which is one record; resting on one record is what a place is")
             return
         singles = [row.label for row in self.drawn_rows() if row.record_count == 1]
         if singles:

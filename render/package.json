@@ -2,7 +2,7 @@
   "name": "journalism-workbench-render",
   "version": "0.1.0",
   "private": true,
-  "description": "Draws ECharts options as SVG on the server for the Journalism Workbench exports (ADR-0005, line 2).",
+  "description": "Draws ECharts options as SVG, and maps as PNG with MapLibre Native, on the server for the Journalism Workbench exports (ADR-0005, lines 2 and 18).",
   "type": "module",
   "main": "server.mjs",
   "scripts": {

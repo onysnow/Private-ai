@@ -87,6 +87,12 @@ forms for every section, every time.
         only over `payment_flows`; with many parties, rank the flows as
         `bar` instead. A flow diagram takes no `sort` or `limit`; its
         `highlight` may name a party or one flow ("Meridian → Bellcastle").
+      - `place` -- where things are, when the locations themselves matter
+        more to the story than anything else (the villa is in Cyprus, the
+        bank in Riga): `map`, only over `places_on_map`, which holds the
+        records that carry their own latitude and longitude. A map takes no
+        `sort` or `limit`; its `highlight` names places, which are drawn
+        larger.
       `spec.title` is a full sentence that states the finding the chart
       shows, in words, e.g. "Meridian received most of the money" or "Most
       payments were small" -- never the name of the data ("Payments by
@@ -96,7 +102,7 @@ forms for every section, every time.
       {"direction": "received"}}`). Optional: `sort` (`value_desc`,
       `value_asc`, `label`, `time`) and `limit` (keep the top N; the rest
       fold into "Other"), neither for a histogram, a scatter plot, a
-      flow diagram or a timeline, whose order and points come from the data; `highlight` (labels to
+      flow diagram, a timeline or a map, whose order and points come from the data; `highlight` (labels to
       pick out). The Workbench runs the query, tags every value with its
       records, draws the chart and checks it against the design rules; a
       chart that fails is removed from the draft and you may be asked once

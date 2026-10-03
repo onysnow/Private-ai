@@ -201,6 +201,9 @@ class VisualDataRowOut(ResponseModel):
     start: str | None = Field(default=None, exclude_if=_absent_when_none)
     end: str | None = Field(default=None, exclude_if=_absent_when_none)
     status: str | None = Field(default=None, exclude_if=_absent_when_none)
+    # A places row's coordinates, as its record gives them (a map).
+    latitude: float | None = Field(default=None, exclude_if=_absent_when_none)
+    longitude: float | None = Field(default=None, exclude_if=_absent_when_none)
 
 
 class VisualDataOut(ResponseModel):
@@ -255,6 +258,9 @@ class DataTableRowOut(ResponseModel):
     start: str | None = Field(default=None, exclude_if=_absent_when_none)
     end: str | None = Field(default=None, exclude_if=_absent_when_none)
     status: str | None = Field(default=None, exclude_if=_absent_when_none)
+    # A place's coordinates (a map; `formatted` says them in words).
+    latitude: float | None = Field(default=None, exclude_if=_absent_when_none)
+    longitude: float | None = Field(default=None, exclude_if=_absent_when_none)
 
 
 class DataTableOut(ResponseModel):

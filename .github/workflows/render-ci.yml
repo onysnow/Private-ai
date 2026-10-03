@@ -1,10 +1,10 @@
 name: Render service CI
 
 # The render service's own tests (render/*.test.mjs): the ECharts route, the
-# map route's request checks, its view arithmetic, and what the base map is
-# allowed to answer. A live map draw needs MapLibre Native's GL libraries and
-# a base map; the backend's live render tests and the image build cover the
-# service as a whole.
+# map route's request checks, its view arithmetic, the place dots, and what
+# the base map is allowed to answer. The live map draw (map.live.test.mjs)
+# needs MapLibre Native's GL libraries, an X display and a 45 MB+ base map,
+# so it is skipped here and run by hand where those are (render/README.md).
 on:
   push:
     paths:

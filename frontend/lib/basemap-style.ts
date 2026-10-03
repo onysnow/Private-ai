@@ -19,6 +19,57 @@ export const PLACES_SOURCE = 'places';
 // asks 3:1 of a mark that carries information); a white ring sets it apart.
 export const PLACE_COLOUR = '#8A2F1E';
 export const PLACE_LABEL_FONT = ['Noto Sans Medium'];
+export const PLACE_RADIUS = 7;    // px
+export const PLACE_RING = 2;      // px of white around each dot
+export const PLACE_LABEL_PX = 13;
+export const PICKED_LABEL_PX = 15;   // a picked place's name: the base map's fonts have no bold face
+
+/** A dot's image name, by its radius; places-map.tsx makes the image when MapLibre first asks for it. */
+export function dotName(radius: number): string {
+  return `place-dot-${radius}`;
+}
+
+/** The radius a dot's image name asks for, or null for an image that is not a dot. */
+export function dotRadius(name: string): number | null {
+  const match = /^place-dot-(\d+(?:\.\d+)?)$/.exec(name);
+  return match ? Number(match[1]) : null;
+}
+
+export const PLACE_DOT = dotName(PLACE_RADIUS);
+
+/** What each place on a map carries: its name, its dot, and whether it is picked out. */
+export type PlaceMark = {entity_id?: string; caption: string; dot: string; picked: boolean};
+export type PlaceMarks = GeoJSON.FeatureCollection<GeoJSON.Point, PlaceMark>;
+
+/**
+ * A place's dot as an image: a filled circle of `radius` px in PLACE_COLOUR
+ * ringed in PLACE_RING px of white, edges smoothed, drawn at `pixelRatio`;
+ * RGBA, not premultiplied (what MapLibre's addImage takes). The dot is an
+ * image on a symbol layer rather than a circle layer because symbols take
+ * part in MapLibre's label placement: the base map's own labels (a city's
+ * name, say) then give way to a place's dot instead of being drawn under it.
+ * render/map.mjs draws the same dot for exported maps.
+ */
+export function dotImage(radius: number, pixelRatio: number): {width: number; height: number; data: Uint8Array} {
+  const outer = radius + PLACE_RING;
+  const size = Math.ceil(2 * outer * pixelRatio) + 2;
+  const data = new Uint8Array(size * size * 4);
+  const centre = size / 2;
+  const [r, g, b] = [1, 3, 5].map(i => parseInt(PLACE_COLOUR.slice(i, i + 2), 16));
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const d = Math.hypot(x + 0.5 - centre, y + 0.5 - centre) / pixelRatio;
+      const cover = Math.max(0, Math.min(1, outer - d + 0.5));
+      const fill = Math.max(0, Math.min(1, radius - d + 0.5));   // 1 inside the dot, 0 on the ring
+      const i = (y * size + x) * 4;
+      data[i] = Math.round(r * fill + 255 * (1 - fill));
+      data[i + 1] = Math.round(g * fill + 255 * (1 - fill));
+      data[i + 2] = Math.round(b * fill + 255 * (1 - fill));
+      data[i + 3] = Math.round(255 * cover);
+    }
+  }
+  return {width: size, height: size, data};
+}
 
 /** The protocol's loader: a `workbench://api/...` URL fetched as `/api/...`
  * through the app's API client. MapLibre asks for JSON (a sprite index) or
@@ -33,29 +84,36 @@ export function basemapLoader(client: Pick<ApiClient, 'blob'>) {
 }
 
 /** The places as GeoJSON points, each carrying its record's id and name. */
-export function placesGeoJson(places: PlaceOut[]): GeoJSON.FeatureCollection<GeoJSON.Point, {entity_id: string; caption: string}> {
+export function placesGeoJson(places: PlaceOut[]): PlaceMarks {
   return {
     type: 'FeatureCollection',
     features: places.map(p => ({type: 'Feature', geometry: {type: 'Point', coordinates: [p.longitude, p.latitude]},
-      properties: {entity_id: p.entity_id, caption: p.caption}})),
+      properties: {entity_id: p.entity_id, caption: p.caption, dot: PLACE_DOT, picked: false}})),
   };
 }
 
 /** West, south, east and north of the places, or null when there are none. */
-export function placesBounds(places: PlaceOut[]): [number, number, number, number] | null {
+export function placesBounds(places: Pick<PlaceOut, 'latitude' | 'longitude'>[]): [number, number, number, number] | null {
   if (!places.length) return null;
   const lons = places.map(p => p.longitude), lats = places.map(p => p.latitude);
   return [Math.min(...lons), Math.min(...lats), Math.max(...lons), Math.max(...lats)];
 }
 
-export function basemapStyle(status: BasemapStatusOut, places: PlaceOut[]): StyleSpecification {
+/**
+ * The base map with the places on top. `everyName`: every place keeps its
+ * name even where names collide, as in a chart (a picture cannot be zoomed);
+ * the app's interactive map lets colliding names wait for a closer zoom.
+ */
+export function basemapStyle(status: BasemapStatusOut, marks: PlaceMarks, {everyName = false}: {everyName?: boolean} = {}): StyleSpecification {
   const placeLayers: LayerSpecification[] = [
-    {id: 'places-dot', type: 'circle', source: PLACES_SOURCE,
-      paint: {'circle-radius': 7, 'circle-color': PLACE_COLOUR, 'circle-stroke-color': '#FFFFFF', 'circle-stroke-width': 2}},
+    // Every dot is drawn, and the base map's labels give way to it (see dotImage).
+    {id: 'places-dot', type: 'symbol', source: PLACES_SOURCE,
+      layout: {'icon-image': ['get', 'dot'], 'icon-allow-overlap': true}},
     // Every place is named beside its dot (rule 12: not by colour or position alone).
     {id: 'places-name', type: 'symbol', source: PLACES_SOURCE,
-      layout: {'text-field': ['get', 'caption'], 'text-font': PLACE_LABEL_FONT, 'text-size': 13, 'text-offset': [0.9, 0],
-        'text-anchor': 'left', 'text-max-width': 14},
+      layout: {'text-field': ['get', 'caption'], 'text-font': PLACE_LABEL_FONT,
+        'text-size': ['case', ['boolean', ['get', 'picked'], false], PICKED_LABEL_PX, PLACE_LABEL_PX], 'text-offset': [0.9, 0],
+        'text-anchor': 'left', 'text-max-width': 14, 'text-allow-overlap': everyName},
       paint: {'text-color': '#1F1B16', 'text-halo-color': '#FFFFFF', 'text-halo-width': 1.5}},
   ];
   return {
@@ -65,7 +123,7 @@ export function basemapStyle(status: BasemapStatusOut, places: PlaceOut[]): Styl
     sources: {
       protomaps: {type: 'vector', tiles: [`${ROOT}/tiles/{z}/{x}/{y}.mvt`], minzoom: status.min_zoom ?? 0, maxzoom: status.max_zoom ?? 6,
         attribution: status.attribution || '© OpenStreetMap'},
-      [PLACES_SOURCE]: {type: 'geojson', data: placesGeoJson(places)},
+      [PLACES_SOURCE]: {type: 'geojson', data: marks},
     },
     layers: [...(layers('protomaps', namedFlavor('grayscale'), {lang: 'en'}) as LayerSpecification[]), ...placeLayers],
   };

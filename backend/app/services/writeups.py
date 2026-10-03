@@ -112,6 +112,11 @@ def extract_plain_text(content_json: dict) -> str:
                         # An event's line leads with its date as recorded, as a hand-made timeline item does.
                         when = row["start"] + (f" to {row['end']}" if isinstance(row.get("end"), str) else "")
                         lines.append(f"{when} — {row.get('label', '')}")
+                    elif isinstance(row.get("latitude"), (int, float)) and isinstance(row.get("longitude"), (int, float)):
+                        # A place's line gives where it is, as the chart's data table does.
+                        lat, lon = float(row["latitude"]), float(row["longitude"])
+                        where = f"{abs(lat):g}° {'N' if lat >= 0 else 'S'}, {abs(lon):g}° {'E' if lon >= 0 else 'W'}"
+                        lines.append(f"{row.get('label', '')} — {where}")
                     else:
                         lines.append(f"{row.get('value')} — {row.get('label', '')}")
             return
@@ -412,6 +417,9 @@ def _render_data_table(docx: Any, built: Any, data: Any, citation_index: dict[tu
     widths = [4.3, 1.2, 1.0] if not (with_x or with_share or with_status) else [3.4, 1.0, 1.2, 0.9]
     if with_status:
         widths = [3.0, 2.0, 1.0, 0.5]
+    elif any("latitude" in r for r in table_rows):
+        # A place's coordinates in words need the room a date range does.
+        widths = [3.6, 2.0, 0.9]
     table = docx.add_table(rows=0, cols=len(widths))
     _row_rules(table)
     for row, cells_in in zip(built.rows, table_rows):
@@ -452,6 +460,24 @@ def _render_events_table(docx: Any, rows: list[Any], citation_index: dict[tuple[
     _set_widths(table, [3.4, 2.1, 1.0])
 
 
+def _render_places_table(docx: Any, rows: list[Any], citation_index: dict[tuple[str, str], int]) -> None:
+    """A map's places when the chart itself cannot be drawn: the place with
+    its records, and where its record puts it."""
+    from app.visuals.echarts import coordinates_text
+
+    table = docx.add_table(rows=0, cols=2)
+    _row_rules(table)
+    for row in rows:
+        cells = table.add_row().cells
+        p = cells[0].paragraphs[0]
+        _set_run(p.add_run(row.label), size=9.5, color=DOCX_INK, font=DOCX_SANS)
+        marker = _refs_marker([r.as_dict() for r in row.record_refs], citation_index)
+        if marker:
+            _set_run(p.add_run(" " + marker), size=8, color=DOCX_BRASS, font=DOCX_SANS, superscript=True)
+        _set_run(cells[1].paragraphs[0].add_run(coordinates_text(row)), size=9.5, color=DOCX_INK, font=DOCX_SANS, bold=True)
+    _set_widths(table, [4.0, 2.5])
+
+
 def _render_chart(docx: Any, visual: dict, citation_index: dict[tuple[str, str], int]) -> None:
     """A resolved chart (app/ai/chart_check.py), drawn again from its own
     rows and checked once more (app/services/decks.py checked_chart): the
@@ -489,6 +515,9 @@ def _render_chart(docx: Any, visual: dict, citation_index: dict[tuple[str, str],
         if spec.kind.value == "timeline":
             # Every event counts one, so bars would say nothing: list them with their dates.
             _render_events_table(docx, rows, citation_index)
+        elif spec.kind.value == "map":
+            # Likewise every place: list them with where they are.
+            _render_places_table(docx, rows, citation_index)
         else:
             _render_bar_table(docx, chart_bar_items(rows, chart_row_labels(data, rows)), data.unit, citation_index)
         return

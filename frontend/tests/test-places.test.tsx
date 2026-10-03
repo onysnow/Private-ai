@@ -13,7 +13,7 @@ import {PlacesMap} from '../components/places-map';
 import {PlacesPanel, coordinates} from '../features/places/places-panel';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
-import {BASEMAP_PROTOCOL, PLACE_COLOUR, basemapLoader, basemapStyle, placesBounds} from '../lib/basemap-style';
+import {BASEMAP_PROTOCOL, PLACE_DOT, PLACE_RADIUS, PLACE_RING, basemapLoader, basemapStyle, dotImage, dotName, placesBounds, placesGeoJson} from '../lib/basemap-style';
 import type {PlaceOut} from '../lib/generated/types.gen';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
@@ -23,16 +23,21 @@ import {basemapStatusBody, placesBody} from '../test-support/page-routes';
 type Handler = (event: {features?: {properties: Record<string, unknown>}[]}) => void;
 const {maps, protocols} = vi.hoisted(() => ({maps: [] as FakeMapInstance[], protocols: [] as string[]}));
 type FakeMapInstance = {options: {style: {sources: Record<string, unknown>; layers: {id: string}[]}; bounds?: number[]; center?: number[]};
-  handlers: Record<string, Handler>; removed: boolean; data: unknown[]};
+  handlers: Record<string, Handler>; removed: boolean; data: unknown[]; images: Record<string, {image: {width: number}; options: unknown}>; resolver: (id: string) => void};
 
 vi.mock('maplibre-gl', () => {
   class FakeMap {
     handlers: Record<string, Handler> = {};
     removed = false;
     data: unknown[] = [];
+    images: Record<string, {image: {width: number}; options: unknown}> = {};
     constructor(public options: unknown) { maps.push(this as unknown as FakeMapInstance); }
     addControl() { return this; }
     on(event: string, layer: string, handler: Handler) { this.handlers[`${event}:${layer}`] = handler; return this; }
+    resolver: ((id: string) => void) | null = null;
+    setMissingStyleImageResolver(resolver: (id: string) => void) { this.resolver = resolver; return this; }
+    hasImage(id: string) { return id in this.images; }
+    addImage(id: string, image: {width: number}, options: unknown) { this.images[id] = {image, options}; }
     getCanvas() { return {style: {cursor: ''}}; }
     getSource() { return {setData: (d: unknown) => this.data.push(d)}; }
     remove() { this.removed = true; }
@@ -57,7 +62,7 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
 describe('the base map style', () => {
   it('asks only this app for tiles, fonts and sprites, in the grayscale flavor, with every place named', () => {
-    const style = basemapStyle(STATUS, [VILLA]);
+    const style = basemapStyle(STATUS, placesGeoJson([VILLA]));
     expect(style.glyphs).toBe(`${BASEMAP_PROTOCOL}://api/basemap/fonts/{fontstack}/{range}.pbf`);
     expect(style.sprite).toBe(`${BASEMAP_PROTOCOL}://api/basemap/sprites/grayscale`);
     expect(style.sources.protomaps).toMatchObject({type: 'vector', tiles: [`${BASEMAP_PROTOCOL}://api/basemap/tiles/{z}/{x}/{y}.mvt`], maxzoom: 6,
@@ -66,10 +71,23 @@ describe('the base map style', () => {
     expect(json).not.toMatch(/https?:\/\//);          // no other host is asked for anything
     const names = style.layers.map(l => l.id);
     expect(names.slice(-2)).toEqual(['places-dot', 'places-name']);
-    expect(json).toContain(PLACE_COLOUR);
+    // The dot is a symbol, so the base map's labels give way to it.
+    expect(style.layers.at(-2)).toMatchObject({type: 'symbol', layout: {'icon-image': ['get', 'dot']}});
+    expect(style.layers.at(-1)).toMatchObject({layout: {'text-allow-overlap': false}});   // names wait for a closer zoom here
+    expect(basemapStyle(STATUS, placesGeoJson([VILLA]), {everyName: true}).layers.at(-1)).toMatchObject({layout: {'text-allow-overlap': true}});
     expect(placesBounds([VILLA, OFFICE])).toEqual([-0.1276, 35.3364, 33.3199, 51.5072]);
     expect(placesBounds([])).toBeNull();
     expect(coordinates(OFFICE)).toBe('51.5072° N, 0.1276° W');
+  });
+
+  it('draws a dot in the place colour, ringed in white, clear outside', () => {
+    const dot = dotImage(PLACE_RADIUS, 2);
+    expect(dot.width).toBe(Math.ceil(2 * (PLACE_RADIUS + PLACE_RING) * 2) + 2);
+    const at = (x: number, y: number) => Array.from(dot.data.slice((y * dot.width + x) * 4, (y * dot.width + x) * 4 + 4));
+    const c = Math.floor(dot.width / 2);
+    expect(at(c, c)).toEqual([0x8a, 0x2f, 0x1e, 255]);
+    expect(at(c + (PLACE_RADIUS + 1) * 2, c)).toEqual([255, 255, 255, 255]);
+    expect(at(0, 0)[3]).toBe(0);
   });
 
   it('fetches a map request through the app\'s API client', async () => {
@@ -91,6 +109,12 @@ describe('PlacesMap', () => {
     expect(maps[0].options.bounds).toEqual([-0.1276, 35.3364, 33.3199, 51.5072]);
     act(() => maps[0].handlers['click:places-dot']({features: [{properties: {entity_id: 'villa'}}]}));
     expect(onPlace).toHaveBeenCalledWith('villa');
+    // MapLibre asks for the dot once it draws the places; it is made then, once.
+    maps[0].resolver(PLACE_DOT);
+    maps[0].resolver(PLACE_DOT);
+    maps[0].resolver(dotName(10));
+    maps[0].resolver('something-else');
+    expect(Object.keys(maps[0].images)).toEqual([PLACE_DOT, dotName(10)]);
     rerender(<PlacesMap status={STATUS} places={[VILLA]} onPlace={onPlace}/>);
     expect(maps).toHaveLength(1);                     // the same map: the reporter's view stays
     expect(maps[0].data.at(-1)).toMatchObject({features: [{properties: {entity_id: 'villa'}}]});

@@ -30,10 +30,12 @@ function draw(fixture: Fixture): string {
 
 describe('every chart kind draws with the app\'s registered ECharts parts', () => {
   it('has a fixture for each drawn kind', () => {
-    expect(Object.keys(fixtures).sort()).toEqual(['area', 'bar', 'column', 'donut', 'histogram', 'line', 'sankey', 'scatter', 'stacked_bar_100', 'timeline', 'treemap']);
+    expect(Object.keys(fixtures).sort()).toEqual(['area', 'bar', 'column', 'donut', 'histogram', 'line', 'map', 'sankey', 'scatter', 'stacked_bar_100',
+      'timeline', 'treemap']);
   });
 
-  it.each(Object.keys(kinds))('draws a %s with its title, its labels and its source line', kind => {
+  // A map's places are MapLibre's (components/presentation/chart-map.tsx); ECharts draws its frame.
+  it.each(Object.keys(kinds).filter(kind => kind !== 'map'))('draws a %s with its title, its labels and its source line', kind => {
     const svg = draw(fixtures[kind]);
     expect(svg.startsWith('<svg')).toBe(true);
     const text = svg.replace(/&#36;/g, '$').replace(/&#39;/g, "'");
@@ -44,6 +46,16 @@ describe('every chart kind draws with the app\'s registered ECharts parts', () =
     const named = {line: '$52K', area: '$52K', column: '$52K', histogram: '$500K', scatter: 'Meridian Holdings Ltd',
       sankey: 'Bellcastle Trading Group', timeline: 'Alaric Voss appointed director'}[kind] ?? 'Alaric Voss';
     expect(text).toContain(named);
+  });
+
+  it('draws a map\'s frame -- its title, unit and source line -- and leaves the places to MapLibre', () => {
+    const {map, ...frame} = fixtures.map.option as Record<string, unknown> & {map: {places: {name: string}[]; top: number; bottom: number}};
+    const text = draw({...fixtures.map, option: frame}).replace(/&#39;/g, "'");
+    expect(text).toContain('The money ended up in a villa in Cyprus');
+    expect(text).toContain('Each place where its record puts it');
+    expect(text).toContain('Map data © OpenStreetMap contributors');
+    expect(map.places.map(p => p.name)).toEqual(['Meridian registered office', 'Villa Kyrenia']);
+    expect([map.top, map.bottom]).toEqual([84, 44]);
   });
 
   it('writes each event\'s date and status beside it on a timeline', () => {

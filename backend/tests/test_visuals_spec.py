@@ -43,7 +43,7 @@ def test_every_chart_kind_is_accepted_and_the_statistical_kinds_are_drawn():
 
 def test_each_question_names_the_kinds_and_query_shapes_that_answer_it():
     # The FT Visual Vocabulary categories the chooser offers (design doc, "Picking the right chart").
-    assert list(QUESTIONS) == ["ranking", "change_over_time", "part_of_whole", "distribution", "correlation", "flow"]
+    assert list(QUESTIONS) == ["ranking", "change_over_time", "part_of_whole", "distribution", "correlation", "flow", "place"]
     assert QUESTIONS["distribution"].kinds == (ChartKind.histogram,)
     assert QUESTIONS["correlation"].series_kinds == ("pairs",)
     assert QUESTIONS["flow"].series_kinds == ("flows",)
@@ -60,6 +60,10 @@ def test_each_question_names_the_kinds_and_query_shapes_that_answer_it():
     assert QUERY_CATALOG["events_in_order"].kinds == (ChartKind.timeline,)
     assert QUERY_CATALOG["payment_amounts"].kinds[0] == ChartKind.histogram
     assert QUERY_CATALOG["payments_count_and_total_by_party"].kinds == (ChartKind.scatter,)
+    # The FT Visual Vocabulary's "Spatial": where things are, on a map.
+    assert QUESTIONS["place"].kinds == (ChartKind.map,) and QUESTIONS["place"].series_kinds == ("places",)
+    assert QUERY_CATALOG["places_on_map"].questions == ("place",)
+    assert QUERY_CATALOG["places_on_map"].kinds == (ChartKind.map,)
 
 
 def test_an_order_may_name_the_question_and_its_kind_and_query_must_answer_it():

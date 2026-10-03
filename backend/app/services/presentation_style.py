@@ -225,7 +225,7 @@ VISUAL_PRESETS: dict[str, list[dict]] = {
 CHART_FAMILIES: dict[str, str] = {
     "bar": "bars", "column": "bars", "line": "lines", "area": "lines",
     "stacked_bar_100": "parts", "donut": "parts", "treemap": "parts", "histogram": "histogram", "scatter": "scatter",
-    "sankey": "flows", "timeline": "timeline",
+    "sankey": "flows", "timeline": "timeline", "map": "map",
 }
 # Rows a sort applies to: groups, records, and flows ranked as bars.
 _RANKED_SERIES = ["category", "distribution", "flows"]
@@ -285,6 +285,12 @@ CHART_OPTIONS: dict[str, dict[str, dict]] = {
     "timeline": {
         "highlight": {"type": "labels", "label": "Highlight events (the others turn grey)"},
     },
+    # A map's places sit where their records put them; a picked place is
+    # drawn larger, its name bold (the others keep their colour: a grey dot
+    # would vanish into the grayscale base map).
+    "map": {
+        "highlight": {"type": "labels", "label": "Highlight places (drawn larger)"},
+    },
 }
 # Each preset is a kind of its family plus option defaults; the first preset
 # with the chart's own kind is how the chart looks as it was ordered.
@@ -328,6 +334,10 @@ CHART_PRESETS: dict[str, list[dict]] = {
     "timeline": [
         {"id": "timeline", "label": "Timeline", "description": "One row per event, earliest first: a dot for a day, a line from start to end.",
          "kind": "timeline", "options": {}},
+    ],
+    "map": [
+        {"id": "map", "label": "Map", "description": "Each place where its record puts it, named beside its dot, on the self-hosted base map.",
+         "kind": "map", "options": {}},
     ],
 }
 

@@ -617,6 +617,7 @@ export const zChartKind = z.enum([
   'scatter',
   'timeline',
   'sankey',
+  'map',
 ]);
 
 /**
@@ -3911,6 +3912,8 @@ export const zDataTableRowOut = z.object({
   end: z.string().nullish(),
   formatted: z.string(),
   label: z.string(),
+  latitude: z.number().nullish(),
+  longitude: z.number().nullish(),
   record_count: z.number().int(),
   record_refs: z.array(zRecordRefOut),
   share: z.number().nullish(),
@@ -5343,6 +5346,8 @@ export const zVisualDataRowOut = z.object({
   end: z.string().nullish(),
   key: z.string(),
   label: z.string(),
+  latitude: z.number().nullish(),
+  longitude: z.number().nullish(),
   record_count: z.number().int(),
   record_refs: z.array(zRecordRefOut),
   source: z.string().nullish(),

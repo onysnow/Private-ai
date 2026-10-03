@@ -14,8 +14,8 @@ in data_service.py and must cover every entry in QUERY_CATALOG.
 
 Pass 2 drew bar and column charts end to end; pass 3 draws the statistical
 kinds (line, area, 100% bar, donut, treemap, histogram, scatter); pass 4
-draws money flows (sankey) and the timeline of events. DRAWN_KINDS says
-which kinds can be drawn today.
+draws money flows (sankey) and the timeline of events; pass 5 draws places
+on a map. DRAWN_KINDS says which kinds can be drawn today.
 
 QUESTIONS is the chart chooser: the question a chart answers, after the
 FT Visual Vocabulary (https://ft-interactive.github.io/visual-vocabulary/),
@@ -49,13 +49,16 @@ class ChartKind(str, Enum):
     scatter = "scatter"
     timeline = "timeline"
     sankey = "sankey"
+    map = "map"                      # places on the self-hosted base map (pass 5)
 
 
 # What app/visuals/echarts.py draws. The sankey and the timeline came with
-# pass 4.
+# pass 4, the map with pass 5 (drawn by MapLibre, not ECharts: the option
+# carries the places, and the app and the render service draw them on the
+# self-hosted base map; ADR-0005, line 18).
 DRAWN_KINDS: frozenset[ChartKind] = frozenset({
     ChartKind.bar, ChartKind.column, ChartKind.line, ChartKind.area, ChartKind.stacked_bar_100, ChartKind.donut,
-    ChartKind.treemap, ChartKind.histogram, ChartKind.scatter, ChartKind.sankey, ChartKind.timeline,
+    ChartKind.treemap, ChartKind.histogram, ChartKind.scatter, ChartKind.sankey, ChartKind.timeline, ChartKind.map,
 })
 
 # Kinds that show a value as a length (rule 9: the easiest to read) ...
@@ -84,8 +87,9 @@ POINT_KINDS: frozenset[ChartKind] = frozenset({ChartKind.line, ChartKind.area, C
 # "flows": one row per pair of parties, from one (`source`) to the other
 # (`target`), for a flow diagram, or ranked as bars; "events": one row per
 # dated event, with its `start`, its `end` when it has one, and its
-# verification `status`, for a timeline.
-SERIES_KINDS = ("category", "time", "distribution", "pairs", "flows", "events")
+# verification `status`, for a timeline; "places": one row per record with
+# a `latitude` and a `longitude`, for a map.
+SERIES_KINDS = ("category", "time", "distribution", "pairs", "flows", "events", "places")
 KINDS_FOR_SERIES: dict[str, tuple[ChartKind, ...]] = {
     "category": (ChartKind.bar, ChartKind.column, ChartKind.stacked_bar_100, ChartKind.donut, ChartKind.treemap),
     "time": (ChartKind.line, ChartKind.column, ChartKind.area, ChartKind.bar),
@@ -93,6 +97,7 @@ KINDS_FOR_SERIES: dict[str, tuple[ChartKind, ...]] = {
     "pairs": (ChartKind.scatter,),
     "flows": (ChartKind.sankey, ChartKind.bar),
     "events": (ChartKind.timeline,),
+    "places": (ChartKind.map,),
 }
 # The shapes a kind needs; any other shape cannot be drawn by it at all (a
 # histogram of periods, a scatter plot of one number). A line over
@@ -103,6 +108,7 @@ SERIES_FOR_KIND: dict[ChartKind, tuple[str, ...]] = {
     ChartKind.scatter: ("pairs",),
     ChartKind.sankey: ("flows",),
     ChartKind.timeline: ("events",),
+    ChartKind.map: ("places",),
 }
 
 
@@ -186,6 +192,12 @@ QUERY_CATALOG: dict[str, QuerySpec] = {q.name: q for q in (
         series_kind="events", unit_kind="count", record_noun="events",
     ),
     QuerySpec(
+        "places_on_map", "Places on a map",
+        "Every record with a latitude and a longitude (addresses, properties), where its record puts it: one row per place, for a map. "
+        "Nothing is looked up; a record without coordinates is not on the map.",
+        {}, series_kind="places", unit_kind="count", record_noun="places",
+    ),
+    QuerySpec(
         "links_by_type", "Links by type",
         "How many relationship links of each kind (ownership, directorship, payment, ...) the investigation holds.",
         {}, series_kind="category", unit_kind="count", record_noun="links",
@@ -267,6 +279,11 @@ QUESTIONS: dict[str, Question] = {q.id: q for q in (
              (ChartKind.scatter,), ("pairs",)),
     Question("flow", "Flow", "Where money moves from and to: who paid whom, and how much.",
              (ChartKind.sankey,), ("flows",)),
+    # The FT Visual Vocabulary's "Spatial": "used only when precise locations
+    # or geographical patterns in data are more important to the reader than
+    # anything else".
+    Question("place", "Place", "Where things are: the addresses and properties the records place on the globe.",
+             (ChartKind.map,), ("places",)),
 )}
 
 
@@ -334,7 +351,7 @@ class VisualSpec(BaseModel):
     # when it is given, the kind must be one that answers it and the query
     # must hold that relationship, so the choice of chart is checked rather
     # than taken on trust.
-    question: str | None = Field(default=None, description="The question the chart answers: ranking, change_over_time, part_of_whole, distribution, correlation or flow.")
+    question: str | None = Field(default=None, description="The question the chart answers: ranking, change_over_time, part_of_whole, distribution, correlation, flow or place.")
     title: str = Field(min_length=1, max_length=200, description="States the finding, e.g. 'Meridian received most of the money'.")
     subtitle: str | None = Field(default=None, max_length=300)
     unit: str | None = Field(default=None, max_length=40, description="Optional unit label; the data's own unit always wins.")

@@ -262,27 +262,36 @@ function Timeline({visual, style, lookup, region}: {visual: Extract<Presentation
   </div>;
 }
 
+/** The rows a kind lists in place of its picture, as the export's table
+ * lists them (backend/app/services/decks.py TABLE_STAND_INS): every event and
+ * every place counts one, so bars would draw nothing true. */
+const TABLE_STAND_INS: Record<string, {name: string; columns: [string, (row: ChartVisual['text']['data_table']['rows'][number]) => string][]} | undefined> = {
+  timeline: {name: 'events', columns: [['Event', r => r.label], ['When', r => r.formatted], ['Status', r => r.status ?? '']]},
+  map: {name: 'places', columns: [['Place', r => r.label], ['Where', r => r.formatted]]},
+};
+
 /** A checked chart placed in a slide region, scaled to fit it. A kind
- * PowerPoint cannot hold natively (the treemap, the sankey, the timeline)
- * shows what the deck stored for this slide -- the drawing at the slide's
- * own scale, or, with the reason, its parts as bars (a timeline: its events
- * listed, as the export's table lists them) -- so the preview is what the
- * export will be. */
+ * PowerPoint cannot hold natively (the treemap, the sankey, the timeline,
+ * the map) shows what the deck stored for this slide -- the drawing at the
+ * slide's own scale, or, with the reason, its parts as bars (a timeline's
+ * events or a map's places listed, as the export's table lists them) -- so
+ * the preview is what the export will be. */
 export function SlideChart({visual, region}: {visual: ChartVisual, region: Region}): ReactElement {
   const {c, sans} = useTheme();
   const [x, y, w, h] = region;
   const drawing = visual.slide_drawing;
   const shown: ChartVisual | null = !drawing ? visual
     : drawing.option ? {...visual, option: drawing.option, width: drawing.width, height: drawing.height} : null;
-  const listed = drawing?.note && !shown && visual.spec.kind === 'timeline';
+  const listed = drawing?.note && !shown ? TABLE_STAND_INS[String(visual.spec.kind)] : undefined;
   return <div style={{...box(x, y, w, h), background: '#fff0', display: 'flex', flexDirection: 'column'}} data-testid="slide-chart"
-    data-drawing={drawing ? (drawing.note ? (listed ? 'events' : 'bars') : 'slide') : 'design'}>
+    data-drawing={drawing ? (drawing.note ? (listed ? listed.name : 'bars') : 'slide') : 'design'}>
     {drawing?.note && <div style={{fontFamily: sans, fontSize: pt(11), fontStyle: 'italic', color: c('alert')}}>{drawing.note}</div>}
     {shown ? <div style={{flex: 1, minHeight: 0}}><ScaledChart visual={shown} fill/></div> : null}
     {listed && <table style={{fontFamily: sans, fontSize: pt(11), color: c('text'), borderCollapse: 'collapse', marginTop: pt(6)}}>
-      <thead><tr>{['Event', 'When', 'Status'].map(h => <th key={h} scope="col" style={{textAlign: 'left', paddingRight: pt(10)}}>{h}</th>)}</tr></thead>
+      <thead><tr>{listed.columns.map(([heading]) => <th key={heading} scope="col" style={{textAlign: 'left', paddingRight: pt(10)}}>{heading}</th>)}</tr></thead>
       <tbody>{visual.text.data_table.rows.map(r => <tr key={r.label}>
-        <td style={{paddingRight: pt(10)}}>{r.label}</td><td style={{paddingRight: pt(10)}}>{r.formatted}</td><td style={{color: c('muted')}}>{r.status ?? ''}</td>
+        {listed.columns.map(([heading, cell]) => <td key={heading}
+          style={heading === 'Status' ? {color: c('muted')} : {paddingRight: pt(10)}}>{cell(r)}</td>)}
       </tr>)}</tbody>
     </table>}
   </div>;

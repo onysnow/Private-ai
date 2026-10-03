@@ -8,7 +8,8 @@ the statistical kinds on the same foundation: `line`, `area`,
 `stacked_bar_100` (the 100% bar the design uses instead of small pies),
 `donut`, `treemap`, `histogram` and `scatter`. Pass 4 draws money flows as a
 `sankey` (below, "Pass 4: the flow diagram") and the events themselves as a
-`timeline` ("Pass 4: the timeline").
+`timeline` ("Pass 4: the timeline"). Pass 5 draws places on a `map`
+("Pass 5: maps").
 
 The promise, in one line: **the AI never types a number.** It writes a short
 order; the Workbench cooks every value from the investigation's own records,
@@ -505,7 +506,7 @@ beside it, the owners as a table.
   `frontend/tests/test-ownership-chain.test.tsx` (React Flow stubbed: jsdom
   does not lay out the page).
 
-## Pass 5: maps (so far: the base map and the places)
+## Pass 5: maps
 
 ADR-0005 line 18 holds the decisions and the numbers behind them.
 
@@ -530,10 +531,46 @@ ADR-0005 line 18 holds the decisions and the numbers behind them.
   stands 3.3:1 against the base map's water and 5.2:1 against its land
   (WCAG 1.4.11), with a white ring; the list under the map names every place
   in words and works without a base map. Clicking a place opens its record.
+- **Dots the base map's labels give way to.** A place's dot is an image on
+  a symbol layer (drawn in code, `dotImage` in `frontend/lib/basemap-style.ts`
+  and `render/map.mjs`), not a circle layer: symbols take part in MapLibre's
+  label placement and circles do not, so a city's name no longer runs under
+  a place's dot. MapLibre 6 asks for the image through its missing-image
+  resolver (its `styleimagemissing` event cannot answer the request).
+- **The map chart** (`map`, the FT Visual Vocabulary's "Spatial", "used only
+  when precise locations or geographical patterns in data are more
+  important to the reader than anything else"): the question `place`, the
+  query `places_on_map` (rows of the new `places` shape: one per record with
+  coordinates, cited as itself; two places of one name told apart by their
+  record id; unusable coordinates under `omitted`). The option is the usual
+  frame -- title, unit, source line ending "Map data © OpenStreetMap
+  contributors" (ODbL) -- plus `map`: the places with their colour, dot size
+  and name, and the room the frame keeps above and below the map. ECharts
+  draws the frame; MapLibre draws the places in between: GL JS in the app
+  (`frontend/components/presentation/chart-map.tsx`, static and scaled like
+  every chart, every name kept), MapLibre Native in the render service for
+  exports (`render/map.mjs`, `POST /map`; `backend/app/visuals/render_client.py`
+  frames its PNG as an image in the option's frame). A highlight draws the
+  picked places' dots larger and their names bold; the others keep the
+  colour, since a grey dot would vanish into the grayscale base map.
+- **Checks.** Rule 0 reads every place's coordinates back off the drawing
+  against its record's; 11 holds the dots to 3:1 against every fill of the
+  base map; 12 asks that every place is named, and that a picked place is
+  picked by more than its size (its name bold). A map has no axes (rules 6
+  and the axis rules do not apply) and one place is one record (16, 20). A
+  map takes no `sort`, `limit` or log scale.
+- **Exports.** PowerPoint has no map, so a deck holds the render service's
+  picture; when the service is down or has no base map, the places go in as
+  a native table (place, where) with the reason, and the slide preview
+  lists them the same way. A brief holds the picture and the data table
+  (place, where, records), or the table alone with the reason.
 - Tests: `backend/tests/test_basemap.py`, `test_places.py`,
-  `frontend/tests/test-places.test.tsx` (MapLibre faked: jsdom has no WebGL).
-- Still to come: maps in decks and briefs (the render service with
-  MapLibre Native), the map linked to the timeline, and shaded maps (rule 17).
+  `test_visuals_map.py`, `frontend/tests/test-places.test.tsx`,
+  `test-chart-map.test.tsx` (MapLibre faked: jsdom has no WebGL), the `map`
+  fixture in `frontend/test-support/chart-kinds.json`,
+  `render/map.test.mjs`, and the live draw `render/map.live.test.mjs`
+  (needs MapLibre Native, an X display and a base map; render/README.md).
+- Still to come: the map linked to the timeline, and shaded maps (rule 17).
 
 ## What pass 3 built, and what is left
 

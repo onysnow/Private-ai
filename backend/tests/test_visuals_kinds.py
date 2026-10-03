@@ -447,7 +447,12 @@ def _fixture_orders() -> dict[str, tuple[str, VisualData]]:
                         status="asserted"),
                 DataRow("Disputed $2.4M payment", 1.0, [RecordRef("timeline_event", "e4")], 1, "2023-11-14", start="2023-11-14", status="disputed")]
     events = VisualData("inv", "events_in_order", {}, "events", "count", "events", "events", happened, record_count=4)
+    located = [DataRow("Meridian registered office", 1.0, [RecordRef("entity", "office")], 1, "meridian registered office|office",
+                       latitude=51.5072, longitude=-0.1276),
+               DataRow("Villa Kyrenia", 1.0, [RecordRef("entity", "villa")], 1, "villa kyrenia|villa", latitude=35.3364, longitude=33.3199)]
+    places = VisualData("inv", "places_on_map", {}, "places", "count", "places", "places", located, record_count=2)
     return {
+        "map": ("The money ended up in a villa in Cyprus", places),
         "timeline": ("The payment came two years after Bellcastle took control", events),
         "sankey": ("Most of Meridian's money went to Bellcastle", flows),
         "bar": ("Meridian received most of the money", by_party),

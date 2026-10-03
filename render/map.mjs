@@ -33,7 +33,46 @@ export const ONE_PLACE_ZOOM = 8;         // the zoom for a single place (capped 
 // in white, each place named beside it.
 export const PLACE_COLOUR = '#8A2F1E';
 export const PLACE_LABEL_FONT = ['Noto Sans Medium'];
+export const PLACE_RADIUS = 7;           // px; a picked place's dot is drawn larger (the backend says how much)
+export const PLACE_RING = 2;             // px of white around each dot
 const SPRITE_FLAVOR = 'grayscale';
+
+/**
+ * A place's dot as an image: a filled circle of `radius` px in PLACE_COLOUR
+ * ringed in PLACE_RING px of white, edges smoothed, drawn at `pixelRatio`.
+ * RGBA, not premultiplied (what MapLibre's addImage takes).
+ *
+ * The dot is an image on a symbol layer rather than a circle layer because
+ * symbols take part in MapLibre's label placement: the base map's own labels
+ * (a city's name, say) then give way to a place's dot instead of being drawn
+ * under it. Circle layers are drawn without regard to labels.
+ * frontend/lib/basemap-style.ts draws the same dot for the app.
+ */
+export function dotImage(radius, pixelRatio) {
+  const outer = radius + PLACE_RING;
+  const size = Math.ceil(2 * outer * pixelRatio) + 2;
+  const data = new Uint8Array(size * size * 4);
+  const centre = size / 2;
+  const [r, g, b] = [1, 3, 5].map(i => parseInt(PLACE_COLOUR.slice(i, i + 2), 16));
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const d = Math.hypot(x + 0.5 - centre, y + 0.5 - centre) / pixelRatio;   // in px
+      const cover = Math.max(0, Math.min(1, outer - d + 0.5));
+      const fill = Math.max(0, Math.min(1, radius - d + 0.5));                  // 1 inside the dot, 0 on the ring
+      const i = (y * size + x) * 4;
+      data[i] = Math.round(r * fill + 255 * (1 - fill));
+      data[i + 1] = Math.round(g * fill + 255 * (1 - fill));
+      data[i + 2] = Math.round(b * fill + 255 * (1 - fill));
+      data[i + 3] = Math.round(255 * cover);
+    }
+  }
+  return {width: size, height: size, data};
+}
+
+/** The image name for a dot of `radius` px. */
+export function dotName(radius) {
+  return `place-dot-${radius}`;
+}
 
 export class NoBasemap extends Error {}
 
@@ -102,14 +141,17 @@ export function mapStyle(places, maxZoom) {
     sources: {
       protomaps: {type: 'vector', tiles: ['basemap://tiles/{z}/{x}/{y}'], minzoom: 0, maxzoom: maxZoom},
       places: {type: 'geojson', data: {type: 'FeatureCollection', features: places.map(p => ({
-        type: 'Feature', geometry: {type: 'Point', coordinates: [p.longitude, p.latitude]}, properties: {label: p.label}}))}},
+        type: 'Feature', geometry: {type: 'Point', coordinates: [p.longitude, p.latitude]},
+        properties: {label: p.label, dot: dotName(p.radius ?? PLACE_RADIUS), picked: Boolean(p.picked)}}))}},
     },
     layers: [
       ...layers('protomaps', namedFlavor(SPRITE_FLAVOR), {lang: 'en'}),
-      {id: 'places-dot', type: 'circle', source: 'places',
-        paint: {'circle-radius': 7, 'circle-color': PLACE_COLOUR, 'circle-stroke-color': '#FFFFFF', 'circle-stroke-width': 2}},
+      // Every dot is drawn, and the base map's labels give way to it (see dotImage).
+      {id: 'places-dot', type: 'symbol', source: 'places',
+        layout: {'icon-image': ['get', 'dot'], 'icon-allow-overlap': true}},
       {id: 'places-name', type: 'symbol', source: 'places',
-        layout: {'text-field': ['get', 'label'], 'text-font': PLACE_LABEL_FONT, 'text-size': 13, 'text-offset': [0.9, 0],
+        // A picked place's name is larger: the base map's fonts have no bold face.
+        layout: {'text-field': ['get', 'label'], 'text-font': PLACE_LABEL_FONT, 'text-size': ['case', ['get', 'picked'], 15, 13], 'text-offset': [0.9, 0],
           'text-anchor': 'left', 'text-max-width': 14, 'text-allow-overlap': true},
         paint: {'text-color': '#1F1B16', 'text-halo-color': '#FFFFFF', 'text-halo-width': 1.5}},
     ],
@@ -164,6 +206,10 @@ export async function renderMap({places, width, height}) {
       },
     });
     map.load(mapStyle(places, header.maxZoom));
+    for (const radius of new Set(places.map(p => p.radius ?? PLACE_RADIUS))) {
+      const dot = dotImage(radius, PIXEL_RATIO);
+      map.addImage(dotName(radius), Buffer.from(dot.data), {width: dot.width, height: dot.height, pixelRatio: PIXEL_RATIO});
+    }
     map.render({...view, width, height}, (err, pixels) => {
       map.release();
       if (err) { reject(err); return; }

@@ -11,7 +11,7 @@ import {useEffect, useRef} from 'react';
 import type {ReactElement} from 'react';
 
 import {api} from '../lib/api-instance';
-import {BASEMAP_PROTOCOL, PLACES_SOURCE, basemapLoader, basemapStyle, placesBounds, placesGeoJson} from '../lib/basemap-style';
+import {BASEMAP_PROTOCOL, PLACES_SOURCE, basemapLoader, basemapStyle, dotImage, dotRadius, placesBounds, placesGeoJson} from '../lib/basemap-style';
 import type {BasemapStatusOut, PlaceOut} from '../lib/generated/types.gen';
 
 let protocolAdded = false;
@@ -29,6 +29,19 @@ export function ensureBasemapProtocol(): void {
   setWorkerUrl(new URL(MAPLIBRE_WORKER_URL, window.location.href).href);
   addProtocol(BASEMAP_PROTOCOL, basemapLoader(api) as AddProtocolAction);
   protocolAdded = true;
+}
+
+/** Makes a place's dot when MapLibre first asks for it, sharp at the
+ * screen's pixel ratio, rather than shipping it as a file (MapLibre 6's
+ * missing-image resolver; its `styleimagemissing` event cannot answer the
+ * request). */
+export function drawDotsOnDemand(map: MapLibreMap): void {
+  map.setMissingStyleImageResolver(id => {
+    const radius = dotRadius(id);
+    if (radius === null || map.hasImage(id)) return;
+    const ratio = Math.max(1, Math.ceil(window.devicePixelRatio || 1));
+    map.addImage(id, dotImage(radius, ratio), {pixelRatio: ratio});
+  });
 }
 
 type Props = {
@@ -50,11 +63,12 @@ export function PlacesMap({status, places, onPlace, height = 420}: Props): React
     ensureBasemapProtocol();
     const bounds = placesBounds(places);
     const made = new MapLibreMap({
-      container: container.current, style: basemapStyle(status, places),
+      container: container.current, style: basemapStyle(status, placesGeoJson(places)),
       ...(bounds ? {bounds, fitBoundsOptions: {padding: 60, maxZoom: Math.min(10, (status.max_zoom ?? 6) + 2)}} : {center: [0, 20], zoom: 1}),
       attributionControl: {compact: false},
     });
     made.addControl(new NavigationControl({showCompass: false}), 'top-right');
+    drawDotsOnDemand(made);
     made.on('click', 'places-dot', (event: MapLayerMouseEvent) => {
       const id = event.features?.[0]?.properties?.entity_id;
       if (typeof id === 'string') onPlaceRef.current?.(id);

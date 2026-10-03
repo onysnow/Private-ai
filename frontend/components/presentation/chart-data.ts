@@ -11,7 +11,7 @@ import type {ChartKind, VisualPreviewOut} from '../../lib/generated/types.gen';
 /** What each kind is called on screen (backend/app/visuals/echarts.py KIND_LABELS). */
 export const KIND_NAMES: Record<ChartKind, string> = {
   bar: 'Bar chart', column: 'Column chart', line: 'Line chart', area: 'Area chart', stacked_bar_100: '100% bar', donut: 'Donut',
-  treemap: 'Treemap', histogram: 'Histogram', scatter: 'Scatter plot', timeline: 'Timeline', sankey: 'Flow diagram',
+  treemap: 'Treemap', histogram: 'Histogram', scatter: 'Scatter plot', timeline: 'Timeline', sankey: 'Flow diagram', map: 'Map',
 };
 
 /** Kinds come as plain strings from the catalogue and stored charts; only a kind the order slip knows counts. */
@@ -33,12 +33,13 @@ export function asChart(v: JsonObject): ChartVisual | null {
     .map(r => ({...r, label: r.label as string, value: r.value as number, record_refs: refs(r.record_refs), record_count: typeof r.record_count === 'number' ? r.record_count : 0}));
   const tableRows = table.rows.filter(isObj).filter(r => typeof r.label === 'string' && typeof r.value === 'number')
     .map(r => ({label: r.label as string, value: r.value as number, formatted: str(r.formatted), record_count: typeof r.record_count === 'number' ? r.record_count : 0, record_refs: refs(r.record_refs),
-      // Only the kinds that write them: a part's share, a scatter plot's second number, a flow's two parties, an event's status.
+      // Only the kinds that write them: a part's share, a scatter plot's second number, a flow's two parties, an event's status, a place's coordinates.
       ...(typeof r.share === 'number' ? {share: r.share} : {}),
       ...(typeof r.status === 'string' ? {status: r.status} : {}),
       ...(typeof r.source === 'string' && typeof r.target === 'string' ? {source: r.source, target: r.target} : {}),
       ...(typeof r.x === 'number' ? {x: r.x} : {}),
-      ...(typeof r.x_formatted === 'string' ? {x_formatted: r.x_formatted} : {})}));
+      ...(typeof r.x_formatted === 'string' ? {x_formatted: r.x_formatted} : {}),
+      ...(typeof r.latitude === 'number' && typeof r.longitude === 'number' ? {latitude: r.latitude, longitude: r.longitude} : {})}));
   // What a deck slide shows for a kind PowerPoint cannot hold natively (the treemap).
   const drawing = isObj(v.slide_drawing) && typeof v.slide_drawing.width === 'number' && typeof v.slide_drawing.height === 'number'
     ? {option: isObj(v.slide_drawing.option) ? v.slide_drawing.option : null, width: v.slide_drawing.width, height: v.slide_drawing.height,

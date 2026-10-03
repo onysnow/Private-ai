@@ -9,7 +9,7 @@ import {mkdtempSync, mkdirSync, writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 
-import {FIT_PADDING, ONE_PLACE_ZOOM, PLACE_COLOUR, TILE_SIZE, answer, fitView, mapStyle} from './map.mjs';
+import {FIT_PADDING, ONE_PLACE_ZOOM, PLACE_RADIUS, PLACE_RING, TILE_SIZE, answer, dotImage, dotName, fitView, mapStyle} from './map.mjs';
 import {BadRequest, MAX_PLACES, mapRequest} from './server.mjs';
 
 const LONDON = {longitude: -0.1276, latitude: 51.5072, label: 'Meridian registered office'};
@@ -40,14 +40,27 @@ test('one place gets a city-scale view; the zoom never passes the base map by mo
 });
 
 test('the style is the grayscale base map with every place named beside a ringed dot', () => {
-  const style = mapStyle([LONDON], 6);
+  const style = mapStyle([LONDON, {...KYRENIA, radius: 10}], 6);
   const json = JSON.stringify(style);
   assert.ok(!/https?:\/\//.test(json), 'nothing is asked of another host');
   assert.equal(style.sources.protomaps.maxzoom, 6);
   const [dot, name] = style.layers.slice(-2);
-  assert.equal(dot.paint['circle-color'], PLACE_COLOUR);
+  // A symbol, so the base map's labels give way to the dot.
+  assert.equal(dot.type, 'symbol');
+  assert.deepEqual(style.sources.places.data.features.map(f => f.properties.dot), [dotName(PLACE_RADIUS), dotName(10)]);
   assert.equal(name.layout['text-field'][1], 'label');
   assert.equal(name.layout['text-allow-overlap'], true);   // every place keeps its name in a picture
+});
+
+test('a dot is the place colour inside, white on its ring and clear outside', () => {
+  const ratio = 2;
+  const dot = dotImage(PLACE_RADIUS, ratio);
+  assert.equal(dot.width, Math.ceil(2 * (PLACE_RADIUS + PLACE_RING) * ratio) + 2);
+  const at = (x, y) => Array.from(dot.data.slice((y * dot.width + x) * 4, (y * dot.width + x) * 4 + 4));
+  const c = Math.floor(dot.width / 2);
+  assert.deepEqual(at(c, c), [0x8A, 0x2F, 0x1E, 255]);
+  assert.deepEqual(at(c + Math.round((PLACE_RADIUS + 1) * ratio), c), [255, 255, 255, 255]);
+  assert.equal(at(0, 0)[3], 0);
 });
 
 test('the base map answers from its files and refuses anything else', async () => {
@@ -72,5 +85,7 @@ test('a map request needs places with coordinates on the globe and a label', () 
   assert.throws(() => mapRequest({places: Array.from({length: MAX_PLACES + 1}, () => LONDON)}), BadRequest);
   assert.throws(() => mapRequest({places: [{...LONDON, latitude: 91}]}), /latitude/);
   assert.throws(() => mapRequest({places: [{...LONDON, label: 7}]}), /label/);
+  assert.deepEqual(mapRequest({places: [{...LONDON, radius: 10, picked: true}]}).places, [{...LONDON, radius: 10, picked: true}]);
+  assert.throws(() => mapRequest({places: [{...LONDON, radius: 99}]}), /radius/);
   assert.throws(() => mapRequest({places: [LONDON], width: 1e9}), BadRequest);
 });

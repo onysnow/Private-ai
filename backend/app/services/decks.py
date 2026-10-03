@@ -152,8 +152,9 @@ def chart_row_labels(data: VisualData, rows: list[DataRow], *, separator: str = 
     sit side by side under it puts the count on a line of its own
     (`separator` "\\n"), so a period's label stays level instead of being
     turned on its side to fit. An event on a timeline is one record by
-    what it is (rules 16 and 20 do not apply), so its label stays as it is."""
-    if data.series_kind == "events":
+    what it is (rules 16 and 20 do not apply), so its label stays as it is;
+    likewise a place on a map."""
+    if data.series_kind in ("events", "places"):
         return {row.label: row.label for row in rows}
     labels: dict[str, str] = {}
     for row in rows:
@@ -459,6 +460,24 @@ def picture_size(width_in: float, height_in: float) -> tuple[int, int]:
     return design_w, round(design_w * height_in / width_in)
 
 
+# A kind with no picture is shown as a native table of its rows when bars
+# would draw nothing true (every event, every place counts one); the columns
+# and their shares of the table's width.
+TABLE_STAND_INS: dict[ChartKind, tuple[tuple[str, str, float], ...]] = {
+    ChartKind.timeline: (("Event", "label", 0.5), ("When", "formatted", 0.32), ("Status", "status", 0.18)),
+    ChartKind.map: (("Place", "label", 0.55), ("Where", "formatted", 0.45)),
+}
+
+
+def stand_in(kind: ChartKind) -> str:
+    """What stands in for a kind's picture when there is none."""
+    if kind == ChartKind.timeline:
+        return "the events are listed instead"
+    if kind == ChartKind.map:
+        return "the places are listed instead"
+    return "the same parts are shown as bars"
+
+
 def slide_picture(visual: dict, theme: Theme, width_in: float, height_in: float) -> tuple[CheckedChart, str | None]:
     """A chart kind PowerPoint cannot hold natively (the treemap), drawn and
     checked at the size its slide region gives it (picture_size), and why it
@@ -471,8 +490,7 @@ def slide_picture(visual: dict, theme: Theme, width_in: float, height_in: float)
         label = KIND_LABELS.get(sized.spec.kind, sized.spec.kind.value)
         first = sized.report.errors[0] if sized.report and sized.report.errors else None
         reason = f"rule {first.rule}: {first.message.split(';')[0]}" if first else (sized.problem or "it cannot be drawn")
-        instead = "The events are listed instead." if sized.spec.kind == ChartKind.timeline else "The same parts are shown as bars."
-        return sized, f"{label} not drawn at this size ({reason}). {instead}"
+        return sized, f"{label} not drawn at this size ({reason}). {stand_in(sized.spec.kind)[0].upper()}{stand_in(sized.spec.kind)[1:]}."
     return sized, None
 
 
@@ -492,6 +510,9 @@ def _slide_drawing(visual: dict, theme: Theme, has_bullets: bool) -> dict | None
     design_w, design_h = picture_size(width_in, height_in)
     if note is None and sized.built is not None:
         return {"option": sized.built.option, "width": design_w, "height": design_h}
+    if kind in TABLE_STAND_INS:
+        # The preview lists the rows (from the chart's data table) as the export does.
+        return {"option": None, "width": design_w, "height": design_h, "note": note}
     try:
         bars = build_chart(sized.spec.model_copy(update={"kind": ChartKind.bar, "question": None}), sized.data, theme,
                            width=design_w, height=design_h)
@@ -1090,8 +1111,8 @@ class _DeckRenderer:
             frame = self._native_histogram(slide, x, top, w, plot_h, checked)
         elif kind == ChartKind.scatter:
             frame = self._native_scatter(slide, x, top, w, plot_h, checked)
-        elif kind == ChartKind.timeline:
-            frame = self._events_as_table(slide, x, top, w, plot_h, checked, missing or "")
+        elif kind in TABLE_STAND_INS:
+            frame = self._rows_as_table(slide, x, top, w, plot_h, checked, missing or "")
         else:
             frame = self._parts_as_bars(slide, x, top, w, plot_h, checked, missing or "")
         _set_alt_text(frame, built.alt_text)
@@ -1236,24 +1257,26 @@ class _DeckRenderer:
         self._style_category_axis(chart.category_axis)
         return frame
 
-    def _events_as_table(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart, note: str) -> Any:
-        """A timeline with no picture: its events as a native table, in date
-        order (the event, when, and how far it is verified), under a line
-        that says why. Bars would draw nothing true here: every event counts
-        one."""
+    def _rows_as_table(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart, note: str) -> Any:
+        """A timeline or a map with no picture: its rows as a native table
+        (TABLE_STAND_INS: a timeline's events in date order with when and how
+        far each is verified; a map's places with where each is), under a
+        line that says why. Bars would draw nothing true here: every event
+        and every place counts one."""
         from pptx.util import Pt
         built = checked.built
         assert built is not None
+        columns = TABLE_STAND_INS[built.kind]
         lines = max(1, math.ceil(block_width(note, 10) * TEXT_SLACK / (w * 72)))
         note_h = lines * 10 * 1.2 / 72 + 0.12
         self.text(slide, x, y, w, note_h, note, size=10, color=self.t.alert, italic=True, line_spacing=1.05)
         table_rows = built.data_table.get("rows") or []
-        frame = slide.shapes.add_table(len(table_rows) + 1, 3, self.Inches(x), self.Inches(y + note_h), self.Inches(w),
+        frame = slide.shapes.add_table(len(table_rows) + 1, len(columns), self.Inches(x), self.Inches(y + note_h), self.Inches(w),
                                        self.Inches(min(h - note_h, 0.32 * (len(table_rows) + 1))))
         table = frame.table
-        for column, width in zip(table.columns, (0.5, 0.32, 0.18)):
-            column.width = self.Inches(w * width)
-        cells = [["Event", "When", "Status"]] + [[str(r.get("label", "")), str(r.get("formatted", "")), str(r.get("status", ""))] for r in table_rows]
+        for column, (_heading, _key, share) in zip(table.columns, columns):
+            column.width = self.Inches(w * share)
+        cells = [[heading for heading, _key, _share in columns]] + [[str(r.get(key, "")) for _heading, key, _share in columns] for r in table_rows]
         for i, values in enumerate(cells):
             for j, value in enumerate(values):
                 cell = table.cell(i, j)
@@ -1458,8 +1481,7 @@ class _DeckRenderer:
         design_w, design_h = picture_size(w, h)
         sized, note = slide_picture(visual, self.t, w, h)
         label = KIND_LABELS.get(sized.spec.kind, sized.spec.kind.value)
-        # What stands in for the picture: a timeline's events as a table, anything else's parts as bars.
-        instead = "the events are listed instead" if sized.spec.kind == ChartKind.timeline else "the same parts are shown as bars"
+        instead = stand_in(sized.spec.kind)
         if note is not None or sized.built is None:
             return note or f"{label} cannot be drawn. {instead[0].upper()}{instead[1:]}."
         try:

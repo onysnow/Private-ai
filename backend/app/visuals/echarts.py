@@ -41,6 +41,11 @@ One builder per kind, all reading the same rows:
   for one that lasted, and a dashed line across the month or year for a
   date known only that far (the timeline never fills in a missing day).
   Every event's date and verification status are written beside it.
+* map (pass 5): every place a dot on the self-hosted base map, named beside
+  it. Not drawn by ECharts: the option carries the places under "map", and
+  the app (MapLibre GL JS) and the render service (MapLibre Native) draw
+  them in one style (ADR-0005, line 18). The frame (title, source line,
+  alt text) is the same as every chart's.
 
 The numbers the drawing needs beyond the query's own (shares, bins,
 outliers) come from app/visuals/stats.py; the drawing only places them.
@@ -86,6 +91,7 @@ KIND_LABELS = {
     ChartKind.bar: "Bar chart", ChartKind.column: "Column chart", ChartKind.line: "Line chart", ChartKind.area: "Area chart",
     ChartKind.stacked_bar_100: "100% bar", ChartKind.donut: "Donut chart", ChartKind.treemap: "Treemap",
     ChartKind.histogram: "Histogram", ChartKind.scatter: "Scatter plot", ChartKind.timeline: "Timeline", ChartKind.sankey: "Flow diagram",
+    ChartKind.map: "Map",
 }
 _AXIS_LABEL_WIDTH = 220                    # px: a category name longer than this is cut short (the data table has it whole)
 BOLD_SLACK = math.ceil(_AXIS_LABEL_WIDTH * 0.1)   # px: how much wider a bold name may run than its regular-weight cut
@@ -237,13 +243,16 @@ def value_label(row: DataRow, data: VisualData) -> str:
 
 def source_line(data: VisualData, rows: list[DataRow], kind: ChartKind | None = None) -> str:
     parts = [f"Source: {data.record_count} {data.record_noun if data.record_count != 1 else singular(data.record_noun)} in this investigation's records ({data.query})"]
-    if kind != ChartKind.timeline and any(row.record_count == 1 for row in rows):
-        # (A timeline's mark is one event, always one record: nothing to flag.)
+    if kind not in (ChartKind.timeline, ChartKind.map) and any(row.record_count == 1 for row in rows):
+        # (A timeline's mark is one event and a map's one place, always one record: nothing to flag.)
         parts.append(f"{SINGLE_RECORD_MARK} hollow markers rest on one record" if kind in (ChartKind.line, ChartKind.area, ChartKind.scatter)
                      else f"{SINGLE_RECORD_MARK} rests on one record")
     other = [o for o in data.omitted if o.get("reason") == "other currency"]
     if other:
         parts.append("not shown: " + ", ".join(f"{o['record_count']} in {o['currency']}" for o in other))
+    if kind == ChartKind.map:
+        # The base map's data is OpenStreetMap's (ODbL): every map says so.
+        parts.append(MAP_ATTRIBUTION)
     return " · ".join(parts)
 
 
@@ -287,7 +296,8 @@ def check_fit(spec: VisualSpec, data: VisualData) -> None:
     needs = SERIES_FOR_KIND.get(kind)
     if needs and data.series_kind not in needs:
         wanted = {"distribution": "one value per record, such as payment_amounts", "pairs": "two numbers per party, such as payments_count_and_total_by_party",
-                  "flows": "money moving between parties, such as payment_flows", "events": "dated events, such as events_in_order"}
+                  "flows": "money moving between parties, such as payment_flows", "events": "dated events, such as events_in_order",
+                  "places": "records with coordinates, such as places_on_map"}
         raise ChartDoesNotFit(f"a {kind.value} needs {' or '.join(wanted[n] for n in needs)}; the query {data.query!r} has {data.series_kind} rows")
     if data.series_kind == "pairs" and kind != ChartKind.scatter:
         raise ChartDoesNotFit(f"the query {data.query!r} holds two numbers per party; draw it as a scatter plot")
@@ -300,6 +310,10 @@ def check_fit(spec: VisualSpec, data: VisualData) -> None:
                                   "leave limit out, or rank the flows as bars")
         if spec.sort is not None:
             raise ChartDoesNotFit("sort does not apply to a flow diagram: each flow sits between its payer and its recipient; leave sort out")
+    if data.series_kind == "places" and kind != ChartKind.map:
+        raise ChartDoesNotFit(f"the query {data.query!r} holds places; draw them on a map")
+    if kind == ChartKind.map and (spec.sort is not None or spec.limit is not None or spec.scale == Scale.log):
+        raise ChartDoesNotFit("a map puts each place where its record says; sort, limit and a log scale do not apply, so leave them out")
     if data.series_kind == "events" and kind != ChartKind.timeline:
         raise ChartDoesNotFit(f"the query {data.query!r} holds dated events; draw them as a timeline, or count them by period with events_over_time")
     if kind == ChartKind.timeline:
@@ -1040,6 +1054,19 @@ TIMELINE_TOP, TIMELINE_BOTTOM = 96, 70     # px: the title block above, the sour
 TIMELINE_AXIS = 24                         # px the date labels take under the plot
 TIMELINE_ROW_MIN = MIN_FONT_PX + 6         # px: a row must be this tall to hold its name and its date (rule 14)
 _STATUS_WORDS = {"reporter_reviewed": "reporter reviewed", "system_recorded": "system recorded"}
+# A map's marks, as the app and the render service draw them
+# (frontend/lib/basemap-style.ts, render/map.mjs): a dark brick red, 3.3:1
+# against the grayscale base map's water (#a3a3a3) and 5.2:1 against its
+# land (#cccccc), ringed in white; every place named at 13 px.
+MAP_PLACE_COLOUR = "#8A2F1E"
+MAP_LABEL_PX = 13
+MAP_RADIUS, MAP_PICKED_RADIUS = 7, 10    # px: a place's dot, and a picked place's
+MAP_ATTRIBUTION = "Map data © OpenStreetMap contributors"
+# px of the picture the title and unit, and the source line, take above and
+# below the map: the same room the other kinds' grids leave them. The option
+# carries them, so the export (render_client.py) and the app
+# (frontend/components/presentation/chart-map.tsx) place the map alike.
+MAP_TOP, MAP_BOTTOM = 84, 44
 _MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 
@@ -1173,6 +1200,29 @@ def _timeline(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def coordinates_text(row: DataRow) -> str:
+    """Where a place is, in words: 35.3364° N, 33.3199° E."""
+    lat, lon = row.latitude or 0.0, row.longitude or 0.0
+    return f"{abs(lat):g}° {'N' if lat >= 0 else 'S'}, {abs(lon):g}° {'E' if lon >= 0 else 'W'}"
+
+
+def _map(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
+    """map: the places for MapLibre to draw on the base map, each named.
+    A highlight makes the picked places' dots larger and their names bold;
+    the others keep their colour, since a grey dot would vanish into the
+    grayscale base map."""
+    highlighted = p.highlighted
+    places = []
+    for row in p.rows:
+        picked = row.label in highlighted
+        places.append({
+            "name": row.label, "longitude": row.longitude, "latitude": row.latitude, "colour": MAP_PLACE_COLOUR,
+            "radius": MAP_PICKED_RADIUS if picked else MAP_RADIUS,
+            "label": {"text": row.label, "fontSize": MAP_LABEL_PX, "fontWeight": "bold" if picked else "normal"},
+        })
+    return {**frame, "map": {"places": places, "flavor": "grayscale", "attribution": MAP_ATTRIBUTION, "top": MAP_TOP, "bottom": MAP_BOTTOM}}
+
+
 def scatter_labels(rows: list[DataRow], label_points: str) -> set[str]:
     """Which points a scatter plot names: all of them when there are few
     (POINT_LABEL_LIMIT), else the outliers by Tukey's fences, unless the
@@ -1211,6 +1261,8 @@ def _subtitle(spec: VisualSpec, data: VisualData, kind: ChartKind) -> str:
             base += ("; the money also runs back the other way, so payers are drawn on the left and recipients on the right, "
                      "and a party can appear on both sides")
         return base
+    if kind == ChartKind.map:
+        return "Each place where its record puts it; nothing is looked up"
     if kind == ChartKind.timeline:
         base = "Each event at its date, earliest first; a line runs from start to end"
         if any(timeline_marks(row) and not timeline_exact(row) for row in data.rows):
@@ -1257,7 +1309,9 @@ def build_chart(spec: VisualSpec, data: VisualData, theme: Theme, *, width: int 
     labelled = scatter_labels(rows, draw.label_points) if kind == ChartKind.scatter else set()
     source = source_line(data, rows, kind)
     words = _words(spec, data, rows, highlighted, kind, shares=shares, total=total, bins=bins, labelled=labelled, stages=stages)
-    colours = part_colours(rows, theme, highlighted) if kind in PART_OF_WHOLE_KINDS else [mark_colour(theme) if kind in (ChartKind.line, ChartKind.area, ChartKind.scatter, ChartKind.timeline) else theme.accent]
+    colours = part_colours(rows, theme, highlighted) if kind in PART_OF_WHOLE_KINDS else (
+        [MAP_PLACE_COLOUR] if kind == ChartKind.map
+        else [mark_colour(theme) if kind in (ChartKind.line, ChartKind.area, ChartKind.scatter, ChartKind.timeline) else theme.accent])
     subtitle = _subtitle(spec, data, kind)
     if stages and not spec.subtitle:
         unit = data.unit or spec.unit or ""
@@ -1281,6 +1335,8 @@ def build_chart(spec: VisualSpec, data: VisualData, theme: Theme, *, width: int 
         option = _sankey(parts, frame)
     elif kind == ChartKind.timeline:
         option = _timeline(parts, frame)
+    elif kind == ChartKind.map:
+        option = _map(parts, frame)
     else:
         option = _scatter(parts, frame, labelled)
     return BuiltChart(
@@ -1345,6 +1401,14 @@ def _words(spec: VisualSpec, data: VisualData, rows: list[DataRow], highlighted:
         for row, share, table_row in zip(rows, shares, table_rows):
             table_row["share"] = round(share, 1)
             lines.append(f"{row.label}: {part_value_text(row, share, data)}.")
+    elif kind == ChartKind.map:
+        shown = ", ".join(row.label for row in rows[:8]) + (f", and {count - 8} more" if count > 8 else "")
+        alt = f"{name}: {spec.title}. {count} place{'s' if count != 1 else ''}: {shown}."
+        columns = ["Place", "Where", "Records"]
+        for row, table_row in zip(rows, table_rows):
+            table_row["formatted"] = coordinates_text(row)
+            table_row["latitude"], table_row["longitude"] = row.latitude, row.longitude
+            lines.append(f"{row.label}: {coordinates_text(row)}.")
     elif kind == ChartKind.timeline:
         first, last = rows[0], rows[-1]
         alt = (f"{name}: {spec.title}. {count} event{'s' if count != 1 else ''} from {when_text(first)} ({first.label}) "

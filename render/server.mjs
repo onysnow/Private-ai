@@ -83,7 +83,9 @@ export function mapRequest(body) {
       throw new BadRequest(`place ${i} needs a longitude (-180 to 180) and a latitude (-90 to 90)`);
     }
     if (typeof p.label !== 'string' || p.label.length > 200) throw new BadRequest(`place ${i} needs a label of at most 200 characters`);
-    return {longitude: lon, latitude: lat, label: p.label};
+    const radius = p.radius === undefined ? undefined : Number(p.radius);
+    if (radius !== undefined && !(radius >= 2 && radius <= 20)) throw new BadRequest(`place ${i}: radius must be 2 to 20 px`);
+    return {longitude: lon, latitude: lat, label: p.label, ...(radius !== undefined ? {radius} : {}), ...(p.picked ? {picked: true} : {})};
   });
   return {places: clean, width: dimension(body.width, DEFAULT_WIDTH), height: dimension(body.height, DEFAULT_HEIGHT)};
 }

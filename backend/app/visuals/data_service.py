@@ -61,6 +61,8 @@ class DataRow:
     start: str | None = None    # an "events" row: its date as recorded (a year, a month or a day) ...
     end: str | None = None      # ... the date it ended, when it has one ...
     status: str | None = None   # ... and how far it is verified (app/services/timeline.py)
+    latitude: float | None = None    # a "places" row: where its record puts it
+    longitude: float | None = None
 
     def as_dict(self) -> dict[str, Any]:
         out: dict[str, Any] = {"label": self.label, "value": self.value, "record_refs": [r.as_dict() for r in self.record_refs],
@@ -76,6 +78,9 @@ class DataRow:
             out["start"], out["status"] = self.start, self.status
             if self.end is not None:
                 out["end"] = self.end
+        if self.latitude is not None and self.longitude is not None:
+            # And only places rows.
+            out["latitude"], out["longitude"] = self.latitude, self.longitude
         return out
 
 
@@ -123,7 +128,8 @@ class VisualData:
                     target=str(r["target"]) if isinstance(r.get("source"), str) and isinstance(r.get("target"), str) else None,
                     start=str(r["start"]) if isinstance(r.get("start"), str) else None,
                     end=str(r["end"]) if isinstance(r.get("start"), str) and isinstance(r.get("end"), str) else None,
-                    status=str(r["status"]) if isinstance(r.get("start"), str) and isinstance(r.get("status"), str) else None)
+                    status=str(r["status"]) if isinstance(r.get("start"), str) and isinstance(r.get("status"), str) else None,
+                    latitude=_coordinate(r, "latitude"), longitude=_coordinate(r, "longitude"))
             for r in (data.get("rows") or []) if isinstance(r, dict)
         ]
         labels = data.get("measure_labels")
@@ -144,6 +150,14 @@ class VisualData:
     @property
     def catalog_entry(self) -> QuerySpec:
         return QUERY_CATALOG[self.query]
+
+
+def _coordinate(row: dict[str, Any], name: str) -> float | None:
+    """A stored row's latitude or longitude, when it holds both as numbers."""
+    pair = (row.get("latitude"), row.get("longitude"))
+    if not all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in pair):
+        return None
+    return float(row[name])
 
 
 class QueryError(ValueError):
@@ -529,6 +543,34 @@ def events_in_order(db: Session, investigation_id: str, params: dict[str, str]) 
     )
 
 
+def places_on_map(db: Session, investigation_id: str, params: dict[str, str]) -> VisualData:
+    """Every record with a latitude and a longitude, one row each, where its
+    record puts it (app/services/places.py: nothing is looked up). A place is
+    one record, cited as itself; the records linked to it are context, not
+    the source of where it is. Records whose coordinates cannot be used are
+    listed under ``omitted`` with why."""
+    from app.services.places import investigation_places
+
+    found = investigation_places(db, investigation_id)
+    # Two places of one name are told apart by their record id, as each is
+    # named on the map and checked by its name.
+    names: dict[str, int] = defaultdict(int)
+    for place in found["places"]:
+        names[place["caption"]] += 1
+    rows = [DataRow(place["caption"] if names[place["caption"]] == 1 else f"{place['caption']} [{place['entity_id'][:8]}]",
+                    1.0, [RecordRef("entity", place["entity_id"])], 1, f"{place['caption'].lower()}|{place['entity_id']}",
+                    latitude=place["latitude"], longitude=place["longitude"])
+            for place in found["places"]]
+    rows.sort(key=lambda r: r.key)
+    omitted = [{"reason": "coordinates not usable", "record_type": "entity", "record_id": o["entity_id"], "detail": f"{o['caption']}: {o['reason']}"}
+               for o in found["omitted"]]
+    return VisualData(
+        investigation_id=investigation_id, query="places_on_map", params=params,
+        unit="places", unit_kind="count", series_kind="places", record_noun="places",
+        rows=rows, record_count=len(rows), omitted=omitted,
+    )
+
+
 def links_by_type(db: Session, investigation_id: str, params: dict[str, str]) -> VisualData:
     from app.services.relationships import RELATIONSHIP_SCHEMAS, investigation_relationships
 
@@ -611,6 +653,7 @@ QUERIES: dict[str, QueryRunner] = {
     "payments_over_time": payments_over_time,
     "events_over_time": events_over_time,
     "events_in_order": events_in_order,
+    "places_on_map": places_on_map,
     "links_by_type": links_by_type,
     "claims_by_status": claims_by_status,
     "entities_by_schema": entities_by_schema,

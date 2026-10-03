@@ -2476,7 +2476,8 @@
           "histogram",
           "scatter",
           "timeline",
-          "sankey"
+          "sankey",
+          "map"
         ],
         "title": "ChartKind",
         "type": "string"
@@ -9935,6 +9936,28 @@
           "label": {
             "title": "Label",
             "type": "string"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
           },
           "record_count": {
             "title": "Record Count",
@@ -24356,6 +24379,28 @@
             "title": "Label",
             "type": "string"
           },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
           "record_count": {
             "title": "Record Count",
             "type": "integer"
@@ -24871,7 +24916,7 @@
                 "type": "null"
               }
             ],
-            "description": "The question the chart answers: ranking, change_over_time, part_of_whole, distribution, correlation or flow.",
+            "description": "The question the chart answers: ranking, change_over_time, part_of_whole, distribution, correlation, flow or place.",
             "title": "Question"
           },
           "scale": {

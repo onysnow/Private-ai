@@ -52,8 +52,8 @@ def test_catalog_lists_the_menu_for_this_investigation():
     assert by_name["payments_by_party"]["has_data"] is True
     assert by_name["payments_by_party"]["params"]["currency"]["choices"] is None
     assert by_name["documents_by_status"]["has_data"] is False
-    assert body["drawn_kinds"] == ["area", "bar", "column", "donut", "histogram", "line", "sankey", "scatter", "stacked_bar_100", "timeline", "treemap"]
-    assert [q["id"] for q in body["questions"]] == ["ranking", "change_over_time", "part_of_whole", "distribution", "correlation", "flow"]
+    assert body["drawn_kinds"] == ["area", "bar", "column", "donut", "histogram", "line", "map", "sankey", "scatter", "stacked_bar_100", "timeline", "treemap"]
+    assert [q["id"] for q in body["questions"]] == ["ranking", "change_over_time", "part_of_whole", "distribution", "correlation", "flow", "place"]
     assert by_name["payment_amounts"]["questions"] == ["ranking", "distribution"]
     assert client.get("/api/investigations/nope/visuals/catalog").status_code == 404
 
