@@ -296,7 +296,7 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
       {module==='hypothesis_test'&&<Textarea className="mt-3" aria-label="Working theory" value={theory} onChange={(e:ChangeEvent<HTMLTextAreaElement>)=>setTheory(e.target.value)} placeholder="The working theory to test against the evidence (required for a hypothesis test)." disabled={!callable||running}/>}
       {module==='presentation_draft'&&<div className="mt-3 space-y-3">
         <Textarea aria-label="Goal" value={goal} onChange={(e:ChangeEvent<HTMLTextAreaElement>)=>setGoal(e.target.value)} rows={2} placeholder="What should this brief or deck accomplish? e.g. “Brief my editor on what we can and can’t say about the Bellcastle payment.”" disabled={!callable||running}/>
-        <RecordPicker api={api} investigationId={investigationId} selected={selectedRefs} onChange={setSelectedRefs} disabled={!callable||running}/>
+        <RecordPicker investigationId={investigationId} selected={selectedRefs} onChange={setSelectedRefs} disabled={!callable||running}/>
       </div>}
       {runStatus&&<p className="muted" data-testid="ai-run-status">{runStatus}</p>}
       <div className="twocol" style={isPresentationDraft?{gridTemplateColumns:'minmax(220px,0.55fr) minmax(0,2fr)'}:undefined}>

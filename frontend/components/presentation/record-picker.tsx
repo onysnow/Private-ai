@@ -1,15 +1,16 @@
 'use client';
 // Evidence picker for the presentation_draft module: search the
-// investigation (the existing /api/search endpoint), add hits of any record
+// investigation (the existing /api/search endpoint, through the generated
+// client, which checks each reply against the API schema), add hits of any record
 // type the backend accepts as a record_ref, and keep the picked set visible
 // as removable chips. Only what is picked here can be cited by the draft.
 import {useState} from 'react';
 import type {FormEvent, ReactElement} from 'react';
 import {Check, Plus, Search, X} from 'lucide-react';
 
-import type {SearchResult} from '../../lib/api-types';
-import {parseSearchBody} from '../../lib/api-validate';
-import {ApiClient, errorMessage} from '../../lib/api-client';
+import {errorMessage} from '../../lib/api-client';
+import {searchWorkbench} from '../../lib/generated/sdk.gen';
+import type {SearchHitOut} from '../../lib/generated/types.gen';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 
@@ -24,13 +25,13 @@ export type SelectedRef = {record_type: string, record_id: string, label: string
 const keyOf = (r: {record_type: string, record_id: string}) => `${r.record_type}:${r.record_id}`;
 
 // Search titles a claim hit just "Claim"; its snippet is the claim itself.
-const hitLabel = (hit: SearchResult) => (hit.type === 'claim' && hit.snippet ? hit.snippet : hit.title);
+const hitLabel = (hit: SearchHitOut) => (hit.type === 'claim' && hit.snippet ? hit.snippet : hit.title);
 
-type Props = {api: ApiClient, investigationId: string, selected: SelectedRef[], onChange: (next: SelectedRef[]) => void, disabled?: boolean};
+type Props = {investigationId: string, selected: SelectedRef[], onChange: (next: SelectedRef[]) => void, disabled?: boolean};
 
-export function RecordPicker({api, investigationId, selected, onChange, disabled}: Props): ReactElement {
+export function RecordPicker({investigationId, selected, onChange, disabled}: Props): ReactElement {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [results, setResults] = useState<SearchHitOut[]>([]);
   const [status, setStatus] = useState('');
   const [searching, setSearching] = useState(false);
   const picked = new Set(selected.map(keyOf));
@@ -41,8 +42,7 @@ export function RecordPicker({api, investigationId, selected, onChange, disabled
     setSearching(true);
     setStatus('');
     try {
-      const params = new URLSearchParams({q: query.trim(), investigation_id: investigationId, limit: '25'});
-      const body = await api.parsed(`/api/search?${params.toString()}`, parseSearchBody);
+      const body = (await searchWorkbench({query: {q: query.trim(), investigation_id: investigationId, limit: 25}, throwOnError: true})).data;
       const hits = body.results.filter(r => SELECTABLE_SEARCH_TYPES.has(r.type));
       setResults(hits);
       if (!hits.length) setStatus('No matching claims, evidence, entities, leads, tasks, sources, documents or relationships.');
@@ -54,7 +54,7 @@ export function RecordPicker({api, investigationId, selected, onChange, disabled
     }
   };
 
-  const toggle = (hit: SearchResult) => {
+  const toggle = (hit: SearchHitOut) => {
     const ref = {record_type: toRecordType(hit.type), record_id: hit.id, label: hitLabel(hit)};
     onChange(picked.has(keyOf(ref)) ? selected.filter(r => keyOf(r) !== keyOf(ref)) : [...selected, ref]);
   };

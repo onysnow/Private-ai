@@ -12,7 +12,9 @@ import type {SelectedRef} from '../components/presentation/record-picker';
 import {DEFAULT_THEME, SlideCanvas, SlideStyleProvider, buildCitationLookup, displayDate, fitSize, fontStack, formatValue, resolveTheme, resolveVisualStyle, sortBarItems} from '../components/presentation/slide-canvas';
 import {StylePanel} from '../components/presentation/style-panel';
 import {ApiClient} from '../lib/api-client';
+import {connectGeneratedClient} from '../lib/api-generated';
 import type {CitationDetail, DeckSlide, JsonObject, PresentationVisual} from '../lib/api-types';
+import {mockApi} from '../test-support/mock-api';
 
 afterEach(() => {
   cleanup();
@@ -143,22 +145,23 @@ describe('RecordPicker', () => {
   it('maps search hits to record_refs, using "task" for a reporting task and skipping unselectable types', async () => {
     const user = userEvent.setup();
     expect(toRecordType('reporting_task')).toBe('task');
-    const fetchMock = vi.fn().mockResolvedValueOnce(new Response(JSON.stringify({
+    connectGeneratedClient(new ApiClient('http://api.test'));
+    const api = mockApi({'GET /api/search': {
+      query: 'registry', investigation_id: 'inv-1', total: 2, returned: 2, counts: {}, group_counts: {},
       results: [
         {type: 'reporting_task', group: 'workflow', id: 't-1', investigation_id: 'inv-1', title: 'Request registry extract', snippet: '', score: 1, provenance: {}, metadata: {}},
         {type: 'connector_finding', group: 'external_lead', id: 'f-1', investigation_id: 'inv-1', title: 'Aleph hit', snippet: '', score: 1, provenance: {}, metadata: {}},
       ],
-      counts: {}, group_counts: {},
-    }), {status: 200, headers: {'content-type': 'application/json'}}));
-    vi.stubGlobal('fetch', fetchMock);
+    }});
     let selected: SelectedRef[] = [];
     const onChange = vi.fn((next: SelectedRef[]) => { selected = next; });
-    render(<RecordPicker api={new ApiClient('http://api.test')} investigationId="inv-1" selected={selected} onChange={onChange}/>);
+    render(<RecordPicker investigationId="inv-1" selected={selected} onChange={onChange}/>);
     await user.type(screen.getByLabelText('Search records to add'), 'registry{Enter}');
     await user.click(await screen.findByRole('button', {name: 'Add Task: Request registry extract'}));
     expect(onChange).toHaveBeenLastCalledWith([{record_type: 'task', record_id: 't-1', label: 'Request registry extract'}]);
     expect(screen.queryByText('Aleph hit')).not.toBeInTheDocument();
-    expect(String(fetchMock.mock.calls[0][0])).toContain('/api/search?q=registry&investigation_id=inv-1');
+    const [call] = api.calls('GET /api/search');
+    expect(Object.fromEntries(call.url.searchParams)).toEqual({q: 'registry', investigation_id: 'inv-1', limit: '25'});
   });
 });
 

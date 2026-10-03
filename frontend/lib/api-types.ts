@@ -2,8 +2,6 @@ export type JsonPrimitive=string|number|boolean|null;
 export type JsonValue=JsonPrimitive|JsonValue[]|{[key:string]:JsonValue};
 export type JsonObject={[key:string]:JsonValue};
 export type CanonicalEntity={id:string,caption:string,schema:string,properties:Record<string,string[]>};
-export type SearchGroup='canonical'|'evidence'|'reporting'|'workflow'|'review'|'external_lead'|'other';
-export type SearchResult={type:string,group:SearchGroup,id:string,investigation_id:string,title:string,snippet:string,score:number,provenance:{locator?:string,source_url?:string,[key:string]:JsonValue|undefined},metadata:JsonObject};
 // A document's own extracted chunks, attached only by the single-document
 // detail endpoint (GET /api/documents/{id}), not by list endpoints. Each
 // ExtractionCandidate.chunk_id points at one of these, and payload.span

@@ -366,7 +366,7 @@ describe('AiReasoningPanel', () => {
       .mockResolvedValueOnce(jsonResponse({candidates: []})) // initial queue
       .mockResolvedValueOnce(jsonResponse({ // GET /api/search
         results: [{type: 'claim', group: 'reporting', id: 'claim-1', investigation_id: 'inv-1', title: 'Claim', snippet: 'Meridian paid Bellcastle $2.4M', score: 1, provenance: {}, metadata: {}}],
-        counts: {claim: 1}, group_counts: {reporting: 1},
+        query: 'Bellcastle', investigation_id: 'inv-1', total: 1, returned: 1, counts: {claim: 1}, group_counts: {reporting: 1},
       }))
       .mockResolvedValueOnce(jsonResponse({candidate_id: 'cand-9', review_status: 'proposed', payload: {}})) // POST presentation-draft
       .mockResolvedValueOnce(jsonResponse({candidates: [draftSummary()]})) // queue reload
