@@ -2704,6 +2704,16 @@
             "title": "Report",
             "type": "object"
           },
+          "slide_drawing": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SlideDrawingOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "spec": {
             "additionalProperties": true,
             "title": "Spec",
@@ -20902,6 +20912,49 @@
           "results"
         ],
         "title": "SimilarDocumentsOut",
+        "type": "object"
+      },
+      "SlideDrawingOut": {
+        "description": "What a deck slide shows for a chart kind PowerPoint cannot hold\nnatively (app/services/decks.py _slide_drawing): the drawing at the\nslide's own scale, or its parts as ranked bars with ``note`` saying why.\n``option`` is null only when not even the bars can be drawn.",
+        "properties": {
+          "height": {
+            "title": "Height",
+            "type": "integer"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "option": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Option"
+          },
+          "width": {
+            "title": "Width",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "option",
+          "width",
+          "height"
+        ],
+        "title": "SlideDrawingOut",
         "type": "object"
       },
       "SortOrder": {

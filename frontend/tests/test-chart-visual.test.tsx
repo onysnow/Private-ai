@@ -153,6 +153,45 @@ describe('every chart kind in the preview (visuals pass 3)', () => {
   });
 });
 
+describe('a treemap slide shows what the deck export will (slide_drawing)', () => {
+  const treemap = (): JsonObject => {
+    const fixture = (kinds as unknown as Record<string, JsonObject>).treemap;
+    return {type: 'chart', spec: fixture.spec, data: fixture.data, report: {ok: true, errors: [], warnings: []}, text: fixture.text,
+      option: fixture.option, width: fixture.width, height: fixture.height};
+  };
+  const slideWith = (visual: JsonObject): ReactElement => {
+    const chart = asDraft({...payload, sections: [{...(payload.sections as JsonObject[])[0], visual}]}).sections[0].visual!;
+    const slides: DeckSlide[] = [{kind: 'content', heading: 'Who got paid', bullets: [], evidence: [], visual: chart}];
+    return <SlideStyleProvider theme={DEFAULT_THEME}><SlideCanvas slide={slides[0]} page={1} contentIndex={1} contentTotal={1} deckTitle="Money" lookup={buildCitationLookup(slides)} sourceCount={5}/></SlideStyleProvider>;
+  };
+  const drawnOption = () => (reactEChartsCoreSpy.mock.calls.at(-1)![0] as {option: unknown}).option;
+
+  it('draws the slide-scale drawing the deck stored', async () => {
+    const slideOption = {series: [{type: 'treemap', data: []}], title: [{text: 'At slide scale'}]};
+    render(slideWith({...treemap(), slide_drawing: {option: slideOption, width: 880, height: 351}}));
+    expect((await screen.findByTestId('slide-chart')).dataset.drawing).toBe('slide');
+    await screen.findByTestId('echarts-canvas');
+    expect(drawnOption()).toEqual(slideOption);
+  });
+
+  it('shows the bars and the reason when the parts cannot be named at that size', async () => {
+    const bars = {series: [{type: 'bar', data: [1, 2]}]};
+    const note = "Treemap not drawn at this size (rule 12: 'Harborline Civic Trust' is too small in a treemap to show its name). The same parts are shown as bars.";
+    render(slideWith({...treemap(), slide_drawing: {option: bars, width: 880, height: 351, note}}));
+    expect((await screen.findByTestId('slide-chart')).dataset.drawing).toBe('bars');
+    expect(screen.getByText(note)).toBeInTheDocument();
+    await screen.findByTestId('echarts-canvas');
+    expect(drawnOption()).toEqual(bars);
+  });
+
+  it('draws the checked option when the deck stored no slide drawing (native kinds, older decks)', async () => {
+    render(slideWith(treemap()));
+    expect((await screen.findByTestId('slide-chart')).dataset.drawing).toBe('design');
+    await screen.findByTestId('echarts-canvas');
+    expect(drawnOption()).toEqual(treemap().option);
+  });
+});
+
 describe('the preview with a chart section', () => {
   it('shows the chart on its slide and in the brief', async () => {
     const draft = asDraft(payload);

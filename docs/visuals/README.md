@@ -167,8 +167,10 @@ order slip  →  kitchen  →  checker  →  drawing  →  review
   its 12 px text reads at 10.5 pt; drawn at 960 x 540 and shrunk into half a
   slide, it read at 5.5 pt) and checked again at that size; a treemap whose
   small parts cannot name themselves there, or one the render service
-  cannot draw, is shown as ranked native bars under a line saying why. (The
-  app's slide preview still shows the 960 x 540 drawing.) Every chart has
+  cannot draw, is shown as ranked native bars under a line saying why. The
+  deck keeps that slide-scale drawing (or the bars and the line) with the
+  chart when it is saved, and the app's slide preview draws it, so the
+  preview is what the export will be (`decks.slide_picture`). Every chart has
   its title and unit above it, the source line under it, its alt text on
   the shape (what a screen reader announces), its description in the
   speaker notes, and its records numbered in the slide footer and on the

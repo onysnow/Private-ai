@@ -37,8 +37,14 @@ export function asChart(v: JsonObject): ChartVisual | null {
       ...(typeof r.share === 'number' ? {share: r.share} : {}),
       ...(typeof r.x === 'number' ? {x: r.x} : {}),
       ...(typeof r.x_formatted === 'string' ? {x_formatted: r.x_formatted} : {})}));
+  // What a deck slide shows for a kind PowerPoint cannot hold natively (the treemap).
+  const drawing = isObj(v.slide_drawing) && typeof v.slide_drawing.width === 'number' && typeof v.slide_drawing.height === 'number'
+    ? {option: isObj(v.slide_drawing.option) ? v.slide_drawing.option : null, width: v.slide_drawing.width, height: v.slide_drawing.height,
+      ...(typeof v.slide_drawing.note === 'string' ? {note: v.slide_drawing.note} : {})}
+    : null;
   return {
     type: 'chart', spec, option, data: {...data, rows},
+    ...(drawing ? {slide_drawing: drawing} : {}),
     width: typeof v.width === 'number' ? v.width : undefined, height: typeof v.height === 'number' ? v.height : undefined,
     text: {alt_text: str(text.alt_text), description: str(text.description), source_line: str(text.source_line),
       data_table: {columns: table.columns.map(c => str(c)), rows: tableRows}},

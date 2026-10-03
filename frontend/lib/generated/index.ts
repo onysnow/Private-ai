@@ -1288,6 +1288,7 @@ export type {
   SettingsStatusResponses,
   SimilarDocumentOut,
   SimilarDocumentsOut,
+  SlideDrawingOut,
   SortOrder,
   SourceCreate,
   SourceOut,

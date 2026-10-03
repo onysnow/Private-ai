@@ -1593,6 +1593,7 @@ export type ChartVisualOut = {
   report: {
     [key: string]: unknown;
   };
+  slide_drawing?: SlideDrawingOut | null;
   /**
    * Spec
    */
@@ -9859,6 +9860,35 @@ export type SimilarDocumentsOut = {
    * State
    */
   state: 'ok' | 'not_configured' | 'no_collection' | 'unreachable';
+};
+
+/**
+ * SlideDrawingOut
+ *
+ * What a deck slide shows for a chart kind PowerPoint cannot hold
+ * natively (app/services/decks.py _slide_drawing): the drawing at the
+ * slide's own scale, or its parts as ranked bars with ``note`` saying why.
+ * ``option`` is null only when not even the bars can be drawn.
+ */
+export type SlideDrawingOut = {
+  /**
+   * Height
+   */
+  height: number;
+  /**
+   * Note
+   */
+  note?: string | null;
+  /**
+   * Option
+   */
+  option: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Width
+   */
+  width: number;
 };
 
 /**

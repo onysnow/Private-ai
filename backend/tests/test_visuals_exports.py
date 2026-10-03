@@ -347,6 +347,39 @@ def test_a_treemap_that_cannot_name_its_parts_at_slide_size_is_shown_as_bars(dem
     assert "The same parts are shown as bars." in text and "Source: " in text
 
 
+def test_a_saved_deck_keeps_what_its_treemap_slide_shows(every_kind, monkeypatch):
+    """The slide preview draws what the export draws: a saved deck keeps,
+    with each treemap, the drawing at the slide's own scale -- or, when its
+    parts cannot be named there, the parts as bars with the export's own
+    words for why."""
+    from app.services.decks import chart_region, picture_size, serialize_deck, update_deck
+
+    db, inv_id, charts = every_kind
+    drawn = {}
+    monkeypatch.setattr("app.visuals.render_client.render_png",
+                        lambda option, width, height, **kwargs: drawn.update(option=option, size=(width, height)) or TINY_PNG)
+    row = _deck(db, inv_id, {"treemap": charts["treemap"], "donut": charts["donut"]})
+    row = update_deck(db, row, {"slides_json": row.slides_json})
+    slides = serialize_deck(row)["slides"]
+    treemap, donut = slides[0]["visual"], slides[1]["visual"]
+    assert "slide_drawing" not in donut                      # native charts are drawn by PowerPoint itself
+    full_width = picture_size(*chart_region(False)[2:])
+    assert (treemap["slide_drawing"]["width"], treemap["slide_drawing"]["height"]) == full_width
+    assert "note" not in treemap["slide_drawing"]
+    render_deck_pptx(row, [])
+    assert drawn["size"] == full_width and drawn["option"] == treemap["slide_drawing"]["option"]   # what the export drew
+
+    lopsided = _stored_parts("treemap", [2_400_000, 355_000, 192_000, 107_000])
+    row = _deck(db, inv_id, {"treemap": lopsided})
+    row = update_deck(db, row, {"slides_json": row.slides_json})
+    drawing = serialize_deck(row)["slides"][0]["visual"]["slide_drawing"]
+    assert drawing["note"].startswith("Treemap not drawn at this size (rule 12: 'Harborline Civic Trust' is too small")
+    assert drawing["option"]["series"][0]["type"] == "bar"
+    # Beside bullets the region is narrower, and so is the drawing.
+    narrow = update_deck(db, row, {"slides_json": [{**row.slides_json[0], "bullets": ["One point"]}]})
+    assert serialize_deck(narrow)["slides"][0]["visual"]["slide_drawing"]["width"] == picture_size(*chart_region(True)[2:])[0]
+
+
 def test_picture_size_reads_at_ten_and_a_half_points_on_the_slide():
     assert picture_size(6.1, 4.7) == (502, 387)    # beside the bullets: 12 px is 10.5 pt across 6.1 in
     assert picture_size(11.8, 4.7) == (960, 382)   # the full width: never wider than the app's design

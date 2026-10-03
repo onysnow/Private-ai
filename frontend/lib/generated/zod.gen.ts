@@ -4113,6 +4113,21 @@ export const zSimilarDocumentsOut = z.object({
 });
 
 /**
+ * SlideDrawingOut
+ *
+ * What a deck slide shows for a chart kind PowerPoint cannot hold
+ * natively (app/services/decks.py _slide_drawing): the drawing at the
+ * slide's own scale, or its parts as ranked bars with ``note`` saying why.
+ * ``option`` is null only when not even the bars can be drawn.
+ */
+export const zSlideDrawingOut = z.object({
+  height: z.number().int(),
+  note: z.string().nullish(),
+  option: z.record(z.unknown()).nullable(),
+  width: z.number().int(),
+});
+
+/**
  * SortOrder
  */
 export const zSortOrder = z.enum(['value_desc', 'value_asc', 'label', 'time']);
@@ -5162,6 +5177,7 @@ export const zChartVisualOut = z.object({
   data: zVisualDataOut,
   option: z.record(z.unknown()).nullish(),
   report: z.record(z.unknown()),
+  slide_drawing: zSlideDrawingOut.nullish(),
   spec: z.record(z.unknown()),
   style: zVisualStyleOut.nullish(),
   text: z.record(z.unknown()),

@@ -49,7 +49,11 @@ export type ChartDataRow={label:string,value:number,record_refs:AiCitationRef[],
 // A part's share of the whole (100% bar, donut, treemap) and a scatter plot's second number come only with those kinds.
 export type ChartDataTableRow={label:string,value:number,formatted:string,record_count:number,record_refs:AiCitationRef[],share?:number,x?:number,x_formatted?:string};
 /** A chart the AI ordered and the data service cooked (backend/app/visuals): the rows, the checked ECharts drawing and the words that go with it (alt text, description, data table, source line). */
-export type ChartVisual={type:'chart',spec:JsonObject,data:{rows:ChartDataRow[],unit?:string|null,currency?:string|null}&JsonObject,option:JsonObject,width?:number,height?:number,text:{alt_text:string,description:string,source_line:string,data_table:{columns:string[],rows:ChartDataTableRow[]}},style?:VisualStyle|null};
+// slide_drawing: what a deck slide shows for a kind PowerPoint cannot hold
+// natively (the treemap) -- the drawing at the slide's own scale, or its
+// parts as bars with the reason (backend app/services/decks.py _slide_drawing).
+export type SlideDrawing={option:JsonObject|null,width:number,height:number,note?:string|null};
+export type ChartVisual={type:'chart',spec:JsonObject,data:{rows:ChartDataRow[],unit?:string|null,currency?:string|null}&JsonObject,option:JsonObject,width?:number,height?:number,text:{alt_text:string,description:string,source_line:string,data_table:{columns:string[],rows:ChartDataTableRow[]}},style?:VisualStyle|null,slide_drawing?:SlideDrawing|null};
 export type PresentationVisual=StyledVisual|ChartVisual;
 export type VisualKind=StyledVisual['type'];
 // A quote the backend found word for word in the cited record (app/ai/quote_check.py).

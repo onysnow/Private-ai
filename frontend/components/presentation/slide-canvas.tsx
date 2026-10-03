@@ -262,10 +262,21 @@ function Timeline({visual, style, lookup, region}: {visual: Extract<Presentation
   </div>;
 }
 
-/** A checked chart placed in a slide region, scaled to fit it. */
-function SlideChart({visual, region}: {visual: ChartVisual, region: Region}): ReactElement {
+/** A checked chart placed in a slide region, scaled to fit it. A kind
+ * PowerPoint cannot hold natively (the treemap) shows what the deck stored
+ * for this slide -- the drawing at the slide's own scale, or its parts as
+ * bars with the reason -- so the preview is what the export will be. */
+export function SlideChart({visual, region}: {visual: ChartVisual, region: Region}): ReactElement {
+  const {c, sans} = useTheme();
   const [x, y, w, h] = region;
-  return <div style={{...box(x, y, w, h), background: '#fff0'}} data-testid="slide-chart"><ScaledChart visual={visual} fill/></div>;
+  const drawing = visual.slide_drawing;
+  const shown: ChartVisual | null = !drawing ? visual
+    : drawing.option ? {...visual, option: drawing.option, width: drawing.width, height: drawing.height} : null;
+  return <div style={{...box(x, y, w, h), background: '#fff0', display: 'flex', flexDirection: 'column'}} data-testid="slide-chart"
+    data-drawing={drawing ? (drawing.note ? 'bars' : 'slide') : 'design'}>
+    {drawing?.note && <div style={{fontFamily: sans, fontSize: pt(11), fontStyle: 'italic', color: c('alert')}}>{drawing.note}</div>}
+    {shown ? <div style={{flex: 1, minHeight: 0}}><ScaledChart visual={shown} fill/></div> : null}
+  </div>;
 }
 
 function BarChart({visual, style, region}: {visual: Extract<PresentationVisual, {type: 'bar'}>, style: ResolvedVisualStyle, region: Region}): ReactElement {

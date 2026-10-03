@@ -2761,6 +2761,17 @@ class BarVisualOut(ResponseModel):
     style: VisualStyleOut | None = Field(default=None, exclude_if=_absent_when_none)
 
 
+class SlideDrawingOut(ResponseModel):
+    """What a deck slide shows for a chart kind PowerPoint cannot hold
+    natively (app/services/decks.py _slide_drawing): the drawing at the
+    slide's own scale, or its parts as ranked bars with ``note`` saying why.
+    ``option`` is null only when not even the bars can be drawn."""
+    option: dict[str, Any] | None
+    width: int
+    height: int
+    note: str | None = Field(default=None, exclude_if=_absent_when_none)
+
+
 class ChartVisualOut(ResponseModel):
     """A checked chart (app/ai/chart_check.py) as a deck keeps it: the order
     slip, the data the Workbench cooked from the records (every value with
@@ -2777,6 +2788,8 @@ class ChartVisualOut(ResponseModel):
     option: dict[str, Any] | None = Field(default=None, exclude_if=_absent_when_none)
     # The chart's preset and options (app/visuals/style.py), when it was styled.
     style: VisualStyleOut | None = Field(default=None, exclude_if=_absent_when_none)
+    # A kind PowerPoint cannot hold natively (the treemap), as the slide shows it.
+    slide_drawing: SlideDrawingOut | None = Field(default=None, exclude_if=_absent_when_none)
 
 
 class StyleWarningOut(ResponseModel):

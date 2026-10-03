@@ -93,6 +93,10 @@ def normalize_chart_visual(visual: Any) -> dict | None:
         # The checked drawing travels with the deck so the preview of a
         # promoted deck is the one the reporter approved.
         kept["option"] = visual["option"]
+    drawing = visual.get("slide_drawing")
+    if isinstance(drawing, dict) and isinstance(drawing.get("width"), int) and isinstance(drawing.get("height"), int):
+        # What the slide itself shows when the kind is not a native chart (recheck_charts).
+        kept["slide_drawing"] = {k: drawing[k] for k in ("option", "width", "height", "note") if k in drawing}
     # The chart's preset and options (app/visuals/style.py), kept as the
     # catalogue allows them; the order slip and the data stay as they are.
     style = normalize_chart_style(spec, data, visual.get("style"))
@@ -118,8 +122,10 @@ def recheck_charts(slides: list[dict], theme: Theme) -> list[dict]:
         if isinstance(visual, dict) and visual.get("type") == CHART_VISUAL:
             checked = checked_chart(visual, theme)
             if checked.built is not None and checked.report is not None:
-                slide = {**slide, "visual": {**visual, "option": checked.built.option, "text": checked.built.text(),
-                                             "report": checked.report.as_dict()}}
+                visual = {**visual, "option": checked.built.option, "text": checked.built.text(), "report": checked.report.as_dict()}
+                drawing = _slide_drawing(visual, theme, bool(slide.get("bullets")))
+                visual.pop("slide_drawing", None)
+                slide = {**slide, "visual": {**visual, "slide_drawing": drawing} if drawing else visual}
         out.append(slide)
     return out
 
@@ -450,6 +456,46 @@ def picture_size(width_in: float, height_in: float) -> tuple[int, int]:
     return design_w, round(design_w * height_in / width_in)
 
 
+def slide_picture(visual: dict, theme: Theme, width_in: float, height_in: float) -> tuple[CheckedChart, str | None]:
+    """A chart kind PowerPoint cannot hold natively (the treemap), drawn and
+    checked at the size its slide region gives it (picture_size), and why it
+    must not be drawn there, if it must not. The export (_chart_picture) and
+    the slide preview (recheck_charts, slide_drawing) both ask this, so they
+    show the same thing."""
+    design_w, design_h = picture_size(width_in, height_in)
+    sized = checked_chart(visual, theme, width=design_w, height=design_h)
+    if sized.built is None or sized.report is None or not sized.report.ok:
+        label = KIND_LABELS.get(sized.spec.kind, sized.spec.kind.value)
+        first = sized.report.errors[0] if sized.report and sized.report.errors else None
+        reason = f"rule {first.rule}: {first.message.split(';')[0]}" if first else (sized.problem or "it cannot be drawn")
+        return sized, f"{label} not drawn at this size ({reason}). The same parts are shown as bars."
+    return sized, None
+
+
+def _slide_drawing(visual: dict, theme: Theme, has_bullets: bool) -> dict | None:
+    """What a deck slide shows for a chart PowerPoint cannot hold natively:
+    the drawing at the slide's own scale, or -- when it cannot name its
+    parts there -- its parts as ranked bars with the reason. Stored with the
+    chart so the preview draws what the export draws."""
+    try:
+        kind = ChartKind(visual["spec"]["kind"])
+    except (KeyError, TypeError, ValueError):
+        return None
+    if kind in NATIVE_KINDS:
+        return None
+    _x, _y, width_in, height_in = chart_region(has_bullets)
+    sized, note = slide_picture(visual, theme, width_in, height_in)
+    design_w, design_h = picture_size(width_in, height_in)
+    if note is None and sized.built is not None:
+        return {"option": sized.built.option, "width": design_w, "height": design_h}
+    try:
+        bars = build_chart(sized.spec.model_copy(update={"kind": ChartKind.bar, "question": None}), sized.data, theme,
+                           width=design_w, height=design_h)
+    except (UnsupportedChartKind, ChartDoesNotFit):
+        return {"option": None, "width": design_w, "height": design_h, "note": note}
+    return {"option": bars.option, "width": design_w, "height": design_h, "note": note}
+
+
 def normalize_visual(visual: Any) -> dict | None:
     """Keep a well-formed visual, drop anything else. A deck must always
     export, so a malformed visual is discarded rather than raised on."""
@@ -606,6 +652,13 @@ SANS = "Calibri"
 
 SLIDE_W_IN, SLIDE_H_IN = 13.333, 7.5
 MARGIN_IN = 0.75
+
+
+def chart_region(has_bullets: bool) -> tuple[float, float, float, float]:
+    """Where a chart sits on a content slide (x, y, width, height in inches):
+    beside the bullets, or across the slide without them. The slide preview
+    (frontend slide-canvas.tsx) places it the same way."""
+    return (6.45, 2.0, 6.1, 4.7) if has_bullets else (MARGIN_IN, 2.0, 11.8, 4.7)
 
 
 _MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
@@ -1368,12 +1421,10 @@ class _DeckRenderer:
         from app.visuals.render_client import RenderUnavailable, render_png
 
         design_w, design_h = picture_size(w, h)
-        sized = checked_chart(visual, self.t, width=design_w, height=design_h)
+        sized, note = slide_picture(visual, self.t, w, h)
         label = KIND_LABELS.get(sized.spec.kind, sized.spec.kind.value)
-        if sized.built is None or sized.report is None or not sized.report.ok:
-            first = sized.report.errors[0] if sized.report and sized.report.errors else None
-            reason = f"rule {first.rule}: {first.message.split(';')[0]}" if first else (sized.problem or "it cannot be drawn")
-            return f"{label} not drawn at this size ({reason}). The same parts are shown as bars."
+        if note is not None or sized.built is None:
+            return note or f"{label} cannot be drawn. The same parts are shown as bars."
         try:
             png = render_png(sized.built.option, design_w, design_h, scale=PICTURE_SCALE)
         except RenderUnavailable as exc:
@@ -1449,7 +1500,7 @@ class _DeckRenderer:
         elif kind == CHART_VISUAL:
             if bullets:
                 self.bullets(slide, MARGIN_IN, 2.1, 5.3, 4.55, bullets, sizes=(22, 20, 18, 16, 15, 14))
-            chart_description = self._chart(slide, 6.45 if bullets else MARGIN_IN, 2.0, 6.1 if bullets else 11.8, 4.7, vis)
+            chart_description = self._chart(slide, *chart_region(bool(bullets)), vis)
         elif kind == "figures":
             if style["layout"].get("arrangement") == "row":
                 if bullets:
