@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import time
 from pathlib import Path
 from typing import Any, Callable
@@ -20,6 +21,13 @@ from app.models.domain import (
 )
 
 PROVIDER = "openaleph"
+
+logger = logging.getLogger("journalism.openaleph")
+
+# A document's pages are listed this many at a time, up to OpenAleph's search
+# window (offset + limit <= 9,999; openaleph_search/settings.py MAX_PAGE).
+PAGE_FETCH_SIZE = 500
+PAGE_FETCH_WINDOW = 9999
 
 
 # Single-user session tokens, by OpenAleph base URL: (token, fetched_at).
@@ -373,24 +381,47 @@ def _openaleph_search(
     document_record_id: str,
     transport: httpx.BaseTransport | None = None,
 ) -> list[dict]:
-    """Fetch page entities belonging to one ingested document.
+    """Fetch every page entity belonging to one ingested document.
 
     OpenAleph stores paginated document text on FollowTheMoney ``Page`` entities.
     We use exact API filters for the collection and parent document so another
     document in the same investigation can never leak into this review queue.
+
+    One search answers at most ``PAGE_FETCH_SIZE`` pages, so the search is
+    paged by offset until OpenAleph's ``total`` is reached (a single call used
+    to drop every page after the 500th). Rows are kept by id, so a page is
+    never counted twice. OpenAleph's search refuses offset + limit beyond
+    9,999 (openaleph_search/settings.py MAX_PAGE); a longer document is read
+    up to that point and the shortfall is logged.
     """
     from app.services import openaleph_http
 
-    params: dict[str, str | int] = {
-        "q": "*",
-        "filter:collection_id": collection_id,
-        "filter:schema": "Page",
-        "filter:properties.document": document_record_id,
-        "limit": 500,
-    }
-    payload = openaleph_http.get_json("/api/2/search", params, transport=transport)
-    rows = payload.get("results", []) if isinstance(payload, dict) else []
-    return [row for row in rows if isinstance(row, dict)]
+    rows: dict[str, dict] = {}
+    offset = 0
+    total: int | None = None
+    while offset < PAGE_FETCH_WINDOW:
+        params: dict[str, str | int] = {
+            "q": "*",
+            "filter:collection_id": collection_id,
+            "filter:schema": "Page",
+            "filter:properties.document": document_record_id,
+            "limit": min(PAGE_FETCH_SIZE, PAGE_FETCH_WINDOW - offset),
+            "offset": offset,
+        }
+        payload = openaleph_http.get_json("/api/2/search", params, transport=transport)
+        results = payload.get("results") if isinstance(payload, dict) else None
+        page = [row for row in results or [] if isinstance(row, dict)]
+        for index, row in enumerate(page):
+            rows.setdefault(str(row.get("id") or f"offset-{offset + index}"), row)
+        offset += len(page)
+        reported = payload.get("total") if isinstance(payload, dict) else None
+        total = reported if isinstance(reported, int) else None
+        if not page or total is None or offset >= total:
+            break
+    if total is not None and len(rows) < total:
+        logger.warning("OpenAleph holds more pages than its search can list", extra={
+            "document_record_id": document_record_id, "pages_listed": len(rows), "pages_total": total})
+    return list(rows.values())
 
 
 def import_openaleph_evidence_candidates(

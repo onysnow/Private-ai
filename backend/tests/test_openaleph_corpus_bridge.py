@@ -219,6 +219,49 @@ def test_openaleph_search_uses_exact_collection_and_parent_filters(monkeypatch):
     assert rows[0]["id"] == "page-1"
 
 
+def test_every_page_of_a_long_document_is_fetched(monkeypatch, caplog):
+    """A 1,234-page document needs three searches of 500; one call used to
+    keep only the first 500 pages."""
+    import httpx
+    from app.services.openaleph_corpus import _openaleph_search
+
+    monkeypatch.setattr(settings, "openaleph_base_url", "http://openaleph.test")
+    monkeypatch.setattr(settings, "openaleph_api_key", "secret")
+    total = 1234
+    asked: list[tuple[int, int]] = []
+
+    def handler(request: httpx.Request):
+        offset, limit = int(request.url.params["offset"]), int(request.url.params["limit"])
+        asked.append((offset, limit))
+        rows = [{"id": f"page-{i}", "schema": "Page", "properties": {"index": [str(i + 1)]}} for i in range(offset, min(offset + limit, total))]
+        return httpx.Response(200, json={"results": rows, "total": total, "limit": limit, "offset": offset})
+
+    rows = _openaleph_search(collection_id="c", document_record_id="d", transport=httpx.MockTransport(handler))
+    assert asked == [(0, 500), (500, 500), (1000, 500)]
+    assert sorted(row["id"] for row in rows) == sorted(f"page-{i}" for i in range(total))
+    assert not [r for r in caplog.records if "more pages" in r.getMessage()]
+
+
+def test_a_document_beyond_the_search_window_is_read_as_far_as_it_goes(monkeypatch, caplog):
+    import logging
+    import httpx
+    from app.services.openaleph_corpus import PAGE_FETCH_WINDOW, _openaleph_search
+
+    monkeypatch.setattr(settings, "openaleph_base_url", "http://openaleph.test")
+    monkeypatch.setattr(settings, "openaleph_api_key", "secret")
+    total = 12000
+
+    def handler(request: httpx.Request):
+        offset, limit = int(request.url.params["offset"]), int(request.url.params["limit"])
+        assert offset + limit <= PAGE_FETCH_WINDOW   # OpenAleph refuses a deeper window
+        return httpx.Response(200, json={"results": [{"id": f"p{i}"} for i in range(offset, offset + limit)], "total": total})
+
+    with caplog.at_level(logging.WARNING, logger="journalism.openaleph"):
+        rows = _openaleph_search(collection_id="c", document_record_id="d", transport=httpx.MockTransport(handler))
+    assert len(rows) == PAGE_FETCH_WINDOW
+    assert any("more pages" in r.getMessage() for r in caplog.records)
+
+
 def test_openaleph_analysis_is_staged_as_proposals_without_auto_resolution(tmp_path, monkeypatch):
     """ftm-analyze's results are properties of the document entity
     (ADR-0006); each becomes a proposal, nothing becomes an entity until a
