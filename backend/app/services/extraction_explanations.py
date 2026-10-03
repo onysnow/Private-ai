@@ -225,6 +225,7 @@ def _explain_evidence(candidate: ExtractionCandidate, payload: dict, lineage: di
     chunk = _chunk_ref(lineage, payload)
     provider = _provider_ref(provenance)
     quote = payload.get("quote") or ""
+    rationale: dict = {}
     if provenance.get("extraction_method") == "openaleph_ingest_file":
         method, basis = "openaleph_ingest_file", "provider"
     else:
@@ -245,8 +246,49 @@ def _explain_evidence(candidate: ExtractionCandidate, payload: dict, lineage: di
     return {
         "summary": f"Evidence quote from {(chunk or {}).get('locator') or 'the document'}",
         "method_id": method, "rationale_basis": basis, "parts": parts, "caveats": caveats,
-        "confidence_basis": "Fixed value of 1.0 for verbatim quotes: it measures that the text is copied exactly from the extracted document, not how reliable the statement is.",
+        "confidence_basis": _passage_confidence_basis(rationale, candidate.confidence),
     }
+
+
+def _passage_confidence_basis(rationale: dict, confidence: float | None) -> str:
+    """Why a passage proposed as evidence has its value (entity_signals.read_passage)."""
+    signal = rationale.get("signal")
+    if signal == "boilerplate":
+        return (f"{confidence:.2f}: the passage reads like a page number, a stamp or a copyright line, which is rarely worth keeping "
+                "as evidence. It says nothing about whether the text is true.")
+    if signal == "short_passage":
+        return (f"{confidence:.2f}: the passage is only {rationale.get('words')} word(s), often a heading or a label rather than a statement. "
+                "It says nothing about whether the text is true.")
+    return ("Fixed value of 1.0 for verbatim quotes: it measures that the text is copied exactly from the extracted document, "
+            "not how reliable the statement is.")
+
+
+def _name_signal_reasoning(rationale: dict, schema: str, confidence: float | None) -> tuple[list[str], str]:
+    """Why the pattern finder proposed this kind, and what set its value
+    (app/services/entity_signals.py). Proposals made before the signals
+    existed carry organization_suffix / no_organization_suffix and the old
+    fixed 0.40."""
+    basis = rationale.get("schema_basis")
+    matched = rationale.get("matched") or rationale.get("matched_suffix")
+    value = f"{confidence:.2f}" if isinstance(confidence, (int, float)) else "This value"
+    if basis == "existing_record":
+        return ([f"The investigation already holds a {schema} with exactly this name, so the proposal takes that record's kind."],
+                f"{value}: an existing record has this exact name. Accepting still asks whether it is the same entity.")
+    if basis == "corporate_suffix":
+        return ([f"The name ends in the legal form “{matched}”, which registered businesses use, so the rule proposed Company."],
+                f"{value}: the legal form in the name says what kind of entity it is. It is not a check that the company exists.")
+    if basis in ("organization_word", "organization_suffix"):
+        return ([f"The name contains “{matched}”, a word organisations use in their names, so the rule proposed {schema}."],
+                f"{value}: a word in the name says what kind of entity it is." if basis == "organization_word"
+                else "Fixed value of 0.40 assigned to every name this rule matched before signals were used.")
+    if basis == "honorific":
+        return ([f"The title “{matched}” comes right before the name, so the rule proposed Person."],
+                f"{value}: a personal title before the name says it is a person.")
+    if basis == "no_type_signal":
+        return (["Nothing in the text says what kind of entity this is, so the rule suggests Person and asks you to choose."],
+                f"{value}: nothing in the text says what kind of entity the name is, so accepting waits for your answer.")
+    return (["The name contains no organizational suffix, so the rule fell back to Person. This is a default, not evidence that it is a person."],
+            "Fixed value of 0.40 assigned to every name this rule matches. It is not computed per name.")
 
 
 def _explain_claim(candidate: ExtractionCandidate, payload: dict, lineage: dict, provenance: dict) -> dict[str, Any]:
@@ -314,10 +356,7 @@ def _explain_entity(candidate: ExtractionCandidate, payload: dict, lineage: dict
         })
         method = "capitalized_name_sequence"
         name_reasoning = [f"The text “{caption}” is a run of capitalized words in the chunk, which the rule treats as a possible name."]
-        if rationale.get("schema_basis") == "organization_suffix":
-            schema_reasoning = [f"The name contains the organizational suffix “{rationale.get('matched_suffix')}”, so the rule proposed Organization."]
-        else:
-            schema_reasoning = ["The name contains no organizational suffix, so the rule fell back to Person. This is a default, not evidence that it is a person."]
+        schema_reasoning, confidence_basis = _name_signal_reasoning(rationale, schema, candidate.confidence)
         caveats.append("Capitalized-word matching also catches sentence starts, titles, places and headings; check that this is a real name.")
     parts = [
         _part("caption", "Name", caption, name_reasoning, [chunk, provider]),

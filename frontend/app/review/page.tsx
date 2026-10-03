@@ -8,6 +8,8 @@ import {errorMessage} from '../../lib/api-client';
 import {isDocItem, isExtractionCandidate} from '../../lib/api-validate';
 import type {DocItem, DocumentChunk, ExtractionCandidate} from '../../lib/api-types';
 import {ExtractionExplanationView} from '../../components/extraction-explanation';
+import {confidenceBand, confidenceLabel} from '../../features/documents/confidence';
+import type {ConfidenceBand} from '../../features/documents/confidence';
 import {EntityIdentity, identityFields} from '../../features/documents/entity-identity';
 import {IdentifierOwner} from '../../features/documents/identifier-owner';
 import {reviewOrderFrom} from '../../features/documents/ingestion-batch';
@@ -59,6 +61,8 @@ function renderChunkBody(chunk: DocumentChunk, active: {chunk_id?: string, paylo
 // An email or phone proposal asks whose it is (identifier-owner.tsx).
 
 const REVIEW_NOTE = 'Reviewed in bulk-import review queue';
+// Low waits for an answer (red); medium is proposed but marked (brass).
+const BAND_CLASS: Record<ConfidenceBand, string> = {high: '', medium: 'text-primary', low: 'text-destructive'};
 
 type DocState = {
   doc: DocItem;
@@ -286,7 +290,8 @@ function ReviewPageInner(): ReactElement {
                   onFocus={() => setActiveCandidateId(c.id)}
                   onBlur={() => setActiveCandidateId(cur => (cur === c.id ? null : cur))}
                 >
-                  <b>{c.candidate_type} proposal</b> <small>· {typeof c.confidence === 'number' ? `${Math.round(c.confidence * 100)}% confidence` : ''}</small>
+                  <b>{c.candidate_type} proposal</b> <small data-band={confidenceBand(c.confidence) ?? undefined}
+                    className={BAND_CLASS[confidenceBand(c.confidence) ?? 'high']}>· {confidenceLabel(c.confidence)}</small>
                   <div>{c.payload.caption || c.payload.text || c.payload.quote || ''}</div>
                   {c.payload.locator && <small>{c.payload.locator}</small>}
                   {c.explanation && <ExtractionExplanationView explanation={c.explanation} />}

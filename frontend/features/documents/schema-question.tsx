@@ -1,9 +1,11 @@
 'use client';
 // What kind of entity a proposed name is, asked before it can be accepted.
 // Two cases ask it:
-// - the Workbench's own pattern finder guessed Person or Organization at a
-//   confidence below 0.5: the reporter confirms the guess (pre-marked as
-//   suggested) or overrides it (the review queue's clarifying question);
+// - the Workbench's own pattern finder saw nothing in the text that says what
+//   kind of entity the name is (confidence below 0.5; backend
+//   app/services/entity_signals.py): the reporter confirms its guess
+//   (pre-marked as suggested) or picks another of the kinds it lists
+//   (payload.schema_choices: Person, Organization, Company, or "not sure");
 // - OpenAleph recorded the name without a kind (namesMentioned, ADR-0006):
 //   the proposal says so (payload.schema_question) and lists the choices,
 //   and nothing is suggested.
@@ -44,6 +46,7 @@ export function SchemaQuestion({candidate, answer, onAnswer}: Props): ReactEleme
   return <div className="rounded border border-accent/40 bg-accent/10 p-2 text-sm" data-testid={`clarify-${candidate.id}`}>
     <b>Clarifying question:</b>{' '}
     {open ? <>What kind of entity is &quot;{caption}&quot;? OpenAleph found the name but not what it is.</>
+      : choicesFor(candidate).length > 2 ? <>What kind of entity is &quot;{caption}&quot;? Nothing in the text says.</>
       : <>Is &quot;{caption}&quot; a Person or an Organization?</>}
     <div className="flex flex-wrap gap-2 mt-1">
       {choicesFor(candidate).map(choice => (

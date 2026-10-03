@@ -54,10 +54,12 @@ def test_extractor_records_rationale_on_new_payloads(env):
     claim = next(c for c in rows if c['candidate_type'] == 'claim')
     assert claim['payload']['rationale'] == {'rule': 'sentence_assertion', 'trigger': 'worked', 'length': len(claim['payload']['text'])}
     org = next(c for c in rows if c['candidate_type'] == 'entity' and c['payload']['caption'].startswith('Example Company'))
-    assert org['payload']['rationale']['schema_basis'] == 'organization_suffix'
-    assert org['payload']['rationale']['matched_suffix'] == 'Company'
+    assert org['payload']['rationale']['schema_basis'] == 'corporate_suffix'
+    assert org['payload']['rationale']['matched'] == 'Company'
+    assert (org['payload']['suggested_schema'], org['confidence']) == ('Company', 0.9)
     person = next(c for c in rows if c['candidate_type'] == 'entity' and c['payload']['caption'] == 'Alice Example')
-    assert person['payload']['rationale'] == {'rule': 'capitalized_name_sequence', 'schema_basis': 'no_organization_suffix', 'matched_suffix': None}
+    assert person['payload']['rationale'] == {'rule': 'capitalized_name_sequence', 'schema_basis': 'no_type_signal', 'confidence': 0.4}
+    assert person['payload']['schema_choices'] == ['Person', 'Organization', 'Company', 'LegalEntity']
     evidence = next(c for c in rows if c['candidate_type'] == 'evidence')
     assert evidence['payload']['rationale'] == {'rule': 'whole_chunk'}
 
@@ -87,10 +89,11 @@ def test_entity_explanation_separates_name_and_schema_reasoning(env):
     person = next(c for c in rows if c['candidate_type'] == 'entity' and c['payload']['caption'] == 'Alice Example')
     expl = _explain(client, person['id'])
     assert [p['id'] for p in expl['parts']] == ['caption', 'schema']
-    assert 'default, not evidence' in _part(expl, 'schema')['reasoning'][0]
+    assert 'Nothing in the text says what kind of entity this is' in _part(expl, 'schema')['reasoning'][0]
+    assert expl['confidence']['basis'].startswith('0.40: nothing in the text says')
     assert _part(expl, 'caption')['sources'][0]['excerpt']['match'] == 'Alice Example'
     org = next(c for c in rows if c['candidate_type'] == 'entity' and c['payload']['caption'].startswith('Example Company'))
-    assert 'organizational suffix “Company”' in _part(_explain(client, org['id']), 'schema')['reasoning'][0]
+    assert 'legal form “Company”' in _part(_explain(client, org['id']), 'schema')['reasoning'][0]
 
 
 def test_evidence_explanation_is_verbatim_whole_chunk(env):

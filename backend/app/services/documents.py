@@ -12,6 +12,7 @@ from app.services.security import contained_path, resolve_storage_root
 from app.services.resolution import candidate_entities
 from app.services.pdf_ocr import extract_pdf_chunks
 from app.services.document_reader import read_chunks
+from app.services.entity_signals import norm_name, read_name, read_passage, split_title
 from app.core.config import settings
 from app.db.locking import lock_investigation_transaction
 from app.jobs.corpus import request_corpus_sync
@@ -101,10 +102,15 @@ def extract_chunks(path: Path) -> tuple[list[dict], list[str]]:
     return rows, issues
 
 
-def _candidate_payloads(chunk: DocumentChunk, *, include_entities: bool = True) -> Iterable[tuple[str, dict, float]]:
+def _candidate_payloads(chunk: DocumentChunk, *, include_entities: bool = True,
+                        existing: dict[str, tuple[str, str]] | None = None) -> Iterable[tuple[str, dict, float]]:
+    """Proposals from one chunk. Each carries why its rule fired and how sure
+    the text lets it be (app/services/entity_signals.py); ``existing`` maps the
+    investigation's record names to (id, schema)."""
     text = chunk.text.strip()
     if not text: return
-    yield ('evidence', {'quote': text, 'locator': chunk.locator, 'span': {'start_char': 0, 'end_char': len(text)}, 'rationale': {'rule': 'whole_chunk'}}, 1.0)
+    passage_confidence, passage_rationale = read_passage(text)
+    yield ('evidence', {'quote': text, 'locator': chunk.locator, 'span': {'start_char': 0, 'end_char': len(text)}, 'rationale': passage_rationale}, passage_confidence)
     # Claims are suggestions only: sentence-like assertions long enough to be useful.
     # Each payload records *why* the rule fired (#190) so review can show it later
     # even if these rules change; see app/services/extraction_explanations.py.
@@ -119,14 +125,16 @@ def _candidate_payloads(chunk: DocumentChunk, *, include_entities: bool = True) 
         return
     seen=set()
     for match in NAME_RE.finditer(text):
-        caption = match.group(1).strip(' .,:;')
+        caption, title_chars = split_title(match.group(1).strip(' .,:;'))
+        start = match.start(1) + title_chars
         if len(caption) < 5 or caption in seen: continue
         seen.add(caption)
-        suffix = ORG_SUFFIX.search(caption)
-        schema = 'Organization' if suffix else 'Person'
-        rationale = {'rule': 'capitalized_name_sequence', 'schema_basis': 'organization_suffix' if suffix else 'no_organization_suffix',
-                     'matched_suffix': suffix.group(1) if suffix else None}
-        yield ('entity', {'caption': caption, 'suggested_schema': schema, 'span': {'start_char': match.start(1), 'end_char': match.end(1)}, 'rationale': rationale}, 0.40)
+        reading = read_name(caption, text[:start], existing)
+        payload = {'caption': caption, 'suggested_schema': reading.schema, 'span': {'start_char': start, 'end_char': start + len(caption)},
+                   'rationale': reading.rationale()}
+        if reading.choices:
+            payload['schema_choices'] = reading.choices
+        yield ('entity', payload, reading.confidence)
 
 
 def store_document(db: Session, *, investigation_id: str, title: str, filename: str, mime_type: str | None, data: bytes, storage_dir: Path,
@@ -222,6 +230,9 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
         raise ValueError('Document has already been read')
     doc.extraction_status = 'extracting'
     doc.extraction_error = None
+    # The investigation's records by name: a name it already holds is proposed as that record's kind.
+    existing = {norm_name(row.caption): (row.id, row.schema) for row in db.scalars(select(Entity).where(
+        Entity.investigation_id == doc.investigation_id, Entity.merged_into_entity_id.is_(None)))}
     try:
         chunks, issues = text if text is not None else read_chunks(Path(doc.storage_path))
         for ordinal, raw in enumerate(chunks, 1):
@@ -229,7 +240,8 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
             provenance = item.pop('provenance', None)
             chunk = DocumentChunk(document_id=doc.id, ordinal=ordinal, **item)
             db.add(chunk); db.flush()
-            for typ, payload, conf in _candidate_payloads(chunk, include_entities=find_names and settings.enable_local_entity_suggestions):
+            for typ, payload, conf in _candidate_payloads(chunk, include_entities=find_names and settings.enable_local_entity_suggestions,
+                                                          existing=existing):
                 if provenance:
                     payload = {**payload, 'provenance': provenance}
                 db.add(ExtractionCandidate(investigation_id=doc.investigation_id, document_id=doc.id, chunk_id=chunk.id, candidate_type=typ, payload=payload, confidence=conf))
