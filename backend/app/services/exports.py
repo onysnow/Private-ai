@@ -184,12 +184,15 @@ def _lineage_integrity(records: dict[str, list[dict[str, Any]]]) -> dict[str, An
         # An accepted email or phone proposal made a statement on the entity
         # the reporter chose (identifier_proposals.py, ADR-0006).
         "statement": {row.get("id") for row in records.get("statements", [])},
+        # An accepted relationship proposal made a relationship edge
+        # (documents.py review_candidate, create_relationship).
+        "relationship": {row.get("id") for row in records.get("relationship_edges", [])},
     }
 
     counts = {"proposed": 0, "accepted": 0, "rejected": 0, "other": 0}
-    # "statement" is counted only when present, so a backup made before
-    # identifier proposals existed still matches the lineage its manifest
-    # declares (the restore compares the two dicts whole).
+    # "statement" and "relationship" are counted only when present, so a
+    # backup made before they could be accepted still matches the lineage its
+    # manifest declares (the restore compares the two dicts whole).
     accepted_by_type = {"entity": 0, "claim": 0, "evidence": 0}
     errors: list[str] = []
 
