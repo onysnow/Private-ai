@@ -71,6 +71,23 @@ def _run(label: str, cmd: list[str], cwd: Path, env: dict[str, str] | None = Non
     print(f"--- passed: {label} ({elapsed:.0f}s)")
 
 
+_render_installed = False
+
+
+def _install_render_packages() -> None:
+    """The render service's packages from its lock file, as render-ci installs them.
+    The backend's live render tests start render/server.mjs, so a
+    node_modules left from an older lock file would fail them for the wrong
+    reason (a package the service now imports is missing). Without npm the
+    live tests skip themselves."""
+    global _render_installed
+    npm = shutil.which("npm") or shutil.which("npm.cmd")
+    if npm is None or _render_installed:
+        return
+    _run("render: npm ci", [npm, "ci", "--no-audit", "--no-fund"], RENDER)
+    _render_installed = True
+
+
 def backend_checks(*, fast: bool = False) -> None:
     python = _venv_python()
     _warn_on_version_drift(python)
@@ -83,6 +100,7 @@ def backend_checks(*, fast: bool = False) -> None:
     if fast:
         return
     _run("backend: API schema up to date", [python, str(ROOT / "tools" / "export_openapi.py"), "--check"], ROOT, env)
+    _install_render_packages()
     _run("backend: pytest (SQLite)", [python, "-m", "pytest", "-q", "-p", "no:warnings"], BACKEND, env)
     if env.get("POSTGRES_TEST_URL"):
         _run("backend: pytest (PostgreSQL gate)", [python, "run_postgres_gate.py"], BACKEND, env)
@@ -103,7 +121,7 @@ def frontend_checks() -> None:
         _run(f"frontend: npm run {script}", [npm, "run", script], FRONTEND)
     # The render service's own tests (CI: render-ci.yml), with its packages
     # installed from its lock file first, as CI does.
-    _run("render: npm ci", [npm, "ci", "--no-audit", "--no-fund"], RENDER)
+    _install_render_packages()
     _run("render: npm test", [npm, "test"], RENDER)
 
 
