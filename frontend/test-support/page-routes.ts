@@ -14,7 +14,7 @@
 //   const api = mockApi(pageRoutes({investigations: [investigation], leads: [leadFixture()]}));
 //   api.add({'POST /api/leads': {id: 'lead-2'}});           // a route the test's action needs
 //   api.add({...investigationRoutes('inv-restored')});       // a case opened later
-import type {CorpusSearchOut, CorpusStatusOut, DocumentFormatsOut, DossierExternalOut, DossierSummaryOut, InvestigationOut, OwnershipChainOut, PostMergeReconciliationOut} from '../lib/generated/types.gen';
+import type {BasemapStatusOut, CorpusSearchOut, CorpusStatusOut, DocumentFormatsOut, DossierExternalOut, DossierSummaryOut, InvestigationOut, OwnershipChainOut, PostMergeReconciliationOut} from '../lib/generated/types.gen';
 import type {Routes} from './mock-api';
 
 /** A reply as a test writes it: the generated shape, with whatever a test overrides. */
@@ -320,7 +320,21 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/cross-references`]: [],
     [`GET ${base}/watchlist`]: watchlistBody(id),
     [`GET ${base}/corpus/entity-sets`]: [],
+    [`GET ${base}/places`]: placesBody(id),
   };
+}
+
+/** The places reply (GET /api/investigations/{id}/places): none by default. */
+export function placesBody(id: string, places: unknown[] = [], omitted: unknown[] = []): {investigation_id: string; places: unknown[]; omitted: unknown[]} {
+  return {investigation_id: id, places, omitted};
+}
+
+/** The base map's status (GET /api/basemap): not installed, unless given. */
+export function basemapStatusBody(available = false): BasemapStatusOut {
+  return available
+    ? {available: true, min_zoom: 0, max_zoom: 6, bounds: [-180, -85.0511287, 180, 85.0511287], version: '4.15.2', built: '2026-10-03T04:00:00Z',
+      attribution: '© OpenStreetMap', fonts: ['Noto Sans Medium']}
+    : {available: false, reason: 'no base map at /data/basemap/world.pmtiles', fonts: []};
 }
 
 export type PageRoutesOptions = InvestigationRecords & {
@@ -339,6 +353,7 @@ export function pageRoutes(options: PageRoutesOptions = {}): Routes {
     'GET /api/investigations': investigations.map(investigationRecord),
     'GET /api/document-formats': documentFormatsBody(),
     'GET /api/connectors': {providers, status: Object.fromEntries(providers.map(p => [p, {configured: true}]))},
+    'GET /api/basemap': basemapStatusBody(),
   };
   for (const investigation of investigations) Object.assign(routes, investigationRoutes(investigation.id, records));
   return routes;

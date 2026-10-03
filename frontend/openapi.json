@@ -18115,6 +18115,35 @@
         "title": "OcrRuntimeStatusOut",
         "type": "object"
       },
+      "OmittedPlaceOut": {
+        "description": "A record with coordinates that cannot be used, and why.",
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id",
+          "caption",
+          "schema",
+          "reason"
+        ],
+        "title": "OmittedPlaceOut",
+        "type": "object"
+      },
       "OpenAlephBindingOut": {
         "properties": {
           "collection_id": {
@@ -19117,6 +19146,143 @@
           "direct"
         ],
         "title": "OwnershipChainOwnerOut",
+        "type": "object"
+      },
+      "PlaceLinkOut": {
+        "description": "A record linked to a place, and the relationship that links them.",
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "direction": {
+            "enum": [
+              "outgoing",
+              "incoming"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "entity_schema": {
+            "title": "Entity Schema",
+            "type": "string"
+          },
+          "relationship_id": {
+            "title": "Relationship Id",
+            "type": "string"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "relationship_id",
+          "schema",
+          "direction",
+          "entity_id",
+          "caption",
+          "entity_schema"
+        ],
+        "title": "PlaceLinkOut",
+        "type": "object"
+      },
+      "PlaceOut": {
+        "description": "A record that says where it is: its coordinates as recorded.",
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "latitude": {
+            "title": "Latitude",
+            "type": "number"
+          },
+          "links": {
+            "items": {
+              "$ref": "#/components/schemas/PlaceLinkOut"
+            },
+            "title": "Links",
+            "type": "array"
+          },
+          "longitude": {
+            "title": "Longitude",
+            "type": "number"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id",
+          "caption",
+          "schema",
+          "latitude",
+          "longitude",
+          "links"
+        ],
+        "title": "PlaceOut",
+        "type": "object"
+      },
+      "PlacesOut": {
+        "description": "The investigation's places (app/services/places.py).",
+        "properties": {
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "omitted": {
+            "items": {
+              "$ref": "#/components/schemas/OmittedPlaceOut"
+            },
+            "title": "Omitted",
+            "type": "array"
+          },
+          "places": {
+            "items": {
+              "$ref": "#/components/schemas/PlaceOut"
+            },
+            "title": "Places",
+            "type": "array"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "places",
+          "omitted"
+        ],
+        "title": "PlacesOut",
         "type": "object"
       },
       "PlanIn": {
@@ -40010,6 +40176,56 @@
           }
         },
         "summary": "Lead Queue"
+      }
+    },
+    "/api/investigations/{investigation_id}/places": {
+      "get": {
+        "description": "Every record with a latitude and a longitude, what is linked to it, and the records whose coordinates cannot be used, with why.",
+        "operationId": "get_investigation_places",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlacesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Investigation Places"
       }
     },
     "/api/investigations/{investigation_id}/relationships": {

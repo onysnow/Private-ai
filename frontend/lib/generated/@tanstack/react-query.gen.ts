@@ -88,6 +88,7 @@ import {
   getIngestionBatch,
   getInvestigationFinancialFlows,
   getInvestigationGraph,
+  getInvestigationPlaces,
   getInvestigationTimeline,
   getJobEndpoint,
   getLead,
@@ -438,6 +439,9 @@ import type {
   GetInvestigationGraphData,
   GetInvestigationGraphError,
   GetInvestigationGraphResponse,
+  GetInvestigationPlacesData,
+  GetInvestigationPlacesError,
+  GetInvestigationPlacesResponse,
   GetInvestigationTimelineData,
   GetInvestigationTimelineError,
   GetInvestigationTimelineResponse,
@@ -4938,6 +4942,36 @@ export const leadQueueInfiniteOptions = (options: Options<LeadQueueData>) => {
   );
   return opts as Omit<typeof opts, 'initialData'>;
 };
+
+export const getInvestigationPlacesQueryKey = (
+  options: Options<GetInvestigationPlacesData>,
+) => createQueryKey('getInvestigationPlaces', options);
+
+/**
+ * Get Investigation Places
+ *
+ * Every record with a latitude and a longitude, what is linked to it, and the records whose coordinates cannot be used, with why.
+ */
+export const getInvestigationPlacesOptions = (
+  options: Options<GetInvestigationPlacesData>,
+) =>
+  queryOptions<
+    GetInvestigationPlacesResponse,
+    GetInvestigationPlacesError,
+    GetInvestigationPlacesResponse,
+    ReturnType<typeof getInvestigationPlacesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getInvestigationPlaces({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getInvestigationPlacesQueryKey(options),
+  });
 
 export const listInvestigationRelationshipsQueryKey = (
   options: Options<ListInvestigationRelationshipsData>,

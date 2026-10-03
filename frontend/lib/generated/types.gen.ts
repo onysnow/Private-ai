@@ -8143,6 +8143,30 @@ export type OcrRuntimeStatusOut = {
 };
 
 /**
+ * OmittedPlaceOut
+ *
+ * A record with coordinates that cannot be used, and why.
+ */
+export type OmittedPlaceOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Reason
+   */
+  reason: string;
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
  * OpenAlephBindingOut
  */
 export type OpenAlephBindingOut = {
@@ -8792,6 +8816,98 @@ export type OwnershipChainOwnerOut = {
    * Paths
    */
   paths: number;
+};
+
+/**
+ * PlaceLinkOut
+ *
+ * A record linked to a place, and the relationship that links them.
+ */
+export type PlaceLinkOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Direction
+   */
+  direction: 'outgoing' | 'incoming';
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Entity Schema
+   */
+  entity_schema: string;
+  /**
+   * Relationship Id
+   */
+  relationship_id: string;
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
+ * PlaceOut
+ *
+ * A record that says where it is: its coordinates as recorded.
+ */
+export type PlaceOut = {
+  /**
+   * Address
+   */
+  address?: string | null;
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Country
+   */
+  country?: string | null;
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Latitude
+   */
+  latitude: number;
+  /**
+   * Links
+   */
+  links: Array<PlaceLinkOut>;
+  /**
+   * Longitude
+   */
+  longitude: number;
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
+ * PlacesOut
+ *
+ * The investigation's places (app/services/places.py).
+ */
+export type PlacesOut = {
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Omitted
+   */
+  omitted: Array<OmittedPlaceOut>;
+  /**
+   * Places
+   */
+  places: Array<PlaceOut>;
 };
 
 /**
@@ -17266,6 +17382,42 @@ export type LeadQueueResponses = {
 };
 
 export type LeadQueueResponse = LeadQueueResponses[keyof LeadQueueResponses];
+
+export type GetInvestigationPlacesData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/places';
+};
+
+export type GetInvestigationPlacesErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetInvestigationPlacesError =
+  GetInvestigationPlacesErrors[keyof GetInvestigationPlacesErrors];
+
+export type GetInvestigationPlacesResponses = {
+  /**
+   * Successful Response
+   */
+  200: PlacesOut;
+};
+
+export type GetInvestigationPlacesResponse =
+  GetInvestigationPlacesResponses[keyof GetInvestigationPlacesResponses];
 
 export type ListInvestigationRelationshipsData = {
   body?: never;

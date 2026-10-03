@@ -24,6 +24,7 @@ import {CorpusPanel} from '../features/corpus/corpus-panel';
 import {DeletionPanel} from '../features/deletion/deletion-panel';
 import {DocumentsPanel} from '../features/documents/documents-panel';
 import {LeadsPanel} from '../features/leads/leads-panel';
+import {PlacesPanel} from '../features/places/places-panel';
 import {ProvenancePanel} from '../features/provenance/provenance-panel';
 import {withEnds} from '../features/relationship-graph/graph';
 import {RelationshipGraphPanel} from '../features/relationship-graph/relationship-graph-panel';
@@ -159,6 +160,7 @@ function Workbench(): ReactElement {
         {access.settingsStatus && <PanelErrorBoundary name="Local security/settings status"><SecurityPanel settingsStatus={access.settingsStatus} providers={providers}/></PanelErrorBoundary>}
       </BackupPanel></PanelErrorBoundary>
       <PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary>
+      <PanelErrorBoundary name="Places"><PlacesPanel investigationId={inv}/></PanelErrorBoundary>
     </div></div>
 
     <div className="section-group"><h4 className="group-label">Document workflow</h4><div className="section-stack">

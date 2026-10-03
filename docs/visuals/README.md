@@ -505,6 +505,36 @@ beside it, the owners as a table.
   `frontend/tests/test-ownership-chain.test.tsx` (React Flow stubbed: jsdom
   does not lay out the page).
 
+## Pass 5: maps (so far: the base map and the places)
+
+ADR-0005 line 18 holds the decisions and the numbers behind them.
+
+- **The base map** is ours: a world extract of the Protomaps build (45 MB to
+  zoom 6) with Protomaps' fonts and sprites, installed once by the compose
+  profile `maps` and served by the backend under `/api/basemap`
+  (`backend/app/services/basemap.py`; the `pmtiles` package reads the file).
+  The app draws it with MapLibre GL JS in Protomaps' grayscale flavor, so the
+  data carries the only colour; every tile, font and sprite request goes
+  through the app's API client (the `workbench` protocol,
+  `frontend/lib/basemap-style.ts`), so no other host is asked. Checked in
+  Chromium (SwiftShader WebGL) against the real extract: the page asked
+  only its own server. MapLibre 6's worker imports a shared module from
+  beside itself, so both are copied from the installed package into
+  `public/maplibre/` before every build (`frontend/scripts/copy-maplibre-worker.mjs`).
+- **Places** (`backend/app/services/places.py`, the "Places" panel beside the
+  timeline): every record with a latitude and a longitude (FollowTheMoney
+  gives them to Address and RealEstate), what is linked to it by a
+  relationship, and the records whose coordinates cannot be used, with why
+  (half a pair, not a number, off the globe, two values recorded). Nothing
+  is geocoded. Each place is a dot named beside it, in a dark brick red that
+  stands 3.3:1 against the base map's water and 5.2:1 against its land
+  (WCAG 1.4.11), with a white ring; the list under the map names every place
+  in words and works without a base map. Clicking a place opens its record.
+- Tests: `backend/tests/test_basemap.py`, `test_places.py`,
+  `frontend/tests/test-places.test.tsx` (MapLibre faked: jsdom has no WebGL).
+- Still to come: maps in decks and briefs (the render service with
+  MapLibre Native), the map linked to the timeline, and shaded maps (rule 17).
+
 ## What pass 3 built, and what is left
 
 Built: the drawing of the seven statistical kinds, the two queries they

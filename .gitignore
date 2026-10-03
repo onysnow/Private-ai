@@ -24,6 +24,8 @@ backend/.coverage
 frontend/node_modules/
 frontend/.next/
 frontend/out/
+# The MapLibre worker, copied from node_modules before each build (frontend/scripts/copy-maplibre-worker.mjs).
+frontend/public/maplibre/
 node_modules/
 .next/
 frontend/tsconfig.tsbuildinfo

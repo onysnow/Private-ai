@@ -249,6 +249,9 @@ import type {
   GetInvestigationGraphData,
   GetInvestigationGraphErrors,
   GetInvestigationGraphResponses,
+  GetInvestigationPlacesData,
+  GetInvestigationPlacesErrors,
+  GetInvestigationPlacesResponses,
   GetInvestigationTimelineData,
   GetInvestigationTimelineErrors,
   GetInvestigationTimelineResponses,
@@ -756,6 +759,8 @@ import {
   zGetInvestigationGraphPath,
   zGetInvestigationGraphQuery,
   zGetInvestigationGraphResponse,
+  zGetInvestigationPlacesPath,
+  zGetInvestigationPlacesResponse,
   zGetInvestigationTimelinePath,
   zGetInvestigationTimelineQuery,
   zGetInvestigationTimelineResponse,
@@ -4969,6 +4974,37 @@ export const leadQueue = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zLeadQueueResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/leads/queue',
+    ...options,
+  });
+
+/**
+ * Get Investigation Places
+ *
+ * Every record with a latitude and a longitude, what is linked to it, and the records whose coordinates cannot be used, with why.
+ */
+export const getInvestigationPlaces = <ThrowOnError extends boolean = false>(
+  options: Options<GetInvestigationPlacesData, ThrowOnError>,
+): RequestResult<
+  GetInvestigationPlacesResponses,
+  GetInvestigationPlacesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetInvestigationPlacesResponses,
+    GetInvestigationPlacesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetInvestigationPlacesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetInvestigationPlacesResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/places',
     ...options,
   });
 

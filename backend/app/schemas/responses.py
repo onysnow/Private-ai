@@ -3387,6 +3387,49 @@ class BasemapStatusOut(ResponseModel):
     fonts: list[str]
 
 
+class PlaceLinkOut(ResponseModel):
+    """A record linked to a place, and the relationship that links them."""
+    relationship_id: str
+    schema_: str = Field(alias="schema")
+    direction: Literal["outgoing", "incoming"]
+    entity_id: str
+    caption: str
+    entity_schema: str
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class PlaceOut(ResponseModel):
+    """A record that says where it is: its coordinates as recorded."""
+    entity_id: str
+    caption: str
+    schema_: str = Field(alias="schema")
+    latitude: float
+    longitude: float
+    address: str | None = None
+    country: str | None = None
+    links: list[PlaceLinkOut]
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class OmittedPlaceOut(ResponseModel):
+    """A record with coordinates that cannot be used, and why."""
+    entity_id: str
+    caption: str
+    schema_: str = Field(alias="schema")
+    reason: str
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class PlacesOut(ResponseModel):
+    """The investigation's places (app/services/places.py)."""
+    investigation_id: str
+    places: list[PlaceOut]
+    omitted: list[OmittedPlaceOut]
+
+
 class TableRowOut(ResponseModel):
     """A spreadsheet row: its number in the sheet (the header is row 1) and its cells by column."""
     number: int

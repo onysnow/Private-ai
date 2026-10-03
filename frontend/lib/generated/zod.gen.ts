@@ -3280,6 +3280,18 @@ export const zDocumentExtractionSettingsOut = z.object({
 });
 
 /**
+ * OmittedPlaceOut
+ *
+ * A record with coordinates that cannot be used, and why.
+ */
+export const zOmittedPlaceOut = z.object({
+  caption: z.string(),
+  entity_id: z.string(),
+  reason: z.string(),
+  schema: z.string(),
+});
+
+/**
  * OpenAlephBindingOut
  */
 export const zOpenAlephBindingOut = z.object({
@@ -3619,6 +3631,47 @@ export const zOwnershipChainOut = z.object({
   nodes: z.array(zOwnershipChainNodeOut),
   owners: z.array(zOwnershipChainOwnerOut),
   truncated: z.boolean(),
+});
+
+/**
+ * PlaceLinkOut
+ *
+ * A record linked to a place, and the relationship that links them.
+ */
+export const zPlaceLinkOut = z.object({
+  caption: z.string(),
+  direction: z.enum(['outgoing', 'incoming']),
+  entity_id: z.string(),
+  entity_schema: z.string(),
+  relationship_id: z.string(),
+  schema: z.string(),
+});
+
+/**
+ * PlaceOut
+ *
+ * A record that says where it is: its coordinates as recorded.
+ */
+export const zPlaceOut = z.object({
+  address: z.string().nullish(),
+  caption: z.string(),
+  country: z.string().nullish(),
+  entity_id: z.string(),
+  latitude: z.number(),
+  links: z.array(zPlaceLinkOut),
+  longitude: z.number(),
+  schema: z.string(),
+});
+
+/**
+ * PlacesOut
+ *
+ * The investigation's places (app/services/places.py).
+ */
+export const zPlacesOut = z.object({
+  investigation_id: z.string(),
+  omitted: z.array(zOmittedPlaceOut),
+  places: z.array(zPlaceOut),
 });
 
 /**
@@ -7211,6 +7264,15 @@ export const zLeadQueueQuery = z.object({
  * Successful Response
  */
 export const zLeadQueueResponse = zLeadQueueOut;
+
+export const zGetInvestigationPlacesPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetInvestigationPlacesResponse = zPlacesOut;
 
 export const zListInvestigationRelationshipsPath = z.object({
   investigation_id: z.string(),
