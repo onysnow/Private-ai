@@ -14,9 +14,11 @@ import type {ChangeEvent,ReactElement} from 'react';
 import type {AiAnalysisCandidate,AiAnalysisCandidateSummary,AiModuleName,AiReasoningStatus,BackgroundJob,DeckStyle,JsonObject,JsonValue,PresentationStyleCatalog,VisualStyle} from '../lib/api-types';
 import {ApiPayloadError,isAiAnalysisCandidate,isAiAnalysisCandidateReview,isAiReasoningRunResult,isBackgroundJob,isDeck,isPresentationStyleCatalog,isWriteup,parseAiAnalysisCandidateList} from '../lib/api-validate';
 import {ApiClient,ApiHttpError,errorMessage} from '../lib/api-client';
-import {checkedReply} from '../lib/api-generated';
 import type {ChartRestyleOut} from '../lib/generated/types.gen';
-import {zChartRestyleOut} from '../lib/generated/zod.gen';
+import {getAiAnalysisCandidateEndpoint,investigationVisualRestyle,listInvestigationAiAnalysisCandidates,presentationStyles,
+  promoteAiAnalysisCandidateToDeckEndpoint,promoteAiAnalysisCandidateToWriteupEndpoint,reviewAiAnalysisCandidateEndpoint} from '../lib/generated/sdk.gen';
+import type {ChartRestyleRequest} from '../lib/generated/types.gen';
+import {narrowed} from '../lib/narrow';
 import {describeJob,waitForJob} from '../lib/jobs';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
@@ -135,11 +137,11 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
   const loadQueue=useCallback(async()=>{
     if(!investigationId){setQueue([]);return}
     try{
-      const params=filter==='all'?'':`?review_status=${filter}`;
-      setQueue(await api.parsed(`/api/investigations/${investigationId}/ai-analysis-candidates${params}`,parseAiAnalysisCandidateList));
+      const listed=(await listInvestigationAiAnalysisCandidates({path:{investigation_id:investigationId},query:filter==='all'?{}:{review_status:filter},throwOnError:true})).data;
+      setQueue(parseAiAnalysisCandidateList(listed,'/api/investigations/{investigation_id}/ai-analysis-candidates'));
       setQueueStatus('');
     }catch(error){setQueue([]);setQueueStatus(errorMessage(error,'Could not load the AI review queue'))}
-  },[api,investigationId,filter]);
+  },[investigationId,filter]);
 
   useEffect(()=>{setSelected(null);setNote('');setReviewStatus('');setPromoteStatus('');setPromoted(null);void loadQueue()},[loadQueue]);
 
@@ -147,10 +149,11 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
   useEffect(()=>{
     if(selected?.module!=='presentation_draft'||catalogRequested.current)return;
     catalogRequested.current=true;
-    api.object('/api/presentation-styles','presentation styles',isPresentationStyleCatalog)
+    presentationStyles({throwOnError:true})
+      .then(({data})=>narrowed(data,isPresentationStyleCatalog,'/api/presentation-styles','presentation styles'))
       .then(catalog=>{setStyleCatalog(catalog);setDeckStyle(catalog.defaults)})
       .catch(()=>{catalogRequested.current=false}); // the preview still works in the default look
-  },[api,selected]);
+  },[selected]);
 
   // Every chart is asked for again when its style or the deck's theme
   // changes; the reply shows on the slide and in the style panel, with its
@@ -168,8 +171,8 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
       if(lookKeys.current[section]===key)return;
       lookKeys.current[section]=key;
       const latest=()=>lookKeys.current[section]===key;
-      api.parsed(`/api/investigations/${investigationId}/visuals/restyle`,checkedReply(zChartRestyleOut),{method:'POST',body:{chart,style,deck_style:deckStyle}})
-        .then(look=>{
+      investigationVisualRestyle({path:{investigation_id:investigationId},body:{chart,style,deck_style:deckStyle} as ChartRestyleRequest,throwOnError:true})
+        .then(({data:look})=>{
           if(!latest())return;
           setChartLooks(prev=>({...prev,[section]:look}));
           setChartProblems(prev=>Object.fromEntries(Object.entries(prev).filter(([k])=>k!==section)));
@@ -179,12 +182,15 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
           if(latest())setChartProblems(prev=>({...prev,[section]:error instanceof ApiHttpError?error.detail:errorMessage(error,'Could not draw this chart in that style')}));
         });
     });
-  },[api,investigationId,selected,styleCatalog,deckStyle,visualStyles]);
+  },[investigationId,selected,styleCatalog,deckStyle,visualStyles]);
 
   const open=async(id:string)=>{
     setPromoteStatus('');setPromoted(null);setPromoteTitle('');
     if(selected?.id!==id){setVisualStyles({});setChartLooks({});setChartProblems({});lookKeys.current={}}
-    try{setSelected(await api.object(`/api/ai-analysis-candidates/${id}`,'AI analysis candidate',isAiAnalysisCandidate))}
+    try{
+      const candidate=(await getAiAnalysisCandidateEndpoint({path:{candidate_id:id},throwOnError:true})).data;
+      setSelected(narrowed(candidate,isAiAnalysisCandidate,'/api/ai-analysis-candidates/{candidate_id}','AI analysis candidate'));
+    }
     catch(error){setSelected(null);setReviewStatus(errorMessage(error,'Could not load the candidate'))}
   };
 
@@ -238,7 +244,8 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
   const review=async(decision:'accept'|'reject')=>{
     if(!selected)return;
     try{
-      const result=await api.object(`/api/ai-analysis-candidates/${selected.id}/review`,'candidate review',isAiAnalysisCandidateReview,{method:'POST',body:{decision,note:note.trim()||null}});
+      const reply=(await reviewAiAnalysisCandidateEndpoint({path:{candidate_id:selected.id},body:{decision,note:note.trim()||null},throwOnError:true})).data;
+      const result=narrowed(reply,isAiAnalysisCandidateReview,'/api/ai-analysis-candidates/{candidate_id}/review','candidate review');
       setReviewStatus(`Recorded: ${result.review_status}.`);
       await loadQueue();
       await open(selected.id);
@@ -249,15 +256,17 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
     if(!selected)return;
     setPromoteStatus('Promoting…');
     try{
-      const path=kind==='writeup'?'promote-to-writeup':'promote-to-deck';
       const body=promoteTitle.trim()?{title:promoteTitle.trim()}:{};
+      const path={candidate_id:selected.id};
       if(kind==='writeup'){
-        const row=await api.object(`/api/ai-analysis-candidates/${selected.id}/${path}`,'write-up',isWriteup,{method:'POST',body});
+        const made=(await promoteAiAnalysisCandidateToWriteupEndpoint({path,body,throwOnError:true})).data;
+        const row=narrowed(made,isWriteup,'/api/ai-analysis-candidates/{candidate_id}/promote-to-writeup','write-up');
         setPromoteStatus(`Promoted to write-up "${row.title}" (${row.word_count} word(s), status ${row.status}).`);
         setPromoted({kind:'writeup',id:row.id,title:row.title});
       }else{
         const styled={...(styleCatalog?{...body,style:deckStyle,visual_styles:visualStyles}:body),deck_kind:deckKind};
-        const row=await api.object(`/api/ai-analysis-candidates/${selected.id}/${path}`,'deck',isDeck,{method:'POST',body:styled});
+        const made=(await promoteAiAnalysisCandidateToDeckEndpoint({path,body:styled,throwOnError:true})).data;
+        const row=narrowed(made,isDeck,'/api/ai-analysis-candidates/{candidate_id}/promote-to-deck','deck');
         setPromoteStatus(`Promoted to deck "${row.title}" (${row.slide_count} slide(s)).`);
         setPromoted({kind:'deck',id:row.id,title:row.title});
       }

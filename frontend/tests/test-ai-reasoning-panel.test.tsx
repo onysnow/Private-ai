@@ -5,12 +5,15 @@
 // rest of app/page.tsx, and without any real model call.
 import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {afterEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {AiReasoningPanel, WritingReport, describeAiStatus} from '../components/ai-reasoning-panel';
 import {ApiClient} from '../lib/api-client';
+import {connectGeneratedClient} from '../lib/api-generated';
 import type {AiReasoningStatus} from '../lib/api-types';
 
+// The panel's plain calls are generated ones (lib/generated), sent through the app's API client.
+beforeEach(() => { connectGeneratedClient(new ApiClient('http://api.test')); });
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
@@ -44,6 +47,7 @@ const summary = (overrides: Record<string, unknown> = {}) => ({
   created_at: '2026-09-21T22:00:00',
   reviewed_at: null,
   checked_citation_count: 1,
+  rejection_reason: null,
   ...overrides,
 });
 
@@ -74,6 +78,11 @@ function jsonResponse(body: unknown, status = 200): Response {
 }
 
 const requestUrl = (call: unknown[]): string => String(call[0]);
+// A request's JSON body: text from a hand-written call, bytes from a generated one (ApiClient.fetchForGenerated passes them on).
+async function sentBody(call: unknown[]): Promise<unknown> {
+  const body = (call[1] as RequestInit | undefined)?.body;
+  return JSON.parse(body instanceof Blob || (typeof body === 'object' && body !== null && 'text' in body) ? await (body as Blob).text() : String(body));
+}
 const requestMethod = (call: unknown[]): string => ((call[1] as RequestInit | undefined)?.method ?? 'GET');
 
 describe('describeAiStatus', () => {
@@ -164,7 +173,7 @@ describe('AiReasoningPanel', () => {
     const runCall = fetchMock.mock.calls[1];
     expect(requestUrl(runCall)).toBe('http://api.test/api/investigations/inv-1/assistant/case-synthesis');
     expect(requestMethod(runCall)).toBe('POST');
-    expect(JSON.parse(String((runCall[1] as RequestInit).body))).toEqual({question: 'What did Ada North sign?', max_results: 30, include_external_leads: true});
+    expect(await sentBody(runCall)).toEqual({question: 'What did Ada North sign?', max_results: 30, include_external_leads: true});
 
     await user.type(screen.getByLabelText('Reviewer note'), 'Looks right.');
     await user.click(screen.getByRole('button', {name: 'Accept as trusted analysis'}));
@@ -172,7 +181,7 @@ describe('AiReasoningPanel', () => {
     await waitFor(() => expect(screen.getByTestId('ai-review-status')).toHaveTextContent('Recorded: accepted.'));
     const reviewCall = fetchMock.mock.calls[4];
     expect(requestUrl(reviewCall)).toBe('http://api.test/api/ai-analysis-candidates/cand-1/review');
-    expect(JSON.parse(String((reviewCall[1] as RequestInit).body))).toEqual({decision: 'accept', note: 'Looks right.'});
+    expect(await sentBody(reviewCall)).toEqual({decision: 'accept', note: 'Looks right.'});
     // Once reviewed, the accept/reject controls are gone.
     expect(screen.queryByRole('button', {name: 'Accept as trusted analysis'})).not.toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledTimes(7);
@@ -278,7 +287,7 @@ describe('AiReasoningPanel', () => {
     const detail = await screen.findByTestId('ai-candidate-detail');
     const runCall = fetchMock.mock.calls[1];
     expect(requestUrl(runCall)).toBe('http://api.test/api/investigations/inv-1/assistant/hypothesis-test');
-    expect(JSON.parse(String((runCall[1] as RequestInit).body))).toEqual({question: 'Did Ada act alone?', max_results: 30, include_external_leads: true, working_theory: 'Ada acted alone.'});
+    expect(await sentBody(runCall)).toEqual({question: 'Did Ada act alone?', max_results: 30, include_external_leads: true, working_theory: 'Ada acted alone.'});
     expect(within(detail).getByText('HYP-0001')).toBeInTheDocument();
     expect(within(detail).getAllByText(/A co-signature on the filing/).length).toBeGreaterThan(0); // rendered falsifier (+ the raw-payload <pre>)
     expect(within(detail).getAllByText(/HYP-0001 remains viable/).length).toBeGreaterThan(0);
@@ -304,7 +313,9 @@ describe('AiReasoningPanel', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1); // only the initial queue load; nothing ran
   });
 
-  const theme = (id: string, label: string) => ({id, label, description: '', cover_bg: '111111', cover_line: '333333', cover_text: 'FFFFFF', cover_muted: 'BDBDBD', cover_accent: 'FF5A6E', accent: 'C8102E', accent_text: 'A30D25', alert: '8B0A1E', page: 'FFFFFF', panel: 'F2F2F2', rule: 'D6D6D6', text: '111111', muted: '5E5E5E', bar_muted: 'C9C9C9', heading_font: 'Source Serif 4', body_font: 'Source Sans 3'});
+  const theme = (id: string, label: string) => ({id, label, description: '', cover_bg: '111111', cover_line: '333333', cover_text: 'FFFFFF', cover_muted: 'BDBDBD', cover_accent: 'FF5A6E', accent: 'C8102E', accent_text: 'A30D25', alert: '8B0A1E', page: 'FFFFFF', panel: 'F2F2F2', rule: 'D6D6D6', text: '111111', muted: '5E5E5E', bar_muted: 'C9C9C9', heading_font: 'Source Serif 4', body_font: 'Source Sans 3',
+    // The Okabe-Ito colours every theme carries for parts of a whole (backend CATEGORICAL_PALETTE).
+    palette: ['0072B2', 'D55E00', '009E73', 'CC79A7', '56B4E9', 'E69F00', 'F0E442']});
   const styleCatalog = {
     defaults: {theme: 'dark_academia', fonts: 'theme'},
     themes: [theme('dark_academia', 'Dark Academia'), theme('newsprint', 'Newsprint')],
@@ -318,6 +329,8 @@ describe('AiReasoningPanel', () => {
       ],
     },
     visual_options: {bar: {}, timeline: {}, figures: {card_fill: {type: 'bool', label: 'Card background'}}},
+    // Checked charts' families, presets and options: this draft has no chart to restyle.
+    chart_families: {}, chart_presets: {}, chart_options: {},
   };
 
   it('runs a presentation draft from picked evidence, previews it as slides and a brief, accepts it, and promotes it to a write-up and a deck', async () => {
@@ -362,8 +375,10 @@ describe('AiReasoningPanel', () => {
       .mockResolvedValueOnce(jsonResponse({id: 'cand-9', module: 'presentation_draft', review_status: 'accepted', reviewer_note: null, reviewed_at: '2026-09-30T12:00:00'})) // POST review
       .mockResolvedValueOnce(jsonResponse({candidates: [draftSummary({review_status: 'accepted'})]})) // queue reload
       .mockResolvedValueOnce(jsonResponse(draftDetail({review_status: 'accepted', reviewed_at: '2026-09-30T12:00:00'}))) // GET candidate
-      .mockResolvedValueOnce(jsonResponse({id: 'wu-1', investigation_id: 'inv-1', title: 'The Bellcastle consulting fee', status: 'draft', cited_record_refs: [{record_type: 'claim', record_id: 'claim-1'}], created_at: '2026-09-30T12:01:00', updated_at: '2026-09-30T12:01:00', word_count: 42})) // POST promote-to-writeup
-      .mockResolvedValueOnce(jsonResponse({id: 'dk-1', investigation_id: 'inv-1', title: 'The Bellcastle consulting fee', slides: deckPreview, slide_count: 4, created_at: '2026-09-30T12:02:00', updated_at: '2026-09-30T12:02:00'})); // POST promote-to-deck
+      .mockResolvedValueOnce(jsonResponse({id: 'wu-1', investigation_id: 'inv-1', title: 'The Bellcastle consulting fee', status: 'draft', cited_record_refs: [{record_type: 'claim', record_id: 'claim-1'}], created_at: '2026-09-30T12:01:00', updated_at: '2026-09-30T12:01:00', word_count: 42,
+        source_ai_candidate_id: 'cand-9', created_by: null, content_json: {type: 'doc', content: []}})) // POST promote-to-writeup
+      .mockResolvedValueOnce(jsonResponse({id: 'dk-1', investigation_id: 'inv-1', title: 'The Bellcastle consulting fee', slides: deckPreview, slide_count: 4, created_at: '2026-09-30T12:02:00', updated_at: '2026-09-30T12:02:00',
+        style: {theme: 'newsprint', fonts: 'theme'}, source_ai_candidate_id: 'cand-9', created_by: null})); // POST promote-to-deck
     vi.stubGlobal('fetch', fetchMock);
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} onTraceRecord={d => traced.push(`${d.trace_record_type}:${d.record_id}`)} />);
     await screen.findByText('No AI analysis candidates yet for this investigation.');
@@ -387,7 +402,7 @@ describe('AiReasoningPanel', () => {
     await screen.findByTestId('draft-preview');
     const runCall = fetchMock.mock.calls[2];
     expect(requestUrl(runCall)).toBe('http://api.test/api/investigations/inv-1/assistant/presentation-draft');
-    expect(JSON.parse(String((runCall[1] as RequestInit).body))).toEqual({goal: 'Summarize the Bellcastle payment.', record_refs: [{record_type: 'claim', record_id: 'claim-1'}]});
+    expect(await sentBody(runCall)).toEqual({goal: 'Summarize the Bellcastle payment.', record_refs: [{record_type: 'claim', record_id: 'claim-1'}]});
 
     // Slides: title + takeaway + 1 content + questions + sources = 5 frames.
     expect(screen.getByTestId('slide-position')).toHaveTextContent('1 / 5');
@@ -423,7 +438,7 @@ describe('AiReasoningPanel', () => {
     expect(within(promotePanel).getByRole('link', {name: 'Download .docx'})).toHaveAttribute('href', 'http://api.test/api/writeups/wu-1/export.docx');
     const writeupCall = fetchMock.mock.calls[9];
     expect(requestUrl(writeupCall)).toBe('http://api.test/api/ai-analysis-candidates/cand-9/promote-to-writeup');
-    expect(JSON.parse(String((writeupCall[1] as RequestInit).body))).toEqual({});
+    expect(await sentBody(writeupCall)).toEqual({});
 
     await user.click(within(promotePanel).getByRole('button', {name: 'Promote to deck'}));
     await waitFor(() => expect(within(promotePanel).getByTestId('promote-status')).toHaveTextContent('Promoted to deck "The Bellcastle consulting fee" (4 slide(s)).'));
@@ -431,7 +446,7 @@ describe('AiReasoningPanel', () => {
     // The deck goes out in the look picked in the style panel.
     const deckCall = fetchMock.mock.calls[10];
     expect(requestUrl(deckCall)).toBe('http://api.test/api/ai-analysis-candidates/cand-9/promote-to-deck');
-    expect(JSON.parse(String((deckCall[1] as RequestInit).body))).toEqual({style: {theme: 'newsprint', fonts: 'theme'}, visual_styles: {'0': {preset: 'row', options: {}}}, deck_kind: 'presenting'});
+    expect(await sentBody(deckCall)).toEqual({style: {theme: 'newsprint', fonts: 'theme'}, visual_styles: {'0': {preset: 'row', options: {}}}, deck_kind: 'presenting'});
   });
 
   it('lets presentation drafts run when the TAS spec is missing, and starts on that module', async () => {

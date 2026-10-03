@@ -12,7 +12,7 @@ import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {Suspense, lazy} from 'react';
 import type {ComponentType} from 'react';
-import {afterEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const reactEChartsCoreSpy = vi.hoisted(() => vi.fn());
 vi.mock('echarts-for-react/lib/core', () => ({
@@ -32,12 +32,15 @@ import {applyVisualStyles} from '../components/presentation/draft-preview';
 import {DEFAULT_THEME} from '../components/presentation/slide-canvas';
 import {StylePanel} from '../components/presentation/style-panel';
 import {ApiClient} from '../lib/api-client';
+import {connectGeneratedClient} from '../lib/api-generated';
 import type {AiReasoningStatus, ChartVisual, DeckSlide, JsonObject, PresentationStyleCatalog} from '../lib/api-types';
 import type {ChartRestyleOut} from '../lib/generated/types.gen';
 import {zChartRestyleOut} from '../lib/generated/zod.gen';
 import kinds from '../test-support/chart-kinds.json';
 import {mockApi} from '../test-support/mock-api';
 
+// The panel's plain calls are generated ones (lib/generated), sent through the app's API client.
+beforeEach(() => { connectGeneratedClient(new ApiClient('http://api.test')); });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); reactEChartsCoreSpy.mockClear(); });
 
 const stored = kinds as unknown as Record<string, JsonObject>;
@@ -70,9 +73,11 @@ const donutLook = (extra: Record<string, unknown> = {}) => look('donut', {
 
 // The parts-of-a-whole family as GET /api/presentation-styles lists it
 // (backend app/services/presentation_style.py CHART_PRESETS, CHART_OPTIONS).
+// The Okabe-Ito colours every theme carries for parts of a whole (backend CATEGORICAL_PALETTE); the page does not read them.
+const OKABE_ITO = {palette: ['0072B2', 'D55E00', '009E73', 'CC79A7', '56B4E9', 'E69F00', 'F0E442']};
 const catalog: PresentationStyleCatalog = {
   defaults: {theme: 'dark_academia', fonts: 'theme'},
-  themes: [{...DEFAULT_THEME}],
+  themes: [{...DEFAULT_THEME, ...OKABE_ITO}],
   font_pairs: [{id: 'theme', label: 'Theme default', heading: '', body: ''}],
   visual_presets: {bar: [], timeline: [], figures: []},
   visual_options: {bar: {}, timeline: {}, figures: {}},
@@ -175,7 +180,8 @@ describe('restyling a chart in a presentation draft', () => {
     enabled: true, provider: 'anthropic', provider_key_configured: true, endpoints_callable: true,
     tas_spec: {present: true, version: '1.8', modules: {presentation_draft: {spec_file: 'presentation_modules/PRESENTATION_DRAFT.md', available: true}}},
   };
-  const visual = {type: 'chart', ...stored.stacked_bar_100};
+  // A chart as a stored draft carries it: the checker's report is always kept with it.
+  const visual = {type: 'chart', ...stored.stacked_bar_100, report: {ok: true, errors: [], warnings: []}};
   const payload = {
     title: 'Where the money went', goal_restated: 'Show who received the payments.', executive_takeaway: '',
     sections: [{heading: 'Who received the money', body: 'Meridian received most of it.', key_points: ['Meridian received most of the money'], evidence: [], visual}],
@@ -184,10 +190,10 @@ describe('restyling a chart in a presentation draft', () => {
   const summary = {
     id: 'cand-7', investigation_id: 'inv-1', module: 'presentation_draft', request: {question: 'Show who received the payments.'},
     review_status: 'accepted', confidence: 0, reviewer_note: null, accepted_record_type: null, accepted_record_id: null,
-    created_at: '2026-10-01T09:00:00', reviewed_at: '2026-10-01T09:05:00', checked_citation_count: 0,
+    created_at: '2026-10-01T09:00:00', reviewed_at: '2026-10-01T09:05:00', checked_citation_count: 0, rejection_reason: null,
   };
   const detail = {
-    ...summary, payload, checked_citation_ids: [], citation_details: [],
+    ...summary, payload, checked_citation_ids: [], citation_details: [], trace: null,
     deck_preview: [
       {kind: 'title', heading: payload.title, bullets: [payload.goal_restated], evidence: [], notes: '', visual: null},
       {kind: 'content', heading: 'Who received the money', bullets: payload.sections[0].key_points, evidence: [], notes: payload.sections[0].body, visual},
@@ -203,7 +209,8 @@ describe('restyling a chart in a presentation draft', () => {
       'GET /api/ai-analysis-candidates/cand-7': detail,
       'GET /api/presentation-styles': catalog,
       [RESTYLE]: ({body}: {body: unknown}) => ((body as {style?: {preset?: string} | null}).style?.preset === 'donut' ? donutLook() : look('stacked_bar_100')),
-      [DECK]: {id: 'dk-1', investigation_id: 'inv-1', title: payload.title, slides: detail.deck_preview, slide_count: 2, created_at: '2026-10-01T09:10:00', updated_at: '2026-10-01T09:10:00'},
+      [DECK]: {id: 'dk-1', investigation_id: 'inv-1', title: payload.title, slides: detail.deck_preview, slide_count: 2, created_at: '2026-10-01T09:10:00',
+        updated_at: '2026-10-01T09:10:00', style: {theme: 'dark_academia', fonts: 'theme'}, source_ai_candidate_id: 'cand-7', created_by: null},
     });
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus}/>);
     await user.click(await screen.findByRole('button', {name: 'Open'}));
