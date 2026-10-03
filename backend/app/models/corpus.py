@@ -96,6 +96,29 @@ class CorpusSyncState(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, onupdate=utcnow_naive)
 
 
+class OpenAlephEntitySetLink(Base):
+    """A diagram, timeline or list the Workbench made in OpenAleph from the
+    investigation's records (ADR-0006, Wave C; app/services/openaleph_entitysets.py).
+
+    ``item_ids`` are the signed entity ids the Workbench put in the set, so
+    sending it again adds what is new and takes out only what the Workbench
+    itself added and no longer belongs; anything a reporter added in
+    OpenAleph stays. Per-deployment state like ``OpenAlephEntityLink``: not
+    carried by backups.
+    """
+    __tablename__ = "openaleph_entity_sets"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=uid)
+    investigation_id: Mapped[str] = mapped_column(ForeignKey("investigations.id"), index=True)
+    kind: Mapped[str] = mapped_column(String(16), index=True)   # diagram | timeline | list
+    label: Mapped[str] = mapped_column(String(512))
+    collection_id: Mapped[str] = mapped_column(String(512))
+    openaleph_entityset_id: Mapped[str] = mapped_column(String(512), index=True)
+    item_ids: Mapped[list] = mapped_column(JSON, default=list)
+    created_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
+    sent_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
+
+
 class CrossReferenceProposal(Base):
     """OpenAleph's cross-referencing says a confirmed entity of ours may be the
     same as another entity. A proposal until a reporter decides; deciding

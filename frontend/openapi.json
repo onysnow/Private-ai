@@ -12759,6 +12759,152 @@
         "title": "EntityRelationshipOut",
         "type": "object"
       },
+      "EntitySetOut": {
+        "description": "A diagram, timeline or list the Workbench made in OpenAleph, and where to open it.",
+        "properties": {
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "items": {
+            "title": "Items",
+            "type": "integer"
+          },
+          "kind": {
+            "enum": [
+              "diagram",
+              "timeline",
+              "list"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "openaleph_entityset_id": {
+            "title": "Openaleph Entityset Id",
+            "type": "string"
+          },
+          "sent_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Sent At",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "label",
+          "openaleph_entityset_id",
+          "url",
+          "items",
+          "created_by",
+          "created_at",
+          "sent_at"
+        ],
+        "title": "EntitySetOut",
+        "type": "object"
+      },
+      "EntitySetSend": {
+        "description": "A diagram, timeline or list to make (or update) in OpenAleph from the\ninvestigation's records in its collection (app/services/openaleph_entitysets.py).",
+        "properties": {
+          "entity_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 500,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A list's entities (Workbench ids).",
+            "title": "Entity Ids"
+          },
+          "kind": {
+            "enum": [
+              "diagram",
+              "timeline",
+              "list"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "maxLength": 512,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The set's name; a list is updated when one with this name exists.",
+            "title": "Label"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "EntitySetSend",
+        "type": "object"
+      },
+      "EntitySetSentOut": {
+        "description": "The set after sending, what changed in it, and how many records wait\nfor the next sync (they show there once synced and sent again).",
+        "properties": {
+          "added": {
+            "title": "Added",
+            "type": "integer"
+          },
+          "entityset": {
+            "$ref": "#/components/schemas/EntitySetOut"
+          },
+          "removed": {
+            "title": "Removed",
+            "type": "integer"
+          },
+          "waiting_for_sync": {
+            "title": "Waiting For Sync",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "entityset",
+          "added",
+          "removed",
+          "waiting_for_sync"
+        ],
+        "title": "EntitySetSentOut",
+        "type": "object"
+      },
       "EntityStatementOut": {
         "description": "A statement as stored, with the entity it belongs to.",
         "properties": {
@@ -37483,6 +37629,118 @@
           }
         },
         "summary": "List Connector Runs"
+      }
+    },
+    "/api/investigations/{investigation_id}/corpus/entity-sets": {
+      "get": {
+        "description": "The diagrams, timelines and lists made in OpenAleph from this investigation, last sent first.",
+        "operationId": "list_corpus_entity_sets",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EntitySetOut"
+                  },
+                  "title": "Response List Corpus Entity Sets",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "List Corpus Entity Sets"
+      },
+      "post": {
+        "description": "Make or update a diagram (the relationship graph), a timeline (the dated\nrecords) or a list (chosen entities) in OpenAleph from what its collection holds.",
+        "operationId": "send_corpus_entity_set",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntitySetSend"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntitySetSentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Send Corpus Entity Set"
       }
     },
     "/api/investigations/{investigation_id}/corpus/insights": {

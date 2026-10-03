@@ -256,3 +256,43 @@ class CorpusGateway:
         """
         reply = self._get(f"/api/2/entities/{entity_id}/expand", {"limit": max(1, limit)})
         return [row for row in (reply or {}).get("results") or [] if isinstance(row, dict)]
+
+    # -- entity sets: diagrams, timelines, lists (views/entitysets_api.py) -------
+    def _send(self, method: str, path: str, body: Any) -> httpx.Response:
+        with self._http() as http:
+            response = http.request(method, path, json=body)
+        if response.status_code == 404:
+            raise OpenAlephNotFound(f"OpenAleph answered 404 for {path}")
+        response.raise_for_status()
+        return response
+
+    def create_entityset(self, collection_id: str, *, kind: str, label: str, summary: str | None,
+                         layout: dict[str, Any]) -> dict[str, Any]:
+        """POST /api/2/entitysets (EntitySetCreate: label, type, collection_id,
+        summary, layout). No ``entities`` are sent: OpenAleph would write them
+        into the collection (logic/entitysets.py create_entityset upserts
+        each); the items are added one by one instead (``set_entityset_item``)."""
+        reply = self._send("POST", "/api/2/entitysets", {"collection_id": collection_id, "type": kind, "label": label,
+                                                         "summary": summary or "", "layout": layout})
+        data = reply.json()
+        return data if isinstance(data, dict) else {}
+
+    def get_entityset(self, entityset_id: str) -> dict[str, Any]:
+        reply = self._get(f"/api/2/entitysets/{entityset_id}")
+        return reply if isinstance(reply, dict) else {}
+
+    def update_entityset(self, entityset_id: str, *, kind: str, label: str, summary: str | None,
+                         layout: dict[str, Any]) -> dict[str, Any]:
+        """POST /api/2/entitysets/{id} (EntitySetUpdate); OpenAleph keeps
+        the old layout when none is sent (model/entityset.py update)."""
+        reply = self._send("POST", f"/api/2/entitysets/{entityset_id}",
+                           {"type": kind, "label": label, "summary": summary or "", "layout": layout})
+        data = reply.json()
+        return data if isinstance(data, dict) else {}
+
+    def set_entityset_item(self, entityset_id: str, entity_id: str, *, keep: bool) -> None:
+        """POST /api/2/entitysets/{id}/items: ``positive`` adds the entity;
+        ``no_judgement`` takes it out (views/entitysets_api.py item_update).
+        The entity must be in OpenAleph's search index."""
+        self._send("POST", f"/api/2/entitysets/{entityset_id}/items",
+                   {"entity_id": entity_id, "judgement": "positive" if keep else "no_judgement"})

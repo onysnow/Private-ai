@@ -466,3 +466,11 @@ class TableMappingIn(BaseModel):
         return {name: {**entity.model_dump(by_alias=True, exclude_none=True),
                        "properties": {prop: spec.model_dump(exclude_none=True) for prop, spec in entity.properties.items()}}
                 for name, entity in self.entities.items()}
+
+
+class EntitySetSend(BaseModel):
+    """A diagram, timeline or list to make (or update) in OpenAleph from the
+    investigation's records in its collection (app/services/openaleph_entitysets.py)."""
+    kind: Literal["diagram", "timeline", "list"]
+    label: str | None = Field(default=None, max_length=512, description="The set's name; a list is updated when one with this name exists.")
+    entity_ids: list[str] | None = Field(default=None, max_length=500, description="A list's entities (Workbench ids).")

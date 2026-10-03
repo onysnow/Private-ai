@@ -1857,6 +1857,56 @@ export const zEntityOut = z.object({
 });
 
 /**
+ * EntitySetOut
+ *
+ * A diagram, timeline or list the Workbench made in OpenAleph, and where to open it.
+ */
+export const zEntitySetOut = z.object({
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  created_by: z.string().nullable(),
+  id: z.string(),
+  items: z.number().int(),
+  kind: z.enum(['diagram', 'timeline', 'list']),
+  label: z.string(),
+  openaleph_entityset_id: z.string(),
+  sent_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  url: z.string(),
+});
+
+/**
+ * EntitySetSend
+ *
+ * A diagram, timeline or list to make (or update) in OpenAleph from the
+ * investigation's records in its collection (app/services/openaleph_entitysets.py).
+ */
+export const zEntitySetSend = z.object({
+  entity_ids: z.array(z.string()).max(500).nullish(),
+  kind: z.enum(['diagram', 'timeline', 'list']),
+  label: z.string().max(512).nullish(),
+});
+
+/**
+ * EntitySetSentOut
+ *
+ * The set after sending, what changed in it, and how many records wait
+ * for the next sync (they show there once synced and sent again).
+ */
+export const zEntitySetSentOut = z.object({
+  added: z.number().int(),
+  entityset: zEntitySetOut,
+  removed: z.number().int(),
+  waiting_for_sync: z.number().int(),
+});
+
+/**
  * EntityStatementOut
  *
  * A statement as stored, with the entity it belongs to.
@@ -6708,6 +6758,28 @@ export const zListConnectorRunsQuery = z.object({
  * Successful Response
  */
 export const zListConnectorRunsResponse = z.array(zConnectorRunOut);
+
+export const zListCorpusEntitySetsPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Response List Corpus Entity Sets
+ *
+ * Successful Response
+ */
+export const zListCorpusEntitySetsResponse = z.array(zEntitySetOut);
+
+export const zSendCorpusEntitySetBody = zEntitySetSend;
+
+export const zSendCorpusEntitySetPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zSendCorpusEntitySetResponse = zEntitySetSentOut;
 
 export const zGetCorpusInsightsPath = z.object({
   investigation_id: z.string(),

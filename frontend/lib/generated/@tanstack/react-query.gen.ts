@@ -120,6 +120,7 @@ import {
   listClaims,
   listConnectorFindings,
   listConnectorRuns,
+  listCorpusEntitySets,
   listCrossProviderDecisions,
   listDecksEndpoint,
   listDocumentCandidatesEndpoint,
@@ -180,6 +181,7 @@ import {
   searchInvestigationCorpus,
   searchWorkbench,
   seedDemo,
+  sendCorpusEntitySet,
   settingsStatus,
   syncCorpusNow,
   syncOpenalephDocument,
@@ -526,6 +528,9 @@ import type {
   ListConnectorRunsData,
   ListConnectorRunsError,
   ListConnectorRunsResponse,
+  ListCorpusEntitySetsData,
+  ListCorpusEntitySetsError,
+  ListCorpusEntitySetsResponse,
   ListCrossProviderDecisionsData,
   ListCrossProviderDecisionsError,
   ListCrossProviderDecisionsResponse,
@@ -703,6 +708,9 @@ import type {
   SeedDemoData,
   SeedDemoError,
   SeedDemoResponse,
+  SendCorpusEntitySetData,
+  SendCorpusEntitySetError,
+  SendCorpusEntitySetResponse,
   SettingsStatusData,
   SettingsStatusError,
   SettingsStatusResponse,
@@ -3765,6 +3773,66 @@ export const listConnectorRunsInfiniteOptions = (
     },
   );
   return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const listCorpusEntitySetsQueryKey = (
+  options: Options<ListCorpusEntitySetsData>,
+) => createQueryKey('listCorpusEntitySets', options);
+
+/**
+ * List Corpus Entity Sets
+ *
+ * The diagrams, timelines and lists made in OpenAleph from this investigation, last sent first.
+ */
+export const listCorpusEntitySetsOptions = (
+  options: Options<ListCorpusEntitySetsData>,
+) =>
+  queryOptions<
+    ListCorpusEntitySetsResponse,
+    ListCorpusEntitySetsError,
+    ListCorpusEntitySetsResponse,
+    ReturnType<typeof listCorpusEntitySetsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listCorpusEntitySets({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listCorpusEntitySetsQueryKey(options),
+  });
+
+/**
+ * Send Corpus Entity Set
+ *
+ * Make or update a diagram (the relationship graph), a timeline (the dated
+ * records) or a list (chosen entities) in OpenAleph from what its collection holds.
+ */
+export const sendCorpusEntitySetMutation = (
+  options?: Partial<Options<SendCorpusEntitySetData>>,
+): UseMutationOptions<
+  SendCorpusEntitySetResponse,
+  SendCorpusEntitySetError,
+  Options<SendCorpusEntitySetData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SendCorpusEntitySetResponse,
+    SendCorpusEntitySetError,
+    Options<SendCorpusEntitySetData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await sendCorpusEntitySet({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
 };
 
 export const getCorpusInsightsQueryKey = (

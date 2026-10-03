@@ -345,6 +345,9 @@ import type {
   ListConnectorRunsData,
   ListConnectorRunsErrors,
   ListConnectorRunsResponses,
+  ListCorpusEntitySetsData,
+  ListCorpusEntitySetsErrors,
+  ListCorpusEntitySetsResponses,
   ListCrossProviderDecisionsData,
   ListCrossProviderDecisionsErrors,
   ListCrossProviderDecisionsResponses,
@@ -522,6 +525,9 @@ import type {
   SeedDemoData,
   SeedDemoErrors,
   SeedDemoResponses,
+  SendCorpusEntitySetData,
+  SendCorpusEntitySetErrors,
+  SendCorpusEntitySetResponses,
   SettingsStatusData,
   SettingsStatusErrors,
   SettingsStatusResponses,
@@ -806,6 +812,8 @@ import {
   zListConnectorRunsPath,
   zListConnectorRunsQuery,
   zListConnectorRunsResponse,
+  zListCorpusEntitySetsPath,
+  zListCorpusEntitySetsResponse,
   zListCrossProviderDecisionsPath,
   zListCrossProviderDecisionsResponse,
   zListDecksEndpointPath,
@@ -945,6 +953,9 @@ import {
   zSearchWorkbenchQuery,
   zSearchWorkbenchResponse,
   zSeedDemoResponse,
+  zSendCorpusEntitySetBody,
+  zSendCorpusEntitySetPath,
+  zSendCorpusEntitySetResponse,
   zSettingsStatusResponse,
   zSyncCorpusNowPath,
   zSyncCorpusNowResponse,
@@ -4062,6 +4073,73 @@ export const listConnectorRuns = <ThrowOnError extends boolean = false>(
       await zListConnectorRunsResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/connector-runs',
     ...options,
+  });
+
+/**
+ * List Corpus Entity Sets
+ *
+ * The diagrams, timelines and lists made in OpenAleph from this investigation, last sent first.
+ */
+export const listCorpusEntitySets = <ThrowOnError extends boolean = false>(
+  options: Options<ListCorpusEntitySetsData, ThrowOnError>,
+): RequestResult<
+  ListCorpusEntitySetsResponses,
+  ListCorpusEntitySetsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ListCorpusEntitySetsResponses,
+    ListCorpusEntitySetsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListCorpusEntitySetsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListCorpusEntitySetsResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/corpus/entity-sets',
+    ...options,
+  });
+
+/**
+ * Send Corpus Entity Set
+ *
+ * Make or update a diagram (the relationship graph), a timeline (the dated
+ * records) or a list (chosen entities) in OpenAleph from what its collection holds.
+ */
+export const sendCorpusEntitySet = <ThrowOnError extends boolean = false>(
+  options: Options<SendCorpusEntitySetData, ThrowOnError>,
+): RequestResult<
+  SendCorpusEntitySetResponses,
+  SendCorpusEntitySetErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    SendCorpusEntitySetResponses,
+    SendCorpusEntitySetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zSendCorpusEntitySetBody,
+          path: zSendCorpusEntitySetPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSendCorpusEntitySetResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/corpus/entity-sets',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

@@ -81,7 +81,9 @@ def test_restore_order_covers_every_investigation_owned_table():
     # Tables that are deliberately not portable (per-deployment state, not investigation content).
     non_portable = {"investigation_memberships", "openaleph_operation_failures", "background_jobs",
                     # What this deployment's OpenAleph holds (ADR-0006, Wave B): a restore re-sends it all.
-                    "openaleph_entity_links", "openaleph_corpus_sync_states"}
+                    "openaleph_entity_links", "openaleph_corpus_sync_states",
+                    # The diagrams, timelines and lists made there (Wave C): made again from the restored records.
+                    "openaleph_entity_sets"}
     missing = owned - set(RESTORE_ORDER) - non_portable
     assert not missing, f"investigation-owned tables absent from RESTORE_ORDER: {sorted(missing)}"
     assert "ai_analysis_candidates" in RESTORE_ORDER

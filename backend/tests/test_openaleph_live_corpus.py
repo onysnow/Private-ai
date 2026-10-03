@@ -204,3 +204,41 @@ def test_two_investigations_sharing_a_company_are_cross_referenced_and_judged(li
         candidates = relationship_endpoint_candidates(db, db.get(ConnectorFinding, by_record[directorship_id]["id"]))
         assert candidates["target_candidates"][0]["entity_id"] == ours.id and candidates["target_candidates"][0]["score"] == 1.0
         assert candidates["source_external_finding"]["provider_record_id"] == director_id
+
+
+def test_the_relationship_graph_and_timeline_become_an_openaleph_diagram_and_timeline(live):
+    """Wave C: OpenAleph accepts the layout (validation/schema/diagram.yml),
+    holds the records as the set's entities, and keeps a moved vertex's place."""
+    from app.services.openaleph_entitysets import send_entityset
+
+    with SessionLocal() as db:
+        inv = _investigation(db, "sets")
+        meridian = _entity(db, inv, "Company", "Meridian Holdings Ltd", incorporationDate=["2011-05-02"])
+        bellcastle = _entity(db, inv, "Company", "Bellcastle Trading Group")
+        paid = create_relationship(db, investigation_id=inv.id, schema="Payment", source_entity_id=meridian.id,
+                                   target_entity_id=bellcastle.id, properties={"amount": ["2400000"], "date": ["2024-03-03"]})
+        corpus_jobs.sync_now(SessionLocal, inv.id)
+        assert _state(db, inv).push_status == "succeeded"
+        paid_id = _link(db, paid.relationship_entity_id).openaleph_entity_id
+        _wait(lambda: live.get(f"/api/2/entities/{paid_id}").status_code == 200, "the payment to be indexed")
+
+        gateway = CorpusGateway()
+        diagram = send_entityset(db, inv.id, kind="diagram", gateway=gateway)
+        set_id = diagram["entityset"]["openaleph_entityset_id"]
+        assert diagram["added"] == 3
+        served = live.get(f"/api/2/entitysets/{set_id}").json()
+        assert served["type"] == "diagram" and len(served["layout"]["vertices"]) == 2 and len(served["layout"]["edges"]) == 1
+        entities = live.get(f"/api/2/entitysets/{set_id}/entities").json()
+        assert {row["id"] for row in entities["results"]} == {_link(db, r).openaleph_entity_id for r in (meridian.id, bellcastle.id, paid.relationship_entity_id)}
+
+        moved = served["layout"]
+        moved["vertices"][0]["position"] = {"x": 33, "y": 44}
+        assert live.post(f"/api/2/entitysets/{set_id}", json={"label": served["label"], "type": "diagram", "layout": moved}).status_code == 200
+        again = send_entityset(db, inv.id, kind="diagram", gateway=gateway)
+        assert again["added"] == 0
+        kept = live.get(f"/api/2/entitysets/{set_id}").json()["layout"]["vertices"]
+        assert {"x": 33, "y": 44} in [v["position"] for v in kept]
+
+        timeline = send_entityset(db, inv.id, kind="timeline", gateway=gateway)
+        dated = live.get(f"/api/2/entitysets/{timeline['entityset']['openaleph_entityset_id']}/entities").json()
+        assert {row["schema"] for row in dated["results"]} == {"Payment", "Company"}

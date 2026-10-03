@@ -47,6 +47,9 @@ class FakeOpenAleph:
     # (method, path prefix) -> status code to answer instead
     fail: dict[tuple[str, str], int] = field(default_factory=dict)
     bulk_batches: list[list[dict[str, Any]]] = field(default_factory=list)
+    # entity set id -> the set as OpenAleph keeps it, with "items": entity id -> judgement
+    entitysets: dict[str, dict[str, Any]] = field(default_factory=dict)
+    entitysets_made: int = 0
 
     def add_collection(self, collection_id: str, foreign_id: str, label: str) -> dict[str, Any]:
         collection = {"id": collection_id, "collection_id": collection_id, "foreign_id": foreign_id, "label": label}
@@ -147,6 +150,8 @@ class FakeOpenAleph:
             wanted = params.get("filter:entities")
             hits = [row for row in rows.values() if wanted is None or self._references(row, wanted)]
             return 200, {"status": "ok", "total": len(hits), "results": hits}
+        if rest and rest[0] == "entitysets":
+            return self._entitysets(method, rest[1:], body or {})
         if rest == ["profiles", "_pairwise"] and method == "POST":
             judgement = (body or {}).get("judgement")
             if judgement not in {"positive", "negative", "unsure", "no_judgement"}:
@@ -156,6 +161,47 @@ class FakeOpenAleph:
             self.pairwise.append(dict(body))
             return 200, {"status": "ok", "profile_id": f"profile-{len(self.pairwise)}"}
         return 404, {"status": "error", "message": "This path does not exist."}
+
+    def _entitysets(self, method: str, rest: list[str], body: dict[str, Any]) -> tuple[int, Any]:
+        """views/entitysets_api.py create, view, update and item_update, as
+        OpenAleph 5.3.1 answers them (validation/schema/entityset.yml)."""
+        if not rest and method == "POST":
+            if body.get("entities"):
+                return 400, {"status": "error", "message": "the fake does not upsert entities"}
+            if str(body.get("collection_id")) not in self.collections or body.get("type") not in {"list", "diagram", "timeline", "profile"}:
+                return 400, {"status": "error", "errors": {"collection_id": "invalid"}}
+            layout = body.get("layout") or {}
+            if not isinstance(layout.get("vertices"), list) or not isinstance(layout.get("edges"), list):
+                return 400, {"status": "error", "errors": {"layout": "'vertices' and 'edges' are required"}}
+            self.entitysets_made += 1
+            new_id = f"set{self.entitysets_made}"
+            self.entitysets[new_id] = {"id": new_id, "collection_id": str(body["collection_id"]), "type": body["type"],
+                                       "label": body.get("label"), "summary": body.get("summary"), "layout": layout, "items": {}}
+            return 200, self._entityset_view(new_id)
+        stored = self.entitysets.get(rest[0]) if rest else None
+        if stored is None:
+            return 404, {"status": "error", "message": "This path does not exist."}
+        if len(rest) == 1 and method == "GET":
+            return 200, self._entityset_view(rest[0])
+        if len(rest) == 1 and method == "POST":
+            stored.update({key: body[key] for key in ("label", "summary", "type") if key in body})
+            stored["layout"] = body.get("layout", stored["layout"])
+            return 200, self._entityset_view(rest[0])
+        if rest[1:] == ["items"] and method == "POST":
+            entity_id = str(body.get("entity_id"))
+            if self.collection_of(entity_id) is None:     # get_index_entity: the search index must show it
+                return 404, {"status": "error", "message": "This path does not exist."}
+            if body.get("judgement") == "no_judgement":
+                stored["items"].pop(entity_id, None)
+            else:
+                stored["items"][entity_id] = body.get("judgement") or "positive"
+            return 200, {"id": f"{rest[0]}${entity_id}", "entityset_id": rest[0], "entity_id": entity_id,
+                         "judgement": body.get("judgement") or "positive"}
+        return 404, {"status": "error", "message": "This path does not exist."}
+
+    def _entityset_view(self, entityset_id: str) -> dict[str, Any]:
+        stored = self.entitysets[entityset_id]
+        return {key: value for key, value in stored.items() if key != "items"}
 
     def _bulk(self, collection: dict[str, Any], rows: list[dict[str, Any]]) -> tuple[int, Any]:
         namespace = Namespace(collection["foreign_id"])

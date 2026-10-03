@@ -11,6 +11,10 @@ records "Same entity", "Different" or "Not sure", with a note.
 
 POST /entities/{id}/corpus/expand asks OpenAleph what surrounds a confirmed
 entity and proposes it for review (app/services/corpus_expand.py).
+
+GET/POST .../corpus/entity-sets: the diagrams, timelines and lists made in
+OpenAleph from the records the collection holds (Wave C,
+app/services/openaleph_entitysets.py).
 """
 
 from typing import Any, Literal
@@ -27,12 +31,16 @@ from app.db.session import build_session_factory, get_db
 from app.jobs import corpus as corpus_jobs
 from app.jobs.corpus import queue_sync_now, runs_in_background, sync_now
 from app.models.domain import CrossReferenceProposal, Entity, Investigation
-from app.schemas.api import CrossReferenceDecisionRequest
-from app.schemas.responses import CorpusExpandOut, CorpusInsightsOut, CorpusSyncNowOut, CorpusSyncOut, CrossReferenceOut
+from app.schemas.api import CrossReferenceDecisionRequest, EntitySetSend
+from app.schemas.responses import (
+    CorpusExpandOut, CorpusInsightsOut, CorpusSyncNowOut, CorpusSyncOut, CrossReferenceOut, EntitySetOut, EntitySetSentOut,
+)
 from app.services.corpus_expand import NotInCorpus, expand_in_corpus
 from app.services.corpus_push import corpus_sync_status
 from app.services.cross_references import decide_cross_reference, list_cross_references, visible_to
 from app.services.openaleph_discover import corpus_insights
+from app.services.openaleph_corpus import record_openaleph_operation_failure
+from app.services.openaleph_entitysets import EntitySetError, list_entitysets, send_entityset
 from app.services.openaleph_gateway import OpenAlephNotFound
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -132,3 +140,35 @@ def expand_entity_in_corpus(entity_id: str, request: Request, db: Session = Depe
         raise HTTPException(409, f"OpenAleph does not hold this entity yet: {exc}")
     except httpx.HTTPError as exc:  # unreachable or refusing; recorded by expand_in_corpus
         raise HTTPException(502, f"OpenAleph could not expand this entity: {type(exc).__name__}")
+
+
+@router.get("/investigations/{investigation_id}/corpus/entity-sets", response_model=list[EntitySetOut])
+def list_corpus_entity_sets(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    """The diagrams, timelines and lists made in OpenAleph from this investigation, last sent first."""
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
+    return list_entitysets(db, investigation_id)
+
+
+@router.post("/investigations/{investigation_id}/corpus/entity-sets", response_model=EntitySetSentOut)
+def send_corpus_entity_set(investigation_id: str, body: EntitySetSend, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Make or update a diagram (the relationship graph), a timeline (the dated
+    records) or a list (chosen entities) in OpenAleph from what its collection holds."""
+    investigation = db.get(Investigation, investigation_id)
+    if investigation is None:
+        raise HTTPException(404, "Investigation not found")
+    scope = scope_for_request(request)
+    ensure_scope_can_mutate_ids(scope, [investigation_id])
+    if investigation.is_demo:
+        raise HTTPException(409, "The demo investigation is never sent to OpenAleph")
+    try:
+        return send_entityset(db, investigation_id, kind=body.kind, label=body.label, entity_ids=body.entity_ids,
+                              gateway=corpus_jobs.gateway_factory(), created_by=scope.actor_id)
+    except EntitySetError as exc:
+        db.rollback()
+        raise HTTPException(409, str(exc))
+    except (OpenAlephNotFound, httpx.HTTPError) as exc:
+        db.rollback()
+        record_openaleph_operation_failure(db, investigation_id=investigation_id, document_id=None,
+                                           operation=f"entityset_{body.kind}", error=f"{type(exc).__name__}: {exc}")
+        raise HTTPException(502, f"OpenAleph could not make the {body.kind}: {type(exc).__name__}")

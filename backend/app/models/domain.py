@@ -88,6 +88,7 @@ from app.models.jobs import (
 )
 from app.models.corpus import (
     OpenAlephEntityLink,
+    OpenAlephEntitySetLink,
     CorpusSyncState,
     CrossReferenceProposal,
     CrossReferenceDecision,
@@ -146,6 +147,7 @@ __all__ = [
     "InvestigationMembership",
     "BackgroundJob",
     "OpenAlephEntityLink",
+    "OpenAlephEntitySetLink",
     "CorpusSyncState",
     "CrossReferenceProposal",
     "CrossReferenceDecision",

@@ -5078,6 +5078,101 @@ export type EntityRelationshipOut = {
 };
 
 /**
+ * EntitySetOut
+ *
+ * A diagram, timeline or list the Workbench made in OpenAleph, and where to open it.
+ */
+export type EntitySetOut = {
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Items
+   */
+  items: number;
+  /**
+   * Kind
+   */
+  kind: 'diagram' | 'timeline' | 'list';
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Openaleph Entityset Id
+   */
+  openaleph_entityset_id: string;
+  /**
+   * Sent At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  sent_at: string;
+  /**
+   * Url
+   */
+  url: string;
+};
+
+/**
+ * EntitySetSend
+ *
+ * A diagram, timeline or list to make (or update) in OpenAleph from the
+ * investigation's records in its collection (app/services/openaleph_entitysets.py).
+ */
+export type EntitySetSend = {
+  /**
+   * Entity Ids
+   *
+   * A list's entities (Workbench ids).
+   */
+  entity_ids?: Array<string> | null;
+  /**
+   * Kind
+   */
+  kind: 'diagram' | 'timeline' | 'list';
+  /**
+   * Label
+   *
+   * The set's name; a list is updated when one with this name exists.
+   */
+  label?: string | null;
+};
+
+/**
+ * EntitySetSentOut
+ *
+ * The set after sending, what changed in it, and how many records wait
+ * for the next sync (they show there once synced and sent again).
+ */
+export type EntitySetSentOut = {
+  /**
+   * Added
+   */
+  added: number;
+  entityset: EntitySetOut;
+  /**
+   * Removed
+   */
+  removed: number;
+  /**
+   * Waiting For Sync
+   */
+  waiting_for_sync: number;
+};
+
+/**
  * EntityStatementOut
  *
  * A statement as stored, with the entity it belongs to.
@@ -15717,6 +15812,80 @@ export type ListConnectorRunsResponses = {
 
 export type ListConnectorRunsResponse =
   ListConnectorRunsResponses[keyof ListConnectorRunsResponses];
+
+export type ListCorpusEntitySetsData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/corpus/entity-sets';
+};
+
+export type ListCorpusEntitySetsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListCorpusEntitySetsError =
+  ListCorpusEntitySetsErrors[keyof ListCorpusEntitySetsErrors];
+
+export type ListCorpusEntitySetsResponses = {
+  /**
+   * Response List Corpus Entity Sets
+   *
+   * Successful Response
+   */
+  200: Array<EntitySetOut>;
+};
+
+export type ListCorpusEntitySetsResponse =
+  ListCorpusEntitySetsResponses[keyof ListCorpusEntitySetsResponses];
+
+export type SendCorpusEntitySetData = {
+  body: EntitySetSend;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/corpus/entity-sets';
+};
+
+export type SendCorpusEntitySetErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SendCorpusEntitySetError =
+  SendCorpusEntitySetErrors[keyof SendCorpusEntitySetErrors];
+
+export type SendCorpusEntitySetResponses = {
+  /**
+   * Successful Response
+   */
+  200: EntitySetSentOut;
+};
+
+export type SendCorpusEntitySetResponse =
+  SendCorpusEntitySetResponses[keyof SendCorpusEntitySetResponses];
 
 export type GetCorpusInsightsData = {
   body?: never;

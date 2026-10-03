@@ -312,6 +312,7 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/corpus/sync`]: corpusSyncBody(id),
     [`GET ${base}/cross-references`]: [],
     [`GET ${base}/watchlist`]: watchlistBody(id),
+    [`GET ${base}/corpus/entity-sets`]: [],
   };
 }
 

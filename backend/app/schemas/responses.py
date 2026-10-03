@@ -3406,3 +3406,25 @@ class TableMappingRunOut(ResponseModel):
     links_proposed: int
     already_proposed: int
     skipped: list[SkippedRowOut]
+
+
+class EntitySetOut(ResponseModel):
+    """A diagram, timeline or list the Workbench made in OpenAleph, and where to open it."""
+    id: str
+    kind: Literal["diagram", "timeline", "list"]
+    label: str
+    openaleph_entityset_id: str
+    url: str
+    items: int
+    created_by: str | None
+    created_at: Timestamp
+    sent_at: Timestamp
+
+
+class EntitySetSentOut(ResponseModel):
+    """The set after sending, what changed in it, and how many records wait
+    for the next sync (they show there once synced and sent again)."""
+    entityset: EntitySetOut
+    added: int
+    removed: int
+    waiting_for_sync: int
