@@ -649,3 +649,23 @@ def test_package_never_imports_the_host() -> None:
         if "from app." in text or "import app." in text or "import app\n" in text:
             offenders.append(str(path.relative_to(root)))
     assert offenders == []
+
+
+def test_a_run_that_finishes_at_once_still_starts_as_running(host: Any, monkeypatch: Any) -> None:
+    """The start reply describes the run as started. The worker thread is
+    made to finish inside start() itself -- the race a busy machine hits --
+    and the reply must still say running."""
+    import threading
+
+    client, handle, _parts = host
+    real_start = threading.Thread.start
+
+    def run_at_once(self: threading.Thread) -> None:
+        real_start(self)
+        self.join(timeout=10)
+
+    monkeypatch.setattr(threading.Thread, "start", run_at_once)
+    started = client.post("/api/console/tests/run", json={"selection": None}).json()
+    monkeypatch.setattr(threading.Thread, "start", real_start)
+    assert started["status"] == "running" and started["live"] is True
+    assert _wait_run(client, "/api/console/tests/runs", started["id"])["status"] == "failed"

@@ -118,8 +118,12 @@ class TaskSupervisor:
             self._live[run_id] = (run, thread)
             self._by_kind[kind] = run_id
         self.bus.publish(f"run:{kind}", {"run_id": run_id, "event": "started", "selection": selection})
+        # The reply describes the run as started. Read after thread.start(), a
+        # run that finishes at once (a fast check, a busy machine) could
+        # already show as finished in its own start reply.
+        started = self.status(run_id)
         thread.start()
-        return self.status(run_id)
+        return started
 
     def _execute(self, run: Run, fn: RunFn) -> None:
         status, summary, exit_code = "error", None, None
