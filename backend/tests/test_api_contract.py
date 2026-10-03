@@ -338,6 +338,8 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     # A watched name and a document it was found in.
     watched = ok(client.post(f"{base}/watchlist", json={"query": "Meridian Holdings", "note": "The holding company"}))["entries"][0]["id"]
     watch_hit = _watchlist_hit(watched, document["id"])
+    # A reporter's timeline event, which can be graded.
+    event = ok(client.post("/api/timeline-events", json={"investigation_id": inv, "title": "Wire sent", "date_start": "2023-11-14"}))["id"]
 
     # Connector findings, a statement assessment, an external relationship review, an enrichment session.
     findings = ok(client.post("/api/connectors/fake-a/search", json={"investigation_id": inv, "query": "Meridian"}))
@@ -389,7 +391,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             "task_id": task, "cross_reference_id": _cross_reference(inv, meridian), "batch_id": batch["id"],
             "user_id": user["id"], "aid": activity, "bid": backup["id"], "kind": "investigation_export", "qid": saved["id"],
             "name": "investigations", "pk": inv, "source": "app", "uid": user["id"], "tid": token["token_id"],
-            "watch_id": watched, "hit_id": watch_hit,
+            "watch_id": watched, "hit_id": watch_hit, "timeline_event_id": event,
             "z": "0", "x": "0", "y": "0", "stack": "Noto Sans Regular", "glyph_range": "0-255",
         },
         per_operation={

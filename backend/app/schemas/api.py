@@ -53,6 +53,11 @@ class ClaimEvidenceLinkCreate(BaseModel):
     stance: str
     note: str | None = None
 
+class TimelineEventGradeUpdate(BaseModel):
+    """A reporter's grade for an event they recorded; null clears it."""
+    grade: Literal["confirmed", "likely", "weak", "unsubstantiated", "unknown"] | None
+
+
 class ClaimCreate(BaseModel):
     investigation_id: str
     text: str
@@ -132,6 +137,8 @@ class TimelineEventCreate(BaseModel):
     date_end: str | None = None
     precision: str = "day"
     verification_status: str = "asserted"
+    # Bellingcat's grading scale (app/services/timeline.py EVENT_GRADES).
+    grade: Literal["confirmed", "likely", "weak", "unsubstantiated", "unknown"] | None = None
     entity_id: str | None = None
     relationship_entity_id: str | None = None
     source_id: str | None = None

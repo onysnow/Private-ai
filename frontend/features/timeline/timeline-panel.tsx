@@ -14,7 +14,7 @@ import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {errorMessage} from '../../lib/api-client';
 import {getInvestigationTimelineOptions, getInvestigationTimelineQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
-import {createTimelineEventEndpoint} from '../../lib/generated/sdk.gen';
+import {createTimelineEventEndpoint, gradeTimelineEventEndpoint} from '../../lib/generated/sdk.gen';
 import type {TimelineEventOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
@@ -27,6 +27,18 @@ type Props = {investigationId: string};
 
 const PRECISIONS = ['day', 'month', 'year', 'range', 'unknown'];
 const STATUSES = ['asserted', 'verified', 'approximate', 'disputed', 'unresolved'];
+// How well an event is substantiated: Bellingcat's grading scale (ADR-0005,
+// line 5; backend app/services/timeline.py EVENT_GRADES, which these words
+// follow). The status above is about the date; the grade about the event.
+export const EVENT_GRADES: Record<string, string> = {
+  confirmed: 'enough evidence, from several verification techniques and at least three sources cross-referenced',
+  likely: 'several sources report it and most of the information can be verified, with minor contradictions',
+  weak: 'a single source says it happened',
+  unsubstantiated: 'no conclusion can be reached for lack of evidence',
+  unknown: 'what happened cannot be identified',
+};
+type Grade = 'confirmed' | 'likely' | 'weak' | 'unsubstantiated' | 'unknown';
+const UNGRADED = 'none';
 
 function text(value: unknown): string | undefined {
   return typeof value === 'string' ? value : undefined;
@@ -39,6 +51,7 @@ export function TimelinePanel({investigationId}: Props): ReactElement {
   const [date, setDate] = useState('');
   const [precision, setPrecision] = useState('day');
   const [status, setStatus] = useState('asserted');
+  const [grade, setGrade] = useState(UNGRADED);
   const [problem, setProblem] = useState('');
 
   const path = {investigation_id: investigationId};
@@ -47,12 +60,22 @@ export function TimelinePanel({investigationId}: Props): ReactElement {
   const add = useMutation({
     mutationFn: async () => (await createTimelineEventEndpoint({body: {
       investigation_id: investigationId, title: title.trim(), date_start: date.trim(), precision, verification_status: status,
+      ...(grade !== UNGRADED ? {grade: grade as Grade} : {}),
     }, throwOnError: true})).data,
     onSuccess: async () => {
-      setTitle(''); setDate(''); setProblem('');
+      setTitle(''); setDate(''); setGrade(UNGRADED); setProblem('');
       await queryClient.invalidateQueries({queryKey: getInvestigationTimelineQueryKey({path})});
     },
     onError: error => setProblem(errorMessage(error, 'Could not add the event')),
+  });
+  const regrade = useMutation({
+    mutationFn: async ({id, value}: {id: string; value: string}) => (await gradeTimelineEventEndpoint({
+      path: {timeline_event_id: id}, body: {grade: value === UNGRADED ? null : value as Grade}, throwOnError: true})).data,
+    onSuccess: async () => {
+      setProblem('');
+      await queryClient.invalidateQueries({queryKey: getInvestigationTimelineQueryKey({path})});
+    },
+    onError: error => setProblem(errorMessage(error, 'Could not grade the event')),
   });
 
   const events: TimelineEventOut[] = timeline.data?.events ?? [];
@@ -61,7 +84,8 @@ export function TimelinePanel({investigationId}: Props): ReactElement {
   return <Card className="card">
     <CardHeader className="pb-3">
       <CardTitle>Investigation timeline</CardTitle>
-      <CardDescription>Dated FollowTheMoney statements and source metadata stay distinguishable from reporter-authored approximate, disputed, or verified events.</CardDescription>
+      <CardDescription>Dated FollowTheMoney statements and source metadata stay distinguishable from reporter-authored approximate, disputed, or verified events.
+        A reporter&apos;s event can also be graded on Bellingcat&apos;s scale (confirmed, likely, weak, unsubstantiated, unknown).</CardDescription>
     </CardHeader>
     <CardContent>
       <div className="searchrow">
@@ -75,6 +99,13 @@ export function TimelinePanel({investigationId}: Props): ReactElement {
           <SelectTrigger className="w-auto"><SelectValue/></SelectTrigger>
           <SelectContent>{STATUSES.map(value => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
         </Select>
+        <Select value={grade} onValueChange={setGrade}>
+          <SelectTrigger className="w-auto" aria-label="Grade"><SelectValue/></SelectTrigger>
+          <SelectContent>
+            <SelectItem value={UNGRADED}>Not graded</SelectItem>
+            {Object.keys(EVENT_GRADES).map(value => <SelectItem key={value} value={value}>{value}</SelectItem>)}
+          </SelectContent>
+        </Select>
         <Button onClick={() => add.mutate()} disabled={!investigationId || !title.trim() || !date.trim() || add.isPending}>Add event</Button>
       </div>
       {problem && <p className="muted">{problem}</p>}
@@ -83,7 +114,17 @@ export function TimelinePanel({investigationId}: Props): ReactElement {
       {events.length > 0 && <CaseTimeline events={events} height={320}/>}
       <div>
         {events.map(e => <div className="candidate" key={e.id}>
-          <b>{e.date_start}{e.date_end ? ` → ${e.date_end}` : ''} · {e.title}</b> <small>{e.kind} · {e.verification_status} · {e.precision}</small>
+          <b>{e.date_start}{e.date_end ? ` → ${e.date_end}` : ''} · {e.title}</b> <small>{e.kind} · {e.verification_status} · {e.precision}
+            {e.grade ? <> · <span title={EVENT_GRADES[e.grade]}>graded {e.grade}</span></> : null}</small>
+          {e.kind === 'reporter_event' && <div className="searchrow">
+            <Select value={e.grade ?? UNGRADED} onValueChange={value => regrade.mutate({id: e.id, value})}>
+              <SelectTrigger className="w-auto" aria-label={`Grade of ${e.title}`}><SelectValue/></SelectTrigger>
+              <SelectContent>
+                <SelectItem value={UNGRADED}>Not graded</SelectItem>
+                {Object.entries(EVENT_GRADES).map(([value, meaning]) => <SelectItem key={value} value={value}>{`${value}: ${meaning}`}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>}
           {e.description && <div>{e.description}</div>}
           {text(e.provenance.origin) && <small>Origin: {text(e.provenance.origin)}</small>}
           {e.context?.claim && <div><small>Claim: {e.context.claim.status} · confidence {Math.round(e.context.claim.confidence * 100)}%</small></div>}

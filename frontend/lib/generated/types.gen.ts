@@ -11457,6 +11457,16 @@ export type TimelineEventCreate = {
    */
   evidence_id?: string | null;
   /**
+   * Grade
+   */
+  grade?:
+    | 'confirmed'
+    | 'likely'
+    | 'weak'
+    | 'unsubstantiated'
+    | 'unknown'
+    | null;
+  /**
    * Investigation Id
    */
   investigation_id: string;
@@ -11491,6 +11501,18 @@ export type TimelineEventCreate = {
 };
 
 /**
+ * TimelineEventGradeUpdate
+ *
+ * A reporter's grade for an event they recorded; null clears it.
+ */
+export type TimelineEventGradeUpdate = {
+  /**
+   * Grade
+   */
+  grade: 'confirmed' | 'likely' | 'weak' | 'unsubstantiated' | 'unknown' | null;
+};
+
+/**
  * TimelineEventOut
  *
  * One timeline event: a reporter-authored row (which carries `context`),
@@ -11512,6 +11534,10 @@ export type TimelineEventOut = {
    * Description
    */
   description?: string | null;
+  /**
+   * Grade
+   */
+  grade?: string | null;
   /**
    * Id
    */
@@ -11599,6 +11625,10 @@ export type TimelineEventRowOut = {
    * Evidence Id
    */
   evidence_id?: string | null;
+  /**
+   * Grade
+   */
+  grade?: string | null;
   /**
    * Id
    */
@@ -12032,6 +12062,10 @@ export type VisualDataRowOut = {
    * End
    */
   end?: string | null;
+  /**
+   * Grade
+   */
+  grade?: string | null;
   /**
    * Key
    */
@@ -19567,6 +19601,42 @@ export type CreateTimelineEventEndpointResponses = {
 
 export type CreateTimelineEventEndpointResponse =
   CreateTimelineEventEndpointResponses[keyof CreateTimelineEventEndpointResponses];
+
+export type GradeTimelineEventEndpointData = {
+  body: TimelineEventGradeUpdate;
+  path: {
+    /**
+     * Timeline Event Id
+     */
+    timeline_event_id: string;
+  };
+  query?: never;
+  url: '/api/timeline-events/{timeline_event_id}';
+};
+
+export type GradeTimelineEventEndpointErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GradeTimelineEventEndpointError =
+  GradeTimelineEventEndpointErrors[keyof GradeTimelineEventEndpointErrors];
+
+export type GradeTimelineEventEndpointResponses = {
+  /**
+   * Successful Response
+   */
+  200: TimelineEventRowOut;
+};
+
+export type GradeTimelineEventEndpointResponse =
+  GradeTimelineEventEndpointResponses[keyof GradeTimelineEventEndpointResponses];
 
 export type DismissHitData = {
   body?: never;

@@ -109,6 +109,7 @@ def _manual_event(db: Session, row: TimelineEvent) -> dict:
         "date_end": row.date_end,
         "precision": row.precision,
         "verification_status": row.verification_status,
+        "grade": row.grade,
         "synthetic": False,
         "refs": {
             "entity_id": row.entity_id,
@@ -293,6 +294,8 @@ def investigation_timeline(
         # Only reporter-authored events point at records; every event still
         # carries the key, so one reply shape covers every kind.
         event.setdefault("context", None)
+        # Only a reporter's event can be graded (Bellingcat's scale); the key is on every event.
+        event.setdefault("grade", None)
         counts[event["kind"]] = counts.get(event["kind"], 0) + 1
         status_counts[event["verification_status"]] = status_counts.get(event["verification_status"], 0) + 1
     total = len(events)
@@ -346,6 +349,34 @@ def validate_timeline_refs(db: Session, row: TimelineEvent) -> None:
 TIMELINE_EVENT_PRECISIONS = {"day", "month", "year", "range", "unknown"}
 TIMELINE_EVENT_VERIFICATION_STATUSES = {"asserted", "verified", "approximate", "disputed", "unresolved"}
 
+# How well an event is substantiated: Bellingcat's incident grading scale
+# (ADR-0005, line 5; Bellingcat, "Yemen Project: Collection protocol",
+# https://yemen.bellingcat.com/methodology/collection-protocol), its words
+# kept, its airstrike-specific level ("cause of explosion as other") left
+# out. A grade is the reporter's; the verification status is about the
+# event's date, the grade about the event itself.
+EVENT_GRADES: dict[str, str] = {
+    "confirmed": "enough evidence, from several verification techniques and at least three sources cross-referenced",
+    "likely": "several sources report it and most of the information can be verified, with minor contradictions",
+    "weak": "a single source says it happened",
+    "unsubstantiated": "no conclusion can be reached for lack of evidence",
+    "unknown": "what happened cannot be identified",
+}
+
+
+def validate_event_grade(grade: str | None) -> None:
+    if grade is not None and grade not in EVENT_GRADES:
+        raise ValueError(f"Grade must be one of: {', '.join(EVENT_GRADES)}")
+
+
+def grade_timeline_event(db: Session, row: TimelineEvent, grade: str | None) -> TimelineEvent:
+    """Set (or, with None, clear) a reporter's event's grade."""
+    validate_event_grade(grade)
+    row.grade = grade
+    db.commit()
+    db.refresh(row)
+    return row
+
 
 def create_timeline_event(db: Session, body: TimelineEventCreate) -> TimelineEvent:
     """Validate and persist a new TimelineEvent from a request body.
@@ -360,6 +391,7 @@ def create_timeline_event(db: Session, body: TimelineEventCreate) -> TimelineEve
         raise ValueError(f"Precision must be one of: {', '.join(sorted(TIMELINE_EVENT_PRECISIONS))}")
     if body.verification_status not in TIMELINE_EVENT_VERIFICATION_STATUSES:
         raise ValueError(f"Verification status must be one of: {', '.join(sorted(TIMELINE_EVENT_VERIFICATION_STATUSES))}")
+    validate_event_grade(body.grade)
     if _normalize_date(body.date_start) is None:
         raise ValueError("date_start must be ISO year, month, or date (YYYY, YYYY-MM, YYYY-MM-DD)")
     if body.date_end and _normalize_date(body.date_end) is None:

@@ -60,6 +60,14 @@ reversed; the code built on it says which ADR line it rests on.
    review shows the stances and how many sources the evidence comes from to
    judge by. The claims on the grid are the design's claim-strength grid
    (chart kind `heatmap`, query `claims_by_strength`).
+   The event grade was built in the same pass: a reporter's timeline event
+   takes one of Bellingcat's words (confirmed, likely, weak,
+   unsubstantiated, unknown), set when recorded or later; the protocol's
+   airstrike-only level ("cause of explosion as other") is left out, and
+   its own word "unsubstantiated" is kept where this line first said
+   "unsupported". The verification status stays: it is about the event's
+   date, the grade about the event. The timeline chart writes the grade
+   beside the status ("verified, graded likely").
 6. **Statistical charts come before money flows and networks** (pass 3 then
    pass 4, as the research doc planned). Reason: statistical charts reuse
    ECharts, which is already in the app, and python-pptx's native charts, so

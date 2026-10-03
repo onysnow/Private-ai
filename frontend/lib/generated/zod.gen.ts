@@ -5104,6 +5104,9 @@ export const zTimelineEventCreate = z.object({
   description: z.string().nullish(),
   entity_id: z.string().nullish(),
   evidence_id: z.string().nullish(),
+  grade: z
+    .enum(['confirmed', 'likely', 'weak', 'unsubstantiated', 'unknown'])
+    .nullish(),
   investigation_id: z.string(),
   lead_id: z.string().nullish(),
   origin: z.string().nullish(),
@@ -5112,6 +5115,17 @@ export const zTimelineEventCreate = z.object({
   source_id: z.string().nullish(),
   title: z.string(),
   verification_status: z.string().optional().default('asserted'),
+});
+
+/**
+ * TimelineEventGradeUpdate
+ *
+ * A reporter's grade for an event they recorded; null clears it.
+ */
+export const zTimelineEventGradeUpdate = z.object({
+  grade: z
+    .enum(['confirmed', 'likely', 'weak', 'unsubstantiated', 'unknown'])
+    .nullable(),
 });
 
 /**
@@ -5127,6 +5141,7 @@ export const zTimelineEventOut = z.object({
   date_end: z.string().nullish(),
   date_start: z.string(),
   description: z.string().nullish(),
+  grade: z.string().nullish(),
   id: z.string(),
   investigation_id: z.string(),
   kind: z.string(),
@@ -5178,6 +5193,7 @@ export const zTimelineEventRowOut = z.object({
   description: z.string().nullish(),
   entity_id: z.string().nullish(),
   evidence_id: z.string().nullish(),
+  grade: z.string().nullish(),
   id: z.string(),
   investigation_id: z.string(),
   lead_id: z.string().nullish(),
@@ -5383,6 +5399,7 @@ export const zVisualDataRowOut = z.object({
   across: z.string().nullish(),
   down: z.string().nullish(),
   end: z.string().nullish(),
+  grade: z.string().nullish(),
   key: z.string(),
   label: z.string(),
   latitude: z.number().nullish(),
@@ -7858,6 +7875,17 @@ export const zCreateTimelineEventEndpointBody = zTimelineEventCreate;
  * Successful Response
  */
 export const zCreateTimelineEventEndpointResponse = zTimelineEventRowOut;
+
+export const zGradeTimelineEventEndpointBody = zTimelineEventGradeUpdate;
+
+export const zGradeTimelineEventEndpointPath = z.object({
+  timeline_event_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGradeTimelineEventEndpointResponse = zTimelineEventRowOut;
 
 export const zDismissHitPath = z.object({
   hit_id: z.string(),

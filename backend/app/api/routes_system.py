@@ -21,7 +21,7 @@ from app.api.dependencies import authorize_request_resource
 from app.core.authorization import scope_for_request
 from app.core.config import settings
 from app.db.session import get_db
-from app.models.domain import AIAnalysisCandidate, Investigation, Source, StatementAssessment
+from app.models.domain import AIAnalysisCandidate, Investigation, Source, StatementAssessment, TimelineEvent
 from app.schemas.responses import (
     AiAnalysisCandidateOut, AiAnalysisCandidateReviewOut, CapabilitiesOut, DeckOut, EvidenceOut, HealthOut,
     OpenAlephStatusOut, PresentationStyleCatalogOut, RelationshipSchemasOut, SearchOut, StatementPromotionOut,
@@ -34,6 +34,7 @@ from app.schemas.api import (
     PromoteToWriteupRequest,
     StatementPromotionRequest,
     TimelineEventCreate,
+    TimelineEventGradeUpdate,
 )
 from app.ai.reasoning import review_ai_analysis_candidate, serialize_ai_analysis_candidate
 from app.services.decks import serialize_deck
@@ -45,7 +46,7 @@ from app.services.promotion import promote_assessment
 from app.services.presentation_style import catalog as presentation_style_catalog
 from app.services.relationships import RELATIONSHIP_SCHEMAS
 from app.services.search import investigation_search
-from app.services.timeline import create_timeline_event
+from app.services.timeline import create_timeline_event, grade_timeline_event
 from app.services.writeups import serialize_writeup
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -123,6 +124,18 @@ def create_timeline_event_endpoint(body: TimelineEventCreate, db: Session = Depe
         return create_timeline_event(db, body)
     except ValueError as exc:
         raise HTTPException(400, str(exc))
+
+
+@router.patch("/timeline-events/{timeline_event_id}", response_model=TimelineEventRowOut)
+def grade_timeline_event_endpoint(timeline_event_id: str, body: TimelineEventGradeUpdate, db: Session = Depends(get_db)) -> Any:
+    """Grade a reporter's event on Bellingcat's scale (or clear the grade)."""
+    row = db.get(TimelineEvent, timeline_event_id)
+    if row is None:
+        raise HTTPException(404, "Timeline event not found")
+    try:
+        return grade_timeline_event(db, row, body.grade)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
 
 
 @router.get("/presentation-styles", response_model=PresentationStyleCatalogOut)

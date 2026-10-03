@@ -106,6 +106,7 @@ import {
   getSimilarDocuments,
   getWatchlist,
   getWriteupEndpoint,
+  gradeTimelineEventEndpoint,
   health,
   importOpenalephDocumentEntities,
   importOpenalephDocumentEvidence,
@@ -493,6 +494,9 @@ import type {
   GetWriteupEndpointData,
   GetWriteupEndpointError,
   GetWriteupEndpointResponse,
+  GradeTimelineEventEndpointData,
+  GradeTimelineEventEndpointError,
+  GradeTimelineEventEndpointResponse,
   HealthData,
   HealthError,
   HealthResponse,
@@ -6728,6 +6732,35 @@ export const createTimelineEventEndpointMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await createTimelineEventEndpoint({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Grade Timeline Event Endpoint
+ *
+ * Grade a reporter's event on Bellingcat's scale (or clear the grade).
+ */
+export const gradeTimelineEventEndpointMutation = (
+  options?: Partial<Options<GradeTimelineEventEndpointData>>,
+): UseMutationOptions<
+  GradeTimelineEventEndpointResponse,
+  GradeTimelineEventEndpointError,
+  Options<GradeTimelineEventEndpointData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    GradeTimelineEventEndpointResponse,
+    GradeTimelineEventEndpointError,
+    Options<GradeTimelineEventEndpointData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await gradeTimelineEventEndpoint({
         ...options,
         ...fnOptions,
         throwOnError: true,

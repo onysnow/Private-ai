@@ -33,6 +33,10 @@ class TimelineEvent(Base):
     date_end: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
     precision: Mapped[str] = mapped_column(String(32), default="day", index=True)
     verification_status: Mapped[str] = mapped_column(String(32), default="asserted", index=True)
+    # How well the event itself is substantiated, on Bellingcat's grading
+    # scale (ADR-0005, line 5; app/services/timeline.py EVENT_GRADES); the
+    # verification status above is about its date. None until graded.
+    grade: Mapped[str | None] = mapped_column(String(16), nullable=True)
     entity_id: Mapped[str | None] = mapped_column(ForeignKey("entities.id"), nullable=True, index=True)
     relationship_entity_id: Mapped[str | None] = mapped_column(ForeignKey("entities.id"), nullable=True, index=True)
     source_id: Mapped[str | None] = mapped_column(ForeignKey("sources.id"), nullable=True, index=True)

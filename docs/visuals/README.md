@@ -614,8 +614,13 @@ ADR-0005 line 18 holds the decisions and the numbers behind them.
 - **Exports.** A deck holds the render service's picture, or the cells as a
   native table (cell, count) with the reason; a brief the picture and the
   data table.
+- **Event grades.** A reporter's timeline event can be graded on
+  Bellingcat's scale (confirmed, likely, weak, unsubstantiated, unknown;
+  ADR-0005, line 5), and the timeline chart writes the grade beside the
+  event's status ("verified, graded likely"), so decks and briefs carry it.
 - Tests: `backend/tests/test_visuals_grid.py`, the `heatmap` fixture in
-  `frontend/test-support/chart-kinds.json`, `frontend/tests/test-claims.test.tsx`.
+  `frontend/test-support/chart-kinds.json`, `frontend/tests/test-claims.test.tsx`., `backend/tests/test_timeline_grade.py`,
+  `frontend/tests/test-timeline-grade.test.tsx`.
 
 ## What pass 3 built, and what is left
 

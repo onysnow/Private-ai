@@ -303,6 +303,9 @@ import type {
   GetWriteupEndpointData,
   GetWriteupEndpointErrors,
   GetWriteupEndpointResponses,
+  GradeTimelineEventEndpointData,
+  GradeTimelineEventEndpointErrors,
+  GradeTimelineEventEndpointResponses,
   HealthData,
   HealthErrors,
   HealthResponses,
@@ -794,6 +797,9 @@ import {
   zGetWatchlistResponse,
   zGetWriteupEndpointPath,
   zGetWriteupEndpointResponse,
+  zGradeTimelineEventEndpointBody,
+  zGradeTimelineEventEndpointPath,
+  zGradeTimelineEventEndpointResponse,
   zHealthResponse,
   zImportOpenalephDocumentEntitiesPath,
   zImportOpenalephDocumentEntitiesResponse,
@@ -6685,6 +6691,43 @@ export const createTimelineEventEndpoint = <
     responseValidator: async (data) =>
       await zCreateTimelineEventEndpointResponse.parseAsync(data),
     url: '/api/timeline-events',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Grade Timeline Event Endpoint
+ *
+ * Grade a reporter's event on Bellingcat's scale (or clear the grade).
+ */
+export const gradeTimelineEventEndpoint = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GradeTimelineEventEndpointData, ThrowOnError>,
+): RequestResult<
+  GradeTimelineEventEndpointResponses,
+  GradeTimelineEventEndpointErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).patch<
+    GradeTimelineEventEndpointResponses,
+    GradeTimelineEventEndpointErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zGradeTimelineEventEndpointBody,
+          path: zGradeTimelineEventEndpointPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGradeTimelineEventEndpointResponse.parseAsync(data),
+    url: '/api/timeline-events/{timeline_event_id}',
     ...options,
     headers: {
       'Content-Type': 'application/json',

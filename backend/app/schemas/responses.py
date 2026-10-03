@@ -201,6 +201,8 @@ class VisualDataRowOut(ResponseModel):
     start: str | None = Field(default=None, exclude_if=_absent_when_none)
     end: str | None = Field(default=None, exclude_if=_absent_when_none)
     status: str | None = Field(default=None, exclude_if=_absent_when_none)
+    # Its grade on Bellingcat's scale, once the reporter has graded it.
+    grade: str | None = Field(default=None, exclude_if=_absent_when_none)
     # A places row's coordinates, as its record gives them (a map).
     latitude: float | None = Field(default=None, exclude_if=_absent_when_none)
     longitude: float | None = Field(default=None, exclude_if=_absent_when_none)
@@ -565,6 +567,8 @@ class TimelineEventOut(ResponseModel):
     date_end: str | None = None
     precision: str
     verification_status: str
+    # Bellingcat's grade, on a reporter's event once graded; null otherwise.
+    grade: str | None = None
     synthetic: bool
     refs: dict[str, Any]
     provenance: dict[str, Any]
@@ -592,6 +596,8 @@ class TimelineEventRowOut(ResponseModel):
     date_end: str | None = None
     precision: str
     verification_status: str
+    # Bellingcat's grade, on a reporter's event once graded; null otherwise.
+    grade: str | None = None
     entity_id: str | None = None
     relationship_entity_id: str | None = None
     source_id: str | None = None

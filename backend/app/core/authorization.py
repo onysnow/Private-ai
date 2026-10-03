@@ -167,6 +167,7 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         ReportingTask,
         Source,
         StatementAssessment,
+        TimelineEvent,
         WatchlistEntry,
         WatchlistHit,
         Writeup,
@@ -191,6 +192,7 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         "batch_id": (IngestionBatch, "investigation_id"),
         "watch_id": (WatchlistEntry, "investigation_id"),
         "hit_id": (WatchlistHit, "investigation_id"),
+        "timeline_event_id": (TimelineEvent, "investigation_id"),
     }
     if key in direct:
         model, attr = direct[key]

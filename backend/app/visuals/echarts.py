@@ -1083,9 +1083,11 @@ _MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 
 
 def status_words(row: DataRow) -> str:
-    """An event's verification status in plain words."""
+    """An event's verification status in plain words, and its grade on
+    Bellingcat's scale once the reporter has graded it: "verified, graded likely"."""
     status = row.status or "asserted"
-    return _STATUS_WORDS.get(status, status)
+    words = _STATUS_WORDS.get(status, status)
+    return f"{words}, graded {row.grade}" if row.grade else words
 
 
 def _date_words(text: str | None) -> str:

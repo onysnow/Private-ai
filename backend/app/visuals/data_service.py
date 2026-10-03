@@ -60,7 +60,8 @@ class DataRow:
     target: str | None = None   # ... and who it went to; `label` is "source → target"
     start: str | None = None    # an "events" row: its date as recorded (a year, a month or a day) ...
     end: str | None = None      # ... the date it ended, when it has one ...
-    status: str | None = None   # ... and how far it is verified (app/services/timeline.py)
+    status: str | None = None   # ... and how far it is verified (app/services/timeline.py) ...
+    grade: str | None = None    # ... and, once graded, how well it is substantiated (Bellingcat's scale)
     latitude: float | None = None    # a "places" row: where its record puts it
     longitude: float | None = None
     across: str | None = None        # a "grid" row: its column (an evidence grade) ...
@@ -80,6 +81,8 @@ class DataRow:
             out["start"], out["status"] = self.start, self.status
             if self.end is not None:
                 out["end"] = self.end
+            if self.grade is not None:
+                out["grade"] = self.grade
         if self.latitude is not None and self.longitude is not None:
             # And only places rows.
             out["latitude"], out["longitude"] = self.latitude, self.longitude
@@ -134,6 +137,7 @@ class VisualData:
                     start=str(r["start"]) if isinstance(r.get("start"), str) else None,
                     end=str(r["end"]) if isinstance(r.get("start"), str) and isinstance(r.get("end"), str) else None,
                     status=str(r["status"]) if isinstance(r.get("start"), str) and isinstance(r.get("status"), str) else None,
+                    grade=str(r["grade"]) if isinstance(r.get("start"), str) and isinstance(r.get("grade"), str) else None,
                     latitude=_coordinate(r, "latitude"), longitude=_coordinate(r, "longitude"),
                     across=str(r["across"]) if isinstance(r.get("across"), str) and isinstance(r.get("down"), str) else None,
                     down=str(r["down"]) if isinstance(r.get("across"), str) and isinstance(r.get("down"), str) else None)
@@ -541,7 +545,8 @@ def events_in_order(db: Session, investigation_id: str, params: dict[str, str]) 
         # date, then by title, so events on the same day keep one order.
         rows.append(DataRow(label, 1.0, refs, 1, f"{lo.isoformat()}|{hi.isoformat()}|{label.lower()}|{event['id']}",
                             start=str(event.get("date_start")), end=str(event["date_end"]) if event.get("date_end") else None,
-                            status=str(event.get("verification_status") or "asserted")))
+                            status=str(event.get("verification_status") or "asserted"),
+                            grade=str(event["grade"]) if event.get("grade") else None))
     rows.sort(key=lambda r: (r.key, r.label))
     return VisualData(
         investigation_id=investigation_id, query="events_in_order", params=params,

@@ -23586,6 +23586,24 @@
             ],
             "title": "Evidence Id"
           },
+          "grade": {
+            "anyOf": [
+              {
+                "enum": [
+                  "confirmed",
+                  "likely",
+                  "weak",
+                  "unsubstantiated",
+                  "unknown"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grade"
+          },
           "investigation_id": {
             "title": "Investigation Id",
             "type": "string"
@@ -23657,6 +23675,34 @@
         "title": "TimelineEventCreate",
         "type": "object"
       },
+      "TimelineEventGradeUpdate": {
+        "description": "A reporter's grade for an event they recorded; null clears it.",
+        "properties": {
+          "grade": {
+            "anyOf": [
+              {
+                "enum": [
+                  "confirmed",
+                  "likely",
+                  "weak",
+                  "unsubstantiated",
+                  "unknown"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grade"
+          }
+        },
+        "required": [
+          "grade"
+        ],
+        "title": "TimelineEventGradeUpdate",
+        "type": "object"
+      },
       "TimelineEventOut": {
         "additionalProperties": true,
         "description": "One timeline event: a reporter-authored row (which carries `context`),\nor one derived from a dated statement, source, relationship or record\nactivity (`synthetic`, with no context). Derived kinds add their own\nkeys, so the model stays open.",
@@ -23696,6 +23742,17 @@
               }
             ],
             "title": "Description"
+          },
+          "grade": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grade"
           },
           "id": {
             "title": "Id",
@@ -23827,6 +23884,17 @@
               }
             ],
             "title": "Evidence Id"
+          },
+          "grade": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grade"
           },
           "id": {
             "title": "Id",
@@ -24615,6 +24683,17 @@
               }
             ],
             "title": "End"
+          },
+          "grade": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grade"
           },
           "key": {
             "title": "Key",
@@ -43689,6 +43768,66 @@
           }
         },
         "summary": "Create Timeline Event Endpoint"
+      }
+    },
+    "/api/timeline-events/{timeline_event_id}": {
+      "patch": {
+        "description": "Grade a reporter's event on Bellingcat's scale (or clear the grade).",
+        "operationId": "grade_timeline_event_endpoint",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "timeline_event_id",
+            "required": true,
+            "schema": {
+              "title": "Timeline Event Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimelineEventGradeUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimelineEventRowOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Grade Timeline Event Endpoint"
       }
     },
     "/api/watchlist-hits/{hit_id}/dismiss": {
