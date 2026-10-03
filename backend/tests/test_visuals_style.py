@@ -50,7 +50,7 @@ def test_the_catalogue_offers_presets_and_options_per_family_and_nothing_the_des
     # axis, no pulled-out slice, no gap between bins.
     names = {name for options in CHART_OPTIONS.values() for name in options}
     assert names == {"sort", "thickness", "axis_line", "gridlines", "highlight", "line_width", "markers", "value_labels", "smooth",
-                     "log_scale", "other_after", "centre_total", "binning", "label_points"}
+                     "log_scale", "other_after", "centre_total", "binning", "label_points", "stages"}
     assert {name for options in CHART_OPTIONS.values() for name, spec in options.items() if spec.get("warning")} == {"smooth", "log_scale"}
     json.dumps(served)
 

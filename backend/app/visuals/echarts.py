@@ -65,7 +65,7 @@ from typing import Any
 
 from app.services.presentation_style import INK_DARK, INK_LIGHT, Theme, contrast_ratio, font_stack
 from app.visuals.data_service import DataRow, RecordRef, VisualData, date_bounds, event_span
-from app.visuals.layout import LABEL_GAP, TEXT_SLACK, block_width, place_on_line
+from app.visuals.layout import LABEL_GAP, TEXT_SLACK, block_width, place_on_line, wrapped_lines
 from app.visuals.spec import (
     COLOUR_PER_CATEGORY_KINDS, DRAWN_KINDS, PART_OF_WHOLE_KINDS, SERIES_FOR_KIND, ChartKind, Scale, SortOrder, VisualSpec,
 )
@@ -125,6 +125,7 @@ class DrawOptions:
     # not hold one at all.
     binning: str = DEFAULT_BINNING  # histogram: the rule that sets the number of bins
     label_points: str = "auto"      # scatter: "auto" (every point when few, else outliers) | "outliers"
+    stages: bool = False            # sankey: the parties at each place in the chain of payments grouped into one stage
 
 
 @dataclass
@@ -145,6 +146,7 @@ class BuiltChart:
     total: float | None = None                                   # part-of-whole kinds: the whole
     bins: list[tuple[float, float]] = field(default_factory=list)  # histogram: each row's [start, end)
     labelled_points: list[str] = field(default_factory=list)   # scatter: the points named on the chart
+    stages: dict[str, list[str]] = field(default_factory=dict)   # a staged flow: each stage and the parties in it
 
     def text(self) -> dict[str, Any]:
         """The words stored beside the chart in a draft (rule 13)."""
@@ -887,6 +889,47 @@ def sankey_layout(rows: list[DataRow], ids: dict[str, tuple[str, str]], plot_hei
     return SankeyLayout(depth, ky if math.isfinite(ky) else 0.0)
 
 
+STAGE_NAMES_SHOWN = 3   # a stage names its parties up to this many; past it, says how many
+STAGE_LABEL_WIDTH = 300 # px: a stage's words wrap at this width, or at the room between columns when that is less
+
+
+def flow_stages(rows: list[DataRow]) -> tuple[list[DataRow], dict[str, list[str]]]:
+    """The flows grouped into stages, for a slide or print (the design doc,
+    after OCCRP's Russian Laundromat: "for a slide or print, simplify the
+    flow into stages"). A party's stage is its column in the full flow
+    diagram (sankey_layout: the longest chain of payments leading to it; a
+    party that pays no one, the last), so the grouping comes from the
+    records alone. The money between two stages is the sum of the flows
+    between their parties, with every payment behind it, so nothing is
+    left out or counted twice. Only for flows with no circle: money that
+    comes back round gives the parties no order."""
+    ids, _split = sankey_node_ids(rows)
+    depth = sankey_layout(rows, ids, 1.0).depth
+    columns = sorted(set(depth.values()))
+    members: dict[int, list[str]] = {c: sorted((n for n in depth if depth[n] == c), key=str.lower) for c in columns}
+    names: dict[int, str] = {}
+    for position, column in enumerate(columns, start=1):
+        parties = members[column]
+        shown = ", ".join(parties) if len(parties) <= STAGE_NAMES_SHOWN else f"{len(parties)} parties"
+        names[column] = f"Stage {position}: {shown}"
+    totals: dict[tuple[int, int], DataRow] = {}
+    for row in rows:
+        a, b = depth[row.source or ""], depth[row.target or ""]
+        staged = totals.get((a, b))
+        if staged is None:
+            label = f"{names[a]} → {names[b]}"
+            staged = totals[(a, b)] = DataRow(label, 0.0, [], 0, label, source=names[a], target=names[b])
+        staged.value = round(staged.value + row.value, 2)
+        staged.record_count += row.record_count
+        for ref in row.record_refs:
+            if ref not in staged.record_refs:
+                staged.record_refs.append(ref)
+    out = sorted(totals.values(), key=lambda r: (-r.value, r.label.lower()))
+    for row in out:
+        row.record_refs.sort(key=lambda r: (r.record_type, r.record_id))
+    return out, {names[c]: members[c] for c in columns}
+
+
 def sankey_labelled(rows: list[DataRow], ids: dict[str, tuple[str, str]], layout: SankeyLayout) -> set[str]:
     """The flows whose amount is written on their band: a band from one
     column to the next (one reaching further passes behind a party's bar,
@@ -905,7 +948,19 @@ def _sankey(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
     fits (sankey_labelled); every party named beside its bar."""
     theme, data, rows, highlighted = p.theme, p.data, p.rows, p.highlighted
     ids, split = sankey_node_ids(rows)
+    staged = p.draw.stages and not split
     top, bottom = 84, 44
+    stage_width = 0
+    if staged:
+        # A staged flow names each stage above its bar ("Stage 2", then its
+        # parties wrapped to the room between two columns): its names are
+        # long and its columns few and wide, and beside the bar they ran over
+        # the bands. The space above the bars is as tall as the longest name.
+        columns = max(1, len({row.source for row in rows} | {row.target for row in rows}) - 1)
+        stage_width = int(min((p.width - 16) / columns - 2 * LABEL_GAP, STAGE_LABEL_WIDTH))
+        lines = max((1 + len(wrapped_lines(name.partition(": ")[2], MIN_FONT_PX, stage_width) or [name])
+                     for row in rows for name in (row.source or "", row.target or "")), default=2)
+        top += lines * (MIN_FONT_PX + 4) + 8
     if split:
         names_by_id = {n: n.split(": ", 1)[1] for pair in ids.values() for n in pair}
         layout = SankeyLayout({n: (0 if n.startswith("pays: ") else 1) for n in names_by_id}, 0.0)
@@ -935,14 +990,25 @@ def _sankey(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
         names[source_id], names[target_id] = row.source or "", row.target or ""
         outgoing.add(source_id)
     nodes = []
+    last_column = max(layout.depth.values(), default=0)
     for node_id in sorted(names, key=lambda n: (layout.depth.get(n, 0), names[n].lower(), n)):
         bold = names[node_id] in picked_parties
+        label: dict[str, Any] = {"show": True, "position": "right" if node_id in outgoing else "left", "formatter": _literal(names[node_id]),
+                                 **_text_style(theme, MIN_FONT_PX, bold=bold)}
+        if staged:
+            column = layout.depth.get(node_id, 0)
+            head, _, parties = names[node_id].partition(": ")
+            # Over the bar, wrapped to the room between two columns; the first
+            # stage's words run right from its bar and the last's left, so
+            # neither leaves the picture.
+            label.update({"position": "top", "formatter": _literal(f"{head}\n{parties}"), "width": stage_width,
+                          "overflow": "break", "lineHeight": MIN_FONT_PX + 4,
+                          "align": "left" if column == 0 else ("right" if column == last_column else "center")})
         nodes.append({
             "name": node_id, "depth": layout.depth.get(node_id, 0), "itemStyle": {"color": _hex(node_colour)},
             # A party that pays no one sits in the last column: its name goes
             # on its left, inside the picture.
-            "label": {"show": True, "position": "right" if node_id in outgoing else "left", "formatter": _literal(names[node_id]),
-                      **_text_style(theme, MIN_FONT_PX, bold=bold)},
+            "label": label,
             "tooltip": {"formatter": _literal(names[node_id])},
         })
     any_pick = bool(highlighted or picked_parties)
@@ -1169,8 +1235,17 @@ def build_chart(spec: VisualSpec, data: VisualData, theme: Theme, *, width: int 
     check_fit(spec, data)
     kind = spec.kind
     bins: list[tuple[float, float]] = []
+    stages: dict[str, list[str]] = {}
     if kind == ChartKind.histogram:
         rows, bins = _histogram_rows(data, draw.binning)
+    elif kind == ChartKind.sankey and draw.stages:
+        if flows_circle(data.rows):
+            raise ChartDoesNotFit("the money runs in a circle, so the parties have no order to group into stages; draw the full flow diagram")
+        rows, stages = flow_stages(data.rows)
+        # A party picked out picks out its stage; a staged flow can be picked by its own label.
+        stage_of = {party: stage for stage, parties in stages.items() for party in parties}
+        picked = [stage_of.get(name, name) for name in spec.highlight]
+        spec = spec.model_copy(update={"highlight": list(dict.fromkeys(picked))})
     else:
         rows = prepare_rows(spec, data, draw)
     highlighted = {label for label in spec.highlight if any(row.label == label for row in rows)}
@@ -1181,9 +1256,14 @@ def build_chart(spec: VisualSpec, data: VisualData, theme: Theme, *, width: int 
         shares = part_shares([row.value for row in rows]) or [0.0 for _ in rows]
     labelled = scatter_labels(rows, draw.label_points) if kind == ChartKind.scatter else set()
     source = source_line(data, rows, kind)
-    words = _words(spec, data, rows, highlighted, kind, shares=shares, total=total, bins=bins, labelled=labelled)
+    words = _words(spec, data, rows, highlighted, kind, shares=shares, total=total, bins=bins, labelled=labelled, stages=stages)
     colours = part_colours(rows, theme, highlighted) if kind in PART_OF_WHOLE_KINDS else [mark_colour(theme) if kind in (ChartKind.line, ChartKind.area, ChartKind.scatter, ChartKind.timeline) else theme.accent]
-    frame = _frame(spec, theme, _subtitle(spec, data, kind), source, words["alt_text"], width, colours=colours)
+    subtitle = _subtitle(spec, data, kind)
+    if stages and not spec.subtitle:
+        unit = data.unit or spec.unit or ""
+        subtitle = ("Money paid from stage to stage" + (f", band width by amount in {unit}" if unit else "")
+                    + "; a stage groups the parties at the same place in the chain of payments")
+    frame = _frame(spec, theme, subtitle, source, words["alt_text"], width, colours=colours)
     parts = _Parts(spec, data, theme, rows, highlighted, draw, width, height)
     if kind in (ChartKind.bar, ChartKind.column):
         option = _bars(parts, frame)
@@ -1207,7 +1287,7 @@ def build_chart(spec: VisualSpec, data: VisualData, theme: Theme, *, width: int 
         option=option, alt_text=words["alt_text"], description=words["description"], data_table=words["data_table"],
         source_line=source, rows=rows, highlighted_labels=sorted(highlighted),
         single_record_labels=[row.label for row in rows if row.record_count == 1], width=width, height=height,
-        kind=kind, draw=draw, shares=shares, total=total, bins=bins, labelled_points=sorted(labelled),
+        kind=kind, draw=draw, shares=shares, total=total, bins=bins, labelled_points=sorted(labelled), stages=stages,
     )
 
 
@@ -1219,7 +1299,8 @@ def _table_row(row: DataRow, data: VisualData) -> dict[str, Any]:
 
 
 def _words(spec: VisualSpec, data: VisualData, rows: list[DataRow], highlighted: set[str], kind: ChartKind, *,
-           shares: list[float], total: float | None, bins: list[tuple[float, float]], labelled: set[str]) -> dict[str, Any]:
+           shares: list[float], total: float | None, bins: list[tuple[float, float]], labelled: set[str],
+           stages: dict[str, list[str]] | None = None) -> dict[str, Any]:
     name = KIND_LABELS.get(kind, kind.value)
     unit = data.unit or spec.unit or ""
     columns = ["Label", f"Value ({unit})", "Records"]
@@ -1279,7 +1360,12 @@ def _words(spec: VisualSpec, data: VisualData, rows: list[DataRow], highlighted:
         parties = {row.source for row in rows} | {row.target for row in rows}
         alt = (f"{name}: {spec.title}. {count} flow{'s' if count != 1 else ''} between {len(parties)} parties, amounts in {unit}. "
                f"Largest: {largest.label} at {format_value(largest.value, data)}; smallest: {smallest.label} at {format_value(smallest.value, data)}.")
-        if kind == ChartKind.sankey and flows_circle(rows):
+        if stages:
+            parties_in = sum(len(p) for p in stages.values())
+            alt = (f"{name}: {spec.title}. {count} flow{'s' if count != 1 else ''} between {len(stages)} stages of {parties_in} parties, "
+                   f"amounts in {unit}. Largest: {largest.label} at {format_value(largest.value, data)}.")
+            lines.extend(f"{stage.split(':', 1)[0]}: {', '.join(parties)}." for stage, parties in stages.items())
+        elif kind == ChartKind.sankey and flows_circle(rows):
             alt += " The money also runs back the other way, so payers are drawn on the left and recipients on the right."
         columns = ["Flow", "From", "To", f"Value ({unit})", "Records"]
         for row, table_row in zip(rows, table_rows):

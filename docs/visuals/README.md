@@ -373,6 +373,16 @@ rows rank as bars.
 - **Exports.** PowerPoint has no sankey, so a deck holds the render
   service's picture, or the flows ranked as bars with the reason when the
   service is down; a brief holds the picture, or the bar table.
+- **In stages, for a slide or print** (the style preset "Flow in stages",
+  option `stages`): the design doc's lesson from OCCRP's Russian Laundromat,
+  "for a slide or print, simplify the flow into stages". A party's stage is
+  its column in the full diagram, so the grouping comes from the records
+  alone; the money between two stages is the sum of the flows between
+  their parties, with every payment behind it (none left out or counted
+  twice). Each stage is named above its bar ("Stage 2", then its parties, or
+  how many past three), wrapped to the room between columns; picking a party
+  picks its stage. Refused when the money runs in a circle: the parties
+  then have no order.
 - Tests: `tests/test_visuals_flows.py`, and the `sankey` fixture in
   `frontend/test-support/chart-kinds.json`.
 
@@ -512,7 +522,9 @@ reporter uses without the AI. The app's side is tested in
 
 Left for later passes:
 
-- The staged flow and the who-pays-whom circle (chord).
+- The who-pays-whom circle (chord) is set aside: ECharts
+  6.1's chord writes no ribbon labels and shows direction by colour only
+  (ADR-0005, line 17); money that runs both ways is drawn on the sankey.
 - Parts of a whole over time (a stacked area), which needs a query with a
   second series.
 - Reading the values back out of the rendered SVG (the image-level half of

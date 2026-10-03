@@ -271,9 +271,13 @@ CHART_OPTIONS: dict[str, dict[str, dict]] = {
         "gridlines": _GRIDLINES,
         "highlight": _CHART_HIGHLIGHT,
     },
-    # A flow diagram has nothing else to set: each band sits between its two
-    # parties and is as wide as its money; the columns follow the payments.
+    # A flow diagram's bands sit between their two parties, as wide as their
+    # money, and the columns follow the payments; what can be set is which
+    # flows stand out, and whether the parties of each column are grouped
+    # into one stage (for a slide or print; refused when the money runs in a
+    # circle, since the parties then have no order).
     "flows": {
+        "stages": {"type": "bool", "label": "Group the parties into stages (for a slide or print)", "kinds": ["sankey"]},
         "highlight": {"type": "labels", "label": "Highlight a party or a flow (the others turn grey)"},
     },
     # A timeline's rows run in date order and every mark sits at its own
@@ -318,6 +322,8 @@ CHART_PRESETS: dict[str, list[dict]] = {
     "flows": [
         {"id": "flow", "label": "Flow diagram", "description": "Payers on the left, recipients to the right, each band as wide as the money.",
          "kind": "sankey", "options": {}},
+        {"id": "staged", "label": "Flow in stages", "description": "For a slide or print: the parties at each place in the chain of payments "
+         "grouped into one stage, and the money between the stages.", "kind": "sankey", "options": {"stages": True}},
     ],
     "timeline": [
         {"id": "timeline", "label": "Timeline", "description": "One row per event, earliest first: a dot for a day, a line from start to end.",

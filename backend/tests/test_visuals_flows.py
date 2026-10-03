@@ -20,7 +20,7 @@ from app.services.relationships import create_relationship
 from app.visuals.checker import MAX_FLOW_PARTIES, check_visual
 from app.visuals.data_service import DataRow, RecordRef, VisualData
 from app.visuals.echarts import (
-    SINGLE_RECORD_MARK, ChartDoesNotFit, build_chart, flows_circle, sankey_layout, sankey_node_ids,
+    SINGLE_RECORD_MARK, ChartDoesNotFit, build_chart, flow_stages, flows_circle, sankey_layout, sankey_node_ids,
 )
 from app.visuals.render_client import RenderUnavailable
 from app.visuals.spec import parse_spec
@@ -207,3 +207,47 @@ def test_a_deck_holds_the_flow_diagram_as_the_rendered_picture_or_ranked_bars(fl
     slide = list(render_deck_pptx(_deck(db, inv_id, chart), []).slides)[1]
     frames = [shape for shape in slide.shapes if shape.has_chart]
     assert len(frames) == 1 and list(frames[0].chart.plots[0].categories)[-1].startswith("Bellcastle Trading Group → Meridian Holdings Ltd")
+
+
+# --- the flow in stages (for a slide or print) --------------------------------------------
+
+LAUNDROMAT = _data(_flow("Shell A", "Moldindcon", 900_000, 2), _flow("Shell B", "Moldindcon", 600_000, 1),
+                   _flow("Moldindcon", "Trasta", 1_400_000, 3), _flow("Trasta", "Luxury goods", 700_000, 2),
+                   _flow("Trasta", "Real estate", 500_000, 1), _flow("Shell A", "Real estate", 50_000, 1))
+
+
+def test_the_parties_at_each_place_in_the_chain_are_grouped_into_one_stage_and_no_money_is_lost():
+    rows, stages = flow_stages(LAUNDROMAT.rows)
+    assert stages == {"Stage 1: Shell A, Shell B": ["Shell A", "Shell B"], "Stage 2: Moldindcon": ["Moldindcon"],
+                      "Stage 3: Trasta": ["Trasta"], "Stage 4: Luxury goods, Real estate": ["Luxury goods", "Real estate"]}
+    assert [(r.source, r.target, r.value, r.record_count) for r in rows] == [
+        ("Stage 1: Shell A, Shell B", "Stage 2: Moldindcon", 1_500_000, 3), ("Stage 2: Moldindcon", "Stage 3: Trasta", 1_400_000, 3),
+        ("Stage 3: Trasta", "Stage 4: Luxury goods, Real estate", 1_200_000, 3),
+        ("Stage 1: Shell A, Shell B", "Stage 4: Luxury goods, Real estate", 50_000, 1)]
+    # Every payment is in exactly one staged flow, and every amount is in the totals.
+    assert sorted(ref.record_id for r in rows for ref in r.record_refs) == sorted(ref.record_id for r in LAUNDROMAT.rows for ref in r.record_refs)
+    assert sum(r.value for r in rows) == sum(r.value for r in LAUNDROMAT.rows)
+    many = flow_stages(_data(*[_flow(f"Payer {i}", "Hub", 10, 1) for i in range(5)]).rows)[1]
+    assert list(many) == ["Stage 1: 5 parties", "Stage 2: Hub"]
+
+
+def test_the_staged_preset_draws_the_stages_names_them_above_their_bars_and_passes_its_check():
+    styled, draw = styled_chart(_spec(), LAUNDROMAT, {"preset": "staged", "options": {"highlight": ["Moldindcon"]}})
+    assert draw.stages
+    built = build_chart(styled, LAUNDROMAT, DARK, draw=draw)
+    series = _sankey(built.option)
+    nodes = {n["name"]: n for n in series["data"]}
+    assert nodes["Stage 1: Shell A, Shell B"]["label"]["formatter"] == "Stage 1\nShell A, Shell B"
+    assert nodes["Stage 1: Shell A, Shell B"]["label"]["position"] == "top" and nodes["Stage 1: Shell A, Shell B"]["label"]["align"] == "left"
+    assert nodes["Stage 4: Luxury goods, Real estate"]["label"]["align"] == "right"
+    # A party picked out picks out its stage.
+    assert nodes["Stage 2: Moldindcon"]["label"]["fontWeight"] == "bold"
+    assert "a stage groups the parties at the same place in the chain of payments" in built.option["title"][0]["subtext"]
+    assert "Stage 4: Luxury goods, Real estate." in built.description
+    assert check_visual(styled, LAUNDROMAT, DARK, built).ok
+
+
+def test_money_that_comes_back_round_cannot_be_put_in_stages():
+    styled, draw = styled_chart(_spec(), CIRCLE, {"preset": "staged"})
+    with pytest.raises(ChartDoesNotFit, match="no order to group into stages"):
+        build_chart(styled, CIRCLE, DARK, draw=draw)

@@ -115,6 +115,25 @@ reversed; the code built on it says which ADR line it rests on.
     silently removes fields a response model doesn't list). Schemathesis then
     checks every reply against the published schema.
 
+### Visuals, decided while building (2026-10-03)
+
+17. **No chord diagram for now; two-way payments stay on the sankey.** The
+    design doc planned a "who-pays-whom circle" on ECharts 6's chord series.
+    Drawn through the render service (ECharts 6.1.0, five flows between four
+    parties), it failed the design's own rules: it wrote no label on any
+    ribbon (an `edgeLabel` or a link's `label` drew nothing), so a ribbon's
+    amount and direction cannot be written on it; its direction shows only
+    by its colour, the payer's (`lineStyle.color: 'source'`, the default;
+    rule 12 refuses colour alone); every party takes its own colour, so rule
+    10 caps it at eight; and a ribbon has one width at both ends
+    (`chordLayout.js` gives both ends the same span), so it cannot show the
+    "net winner" the FT Visual Vocabulary gives as the point of a chord
+    ("can illustrate 2-way flows (and net winner) in a matrix"). The sankey
+    already draws money that runs both ways (payers left, recipients right,
+    every band's amount written and in its tooltip; pass 4), and the
+    connection grid lists who is linked to whom. Revisit when ECharts' chord
+    writes ribbon labels, or if a reader needs the circle anyway.
+
 ## Consequences
 
 Easier: the build can continue without waiting on answers; each line is a
