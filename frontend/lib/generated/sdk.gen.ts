@@ -174,6 +174,9 @@ import type {
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceErrors,
   GetClaimReviewWorkspaceResponses,
+  GetCorpusInsightsData,
+  GetCorpusInsightsErrors,
+  GetCorpusInsightsResponses,
   GetCorpusStatusData,
   GetCorpusStatusErrors,
   GetCorpusStatusResponses,
@@ -645,6 +648,8 @@ import {
   zGetAiAnalysisCandidateEndpointResponse,
   zGetClaimReviewWorkspacePath,
   zGetClaimReviewWorkspaceResponse,
+  zGetCorpusInsightsPath,
+  zGetCorpusInsightsResponse,
   zGetCorpusStatusPath,
   zGetCorpusStatusResponse,
   zGetCorpusSyncPath,
@@ -3866,6 +3871,39 @@ export const listConnectorRuns = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zListConnectorRunsResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/connector-runs',
+    ...options,
+  });
+
+/**
+ * Get Corpus Insights
+ *
+ * The names that stand out in the investigation's corpus, from OpenAleph's
+ * discovery (ADR-0006, Wave C), each marked when it is already a record or a
+ * lead. OpenAleph being off or unreachable is a state in the reply.
+ */
+export const getCorpusInsights = <ThrowOnError extends boolean = false>(
+  options: Options<GetCorpusInsightsData, ThrowOnError>,
+): RequestResult<
+  GetCorpusInsightsResponses,
+  GetCorpusInsightsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetCorpusInsightsResponses,
+    GetCorpusInsightsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCorpusInsightsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCorpusInsightsResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/corpus/insights',
     ...options,
   });
 

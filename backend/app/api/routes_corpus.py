@@ -28,10 +28,11 @@ from app.jobs import corpus as corpus_jobs
 from app.jobs.corpus import queue_sync_now, runs_in_background, sync_now
 from app.models.domain import CrossReferenceProposal, Entity, Investigation
 from app.schemas.api import CrossReferenceDecisionRequest
-from app.schemas.responses import CorpusExpandOut, CorpusSyncNowOut, CorpusSyncOut, CrossReferenceOut
+from app.schemas.responses import CorpusExpandOut, CorpusInsightsOut, CorpusSyncNowOut, CorpusSyncOut, CrossReferenceOut
 from app.services.corpus_expand import NotInCorpus, expand_in_corpus
 from app.services.corpus_push import corpus_sync_status
 from app.services.cross_references import decide_cross_reference, list_cross_references, visible_to
+from app.services.openaleph_discover import corpus_insights
 from app.services.openaleph_gateway import OpenAlephNotFound
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -72,6 +73,16 @@ def sync_corpus_now(investigation_id: str, request: Request, db: Session = Depen
     sync_now(build_session_factory(engine), investigation_id)
     db.expire_all()
     return {"queued": False, "ran": True, "sync": _status(db, request, investigation_id)}
+
+
+@router.get("/investigations/{investigation_id}/corpus/insights", response_model=CorpusInsightsOut)
+def get_corpus_insights(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    """The names that stand out in the investigation's corpus, from OpenAleph's
+    discovery (ADR-0006, Wave C), each marked when it is already a record or a
+    lead. OpenAleph being off or unreachable is a state in the reply."""
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
+    return corpus_insights(db, investigation_id)
 
 
 @router.get("/investigations/{investigation_id}/cross-references", response_model=list[CrossReferenceOut])

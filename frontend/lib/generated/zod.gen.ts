@@ -1082,6 +1082,58 @@ export const zCorpusExpandOut = z.object({
 });
 
 /**
+ * CorpusInsightNameOut
+ *
+ * A name found alongside a discovered one, and in how many of its documents.
+ */
+export const zCorpusInsightNameOut = z.object({
+  documents: z.number().int(),
+  kind: z.enum(['people', 'companies', 'places', 'names']),
+  name: z.string(),
+});
+
+/**
+ * CorpusInsightTermOut
+ *
+ * A name OpenAleph's discovery found standing out in the corpus
+ * (app/services/openaleph_discover.py): how many documents mention it,
+ * what it is mentioned alongside, and whether the investigation already
+ * holds a record of it or a lead made from it (``lead_key`` is the lead's
+ * provider_record_id).
+ */
+export const zCorpusInsightTermOut = z.object({
+  alongside: z.array(zCorpusInsightNameOut),
+  documents: z.number().int(),
+  lead_id: z.string().nullable(),
+  lead_key: z.string(),
+  name: z.string(),
+  record_id: z.string().nullable(),
+});
+
+/**
+ * CorpusInsightGroupOut
+ */
+export const zCorpusInsightGroupOut = z.object({
+  kind: z.enum(['people', 'companies', 'places', 'names']),
+  label: z.string(),
+  terms: z.array(zCorpusInsightTermOut),
+});
+
+/**
+ * CorpusInsightsOut
+ *
+ * What stands out in the investigation's corpus (GET /api/2/collections/{id}/discover).
+ * ``state`` is ok, disabled, no_collection or unavailable.
+ */
+export const zCorpusInsightsOut = z.object({
+  collection_id: z.string().nullable(),
+  detail: z.string().nullable(),
+  groups: z.array(zCorpusInsightGroupOut),
+  investigation_id: z.string(),
+  state: z.enum(['ok', 'disabled', 'no_collection', 'unavailable']),
+});
+
+/**
  * CorpusPendingOut
  *
  * What the next push would change -- records to send or remove, match
@@ -6351,6 +6403,15 @@ export const zListConnectorRunsQuery = z.object({
  * Successful Response
  */
 export const zListConnectorRunsResponse = z.array(zConnectorRunOut);
+
+export const zGetCorpusInsightsPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetCorpusInsightsResponse = zCorpusInsightsOut;
 
 export const zGetOpenalephCorpusBindingPath = z.object({
   investigation_id: z.string(),

@@ -8754,6 +8754,181 @@
         "title": "CorpusHitOut",
         "type": "object"
       },
+      "CorpusInsightGroupOut": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "people",
+              "companies",
+              "places",
+              "names"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "terms": {
+            "items": {
+              "$ref": "#/components/schemas/CorpusInsightTermOut"
+            },
+            "title": "Terms",
+            "type": "array"
+          }
+        },
+        "required": [
+          "kind",
+          "label",
+          "terms"
+        ],
+        "title": "CorpusInsightGroupOut",
+        "type": "object"
+      },
+      "CorpusInsightNameOut": {
+        "description": "A name found alongside a discovered one, and in how many of its documents.",
+        "properties": {
+          "documents": {
+            "title": "Documents",
+            "type": "integer"
+          },
+          "kind": {
+            "enum": [
+              "people",
+              "companies",
+              "places",
+              "names"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "name",
+          "documents"
+        ],
+        "title": "CorpusInsightNameOut",
+        "type": "object"
+      },
+      "CorpusInsightTermOut": {
+        "description": "A name OpenAleph's discovery found standing out in the corpus\n(app/services/openaleph_discover.py): how many documents mention it,\nwhat it is mentioned alongside, and whether the investigation already\nholds a record of it or a lead made from it (``lead_key`` is the lead's\nprovider_record_id).",
+        "properties": {
+          "alongside": {
+            "items": {
+              "$ref": "#/components/schemas/CorpusInsightNameOut"
+            },
+            "title": "Alongside",
+            "type": "array"
+          },
+          "documents": {
+            "title": "Documents",
+            "type": "integer"
+          },
+          "lead_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Id"
+          },
+          "lead_key": {
+            "title": "Lead Key",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "record_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Record Id"
+          }
+        },
+        "required": [
+          "name",
+          "documents",
+          "alongside",
+          "record_id",
+          "lead_id",
+          "lead_key"
+        ],
+        "title": "CorpusInsightTermOut",
+        "type": "object"
+      },
+      "CorpusInsightsOut": {
+        "description": "What stands out in the investigation's corpus (GET /api/2/collections/{id}/discover).\n``state`` is ok, disabled, no_collection or unavailable.",
+        "properties": {
+          "collection_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collection Id"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/CorpusInsightGroupOut"
+            },
+            "title": "Groups",
+            "type": "array"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "ok",
+              "disabled",
+              "no_collection",
+              "unavailable"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "state",
+          "detail",
+          "collection_id",
+          "groups"
+        ],
+        "title": "CorpusInsightsOut",
+        "type": "object"
+      },
       "CorpusPendingOut": {
         "description": "What the next push would change -- records to send or remove, match\njudgements to send -- and the records it cannot send (with why).",
         "properties": {
@@ -36154,6 +36329,56 @@
           }
         },
         "summary": "List Connector Runs"
+      }
+    },
+    "/api/investigations/{investigation_id}/corpus/insights": {
+      "get": {
+        "description": "The names that stand out in the investigation's corpus, from OpenAleph's\ndiscovery (ADR-0006, Wave C), each marked when it is already a record or a\nlead. OpenAleph being off or unreachable is a state in the reply.",
+        "operationId": "get_corpus_insights",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorpusInsightsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Corpus Insights"
       }
     },
     "/api/investigations/{investigation_id}/corpus/openaleph": {

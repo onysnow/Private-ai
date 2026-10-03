@@ -214,6 +214,21 @@ export type LeadQueueBody = {investigation_id: string; total: number; counts: Re
 
 /** A lead queue reply in the generated LeadQueueOut shape, which the leads
  * panel checks; its counts are tallied from the leads given. */
+/** A lead as the API returns it (the generated LeadOut shape): an unreviewed
+ * question with no links, tasks or triage signals, unless a test says otherwise. */
+export function leadBody(overrides: Fixture = {}): Fixture {
+  return {
+    id: 'lead-1', investigation_id: 'inv-1', title: 'Who approved this contract?', status: 'unreviewed', priority: 'normal', owner: null,
+    detail: null, provider: null, provider_record_id: null, kind: 'question', next_action: null, created_at: '2026-10-01T00:00:00',
+    links: [], tasks: [], history: [],
+    triage: {
+      needs_attention: false, attention_score: 0, stance_counts: {supports: 0, contradicts: 0, context: 0}, linked_claim_count: 0, disputed_claim_count: 0,
+      relationship_evidence_review_counts: {supports: 0, contradicts: 0, context: 0, superseded: 0, unresolved: 0, unreviewed: 0}, reasons: [],
+    },
+    ...overrides,
+  };
+}
+
 export function leadQueueBody(investigationId: string, leads: unknown[] = []): LeadQueueBody {
   return {investigation_id: investigationId, total: leads.length, counts: tally(leads, 'status'), items: leads};
 }

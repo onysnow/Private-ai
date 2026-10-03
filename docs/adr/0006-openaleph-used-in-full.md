@@ -154,7 +154,7 @@ becomes a fact until a reporter accepts it (ADR-0004, decision 1).
 | Watchlists | `/alerts`, `/notifications` | A watchlist of names re-checked as documents arrive; new hits become leads | Wave C |
 | Spreadsheets to entities | `/collections/{id}/mappings` | Map a ledger's columns to Payment/Company entities; results arrive as proposals | Wave C |
 | Translation | ftm-translate (`5.3.0-argos`/`-apertium`), deferred by ftm-analyze when `FTM_TRANSLATE_TARGET_LANGUAGE` is set | Optional compose profile `translate`; the document view shows `translatedText` beside the original | Wave C |
-| Collection insights | `GET /collections/{id}/discover` | Significant names and terms as suggested leads | Wave C |
+| Collection insights | `GET /collections/{id}/discover` | Significant names and terms as suggested leads: the corpus panel's "What stands out" (`GET /api/investigations/{id}/corpus/insights`) lists the people, companies, places and other names with their document counts and what they are mentioned alongside; a known record opens its dossier, any other can be made a lead by the reporter (provider `openaleph`, `discover:<kind>:<name>`). OpenAleph keeps these names in lower case, so a label like "AS" comes back title-cased | Wave C (built) |
 
 ### Not used, and why
 

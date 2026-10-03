@@ -1359,6 +1359,43 @@ class CrossReferenceDecisionOut(ResponseModel):
     created_at: Timestamp
 
 
+class CorpusInsightNameOut(ResponseModel):
+    """A name found alongside a discovered one, and in how many of its documents."""
+    kind: Literal["people", "companies", "places", "names"]
+    name: str
+    documents: int
+
+
+class CorpusInsightTermOut(ResponseModel):
+    """A name OpenAleph's discovery found standing out in the corpus
+    (app/services/openaleph_discover.py): how many documents mention it,
+    what it is mentioned alongside, and whether the investigation already
+    holds a record of it or a lead made from it (``lead_key`` is the lead's
+    provider_record_id)."""
+    name: str
+    documents: int
+    alongside: list[CorpusInsightNameOut]
+    record_id: str | None
+    lead_id: str | None
+    lead_key: str
+
+
+class CorpusInsightGroupOut(ResponseModel):
+    kind: Literal["people", "companies", "places", "names"]
+    label: str
+    terms: list[CorpusInsightTermOut]
+
+
+class CorpusInsightsOut(ResponseModel):
+    """What stands out in the investigation's corpus (GET /api/2/collections/{id}/discover).
+    ``state`` is ok, disabled, no_collection or unavailable."""
+    investigation_id: str
+    state: Literal["ok", "disabled", "no_collection", "unavailable"]
+    detail: str | None
+    collection_id: str | None
+    groups: list[CorpusInsightGroupOut]
+
+
 class CrossReferenceOut(ResponseModel):
     """OpenAleph's cross-referencing says a confirmed entity may be the same as
     another entity: a proposal until a reporter decides."""

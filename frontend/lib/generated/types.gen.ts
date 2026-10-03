@@ -2711,6 +2711,109 @@ export type CorpusHitOut = {
 };
 
 /**
+ * CorpusInsightGroupOut
+ */
+export type CorpusInsightGroupOut = {
+  /**
+   * Kind
+   */
+  kind: 'people' | 'companies' | 'places' | 'names';
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Terms
+   */
+  terms: Array<CorpusInsightTermOut>;
+};
+
+/**
+ * CorpusInsightNameOut
+ *
+ * A name found alongside a discovered one, and in how many of its documents.
+ */
+export type CorpusInsightNameOut = {
+  /**
+   * Documents
+   */
+  documents: number;
+  /**
+   * Kind
+   */
+  kind: 'people' | 'companies' | 'places' | 'names';
+  /**
+   * Name
+   */
+  name: string;
+};
+
+/**
+ * CorpusInsightTermOut
+ *
+ * A name OpenAleph's discovery found standing out in the corpus
+ * (app/services/openaleph_discover.py): how many documents mention it,
+ * what it is mentioned alongside, and whether the investigation already
+ * holds a record of it or a lead made from it (``lead_key`` is the lead's
+ * provider_record_id).
+ */
+export type CorpusInsightTermOut = {
+  /**
+   * Alongside
+   */
+  alongside: Array<CorpusInsightNameOut>;
+  /**
+   * Documents
+   */
+  documents: number;
+  /**
+   * Lead Id
+   */
+  lead_id: string | null;
+  /**
+   * Lead Key
+   */
+  lead_key: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Record Id
+   */
+  record_id: string | null;
+};
+
+/**
+ * CorpusInsightsOut
+ *
+ * What stands out in the investigation's corpus (GET /api/2/collections/{id}/discover).
+ * ``state`` is ok, disabled, no_collection or unavailable.
+ */
+export type CorpusInsightsOut = {
+  /**
+   * Collection Id
+   */
+  collection_id: string | null;
+  /**
+   * Detail
+   */
+  detail: string | null;
+  /**
+   * Groups
+   */
+  groups: Array<CorpusInsightGroupOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * State
+   */
+  state: 'ok' | 'disabled' | 'no_collection' | 'unavailable';
+};
+
+/**
  * CorpusPendingOut
  *
  * What the next push would change -- records to send or remove, match
@@ -14907,6 +15010,42 @@ export type ListConnectorRunsResponses = {
 
 export type ListConnectorRunsResponse =
   ListConnectorRunsResponses[keyof ListConnectorRunsResponses];
+
+export type GetCorpusInsightsData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/corpus/insights';
+};
+
+export type GetCorpusInsightsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCorpusInsightsError =
+  GetCorpusInsightsErrors[keyof GetCorpusInsightsErrors];
+
+export type GetCorpusInsightsResponses = {
+  /**
+   * Successful Response
+   */
+  200: CorpusInsightsOut;
+};
+
+export type GetCorpusInsightsResponse =
+  GetCorpusInsightsResponses[keyof GetCorpusInsightsResponses];
 
 export type GetOpenalephCorpusBindingData = {
   body?: never;

@@ -63,6 +63,7 @@ import {
   findOpenalephChildren,
   getAiAnalysisCandidateEndpoint,
   getClaimReviewWorkspace,
+  getCorpusInsights,
   getCorpusStatus,
   getCorpusSync,
   getDeckEndpoint,
@@ -343,6 +344,9 @@ import type {
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceError,
   GetClaimReviewWorkspaceResponse,
+  GetCorpusInsightsData,
+  GetCorpusInsightsError,
+  GetCorpusInsightsResponse,
   GetCorpusStatusData,
   GetCorpusStatusError,
   GetCorpusStatusResponse,
@@ -3600,6 +3604,38 @@ export const listConnectorRunsInfiniteOptions = (
   );
   return opts as Omit<typeof opts, 'initialData'>;
 };
+
+export const getCorpusInsightsQueryKey = (
+  options: Options<GetCorpusInsightsData>,
+) => createQueryKey('getCorpusInsights', options);
+
+/**
+ * Get Corpus Insights
+ *
+ * The names that stand out in the investigation's corpus, from OpenAleph's
+ * discovery (ADR-0006, Wave C), each marked when it is already a record or a
+ * lead. OpenAleph being off or unreachable is a state in the reply.
+ */
+export const getCorpusInsightsOptions = (
+  options: Options<GetCorpusInsightsData>,
+) =>
+  queryOptions<
+    GetCorpusInsightsResponse,
+    GetCorpusInsightsError,
+    GetCorpusInsightsResponse,
+    ReturnType<typeof getCorpusInsightsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCorpusInsights({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCorpusInsightsQueryKey(options),
+  });
 
 export const getOpenalephCorpusBindingQueryKey = (
   options: Options<GetOpenalephCorpusBindingData>,
