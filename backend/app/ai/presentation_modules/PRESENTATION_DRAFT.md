@@ -93,6 +93,11 @@ forms for every section, every time.
         records that carry their own latitude and longitude. A map takes no
         `sort` or `limit`; its `highlight` names places, which are drawn
         larger.
+      - `confidence` -- how sure the investigation is: how much evidence
+        the claims rest on against how far it agrees (the IPCC grid the
+        reporter grades each claim on): `heatmap`, only over
+        `claims_by_strength`. A grid takes no `sort` or `limit`; its
+        `highlight` names cells ("robust evidence, high agreement").
       `spec.title` is a full sentence that states the finding the chart
       shows, in words, e.g. "Meridian received most of the money" or "Most
       payments were small" -- never the name of the data ("Payments by
@@ -102,7 +107,7 @@ forms for every section, every time.
       {"direction": "received"}}`). Optional: `sort` (`value_desc`,
       `value_asc`, `label`, `time`) and `limit` (keep the top N; the rest
       fold into "Other"), neither for a histogram, a scatter plot, a
-      flow diagram, a timeline or a map, whose order and points come from the data; `highlight` (labels to
+      flow diagram, a timeline, a map or a grid, whose order and points come from the data; `highlight` (labels to
       pick out). The Workbench runs the query, tags every value with its
       records, draws the chart and checks it against the design rules; a
       chart that fails is removed from the draft and you may be asked once

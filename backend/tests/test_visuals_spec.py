@@ -43,7 +43,7 @@ def test_every_chart_kind_is_accepted_and_the_statistical_kinds_are_drawn():
 
 def test_each_question_names_the_kinds_and_query_shapes_that_answer_it():
     # The FT Visual Vocabulary categories the chooser offers (design doc, "Picking the right chart").
-    assert list(QUESTIONS) == ["ranking", "change_over_time", "part_of_whole", "distribution", "correlation", "flow", "place"]
+    assert list(QUESTIONS) == ["ranking", "change_over_time", "part_of_whole", "distribution", "correlation", "flow", "place", "confidence"]
     assert QUESTIONS["distribution"].kinds == (ChartKind.histogram,)
     assert QUESTIONS["correlation"].series_kinds == ("pairs",)
     assert QUESTIONS["flow"].series_kinds == ("flows",)
@@ -64,6 +64,8 @@ def test_each_question_names_the_kinds_and_query_shapes_that_answer_it():
     assert QUESTIONS["place"].kinds == (ChartKind.map,) and QUESTIONS["place"].series_kinds == ("places",)
     assert QUERY_CATALOG["places_on_map"].questions == ("place",)
     assert QUERY_CATALOG["places_on_map"].kinds == (ChartKind.map,)
+    # The design doc's claim-strength grid: the claims on the IPCC evidence-by-agreement grid.
+    assert QUESTIONS["confidence"].kinds == (ChartKind.heatmap,) and QUERY_CATALOG["claims_by_strength"].kinds == (ChartKind.heatmap,)
 
 
 def test_an_order_may_name_the_question_and_its_kind_and_query_must_answer_it():

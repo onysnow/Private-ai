@@ -63,6 +63,8 @@ class DataRow:
     status: str | None = None   # ... and how far it is verified (app/services/timeline.py)
     latitude: float | None = None    # a "places" row: where its record puts it
     longitude: float | None = None
+    across: str | None = None        # a "grid" row: its column (an evidence grade) ...
+    down: str | None = None          # ... and its row (an agreement grade)
 
     def as_dict(self) -> dict[str, Any]:
         out: dict[str, Any] = {"label": self.label, "value": self.value, "record_refs": [r.as_dict() for r in self.record_refs],
@@ -81,6 +83,9 @@ class DataRow:
         if self.latitude is not None and self.longitude is not None:
             # And only places rows.
             out["latitude"], out["longitude"] = self.latitude, self.longitude
+        if self.across is not None and self.down is not None:
+            # And only grid rows.
+            out["across"], out["down"] = self.across, self.down
         return out
 
 
@@ -129,7 +134,9 @@ class VisualData:
                     start=str(r["start"]) if isinstance(r.get("start"), str) else None,
                     end=str(r["end"]) if isinstance(r.get("start"), str) and isinstance(r.get("end"), str) else None,
                     status=str(r["status"]) if isinstance(r.get("start"), str) and isinstance(r.get("status"), str) else None,
-                    latitude=_coordinate(r, "latitude"), longitude=_coordinate(r, "longitude"))
+                    latitude=_coordinate(r, "latitude"), longitude=_coordinate(r, "longitude"),
+                    across=str(r["across"]) if isinstance(r.get("across"), str) and isinstance(r.get("down"), str) else None,
+                    down=str(r["down"]) if isinstance(r.get("across"), str) and isinstance(r.get("down"), str) else None)
             for r in (data.get("rows") or []) if isinstance(r, dict)
         ]
         labels = data.get("measure_labels")
@@ -594,6 +601,31 @@ def claims_by_status(db: Session, investigation_id: str, params: dict[str, str])
                       series_kind="category", record_noun="claims", rows=rows, record_count=len(claims))
 
 
+def claims_by_strength(db: Session, investigation_id: str, params: dict[str, str]) -> VisualData:
+    """The claims on the IPCC AR5 evidence-by-agreement grid (ADR-0005,
+    line 5; app/services/claims.py): one row per cell, every cell present
+    (an empty cell too: its place on the grid is what it says), evidence
+    across from limited to robust and agreement from low to high, each with
+    the claims the reporter graded there. A claim not graded yet is left out
+    and listed under ``omitted``."""
+    from app.services.claims import AGREEMENT_GRADES, EVIDENCE_GRADES
+
+    cells: dict[tuple[str, str], list[RecordRef]] = {(e, a): [] for e in EVIDENCE_GRADES for a in AGREEMENT_GRADES}
+    omitted: list[dict[str, Any]] = []
+    claims = db.scalars(select(Claim).where(Claim.investigation_id == investigation_id).order_by(Claim.created_at, Claim.id)).all()
+    for claim in claims:
+        cell = (claim.evidence_grade or "", claim.agreement_grade or "")
+        if cell in cells:
+            cells[cell].append(RecordRef("claim", claim.id))
+        else:
+            omitted.append({"reason": "not graded", "record_type": "claim", "record_id": claim.id, "detail": claim.text[:120]})
+    rows = [DataRow(f"{evidence} evidence, {agreement} agreement", float(len(refs)), refs, len(refs), f"{i}{j}", across=evidence, down=agreement)
+            for i, evidence in enumerate(EVIDENCE_GRADES) for j, agreement in enumerate(AGREEMENT_GRADES)
+            for refs in [cells[(evidence, agreement)]]]
+    return VisualData(investigation_id=investigation_id, query="claims_by_strength", params=params, unit="claims", unit_kind="count",
+                      series_kind="grid", record_noun="claims", rows=rows, record_count=sum(len(r) for r in cells.values()), omitted=omitted)
+
+
 def entities_by_schema(db: Session, investigation_id: str, params: dict[str, str]) -> VisualData:
     # Relationship entities (the FtM interstitials behind each edge) are
     # links, not things; merged entities live on in their target.
@@ -654,6 +686,7 @@ QUERIES: dict[str, QueryRunner] = {
     "events_over_time": events_over_time,
     "events_in_order": events_in_order,
     "places_on_map": places_on_map,
+    "claims_by_strength": claims_by_strength,
     "links_by_type": links_by_type,
     "claims_by_status": claims_by_status,
     "entities_by_schema": entities_by_schema,

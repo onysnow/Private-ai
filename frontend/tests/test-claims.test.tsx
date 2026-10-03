@@ -50,6 +50,38 @@ async function renderPanel(routes: Record<string, unknown> = {}, onInspectRelati
 }
 
 describe('ClaimsPanel', () => {
+  it('grades a claim on the IPCC grid in a review, both halves or neither, and shows the grade and its history', async () => {
+    const api = await renderPanel({[WORKSPACE]: workspace(claimFixture(), {source_count: 2})});
+    const user = userEvent.setup();
+    await user.click(screen.getByText('The contract was approved on March 3.'));
+    expect(await screen.findByText('From 2 sources')).toBeInTheDocument();
+    await user.type(screen.getByPlaceholderText('Required rationale for this review'), 'Two independent filings agree.');
+    // One half alone is refused before anything is sent.
+    screen.getByRole('combobox', {name: 'Evidence'}).focus();
+    await user.keyboard('{ArrowDown}');
+    await user.click(await screen.findByRole('option', {name: 'Evidence: robust'}));
+    await user.click(screen.getByRole('button', {name: 'Record review'}));
+    expect(await screen.findByText('A confidence grade gives both the evidence and the agreement.')).toBeInTheDocument();
+    expect(api.calls('POST /api/claims/claim-1/reviews')).toHaveLength(0);
+
+    const graded = claimFixture({status: 'unverified', evidence_grade: 'robust', agreement_grade: 'high'});
+    api.add({'POST /api/claims/claim-1/reviews': {claim: graded, review: {id: 'r1', claim_id: 'claim-1', from_status: 'unverified', to_status: 'unverified',
+      from_confidence: 0.4, to_confidence: 0.4, from_evidence_grade: null, to_evidence_grade: 'robust', from_agreement_grade: null, to_agreement_grade: 'high',
+      rationale: 'Two independent filings agree.', created_at: '2026-10-03T00:00:00'},
+    workspace: workspace(graded, {source_count: 2, review_history: [{id: 'r1', claim_id: 'claim-1', from_status: 'unverified', to_status: 'unverified',
+      from_confidence: 0.4, to_confidence: 0.4, from_evidence_grade: null, to_evidence_grade: 'robust', from_agreement_grade: null, to_agreement_grade: 'high',
+      rationale: 'Two independent filings agree.', created_at: '2026-10-03T00:00:00'}]})}});
+    screen.getByRole('combobox', {name: 'Agreement'}).focus();
+    await user.keyboard('{ArrowDown}');
+    await user.click(await screen.findByRole('option', {name: 'Agreement: high'}));
+    await user.click(screen.getByRole('button', {name: 'Record review'}));
+    expect(await screen.findByText(/robust evidence, high agreement\.$/)).toBeInTheDocument();
+    expect(api.lastBody('POST /api/claims/claim-1/reviews')).toEqual({status: 'unverified', confidence: 0.4, rationale: 'Two independent filings agree.',
+      evidence_grade: 'robust', agreement_grade: 'high'});
+    expect(screen.getByText('unverified · 40% confidence · robust evidence, high agreement')).toBeInTheDocument();
+    expect(screen.getByText(/not graded → robust evidence, high agreement/)).toBeInTheDocument();
+  });
+
   it('lists the claims and disables Add unverified claim until text is entered', async () => {
     await renderPanel();
     expect(screen.getByText('unverified · 40% confidence')).toBeInTheDocument();

@@ -618,6 +618,7 @@ export const zChartKind = z.enum([
   'timeline',
   'sankey',
   'map',
+  'heatmap',
 ]);
 
 /**
@@ -757,12 +758,14 @@ export const zClaimEvidenceLinkOut = z.object({
  * ClaimOut
  */
 export const zClaimOut = z.object({
+  agreement_grade: z.enum(['low', 'medium', 'high']).nullish(),
   confidence: z.number(),
   created_at: z
     .string()
     .regex(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     ),
+  evidence_grade: z.enum(['limited', 'medium', 'robust']).nullish(),
   id: z.string(),
   investigation_id: z.string(),
   status: z.string(),
@@ -779,11 +782,15 @@ export const zClaimReviewEventOut = z.object({
     .regex(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     ),
+  from_agreement_grade: z.string().nullish(),
   from_confidence: z.number(),
+  from_evidence_grade: z.string().nullish(),
   from_status: z.string(),
   id: z.string(),
   rationale: z.string(),
+  to_agreement_grade: z.string().nullish(),
   to_confidence: z.number(),
+  to_evidence_grade: z.string().nullish(),
   to_status: z.string(),
 });
 
@@ -791,7 +798,9 @@ export const zClaimReviewEventOut = z.object({
  * ClaimReviewRequest
  */
 export const zClaimReviewRequest = z.object({
+  agreement_grade: z.enum(['low', 'medium', 'high']).nullish(),
   confidence: z.number(),
+  evidence_grade: z.enum(['limited', 'medium', 'robust']).nullish(),
   rationale: z.string(),
   status: z.string(),
 });
@@ -3934,6 +3943,8 @@ export const zBarItemOut = z.object({
  * DataTableRowOut
  */
 export const zDataTableRowOut = z.object({
+  across: z.string().nullish(),
+  down: z.string().nullish(),
   end: z.string().nullish(),
   formatted: z.string(),
   label: z.string(),
@@ -4584,6 +4595,7 @@ export const zClaimReviewWorkspaceOut = z.object({
   dependent_relationships: z.array(zClaimDependentRelationshipOut),
   evidence: z.array(zClaimEvidenceRowOut),
   review_history: z.array(zClaimReviewEventOut),
+  source_count: z.number().int().optional().default(0),
   stance_counts: zStanceCountsOut,
 });
 
@@ -5368,6 +5380,8 @@ export const zValidationErrorOut = z.object({
  * VisualDataRowOut
  */
 export const zVisualDataRowOut = z.object({
+  across: z.string().nullish(),
+  down: z.string().nullish(),
   end: z.string().nullish(),
   key: z.string(),
   label: z.string(),

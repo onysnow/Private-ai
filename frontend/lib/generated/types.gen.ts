@@ -1445,7 +1445,8 @@ export type ChartKind =
   | 'scatter'
   | 'timeline'
   | 'sankey'
-  | 'map';
+  | 'map'
+  | 'heatmap';
 
 /**
  * ChartOptionSpecOut
@@ -1934,6 +1935,10 @@ export type ClaimEvidenceRowOut = {
  */
 export type ClaimOut = {
   /**
+   * Agreement Grade
+   */
+  agreement_grade?: 'low' | 'medium' | 'high' | null;
+  /**
    * Confidence
    */
   confidence: number;
@@ -1943,6 +1948,10 @@ export type ClaimOut = {
    * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
+  /**
+   * Evidence Grade
+   */
+  evidence_grade?: 'limited' | 'medium' | 'robust' | null;
   /**
    * Id
    */
@@ -1976,9 +1985,17 @@ export type ClaimReviewEventOut = {
    */
   created_at: string;
   /**
+   * From Agreement Grade
+   */
+  from_agreement_grade?: string | null;
+  /**
    * From Confidence
    */
   from_confidence: number;
+  /**
+   * From Evidence Grade
+   */
+  from_evidence_grade?: string | null;
   /**
    * From Status
    */
@@ -1992,9 +2009,17 @@ export type ClaimReviewEventOut = {
    */
   rationale: string;
   /**
+   * To Agreement Grade
+   */
+  to_agreement_grade?: string | null;
+  /**
    * To Confidence
    */
   to_confidence: number;
+  /**
+   * To Evidence Grade
+   */
+  to_evidence_grade?: string | null;
   /**
    * To Status
    */
@@ -2006,9 +2031,17 @@ export type ClaimReviewEventOut = {
  */
 export type ClaimReviewRequest = {
   /**
+   * Agreement Grade
+   */
+  agreement_grade?: 'low' | 'medium' | 'high' | null;
+  /**
    * Confidence
    */
   confidence: number;
+  /**
+   * Evidence Grade
+   */
+  evidence_grade?: 'limited' | 'medium' | 'robust' | null;
   /**
    * Rationale
    */
@@ -2048,6 +2081,10 @@ export type ClaimReviewWorkspaceOut = {
    * Review History
    */
   review_history: Array<ClaimReviewEventOut>;
+  /**
+   * Source Count
+   */
+  source_count?: number;
   stance_counts: StanceCountsOut;
 };
 
@@ -3372,6 +3409,14 @@ export type DataTableOut = {
  * DataTableRowOut
  */
 export type DataTableRowOut = {
+  /**
+   * Across
+   */
+  across?: string | null;
+  /**
+   * Down
+   */
+  down?: string | null;
   /**
    * End
    */
@@ -11976,6 +12021,14 @@ export type VisualDataOut = {
  */
 export type VisualDataRowOut = {
   /**
+   * Across
+   */
+  across?: string | null;
+  /**
+   * Down
+   */
+  down?: string | null;
+  /**
    * End
    */
   end?: string | null;
@@ -12305,7 +12358,7 @@ export type VisualSpec = {
   /**
    * Question
    *
-   * The question the chart answers: ranking, change_over_time, part_of_whole, distribution, correlation, flow or place.
+   * The question the chart answers: ranking, change_over_time, part_of_whole, distribution, correlation, flow, place or confidence.
    */
   question?: string | null;
   scale?: Scale;

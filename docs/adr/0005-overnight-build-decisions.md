@@ -52,6 +52,14 @@ reversed; the code built on it says which ADR line it rests on.
    (confirmed / likely / weak / unsupported / unknown) for incidents and
    timeline events. Reason: each scale was designed for exactly one of those
    three objects; mixing them would blur what "likely" means.
+   The claim grade was built in visuals pass 6 (2026-10-03): a review sets
+   a claim's evidence (limited / medium / robust) and agreement (low /
+   medium / high), both the reporter's judgement, since the guidance note
+   gives no counts to derive them from ("for a given evidence and agreement
+   statement, different confidence levels could be assigned"); the claim
+   review shows the stances and how many sources the evidence comes from to
+   judge by. The claims on the grid are the design's claim-strength grid
+   (chart kind `heatmap`, query `claims_by_strength`).
 6. **Statistical charts come before money flows and networks** (pass 3 then
    pass 4, as the research doc planned). Reason: statistical charts reuse
    ECharts, which is already in the app, and python-pptx's native charts, so

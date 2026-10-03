@@ -78,7 +78,7 @@ from app.services.presentation_style import Theme, contrast_ratio
 from app.visuals.data_service import DataRow, VisualData
 from app.visuals.echarts import (
     DEFAULT_HEIGHT, DEFAULT_WIDTH, GRAPHIC_CONTRAST, HOLLOW_SYMBOL, MIN_FONT_PX, SINGLE_RECORD_MARK, TIMELINE_ROW_MIN, TREEMAP_LABEL_PADDING,
-    MAP_LABEL_PX, MAP_PLACE_COLOUR, BuiltChart, UnsupportedChartKind, build_chart, count_phrase, format_value, prepare_rows, timeline_marks,
+    MAP_LABEL_PX, MAP_PLACE_COLOUR, BuiltChart, heatmap_axes, UnsupportedChartKind, build_chart, count_phrase, format_value, prepare_rows, timeline_marks,
     timeline_row_room, timeline_text,
 )
 from app.visuals.layout import LABEL_GAP, block_width, treemap_rects, wrapped_lines
@@ -369,6 +369,9 @@ class _Checker:
             if self.kind == ChartKind.scatter:
                 pair = value if isinstance(value, list) and len(value) == 2 else [None, None]
                 out.append((name, _number(pair[0]), _number(pair[1])))
+            elif self.kind == ChartKind.heatmap:
+                cell = value if isinstance(value, list) and len(value) == 3 else [None, None, None]
+                out.append((name, _number(cell[2])))
             else:
                 out.append((name, _number(value)))
         out.extend((str(link.get("name")), _number(link.get("value"))) for link in self.links())
@@ -392,6 +395,17 @@ class _Checker:
         return [row for row in self.rows if row.value != 0 or row.record_count]
 
     # 0. The numbers match (the design's first check, after VisEval).
+    def _grid_cells(self) -> None:
+        """Rule 0 for a grid: every cell at the column and row its two
+        grades name (the counts are read back with every kind's below)."""
+        across, down = heatmap_axes(self.rows)
+        place = {row.label: (across.index(row.across or ""), down.index(row.down or "")) for row in self.rows}
+        for _series, item in self.items():
+            value = item.get("value")
+            where = (value[0], value[1]) if isinstance(value, list) and len(value) == 3 else None
+            if place.get(str(item.get("name"))) != where:
+                self.error(0, f"the cell '{item.get('name')}' is not drawn where its grades meet")
+
     def _map_coordinates(self) -> None:
         """Rule 0 for a map: every place drawn where its record puts it."""
         placed = sorted(((str(p.get("name")), _number(p.get("longitude")), _number(p.get("latitude"))) for p in self.places()), key=str)
@@ -411,6 +425,8 @@ class _Checker:
             self._map_coordinates()
             self.passed(0)
             return
+        if self.kind == ChartKind.heatmap:
+            self._grid_cells()
         expected: list[tuple[Any, ...]]
         if self.kind == ChartKind.scatter:
             expected = sorted(((row.label, _number(row.x), _number(row.value)) for row in self.rows), key=str)
@@ -569,6 +585,9 @@ class _Checker:
         if self.kind == ChartKind.map:
             self.does_not_apply(6, "a map has no value axis")
             return
+        if self.kind == ChartKind.heatmap:
+            self.does_not_apply(6, "a grid has no value axis: its counts are written in its cells")
+            return
         if not self.needs_option(6):
             return
         per_side = [sum(1 for a in self.axes_of(key) if a.get("type") in ("value", "log")) for key in ("xAxis", "yAxis")]
@@ -599,6 +618,12 @@ class _Checker:
                         self.error(7, "a slice is pulled out of the donut, which distorts its share; keep every slice in the ring")
             if self.kind == ChartKind.histogram:
                 self._even_bins()
+            if self.kind == ChartKind.heatmap:
+                # The grades run in their own order, from least to most, across and up.
+                across, down = heatmap_axes(self.rows)
+                x, y = (self.axes_of("xAxis") or [{}])[0], (self.axes_of("yAxis") or [{}])[0]
+                if [str(v).lower() for v in x.get("data") or []] != across or [str(v).lower() for v in y.get("data") or []] != down:
+                    self.error(7, "the grades are not in their own order (least to most, across and up)")
             self.passed(7)
         if self.kind == ChartKind.timeline and len(rows) > 1:
             starts = [timeline_marks(row)[:1] for row in rows]
@@ -713,6 +738,15 @@ class _Checker:
                         ratio = contrast_ratio(colour.lstrip("#"), fill)
                         if ratio < GRAPHIC_CONTRAST:
                             self.error(11, f"the places' dots ({colour}) are {ratio:.2f}:1 against the base map's #{fill}; marks need 3:1")
+            if kind == ChartKind.heatmap:
+                # Each cell writes its count on its shade: 4.5:1 (WCAG 1.4.3).
+                for series, item in self.items():
+                    shade = (item.get("itemStyle") or {}).get("color")
+                    ink = self.label_of(series, item).get("color")
+                    if not isinstance(shade, str) or not isinstance(ink, str):
+                        self.error(11, f"the count in '{item.get('name')}' has no colour of its own, so its contrast with its cell is not known")
+                    elif contrast_ratio(ink.lstrip("#"), shade.lstrip("#")) < TEXT_CONTRAST:
+                        self.error(11, f"the count in '{item.get('name')}' ({ink} on {shade}) is under {TEXT_CONTRAST}:1")
             if kind == ChartKind.sankey:
                 # A band's width carries its value, read against the page; the
                 # amount is written on it too, so the bands may be pale, but the
@@ -791,6 +825,12 @@ class _Checker:
                     self.error(12, f"the event '{row.label}' is not named on the timeline's axis")
                 if written.get(row.label) != timeline_text(row):
                     self.error(12, f"the date and status of '{row.label}' are not written beside it")
+        if kind == ChartKind.heatmap and self.needs_option(12):
+            # The shade says "more" or "fewer"; the count written in each cell says how many.
+            texts = self.label_text()
+            for row in self.rows:
+                if str(int(row.value)) not in texts.get(row.label, "").split():
+                    self.error(12, f"the cell '{row.label}' is told by its shade only; write its count in it")
         if self.spec.highlight and kind != ChartKind.map and self.needs_option(12):
             picked = [name for name in self.spec.highlight if any(row.label == name for row in self.rows)]
             if kind in (ChartKind.bar, ChartKind.column, ChartKind.histogram):
@@ -914,6 +954,9 @@ class _Checker:
         if self.kind == ChartKind.map:
             self.does_not_apply(20, "each dot on a map is one place, which is one record; resting on one record is what a place is")
             return
+        if self.kind == ChartKind.heatmap:
+            self.does_not_apply(20, "a cell's value is how many claims sit in it: a count of one is one claim, not a value resting on one record")
+            return
         singles = [row.label for row in self.drawn_rows() if row.record_count == 1]
         if singles:
             self.warn(20, "these values rest on one record each: " + ", ".join(singles))
@@ -953,6 +996,8 @@ def _mark_noun(kind: ChartKind) -> str:
         return "part"
     if kind == ChartKind.sankey:
         return "flow"
+    if kind == ChartKind.heatmap:
+        return "cell"
     return "bar"
 
 

@@ -587,6 +587,36 @@ ADR-0005 line 18 holds the decisions and the numbers behind them.
   a chart of custom series in ECharts 6.1 (checked in Chromium).
 - Still to come: shaded maps (rule 17).
 
+## Pass 6: the claim-strength grid
+
+- **The grade.** A claim review sets the claim's confidence grade on the
+  IPCC AR5 evidence-by-agreement grid (ADR-0005, line 5): evidence limited,
+  medium or robust; agreement low, medium or high; both together or
+  neither, kept on the claim and on the review's immutable history
+  (`claims.evidence_grade`, `agreement_grade`; migration `a8c1d4e7f052`).
+  Both are the reporter's judgement; the review shows the stances and how
+  many separate sources the evidence comes from.
+- **The grid** (`heatmap`, question `confidence`, query `claims_by_strength`,
+  rows of the new `grid` shape): one cell per pair of grades, every cell
+  drawn (an empty one too), evidence across and agreement up so confidence
+  rises toward the top right as on the IPCC's figure. A cell is shaded by
+  its count in four equal steps of the largest count (Axis Maps, data
+  classification: equal intervals suit small whole counts), and writes its
+  count in black or white, whichever reads on its shade. A claim not graded
+  is left out and the source line says how many. ECharts draws a heatmap
+  only with a visualMap: a hidden piecewise one with the same steps. A
+  highlight outlines the picked cells and writes their counts bold.
+- **Checks.** Rule 0 reads every count back and every cell's place; 7 the
+  grades' order; 11 each count 4.5:1 on its shade; 12 every cell's count
+  written and a pick marked bold; 6 and 20 do not apply (no value axis; a
+  count of one claim is one claim). A grid takes no `sort`, `limit` or log
+  scale.
+- **Exports.** A deck holds the render service's picture, or the cells as a
+  native table (cell, count) with the reason; a brief the picture and the
+  data table.
+- Tests: `backend/tests/test_visuals_grid.py`, the `heatmap` fixture in
+  `frontend/test-support/chart-kinds.json`, `frontend/tests/test-claims.test.tsx`.
+
 ## What pass 3 built, and what is left
 
 Built: the drawing of the seven statistical kinds, the two queries they

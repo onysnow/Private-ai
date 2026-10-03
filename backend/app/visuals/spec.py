@@ -50,15 +50,18 @@ class ChartKind(str, Enum):
     timeline = "timeline"
     sankey = "sankey"
     map = "map"                      # places on the self-hosted base map (pass 5)
+    heatmap = "heatmap"              # a grid of two graded scales, each cell shaded by its count (pass 6)
 
 
 # What app/visuals/echarts.py draws. The sankey and the timeline came with
 # pass 4, the map with pass 5 (drawn by MapLibre, not ECharts: the option
 # carries the places, and the app and the render service draw them on the
-# self-hosted base map; ADR-0005, line 18).
+# self-hosted base map; ADR-0005, line 18), and the heatmap with pass 6 (the
+# claim-strength grid of the design doc).
 DRAWN_KINDS: frozenset[ChartKind] = frozenset({
     ChartKind.bar, ChartKind.column, ChartKind.line, ChartKind.area, ChartKind.stacked_bar_100, ChartKind.donut,
     ChartKind.treemap, ChartKind.histogram, ChartKind.scatter, ChartKind.sankey, ChartKind.timeline, ChartKind.map,
+    ChartKind.heatmap,
 })
 
 # Kinds that show a value as a length (rule 9: the easiest to read) ...
@@ -88,8 +91,10 @@ POINT_KINDS: frozenset[ChartKind] = frozenset({ChartKind.line, ChartKind.area, C
 # (`target`), for a flow diagram, or ranked as bars; "events": one row per
 # dated event, with its `start`, its `end` when it has one, and its
 # verification `status`, for a timeline; "places": one row per record with
-# a `latitude` and a `longitude`, for a map.
-SERIES_KINDS = ("category", "time", "distribution", "pairs", "flows", "events", "places")
+# a `latitude` and a `longitude`, for a map; "grid": one row per cell of
+# two graded scales, `across` and `down`, every cell present (an empty one
+# too, since a cell's place says what it means), for a heatmap.
+SERIES_KINDS = ("category", "time", "distribution", "pairs", "flows", "events", "places", "grid")
 KINDS_FOR_SERIES: dict[str, tuple[ChartKind, ...]] = {
     "category": (ChartKind.bar, ChartKind.column, ChartKind.stacked_bar_100, ChartKind.donut, ChartKind.treemap),
     "time": (ChartKind.line, ChartKind.column, ChartKind.area, ChartKind.bar),
@@ -98,6 +103,7 @@ KINDS_FOR_SERIES: dict[str, tuple[ChartKind, ...]] = {
     "flows": (ChartKind.sankey, ChartKind.bar),
     "events": (ChartKind.timeline,),
     "places": (ChartKind.map,),
+    "grid": (ChartKind.heatmap,),
 }
 # The shapes a kind needs; any other shape cannot be drawn by it at all (a
 # histogram of periods, a scatter plot of one number). A line over
@@ -109,6 +115,7 @@ SERIES_FOR_KIND: dict[ChartKind, tuple[str, ...]] = {
     ChartKind.sankey: ("flows",),
     ChartKind.timeline: ("events",),
     ChartKind.map: ("places",),
+    ChartKind.heatmap: ("grid",),
 }
 
 
@@ -198,6 +205,12 @@ QUERY_CATALOG: dict[str, QuerySpec] = {q.name: q for q in (
         {}, series_kind="places", unit_kind="count", record_noun="places",
     ),
     QuerySpec(
+        "claims_by_strength", "Claims by confidence grade",
+        "How many claims sit in each cell of the IPCC grid: how much evidence each rests on (limited, medium, robust) against how "
+        "far it agrees (low, medium, high), as the reporter graded them. A claim not yet graded is left out and listed.",
+        {}, series_kind="grid", unit_kind="count", record_noun="claims",
+    ),
+    QuerySpec(
         "links_by_type", "Links by type",
         "How many relationship links of each kind (ownership, directorship, payment, ...) the investigation holds.",
         {}, series_kind="category", unit_kind="count", record_noun="links",
@@ -284,6 +297,11 @@ QUESTIONS: dict[str, Question] = {q.id: q for q in (
     # anything else".
     Question("place", "Place", "Where things are: the addresses and properties the records place on the globe.",
              (ChartKind.map,), ("places",)),
+    # Not an FT Visual Vocabulary category: the design doc's "Confidence"
+    # (the claim-strength grid), after the IPCC AR5 evidence-by-agreement
+    # grid the claims are graded on (ADR-0005, line 5).
+    Question("confidence", "How sure we are", "How much evidence the claims rest on and how far it agrees: the claims on the IPCC grid.",
+             (ChartKind.heatmap,), ("grid",)),
 )}
 
 
@@ -351,7 +369,7 @@ class VisualSpec(BaseModel):
     # when it is given, the kind must be one that answers it and the query
     # must hold that relationship, so the choice of chart is checked rather
     # than taken on trust.
-    question: str | None = Field(default=None, description="The question the chart answers: ranking, change_over_time, part_of_whole, distribution, correlation, flow or place.")
+    question: str | None = Field(default=None, description="The question the chart answers: ranking, change_over_time, part_of_whole, distribution, correlation, flow, place or confidence.")
     title: str = Field(min_length=1, max_length=200, description="States the finding, e.g. 'Meridian received most of the money'.")
     subtitle: str | None = Field(default=None, max_length=300)
     unit: str | None = Field(default=None, max_length=40, description="Optional unit label; the data's own unit always wins.")

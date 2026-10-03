@@ -339,6 +339,10 @@ class ClaimReviewRequest(BaseModel):
     status: str
     confidence: float
     rationale: str
+    # The confidence grade on the IPCC AR5 grid (app/services/claims.py):
+    # both or neither; left out, the claim keeps the grade it has.
+    evidence_grade: Literal["limited", "medium", "robust"] | None = None
+    agreement_grade: Literal["low", "medium", "high"] | None = None
 
 
 class WriteupCreate(BaseModel):

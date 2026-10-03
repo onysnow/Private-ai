@@ -225,7 +225,7 @@ VISUAL_PRESETS: dict[str, list[dict]] = {
 CHART_FAMILIES: dict[str, str] = {
     "bar": "bars", "column": "bars", "line": "lines", "area": "lines",
     "stacked_bar_100": "parts", "donut": "parts", "treemap": "parts", "histogram": "histogram", "scatter": "scatter",
-    "sankey": "flows", "timeline": "timeline", "map": "map",
+    "sankey": "flows", "timeline": "timeline", "map": "map", "heatmap": "grid",
 }
 # Rows a sort applies to: groups, records, and flows ranked as bars.
 _RANKED_SERIES = ["category", "distribution", "flows"]
@@ -291,6 +291,11 @@ CHART_OPTIONS: dict[str, dict[str, dict]] = {
     "map": {
         "highlight": {"type": "labels", "label": "Highlight places (drawn larger)"},
     },
+    # A grid's cells sit where their grades meet and are shaded by their
+    # counts; a picked cell is outlined and its count written bold.
+    "grid": {
+        "highlight": {"type": "labels", "label": "Highlight cells (outlined)"},
+    },
 }
 # Each preset is a kind of its family plus option defaults; the first preset
 # with the chart's own kind is how the chart looks as it was ordered.
@@ -334,6 +339,10 @@ CHART_PRESETS: dict[str, list[dict]] = {
     "timeline": [
         {"id": "timeline", "label": "Timeline", "description": "One row per event, earliest first: a dot for a day, a line from start to end.",
          "kind": "timeline", "options": {}},
+    ],
+    "grid": [
+        {"id": "grid", "label": "Grid", "description": "One cell per pair of grades, shaded by how many sit there, each count written in its cell.",
+         "kind": "heatmap", "options": {}},
     ],
     "map": [
         {"id": "map", "label": "Map", "description": "Each place where its record puts it, named beside its dot, on the self-hosted base map.",

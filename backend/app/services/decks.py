@@ -153,8 +153,9 @@ def chart_row_labels(data: VisualData, rows: list[DataRow], *, separator: str = 
     (`separator` "\\n"), so a period's label stays level instead of being
     turned on its side to fit. An event on a timeline is one record by
     what it is (rules 16 and 20 do not apply), so its label stays as it is;
-    likewise a place on a map."""
-    if data.series_kind in ("events", "places"):
+    likewise a place on a map, and a grid's cell, whose count is its
+    records."""
+    if data.series_kind in ("events", "places", "grid"):
         return {row.label: row.label for row in rows}
     labels: dict[str, str] = {}
     for row in rows:
@@ -466,6 +467,7 @@ def picture_size(width_in: float, height_in: float) -> tuple[int, int]:
 TABLE_STAND_INS: dict[ChartKind, tuple[tuple[str, str, float], ...]] = {
     ChartKind.timeline: (("Event", "label", 0.5), ("When", "formatted", 0.32), ("Status", "status", 0.18)),
     ChartKind.map: (("Place", "label", 0.55), ("Where", "formatted", 0.45)),
+    ChartKind.heatmap: (("Cell", "label", 0.7), ("Count", "formatted", 0.3)),
 }
 
 
@@ -475,6 +477,8 @@ def stand_in(kind: ChartKind) -> str:
         return "the events are listed instead"
     if kind == ChartKind.map:
         return "the places are listed instead"
+    if kind == ChartKind.heatmap:
+        return "the cells are listed instead"
     return "the same parts are shown as bars"
 
 

@@ -11,7 +11,7 @@ import type {ChartKind, VisualPreviewOut} from '../../lib/generated/types.gen';
 /** What each kind is called on screen (backend/app/visuals/echarts.py KIND_LABELS). */
 export const KIND_NAMES: Record<ChartKind, string> = {
   bar: 'Bar chart', column: 'Column chart', line: 'Line chart', area: 'Area chart', stacked_bar_100: '100% bar', donut: 'Donut',
-  treemap: 'Treemap', histogram: 'Histogram', scatter: 'Scatter plot', timeline: 'Timeline', sankey: 'Flow diagram', map: 'Map',
+  treemap: 'Treemap', histogram: 'Histogram', scatter: 'Scatter plot', timeline: 'Timeline', sankey: 'Flow diagram', map: 'Map', heatmap: 'Grid',
 };
 
 /** Kinds come as plain strings from the catalogue and stored charts; only a kind the order slip knows counts. */
@@ -39,7 +39,8 @@ export function asChart(v: JsonObject): ChartVisual | null {
       ...(typeof r.source === 'string' && typeof r.target === 'string' ? {source: r.source, target: r.target} : {}),
       ...(typeof r.x === 'number' ? {x: r.x} : {}),
       ...(typeof r.x_formatted === 'string' ? {x_formatted: r.x_formatted} : {}),
-      ...(typeof r.latitude === 'number' && typeof r.longitude === 'number' ? {latitude: r.latitude, longitude: r.longitude} : {})}));
+      ...(typeof r.latitude === 'number' && typeof r.longitude === 'number' ? {latitude: r.latitude, longitude: r.longitude} : {}),
+      ...(typeof r.across === 'string' && typeof r.down === 'string' ? {across: r.across, down: r.down} : {})}));
   // What a deck slide shows for a kind PowerPoint cannot hold natively (the treemap).
   const drawing = isObj(v.slide_drawing) && typeof v.slide_drawing.width === 'number' && typeof v.slide_drawing.height === 'number'
     ? {option: isObj(v.slide_drawing.option) ? v.slide_drawing.option : null, width: v.slide_drawing.width, height: v.slide_drawing.height,

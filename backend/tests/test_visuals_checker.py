@@ -318,7 +318,7 @@ def test_report_serializes_for_storage():
 
 
 def test_kinds_are_the_design_docs_list():
-    assert {k.value for k in ChartKind} == {"bar", "column", "line", "area", "stacked_bar_100", "donut", "treemap", "histogram", "scatter", "timeline", "sankey", "map"}
+    assert {k.value for k in ChartKind} == {"bar", "column", "line", "area", "stacked_bar_100", "donut", "treemap", "histogram", "scatter", "timeline", "sankey", "map", "heatmap"}
     assert isinstance(DARK, Theme)
     with pytest.raises(ValueError):
         parse_spec({"kind": "pie", "title": "A finding stated", "query": {"name": "links_by_type"}})

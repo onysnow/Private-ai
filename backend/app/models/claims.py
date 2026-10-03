@@ -18,6 +18,12 @@ class Claim(Base):
     text: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(64), default="lead")
     confidence: Mapped[float] = mapped_column(Float, default=0.0)
+    # The confidence grade on the IPCC AR5 grid (ADR-0005, line 5): how much
+    # evidence there is (limited / medium / robust) and how far it agrees
+    # (low / medium / high), each the reporter's judgement, set in a review.
+    # None until a review grades the claim.
+    evidence_grade: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    agreement_grade: Mapped[str | None] = mapped_column(String(16), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
 
 
@@ -41,5 +47,9 @@ class ClaimReviewEvent(Base):
     to_status: Mapped[str] = mapped_column(String(64), index=True)
     from_confidence: Mapped[float] = mapped_column(Float)
     to_confidence: Mapped[float] = mapped_column(Float)
+    from_evidence_grade: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    to_evidence_grade: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    from_agreement_grade: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    to_agreement_grade: Mapped[str | None] = mapped_column(String(16), nullable=True)
     rationale: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)

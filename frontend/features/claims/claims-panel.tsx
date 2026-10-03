@@ -37,6 +37,18 @@ type Props = {
 
 type Stance = 'supports' | 'contradicts' | 'context';
 const CLAIM_STATUSES = ['lead', 'unverified', 'supported', 'confirmed', 'disputed', 'rejected'];
+// The confidence grade on each claim: the IPCC AR5 evidence-by-agreement
+// grid (ADR-0005, line 5; backend app/services/claims.py). Both halves are
+// the reporter's judgement, made from the evidence balance shown below.
+const EVIDENCE_GRADES = ['limited', 'medium', 'robust'] as const;
+const AGREEMENT_GRADES = ['low', 'medium', 'high'] as const;
+const UNGRADED = 'none';
+
+/** A grade in words: "medium evidence, high agreement", or null when the claim has none. */
+export function gradeText(claim: {evidence_grade?: string | null; agreement_grade?: string | null}): string | null {
+  return claim.evidence_grade && claim.agreement_grade ? `${claim.evidence_grade} evidence, ${claim.agreement_grade} agreement` : null;
+}
+
 // One empty list while the claims load, so the effect below sees the same value.
 const NO_CLAIMS: ClaimOut[] = [];
 
@@ -48,6 +60,8 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [claimStatus, setClaimStatus] = useState('unverified');
   const [claimConfidence, setClaimConfidence] = useState(0);
+  const [evidenceGrade, setEvidenceGrade] = useState<string>(UNGRADED);
+  const [agreementGrade, setAgreementGrade] = useState<string>(UNGRADED);
   const [newClaimText, setNewClaimText] = useState('');
   const [evidenceNote, setEvidenceNote] = useState('');
   const [rationale, setRationale] = useState('');
@@ -80,6 +94,8 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
     setSelectedId(claim.id);
     setClaimStatus(claim.status);
     setClaimConfidence(claim.confidence);
+    setEvidenceGrade(claim.evidence_grade ?? UNGRADED);
+    setAgreementGrade(claim.agreement_grade ?? UNGRADED);
     setReviewStatus('');
   }, [asked, claims]);
 
@@ -102,14 +118,21 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
       setReviewStatus('Add a reporter rationale before recording this review.');
       return;
     }
+    const graded = evidenceGrade !== UNGRADED && agreementGrade !== UNGRADED;
+    if ((evidenceGrade === UNGRADED) !== (agreementGrade === UNGRADED)) {
+      setReviewStatus('A confidence grade gives both the evidence and the agreement.');
+      return;
+    }
     try {
-      const result = (await createClaimReview({path: {claim_id: selectedClaim.id}, body: {status: claimStatus, confidence: claimConfidence, rationale: rationale.trim()}, throwOnError: true})).data;
+      const grade = graded ? {evidence_grade: evidenceGrade as typeof EVIDENCE_GRADES[number], agreement_grade: agreementGrade as typeof AGREEMENT_GRADES[number]} : {};
+      const result = (await createClaimReview({path: {claim_id: selectedClaim.id}, body: {status: claimStatus, confidence: claimConfidence, rationale: rationale.trim(), ...grade}, throwOnError: true})).data;
       const updated = result.claim;
       // The reply already carries the claim and its workspace as they now stand.
       queryClient.setQueryData<ClaimOut[]>(listClaimsQueryKey({path}), current => current?.map(c => (c.id === updated.id ? updated : c)));
       queryClient.setQueryData(getClaimReviewWorkspaceQueryKey({path: {claim_id: updated.id}}), result.workspace);
       setRationale('');
-      setReviewStatus(`Recorded immutable review: ${updated.status} at ${Math.round(updated.confidence * 100)}% confidence.`);
+      const words = gradeText(updated);
+      setReviewStatus(`Recorded immutable review: ${updated.status} at ${Math.round(updated.confidence * 100)}% confidence${words ? `; ${words}` : ''}.`);
     } catch (error) {
       setReviewStatus(errorMessage(error, 'Could not record the review'));
     }
@@ -147,7 +170,7 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
       <div className="twocol">
         <div>
           {claims.length === 0 ? <p className="muted">No claims yet.</p> : claims.map(c => <button className="finding" key={c.id} onClick={() => openClaim(c.id)}>
-            <strong>{c.text}</strong><small>{c.status} · {Math.round(c.confidence * 100)}% confidence</small>
+            <strong>{c.text}</strong><small>{c.status} · {Math.round(c.confidence * 100)}% confidence{gradeText(c) ? ` · ${gradeText(c)}` : ''}</small>
           </button>)}
         </div>
         <div>
@@ -158,6 +181,20 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
                 <SelectTrigger className="w-auto"><SelectValue/></SelectTrigger>
                 <SelectContent>{CLAIM_STATUSES.map(status => <SelectItem value={status} key={status}>{status}</SelectItem>)}</SelectContent>
               </Select>
+              <Select value={evidenceGrade} onValueChange={setEvidenceGrade}>
+                <SelectTrigger className="w-auto" aria-label="Evidence"><SelectValue/></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={UNGRADED}>Evidence: not graded</SelectItem>
+                  {EVIDENCE_GRADES.map(grade => <SelectItem value={grade} key={grade}>{`Evidence: ${grade}`}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Select value={agreementGrade} onValueChange={setAgreementGrade}>
+                <SelectTrigger className="w-auto" aria-label="Agreement"><SelectValue/></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={UNGRADED}>Agreement: not graded</SelectItem>
+                  {AGREEMENT_GRADES.map(grade => <SelectItem value={grade} key={grade}>{`Agreement: ${grade}`}</SelectItem>)}
+                </SelectContent>
+              </Select>
               <label>Confidence {Math.round(claimConfidence * 100)}% <Slider className="w-32" value={[claimConfidence]} min={0} max={1} step={0.05} onValueChange={(vals: number[]) => setClaimConfidence(vals[0])}/></label>
               <Input value={rationale} onChange={(e: ChangeEvent<HTMLInputElement>) => setRationale(e.target.value)} placeholder="Required rationale for this review"/>
               <Button onClick={saveClaimReview} disabled={!rationale.trim()}>Record review</Button>
@@ -167,6 +204,9 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
               <div className="candidate">
                 <b>Evidence balance</b>
                 <div>{workspace.stance_counts.supports} supporting · {workspace.stance_counts.contradicts} contradicting · {workspace.stance_counts.context} context</div>
+                <div>From {workspace.source_count ?? 0} source{workspace.source_count === 1 ? '' : 's'}</div>
+                <small>Grade the claim on the IPCC grid from this: evidence is limited, medium or robust by its type, amount, quality and
+                  consistency; agreement is low, medium or high by how far the evidence agrees.</small>
               </div>
               <h4>Dependent canonical relationships</h4>
               {workspace.dependent_relationships.length === 0 ? <p className="muted">No canonical relationship currently depends on this claim&apos;s linked evidence.</p> : workspace.dependent_relationships.map(dep => {
@@ -182,6 +222,7 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
               <h4>Immutable review history</h4>
               {workspace.review_history.length === 0 ? <p className="muted">No reporter review has been recorded yet.</p> : workspace.review_history.map(event => <div className="statement" key={event.id}>
                 <b>{event.from_status} → {event.to_status}</b> · {Math.round(event.from_confidence * 100)}% → {Math.round(event.to_confidence * 100)}%
+                {(event.to_evidence_grade || event.from_evidence_grade) && <span> · {gradeText({evidence_grade: event.from_evidence_grade, agreement_grade: event.from_agreement_grade}) ?? 'not graded'} → {gradeText({evidence_grade: event.to_evidence_grade, agreement_grade: event.to_agreement_grade}) ?? 'not graded'}</span>}
                 <div>{event.rationale}</div>
                 {event.created_at && <small>{new Date(event.created_at).toLocaleString()}</small>}
               </div>)}

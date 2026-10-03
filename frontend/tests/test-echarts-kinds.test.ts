@@ -1,5 +1,5 @@
 // The app's tree-shaken ECharts (lib/echarts-setup.ts) draws every chart kind
-// the backend builds (visuals passes 3 and 4). Each option is the backend's own,
+// the backend builds (visuals passes 3 to 6; the map's places are MapLibre's). Each option is the backend's own,
 // kept in test-support/chart-kinds.json (backend/tests/test_visuals_kinds.py
 // fails if the drawing drifts from that file). ECharts skips a series whose
 // chart type was never registered and draws the rest without a word (checked
@@ -30,8 +30,8 @@ function draw(fixture: Fixture): string {
 
 describe('every chart kind draws with the app\'s registered ECharts parts', () => {
   it('has a fixture for each drawn kind', () => {
-    expect(Object.keys(fixtures).sort()).toEqual(['area', 'bar', 'column', 'donut', 'histogram', 'line', 'map', 'sankey', 'scatter', 'stacked_bar_100',
-      'timeline', 'treemap']);
+    expect(Object.keys(fixtures).sort()).toEqual(['area', 'bar', 'column', 'donut', 'heatmap', 'histogram', 'line', 'map', 'sankey', 'scatter',
+      'stacked_bar_100', 'timeline', 'treemap']);
   });
 
   // A map's places are MapLibre's (components/presentation/chart-map.tsx); ECharts draws its frame.
@@ -44,7 +44,7 @@ describe('every chart kind draws with the app\'s registered ECharts parts', () =
     expect(text).toContain('Source: ');
     // A part, a point or a bin is named on the chart, not only in a key.
     const named = {line: '$52K', area: '$52K', column: '$52K', histogram: '$500K', scatter: 'Meridian Holdings Ltd',
-      sankey: 'Bellcastle Trading Group', timeline: 'Alaric Voss appointed director'}[kind] ?? 'Alaric Voss';
+      sankey: 'Bellcastle Trading Group', timeline: 'Alaric Voss appointed director', heatmap: '2 claims'}[kind] ?? 'Alaric Voss';
     expect(text).toContain(named);
   });
 

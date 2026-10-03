@@ -91,7 +91,7 @@ KIND_LABELS = {
     ChartKind.bar: "Bar chart", ChartKind.column: "Column chart", ChartKind.line: "Line chart", ChartKind.area: "Area chart",
     ChartKind.stacked_bar_100: "100% bar", ChartKind.donut: "Donut chart", ChartKind.treemap: "Treemap",
     ChartKind.histogram: "Histogram", ChartKind.scatter: "Scatter plot", ChartKind.timeline: "Timeline", ChartKind.sankey: "Flow diagram",
-    ChartKind.map: "Map",
+    ChartKind.map: "Map", ChartKind.heatmap: "Grid",
 }
 _AXIS_LABEL_WIDTH = 220                    # px: a category name longer than this is cut short (the data table has it whole)
 BOLD_SLACK = math.ceil(_AXIS_LABEL_WIDTH * 0.1)   # px: how much wider a bold name may run than its regular-weight cut
@@ -243,13 +243,17 @@ def value_label(row: DataRow, data: VisualData) -> str:
 
 def source_line(data: VisualData, rows: list[DataRow], kind: ChartKind | None = None) -> str:
     parts = [f"Source: {data.record_count} {data.record_noun if data.record_count != 1 else singular(data.record_noun)} in this investigation's records ({data.query})"]
-    if kind not in (ChartKind.timeline, ChartKind.map) and any(row.record_count == 1 for row in rows):
-        # (A timeline's mark is one event and a map's one place, always one record: nothing to flag.)
+    if kind not in (ChartKind.timeline, ChartKind.map, ChartKind.heatmap) and any(row.record_count == 1 for row in rows):
+        # (A timeline's mark is one event and a map's one place, always one record, and a grid's
+        # cell counts the claims themselves: nothing to flag.)
         parts.append(f"{SINGLE_RECORD_MARK} hollow markers rest on one record" if kind in (ChartKind.line, ChartKind.area, ChartKind.scatter)
                      else f"{SINGLE_RECORD_MARK} rests on one record")
     other = [o for o in data.omitted if o.get("reason") == "other currency"]
     if other:
         parts.append("not shown: " + ", ".join(f"{o['record_count']} in {o['currency']}" for o in other))
+    ungraded = [o for o in data.omitted if o.get("reason") == "not graded"]
+    if ungraded:
+        parts.append(f"not shown: {len(ungraded)} not graded yet")
     if kind == ChartKind.map:
         # The base map's data is OpenStreetMap's (ODbL): every map says so.
         parts.append(MAP_ATTRIBUTION)
@@ -297,7 +301,8 @@ def check_fit(spec: VisualSpec, data: VisualData) -> None:
     if needs and data.series_kind not in needs:
         wanted = {"distribution": "one value per record, such as payment_amounts", "pairs": "two numbers per party, such as payments_count_and_total_by_party",
                   "flows": "money moving between parties, such as payment_flows", "events": "dated events, such as events_in_order",
-                  "places": "records with coordinates, such as places_on_map"}
+                  "places": "records with coordinates, such as places_on_map",
+                  "grid": "a grid of two graded scales, such as claims_by_strength"}
         raise ChartDoesNotFit(f"a {kind.value} needs {' or '.join(wanted[n] for n in needs)}; the query {data.query!r} has {data.series_kind} rows")
     if data.series_kind == "pairs" and kind != ChartKind.scatter:
         raise ChartDoesNotFit(f"the query {data.query!r} holds two numbers per party; draw it as a scatter plot")
@@ -310,6 +315,10 @@ def check_fit(spec: VisualSpec, data: VisualData) -> None:
                                   "leave limit out, or rank the flows as bars")
         if spec.sort is not None:
             raise ChartDoesNotFit("sort does not apply to a flow diagram: each flow sits between its payer and its recipient; leave sort out")
+    if data.series_kind == "grid" and kind != ChartKind.heatmap:
+        raise ChartDoesNotFit(f"the query {data.query!r} holds a grid of two graded scales; draw it as a grid (heatmap)")
+    if kind == ChartKind.heatmap and (spec.sort is not None or spec.limit is not None or spec.scale == Scale.log):
+        raise ChartDoesNotFit("a grid puts each cell where its two grades meet; sort, limit and a log scale do not apply, so leave them out")
     if data.series_kind == "places" and kind != ChartKind.map:
         raise ChartDoesNotFit(f"the query {data.query!r} holds places; draw them on a map")
     if kind == ChartKind.map and (spec.sort is not None or spec.limit is not None or spec.scale == Scale.log):
@@ -360,6 +369,9 @@ def prepare_rows(spec: VisualSpec, data: VisualData, draw: DrawOptions | None = 
         return _histogram_rows(data, (draw or DrawOptions()).binning)[0]
     if spec.kind == ChartKind.scatter:
         return sorted(data.rows, key=lambda r: (r.label.lower(), r.key))
+    if spec.kind == ChartKind.heatmap:
+        # A cell's place is its meaning: the rows keep the grid's own order.
+        return sorted(data.rows, key=lambda r: r.key)
     rows = _sort_rows(list(data.rows), spec.effective_sort())
     if data.series_kind in ("category", "distribution") or (data.series_kind == "flows" and spec.kind != ChartKind.sankey):
         keep = spec.limit if spec.limit is not None else (MAX_COLOURS - 1 if spec.kind in COLOUR_PER_CATEGORY_KINDS else None)
@@ -1223,6 +1235,89 @@ def _map(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
     return {**frame, "map": {"places": places, "flavor": "grayscale", "attribution": MAP_ATTRIBUTION, "top": MAP_TOP, "bottom": MAP_BOTTOM}}
 
 
+# The grid (heatmap): the design doc's claim-strength grid. Each cell is
+# shaded by how many claims sit in it, in HEATMAP_STEPS equal steps of the
+# largest count from the page colour to the theme's accent (Axis Maps,
+# "Data classification": equal intervals suit small whole counts; 3 to 7
+# steps, as the design's rule 17 asks of a shaded map), an empty cell left
+# the page colour with an outline. Every cell writes its count in black or
+# white, whichever reads better on its shade (rule 11).
+HEATMAP_STEPS = 4
+HEATMAP_LABEL_PX = 14
+HEATMAP_TOP, HEATMAP_BOTTOM = 96, 80
+
+
+def _mix(page: str, accent: str, share: float) -> str:
+    """A colour `share` of the way from `page` to `accent`, in sRGB."""
+    a, b = page.lstrip("#"), accent.lstrip("#")
+    channels = [round(int(a[i:i + 2], 16) * (1 - share) + int(b[i:i + 2], 16) * share) for i in (0, 2, 4)]
+    return "#" + "".join(f"{c:02X}" for c in channels)
+
+
+def heatmap_step(value: float, largest: float) -> int:
+    """Which of the HEATMAP_STEPS shades a count takes: 0 for an empty
+    cell, else 1 to HEATMAP_STEPS in equal intervals of the largest count."""
+    if value <= 0 or largest <= 0:
+        return 0
+    return max(1, min(HEATMAP_STEPS, math.ceil(HEATMAP_STEPS * value / largest)))
+
+
+def heatmap_fill(theme: Theme, step: int) -> str:
+    return _hex(theme.page) if step == 0 else _mix(_hex(theme.page), _hex(theme.accent), step / HEATMAP_STEPS)
+
+
+def heatmap_axes(rows: list[DataRow]) -> tuple[list[str], list[str]]:
+    """The grid's columns and rows, in the order the data gives them."""
+    return list(dict.fromkeys(r.across or "" for r in rows)), list(dict.fromkeys(r.down or "" for r in rows))
+
+
+def heatmap_cell_text(row: DataRow, data: VisualData) -> str:
+    count = int(row.value)
+    return f"{count} {data.record_noun if count != 1 else singular(data.record_noun)}"
+
+
+def _heatmap(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
+    """heatmap: one cell per pair of grades, evidence across (limited to
+    robust) and agreement up (low to high), so confidence rises toward the
+    top right as on the IPCC's grid. A highlight outlines the picked cells
+    and writes their counts bold; the shading stays, since it carries the
+    counts."""
+    theme, rows = p.theme, p.rows
+    across, down = heatmap_axes(rows)
+    largest = max((r.value for r in rows), default=0.0)
+    data = []
+    for row in rows:
+        fill = heatmap_fill(theme, heatmap_step(row.value, largest))
+        picked = row.label in p.highlighted
+        label: dict[str, Any] = {"show": True, "formatter": _literal(heatmap_cell_text(row, p.data)),
+                                 **_text_style(theme, HEATMAP_LABEL_PX, colour=ink_on(fill), bold=picked)}
+        data.append({
+            "name": row.label, "value": [across.index(row.across or ""), down.index(row.down or ""), row.value],
+            "itemStyle": {"color": fill, "borderColor": _hex(theme.text) if picked else _hex(theme.rule), "borderWidth": 3 if picked else 1},
+            "label": label,
+        })
+    names = p.data.measure_labels
+    axis_text = _text_style(theme, MIN_FONT_PX)
+    return {
+        **frame,
+        "tooltip": _tooltip(theme),
+        # Room on the left for the rotated "Agreement" name, which containLabel does not count.
+        "grid": {"left": 40, "right": 24, "top": HEATMAP_TOP, "bottom": HEATMAP_BOTTOM, "containLabel": True},
+        "xAxis": {"type": "category", "data": [a.capitalize() for a in across], "name": names.get("x", "Evidence →"), "nameLocation": "middle",
+                  "nameGap": 32, "nameTextStyle": axis_text, "axisLabel": axis_text, "axisTick": {"show": False}, "splitArea": {"show": False}},
+        "yAxis": {"type": "category", "data": [d.capitalize() for d in down], "name": names.get("y", "Agreement →"), "nameLocation": "middle",
+                  "nameGap": 80, "nameRotate": 90, "nameTextStyle": axis_text, "axisLabel": axis_text, "axisTick": {"show": False}},
+        # ECharts draws a heatmap only with a visualMap: its pieces are the
+        # same steps as the cells' own colours (heatmap_step), kept off the
+        # picture since every cell writes its count.
+        "visualMap": {"type": "piecewise", "show": False, "dimension": 2, "seriesIndex": 0,
+                      "pieces": [{"value": 0, "color": heatmap_fill(theme, 0)}] + [
+                          {"gt": largest * (step - 1) / HEATMAP_STEPS, "lte": largest * step / HEATMAP_STEPS, "color": heatmap_fill(theme, step)}
+                          for step in range(1, HEATMAP_STEPS + 1)] if largest > 0 else [{"value": 0, "color": heatmap_fill(theme, 0)}]},
+        "series": [{"type": "heatmap", "name": p.spec.title, "data": data, "emphasis": {"disabled": True}}],
+    }
+
+
 def scatter_labels(rows: list[DataRow], label_points: str) -> set[str]:
     """Which points a scatter plot names: all of them when there are few
     (POINT_LABEL_LIMIT), else the outliers by Tukey's fences, unless the
@@ -1263,6 +1358,9 @@ def _subtitle(spec: VisualSpec, data: VisualData, kind: ChartKind) -> str:
         return base
     if kind == ChartKind.map:
         return "Each place where its record puts it; nothing is looked up"
+    if kind == ChartKind.heatmap:
+        return (f"Number of {data.record_noun} in each cell, darker for more; "
+                "the further right and up, the more evidence and the more it agrees")
     if kind == ChartKind.timeline:
         base = "Each event at its date, earliest first; a line runs from start to end"
         if any(timeline_marks(row) and not timeline_exact(row) for row in data.rows):
@@ -1337,6 +1435,8 @@ def build_chart(spec: VisualSpec, data: VisualData, theme: Theme, *, width: int 
         option = _timeline(parts, frame)
     elif kind == ChartKind.map:
         option = _map(parts, frame)
+    elif kind == ChartKind.heatmap:
+        option = _heatmap(parts, frame)
     else:
         option = _scatter(parts, frame, labelled)
     return BuiltChart(
@@ -1401,6 +1501,15 @@ def _words(spec: VisualSpec, data: VisualData, rows: list[DataRow], highlighted:
         for row, share, table_row in zip(rows, shares, table_rows):
             table_row["share"] = round(share, 1)
             lines.append(f"{row.label}: {part_value_text(row, share, data)}.")
+    elif kind == ChartKind.heatmap:
+        filled = [row for row in rows if row.value > 0]
+        alt = (f"{name}: {spec.title}. {int(sum(r.value for r in rows))} {data.record_noun} in {len(filled)} of {count} cells"
+               + (f"; most in {largest.label} ({heatmap_cell_text(largest, data)})." if filled else "."))
+        columns = ["Cell", f"Number of {data.record_noun}", "Records"]
+        for row, table_row in zip(rows, table_rows):
+            table_row["formatted"] = f"{int(row.value):,}"
+            table_row["across"], table_row["down"] = row.across, row.down
+            lines.append(f"{row.label}: {heatmap_cell_text(row, data)}.")
     elif kind == ChartKind.map:
         shown = ", ".join(row.label for row in rows[:8]) + (f", and {count - 8} more" if count > 8 else "")
         alt = f"{name}: {spec.title}. {count} place{'s' if count != 1 else ''}: {shown}."

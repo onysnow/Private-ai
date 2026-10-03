@@ -1290,6 +1290,593 @@
   },
   "width": 960
  },
+ "heatmap": {
+  "data": {
+   "currency": null,
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {},
+   "query": "claims_by_strength",
+   "record_count": 3,
+   "record_noun": "claims",
+   "rows": [
+    {
+     "across": "limited",
+     "down": "low",
+     "key": "00",
+     "label": "limited evidence, low agreement",
+     "record_count": 0,
+     "record_refs": [],
+     "value": 0.0
+    },
+    {
+     "across": "limited",
+     "down": "medium",
+     "key": "01",
+     "label": "limited evidence, medium agreement",
+     "record_count": 0,
+     "record_refs": [],
+     "value": 0.0
+    },
+    {
+     "across": "limited",
+     "down": "high",
+     "key": "02",
+     "label": "limited evidence, high agreement",
+     "record_count": 0,
+     "record_refs": [],
+     "value": 0.0
+    },
+    {
+     "across": "medium",
+     "down": "low",
+     "key": "10",
+     "label": "medium evidence, low agreement",
+     "record_count": 0,
+     "record_refs": [],
+     "value": 0.0
+    },
+    {
+     "across": "medium",
+     "down": "medium",
+     "key": "11",
+     "label": "medium evidence, medium agreement",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "claim-medium-medium-0",
+       "record_type": "claim"
+      }
+     ],
+     "value": 1.0
+    },
+    {
+     "across": "medium",
+     "down": "high",
+     "key": "12",
+     "label": "medium evidence, high agreement",
+     "record_count": 0,
+     "record_refs": [],
+     "value": 0.0
+    },
+    {
+     "across": "robust",
+     "down": "low",
+     "key": "20",
+     "label": "robust evidence, low agreement",
+     "record_count": 0,
+     "record_refs": [],
+     "value": 0.0
+    },
+    {
+     "across": "robust",
+     "down": "medium",
+     "key": "21",
+     "label": "robust evidence, medium agreement",
+     "record_count": 0,
+     "record_refs": [],
+     "value": 0.0
+    },
+    {
+     "across": "robust",
+     "down": "high",
+     "key": "22",
+     "label": "robust evidence, high agreement",
+     "record_count": 2,
+     "record_refs": [
+      {
+       "record_id": "claim-robust-high-0",
+       "record_type": "claim"
+      },
+      {
+       "record_id": "claim-robust-high-1",
+       "record_type": "claim"
+      }
+     ],
+     "value": 2.0
+    }
+   ],
+   "series_kind": "grid",
+   "unit": "claims",
+   "unit_kind": "count"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Grid: Most claims rest on robust, agreeing evidence. 3 claims in 2 of 9 cells; most in robust evidence, high agreement (2 claims).",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#B98D34"
+   ],
+   "grid": {
+    "bottom": 80,
+    "containLabel": true,
+    "left": 40,
+    "right": 24,
+    "top": 96
+   },
+   "series": [
+    {
+     "data": [
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#F7F2E8"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "0 claims",
+        "show": true
+       },
+       "name": "limited evidence, low agreement",
+       "value": [
+        0,
+        0,
+        0.0
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#F7F2E8"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "0 claims",
+        "show": true
+       },
+       "name": "limited evidence, medium agreement",
+       "value": [
+        0,
+        1,
+        0.0
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#F7F2E8"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "0 claims",
+        "show": true
+       },
+       "name": "limited evidence, high agreement",
+       "value": [
+        0,
+        2,
+        0.0
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#F7F2E8"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "0 claims",
+        "show": true
+       },
+       "name": "medium evidence, low agreement",
+       "value": [
+        1,
+        0,
+        0.0
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#D8C08E"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "1 claim",
+        "show": true
+       },
+       "name": "medium evidence, medium agreement",
+       "value": [
+        1,
+        1,
+        1.0
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#F7F2E8"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "0 claims",
+        "show": true
+       },
+       "name": "medium evidence, high agreement",
+       "value": [
+        1,
+        2,
+        0.0
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#F7F2E8"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "0 claims",
+        "show": true
+       },
+       "name": "robust evidence, low agreement",
+       "value": [
+        2,
+        0,
+        0.0
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#F7F2E8"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "0 claims",
+        "show": true
+       },
+       "name": "robust evidence, medium agreement",
+       "value": [
+        2,
+        1,
+        0.0
+       ]
+      },
+      {
+       "itemStyle": {
+        "borderColor": "#D9CDB6",
+        "borderWidth": 1,
+        "color": "#B98D34"
+       },
+       "label": {
+        "color": "#000000",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 14,
+        "formatter": "2 claims",
+        "show": true
+       },
+       "name": "robust evidence, high agreement",
+       "value": [
+        2,
+        2,
+        2.0
+       ]
+      }
+     ],
+     "emphasis": {
+      "disabled": true
+     },
+     "name": "Most claims rest on robust, agreeing evidence",
+     "type": "heatmap"
+    }
+   ],
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Number of claims in each cell, darker for more; the further right and up, the more evidence and the more it agrees",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "Most claims rest on robust, agreeing evidence",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 3 claims in this investigation's records (claims_by_strength)",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ],
+   "tooltip": {
+    "renderMode": "richText",
+    "show": true,
+    "textStyle": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "trigger": "item"
+   },
+   "visualMap": {
+    "dimension": 2,
+    "pieces": [
+     {
+      "color": "#F7F2E8",
+      "value": 0
+     },
+     {
+      "color": "#E8D9BB",
+      "gt": 0.0,
+      "lte": 0.5
+     },
+     {
+      "color": "#D8C08E",
+      "gt": 0.5,
+      "lte": 1.0
+     },
+     {
+      "color": "#C8A661",
+      "gt": 1.0,
+      "lte": 1.5
+     },
+     {
+      "color": "#B98D34",
+      "gt": 1.5,
+      "lte": 2.0
+     }
+    ],
+    "seriesIndex": 0,
+    "show": false,
+    "type": "piecewise"
+   },
+   "xAxis": {
+    "axisLabel": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "axisTick": {
+     "show": false
+    },
+    "data": [
+     "Limited",
+     "Medium",
+     "Robust"
+    ],
+    "name": "Evidence →",
+    "nameGap": 32,
+    "nameLocation": "middle",
+    "nameTextStyle": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "splitArea": {
+     "show": false
+    },
+    "type": "category"
+   },
+   "yAxis": {
+    "axisLabel": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "axisTick": {
+     "show": false
+    },
+    "data": [
+     "Low",
+     "Medium",
+     "High"
+    ],
+    "name": "Agreement →",
+    "nameGap": 80,
+    "nameLocation": "middle",
+    "nameRotate": 90,
+    "nameTextStyle": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "type": "category"
+   }
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "heatmap",
+   "limit": null,
+   "query": {
+    "name": "claims_by_strength",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "Most claims rest on robust, agreeing evidence",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Grid: Most claims rest on robust, agreeing evidence. 3 claims in 2 of 9 cells; most in robust evidence, high agreement (2 claims).",
+   "data_table": {
+    "columns": [
+     "Cell",
+     "Number of claims",
+     "Records"
+    ],
+    "rows": [
+     {
+      "across": "limited",
+      "down": "low",
+      "formatted": "0",
+      "label": "limited evidence, low agreement",
+      "record_count": 0,
+      "record_refs": [],
+      "value": 0.0
+     },
+     {
+      "across": "limited",
+      "down": "medium",
+      "formatted": "0",
+      "label": "limited evidence, medium agreement",
+      "record_count": 0,
+      "record_refs": [],
+      "value": 0.0
+     },
+     {
+      "across": "limited",
+      "down": "high",
+      "formatted": "0",
+      "label": "limited evidence, high agreement",
+      "record_count": 0,
+      "record_refs": [],
+      "value": 0.0
+     },
+     {
+      "across": "medium",
+      "down": "low",
+      "formatted": "0",
+      "label": "medium evidence, low agreement",
+      "record_count": 0,
+      "record_refs": [],
+      "value": 0.0
+     },
+     {
+      "across": "medium",
+      "down": "medium",
+      "formatted": "1",
+      "label": "medium evidence, medium agreement",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "claim-medium-medium-0",
+        "record_type": "claim"
+       }
+      ],
+      "value": 1.0
+     },
+     {
+      "across": "medium",
+      "down": "high",
+      "formatted": "0",
+      "label": "medium evidence, high agreement",
+      "record_count": 0,
+      "record_refs": [],
+      "value": 0.0
+     },
+     {
+      "across": "robust",
+      "down": "low",
+      "formatted": "0",
+      "label": "robust evidence, low agreement",
+      "record_count": 0,
+      "record_refs": [],
+      "value": 0.0
+     },
+     {
+      "across": "robust",
+      "down": "medium",
+      "formatted": "0",
+      "label": "robust evidence, medium agreement",
+      "record_count": 0,
+      "record_refs": [],
+      "value": 0.0
+     },
+     {
+      "across": "robust",
+      "down": "high",
+      "formatted": "2",
+      "label": "robust evidence, high agreement",
+      "record_count": 2,
+      "record_refs": [
+       {
+        "record_id": "claim-robust-high-0",
+        "record_type": "claim"
+       },
+       {
+        "record_id": "claim-robust-high-1",
+        "record_type": "claim"
+       }
+      ],
+      "value": 2.0
+     }
+    ]
+   },
+   "description": "Grid: Most claims rest on robust, agreeing evidence. 3 claims in 2 of 9 cells; most in robust evidence, high agreement (2 claims). limited evidence, low agreement: 0 claims. limited evidence, medium agreement: 0 claims. limited evidence, high agreement: 0 claims. medium evidence, low agreement: 0 claims. medium evidence, medium agreement: 1 claim. medium evidence, high agreement: 0 claims. robust evidence, low agreement: 0 claims. robust evidence, medium agreement: 0 claims. robust evidence, high agreement: 2 claims. Source: 3 claims in this investigation's records (claims_by_strength).",
+   "source_line": "Source: 3 claims in this investigation's records (claims_by_strength)"
+  },
+  "width": 960
+ },
  "histogram": {
   "data": {
    "currency": "USD",

@@ -2477,7 +2477,8 @@
           "scatter",
           "timeline",
           "sankey",
-          "map"
+          "map",
+          "heatmap"
         ],
         "title": "ChartKind",
         "type": "string"
@@ -3282,6 +3283,22 @@
       },
       "ClaimOut": {
         "properties": {
+          "agreement_grade": {
+            "anyOf": [
+              {
+                "enum": [
+                  "low",
+                  "medium",
+                  "high"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agreement Grade"
+          },
           "confidence": {
             "title": "Confidence",
             "type": "number"
@@ -3291,6 +3308,22 @@
             "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
             "title": "Created At",
             "type": "string"
+          },
+          "evidence_grade": {
+            "anyOf": [
+              {
+                "enum": [
+                  "limited",
+                  "medium",
+                  "robust"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence Grade"
           },
           "id": {
             "title": "Id",
@@ -3332,9 +3365,31 @@
             "title": "Created At",
             "type": "string"
           },
+          "from_agreement_grade": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Agreement Grade"
+          },
           "from_confidence": {
             "title": "From Confidence",
             "type": "number"
+          },
+          "from_evidence_grade": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Evidence Grade"
           },
           "from_status": {
             "title": "From Status",
@@ -3348,9 +3403,31 @@
             "title": "Rationale",
             "type": "string"
           },
+          "to_agreement_grade": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Agreement Grade"
+          },
           "to_confidence": {
             "title": "To Confidence",
             "type": "number"
+          },
+          "to_evidence_grade": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Evidence Grade"
           },
           "to_status": {
             "title": "To Status",
@@ -3372,9 +3449,41 @@
       },
       "ClaimReviewRequest": {
         "properties": {
+          "agreement_grade": {
+            "anyOf": [
+              {
+                "enum": [
+                  "low",
+                  "medium",
+                  "high"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agreement Grade"
+          },
           "confidence": {
             "title": "Confidence",
             "type": "number"
+          },
+          "evidence_grade": {
+            "anyOf": [
+              {
+                "enum": [
+                  "limited",
+                  "medium",
+                  "robust"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence Grade"
           },
           "rationale": {
             "title": "Rationale",
@@ -3439,6 +3548,11 @@
             },
             "title": "Review History",
             "type": "array"
+          },
+          "source_count": {
+            "default": 0,
+            "title": "Source Count",
+            "type": "integer"
           },
           "stance_counts": {
             "$ref": "#/components/schemas/StanceCountsOut"
@@ -9918,6 +10032,28 @@
       },
       "DataTableRowOut": {
         "properties": {
+          "across": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Across"
+          },
+          "down": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Down"
+          },
           "end": {
             "anyOf": [
               {
@@ -24447,6 +24583,28 @@
       },
       "VisualDataRowOut": {
         "properties": {
+          "across": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Across"
+          },
+          "down": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Down"
+          },
           "end": {
             "anyOf": [
               {
@@ -25003,7 +25161,7 @@
                 "type": "null"
               }
             ],
-            "description": "The question the chart answers: ranking, change_over_time, part_of_whole, distribution, correlation, flow or place.",
+            "description": "The question the chart answers: ranking, change_over_time, part_of_whole, distribution, correlation, flow, place or confidence.",
             "title": "Question"
           },
           "scale": {

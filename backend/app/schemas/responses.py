@@ -204,6 +204,9 @@ class VisualDataRowOut(ResponseModel):
     # A places row's coordinates, as its record gives them (a map).
     latitude: float | None = Field(default=None, exclude_if=_absent_when_none)
     longitude: float | None = Field(default=None, exclude_if=_absent_when_none)
+    # A grid row's column and row: the two grades it sits at (a heatmap).
+    across: str | None = Field(default=None, exclude_if=_absent_when_none)
+    down: str | None = Field(default=None, exclude_if=_absent_when_none)
 
 
 class VisualDataOut(ResponseModel):
@@ -261,6 +264,9 @@ class DataTableRowOut(ResponseModel):
     # A place's coordinates (a map; `formatted` says them in words).
     latitude: float | None = Field(default=None, exclude_if=_absent_when_none)
     longitude: float | None = Field(default=None, exclude_if=_absent_when_none)
+    # A cell's two grades (a heatmap; `formatted` is its count).
+    across: str | None = Field(default=None, exclude_if=_absent_when_none)
+    down: str | None = Field(default=None, exclude_if=_absent_when_none)
 
 
 class DataTableOut(ResponseModel):
@@ -1559,6 +1565,9 @@ class ClaimOut(ResponseModel):
     text: str
     status: str  # lead | unverified | supported | confirmed | disputed | rejected
     confidence: float
+    # The confidence grade on the IPCC AR5 grid; null until a review gives it.
+    evidence_grade: Literal["limited", "medium", "robust"] | None = None
+    agreement_grade: Literal["low", "medium", "high"] | None = None
     created_at: Timestamp
 
 
@@ -1606,6 +1615,10 @@ class ClaimReviewEventOut(ResponseModel):
     to_status: str
     from_confidence: float
     to_confidence: float
+    from_evidence_grade: str | None = None
+    to_evidence_grade: str | None = None
+    from_agreement_grade: str | None = None
+    to_agreement_grade: str | None = None
     rationale: str
     created_at: Timestamp
 
@@ -1616,6 +1629,8 @@ class ClaimReviewWorkspaceOut(ResponseModel):
     dependent_relationships: list[ClaimDependentRelationshipOut]
     review_history: list[ClaimReviewEventOut]
     stance_counts: StanceCountsOut
+    # How many separate sources the linked evidence comes from (what the evidence grade is judged on, with the stances).
+    source_count: int = 0
 
 
 class ClaimReviewResultOut(ResponseModel):

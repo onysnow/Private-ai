@@ -27,8 +27,8 @@
 // literal below now traces to the real current Dark Academia tokens.
 
 import * as echarts from 'echarts/core';
-import {BarChart, CustomChart, LineChart, PieChart, SankeyChart, ScatterChart, TreemapChart} from 'echarts/charts';
-import {AriaComponent, DataZoomComponent, GridComponent, LegendComponent, MarkAreaComponent, TitleComponent, TooltipComponent} from 'echarts/components';
+import {BarChart, CustomChart, HeatmapChart, LineChart, PieChart, SankeyChart, ScatterChart, TreemapChart} from 'echarts/charts';
+import {AriaComponent, DataZoomComponent, GridComponent, LegendComponent, MarkAreaComponent, TitleComponent, TooltipComponent, VisualMapPiecewiseComponent} from 'echarts/components';
 import {LabelLayout, LegacyGridContainLabel} from 'echarts/features';
 import {CanvasRenderer} from 'echarts/renderers';
 
@@ -63,6 +63,10 @@ echarts.use([
   LabelLayout,
   // The places' timeline shades the stretch of time picked (features/places/places-timeline.tsx).
   MarkAreaComponent,
+  // The grid (the claim-strength grid): ECharts draws a heatmap only with a
+  // visualMap, here a piecewise one matching the cells' own shades.
+  HeatmapChart,
+  VisualMapPiecewiseComponent,
   CanvasRenderer,
 ]);
 

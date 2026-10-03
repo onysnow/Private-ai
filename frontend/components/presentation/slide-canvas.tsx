@@ -264,10 +264,12 @@ function Timeline({visual, style, lookup, region}: {visual: Extract<Presentation
 
 /** The rows a kind lists in place of its picture, as the export's table
  * lists them (backend/app/services/decks.py TABLE_STAND_INS): every event and
- * every place counts one, so bars would draw nothing true. */
+ * every place counts one, so bars would draw nothing true; a grid's cells
+ * mean their place, which bars would lose. */
 const TABLE_STAND_INS: Record<string, {name: string; columns: [string, (row: ChartVisual['text']['data_table']['rows'][number]) => string][]} | undefined> = {
   timeline: {name: 'events', columns: [['Event', r => r.label], ['When', r => r.formatted], ['Status', r => r.status ?? '']]},
   map: {name: 'places', columns: [['Place', r => r.label], ['Where', r => r.formatted]]},
+  heatmap: {name: 'cells', columns: [['Cell', r => r.label], ['Count', r => r.formatted]]},
 };
 
 /** A checked chart placed in a slide region, scaled to fit it. A kind

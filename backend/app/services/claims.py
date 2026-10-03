@@ -5,16 +5,49 @@ from app.schemas.api import ClaimCreate
 from app.models.domain import Claim, ClaimReviewEvent, ClaimEvidenceLink, Evidence, Source, RelationshipEdge, RelationshipEvidenceAttachment
 
 
-def review_claim(db: Session, claim: Claim, *, status: str, confidence: float, rationale: str) -> Any:
+# The confidence grade on each claim (ADR-0005, line 5): the IPCC AR5
+# evidence-by-agreement grid (Mastrandrea et al. 2010, "Guidance Note for
+# Lead Authors of the IPCC Fifth Assessment Report on Consistent Treatment of
+# Uncertainties", Figure 1). Evidence is summarised as limited, medium or
+# robust (its type, amount, quality and consistency), agreement as low,
+# medium or high. Both are the reporter's judgement: the note gives no
+# counts to derive them from, so the Workbench shows the evidence (its
+# stances and how many sources it comes from) and records the grade the
+# reporter gives, with the rationale.
+EVIDENCE_GRADES = ("limited", "medium", "robust")
+AGREEMENT_GRADES = ("low", "medium", "high")
+
+
+def validate_grade(*, evidence_grade: str | None, agreement_grade: str | None) -> None:
+    if evidence_grade is not None and evidence_grade not in EVIDENCE_GRADES:
+        raise ValueError(f"Invalid evidence grade. Allowed: {', '.join(EVIDENCE_GRADES)}")
+    if agreement_grade is not None and agreement_grade not in AGREEMENT_GRADES:
+        raise ValueError(f"Invalid agreement grade. Allowed: {', '.join(AGREEMENT_GRADES)}")
+    if (evidence_grade is None) != (agreement_grade is None):
+        raise ValueError("A confidence grade gives both the evidence and the agreement")
+
+
+def review_claim(db: Session, claim: Claim, *, status: str, confidence: float, rationale: str,
+                 evidence_grade: str | None = None, agreement_grade: str | None = None) -> Any:
+    """Record a reporter's review: the claim's status, confidence and, when
+    given, its grade (both halves together; a review without one keeps the
+    grade the claim has)."""
     rationale = rationale.strip()
     if not rationale:
         raise ValueError("Reporter rationale is required for a claim review")
+    validate_grade(evidence_grade=evidence_grade, agreement_grade=agreement_grade)
+    new_evidence = evidence_grade if evidence_grade is not None else claim.evidence_grade
+    new_agreement = agreement_grade if agreement_grade is not None else claim.agreement_grade
     event = ClaimReviewEvent(
         claim_id=claim.id, from_status=claim.status, to_status=status,
         from_confidence=claim.confidence, to_confidence=confidence, rationale=rationale,
+        from_evidence_grade=claim.evidence_grade, to_evidence_grade=new_evidence,
+        from_agreement_grade=claim.agreement_grade, to_agreement_grade=new_agreement,
     )
     claim.status = status
     claim.confidence = confidence
+    claim.evidence_grade = new_evidence
+    claim.agreement_grade = new_agreement
     db.add(event)
     db.commit(); db.refresh(claim); db.refresh(event)
     return claim, event
@@ -41,8 +74,11 @@ def claim_review_workspace(db: Session, claim: Claim) -> dict:
         for edge in edges:
             relationships.append({"id": edge.id, "relationship_entity_id": edge.relationship_entity_id, "source_entity_id": edge.source_entity_id, "target_entity_id": edge.target_entity_id, "evidence_ids": sorted(attached_by_edge.get(edge.id, []))})
     history = list(db.scalars(select(ClaimReviewEvent).where(ClaimReviewEvent.claim_id == claim.id).order_by(ClaimReviewEvent.created_at.desc())).all())
+    # What the grade is judged from: the stances, and how many separate sources the evidence comes from.
+    sources = {link_source.id for row in evidence_rows if isinstance(link_source := row["source"], Source)}
     return {"claim": claim, "evidence": evidence_rows, "dependent_relationships": relationships, "review_history": history,
-            "stance_counts": {s: sum(1 for x in links if x.stance == s) for s in ("supports", "contradicts", "context")}}
+            "stance_counts": {s: sum(1 for x in links if x.stance == s) for s in ("supports", "contradicts", "context")},
+            "source_count": len(sources)}
 
 
 CLAIM_STATUSES = {"lead", "unverified", "supported", "confirmed", "disputed", "rejected"}

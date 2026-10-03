@@ -451,7 +451,14 @@ def _fixture_orders() -> dict[str, tuple[str, VisualData]]:
                        latitude=51.5072, longitude=-0.1276),
                DataRow("Villa Kyrenia", 1.0, [RecordRef("entity", "villa")], 1, "villa kyrenia|villa", latitude=35.3364, longitude=33.3199)]
     places = VisualData("inv", "places_on_map", {}, "places", "count", "places", "places", located, record_count=2)
+    graded = {("medium", "medium"): 1, ("robust", "high"): 2}
+    cells = [DataRow(f"{e} evidence, {a} agreement", float(graded.get((e, a), 0)),
+                     [RecordRef("claim", f"claim-{e}-{a}-{n}") for n in range(graded.get((e, a), 0))], graded.get((e, a), 0), f"{i}{j}",
+                     across=e, down=a)
+             for i, e in enumerate(("limited", "medium", "robust")) for j, a in enumerate(("low", "medium", "high"))]
+    grid = VisualData("inv", "claims_by_strength", {}, "claims", "count", "grid", "claims", cells, record_count=3)
     return {
+        "heatmap": ("Most claims rest on robust, agreeing evidence", grid),
         "map": ("The money ended up in a villa in Cyprus", places),
         "timeline": ("The payment came two years after Bellcastle took control", events),
         "sankey": ("Most of Meridian's money went to Bellcastle", flows),
