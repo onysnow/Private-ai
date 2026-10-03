@@ -26,7 +26,7 @@ import logging
 import re
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from app.core.time import utcnow_naive
@@ -67,9 +67,11 @@ def add_entry(db: Session, investigation_id: str, *, query: str, note: str | Non
 
 
 def remove_entry(db: Session, entry: WatchlistEntry) -> None:
-    """The entry and its hits go; leads already made from them stay."""
-    for hit in db.scalars(select(WatchlistHit).where(WatchlistHit.entry_id == entry.id)):
-        db.delete(hit)
+    """The entry and its hits go; leads already made from them stay. The hits
+    are deleted by a statement of their own first: the models have no ORM
+    relationship, so one flush would not order the two deletes and PostgreSQL
+    would refuse the entry's while its hits still point at it."""
+    db.execute(delete(WatchlistHit).where(WatchlistHit.entry_id == entry.id))
     db.delete(entry)
     db.commit()
 
