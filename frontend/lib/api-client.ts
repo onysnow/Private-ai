@@ -26,6 +26,8 @@ async function parseError(response:Response,endpoint:string):Promise<ApiHttpErro
         const value=(body as {detail?:unknown}).detail;
         if(typeof value==='string'&&value.trim())detail=value.trim();
         else if(Array.isArray(value))detail=value.map(x=>typeof x==='string'?x:JSON.stringify(x)).join('; ');
+        // A structured detail ({message, document, ...}: an upload's 409 or 422) says it in its message.
+        else if(typeof value==='object'&&value!==null&&typeof (value as {message?:unknown}).message==='string')detail=(value as {message:string}).message;
       }
     }else{
       const text=(await response.text()).trim();

@@ -456,6 +456,8 @@ export const zBodyRestoreBackup = z.object({
  * Body_upload_document
  */
 export const zBodyUploadDocument = z.object({
+  allow_duplicate: z.boolean().optional().default(false),
+  batch_id: z.string().nullish(),
   file: z.string(),
   investigation_id: z.string(),
   title: z.string().optional().default(''),
@@ -1556,6 +1558,24 @@ export const zDossierSummaryOut = z.object({
 });
 
 /**
+ * DuplicateDocumentDetailOut
+ */
+export const zDuplicateDocumentDetailOut = z.object({
+  document: zDocumentOut,
+  message: z.string(),
+});
+
+/**
+ * DuplicateDocumentOut
+ *
+ * 409 from an upload: the same bytes are already a document of this
+ * investigation. Send ``allow_duplicate`` to keep a second copy anyway.
+ */
+export const zDuplicateDocumentOut = z.object({
+  detail: zDuplicateDocumentDetailOut,
+});
+
+/**
  * EmailHeadersOut
  *
  * An email's headers as OpenAleph read them.
@@ -2481,6 +2501,99 @@ export const zFinancialLedgerOut = z.object({
   incomplete: z.array(zIncompleteTransactionOut),
   investigation_id: z.string(),
   transactions: z.array(zFinancialTransactionOut),
+});
+
+/**
+ * IngestionBatchCreate
+ */
+export const zIngestionBatchCreate = z.object({
+  label: z.string().max(512).nullish(),
+});
+
+/**
+ * IngestionBatchDocumentOut
+ *
+ * A document of the batch with the latest job that reads it.
+ */
+export const zIngestionBatchDocumentOut = z.object({
+  candidate_counts: z.record(z.number().int()),
+  chunk_count: z.number().int(),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  extraction_error: z.string().nullish(),
+  extraction_issues: z.array(z.string()),
+  extraction_status: z.string(),
+  filename: z.string(),
+  id: z.string(),
+  investigation_id: z.string(),
+  job: zBackgroundJobOut.nullable(),
+  mime_type: z.string().nullish(),
+  openaleph_document_id: z.string().nullish(),
+  openaleph_schema: z.string().nullish(),
+  parent_document_id: z.string().nullish(),
+  sha256: z.string(),
+  source_id: z.string(),
+});
+
+/**
+ * IngestionBatchItemOut
+ *
+ * What happened to one file of a bulk import when it was sent.
+ */
+export const zIngestionBatchItemOut = z.object({
+  document_id: z.string().nullable(),
+  duplicate_of: z.record(z.string()).nullable(),
+  error: z.string().nullable(),
+  filename: z.string(),
+  outcome: z.enum(['saved', 'duplicate', 'refused']),
+  position: z.number().int(),
+});
+
+/**
+ * IngestionBatchOut
+ *
+ * A bulk import (app/services/ingestion_batches.py): each file's outcome,
+ * every document to review with its live status, and the order to review
+ * them in (each saved file, then the files found inside it).
+ */
+export const zIngestionBatchOut = z.object({
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  created_by: z.string().nullable(),
+  documents: z.array(zIngestionBatchDocumentOut),
+  id: z.string(),
+  investigation_id: z.string(),
+  items: z.array(zIngestionBatchItemOut),
+  label: z.string(),
+  review_order: z.array(z.string()),
+});
+
+/**
+ * IngestionBatchSummaryOut
+ */
+export const zIngestionBatchSummaryOut = z.object({
+  counts: z.record(z.number().int()),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  created_by: z.string().nullable(),
+  id: z.string(),
+  label: z.string(),
+});
+
+/**
+ * IngestionBatchesOut
+ */
+export const zIngestionBatchesOut = z.object({
+  batches: z.array(zIngestionBatchSummaryOut),
 });
 
 /**
@@ -6065,6 +6178,15 @@ export const zReviewExtractionCandidateResponse = zExtractionReviewOut;
  */
 export const zHealthResponse = zHealthOut;
 
+export const zGetIngestionBatchPath = z.object({
+  batch_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetIngestionBatchResponse = zIngestionBatchOut;
+
 /**
  * Successful Response
  */
@@ -6399,6 +6521,26 @@ export const zGetInvestigationGraphQuery = z.object({
  * Successful Response
  */
 export const zGetInvestigationGraphResponse = zGraphOut;
+
+export const zListIngestionBatchesPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zListIngestionBatchesResponse = zIngestionBatchesOut;
+
+export const zCreateIngestionBatchBody = zIngestionBatchCreate;
+
+export const zCreateIngestionBatchPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCreateIngestionBatchResponse = zIngestionBatchOut;
 
 export const zListLeadsPath = z.object({
   investigation_id: z.string(),

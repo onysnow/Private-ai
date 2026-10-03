@@ -405,6 +405,10 @@ class PromoteToDeckRequest(BaseModel):
     visual_styles: dict[str, VisualStyle] = Field(default_factory=dict)
 
 
+class IngestionBatchCreate(BaseModel):
+    label: str | None = Field(default=None, max_length=512, description="What the import holds; 'Bulk import' when left out.")
+
+
 class DeckSlideIn(BaseModel):
     """One slide as the editor sends it back. The types are checked here so a
     malformed slide is answered with a 422 naming the field; the values are

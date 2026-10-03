@@ -160,6 +160,7 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         EnrichmentSession,
         Evidence,
         ExternalRelationshipReview,
+        IngestionBatch,
         ExtractionCandidate,
         Lead,
         RelationshipEdge,
@@ -185,6 +186,7 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         "relationship_id": (RelationshipEdge, "investigation_id"),
         "deck_id": (Deck, "investigation_id"),
         "writeup_id": (Writeup, "investigation_id"),
+        "batch_id": (IngestionBatch, "investigation_id"),
     }
     if key in direct:
         model, attr = direct[key]

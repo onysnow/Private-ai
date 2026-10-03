@@ -17,7 +17,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/compo
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ExtractionExplanationView} from '../../components/extraction-explanation';
-import {errorMessage, isAbortError} from '../../lib/api-client';
+import {ApiHttpError, errorMessage, isAbortError} from '../../lib/api-client';
 import {checkedReply} from '../../lib/api-generated';
 import {api} from '../../lib/api-instance';
 import {
@@ -25,7 +25,7 @@ import {
   listEntitiesQueryKey, listInvestigationEvidenceQueryKey, listSourcesQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {
-  analyzeOpenalephDocument, createExtractedRelationshipProposal, findOpenalephChildren, getDocument, getOpenalephDocumentReviewStatus, listDocumentCandidatesEndpoint,
+  analyzeOpenalephDocument, createExtractedRelationshipProposal, createIngestionBatch, findOpenalephChildren, getDocument, getOpenalephDocumentReviewStatus, listDocumentCandidatesEndpoint,
   listJobsEndpoint, refreshOpenalephDocumentReview, retryJobEndpoint, reviewExtractionCandidate, syncOpenalephDocument,
 } from '../../lib/generated/sdk.gen';
 import type {
@@ -58,16 +58,29 @@ function shownText(c: ExtractionCandidateOut): string | undefined {
   return text(c.payload.caption) || text(c.payload.text) || text(c.payload.quote);
 }
 
-function uploadForm(investigationId: string, title: string, file: File): FormData {
+type UploadOptions = {batchId?: string, allowDuplicate?: boolean};
+
+function uploadForm(investigationId: string, title: string, file: File, options: UploadOptions = {}): FormData {
   const fd = new FormData();
   fd.append('investigation_id', investigationId);
   fd.append('title', title);
   fd.append('file', file);
+  if (options.batchId) fd.append('batch_id', options.batchId);
+  if (options.allowDuplicate) fd.append('allow_duplicate', 'true');
   return fd;
 }
 
-const upload = (investigationId: string, title: string, file: File): Promise<DocumentUploadOut> =>
-  api.parsed('/api/documents/upload', checkedReply(zDocumentUploadOut), {method: 'POST', rawBody: uploadForm(investigationId, title, file)});
+const upload = (investigationId: string, title: string, file: File, options: UploadOptions = {}): Promise<DocumentUploadOut> =>
+  api.parsed('/api/documents/upload', checkedReply(zDocumentUploadOut), {method: 'POST', rawBody: uploadForm(investigationId, title, file, options)});
+
+/** The same bytes are already a document of this investigation (409 from the upload). */
+const isDuplicate = (error: unknown): boolean => error instanceof ApiHttpError && error.status === 409;
+
+/** A name for a bulk import: its first file, and how many more. */
+export function batchLabel(files: File[]): string {
+  if (files.length === 0) return 'Bulk import';
+  return files.length === 1 ? files[0].name : `${files[0].name} and ${files.length - 1} more`;
+}
 
 export function DocumentsPanel({investigationId}: Props): ReactElement {
   const queryClient = useQueryClient();
@@ -78,6 +91,7 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
   const [docTitle, setDocTitle] = useState('');
   const [docFile, setDocFile] = useState<File | null>(null);
   const [docStatus, setDocStatus] = useState('');
+  const [duplicateOf, setDuplicateOf] = useState('');
   const [candidates, setCandidates] = useState<ExtractionCandidateOut[]>([]);
   // What kind of entity a name is, for proposals that ask (schema-question.tsx).
   const [schemaAnswers, setSchemaAnswers] = useState<Record<string, string>>({});
@@ -144,10 +158,13 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
   // The API saves the file and reads it as a background job (ADR-0004). In the
   // product the upload answers before the read is done, so follow the job;
   // in developer mode the answer already carries the finished job.
-  const uploadDocument = async () => {
+  // A file whose bytes are already a document here is named, not saved again,
+  // unless the reporter asks for a second copy.
+  const uploadDocument = async (allowDuplicate = false) => {
     if (!investigationId || !docFile) return;
+    setDuplicateOf('');
     try {
-      const uploaded = await upload(investigationId, docTitle, docFile);
+      const uploaded = await upload(investigationId, docTitle, docFile, {allowDuplicate});
       void recheckCorpus();
       setDocFile(null);
       setDocTitle('');
@@ -169,6 +186,7 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
       setDocStatus(extracted);
       await loadCandidates(saved.id, 'proposed', extracted);
     } catch (error) {
+      if (isDuplicate(error)) setDuplicateOf(docFile.name);
       setDocStatus(errorMessage(error, 'Document upload failed'));
     }
   };
@@ -206,18 +224,28 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
     if (!investigationId || bulkFiles.length === 0) return;
     setBulkImporting(true);
     setBulkStatus('');
+    let batchId: string;
+    try {
+      batchId = (await createIngestionBatch({path: {investigation_id: investigationId}, body: {label: batchLabel(bulkFiles)}, throwOnError: true})).data.id;
+    } catch (error) {
+      setBulkImporting(false);
+      setBulkStatus(errorMessage(error, 'Could not start the import'));
+      return;
+    }
     const ids: string[] = [];
     const failed: string[] = [];
+    const duplicates: string[] = [];
     const reading: {name: string, jobId: string}[] = [];
     for (let i = 0; i < bulkFiles.length; i++) {
       const file = bulkFiles[i];
       setBulkProgress({done: i, total: bulkFiles.length, currentName: file.name});
       try {
-        const d = await upload(investigationId, file.name.replace(/\.[^./]+$/, ''), file);
+        const d = await upload(investigationId, file.name.replace(/\.[^./]+$/, ''), file, {batchId});
         ids.push(d.id);
         if (d.job && !d.job.finished) reading.push({name: file.name, jobId: d.job.id});
       } catch (error) {
-        failed.push(`${file.name}: ${errorMessage(error, 'upload failed')}`);
+        if (isDuplicate(error)) duplicates.push(file.name);
+        else failed.push(`${file.name}: ${errorMessage(error, 'upload failed')}`);
       }
     }
     if (ids.length) void recheckCorpus();
@@ -241,14 +269,15 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
     setBulkImporting(false);
     setBulkFiles([]);
     await reloadDocuments();
+    const already = duplicates.length ? ` ${duplicates.length} already in this investigation: ${duplicates.join(', ')}.` : '';
     if (ids.length === 0) {
-      setBulkStatus(`All ${failed.length} file(s) failed to import. ${failed.join(' · ')}`);
+      setBulkStatus(failed.length ? `No file was imported. ${failed.join(' · ')}${already}` : `No file was imported.${already}`);
       return;
     }
     setBulkStatus(failed.length
-      ? `Imported ${ids.length} of ${ids.length + failed.length} file(s). ${failed.length} failed and were skipped: ${failed.join(' · ')}`
-      : `Imported ${ids.length} file(s). Opening batch triage...`);
-    router.push(`/review/batch?inv=${encodeURIComponent(investigationId)}&docs=${ids.map(encodeURIComponent).join(',')}`);
+      ? `Imported ${ids.length} of ${bulkFiles.length} file(s). ${failed.length} failed and were skipped: ${failed.join(' · ')}.${already}`
+      : `Imported ${ids.length} file(s).${already} Opening batch triage...`);
+    router.push(`/review/batch?inv=${encodeURIComponent(investigationId)}&batch=${encodeURIComponent(batchId)}`);
   };
 
   const stageRelationship = async () => {
@@ -399,10 +428,11 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
     <CardContent>
       <div className="searchrow">
         <Input value={docTitle} onChange={(e: ChangeEvent<HTMLInputElement>) => setDocTitle(e.target.value)} placeholder="Document title"/>
-        <Input type="file" accept={accept} onChange={(e: ChangeEvent<HTMLInputElement>) => setDocFile(e.target.files?.[0] || null)}/>
-        <Button onClick={uploadDocument} disabled={!docFile}>Upload & extract</Button>
+        <Input type="file" accept={accept} onChange={(e: ChangeEvent<HTMLInputElement>) => { setDocFile(e.target.files?.[0] || null); setDuplicateOf(''); }}/>
+        <Button onClick={() => uploadDocument()} disabled={!docFile}>Upload & extract</Button>
       </div>
       {docStatus && <p className="muted">{docStatus}</p>}
+      {duplicateOf && docFile && <Button size="sm" variant="outline" onClick={() => uploadDocument(true)}>Keep a second copy of {duplicateOf}</Button>}
       {documentsQuery.isError && <p className="muted">{errorMessage(documentsQuery.error, 'Could not load the documents')}</p>}
       {investigationId && <CorpusStatus investigationId={investigationId} watch={filesBeingRead} onIdle={reloadDocuments}/>}
       <hr/>

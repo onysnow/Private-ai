@@ -177,6 +177,24 @@ describe('Document review queue: issues and clarifying questions', () => {
     expect(api.unmatched()).toEqual([]);
   });
 
+  it('walks a recorded import in its own order, from the document the reporter chose', async () => {
+    setParams('inv=inv-1&batch=batch-1&start=doc-b');
+    const api = mockApi({
+      'GET /api/ingestion-batches/batch-1': {id: 'batch-1', investigation_id: 'inv-1', label: 'Bulk import', created_by: null,
+        created_at: '2026-10-03T01:00:00', items: [], documents: [], review_order: ['doc-a', 'doc-b', 'doc-c']},
+      [documentRoute('doc-b')]: docFixture({id: 'doc-b', filename: 'scan.pdf'}),
+      [candidatesRoute('doc-b')]: [],
+    });
+
+    const ReviewPage = await importReviewPage();
+    render(<ReviewPage />);
+
+    await screen.findByText('Document 1 of 3');
+    await screen.findByText('scan.pdf');
+    expect(api.calls('GET /api/investigations/inv-1/documents')).toHaveLength(0);   // no scan of the whole investigation
+    expect(api.unmatched()).toEqual([]);
+  });
+
   it('falls back to every document in the investigation that still has proposed candidates when no ?docs= is given', async () => {
     setParams('inv=inv-1');
     const api = mockApi({

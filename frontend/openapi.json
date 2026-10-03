@@ -1676,6 +1676,22 @@
       },
       "Body_upload_document": {
         "properties": {
+          "allow_duplicate": {
+            "default": false,
+            "title": "Allow Duplicate",
+            "type": "boolean"
+          },
+          "batch_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Batch Id"
+          },
           "file": {
             "contentMediaType": "application/octet-stream",
             "title": "File",
@@ -11426,6 +11442,36 @@
         "title": "DossierSummaryOut",
         "type": "object"
       },
+      "DuplicateDocumentDetailOut": {
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/DocumentOut"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "document"
+        ],
+        "title": "DuplicateDocumentDetailOut",
+        "type": "object"
+      },
+      "DuplicateDocumentOut": {
+        "description": "409 from an upload: the same bytes are already a document of this\ninvestigation. Send ``allow_duplicate`` to keep a second copy anyway.",
+        "properties": {
+          "detail": {
+            "$ref": "#/components/schemas/DuplicateDocumentDetailOut"
+          }
+        },
+        "required": [
+          "detail"
+        ],
+        "title": "DuplicateDocumentOut",
+        "type": "object"
+      },
       "EmailHeadersOut": {
         "description": "An email's headers as OpenAleph read them.",
         "properties": {
@@ -15148,6 +15194,356 @@
           "problems"
         ],
         "title": "IncompleteTransactionOut",
+        "type": "object"
+      },
+      "IngestionBatchCreate": {
+        "properties": {
+          "label": {
+            "anyOf": [
+              {
+                "maxLength": 512,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What the import holds; 'Bulk import' when left out.",
+            "title": "Label"
+          }
+        },
+        "title": "IngestionBatchCreate",
+        "type": "object"
+      },
+      "IngestionBatchDocumentOut": {
+        "description": "A document of the batch with the latest job that reads it.",
+        "properties": {
+          "candidate_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Candidate Counts",
+            "type": "object"
+          },
+          "chunk_count": {
+            "title": "Chunk Count",
+            "type": "integer"
+          },
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "extraction_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extraction Error"
+          },
+          "extraction_issues": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Extraction Issues",
+            "type": "array"
+          },
+          "extraction_status": {
+            "title": "Extraction Status",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "job": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BackgroundJobOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mime_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mime Type"
+          },
+          "openaleph_document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Openaleph Document Id"
+          },
+          "openaleph_schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Openaleph Schema"
+          },
+          "parent_document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Document Id"
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          },
+          "source_id": {
+            "title": "Source Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "source_id",
+          "filename",
+          "sha256",
+          "extraction_status",
+          "extraction_issues",
+          "created_at",
+          "chunk_count",
+          "candidate_counts",
+          "job"
+        ],
+        "title": "IngestionBatchDocumentOut",
+        "type": "object"
+      },
+      "IngestionBatchItemOut": {
+        "description": "What happened to one file of a bulk import when it was sent.",
+        "properties": {
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "duplicate_of": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The earlier document with the same bytes: id and filename.",
+            "title": "Duplicate Of"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "outcome": {
+            "enum": [
+              "saved",
+              "duplicate",
+              "refused"
+            ],
+            "title": "Outcome",
+            "type": "string"
+          },
+          "position": {
+            "title": "Position",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "position",
+          "filename",
+          "outcome",
+          "error",
+          "document_id",
+          "duplicate_of"
+        ],
+        "title": "IngestionBatchItemOut",
+        "type": "object"
+      },
+      "IngestionBatchOut": {
+        "description": "A bulk import (app/services/ingestion_batches.py): each file's outcome,\nevery document to review with its live status, and the order to review\nthem in (each saved file, then the files found inside it).",
+        "properties": {
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/IngestionBatchDocumentOut"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/IngestionBatchItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "review_order": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Review Order",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "label",
+          "created_by",
+          "created_at",
+          "items",
+          "documents",
+          "review_order"
+        ],
+        "title": "IngestionBatchOut",
+        "type": "object"
+      },
+      "IngestionBatchSummaryOut": {
+        "properties": {
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Files saved, duplicate and refused.",
+            "title": "Counts",
+            "type": "object"
+          },
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "created_by",
+          "created_at",
+          "counts"
+        ],
+        "title": "IngestionBatchSummaryOut",
+        "type": "object"
+      },
+      "IngestionBatchesOut": {
+        "properties": {
+          "batches": {
+            "items": {
+              "$ref": "#/components/schemas/IngestionBatchSummaryOut"
+            },
+            "title": "Batches",
+            "type": "array"
+          }
+        },
+        "required": [
+          "batches"
+        ],
+        "title": "IngestionBatchesOut",
         "type": "object"
       },
       "InvestigationCreate": {
@@ -32139,6 +32535,16 @@
             },
             "description": "Saved; the document is read by a background job (follow `job`)"
           },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DuplicateDocumentOut"
+                }
+              }
+            },
+            "description": "The same bytes are already a document of this investigation (send allow_duplicate to keep a second copy)"
+          },
           "415": {
             "content": {
               "application/json": {
@@ -34701,6 +35107,56 @@
         "summary": "Health"
       }
     },
+    "/api/ingestion-batches/{batch_id}": {
+      "get": {
+        "description": "A bulk import: what happened to each file, every document to review with its live status, and the order to review them in.",
+        "operationId": "get_ingestion_batch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "title": "Batch Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngestionBatchOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Ingestion Batch"
+      }
+    },
     "/api/integrations/openaleph/status": {
       "get": {
         "description": "Report whether the local OpenAleph corpus platform is actually reachable.",
@@ -36603,6 +37059,114 @@
           }
         },
         "summary": "Get Investigation Graph"
+      }
+    },
+    "/api/investigations/{investigation_id}/ingestion-batches": {
+      "get": {
+        "description": "The investigation's recent bulk imports, newest first, with how many files each saved, found already there, or refused.",
+        "operationId": "list_ingestion_batches",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngestionBatchesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "List Ingestion Batches"
+      },
+      "post": {
+        "description": "Start a bulk import; each upload then names it (``batch_id``).",
+        "operationId": "create_ingestion_batch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IngestionBatchCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngestionBatchOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Create Ingestion Batch"
       }
     },
     "/api/investigations/{investigation_id}/leads": {

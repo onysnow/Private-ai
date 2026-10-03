@@ -113,3 +113,33 @@ class ExtractionCandidate(Base):
     reviewer_note: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class IngestionBatch(Base):
+    """One bulk import: the files a reporter chose together (design doc
+    "Document Ingestion & Review System Design", Phase 2). Reading each file
+    is its own background job; the batch is what the triage screen and the
+    review queue follow, instead of a list of document ids in the URL."""
+    __tablename__ = "ingestion_batches"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=uid)
+    investigation_id: Mapped[str] = mapped_column(ForeignKey("investigations.id"), index=True)
+    label: Mapped[str] = mapped_column(String(512))
+    created_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
+
+
+class IngestionBatchItem(Base):
+    """What happened to one file of a batch when it was sent: ``saved`` (its
+    document, which a job reads), ``duplicate`` (the same bytes were already
+    in the investigation: ``document_id`` is that document) or ``refused``
+    (the file could not be taken; ``error`` says why). How reading it went
+    is the document's own status and job, read live."""
+    __tablename__ = "ingestion_batch_items"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=uid)
+    batch_id: Mapped[str] = mapped_column(ForeignKey("ingestion_batches.id"), index=True)
+    position: Mapped[int] = mapped_column(index=True)
+    filename: Mapped[str] = mapped_column(String(512))
+    outcome: Mapped[str] = mapped_column(String(16), index=True)  # saved | duplicate | refused
+    document_id: Mapped[str | None] = mapped_column(ForeignKey("documents.id"), nullable=True, index=True)
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)

@@ -10,6 +10,8 @@ import type {DocItem, DocumentChunk, ExtractionCandidate} from '../../lib/api-ty
 import {ExtractionExplanationView} from '../../components/extraction-explanation';
 import {EntityIdentity, identityFields} from '../../features/documents/entity-identity';
 import {IdentifierOwner} from '../../features/documents/identifier-owner';
+import {reviewOrderFrom} from '../../features/documents/ingestion-batch';
+import {getIngestionBatch} from '../../lib/generated/sdk.gen';
 import {SchemaQuestion, needsSchemaAnswer} from '../../features/documents/schema-question';
 import {QueryProvider} from '../../lib/query-client';
 import {Button} from '@/components/ui/button';
@@ -69,6 +71,9 @@ function ReviewPageInner(): ReactElement {
   const params = useSearchParams();
   const invId = params.get('inv') || '';
   const explicitDocs = (params.get('docs') || '').split(',').map(s => s.trim()).filter(Boolean);
+  // A bulk import (design doc Phase 2): its own review order, from the document the reporter chose.
+  const batchId = params.get('batch') || '';
+  const start = params.get('start');
 
   const [docIds, setDocIds] = useState<string[] | null>(explicitDocs.length ? explicitDocs : null);
   const [resolvingQueue, setResolvingQueue] = useState(explicitDocs.length === 0);
@@ -86,7 +91,24 @@ function ReviewPageInner(): ReactElement {
   // directly from "Open review queue"). Find every document in this
   // investigation that still has at least one proposed candidate.
   useEffect(() => {
-    if (docIds !== null || !invId) return;
+    if (!batchId || docIds !== null) return;
+    let cancelled = false;
+    (async () => {
+      setResolvingQueue(true);
+      try {
+        const batch = (await getIngestionBatch({path: {batch_id: batchId}, throwOnError: true})).data;
+        if (!cancelled) setDocIds(reviewOrderFrom(batch.review_order, start));
+      } catch (error) {
+        if (!cancelled) setQueueError(errorMessage(error, 'Could not load this import'));
+      } finally {
+        if (!cancelled) setResolvingQueue(false);
+      }
+    })();
+    return () => { cancelled = true };
+  }, [batchId, docIds, start]);
+
+  useEffect(() => {
+    if (docIds !== null || !invId || batchId) return;
     let cancelled = false;
     (async () => {
       setResolvingQueue(true);
@@ -106,7 +128,7 @@ function ReviewPageInner(): ReactElement {
       }
     })();
     return () => { cancelled = true };
-  }, [docIds, invId]);
+  }, [batchId, docIds, invId]);
 
   const loadDoc = useCallback(async (id: string) => {
     setLoading(true); setAnswers({}); setStatus(''); setActiveCandidateId(null);

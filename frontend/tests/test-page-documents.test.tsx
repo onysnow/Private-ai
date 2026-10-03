@@ -330,6 +330,9 @@ describe('Home bulk document import', () => {
         return docFixture({id: name === 'memo-a.txt' ? 'doc-a' : 'doc-c', filename: name});
       },
       [DOCUMENTS]: [docFixture(), docFixture({id: 'doc-a'}), docFixture({id: 'doc-c'})], // the list the reload finds
+      // The import is one record the triage screen follows.
+      'POST /api/investigations/inv-1/ingestion-batches': {id: 'batch-1', investigation_id: 'inv-1', label: 'memo-a.txt and 2 more', created_by: null,
+        created_at: '2026-10-03T01:00:00', items: [], documents: [], review_order: []},
     });
 
     const user = userEvent.setup();
@@ -337,7 +340,7 @@ describe('Home bulk document import', () => {
     await user.click(screen.getByRole('button', {name: 'Import 3 document(s)'}));
 
     await screen.findByText(/Imported 2 of 3 file\(s\)\. 1 failed and were skipped/, {exact: false});
-    expect(mockPush).toHaveBeenCalledWith('/review/batch?inv=inv-1&docs=doc-a,doc-c');
+    expect(mockPush).toHaveBeenCalledWith('/review/batch?inv=inv-1&batch=batch-1');
 
     // Three separate sequential POSTs, one per file in the order chosen,
     // each with its own filename-derived title and no manual title field

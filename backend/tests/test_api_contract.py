@@ -297,8 +297,10 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     payment = next(row for row in evidence if row["evidence"]["quote"].startswith("Bank records show"))
     relationship_evidence = ok(client.get(f"/api/relationships/{relationship}/evidence-reviews"))
 
-    # A read document, its proposals (one accepted, so a record has a lineage) and the job that read it.
-    document = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Wire memo"}, files={
+    # A read document, its proposals (one accepted, so a record has a lineage) and the job that read it,
+    # sent as part of a bulk import.
+    batch = ok(client.post(f"/api/investigations/{inv}/ingestion-batches", json={"label": "Wire memos"}))
+    document = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Wire memo", "batch_id": batch["id"]}, files={
         "file": ("memo.txt", b"Meridian Holdings Ltd paid Bellcastle Trading Group. \"The $2.4M wire cleared on 3 March.\"\n", "text/plain")}))
     proposals = ok(client.get(f"/api/documents/{document['id']}/candidates"))
     proposal = next(row for row in proposals if row["candidate_type"] == "entity")["id"]
@@ -357,7 +359,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             "source_id": payment["source"]["id"], "evidence_id": payment["evidence"]["id"], "document_id": document["id"],
             "job_id": document["job"]["id"], "finding_id": company["id"], "session_id": session["id"], "assessment_id": assessment["id"],
             "review_id": review["id"], "writeup_id": writeup["id"], "deck_id": deck["id"], "prop": "jurisdiction", "provider": "fake-a",
-            "task_id": task, "cross_reference_id": _cross_reference(inv, meridian),
+            "task_id": task, "cross_reference_id": _cross_reference(inv, meridian), "batch_id": batch["id"],
             "user_id": user["id"], "aid": activity, "bid": backup["id"], "kind": "investigation_export", "qid": saved["id"],
             "name": "investigations", "pk": inv, "source": "app", "uid": user["id"], "tid": token["token_id"],
         },

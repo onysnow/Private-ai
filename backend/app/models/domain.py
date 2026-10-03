@@ -62,6 +62,8 @@ from app.models.documents import (
     OpenAlephOperationFailure,
     DocumentChunk,
     ExtractionCandidate,
+    IngestionBatch,
+    IngestionBatchItem,
 )
 from app.models.ai import (
     AIAnalysisCandidate,
@@ -127,6 +129,8 @@ __all__ = [
     "OpenAlephOperationFailure",
     "DocumentChunk",
     "ExtractionCandidate",
+    "IngestionBatch",
+    "IngestionBatchItem",
     "AIAnalysisCandidate",
     "Writeup",
     "Deck",

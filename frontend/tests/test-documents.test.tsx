@@ -142,6 +142,28 @@ describe('DocumentsPanel upload and review', () => {
     await screen.findByText(/^Extracted 4 chunk\(s\)\. Review proposals before canonicalizing\. Proposals unavailable/);
   });
 
+  it('names the document a file already is, and keeps a second copy only when asked', async () => {
+    const api = await renderWithDocuments();
+    const uploaded = {...docFixture({id: 'doc-2', filename: 'memo.txt', chunk_count: 1, candidate_counts: {}}), job: null, openaleph_sync: null};
+    api.add({
+      [UPLOAD]: (call: RouteCall) => uploadForm(call).get('allow_duplicate') === 'true'
+        ? uploaded
+        : {status: 409, body: {detail: {message: 'Already in this investigation as “memo.txt”', document: docFixture()}}},
+      [DOCUMENTS]: [docFixture(), uploaded],
+      'GET /api/documents/doc-2/candidates': [],
+    });
+    const user = userEvent.setup();
+    await user.upload(fileInput(), new File(['same bytes'], 'memo.txt', {type: 'text/plain'}));
+    await user.click(screen.getByRole('button', {name: 'Upload & extract'}));
+    await screen.findByText(/^Already in this investigation as “memo\.txt”/);
+    expect(uploadForm(api.calls(UPLOAD)[0]).get('allow_duplicate')).toBeNull();
+
+    await user.click(screen.getByRole('button', {name: 'Keep a second copy of memo.txt'}));
+    await screen.findByText('Extracted 1 chunk(s). Review proposals before canonicalizing.');
+    expect(uploadForm(api.calls(UPLOAD)[1]).get('allow_duplicate')).toBe('true');
+    expect(screen.queryByRole('button', {name: /Keep a second copy/})).not.toBeInTheDocument();
+  });
+
   it('shows the server\'s reason when an upload is refused', async () => {
     const api = await renderWithDocuments();
     api.add({[UPLOAD]: {status: 400, body: {detail: 'Document is empty'}}});
@@ -348,28 +370,37 @@ describe('DocumentsPanel reading as a background job (ADR-0004)', () => {
   });
 });
 
+const BATCHES = 'POST /api/investigations/inv-1/ingestion-batches';
+const batchFixture = (overrides: Record<string, unknown> = {}) => ({id: 'batch-1', investigation_id: 'inv-1', label: 'Bulk import', created_by: 'local-owner',
+  created_at: '2026-10-03T01:00:00', items: [], documents: [], review_order: [], ...overrides});
+
 describe('DocumentsPanel bulk import', () => {
-  it('uploads every selected file in turn, tolerates one failure, and opens batch triage', async () => {
+  it('imports the files as one batch, in turn, names duplicates, tolerates a failure, and opens its triage', async () => {
     const api = await renderWithDocuments();
     api.add({
+      [BATCHES]: batchFixture(),
       [UPLOAD]: (call: RouteCall) => {
         const name = (uploadForm(call).get('file') as File).name;
         if (name === 'memo-b.txt') return {status: 400, body: {detail: 'Document is empty'}};
+        if (name === 'memo-d.txt') return {status: 409, body: {detail: {message: 'Already in this investigation as “memo-a.txt”', document: docFixture({id: 'doc-a'})}}};
         return {...docFixture({id: name === 'memo-a.txt' ? 'doc-a' : 'doc-c', filename: name}), job: null, openaleph_sync: null};
       },
       [DOCUMENTS]: [docFixture(), docFixture({id: 'doc-a'}), docFixture({id: 'doc-c'})],
     });
     const user = userEvent.setup();
     expect(screen.getByRole('button', {name: 'Import 0 document(s)'})).toBeDisabled();
-    await user.upload(bulkFileInput(), [new File(['a'], 'memo-a.txt', {type: 'text/plain'}), new File(['b'], 'memo-b.txt', {type: 'text/plain'}), new File(['c'], 'memo-c.txt', {type: 'text/plain'})]);
-    await user.click(screen.getByRole('button', {name: 'Import 3 document(s)'}));
+    await user.upload(bulkFileInput(), ['a', 'b', 'c', 'd'].map(x => new File([x], `memo-${x}.txt`, {type: 'text/plain'})));
+    await user.click(screen.getByRole('button', {name: 'Import 4 document(s)'}));
 
-    await screen.findByText(/Imported 2 of 3 file\(s\)\. 1 failed and were skipped: memo-b\.txt: Document is empty/);
-    expect(mockPush).toHaveBeenCalledWith('/review/batch?inv=inv-1&docs=doc-a,doc-c');
+    const summary = await screen.findByText(/^Imported 2 of 4 file\(s\)\. 1 failed and were skipped: memo-b\.txt: Document is empty/);
+    expect(summary).toHaveTextContent(/1 already in this investigation: memo-d\.txt\.$/);
+    expect(mockPush).toHaveBeenCalledWith('/review/batch?inv=inv-1&batch=batch-1');
+    expect(api.lastBody(BATCHES)).toEqual({label: 'memo-a.txt and 3 more'});
     const uploads = api.calls(UPLOAD);
-    expect(uploads.map(call => (uploadForm(call).get('file') as File).name)).toEqual(['memo-a.txt', 'memo-b.txt', 'memo-c.txt']);
-    expect(uploads.map(call => uploadForm(call).get('title'))).toEqual(['memo-a', 'memo-b', 'memo-c']);
-    expect(uploads.map(call => uploadForm(call).get('investigation_id'))).toEqual(['inv-1', 'inv-1', 'inv-1']);
+    expect(uploads.map(call => (uploadForm(call).get('file') as File).name)).toEqual(['memo-a.txt', 'memo-b.txt', 'memo-c.txt', 'memo-d.txt']);
+    expect(uploads.map(call => uploadForm(call).get('title'))).toEqual(['memo-a', 'memo-b', 'memo-c', 'memo-d']);
+    expect(uploads.map(call => uploadForm(call).get('batch_id'))).toEqual(['batch-1', 'batch-1', 'batch-1', 'batch-1']);
+    expect(uploads.map(call => uploadForm(call).get('investigation_id'))).toEqual(['inv-1', 'inv-1', 'inv-1', 'inv-1']);
     await waitFor(() => expect(api.calls(DOCUMENTS)).toHaveLength(2));
     expect(api.unmatched()).toEqual([]);
   });
@@ -377,6 +408,7 @@ describe('DocumentsPanel bulk import', () => {
   it('waits for every queued read before opening triage, and stays put when every file failed', async () => {
     const api = await renderWithDocuments();
     api.add({
+      [BATCHES]: batchFixture(),
       [UPLOAD]: (call: RouteCall) => ({...docFixture({id: 'doc-q', filename: (uploadForm(call).get('file') as File).name, extraction_status: 'queued'}), job: jobFixture({id: 'job-q', subject_id: 'doc-q'}), openaleph_sync: null}),
       'GET /api/jobs/job-q': jobFixture({id: 'job-q', status: 'succeeded', finished: true, message: 'Document read'}),
       [DOCUMENTS]: [docFixture(), docFixture({id: 'doc-q', filename: 'queued.txt'})],
@@ -386,13 +418,13 @@ describe('DocumentsPanel bulk import', () => {
     await user.click(screen.getByRole('button', {name: 'Import 1 document(s)'}));
     await screen.findByText('Imported 1 file(s). Opening batch triage...');
     expect(api.calls('GET /api/jobs/job-q')).toHaveLength(1);
-    expect(mockPush).toHaveBeenCalledWith('/review/batch?inv=inv-1&docs=doc-q');
+    expect(mockPush).toHaveBeenCalledWith('/review/batch?inv=inv-1&batch=batch-1');
 
     mockPush.mockClear();
     api.add({[UPLOAD]: {status: 400, body: {detail: 'Document is empty'}}});
     await user.upload(bulkFileInput(), [new File([''], 'blank.txt', {type: 'text/plain'})]);
     await user.click(screen.getByRole('button', {name: 'Import 1 document(s)'}));
-    await screen.findByText(/All 1 file\(s\) failed to import\. blank\.txt: Document is empty/);
+    await screen.findByText(/^No file was imported\. blank\.txt: Document is empty/);
     expect(mockPush).not.toHaveBeenCalled();
   });
 });

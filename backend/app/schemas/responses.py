@@ -818,6 +818,58 @@ class OpenAlephSyncOut(ResponseModel):
     updated_at: Timestamp
 
 
+class DuplicateDocumentDetailOut(ResponseModel):
+    message: str
+    document: DocumentOut
+
+
+class DuplicateDocumentOut(ResponseModel):
+    """409 from an upload: the same bytes are already a document of this
+    investigation. Send ``allow_duplicate`` to keep a second copy anyway."""
+    detail: DuplicateDocumentDetailOut
+
+
+class IngestionBatchItemOut(ResponseModel):
+    """What happened to one file of a bulk import when it was sent."""
+    position: int
+    filename: str
+    outcome: Literal["saved", "duplicate", "refused"]
+    error: str | None
+    document_id: str | None
+    duplicate_of: dict[str, str] | None = Field(description="The earlier document with the same bytes: id and filename.")
+
+
+class IngestionBatchDocumentOut(DocumentOut):
+    """A document of the batch with the latest job that reads it."""
+    job: BackgroundJobOut | None
+
+
+class IngestionBatchOut(ResponseModel):
+    """A bulk import (app/services/ingestion_batches.py): each file's outcome,
+    every document to review with its live status, and the order to review
+    them in (each saved file, then the files found inside it)."""
+    id: str
+    investigation_id: str
+    label: str
+    created_by: str | None
+    created_at: Timestamp
+    items: list[IngestionBatchItemOut]
+    documents: list[IngestionBatchDocumentOut]
+    review_order: list[str]
+
+
+class IngestionBatchSummaryOut(ResponseModel):
+    id: str
+    label: str
+    created_by: str | None
+    created_at: Timestamp
+    counts: dict[str, int] = Field(description="Files saved, duplicate and refused.")
+
+
+class IngestionBatchesOut(ResponseModel):
+    batches: list[IngestionBatchSummaryOut]
+
+
 class DocumentUploadOut(DocumentOut):
     """The reply to an upload: the saved document, the job that reads it
     (already finished in developer mode), and its OpenAleph state."""

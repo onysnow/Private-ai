@@ -1031,6 +1031,14 @@ export type BodyRestoreBackup = {
  */
 export type BodyUploadDocument = {
   /**
+   * Allow Duplicate
+   */
+  allow_duplicate?: boolean;
+  /**
+   * Batch Id
+   */
+  batch_id?: string | null;
+  /**
    * File
    */
   file: Blob | File;
@@ -4324,6 +4332,27 @@ export type DossierSummaryOut = {
 };
 
 /**
+ * DuplicateDocumentDetailOut
+ */
+export type DuplicateDocumentDetailOut = {
+  document: DocumentOut;
+  /**
+   * Message
+   */
+  message: string;
+};
+
+/**
+ * DuplicateDocumentOut
+ *
+ * 409 from an upload: the same bytes are already a document of this
+ * investigation. Send ``allow_duplicate`` to keep a second copy anyway.
+ */
+export type DuplicateDocumentOut = {
+  detail: DuplicateDocumentDetailOut;
+};
+
+/**
  * EmailHeadersOut
  *
  * An email's headers as OpenAleph read them.
@@ -6423,6 +6452,213 @@ export type IncompleteTransactionOut = {
    * Transactionnumber
    */
   transactionNumber?: string | null;
+};
+
+/**
+ * IngestionBatchCreate
+ */
+export type IngestionBatchCreate = {
+  /**
+   * Label
+   *
+   * What the import holds; 'Bulk import' when left out.
+   */
+  label?: string | null;
+};
+
+/**
+ * IngestionBatchDocumentOut
+ *
+ * A document of the batch with the latest job that reads it.
+ */
+export type IngestionBatchDocumentOut = {
+  /**
+   * Candidate Counts
+   */
+  candidate_counts: {
+    [key: string]: number;
+  };
+  /**
+   * Chunk Count
+   */
+  chunk_count: number;
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Extraction Error
+   */
+  extraction_error?: string | null;
+  /**
+   * Extraction Issues
+   */
+  extraction_issues: Array<string>;
+  /**
+   * Extraction Status
+   */
+  extraction_status: string;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  job: BackgroundJobOut | null;
+  /**
+   * Mime Type
+   */
+  mime_type?: string | null;
+  /**
+   * Openaleph Document Id
+   */
+  openaleph_document_id?: string | null;
+  /**
+   * Openaleph Schema
+   */
+  openaleph_schema?: string | null;
+  /**
+   * Parent Document Id
+   */
+  parent_document_id?: string | null;
+  /**
+   * Sha256
+   */
+  sha256: string;
+  /**
+   * Source Id
+   */
+  source_id: string;
+};
+
+/**
+ * IngestionBatchItemOut
+ *
+ * What happened to one file of a bulk import when it was sent.
+ */
+export type IngestionBatchItemOut = {
+  /**
+   * Document Id
+   */
+  document_id: string | null;
+  /**
+   * Duplicate Of
+   *
+   * The earlier document with the same bytes: id and filename.
+   */
+  duplicate_of: {
+    [key: string]: string;
+  } | null;
+  /**
+   * Error
+   */
+  error: string | null;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * Outcome
+   */
+  outcome: 'saved' | 'duplicate' | 'refused';
+  /**
+   * Position
+   */
+  position: number;
+};
+
+/**
+ * IngestionBatchOut
+ *
+ * A bulk import (app/services/ingestion_batches.py): each file's outcome,
+ * every document to review with its live status, and the order to review
+ * them in (each saved file, then the files found inside it).
+ */
+export type IngestionBatchOut = {
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by: string | null;
+  /**
+   * Documents
+   */
+  documents: Array<IngestionBatchDocumentOut>;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Items
+   */
+  items: Array<IngestionBatchItemOut>;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Review Order
+   */
+  review_order: Array<string>;
+};
+
+/**
+ * IngestionBatchSummaryOut
+ */
+export type IngestionBatchSummaryOut = {
+  /**
+   * Counts
+   *
+   * Files saved, duplicate and refused.
+   */
+  counts: {
+    [key: string]: number;
+  };
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Label
+   */
+  label: string;
+};
+
+/**
+ * IngestionBatchesOut
+ */
+export type IngestionBatchesOut = {
+  /**
+   * Batches
+   */
+  batches: Array<IngestionBatchSummaryOut>;
 };
 
 /**
@@ -12319,6 +12555,10 @@ export type UploadDocumentData = {
 
 export type UploadDocumentErrors = {
   /**
+   * The same bytes are already a document of this investigation (send allow_duplicate to keep a second copy)
+   */
+  409: DuplicateDocumentOut;
+  /**
    * The reader this deployment uses cannot read this kind of file (GET /api/document-formats)
    */
   415: ErrorOut;
@@ -14067,6 +14307,42 @@ export type HealthResponses = {
 
 export type HealthResponse = HealthResponses[keyof HealthResponses];
 
+export type GetIngestionBatchData = {
+  body?: never;
+  path: {
+    /**
+     * Batch Id
+     */
+    batch_id: string;
+  };
+  query?: never;
+  url: '/api/ingestion-batches/{batch_id}';
+};
+
+export type GetIngestionBatchErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetIngestionBatchError =
+  GetIngestionBatchErrors[keyof GetIngestionBatchErrors];
+
+export type GetIngestionBatchResponses = {
+  /**
+   * Successful Response
+   */
+  200: IngestionBatchOut;
+};
+
+export type GetIngestionBatchResponse =
+  GetIngestionBatchResponses[keyof GetIngestionBatchResponses];
+
 export type OpenalephIntegrationStatusData = {
   body?: never;
   path?: never;
@@ -15227,6 +15503,78 @@ export type GetInvestigationGraphResponses = {
 
 export type GetInvestigationGraphResponse =
   GetInvestigationGraphResponses[keyof GetInvestigationGraphResponses];
+
+export type ListIngestionBatchesData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/ingestion-batches';
+};
+
+export type ListIngestionBatchesErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListIngestionBatchesError =
+  ListIngestionBatchesErrors[keyof ListIngestionBatchesErrors];
+
+export type ListIngestionBatchesResponses = {
+  /**
+   * Successful Response
+   */
+  200: IngestionBatchesOut;
+};
+
+export type ListIngestionBatchesResponse =
+  ListIngestionBatchesResponses[keyof ListIngestionBatchesResponses];
+
+export type CreateIngestionBatchData = {
+  body: IngestionBatchCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/ingestion-batches';
+};
+
+export type CreateIngestionBatchErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CreateIngestionBatchError =
+  CreateIngestionBatchErrors[keyof CreateIngestionBatchErrors];
+
+export type CreateIngestionBatchResponses = {
+  /**
+   * Successful Response
+   */
+  200: IngestionBatchOut;
+};
+
+export type CreateIngestionBatchResponse =
+  CreateIngestionBatchResponses[keyof CreateIngestionBatchResponses];
 
 export type ListLeadsData = {
   body?: never;

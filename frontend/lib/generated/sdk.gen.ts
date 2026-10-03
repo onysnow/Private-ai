@@ -66,6 +66,9 @@ import type {
   CreateExtractedRelationshipProposalData,
   CreateExtractedRelationshipProposalErrors,
   CreateExtractedRelationshipProposalResponses,
+  CreateIngestionBatchData,
+  CreateIngestionBatchErrors,
+  CreateIngestionBatchResponses,
   CreateInvestigationData,
   CreateInvestigationErrors,
   CreateInvestigationResponses,
@@ -207,6 +210,9 @@ import type {
   GetIdentifierTargetsData,
   GetIdentifierTargetsErrors,
   GetIdentifierTargetsResponses,
+  GetIngestionBatchData,
+  GetIngestionBatchErrors,
+  GetIngestionBatchResponses,
   GetInvestigationFinancialFlowsData,
   GetInvestigationFinancialFlowsErrors,
   GetInvestigationFinancialFlowsResponses,
@@ -354,6 +360,9 @@ import type {
   ListExternalRelationshipReviewsData,
   ListExternalRelationshipReviewsErrors,
   ListExternalRelationshipReviewsResponses,
+  ListIngestionBatchesData,
+  ListIngestionBatchesErrors,
+  ListIngestionBatchesResponses,
   ListInvestigationAiAnalysisCandidatesData,
   ListInvestigationAiAnalysisCandidatesErrors,
   ListInvestigationAiAnalysisCandidatesResponses,
@@ -555,6 +564,9 @@ import {
   zCreateExtractedRelationshipProposalBody,
   zCreateExtractedRelationshipProposalPath,
   zCreateExtractedRelationshipProposalResponse,
+  zCreateIngestionBatchBody,
+  zCreateIngestionBatchPath,
+  zCreateIngestionBatchResponse,
   zCreateInvestigationBody,
   zCreateInvestigationResponse,
   zCreateLeadEndpointBody,
@@ -656,6 +668,8 @@ import {
   zGetExtractionOpenalephMatchesResponse,
   zGetIdentifierTargetsPath,
   zGetIdentifierTargetsResponse,
+  zGetIngestionBatchPath,
+  zGetIngestionBatchResponse,
   zGetInvestigationFinancialFlowsPath,
   zGetInvestigationFinancialFlowsResponse,
   zGetInvestigationGraphPath,
@@ -768,6 +782,8 @@ import {
   zListExternalRelationshipPromotionsResponse,
   zListExternalRelationshipReviewsPath,
   zListExternalRelationshipReviewsResponse,
+  zListIngestionBatchesPath,
+  zListIngestionBatchesResponse,
   zListInvestigationAiAnalysisCandidatesPath,
   zListInvestigationAiAnalysisCandidatesQuery,
   zListInvestigationAiAnalysisCandidatesResponse,
@@ -3422,6 +3438,37 @@ export const health = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Ingestion Batch
+ *
+ * A bulk import: what happened to each file, every document to review with its live status, and the order to review them in.
+ */
+export const getIngestionBatch = <ThrowOnError extends boolean = false>(
+  options: Options<GetIngestionBatchData, ThrowOnError>,
+): RequestResult<
+  GetIngestionBatchResponses,
+  GetIngestionBatchErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetIngestionBatchResponses,
+    GetIngestionBatchErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetIngestionBatchPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetIngestionBatchResponse.parseAsync(data),
+    url: '/api/ingestion-batches/{batch_id}',
+    ...options,
+  });
+
+/**
  * Openaleph Integration Status
  *
  * Report whether the local OpenAleph corpus platform is actually reachable.
@@ -4298,6 +4345,72 @@ export const getInvestigationGraph = <ThrowOnError extends boolean = false>(
       await zGetInvestigationGraphResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/graph',
     ...options,
+  });
+
+/**
+ * List Ingestion Batches
+ *
+ * The investigation's recent bulk imports, newest first, with how many files each saved, found already there, or refused.
+ */
+export const listIngestionBatches = <ThrowOnError extends boolean = false>(
+  options: Options<ListIngestionBatchesData, ThrowOnError>,
+): RequestResult<
+  ListIngestionBatchesResponses,
+  ListIngestionBatchesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ListIngestionBatchesResponses,
+    ListIngestionBatchesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListIngestionBatchesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListIngestionBatchesResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/ingestion-batches',
+    ...options,
+  });
+
+/**
+ * Create Ingestion Batch
+ *
+ * Start a bulk import; each upload then names it (``batch_id``).
+ */
+export const createIngestionBatch = <ThrowOnError extends boolean = false>(
+  options: Options<CreateIngestionBatchData, ThrowOnError>,
+): RequestResult<
+  CreateIngestionBatchResponses,
+  CreateIngestionBatchErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CreateIngestionBatchResponses,
+    CreateIngestionBatchErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateIngestionBatchBody,
+          path: zCreateIngestionBatchPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateIngestionBatchResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/ingestion-batches',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

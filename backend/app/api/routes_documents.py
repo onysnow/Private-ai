@@ -17,14 +17,17 @@ from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
 
 from app.api.dependencies import authorize_request_resource, read_upload_limited
+from app.core.authorization import scope_for_request
 from app.core.config import settings
 from app.db.session import get_db
 from app.jobs.handlers import ANALYZE_DOCUMENT, EXTRACT_DOCUMENT, FIND_CHILDREN
 from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
-from app.models.domain import BackgroundJob, Document, Investigation
+from app.models.domain import BackgroundJob, Document, IngestionBatch, Investigation
+from app.schemas.api import IngestionBatchCreate
 from app.schemas.responses import (
-    BackgroundJobOut, DocumentDetailOut, DocumentEmailOut, DocumentFormatsOut, DocumentReadFailedOut, DocumentUploadOut, ErrorOut,
+    BackgroundJobOut, DocumentDetailOut, DocumentEmailOut, DocumentFormatsOut, DocumentReadFailedOut, DocumentUploadOut,
+    DuplicateDocumentOut, ErrorOut, IngestionBatchesOut, IngestionBatchOut,
     ExtractionCandidateOut, OpenAlephDocumentSyncOut, OpenAlephEntityImportOut, OpenAlephEvidenceImportOut,
     OpenAlephReviewRefreshOut, OpenAlephReviewStatusOut, SimilarDocumentsOut, ValidationErrorOut, upstream,
 )
@@ -33,7 +36,10 @@ from app.services.email_documents import document_email
 from app.services.openaleph_children import is_container
 from app.services.openaleph_search import similar_documents
 from app.services.documents import (
-    get_document_detail, list_document_candidates, serialize_document, store_document,
+    get_document_detail, list_document_candidates, serialize_document, sha256_bytes, store_document,
+)
+from app.services.ingestion_batches import (
+    batch_for_upload, create_batch, find_duplicate, list_batches, record_item, serialize_batch,
 )
 from app.services.openaleph_corpus import (
     get_document_sync, get_openaleph_review_status, import_openaleph_entity_candidates,
@@ -241,8 +247,36 @@ def get_document_formats() -> Any:
     return accepted_formats()
 
 
+@router.post("/investigations/{investigation_id}/ingestion-batches", response_model=IngestionBatchOut)
+def create_ingestion_batch(investigation_id: str, body: IngestionBatchCreate, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Start a bulk import; each upload then names it (``batch_id``)."""
+    try:
+        batch = create_batch(db, investigation_id, label=body.label, created_by=scope_for_request(request).actor_id)
+    except LookupError as exc:
+        raise HTTPException(404, str(exc))
+    return serialize_batch(db, batch)
+
+
+@router.get("/investigations/{investigation_id}/ingestion-batches", response_model=IngestionBatchesOut)
+def list_ingestion_batches(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    """The investigation's recent bulk imports, newest first, with how many files each saved, found already there, or refused."""
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
+    return {"batches": list_batches(db, investigation_id)}
+
+
+@router.get("/ingestion-batches/{batch_id}", response_model=IngestionBatchOut)
+def get_ingestion_batch(batch_id: str, db: Session = Depends(get_db)) -> Any:
+    """A bulk import: what happened to each file, every document to review with its live status, and the order to review them in."""
+    batch = db.get(IngestionBatch, batch_id)
+    if batch is None:
+        raise HTTPException(404, "Import batch not found")
+    return serialize_batch(db, batch)
+
+
 @router.post("/documents/upload", response_model=DocumentUploadOut, responses={
     202: {"model": DocumentUploadOut, "description": "Saved; the document is read by a background job (follow `job`)"},
+    409: {"model": DuplicateDocumentOut, "description": "The same bytes are already a document of this investigation (send allow_duplicate to keep a second copy)"},
     415: {"model": ErrorOut, "description": "The reader this deployment uses cannot read this kind of file (GET /api/document-formats)"},
     422: {"model": ValidationErrorOut | DocumentReadFailedOut,
           "description": "The input does not match the route, or the file was saved but could not be read"},
@@ -253,6 +287,8 @@ async def upload_document(
     investigation_id: str = Form(...),
     title: str = Form(""),
     file: UploadFile = File(...),
+    batch_id: str | None = Form(None),
+    allow_duplicate: bool = Form(False),
     db: Session = Depends(get_db),
 ) -> Any:
     """Save the file, then read it as a background job.
@@ -265,12 +301,36 @@ async def upload_document(
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     try:
+        batch = batch_for_upload(db, batch_id, investigation_id)
+    except LookupError as exc:
+        raise HTTPException(404, str(exc))
+    filename = file.filename or "document"
+
+    def refused(status: int, message: str) -> HTTPException:
+        # A file the batch could not take is listed with why (Phase 2).
+        if batch is not None:
+            record_item(db, batch, filename=filename, outcome="refused", error=message)
+        return HTTPException(status, message)
+
+    try:
         check_upload(file.filename, file.content_type)
     except UnsupportedFormat as exc:
-        raise HTTPException(415, str(exc))
-    data = await read_upload_limited(file, settings.max_document_bytes)
+        raise refused(415, str(exc))
+    try:
+        data = await read_upload_limited(file, settings.max_document_bytes)
+    except HTTPException as exc:
+        raise refused(exc.status_code, str(exc.detail))
     if not data:
-        raise HTTPException(400, "Document is empty")
+        raise refused(400, "Document is empty")
+    if not allow_duplicate:
+        existing = find_duplicate(db, investigation_id, sha256_bytes(data))
+        if existing is not None:
+            if batch is not None:
+                record_item(db, batch, filename=filename, outcome="duplicate", document_id=existing.id)
+            raise HTTPException(409, jsonable_encoder({
+                "message": f"Already in this investigation as “{existing.filename}”",
+                "document": serialize_document(db, existing),
+            }))
     try:
         doc = await run_in_threadpool(
             store_document,
@@ -282,6 +342,8 @@ async def upload_document(
         if str(exc) == "Investigation not found":
             raise HTTPException(404, str(exc))
         raise
+    if batch is not None:
+        record_item(db, batch, filename=filename, outcome="saved", document_id=doc.id)
     runner = job_runner(request)
     job = create_job(
         db, kind=EXTRACT_DOCUMENT, investigation_id=doc.investigation_id,

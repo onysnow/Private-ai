@@ -27,6 +27,7 @@ import {
   createEntity,
   createEvidenceEndpoint,
   createExtractedRelationshipProposal,
+  createIngestionBatch,
   createInvestigation,
   createLeadEndpoint,
   createLeadFromRelationshipContext,
@@ -74,6 +75,7 @@ import {
   getExtractionEntityMatches,
   getExtractionOpenalephMatches,
   getIdentifierTargets,
+  getIngestionBatch,
   getInvestigationFinancialFlows,
   getInvestigationGraph,
   getInvestigationTimeline,
@@ -123,6 +125,7 @@ import {
   listEntityStatements,
   listExternalRelationshipPromotions,
   listExternalRelationshipReviews,
+  listIngestionBatches,
   listInvestigationAiAnalysisCandidates,
   listInvestigationCrossReferences,
   listInvestigationEvidence,
@@ -232,6 +235,9 @@ import type {
   CreateExtractedRelationshipProposalData,
   CreateExtractedRelationshipProposalError,
   CreateExtractedRelationshipProposalResponse,
+  CreateIngestionBatchData,
+  CreateIngestionBatchError,
+  CreateIngestionBatchResponse,
   CreateInvestigationData,
   CreateInvestigationError,
   CreateInvestigationResponse,
@@ -373,6 +379,9 @@ import type {
   GetIdentifierTargetsData,
   GetIdentifierTargetsError,
   GetIdentifierTargetsResponse,
+  GetIngestionBatchData,
+  GetIngestionBatchError,
+  GetIngestionBatchResponse,
   GetInvestigationFinancialFlowsData,
   GetInvestigationFinancialFlowsError,
   GetInvestigationFinancialFlowsResponse,
@@ -520,6 +529,9 @@ import type {
   ListExternalRelationshipReviewsData,
   ListExternalRelationshipReviewsError,
   ListExternalRelationshipReviewsResponse,
+  ListIngestionBatchesData,
+  ListIngestionBatchesError,
+  ListIngestionBatchesResponse,
   ListInvestigationAiAnalysisCandidatesData,
   ListInvestigationAiAnalysisCandidatesError,
   ListInvestigationAiAnalysisCandidatesResponse,
@@ -2964,6 +2976,36 @@ export const healthOptions = (options?: Options<HealthData>) =>
     queryKey: healthQueryKey(options),
   });
 
+export const getIngestionBatchQueryKey = (
+  options: Options<GetIngestionBatchData>,
+) => createQueryKey('getIngestionBatch', options);
+
+/**
+ * Get Ingestion Batch
+ *
+ * A bulk import: what happened to each file, every document to review with its live status, and the order to review them in.
+ */
+export const getIngestionBatchOptions = (
+  options: Options<GetIngestionBatchData>,
+) =>
+  queryOptions<
+    GetIngestionBatchResponse,
+    GetIngestionBatchError,
+    GetIngestionBatchResponse,
+    ReturnType<typeof getIngestionBatchQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getIngestionBatch({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getIngestionBatchQueryKey(options),
+  });
+
 export const openalephIntegrationStatusQueryKey = (
   options?: Options<OpenalephIntegrationStatusData>,
 ) => createQueryKey('openalephIntegrationStatus', options);
@@ -4227,6 +4269,65 @@ export const getInvestigationGraphOptions = (
     },
     queryKey: getInvestigationGraphQueryKey(options),
   });
+
+export const listIngestionBatchesQueryKey = (
+  options: Options<ListIngestionBatchesData>,
+) => createQueryKey('listIngestionBatches', options);
+
+/**
+ * List Ingestion Batches
+ *
+ * The investigation's recent bulk imports, newest first, with how many files each saved, found already there, or refused.
+ */
+export const listIngestionBatchesOptions = (
+  options: Options<ListIngestionBatchesData>,
+) =>
+  queryOptions<
+    ListIngestionBatchesResponse,
+    ListIngestionBatchesError,
+    ListIngestionBatchesResponse,
+    ReturnType<typeof listIngestionBatchesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listIngestionBatches({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listIngestionBatchesQueryKey(options),
+  });
+
+/**
+ * Create Ingestion Batch
+ *
+ * Start a bulk import; each upload then names it (``batch_id``).
+ */
+export const createIngestionBatchMutation = (
+  options?: Partial<Options<CreateIngestionBatchData>>,
+): UseMutationOptions<
+  CreateIngestionBatchResponse,
+  CreateIngestionBatchError,
+  Options<CreateIngestionBatchData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateIngestionBatchResponse,
+    CreateIngestionBatchError,
+    Options<CreateIngestionBatchData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createIngestionBatch({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const listLeadsQueryKey = (options: Options<ListLeadsData>) =>
   createQueryKey('listLeads', options);

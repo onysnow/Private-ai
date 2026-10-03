@@ -169,3 +169,64 @@ describe('Batch triage table', () => {
     expect(mockPush).toHaveBeenCalledWith('/review?inv=inv-1&docs=doc-zip,doc-first,doc-inner,doc-deep');
   });
 });
+
+describe('Batch triage of a recorded import (?batch=)', () => {
+  const BATCH = 'GET /api/ingestion-batches/batch-1';
+  const job = (overrides: Record<string, unknown> = {}) => ({
+    id: 'job-1', kind: 'extract_document', investigation_id: 'inv-1', subject_type: 'document', subject_id: 'doc-a', status: 'succeeded',
+    progress: null, message: 'Document read', error: null, attempts: 1, runner: 'inline', created_at: '2026-10-03T01:00:00',
+    started_at: '2026-10-03T01:00:00', finished_at: '2026-10-03T01:00:01', updated_at: '2026-10-03T01:00:01', finished: true, ...overrides});
+  const batch = (overrides: Record<string, unknown> = {}) => ({
+    id: 'batch-1', investigation_id: 'inv-1', label: 'memo-a.txt and 3 more', created_by: 'local-owner', created_at: '2026-10-03T01:00:00',
+    items: [
+      {position: 0, filename: 'memo-a.txt', outcome: 'saved', error: null, document_id: 'doc-a', duplicate_of: null},
+      {position: 1, filename: 'scan.pdf', outcome: 'saved', error: null, document_id: 'doc-b', duplicate_of: null},
+      {position: 2, filename: 'memo copy.txt', outcome: 'duplicate', error: null, document_id: 'doc-old', duplicate_of: {id: 'doc-old', filename: 'memo.txt'}},
+      {position: 3, filename: 'blank.txt', outcome: 'refused', error: 'Document is empty', document_id: null, duplicate_of: null},
+    ],
+    documents: [
+      {...listed({id: 'doc-a', filename: 'memo-a.txt'}), job: job()},
+      {...listed({id: 'doc-b', filename: 'scan.pdf', extraction_status: 'failed', extraction_error: 'OCR stopped', candidate_counts: {}}),
+        job: job({id: 'job-b', subject_id: 'doc-b', status: 'failed', error: 'OCR stopped', message: null})},
+    ],
+    review_order: ['doc-a', 'doc-b'],
+    ...overrides,
+  });
+
+  it('lists what each file became, retries a failed read, and reviews from the batch', async () => {
+    setParams('inv=inv-1&batch=batch-1');
+    const api = mockApi({
+      [BATCH]: batch(),
+      'POST /api/jobs/job-b/retry': job({id: 'job-b', subject_id: 'doc-b', status: 'queued', finished: false, finished_at: null}),
+    });
+    const Page = await importBatchPage();
+    render(<Page/>);
+
+    expect(await screen.findByText('memo-a.txt and 3 more')).toBeInTheDocument();
+    expect(screen.getByTestId('triage-summary')).toHaveTextContent('2 document(s) imported · 1 with problems · 2 not imported');
+    const notImported = within(screen.getByRole('list', {name: 'Not imported'}));
+    expect(notImported.getAllByRole('listitem').map(li => li.textContent)).toEqual([
+      'memo copy.txt: Already in this investigation as memo.txt', 'blank.txt: Document is empty']);
+    const failed = within(screen.getByTestId('triage-row-doc-b'));
+    expect(failed.getByText('Reading failed: OCR stopped')).toBeInTheDocument();
+
+    const user = userEvent.setup();
+    await user.click(failed.getByRole('button', {name: 'Retry'}));
+    expect(api.calls('POST /api/jobs/job-b/retry')).toHaveLength(1);
+    expect(await screen.findByText('Reading scan.pdf again…')).toBeInTheDocument();
+
+    await user.click(screen.getByTestId('start-review-button'));   // problems first
+    expect(mockPush).toHaveBeenCalledWith('/review?inv=inv-1&batch=batch-1&start=doc-b');
+    expect(api.unmatched()).toEqual([]);
+  });
+
+  it('says so while files are still being read', async () => {
+    setParams('inv=inv-1&batch=batch-1');
+    mockApi({[BATCH]: batch({documents: [{...listed({id: 'doc-a', filename: 'memo-a.txt', extraction_status: 'queued'}),
+      job: job({status: 'running', finished: false, finished_at: null, message: 'Reading page 3 of 10'})}], items: [], review_order: ['doc-a']})});
+    const Page = await importBatchPage();
+    render(<Page/>);
+    expect(await screen.findByText('Some files are still being read; this list updates by itself.')).toBeInTheDocument();
+    expect(within(screen.getByTestId('triage-row-doc-a')).getByText('Reading page 3 of 10')).toBeInTheDocument();
+  });
+});

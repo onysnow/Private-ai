@@ -27,7 +27,7 @@ from app.models.domain import (
     EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
-    AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision,
+    AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -42,7 +42,7 @@ MODEL_BY_TABLE = {
         EnrichmentSessionFinding, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
-        AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision,
+        AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
     ]
 }
 
@@ -60,6 +60,8 @@ RESTORE_ORDER = [
     "enrichment_session_findings", "cross_provider_decisions", "relationship_edges", "relationship_evidence_attachments", "relationship_evidence_review_events",
     "external_relationship_reviews", "external_relationship_promotions",
     "document_chunks", "extraction_candidates",
+    # Bulk imports and what happened to each file; an item points at its document.
+    "ingestion_batches", "ingestion_batch_items",
     # The TAS reasoning review queue travels with the investigation: a restored
     # backup keeps every proposed/accepted/rejected analysis and its reviewer note,
     # exactly as extraction_candidates keeps the document review trail.
@@ -133,13 +135,14 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         ReportingTask, ReportingTaskWorkflowEvent, TimelineEvent, ResolutionDecision, CanonicalResolutionDecision, CanonicalEntityMergeAudit, PostMergeReconciliationDecision, PropertyConflictDecision, StatementAssessment,
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
-        Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision,
+        Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
         for m in direct_models
     }
 
+    batch_items = _rows(db, IngestionBatchItem, {x.id for x in direct["ingestion_batches"]}, IngestionBatchItem.batch_id)
     relationship_edge_ids = {x.id for x in direct["relationship_edges"]}
     relationship_evidence_reviews = _rows(db, RelationshipEvidenceReviewEvent, relationship_edge_ids, RelationshipEvidenceReviewEvent.relationship_edge_id)
     relationship_evidence_attachments = _rows(db, RelationshipEvidenceAttachment, relationship_edge_ids, RelationshipEvidenceAttachment.relationship_edge_id)
@@ -168,6 +171,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "writeups": direct["writeups"], "decks": direct["decks"],
         "cross_reference_proposals": direct["cross_reference_proposals"],
         "cross_reference_decisions": direct["cross_reference_decisions"],
+        "ingestion_batches": direct["ingestion_batches"], "ingestion_batch_items": batch_items,
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 
@@ -455,6 +459,19 @@ def preview_investigation_restore(
                     "id": str(row_id or "<missing-id>"),
                     "message": f"{table} record belongs to investigation {row.get('investigation_id')!r}, not the backup's {investigation_id!r}",
                 })
+
+    # An import item has no investigation_id of its own: it must point only at
+    # a batch and a document inside this same backup.
+    backup_batches = {row.get("id") for row in records.get("ingestion_batches", [])}
+    backup_documents = {row.get("id") for row in records.get("documents", [])}
+    for row in records.get("ingestion_batch_items", []):
+        if row.get("batch_id") not in backup_batches or (row.get("document_id") is not None and row.get("document_id") not in backup_documents):
+            conflicts.append({
+                "kind": "foreign_investigation",
+                "table": "ingestion_batch_items",
+                "id": str(row.get("id") or "<missing-id>"),
+                "message": "ingestion_batch_items record points at a batch or document outside this backup",
+            })
 
     storage_root = resolve_storage_root(document_storage_dir)
     for entry in manifest.get("document_files", []):
