@@ -83,12 +83,16 @@ export function basemapLoader(client: Pick<ApiClient, 'blob'>) {
   };
 }
 
-/** The places as GeoJSON points, each carrying its record's id and name. */
-export function placesGeoJson(places: PlaceOut[]): PlaceMarks {
+export const PICKED_RADIUS = 10;   // px: a picked place's dot
+
+/** The places as GeoJSON points, each carrying its record's id and name;
+ * the picked place's dot is larger and its name larger, as on a chart. */
+export function placesGeoJson(places: PlaceOut[], picked: string | null = null): PlaceMarks {
   return {
     type: 'FeatureCollection',
     features: places.map(p => ({type: 'Feature', geometry: {type: 'Point', coordinates: [p.longitude, p.latitude]},
-      properties: {entity_id: p.entity_id, caption: p.caption, dot: PLACE_DOT, picked: false}})),
+      properties: {entity_id: p.entity_id, caption: p.caption, dot: p.entity_id === picked ? dotName(PICKED_RADIUS) : PLACE_DOT,
+        picked: p.entity_id === picked}})),
   };
 }
 

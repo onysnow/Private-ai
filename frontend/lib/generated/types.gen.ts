@@ -8828,6 +8828,62 @@ export type OwnershipChainOwnerOut = {
 };
 
 /**
+ * PlaceEventOut
+ *
+ * An event on the investigation's timeline that happened at a place:
+ * one about the place's own record ("place") or about a relationship
+ * linking something to it ("link"). `first_day` and `last_day` are the
+ * days its dates as recorded can mean; `exact` is false when a date is
+ * known only to the month or year.
+ */
+export type PlaceEventOut = {
+  /**
+   * Date End
+   */
+  date_end?: string | null;
+  /**
+   * Date Start
+   */
+  date_start: string;
+  /**
+   * Exact
+   */
+  exact: boolean;
+  /**
+   * First Day
+   */
+  first_day: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Last Day
+   */
+  last_day: string;
+  /**
+   * Relationship Id
+   */
+  relationship_id?: string | null;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Verification Status
+   */
+  verification_status: string;
+  /**
+   * Via
+   */
+  via: 'place' | 'link';
+};
+
+/**
  * PlaceLinkOut
  *
  * A record linked to a place, and the relationship that links them.
@@ -8862,7 +8918,8 @@ export type PlaceLinkOut = {
 /**
  * PlaceOut
  *
- * A record that says where it is: its coordinates as recorded.
+ * A record that says where it is: its coordinates as recorded, and
+ * when things happened there.
  */
 export type PlaceOut = {
   /**
@@ -8881,6 +8938,10 @@ export type PlaceOut = {
    * Entity Id
    */
   entity_id: string;
+  /**
+   * Events
+   */
+  events?: Array<PlaceEventOut>;
   /**
    * Latitude
    */

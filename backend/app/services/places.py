@@ -9,6 +9,16 @@ is at a place is what the investigation links to it, through its
 relationship edges (an owner of a property, a company registered at an
 address), each with the link that says so.
 
+When things happened at a place is read off the investigation's timeline
+(app/services/timeline.py): an event belongs to a place when it points at
+the place's own record, or at one of the relationships linking something to
+it (an ownership of the property starting on a date). The app links the map
+to a strip of those events, so a stretch of time picks the places
+(Bellingcat's map of civilian harm in Ukraine and Forensic Architecture's
+TimeMap: one filter drives both views; design doc, "Timelines and maps").
+Nothing is dated by a guess: an event whose date cannot be read is left
+off the strip, as it is left off the timeline chart.
+
 A record whose coordinates are missing one half, are not numbers, lie
 outside the globe, or disagree (two latitudes recorded) is listed under
 `omitted` with the reason, never placed by a guess. A merged-away record is
@@ -17,12 +27,15 @@ left out; its surviving record stands for it.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Any
 
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.models.domain import Entity, RelationshipEdge
+from app.services.timeline import investigation_timeline
+from app.visuals.data_service import event_span
 
 _RANGES = {"latitude": (-90.0, 90.0), "longitude": (-180.0, 180.0)}
 
@@ -89,4 +102,37 @@ def investigation_places(db: Session, investigation_id: str) -> dict[str, Any]:
                     other = others[there]
                     by_id[here]["links"].append({"relationship_id": edge.id, "schema": edge.schema, "direction": direction,
                                                  "entity_id": other.id, "caption": other.caption, "entity_schema": other.schema})
+        _place_events(db, investigation_id, places, edges)
     return {"investigation_id": investigation_id, "places": places, "omitted": omitted}
+
+
+def _place_events(db: Session, investigation_id: str, places: list[dict[str, Any]], edges: Sequence[RelationshipEdge]) -> None:
+    """Each place's dated events, earliest first: the timeline's events that
+    point at the place's record ("place") or at a relationship linking
+    something to it ("link", with that relationship), with the days each
+    covers as the timeline chart reads them (data_service.event_span)."""
+    by_id = {place["entity_id"]: place for place in places}
+    for place in places:
+        place["events"] = []
+    links_of: dict[str, list[tuple[str, str]]] = {}   # relationship record -> [(place id, edge id)]
+    for edge in edges:
+        for end in (edge.source_entity_id, edge.target_entity_id):
+            if end in by_id:
+                links_of.setdefault(edge.relationship_entity_id, []).append((end, edge.id))
+    for event in investigation_timeline(db, investigation_id)["events"]:
+        refs = event.get("refs") or {}
+        span = event_span(event.get("date_start"), event.get("date_end"))
+        if span is None:
+            continue
+        at: list[tuple[str, str | None]] = []
+        if refs.get("entity_id") in by_id:
+            at.append((refs["entity_id"], None))
+        at.extend(links_of.get(refs.get("relationship_entity_id") or "", []))
+        for place_id, relationship_id in dict.fromkeys(at):
+            by_id[place_id]["events"].append({
+                "id": event["id"], "kind": event["kind"], "title": event["title"],
+                "date_start": event["date_start"], "date_end": event.get("date_end"),
+                "first_day": span[0].isoformat(), "last_day": span[1].isoformat(), "exact": span[2],
+                "verification_status": event["verification_status"],
+                "via": "place" if relationship_id is None else "link", "relationship_id": relationship_id,
+            })

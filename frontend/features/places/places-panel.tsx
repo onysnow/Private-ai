@@ -5,9 +5,12 @@
 // and works without a base map. Coordinates come only from the records
 // (FollowTheMoney's latitude and longitude); nothing is looked up, so no
 // address leaves the machine. Records whose coordinates cannot be used are
-// listed with why.
+// listed with why. Under the map, a strip of the dated events at each place
+// picks a stretch of time, and the map and the list keep the places with an
+// event in it (places-timeline.tsx).
 import {useQuery} from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
+import {useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {Button} from '@/components/ui/button';
@@ -16,7 +19,11 @@ import {errorMessage} from '../../lib/api-client';
 import {getBasemapStatusOptions, getInvestigationPlacesOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {PlaceOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {placesInWindow} from '../../lib/place-times';
+import type {TimeWindow} from '../../lib/place-times';
 
+const PlacesTimeline = dynamic(() => import('./places-timeline').then(m => m.PlacesTimeline),
+  {ssr: false, loading: () => <p className="muted">Loading timeline…</p>});
 const PlacesMap = dynamic(() => import('../../components/places-map').then(m => m.PlacesMap),
   {ssr: false, loading: () => <p className="muted">Loading map…</p>});
 
@@ -32,9 +39,13 @@ export function coordinates(place: Pick<PlaceOut, 'latitude' | 'longitude'>): st
 export function PlacesPanel({investigationId}: Props): ReactElement {
   const openDossier = useWorkbenchStore(state => state.openDossier);
   const placesQuery = useQuery({...getInvestigationPlacesOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
-  const places = placesQuery.data?.places ?? [];
+  const all = placesQuery.data?.places ?? [];
+  const [timeWindow, setTimeWindow] = useState<TimeWindow | null>(null);
+  const [picked, setPicked] = useState<string | null>(null);
+  const places = placesInWindow(all, timeWindow);
+  const pick = (entityId: string) => { setPicked(entityId); openDossier(entityId); };
   // Whether a base map is installed matters only once there is a place to draw.
-  const statusQuery = useQuery({...getBasemapStatusOptions(), enabled: places.length > 0});
+  const statusQuery = useQuery({...getBasemapStatusOptions(), enabled: all.length > 0});
   const omitted = placesQuery.data?.omitted ?? [];
   const status = statusQuery.data;
   return <Card>
@@ -44,16 +55,19 @@ export function PlacesPanel({investigationId}: Props): ReactElement {
     </CardHeader>
     <CardContent>
       {placesQuery.isError && <p className="muted">{errorMessage(placesQuery.error, 'Could not read the places')}</p>}
-      {placesQuery.data && places.length === 0 && <p className="muted">No record in this investigation holds both a latitude and a longitude.
+      {placesQuery.data && all.length === 0 && <p className="muted">No record in this investigation holds both a latitude and a longitude.
         An Address or a RealEstate record with coordinates shows here.</p>}
-      {places.length > 0 && status?.available && <PlacesMap status={status} places={places} onPlace={openDossier}/>}
-      {places.length > 0 && status && !status.available && <p className="muted" data-testid="no-basemap">
+      {all.length > 0 && status?.available && <PlacesMap status={status} places={places} onPlace={pick} picked={picked}/>}
+      {all.length > 0 && <PlacesTimeline places={all} picked={picked} timeWindow={timeWindow} onWindow={setTimeWindow} onPick={pick}/>}
+      {timeWindow && places.length < all.length && <p className="muted text-sm" data-testid="places-window">
+        {places.length} of {all.length} places have an event in this stretch of time; the others are hidden until you show all dates.</p>}
+      {all.length > 0 && status && !status.available && <p className="muted" data-testid="no-basemap">
         No base map is installed here, so the places are listed only. To draw them on a map, install the base map once with the
         compose profile <code>maps</code> (see DEPLOYMENT.md).</p>}
       {places.length > 0 && <table className="text-sm" aria-label="Places">
         <thead><tr><th scope="col">Place</th><th scope="col">Where</th><th scope="col">Linked</th></tr></thead>
         <tbody>{places.map(place => <tr key={place.entity_id}>
-          <th scope="row"><Button variant="link" size="sm" onClick={() => openDossier(place.entity_id)}>{place.caption}</Button>
+          <th scope="row"><Button variant="link" size="sm" onClick={() => pick(place.entity_id)}>{place.caption}</Button>
             <small> · {place.schema}</small></th>
           <td>{place.address ? `${place.address} · ` : ''}{coordinates(place)}{place.country ? ` · ${place.country.toUpperCase()}` : ''}</td>
           <td>{place.links.length === 0 ? '—' : place.links.map(link => <div key={`${link.relationship_id}-${link.direction}`}>

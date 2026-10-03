@@ -1230,6 +1230,7 @@ export type {
   OwnershipChainNodeOut,
   OwnershipChainOut,
   OwnershipChainOwnerOut,
+  PlaceEventOut,
   PlaceLinkOut,
   PlaceOut,
   PlacesOut,

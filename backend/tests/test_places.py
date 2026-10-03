@@ -64,3 +64,28 @@ def test_coordinates_that_cannot_be_used_are_listed_with_why_never_placed():
     assert omitted["Disputed address"] == "2 different values of latitude are recorded (40.1, 40.2); the reporter decides which holds"
     assert omitted["Typo address"] == "the latitude 'abc' is not a number; the longitude 200 lies outside -180 to 180"
     assert client.get("/api/investigations/nope/places").status_code == 404
+
+
+def test_each_place_carries_the_dated_events_at_it_from_the_timeline():
+    from app.schemas.api import TimelineEventCreate
+    from app.services.timeline import create_timeline_event
+
+    ids = _world()
+    with SessionLocal() as db:
+        # A stake in the villa that started in a month, an event about the villa itself, one about nothing here, one undated.
+        create_relationship(db, investigation_id=ids["inv"], schema="Ownership", source_entity_id=ids["meridian"], target_entity_id=ids["villa"],
+                            properties={"startDate": ["2021-02"]})
+        create_timeline_event(db, TimelineEventCreate(investigation_id=ids["inv"], title="Villa searched", date_start="2023-11-14",
+                                                      precision="day", entity_id=ids["villa"]))
+        create_timeline_event(db, TimelineEventCreate(investigation_id=ids["inv"], title="Elsewhere", date_start="2020", precision="year",
+                                                      entity_id=ids["voss"]))
+    body = client.get(f"/api/investigations/{ids['inv']}/places").json()
+    places = {p["caption"]: p for p in body["places"]}
+    assert places["Meridian registered office"]["events"] == []
+    events = places["Villa Kyrenia"]["events"]
+    assert [(e["title"], e["via"], e["first_day"], e["last_day"], e["exact"]) for e in events] == [
+        ("Meridian Holdings Ltd — Ownership → Villa Kyrenia — startDate", "link", "2021-02-01", "2021-02-28", False),
+        ("Villa searched", "place", "2023-11-14", "2023-11-14", True),
+    ]
+    ownership = next(link for link in places["Villa Kyrenia"]["links"] if link["caption"] == "Meridian Holdings Ltd")
+    assert events[0]["relationship_id"] == ownership["relationship_id"] and events[1]["relationship_id"] is None

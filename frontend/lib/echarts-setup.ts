@@ -28,7 +28,7 @@
 
 import * as echarts from 'echarts/core';
 import {BarChart, CustomChart, LineChart, PieChart, SankeyChart, ScatterChart, TreemapChart} from 'echarts/charts';
-import {AriaComponent, DataZoomComponent, GridComponent, LegendComponent, TitleComponent, TooltipComponent} from 'echarts/components';
+import {AriaComponent, DataZoomComponent, GridComponent, LegendComponent, MarkAreaComponent, TitleComponent, TooltipComponent} from 'echarts/components';
 import {LabelLayout, LegacyGridContainLabel} from 'echarts/features';
 import {CanvasRenderer} from 'echarts/renderers';
 
@@ -61,6 +61,8 @@ echarts.use([
   // "Specified `grid.containLabel` but no `use(LegacyGridContainLabel)`").
   LegacyGridContainLabel,
   LabelLayout,
+  // The places' timeline shades the stretch of time picked (features/places/places-timeline.tsx).
+  MarkAreaComponent,
   CanvasRenderer,
 ]);
 

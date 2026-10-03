@@ -19171,6 +19171,86 @@
         "title": "OwnershipChainOwnerOut",
         "type": "object"
       },
+      "PlaceEventOut": {
+        "description": "An event on the investigation's timeline that happened at a place:\none about the place's own record (\"place\") or about a relationship\nlinking something to it (\"link\"). `first_day` and `last_day` are the\ndays its dates as recorded can mean; `exact` is false when a date is\nknown only to the month or year.",
+        "properties": {
+          "date_end": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date End"
+          },
+          "date_start": {
+            "title": "Date Start",
+            "type": "string"
+          },
+          "exact": {
+            "title": "Exact",
+            "type": "boolean"
+          },
+          "first_day": {
+            "title": "First Day",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "last_day": {
+            "title": "Last Day",
+            "type": "string"
+          },
+          "relationship_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relationship Id"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "verification_status": {
+            "title": "Verification Status",
+            "type": "string"
+          },
+          "via": {
+            "enum": [
+              "place",
+              "link"
+            ],
+            "title": "Via",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "date_start",
+          "first_day",
+          "last_day",
+          "exact",
+          "verification_status",
+          "via"
+        ],
+        "title": "PlaceEventOut",
+        "type": "object"
+      },
       "PlaceLinkOut": {
         "description": "A record linked to a place, and the relationship that links them.",
         "properties": {
@@ -19215,7 +19295,7 @@
         "type": "object"
       },
       "PlaceOut": {
-        "description": "A record that says where it is: its coordinates as recorded.",
+        "description": "A record that says where it is: its coordinates as recorded, and\nwhen things happened there.",
         "properties": {
           "address": {
             "anyOf": [
@@ -19246,6 +19326,13 @@
           "entity_id": {
             "title": "Entity Id",
             "type": "string"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/PlaceEventOut"
+            },
+            "title": "Events",
+            "type": "array"
           },
           "latitude": {
             "title": "Latitude",

@@ -564,13 +564,28 @@ ADR-0005 line 18 holds the decisions and the numbers behind them.
   a native table (place, where) with the reason, and the slide preview
   lists them the same way. A brief holds the picture and the data table
   (place, where, records), or the table alone with the reason.
-- Tests: `backend/tests/test_basemap.py`, `test_places.py`,
-  `test_visuals_map.py`, `frontend/tests/test-places.test.tsx`,
+- Tests: `backend/tests/test_basemap.py`, `test_places.py` (the events at
+  each place too), `test_visuals_map.py`, `frontend/tests/test-places.test.tsx`,
   `test-chart-map.test.tsx` (MapLibre faked: jsdom has no WebGL), the `map`
   fixture in `frontend/test-support/chart-kinds.json`,
   `render/map.test.mjs`, and the live draw `render/map.live.test.mjs`
   (needs MapLibre Native, an X display and a base map; render/README.md).
-- Still to come: the map linked to the timeline, and shaded maps (rule 17).
+- **The map linked to the timeline** (design doc, "Timelines and maps":
+  Bellingcat's map of civilian harm in Ukraine filters by a timeline strip
+  under it; Forensic Architecture's TimeMap drives both views from one set
+  of filters). Each place carries the dated events at it, read off the
+  investigation's timeline: an event about the place's own record, or about
+  a relationship linking something to it (an ownership that started on a
+  date), with the days its dates can mean (`data_service.event_span`). Under
+  the map, a strip draws a row per place and its events on one time axis
+  (`frontend/features/places/places-timeline.tsx`); "From" and "To" date
+  fields pick a stretch of time, the map and the list keep the places with
+  an event in it, and the strip shades it and greys the rest. Picking a
+  place on the map, the list or the strip picks out its dot and its row.
+  The dates are native date fields rather than ECharts' slider: they work
+  from the keyboard (WCAG 2.1.1), and the slider's handles did not move on
+  a chart of custom series in ECharts 6.1 (checked in Chromium).
+- Still to come: shaded maps (rule 17).
 
 ## What pass 3 built, and what is left
 

@@ -3635,6 +3635,29 @@ export const zOwnershipChainOut = z.object({
 });
 
 /**
+ * PlaceEventOut
+ *
+ * An event on the investigation's timeline that happened at a place:
+ * one about the place's own record ("place") or about a relationship
+ * linking something to it ("link"). `first_day` and `last_day` are the
+ * days its dates as recorded can mean; `exact` is false when a date is
+ * known only to the month or year.
+ */
+export const zPlaceEventOut = z.object({
+  date_end: z.string().nullish(),
+  date_start: z.string(),
+  exact: z.boolean(),
+  first_day: z.string(),
+  id: z.string(),
+  kind: z.string(),
+  last_day: z.string(),
+  relationship_id: z.string().nullish(),
+  title: z.string(),
+  verification_status: z.string(),
+  via: z.enum(['place', 'link']),
+});
+
+/**
  * PlaceLinkOut
  *
  * A record linked to a place, and the relationship that links them.
@@ -3651,13 +3674,15 @@ export const zPlaceLinkOut = z.object({
 /**
  * PlaceOut
  *
- * A record that says where it is: its coordinates as recorded.
+ * A record that says where it is: its coordinates as recorded, and
+ * when things happened there.
  */
 export const zPlaceOut = z.object({
   address: z.string().nullish(),
   caption: z.string(),
   country: z.string().nullish(),
   entity_id: z.string(),
+  events: z.array(zPlaceEventOut).optional(),
   latitude: z.number(),
   links: z.array(zPlaceLinkOut),
   longitude: z.number(),

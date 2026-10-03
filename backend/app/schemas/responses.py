@@ -3405,8 +3405,28 @@ class PlaceLinkOut(ResponseModel):
     model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
 
 
+class PlaceEventOut(ResponseModel):
+    """An event on the investigation's timeline that happened at a place:
+    one about the place's own record ("place") or about a relationship
+    linking something to it ("link"). `first_day` and `last_day` are the
+    days its dates as recorded can mean; `exact` is false when a date is
+    known only to the month or year."""
+    id: str
+    kind: str
+    title: str
+    date_start: str
+    date_end: str | None = None
+    first_day: str
+    last_day: str
+    exact: bool
+    verification_status: str
+    via: Literal["place", "link"]
+    relationship_id: str | None = None
+
+
 class PlaceOut(ResponseModel):
-    """A record that says where it is: its coordinates as recorded."""
+    """A record that says where it is: its coordinates as recorded, and
+    when things happened there."""
     entity_id: str
     caption: str
     schema_: str = Field(alias="schema")
@@ -3415,6 +3435,7 @@ class PlaceOut(ResponseModel):
     address: str | None = None
     country: str | None = None
     links: list[PlaceLinkOut]
+    events: list[PlaceEventOut] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
 

@@ -48,10 +48,12 @@ type Props = {
   status: BasemapStatusOut;
   places: PlaceOut[];
   onPlace?: (entityId: string) => void;
+  /** The place picked on the map or the timeline: its dot is drawn larger. */
+  picked?: string | null;
   height?: number;
 };
 
-export function PlacesMap({status, places, onPlace, height = 420}: Props): ReactElement {
+export function PlacesMap({status, places, onPlace, picked = null, height = 420}: Props): ReactElement {
   const container = useRef<HTMLDivElement | null>(null);
   const map = useRef<MapLibreMap | null>(null);
   const onPlaceRef = useRef(onPlace);
@@ -63,7 +65,7 @@ export function PlacesMap({status, places, onPlace, height = 420}: Props): React
     ensureBasemapProtocol();
     const bounds = placesBounds(places);
     const made = new MapLibreMap({
-      container: container.current, style: basemapStyle(status, placesGeoJson(places)),
+      container: container.current, style: basemapStyle(status, placesGeoJson(places, picked)),
       ...(bounds ? {bounds, fitBoundsOptions: {padding: 60, maxZoom: Math.min(10, (status.max_zoom ?? 6) + 2)}} : {center: [0, 20], zoom: 1}),
       attributionControl: {compact: false},
     });
@@ -81,11 +83,11 @@ export function PlacesMap({status, places, onPlace, height = 420}: Props): React
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
-  // New places replace the dots without moving the reporter's view.
+  // New places, or a new pick, replace the dots without moving the reporter's view.
   useEffect(() => {
     const source = map.current?.getSource(PLACES_SOURCE) as GeoJSONSource | undefined;
-    source?.setData(placesGeoJson(places));
-  }, [places]);
+    source?.setData(placesGeoJson(places, picked));
+  }, [places, picked]);
 
   return <div ref={container} style={{height}} role="region"
     aria-label={`Map of ${places.length} place${places.length === 1 ? '' : 's'}; the list below names each one`}/>;
