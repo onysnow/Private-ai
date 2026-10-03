@@ -6,7 +6,8 @@
 // Plain node:http on purpose: two routes need no framework, and a smaller
 // dependency list is easier to audit for a service that runs beside the
 // reporters' data. Nothing here reads the database or the network; the
-// only input is the option in the request body.
+// only input is the request body (and, for /map, the base map files,
+// map.mjs).
 //
 // ECharts server-side rendering, as its handbook documents it
 // (https://echarts.apache.org/handbook/en/how-to/cross-platform/server/):
@@ -20,6 +21,7 @@ import * as echarts from 'echarts';
 import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {dirname, join} from 'node:path';
+import {NoBasemap, renderMap} from './map.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ECHARTS_VERSION = JSON.parse(readFileSync(join(HERE, 'node_modules', 'echarts', 'package.json'), 'utf8')).version;
@@ -63,6 +65,27 @@ export function renderSvg(body) {
   } finally {
     chart.dispose();
   }
+}
+
+export const MAX_PLACES = 500;
+
+// Check a /map request: the places (each a longitude, a latitude and a
+// label) and the picture's size.
+export function mapRequest(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) throw new BadRequest('the request body must be a JSON object with "places"');
+  const places = body.places;
+  if (!Array.isArray(places) || places.length === 0 || places.length > MAX_PLACES) {
+    throw new BadRequest(`"places" must be a list of 1 to ${MAX_PLACES} places`);
+  }
+  const clean = places.map((p, i) => {
+    const lon = Number(p?.longitude), lat = Number(p?.latitude);
+    if (!Number.isFinite(lon) || lon < -180 || lon > 180 || !Number.isFinite(lat) || lat < -90 || lat > 90) {
+      throw new BadRequest(`place ${i} needs a longitude (-180 to 180) and a latitude (-90 to 90)`);
+    }
+    if (typeof p.label !== 'string' || p.label.length > 200) throw new BadRequest(`place ${i} needs a label of at most 200 characters`);
+    return {longitude: lon, latitude: lat, label: p.label};
+  });
+  return {places: clean, width: dimension(body.width, DEFAULT_WIDTH), height: dimension(body.height, DEFAULT_HEIGHT)};
 }
 
 function readBody(req) {
@@ -116,7 +139,26 @@ export async function handle(req, res) {
     }
     return;
   }
-  sendJson(res, 404, {error: 'not found: GET /health or POST /echarts'});
+  if (req.method === 'POST' && req.url === '/map') {
+    try {
+      const raw = await readBody(req);
+      let body;
+      try {
+        body = JSON.parse(raw);
+      } catch (err) {
+        throw new BadRequest(`request body is not JSON: ${err.message}`);
+      }
+      const png = await renderMap(mapRequest(body));
+      res.writeHead(200, {'content-type': 'image/png'});
+      res.end(png);
+    } catch (err) {
+      if (err instanceof BadRequest) sendJson(res, 400, {error: err.message});
+      else if (err instanceof NoBasemap) sendJson(res, 503, {error: err.message});
+      else sendJson(res, 500, {error: `the map could not be drawn: ${err.message}`});
+    }
+    return;
+  }
+  sendJson(res, 404, {error: 'not found: GET /health, POST /echarts or POST /map'});
 }
 
 export function createServer() {

@@ -342,8 +342,14 @@ services:
   render:
     build:
       context: ./render
+    # xvfb-run, which gives MapLibre Native its X display, does not start its
+    # program when it runs as PID 1 (seen 2026-10-03): an init runs first.
+    init: true
     ports:
       - "127.0.0.1:8070:8070"
+    volumes:
+      # The base map the `maps` profile installs, for maps in exports (ADR-0005, line 18).
+      - basemap:/basemap:ro
 
   # Database inspector for local development: browse and edit workbench-db tables, run SQL.
   # Chosen over pgweb/CloudBeaver/sqladmin on 2026-09-21 (see dev-log.md). Bound to localhost only;

@@ -13,7 +13,11 @@
     "node": ">=22"
   },
   "dependencies": {
-    "echarts": "6.1.0"
+    "@maplibre/maplibre-gl-native": "6.4.1",
+    "@protomaps/basemaps": "5.7.2",
+    "echarts": "6.1.0",
+    "pmtiles": "4.5.0",
+    "pngjs": "7.0.0"
   },
   "license": "MIT"
 }

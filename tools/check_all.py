@@ -2,7 +2,7 @@
 
     python tools/check_all.py            # everything
     python tools/check_all.py --backend  # ruff, mypy, pytest only
-    python tools/check_all.py --frontend # lint, typecheck, tests, build only
+    python tools/check_all.py --frontend # lint, typecheck, tests, build, and the render service's tests
     python tools/check_all.py --fast     # ruff and mypy only (the pre-commit hook)
 
 Run it before every commit. It exists because the CI type check (mypy,
@@ -33,6 +33,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 BACKEND = ROOT / "backend"
 FRONTEND = ROOT / "frontend"
+RENDER = ROOT / "render"
 
 
 def _venv_python() -> str:
@@ -100,6 +101,10 @@ def frontend_checks() -> None:
         _run("frontend: lib/generated matches openapi.json", [git, "diff", "--exit-code", "--", "lib/generated"], FRONTEND)
     for script in ("lint", "typecheck", "test", "build"):
         _run(f"frontend: npm run {script}", [npm, "run", script], FRONTEND)
+    # The render service's own tests (CI: render-ci.yml), with its packages
+    # installed from its lock file first, as CI does.
+    _run("render: npm ci", [npm, "ci", "--no-audit", "--no-fund"], RENDER)
+    _run("render: npm test", [npm, "test"], RENDER)
 
 
 def main() -> None:

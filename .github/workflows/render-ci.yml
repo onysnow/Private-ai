@@ -1,0 +1,41 @@
+name: Render service CI
+
+# The render service's own tests (render/*.test.mjs): the ECharts route, the
+# map route's request checks, its view arithmetic, and what the base map is
+# allowed to answer. A live map draw needs MapLibre Native's GL libraries and
+# a base map; the backend's live render tests and the image build cover the
+# service as a whole.
+on:
+  push:
+    paths:
+      - 'render/**'
+      - '.github/workflows/render-ci.yml'
+  pull_request:
+    paths:
+      - 'render/**'
+      - '.github/workflows/render-ci.yml'
+
+jobs:
+  render:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: render
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.18.0'
+          cache: npm
+          cache-dependency-path: render/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test
+        run: npm test

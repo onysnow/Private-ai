@@ -96,6 +96,9 @@ def _assert_render_service(services, *, production: bool):
     for it (an export falls back when it is down)."""
     render = services["render"]
     assert render["build"] == {"context": "./render"}
+    # Maps in exports (ADR-0005, line 18): the base map, read-only, and an init
+    # in front of xvfb-run, which does not start its program as PID 1.
+    assert render["init"] is True and render["volumes"] == ["basemap:/basemap:ro"]
     assert services["backend"]["environment"]["RENDER_SERVICE_URL"] == "http://render:8070"
     assert "render" not in services["backend"].get("depends_on", {}), "exports fall back when the render service is down"
     if production:

@@ -379,6 +379,12 @@ services:
       context: ./render
     image: journalism-workbench-render:${WORKBENCH_TAG:-latest}
     restart: unless-stopped
+    # xvfb-run, which gives MapLibre Native its X display, does not start its
+    # program when it runs as PID 1 (seen 2026-10-03): an init runs first.
+    init: true
+    volumes:
+      # The base map the `maps` profile installs, for maps in exports (ADR-0005, line 18).
+      - basemap:/basemap:ro
 
 volumes:
   workbench-pgdata:
