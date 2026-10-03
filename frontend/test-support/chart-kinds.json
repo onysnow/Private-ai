@@ -2070,6 +2070,370 @@
   },
   "width": 960
  },
+ "sankey": {
+  "data": {
+   "currency": "USD",
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {},
+   "query": "payment_flows",
+   "record_count": 6,
+   "record_noun": "payments",
+   "rows": [
+    {
+     "key": "Meridian Holdings Ltd → Bellcastle Trading Group",
+     "label": "Meridian Holdings Ltd → Bellcastle Trading Group",
+     "record_count": 2,
+     "record_refs": [
+      {
+       "record_id": "f1",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "f2",
+       "record_type": "relationship"
+      }
+     ],
+     "source": "Meridian Holdings Ltd",
+     "target": "Bellcastle Trading Group",
+     "value": 2400000
+    },
+    {
+     "key": "Bellcastle Trading Group → Orrin Ltd",
+     "label": "Bellcastle Trading Group → Orrin Ltd",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "f3",
+       "record_type": "relationship"
+      }
+     ],
+     "source": "Bellcastle Trading Group",
+     "target": "Orrin Ltd",
+     "value": 900000
+    },
+    {
+     "key": "Meridian Holdings Ltd → Orrin Ltd",
+     "label": "Meridian Holdings Ltd → Orrin Ltd",
+     "record_count": 3,
+     "record_refs": [
+      {
+       "record_id": "f4",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "f5",
+       "record_type": "relationship"
+      },
+      {
+       "record_id": "f6",
+       "record_type": "relationship"
+      }
+     ],
+     "source": "Meridian Holdings Ltd",
+     "target": "Orrin Ltd",
+     "value": 150000
+    }
+   ],
+   "series_kind": "flows",
+   "unit": "USD",
+   "unit_kind": "amount"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Flow diagram: Most of Meridian's money went to Bellcastle. 3 flows between 3 parties, amounts in USD. Largest: Meridian Holdings Ltd → Bellcastle Trading Group at $2.4M; smallest: Meridian Holdings Ltd → Orrin Ltd at $150K.",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#B98D34"
+   ],
+   "series": [
+    {
+     "bottom": 44,
+     "data": [
+      {
+       "depth": 0,
+       "itemStyle": {
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "Meridian Holdings Ltd",
+        "position": "right",
+        "show": true
+       },
+       "name": "Meridian Holdings Ltd",
+       "tooltip": {
+        "formatter": "Meridian Holdings Ltd"
+       }
+      },
+      {
+       "depth": 1,
+       "itemStyle": {
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "Bellcastle Trading Group",
+        "position": "right",
+        "show": true
+       },
+       "name": "Bellcastle Trading Group",
+       "tooltip": {
+        "formatter": "Bellcastle Trading Group"
+       }
+      },
+      {
+       "depth": 2,
+       "itemStyle": {
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "Orrin Ltd",
+        "position": "left",
+        "show": true
+       },
+       "name": "Orrin Ltd",
+       "tooltip": {
+        "formatter": "Orrin Ltd"
+       }
+      }
+     ],
+     "draggable": false,
+     "emphasis": {
+      "focus": "adjacency"
+     },
+     "layoutIterations": 32,
+     "left": 8,
+     "lineStyle": {
+      "curveness": 0.5
+     },
+     "links": [
+      {
+       "edgeLabel": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$2.4M · 2 payments",
+        "show": true
+       },
+       "lineStyle": {
+        "color": "#CDBFA6",
+        "opacity": 0.45
+       },
+       "name": "Meridian Holdings Ltd → Bellcastle Trading Group",
+       "source": "Meridian Holdings Ltd",
+       "target": "Bellcastle Trading Group",
+       "tooltip": {
+        "formatter": "Meridian Holdings Ltd → Bellcastle Trading Group: $2.4M · 2 payments"
+       },
+       "value": 2400000
+      },
+      {
+       "edgeLabel": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$900K · 1 payment †",
+        "show": true
+       },
+       "lineStyle": {
+        "color": "#CDBFA6",
+        "opacity": 0.45
+       },
+       "name": "Bellcastle Trading Group → Orrin Ltd",
+       "source": "Bellcastle Trading Group",
+       "target": "Orrin Ltd",
+       "tooltip": {
+        "formatter": "Bellcastle Trading Group → Orrin Ltd: $900K · 1 payment †"
+       },
+       "value": 900000
+      },
+      {
+       "edgeLabel": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "$150K · 3 payments",
+        "show": false
+       },
+       "lineStyle": {
+        "color": "#CDBFA6",
+        "opacity": 0.45
+       },
+       "name": "Meridian Holdings Ltd → Orrin Ltd",
+       "source": "Meridian Holdings Ltd",
+       "target": "Orrin Ltd",
+       "tooltip": {
+        "formatter": "Meridian Holdings Ltd → Orrin Ltd: $150K · 3 payments"
+       },
+       "value": 150000
+      }
+     ],
+     "name": "Most of Meridian's money went to Bellcastle",
+     "nodeAlign": "justify",
+     "nodeGap": 12,
+     "nodeWidth": 14,
+     "right": 8,
+     "top": 84,
+     "type": "sankey"
+    }
+   ],
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Money paid from left to right, band width by amount in USD",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "Most of Meridian's money went to Bellcastle",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 6 payments in this investigation's records (payment_flows) · † rests on one record",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ],
+   "tooltip": {
+    "renderMode": "richText",
+    "show": true,
+    "textStyle": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "trigger": "item"
+   }
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "sankey",
+   "limit": null,
+   "query": {
+    "name": "payment_flows",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "Most of Meridian's money went to Bellcastle",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Flow diagram: Most of Meridian's money went to Bellcastle. 3 flows between 3 parties, amounts in USD. Largest: Meridian Holdings Ltd → Bellcastle Trading Group at $2.4M; smallest: Meridian Holdings Ltd → Orrin Ltd at $150K.",
+   "data_table": {
+    "columns": [
+     "Flow",
+     "From",
+     "To",
+     "Value (USD)",
+     "Records"
+    ],
+    "rows": [
+     {
+      "formatted": "$2.4M",
+      "label": "Meridian Holdings Ltd → Bellcastle Trading Group",
+      "record_count": 2,
+      "record_refs": [
+       {
+        "record_id": "f1",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "f2",
+        "record_type": "relationship"
+       }
+      ],
+      "source": "Meridian Holdings Ltd",
+      "target": "Bellcastle Trading Group",
+      "value": 2400000
+     },
+     {
+      "formatted": "$900K",
+      "label": "Bellcastle Trading Group → Orrin Ltd",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "f3",
+        "record_type": "relationship"
+       }
+      ],
+      "source": "Bellcastle Trading Group",
+      "target": "Orrin Ltd",
+      "value": 900000
+     },
+     {
+      "formatted": "$150K",
+      "label": "Meridian Holdings Ltd → Orrin Ltd",
+      "record_count": 3,
+      "record_refs": [
+       {
+        "record_id": "f4",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "f5",
+        "record_type": "relationship"
+       },
+       {
+        "record_id": "f6",
+        "record_type": "relationship"
+       }
+      ],
+      "source": "Meridian Holdings Ltd",
+      "target": "Orrin Ltd",
+      "value": 150000
+     }
+    ]
+   },
+   "description": "Flow diagram: Most of Meridian's money went to Bellcastle. 3 flows between 3 parties, amounts in USD. Largest: Meridian Holdings Ltd → Bellcastle Trading Group at $2.4M; smallest: Meridian Holdings Ltd → Orrin Ltd at $150K. Meridian Holdings Ltd → Bellcastle Trading Group: $2.4M, from 2 payments. Bellcastle Trading Group → Orrin Ltd: $900K, from 1 payment († one record). Meridian Holdings Ltd → Orrin Ltd: $150K, from 3 payments. Source: 6 payments in this investigation's records (payment_flows) · † rests on one record.",
+   "source_line": "Source: 6 payments in this investigation's records (payment_flows) · † rests on one record"
+  },
+  "width": 960
+ },
  "scatter": {
   "data": {
    "currency": "USD",

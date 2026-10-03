@@ -1,4 +1,4 @@
-# Investigation visuals (passes 2 and 3: the foundation and the statistical charts)
+# Investigation visuals (passes 2–4: the foundation, the statistical charts, money flows)
 
 This is the code behind the design doc "Investigation Visuals & Presentation
 System" (pass 1: research) and the decisions in ADR-0005 (lines 1, 2, 5, 6).
@@ -6,8 +6,8 @@ Pass 2 laid the foundation under every later visual and proved it end to end
 with bars: a horizontal ranked `bar` and a vertical `column`. Pass 3 draws
 the statistical kinds on the same foundation: `line`, `area`,
 `stacked_bar_100` (the 100% bar the design uses instead of small pies),
-`donut`, `treemap`, `histogram` and `scatter`. `timeline` and `sankey` wait
-for the money-flow and network pass.
+`donut`, `treemap`, `histogram` and `scatter`. Pass 4 draws money flows as a
+`sankey` (below, "Pass 4: the flow diagram"); `timeline` is still to come.
 
 The promise, in one line: **the AI never types a number.** It writes a short
 order; the Workbench cooks every value from the investigation's own records,
@@ -340,6 +340,41 @@ TZ=UTC PYTHONPATH=. python -m pytest tests/test_visuals_*.py -q --no-cov
 | `test_visuals_style.py` | The presets a chart can take, the options of each kind, a style that never changes the data and is checked again, the warnings, what is refused by having no control |
 | `test_visuals_draft.py` | A draft whose model orders a chart: kept, re-asked, or removed with reasons |
 
+## Pass 4: the flow diagram
+
+Who paid whom, drawn as a sankey (the design doc's "Money-flow diagram",
+question `flow`). The query `payment_flows` totals the Payment records of
+each payer and recipient pair in one currency (rows of the new `flows`
+shape: `source`, `target`, the amount, the payments behind it); the same
+rows rank as bars.
+
+- **Layout.** A party's column is the longest chain of payments leading to
+  it, and a party that pays no one sits in the last column (ECharts'
+  `justify`); the columns are set on each node (`depth`) rather than left
+  to ECharts, so the checker and the labels know where every band runs.
+  ECharts refuses flows that come back round ("Sankey is a DAG", checked on
+  6.1.0): when A pays B and B pays A, payers are drawn on the left and
+  recipients on the right, and the subtitle and alt text say so, rather
+  than dropping the payment that closes the circle.
+- **Words.** Every flow's amount and payments are in its tooltip and the
+  data table (rule 16, as for points); they are written on the band when
+  it goes one column (a longer band passes behind a party's bar) and is
+  thick enough for a line of text, the thickness taken from ECharts' own
+  formula (`sankeyLayout.js` `initializeNodeDepth`), and only up to twelve
+  flows. Every party is named beside its bar (rule 12).
+- **Colour.** Parties in one colour (3:1 against the page, rule 11), bands
+  in grey; a highlight may name a party (every flow in or out of it) or one
+  flow, colours those bands and writes their amounts in bold.
+- **Checks.** Rule 0 reads the bands back against the rows; 10 warns past
+  twenty parties; a sankey takes no `sort` or `limit` (it has no ranking,
+  and "Other" has no payer or recipient), and flows are drawn only as a
+  sankey or as bars.
+- **Exports.** PowerPoint has no sankey, so a deck holds the render
+  service's picture, or the flows ranked as bars with the reason when the
+  service is down; a brief holds the picture, or the bar table.
+- Tests: `tests/test_visuals_flows.py`, and the `sankey` fixture in
+  `frontend/test-support/chart-kinds.json`.
+
 ## What pass 3 built, and what is left
 
 Built: the drawing of the seven statistical kinds, the two queries they
@@ -357,7 +392,7 @@ reporter uses without the AI. The app's side is tested in
 
 Left for later passes:
 
-- `timeline` and `sankey` (the money-flow and network pass).
+- `timeline` (pass 4), the staged flow and the who-pays-whom circle (chord).
 - Parts of a whole over time (a stacked area), which needs a query with a
   second series.
 - Reading the values back out of the rendered SVG (the image-level half of

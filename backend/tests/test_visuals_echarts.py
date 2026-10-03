@@ -174,7 +174,7 @@ def test_format_value_is_compact_and_honest():
 
 def test_kinds_not_drawn_yet_raise_a_clear_error():
     with pytest.raises(UnsupportedChartKind, match="not drawn yet"):
-        build_chart(parse_spec({"kind": "sankey", "title": "The money flowed to Meridian", "query": {"name": "payments_by_party"}}), RANKED, DARK)
+        build_chart(parse_spec({"kind": "timeline", "title": "The payments came in one burst", "query": {"name": "payments_by_party"}}), RANKED, DARK)
 
 
 # --- metamorphic tests (McNutt et al. 2020) ------------------------------------------

@@ -99,6 +99,9 @@ def normalize_chart_style(spec: VisualSpec, data: VisualData, style: Any) -> dic
     raw_options = style.get("options")
     raw: dict[str, Any] = raw_options if isinstance(raw_options, dict) else {}
     labels = [row.label for row in data.rows]
+    if data.series_kind == "flows":
+        # A flow diagram highlights a party (every flow in or out of it) as well as one flow.
+        labels += sorted({party for row in data.rows for party in (row.source, row.target) if party})
     options: dict[str, Any] = {}
     for name, value in raw.items():
         option = allowed.get(name)

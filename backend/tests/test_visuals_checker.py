@@ -293,15 +293,15 @@ def test_rule_20_values_resting_on_one_record_are_flagged():
 
 def test_a_kind_that_is_not_drawn_yet_is_checked_on_spec_and_data_only():
     over_time = _data([("2020", 5, 1), ("2021", 7, 2)], series_kind="time", query="payments_over_time")
-    report = check_visual(_spec(kind="sankey", query="payments_over_time"), over_time, DARK)
+    report = check_visual(_spec(kind="timeline", query="payments_over_time"), over_time, DARK)
     assert report.ok
     # Rule 12 needs the option only when something is highlighted.
     assert {0, 6, 7, 9, 10, 13, 14, 15, 16, 20} <= set(report.not_checked)
     assert "not drawn yet" in report.not_checked[6]
     # What the order slip, the data and the theme can tell is judged ...
-    assert {2, 3, 4, 11, 19} <= set(report.checked_rules)
+    assert {2, 4, 11, 19} <= set(report.checked_rules)
     # ... and rules about other kinds of chart are not applicable, not "checked".
-    assert {1, 5, 8} <= set(report.not_applicable)
+    assert {1, 3, 5, 8} <= set(report.not_applicable)
     assert not set(report.not_applicable) & set(report.checked_rules)
 
 

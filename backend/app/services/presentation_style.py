@@ -225,8 +225,10 @@ VISUAL_PRESETS: dict[str, list[dict]] = {
 CHART_FAMILIES: dict[str, str] = {
     "bar": "bars", "column": "bars", "line": "lines", "area": "lines",
     "stacked_bar_100": "parts", "donut": "parts", "treemap": "parts", "histogram": "histogram", "scatter": "scatter",
+    "sankey": "flows",
 }
-_RANKED_SERIES = ["category", "distribution"]
+# Rows a sort applies to: groups, records, and flows ranked as bars.
+_RANKED_SERIES = ["category", "distribution", "flows"]
 _CHART_SORT = {"type": "choice", "label": "Sort", "values": ["as_ordered", "value_desc", "value_asc", "label"], "series": _RANKED_SERIES}
 _CHART_HIGHLIGHT = {"type": "labels", "label": "Highlight (the others turn grey)"}
 _GRIDLINES = {"type": "bool", "label": "Gridlines"}
@@ -269,6 +271,11 @@ CHART_OPTIONS: dict[str, dict[str, dict]] = {
         "gridlines": _GRIDLINES,
         "highlight": _CHART_HIGHLIGHT,
     },
+    # A flow diagram has nothing else to set: each band sits between its two
+    # parties and is as wide as its money; the columns follow the payments.
+    "flows": {
+        "highlight": {"type": "labels", "label": "Highlight a party or a flow (the others turn grey)"},
+    },
 }
 # Each preset is a kind of its family plus option defaults; the first preset
 # with the chart's own kind is how the chart looks as it was ordered.
@@ -302,6 +309,10 @@ CHART_PRESETS: dict[str, list[dict]] = {
          "options": {"label_points": "auto"}},
         {"id": "labelled_outliers", "label": "Labelled outliers", "description": "Only the points outside Tukey's fences are named.", "kind": "scatter",
          "options": {"label_points": "outliers"}},
+    ],
+    "flows": [
+        {"id": "flow", "label": "Flow diagram", "description": "Payers on the left, recipients to the right, each band as wide as the money.",
+         "kind": "sankey", "options": {}},
     ],
 }
 

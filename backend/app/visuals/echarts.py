@@ -27,6 +27,14 @@ One builder per kind, all reading the same rows:
   gaps: the amounts are continuous).
 * scatter: two numbers per party; every point named when there are few,
   otherwise the outliers (Tukey's fences).
+* sankey (pass 4, money flows): one band per payer-recipient pair, as wide
+  as the money, each written with its amount and how many payments make it;
+  every party named. Parties in one colour and bands in grey (a highlight
+  colours the flows it picks), since the colour carries no second meaning.
+  ECharts draws a sankey only when the money never comes back round (it
+  refuses a cycle: "Sankey is a DAG"); when it does (A pays B, B pays A),
+  payers are drawn in one column and recipients in the other, and the
+  subtitle says so, rather than dropping the flow that closes the circle.
 
 The numbers the drawing needs beyond the query's own (shares, bins,
 outliers) come from app/visuals/stats.py; the drawing only places them.
@@ -266,10 +274,20 @@ def check_fit(spec: VisualSpec, data: VisualData) -> None:
         raise ChartDoesNotFit(answer)
     needs = SERIES_FOR_KIND.get(kind)
     if needs and data.series_kind not in needs:
-        wanted = {"distribution": "one value per record, such as payment_amounts", "pairs": "two numbers per party, such as payments_count_and_total_by_party"}
+        wanted = {"distribution": "one value per record, such as payment_amounts", "pairs": "two numbers per party, such as payments_count_and_total_by_party",
+                  "flows": "money moving between parties, such as payment_flows"}
         raise ChartDoesNotFit(f"a {kind.value} needs {' or '.join(wanted[n] for n in needs)}; the query {data.query!r} has {data.series_kind} rows")
     if data.series_kind == "pairs" and kind != ChartKind.scatter:
         raise ChartDoesNotFit(f"the query {data.query!r} holds two numbers per party; draw it as a scatter plot")
+    if data.series_kind == "flows" and kind not in (ChartKind.sankey, ChartKind.bar):
+        raise ChartDoesNotFit(f"the query {data.query!r} holds money moving from one party to another; draw it as a flow diagram (sankey) "
+                              "or rank the flows as bars")
+    if kind == ChartKind.sankey:
+        if spec.limit is not None:
+            raise ChartDoesNotFit("limit folds ranked rows into 'Other', which has no payer or recipient to draw a flow between; "
+                                  "leave limit out, or rank the flows as bars")
+        if spec.sort is not None:
+            raise ChartDoesNotFit("sort does not apply to a flow diagram: each flow sits between its payer and its recipient; leave sort out")
     if kind in (ChartKind.histogram, ChartKind.scatter):
         if spec.limit is not None:
             raise ChartDoesNotFit(f"limit folds ranked categories into 'Other'; a {kind.value} has none to fold, so leave limit out")
@@ -310,7 +328,7 @@ def prepare_rows(spec: VisualSpec, data: VisualData, draw: DrawOptions | None = 
     if spec.kind == ChartKind.scatter:
         return sorted(data.rows, key=lambda r: (r.label.lower(), r.key))
     rows = _sort_rows(list(data.rows), spec.effective_sort())
-    if data.series_kind in ("category", "distribution"):
+    if data.series_kind in ("category", "distribution") or (data.series_kind == "flows" and spec.kind != ChartKind.sankey):
         keep = spec.limit if spec.limit is not None else (MAX_COLOURS - 1 if spec.kind in COLOUR_PER_CATEGORY_KINDS else None)
         if keep is not None:
             rows = _fold(rows, keep)
@@ -755,6 +773,182 @@ def _scatter(p: _Parts, frame: dict[str, Any], labelled: set[str]) -> dict[str, 
     }
 
 
+SANKEY_NODE_WIDTH = 14
+SANKEY_NODE_GAP = 12
+SANKEY_EDGE_OPACITY = 0.45
+SANKEY_LABEL_LIMIT = 12      # past this many flows, the amounts live in the tooltips and the data table only
+SANKEY_LABEL_BAND = MIN_FONT_PX + 6   # px: a band must be this thick to hold its amount
+
+
+def flows_circle(rows: list[DataRow]) -> bool:
+    """Whether following the money from party to party can come back to
+    where it started (A pays B and B pays A, or a longer round). ECharts
+    cannot draw such flows as one chain (it refuses: "Sankey is a DAG")."""
+    graph: dict[str, set[str]] = {}
+    for row in rows:
+        if row.source is not None and row.target is not None:
+            graph.setdefault(row.source, set()).add(row.target)
+    state: dict[str, int] = {}     # 1: being followed, 2: done
+
+    def visit(node: str) -> bool:
+        state[node] = 1
+        for nxt in sorted(graph.get(node, ())):
+            if state.get(nxt) == 1 or (state.get(nxt) is None and visit(nxt)):
+                return True
+        state[node] = 2
+        return False
+
+    return any(state.get(node) is None and visit(node) for node in sorted(graph))
+
+
+def sankey_node_ids(rows: list[DataRow]) -> tuple[dict[str, tuple[str, str]], bool]:
+    """flow label -> (source node id, target node id), and whether payers
+    and recipients are drawn as two columns (when the money runs in a
+    circle). In two columns a party that pays and receives is two nodes,
+    "pays: X" and "receives: X", each labelled X."""
+    split = flows_circle(rows)
+    out: dict[str, tuple[str, str]] = {}
+    for row in rows:
+        source, target = row.source or "", row.target or ""
+        out[row.label] = (f"pays: {source}", f"receives: {target}") if split else (source, target)
+    return out, split
+
+
+@dataclass(frozen=True)
+class SankeyLayout:
+    """Where the flow diagram puts things, decided here rather than left to
+    ECharts, so the checker and the labels can rely on it: each node's
+    column (`depth`), and the pixels per unit of money (`ky`, as ECharts
+    computes it: the tightest column decides, sankeyLayout.js
+    initializeNodeDepth), from which each band's thickness follows."""
+    depth: dict[str, int]
+    ky: float
+
+    def band(self, value: float) -> float:
+        return value * self.ky
+
+
+def sankey_layout(rows: list[DataRow], ids: dict[str, tuple[str, str]], plot_height: float) -> SankeyLayout:
+    """Columns from the left: a party's column is the longest chain of
+    payments leading to it; a party that pays no one goes in the last
+    column (ECharts' "justify"). Run only on flows with no circle (two
+    columns are fixed otherwise)."""
+    edges = [ids[row.label] for row in rows]
+    nodes = sorted({n for pair in edges for n in pair})
+    incoming: dict[str, list[str]] = {n: [] for n in nodes}
+    for a, b in edges:
+        incoming[b].append(a)
+    depth: dict[str, int] = {}
+
+    def depth_of(node: str) -> int:
+        if node not in depth:
+            depth[node] = 1 + max((depth_of(a) for a in incoming[node]), default=-1)
+        return depth[node]
+
+    for node in nodes:
+        depth_of(node)
+    sources = {a for a, _b in edges}
+    last = max(depth.values(), default=0)
+    for node in nodes:
+        if node not in sources:
+            depth[node] = last
+    flow_in: dict[str, float] = {n: 0.0 for n in nodes}
+    flow_out: dict[str, float] = {n: 0.0 for n in nodes}
+    for row, (a, b) in zip(rows, edges):
+        flow_out[a] += row.value
+        flow_in[b] += row.value
+    ky = math.inf
+    for column in sorted(set(depth.values())):
+        members = [n for n in nodes if depth[n] == column]
+        total = math.fsum(max(flow_in[n], flow_out[n]) for n in members)
+        if total > 0:
+            ky = min(ky, (plot_height - (len(members) - 1) * SANKEY_NODE_GAP) / total)
+    return SankeyLayout(depth, ky if math.isfinite(ky) else 0.0)
+
+
+def sankey_labelled(rows: list[DataRow], ids: dict[str, tuple[str, str]], layout: SankeyLayout) -> set[str]:
+    """The flows whose amount is written on their band: a band from one
+    column to the next (one reaching further passes behind a party's bar,
+    where its words would sit on the bar) and thick enough to hold a line of
+    text. Every flow's amount and payments are in its tooltip and the data
+    table whatever this says (rule 16)."""
+    if len(rows) > SANKEY_LABEL_LIMIT:
+        return set()
+    return {row.label for row in rows
+            if layout.depth[ids[row.label][1]] - layout.depth[ids[row.label][0]] == 1 and layout.band(row.value) >= SANKEY_LABEL_BAND}
+
+
+def _sankey(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
+    """sankey: one band per flow, as wide as its amount; every flow's
+    amount and payments in its tooltip, and written on its band where it
+    fits (sankey_labelled); every party named beside its bar."""
+    theme, data, rows, highlighted = p.theme, p.data, p.rows, p.highlighted
+    ids, split = sankey_node_ids(rows)
+    top, bottom = 84, 44
+    if split:
+        names_by_id = {n: n.split(": ", 1)[1] for pair in ids.values() for n in pair}
+        layout = SankeyLayout({n: (0 if n.startswith("pays: ") else 1) for n in names_by_id}, 0.0)
+        flow_in = {n: 0.0 for n in names_by_id}
+        flow_out = dict(flow_in)
+        for row in rows:
+            a, b = ids[row.label]
+            flow_out[a] += row.value
+            flow_in[b] += row.value
+        height = p.height - top - bottom
+        kys = []
+        for column in (0, 1):
+            members = [n for n in names_by_id if layout.depth[n] == column]
+            total = math.fsum(max(flow_in[n], flow_out[n]) for n in members)
+            if total > 0:
+                kys.append((height - (len(members) - 1) * SANKEY_NODE_GAP) / total)
+        layout = SankeyLayout(layout.depth, min(kys) if kys else 0.0)
+    else:
+        layout = sankey_layout(rows, ids, p.height - top - bottom)
+    written = sankey_labelled(rows, ids, layout)
+    picked_parties = set(p.spec.highlight)
+    node_colour = mark_colour(theme)
+    names: dict[str, str] = {}            # node id -> the party's name
+    outgoing: set[str] = set()
+    for row in rows:
+        source_id, target_id = ids[row.label]
+        names[source_id], names[target_id] = row.source or "", row.target or ""
+        outgoing.add(source_id)
+    nodes = []
+    for node_id in sorted(names, key=lambda n: (layout.depth.get(n, 0), names[n].lower(), n)):
+        bold = names[node_id] in picked_parties
+        nodes.append({
+            "name": node_id, "depth": layout.depth.get(node_id, 0), "itemStyle": {"color": _hex(node_colour)},
+            # A party that pays no one sits in the last column: its name goes
+            # on its left, inside the picture.
+            "label": {"show": True, "position": "right" if node_id in outgoing else "left", "formatter": _literal(names[node_id]),
+                      **_text_style(theme, MIN_FONT_PX, bold=bold)},
+            "tooltip": {"formatter": _literal(names[node_id])},
+        })
+    any_pick = bool(highlighted or picked_parties)
+    links = []
+    for row in rows:
+        source_id, target_id = ids[row.label]
+        picked = any_pick and (row.label in highlighted or bool({row.source, row.target} & picked_parties))
+        links.append({
+            "name": row.label, "source": source_id, "target": target_id, "value": row.value,
+            "lineStyle": {"color": _hex(theme.accent if picked else theme.bar_muted), "opacity": 0.75 if picked else SANKEY_EDGE_OPACITY},
+            # A picked flow always shows its amount, in bold: its colour is not the only cue (rule 12).
+            "edgeLabel": {"show": row.label in written or picked, "formatter": _literal(value_label(row, data)),
+                          **_text_style(theme, MIN_FONT_PX, bold=picked)},
+            "tooltip": _point_tooltip(row, data),
+        })
+    return {
+        **frame,
+        "tooltip": _tooltip(theme),
+        "series": [{
+            "type": "sankey", "name": p.spec.title, "left": 8, "right": 8, "top": top, "bottom": bottom,
+            "nodeWidth": SANKEY_NODE_WIDTH, "nodeGap": SANKEY_NODE_GAP, "nodeAlign": "justify", "layoutIterations": 32,
+            "draggable": False, "emphasis": {"focus": "adjacency"},
+            "lineStyle": {"curveness": 0.5},
+            "data": nodes, "links": links,
+        }],
+    }
+
 def scatter_labels(rows: list[DataRow], label_points: str) -> set[str]:
     """Which points a scatter plot names: all of them when there are few
     (POINT_LABEL_LIMIT), else the outliers by Tukey's fences, unless the
@@ -787,6 +981,12 @@ def _subtitle(spec: VisualSpec, data: VisualData, kind: ChartKind) -> str:
     if kind == ChartKind.scatter:
         names = data.measure_labels
         return f"{names.get('y', 'y')} against {_lower_first(names.get('x', 'x'))}"
+    if kind == ChartKind.sankey:
+        base = f"Money paid from left to right, band width by amount in {unit}" if unit else "Money paid from left to right"
+        if flows_circle(data.rows):
+            base += ("; the money also runs back the other way, so payers are drawn on the left and recipients on the right, "
+                     "and a party can appear on both sides")
+        return base
     if kind in PART_OF_WHOLE_KINDS:
         base = f"Share of the total, amounts in {unit}" if data.unit_kind == "amount" and unit else f"Share of all {data.record_noun}"
         return base
@@ -834,6 +1034,8 @@ def build_chart(spec: VisualSpec, data: VisualData, theme: Theme, *, width: int 
         option = _treemap(parts, frame, shares)
     elif kind == ChartKind.histogram:
         option = _histogram(parts, frame)
+    elif kind == ChartKind.sankey:
+        option = _sankey(parts, frame)
     else:
         option = _scatter(parts, frame, labelled)
     return BuiltChart(
@@ -897,6 +1099,17 @@ def _words(spec: VisualSpec, data: VisualData, rows: list[DataRow], highlighted:
         for row, share, table_row in zip(rows, shares, table_rows):
             table_row["share"] = round(share, 1)
             lines.append(f"{row.label}: {part_value_text(row, share, data)}.")
+    elif data.series_kind == "flows":
+        parties = {row.source for row in rows} | {row.target for row in rows}
+        alt = (f"{name}: {spec.title}. {count} flow{'s' if count != 1 else ''} between {len(parties)} parties, amounts in {unit}. "
+               f"Largest: {largest.label} at {format_value(largest.value, data)}; smallest: {smallest.label} at {format_value(smallest.value, data)}.")
+        if kind == ChartKind.sankey and flows_circle(rows):
+            alt += " The money also runs back the other way, so payers are drawn on the left and recipients on the right."
+        columns = ["Flow", "From", "To", f"Value ({unit})", "Records"]
+        for row, table_row in zip(rows, table_rows):
+            table_row["source"], table_row["target"] = row.source, row.target
+            mark = f" ({SINGLE_RECORD_MARK} one record)" if row.record_count == 1 else ""
+            lines.append(f"{row.label}: {format_value(row.value, data)}, from {count_phrase(row, data)}{mark}.")
     else:
         if data.series_kind == "time":
             span = f"from {rows[0].label} to {rows[-1].label}"

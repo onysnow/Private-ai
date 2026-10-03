@@ -63,11 +63,15 @@ export function ScaledChart({visual, fill = false}: {visual: ChartVisual, fill?:
 type TableRow = ChartVisual['text']['data_table']['rows'][number];
 
 /** A data-table row's cells in the order the backend lists its columns
- * (backend/app/visuals/echarts.py): the label, a scatter plot's second
- * number when the chart has one, the value, a part's share when the chart
- * shows parts of a whole, and the number of records behind the value. */
+ * (backend/app/visuals/echarts.py): the label, a flow's payer and recipient
+ * when the chart shows flows, a scatter plot's second number when the chart
+ * has one, the value, a part's share when the chart shows parts of a whole,
+ * and the number of records behind the value. */
 export function tableCells(rows: TableRow[], row: TableRow): {key: string, text: string, numeric: boolean}[] {
   const cells = [];
+  if (rows.some(r => r.source !== undefined)) {
+    cells.push({key: 'source', text: row.source ?? '', numeric: false}, {key: 'target', text: row.target ?? '', numeric: false});
+  }
   if (rows.some(r => r.x_formatted !== undefined)) cells.push({key: 'x', text: row.x_formatted ?? '', numeric: true});
   cells.push({key: 'value', text: row.formatted, numeric: true});
   if (rows.some(r => r.share !== undefined)) cells.push({key: 'share', text: row.share === undefined ? '' : `${row.share.toFixed(1)}%`, numeric: true});

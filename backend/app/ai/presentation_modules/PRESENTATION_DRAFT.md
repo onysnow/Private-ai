@@ -78,8 +78,10 @@ forms for every section, every time.
       - `correlation` -- how two numbers about the same party move
         together: `scatter`, only over
         `payments_count_and_total_by_party`.
-      - `flow` -- where money moves from and to: not drawn yet; rank the
-        recipients with `payments_by_party` instead.
+      - `flow` -- where money moves from and to (who paid whom): `sankey`,
+        only over `payment_flows`; with many parties, rank the flows as
+        `bar` instead. A flow diagram takes no `sort` or `limit`; its
+        `highlight` may name a party or one flow ("Meridian → Bellcastle").
       `spec.title` is a full sentence that states the finding the chart
       shows, in words, e.g. "Meridian received most of the money" or "Most
       payments were small" -- never the name of the data ("Payments by
@@ -88,8 +90,8 @@ forms for every section, every time.
       its `params` (e.g. `{"name": "payments_by_party", "params":
       {"direction": "received"}}`). Optional: `sort` (`value_desc`,
       `value_asc`, `label`, `time`) and `limit` (keep the top N; the rest
-      fold into "Other"), neither for a histogram or a scatter plot,
-      whose order and points come from the data; `highlight` (labels to
+      fold into "Other"), neither for a histogram, a scatter plot or a
+      flow diagram, whose order and points come from the data; `highlight` (labels to
       pick out). The Workbench runs the query, tags every value with its
       records, draws the chart and checks it against the design rules; a
       chart that fails is removed from the draft and you may be asked once

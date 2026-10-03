@@ -41,6 +41,30 @@ def test_payments_by_party_sums_amounts_and_cites_the_payment_relationships(demo
     assert paid.rows[0].record_refs == received.rows[0].record_refs
 
 
+def test_payment_flows_total_each_payer_recipient_pair_and_keep_its_payments(demo):
+    db, inv_id = demo
+    flows = run_query(db, inv_id, QueryRef(name="payment_flows"))
+    assert flows.series_kind == "flows" and flows.currency == "USD"
+    assert [(r.source, r.target, r.value, r.record_count) for r in flows.rows] == [
+        ("Bellcastle Trading Group", "Meridian Holdings Ltd", 2400000.0, 1)]
+    assert flows.rows[0].label == "Bellcastle Trading Group → Meridian Holdings Ltd"
+    assert flows.rows[0].as_dict()["source"] == "Bellcastle Trading Group"
+    assert VisualData.from_dict(flows.as_dict()).rows[0].target == "Meridian Holdings Ltd"
+
+    # Two payments the same way are one flow; one back the other way is its own
+    # flow; one in another currency is left out, not added.
+    entities = {e.caption: e for e in db.query(Entity).filter(Entity.investigation_id == inv_id)}
+    meridian, bellcastle = entities["Meridian Holdings Ltd"], entities["Bellcastle Trading Group"]
+    for source, target, amount, currency in ((bellcastle, meridian, "100000", "USD"), (meridian, bellcastle, "50000", "USD"),
+                                             (meridian, bellcastle, "9000", "EUR")):
+        create_relationship(db, investigation_id=inv_id, schema="Payment", source_entity_id=source.id, target_entity_id=target.id,
+                            properties={"amount": [amount], "currency": [currency], "date": ["2024-01-05"]})
+    flows = run_query(db, inv_id, QueryRef(name="payment_flows"))
+    assert [(r.label, r.value, r.record_count) for r in flows.rows] == [
+        ("Bellcastle Trading Group → Meridian Holdings Ltd", 2500000.0, 2), ("Meridian Holdings Ltd → Bellcastle Trading Group", 50000.0, 1)]
+    assert [o["currency"] for o in flows.omitted if o["reason"] == "other currency"] == ["EUR"]
+
+
 def test_payments_over_time_groups_by_month_or_year(demo):
     db, inv_id = demo
     month = run_query(db, inv_id, QueryRef(name="payments_over_time"))
@@ -106,12 +130,12 @@ def test_describe_catalog_lists_every_query_and_whether_it_has_data(demo):
     by_name = {q["name"]: q for q in catalog["queries"]}
     assert set(by_name) == {"payments_by_party", "payments_over_time", "events_over_time", "links_by_type", "claims_by_status",
                             "entities_by_schema", "evidence_by_stance", "documents_by_status", "leads_by_status",
-                            "payment_amounts", "payments_count_and_total_by_party"}
+                            "payment_amounts", "payments_count_and_total_by_party", "payment_flows"}
     assert by_name["payments_by_party"]["has_data"] and by_name["payments_by_party"]["currencies"] == ["USD"]
     assert by_name["payments_by_party"]["params"]["direction"] == {"description": "Rank who received the money, or who paid it.", "choices": ["received", "paid"], "default": "received"}
     assert by_name["documents_by_status"]["has_data"] is False
-    assert catalog["drawn_kinds"] == ["area", "bar", "column", "donut", "histogram", "line", "scatter", "stacked_bar_100", "treemap"]
-    assert "sankey" in catalog["kinds"] and "sankey" not in catalog["drawn_kinds"]
+    assert catalog["drawn_kinds"] == ["area", "bar", "column", "donut", "histogram", "line", "sankey", "scatter", "stacked_bar_100", "treemap"]
+    assert "timeline" in catalog["kinds"] and "timeline" not in catalog["drawn_kinds"]
     # Each query says which drawn kinds can draw it and which questions it answers.
     assert by_name["payments_by_party"]["kinds"] == ["bar", "column", "stacked_bar_100", "donut", "treemap"]
     assert by_name["payments_by_party"]["questions"] == ["ranking", "part_of_whole"]
@@ -121,7 +145,8 @@ def test_describe_catalog_lists_every_query_and_whether_it_has_data(demo):
     questions = {q["id"]: q for q in catalog["questions"]}
     assert questions["part_of_whole"]["kinds"] == ["stacked_bar_100", "donut", "treemap"]
     assert "payments_by_party" in questions["part_of_whole"]["queries"] and "payments_over_time" not in questions["part_of_whole"]["queries"]
-    assert questions["flow"]["drawn_kinds"] == [] and questions["flow"]["queries"] == []
+    assert questions["flow"]["drawn_kinds"] == ["sankey"] and questions["flow"]["queries"] == ["payment_flows"]
+    assert by_name["payment_flows"]["kinds"] == ["sankey", "bar"] and by_name["payment_flows"]["has_data"]
 
 
 def _add_payment(db, inv_id: str, payer: str, beneficiary: str, props: dict) -> str:

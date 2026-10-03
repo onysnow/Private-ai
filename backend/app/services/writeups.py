@@ -388,7 +388,7 @@ def _render_bar_table(docx: Any, items: list[dict], unit: str, citation_index: d
 # Kinds whose rows the bar table can stand in for when the image is not
 # available: one value per row. The others (shares of a whole, two numbers
 # per party) fall back to the data table, which holds every number they draw.
-_BAR_TABLE_KINDS = {"bar", "column", "line", "area", "histogram"}
+_BAR_TABLE_KINDS = {"bar", "column", "line", "area", "histogram", "sankey"}
 
 
 def _render_data_table(docx: Any, built: Any, data: Any, citation_index: dict[tuple[str, str], int]) -> None:

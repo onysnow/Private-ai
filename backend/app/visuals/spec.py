@@ -51,11 +51,11 @@ class ChartKind(str, Enum):
     sankey = "sankey"
 
 
-# What app/visuals/echarts.py draws. Timeline and sankey wait for the
-# money-flow and network pass.
+# What app/visuals/echarts.py draws. The sankey came with the money-flow
+# pass (pass 4); the timeline is still to come.
 DRAWN_KINDS: frozenset[ChartKind] = frozenset({
     ChartKind.bar, ChartKind.column, ChartKind.line, ChartKind.area, ChartKind.stacked_bar_100, ChartKind.donut,
-    ChartKind.treemap, ChartKind.histogram, ChartKind.scatter,
+    ChartKind.treemap, ChartKind.histogram, ChartKind.scatter, ChartKind.sankey,
 })
 
 # Kinds that show a value as a length (rule 9: the easiest to read) ...
@@ -80,13 +80,16 @@ POINT_KINDS: frozenset[ChartKind] = frozenset({ChartKind.line, ChartKind.area, C
 # What a query's rows are, and which kinds can draw them. "category": one
 # row per group (ranked or compared); "time": one row per period, in
 # order; "distribution": one row per record, whose values a histogram bins;
-# "pairs": one row per group with two numbers, x and y, for a scatter plot.
-SERIES_KINDS = ("category", "time", "distribution", "pairs")
+# "pairs": one row per group with two numbers, x and y, for a scatter plot;
+# "flows": one row per pair of parties, from one (`source`) to the other
+# (`target`), for a flow diagram, or ranked as bars.
+SERIES_KINDS = ("category", "time", "distribution", "pairs", "flows")
 KINDS_FOR_SERIES: dict[str, tuple[ChartKind, ...]] = {
     "category": (ChartKind.bar, ChartKind.column, ChartKind.stacked_bar_100, ChartKind.donut, ChartKind.treemap),
     "time": (ChartKind.line, ChartKind.column, ChartKind.area, ChartKind.bar),
     "distribution": (ChartKind.histogram, ChartKind.bar, ChartKind.column),
     "pairs": (ChartKind.scatter,),
+    "flows": (ChartKind.sankey, ChartKind.bar),
 }
 # The shapes a kind needs; any other shape cannot be drawn by it at all (a
 # histogram of periods, a scatter plot of one number). A line over
@@ -95,6 +98,7 @@ KINDS_FOR_SERIES: dict[str, tuple[ChartKind, ...]] = {
 SERIES_FOR_KIND: dict[ChartKind, tuple[str, ...]] = {
     ChartKind.histogram: ("distribution",),
     ChartKind.scatter: ("pairs",),
+    ChartKind.sankey: ("flows",),
 }
 
 
@@ -206,6 +210,13 @@ QUERY_CATALOG: dict[str, QuerySpec] = {q.name: q for q in (
          "currency": _CURRENCY},
         series_kind="pairs", unit_kind="amount", record_noun="payments",
     ),
+    QuerySpec(
+        "payment_flows", "Payment flows",
+        "How much money went from each payer to each recipient: one row per pair of parties, totalling their Payment records, "
+        "for a flow diagram (or ranked as bars).",
+        {"currency": _CURRENCY},
+        series_kind="flows", unit_kind="amount", record_noun="payments",
+    ),
 )}
 
 
@@ -220,9 +231,8 @@ class Question:
 
 
 # The FT Visual Vocabulary's categories this pass can answer from the
-# records, in its own words where they fit. "Flow" is listed so the chooser
-# is complete; its sankey waits for the money-flow pass and no query holds
-# flows yet.
+# records, in its own words where they fit. "Flow" is answered by the
+# payment_flows query, drawn as a sankey (pass 4).
 QUESTIONS: dict[str, Question] = {q.id: q for q in (
     Question("ranking", "Ranking", "Where an item sits in an ordered list: who received the most, which status holds the most claims.",
              (ChartKind.bar, ChartKind.column), ("category", "distribution")),
@@ -234,8 +244,8 @@ QUESTIONS: dict[str, Question] = {q.id: q for q in (
              (ChartKind.histogram,), ("distribution",)),
     Question("correlation", "Correlation", "How two numbers about the same party move together: how many payments against how much money.",
              (ChartKind.scatter,), ("pairs",)),
-    Question("flow", "Flow", "Where money moves from and to. Drawn in the money-flow pass; no query holds flows yet.",
-             (ChartKind.sankey,), ()),
+    Question("flow", "Flow", "Where money moves from and to: who paid whom, and how much.",
+             (ChartKind.sankey,), ("flows",)),
 )}
 
 

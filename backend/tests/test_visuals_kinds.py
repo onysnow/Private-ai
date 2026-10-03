@@ -434,7 +434,15 @@ def _fixture_orders() -> dict[str, tuple[str, VisualData]]:
     two_numbers = VisualData("inv", "payments_count_and_total_by_party", {"direction": "received"}, "USD", "amount", "pairs", "payments", twos,
                              "USD", 5, x_unit="payments", x_unit_kind="count",
                              measure_labels={"x": "Number of payments received", "y": "Total received (USD)"})
+    flowing = [DataRow("Meridian Holdings Ltd → Bellcastle Trading Group", 2400000, ref("f1", "f2"), 2, "Meridian Holdings Ltd → Bellcastle Trading Group",
+                       source="Meridian Holdings Ltd", target="Bellcastle Trading Group"),
+               DataRow("Bellcastle Trading Group → Orrin Ltd", 900000, ref("f3"), 1, "Bellcastle Trading Group → Orrin Ltd",
+                       source="Bellcastle Trading Group", target="Orrin Ltd"),
+               DataRow("Meridian Holdings Ltd → Orrin Ltd", 150000, ref("f4", "f5", "f6"), 3, "Meridian Holdings Ltd → Orrin Ltd",
+                       source="Meridian Holdings Ltd", target="Orrin Ltd")]
+    flows = VisualData("inv", "payment_flows", {}, "USD", "amount", "flows", "payments", flowing, "USD", 6)
     return {
+        "sankey": ("Most of Meridian's money went to Bellcastle", flows),
         "bar": ("Meridian received most of the money", by_party),
         "column": ("Payments fell after the November transfer", by_month),
         "line": ("Payments fell after the November transfer", by_month),

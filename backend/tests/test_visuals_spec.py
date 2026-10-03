@@ -37,8 +37,8 @@ def test_every_chart_kind_is_accepted_and_the_statistical_kinds_are_drawn():
         query = {"name": "events_over_time"} if kind in (ChartKind.line, ChartKind.area) else {"name": "links_by_type"}
         spec = parse_spec({"kind": kind.value, "title": "Something happened over time", "query": query})
         assert spec.drawable == (kind in DRAWN_KINDS)
-    # Pass 3 draws the statistical kinds; timeline and sankey wait for the money-flow pass.
-    assert {k.value for k in DRAWN_KINDS} == {"bar", "column", "line", "area", "stacked_bar_100", "donut", "treemap", "histogram", "scatter"}
+    # Pass 3 drew the statistical kinds, pass 4 the flow diagram; the timeline is still to come.
+    assert {k.value for k in DRAWN_KINDS} == {"bar", "column", "line", "area", "stacked_bar_100", "donut", "treemap", "histogram", "scatter", "sankey"}
 
 
 def test_each_question_names_the_kinds_and_query_shapes_that_answer_it():
@@ -46,7 +46,9 @@ def test_each_question_names_the_kinds_and_query_shapes_that_answer_it():
     assert list(QUESTIONS) == ["ranking", "change_over_time", "part_of_whole", "distribution", "correlation", "flow"]
     assert QUESTIONS["distribution"].kinds == (ChartKind.histogram,)
     assert QUESTIONS["correlation"].series_kinds == ("pairs",)
-    assert QUESTIONS["flow"].series_kinds == ()   # no query holds flows until the money-flow pass
+    assert QUESTIONS["flow"].series_kinds == ("flows",)
+    assert QUERY_CATALOG["payment_flows"].questions == ("flow",)
+    assert QUERY_CATALOG["payment_flows"].kinds == (ChartKind.sankey, ChartKind.bar)
     for question in QUESTIONS.values():
         assert all(shape in SERIES_KINDS for shape in question.series_kinds)
     assert QUERY_CATALOG["payment_amounts"].questions == ("ranking", "distribution")

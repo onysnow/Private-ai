@@ -51,7 +51,7 @@ def test_catalog_lists_the_menu_for_this_investigation():
     assert by_name["payments_by_party"]["has_data"] is True
     assert by_name["payments_by_party"]["params"]["currency"]["choices"] is None
     assert by_name["documents_by_status"]["has_data"] is False
-    assert body["drawn_kinds"] == ["area", "bar", "column", "donut", "histogram", "line", "scatter", "stacked_bar_100", "treemap"]
+    assert body["drawn_kinds"] == ["area", "bar", "column", "donut", "histogram", "line", "sankey", "scatter", "stacked_bar_100", "treemap"]
     assert [q["id"] for q in body["questions"]] == ["ranking", "change_over_time", "part_of_whole", "distribution", "correlation", "flow"]
     assert by_name["payment_amounts"]["questions"] == ["ranking", "distribution"]
     assert client.get("/api/investigations/nope/visuals/catalog").status_code == 404
@@ -90,8 +90,8 @@ def test_preview_refuses_bad_orders_and_kinds_not_drawn_yet():
     assert "unknown query 'nope'" in bad.text
     numbers = client.post(f"/api/investigations/{inv_id}/visuals/preview", json={**SPEC, "values": [1, 2]})
     assert numbers.status_code == 422
-    sankey = client.post(f"/api/investigations/{inv_id}/visuals/preview", json={**SPEC, "kind": "sankey"})
-    assert sankey.status_code == 422 and "not drawn yet" in sankey.text
+    timeline = client.post(f"/api/investigations/{inv_id}/visuals/preview", json={**SPEC, "kind": "timeline"})
+    assert timeline.status_code == 422 and "not drawn yet" in timeline.text
     assert client.post("/api/investigations/nope/visuals/preview", json=SPEC).status_code == 404
 
 

@@ -46,6 +46,11 @@ What each rule is judged from:
   closer together than they are wide: a warning, since how far apart they
   sit up and down depends on the axis ECharts picks), 16 (a treemap part
   too small to show its count).
+
+A flow diagram (sankey) is read through its bands (``links``): rule 0
+compares their values with the rows, rules 16 and 20 read each band's
+tooltip, rule 12 asks that every party is named, rule 11 that the parties'
+bars stand 3:1 against the page, and rule 10 warns past twenty parties.
 """
 
 from __future__ import annotations
@@ -74,6 +79,7 @@ MAX_PERIODS = 36              # rule 7: three years of months still labels; past
 RECORD_COUNT_SPREAD = 10      # rule 16 (our own threshold)
 TEXT_CONTRAST, LARGE_TEXT_CONTRAST = 4.5, 3.0   # rule 11 (WCAG 1.4.3)
 MIN_TITLE_WORDS = 3           # rule 13: "Payments" names the data; a finding takes a sentence
+MAX_FLOW_PARTIES = 20         # rule 10, flow diagrams: past this, the bands cross too often to follow (our own threshold)
 
 NOT_CHECKABLE_HERE = {
     17: "shaded maps are judged in the maps pass",
@@ -198,8 +204,16 @@ class _Checker:
         bar's segments carry their label on the series, one per part)."""
         return {**(series.get("label") or {}), **(item.get("label") or {})}
 
+    def links(self) -> list[dict[str, Any]]:
+        """A flow diagram's bands (its marks that carry values); its
+        series' data are the parties."""
+        return [link for s in self.series() if s.get("type") == "sankey" for link in (s.get("links") or []) if isinstance(link, dict)]
+
     def labels(self) -> dict[str, dict[str, Any]]:
-        """mark name -> its label settings, for every drawn mark."""
+        """mark name -> its label settings, for every drawn mark (a flow
+        diagram's bands: their edge labels)."""
+        if self.kind == ChartKind.sankey:
+            return {str(link.get("name")): dict(link.get("edgeLabel") or {}) for link in self.links()}
         return {str(item.get("name")): self.label_of(series, item) for series, item in self.items()}
 
     def label_text(self) -> dict[str, str]:
@@ -208,6 +222,12 @@ class _Checker:
 
     def tooltip_text(self) -> dict[str, str]:
         out: dict[str, str] = {}
+        if self.kind == ChartKind.sankey:
+            for link in self.links():
+                formatter = (link.get("tooltip") or {}).get("formatter")
+                if isinstance(formatter, str):
+                    out[str(link.get("name"))] = formatter
+            return out
         for _series, item in self.items():
             formatter = (item.get("tooltip") or {}).get("formatter")
             if isinstance(formatter, str):
@@ -320,11 +340,14 @@ class _Checker:
         for _series, item in self.items():
             value = item.get("value")
             name = str(item.get("name"))
+            if self.kind == ChartKind.sankey:
+                continue    # parties; the bands below carry the values
             if self.kind == ChartKind.scatter:
                 pair = value if isinstance(value, list) and len(value) == 2 else [None, None]
                 out.append((name, _number(pair[0]), _number(pair[1])))
             else:
                 out.append((name, _number(value)))
+        out.extend((str(link.get("name")), _number(link.get("value"))) for link in self.links())
         return out
 
     # --- the rules -----------------------------------------------------------------
@@ -573,6 +596,10 @@ class _Checker:
         kind, data, rows = self.kind, self.data, self.rows
         if kind in COLOUR_PER_CATEGORY_KINDS and len(rows) > MAX_COLOURS:
             self.error(10, f"{len(rows)} categories would need {len(rows)} colours; keep {MAX_COLOURS} and fold the rest into 'Other'")
+        elif kind == ChartKind.sankey and len({r.source for r in rows} | {r.target for r in rows}) > MAX_FLOW_PARTIES:
+            parties = len({r.source for r in rows} | {r.target for r in rows})
+            self.warn(10, f"{parties} parties is more than a flow diagram can show readably; narrow the question (one currency, one period), "
+                          f"or rank the flows as bars")
         elif data.series_kind in ("category", "distribution") and kind in (ChartKind.bar, ChartKind.column) and len(rows) > HARD_MAX_COLOURS:
             self.warn(10, f"{len(rows)} bars is a list, not a chart; set a limit to keep the top few and fold the rest into 'Other'")
         if self.needs_option(10):
@@ -606,6 +633,14 @@ class _Checker:
                         self.error(11, f"the line and points ({colour}) are {ratio:.2f}:1 against the page; marks that carry values need 3:1")
             if kind in COLOUR_PER_CATEGORY_KINDS:
                 self._part_contrast()
+            if kind == ChartKind.sankey:
+                # A band's width carries its value, read against the page; the
+                # amount is written on it too, so the bands may be pale, but the
+                # parties' bars must stand 3:1 against the page (WCAG 1.4.11).
+                for colour in sorted(set(self.item_colours())):
+                    ratio = contrast_ratio(colour.lstrip("#"), theme.page)
+                    if ratio < GRAPHIC_CONTRAST:
+                        self.error(11, f"the parties' bars ({colour}) are {ratio:.2f}:1 against the page; marks need 3:1")
         self.passed(11)
 
     def _part_contrast(self) -> None:
@@ -652,6 +687,11 @@ class _Checker:
             if kind == ChartKind.stacked_bar_100:
                 for problem in self.whole_bar_clashes():
                     self.error(12, f"{problem}, so a part is told apart by its colour only; a bar chart has room for every name")
+        if kind == ChartKind.sankey and self.needs_option(12):
+            for series, node in self.items():
+                label = self.label_of(series, node)
+                if not label.get("show", True) or not str(label.get("formatter", "")).strip():
+                    self.error(12, f"the party drawn as '{node.get('name')}' is not named on the chart")
         if self.spec.highlight and self.needs_option(12):
             picked = [name for name in self.spec.highlight if any(row.label == name for row in self.rows)]
             if kind in (ChartKind.bar, ChartKind.column, ChartKind.histogram):
@@ -726,10 +766,11 @@ class _Checker:
             if any("record_count" not in r for r in self.built.data_table["rows"]):
                 self.error(16, "the data table does not show how many records sit behind each value")
         if self.needs_option(16):
-            if kind in POINT_KINDS:
-                # Values are not written on every point, so each point's
-                # tooltip says how many records hold it up (and the data table does).
-                where, texts = "point", self.tooltip_text()
+            if kind in POINT_KINDS or kind == ChartKind.sankey:
+                # Values are not written on every point (or every band of a
+                # flow diagram), so each one's tooltip says how many records
+                # hold it up (and the data table does).
+                where, texts = ("flow" if kind == ChartKind.sankey else "point"), self.tooltip_text()
             else:
                 where, texts = _mark_noun(kind), self.label_text()
             for row in drawn:
@@ -766,7 +807,7 @@ class _Checker:
                         if symbols.get(label) != HOLLOW_SYMBOL:
                             self.error(20, f"'{label}' rests on one record but its marker is not hollow")
                 else:
-                    texts = self.label_text()
+                    texts = self.tooltip_text() if self.kind == ChartKind.sankey else self.label_text()
                     for label in singles:
                         if SINGLE_RECORD_MARK not in texts.get(label, ""):
                             self.error(20, f"'{label}' rests on one record but carries no mark ({SINGLE_RECORD_MARK}) on the chart")
@@ -793,6 +834,8 @@ def _px(value: Any, whole: float) -> float:
 def _mark_noun(kind: ChartKind) -> str:
     if kind in PART_OF_WHOLE_KINDS:
         return "part"
+    if kind == ChartKind.sankey:
+        return "flow"
     return "bar"
 
 

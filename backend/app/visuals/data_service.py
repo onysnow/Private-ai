@@ -53,6 +53,8 @@ class DataRow:
     record_count: int
     key: str = ""      # what the row is sorted by within its kind: a period for time series, the label otherwise
     x: float | None = None   # the second number of a "pairs" row (a scatter plot's x); `value` is its y
+    source: str | None = None   # a "flows" row: who the money came from ...
+    target: str | None = None   # ... and who it went to; `label` is "source → target"
 
     def as_dict(self) -> dict[str, Any]:
         out: dict[str, Any] = {"label": self.label, "value": self.value, "record_refs": [r.as_dict() for r in self.record_refs],
@@ -60,6 +62,9 @@ class DataRow:
         if self.x is not None:
             # Only pairs rows carry it, so every other row keeps its pass-2 shape.
             out["x"] = self.x
+        if self.source is not None and self.target is not None:
+            # Likewise only flows rows.
+            out["source"], out["target"] = self.source, self.target
         return out
 
 
@@ -102,7 +107,9 @@ class VisualData:
                     record_refs=[RecordRef(str(ref["record_type"]), str(ref["record_id"])) for ref in (r.get("record_refs") or [])
                                  if isinstance(ref, dict) and ref.get("record_type") and ref.get("record_id")],
                     record_count=int(r.get("record_count", 0)), key=str(r.get("key", "")),
-                    x=float(r["x"]) if isinstance(r.get("x"), (int, float)) and not isinstance(r.get("x"), bool) else None)
+                    x=float(r["x"]) if isinstance(r.get("x"), (int, float)) and not isinstance(r.get("x"), bool) else None,
+                    source=str(r["source"]) if isinstance(r.get("source"), str) and isinstance(r.get("target"), str) else None,
+                    target=str(r["target"]) if isinstance(r.get("source"), str) and isinstance(r.get("target"), str) else None)
             for r in (data.get("rows") or []) if isinstance(r, dict)
         ]
         labels = data.get("measure_labels")
@@ -297,6 +304,41 @@ def payments_count_and_total_by_party(db: Session, investigation_id: str, params
     )
 
 
+def payment_flows(db: Session, investigation_id: str, params: dict[str, str]) -> VisualData:
+    """How much went from each payer to each recipient, in one currency: one
+    row per (payer, recipient) pair, totalling their Payment records, which
+    are the row's records. Parties are named as the ledger names them; two
+    parties that share a name are told apart by their record id, since a
+    flow diagram joins its ends by name."""
+    transactions, currency, omitted = _ledger(db, investigation_id, params.get("currency"))
+    names: dict[str, str] = {}
+    for tx in transactions:
+        for side in ("from", "to"):
+            names.setdefault(tx[f"{side}_entity_id"], tx[side] or tx[f"{side}_entity_id"])
+    taken: dict[str, list[str]] = defaultdict(list)
+    for entity_id, name in sorted(names.items()):
+        taken[name].append(entity_id)
+    shown = {entity_id: (name if len(taken[name]) == 1 else f"{name} ({entity_id[:8]})") for entity_id, name in names.items()}
+    totals: dict[tuple[str, str], float] = defaultdict(float)
+    refs: dict[tuple[str, str], list[RecordRef]] = defaultdict(list)
+    for tx in transactions:
+        pair = (tx["from_entity_id"], tx["to_entity_id"])
+        totals[pair] += float(tx["amount"])
+        refs[pair].append(RecordRef("relationship", tx["relationship_id"]))
+    rows = []
+    for (payer, recipient), total in totals.items():
+        source, target = shown[payer], shown[recipient]
+        label = f"{source} → {target}"
+        rows.append(DataRow(label, round(total, 2), sorted(set(refs[(payer, recipient)]), key=lambda r: r.record_id),
+                            len(refs[(payer, recipient)]), label, source=source, target=target))
+    rows.sort(key=lambda r: (-r.value, r.label.lower()))
+    return VisualData(
+        investigation_id=investigation_id, query="payment_flows", params=params,
+        unit=currency or "", unit_kind="amount", series_kind="flows", record_noun="payments",
+        rows=rows, currency=currency, record_count=len(transactions), omitted=omitted,
+    )
+
+
 def payments_over_time(db: Session, investigation_id: str, params: dict[str, str]) -> VisualData:
     transactions, currency, omitted = _ledger(db, investigation_id, params.get("currency"))
     granularity = params.get("granularity", "month")
@@ -460,6 +502,7 @@ QUERIES: dict[str, QueryRunner] = {
     "leads_by_status": leads_by_status,
     "payment_amounts": payment_amounts,
     "payments_count_and_total_by_party": payments_count_and_total_by_party,
+    "payment_flows": payment_flows,
 }
 
 # The menu and the kitchen must agree, or an order could name a dish nobody cooks.

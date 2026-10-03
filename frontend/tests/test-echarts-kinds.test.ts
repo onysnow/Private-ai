@@ -1,5 +1,5 @@
 // The app's tree-shaken ECharts (lib/echarts-setup.ts) draws every chart kind
-// the backend builds (visuals pass 3). Each option is the backend's own,
+// the backend builds (visuals passes 3 and 4). Each option is the backend's own,
 // kept in test-support/chart-kinds.json (backend/tests/test_visuals_kinds.py
 // fails if the drawing drifts from that file). ECharts skips a series whose
 // chart type was never registered and draws the rest without a word (checked
@@ -30,19 +30,24 @@ function draw(fixture: Fixture): string {
 
 describe('every chart kind draws with the app\'s registered ECharts parts', () => {
   it('has a fixture for each drawn kind', () => {
-    expect(Object.keys(fixtures).sort()).toEqual(['area', 'bar', 'column', 'donut', 'histogram', 'line', 'scatter', 'stacked_bar_100', 'treemap']);
+    expect(Object.keys(fixtures).sort()).toEqual(['area', 'bar', 'column', 'donut', 'histogram', 'line', 'sankey', 'scatter', 'stacked_bar_100', 'treemap']);
   });
 
   it.each(Object.keys(kinds))('draws a %s with its title, its labels and its source line', kind => {
     const svg = draw(fixtures[kind]);
     expect(svg.startsWith('<svg')).toBe(true);
-    const text = svg.replace(/&#36;/g, '$');
+    const text = svg.replace(/&#36;/g, '$').replace(/&#39;/g, "'");
     const title = (fixtures[kind].option as {title: {text: string}[]}).title;
     expect(text).toContain(title[0].text);
     expect(text).toContain('Source: ');
     // A part, a point or a bin is named on the chart, not only in a key.
-    const named = {line: '$52K', area: '$52K', column: '$52K', histogram: '$500K', scatter: 'Meridian Holdings Ltd'}[kind] ?? 'Alaric Voss';
+    const named = {line: '$52K', area: '$52K', column: '$52K', histogram: '$500K', scatter: 'Meridian Holdings Ltd',
+      sankey: 'Bellcastle Trading Group'}[kind] ?? 'Alaric Voss';
     expect(text).toContain(named);
+  });
+
+  it('writes a flow\'s amount on its band', () => {
+    expect(draw(fixtures.sankey).replace(/&#36;/g, '$')).toContain('$2.4M · 2 payments');
   });
 
   it('writes the donut\'s total in its centre and keeps the 100% bar to one bar', () => {
