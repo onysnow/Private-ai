@@ -66,6 +66,9 @@ class DataRow:
     longitude: float | None = None
     across: str | None = None        # a "grid" row: its column (an evidence grade) ...
     down: str | None = None          # ... and its row (an agreement grade)
+    # A "places" row: the dated events at the place, each an "events" row,
+    # earliest first (for the map with its timeline beside it).
+    events: list[DataRow] | None = None
 
     def as_dict(self) -> dict[str, Any]:
         out: dict[str, Any] = {"label": self.label, "value": self.value, "record_refs": [r.as_dict() for r in self.record_refs],
@@ -86,6 +89,8 @@ class DataRow:
         if self.latitude is not None and self.longitude is not None:
             # And only places rows.
             out["latitude"], out["longitude"] = self.latitude, self.longitude
+            if self.events is not None:
+                out["events"] = [event.as_dict() for event in self.events]
         if self.across is not None and self.down is not None:
             # And only grid rows.
             out["across"], out["down"] = self.across, self.down
@@ -126,23 +131,7 @@ class VisualData:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> VisualData:
-        rows = [
-            DataRow(label=str(r.get("label", "")), value=float(r.get("value", 0)),
-                    record_refs=[RecordRef(str(ref["record_type"]), str(ref["record_id"])) for ref in (r.get("record_refs") or [])
-                                 if isinstance(ref, dict) and ref.get("record_type") and ref.get("record_id")],
-                    record_count=int(r.get("record_count", 0)), key=str(r.get("key", "")),
-                    x=float(r["x"]) if isinstance(r.get("x"), (int, float)) and not isinstance(r.get("x"), bool) else None,
-                    source=str(r["source"]) if isinstance(r.get("source"), str) and isinstance(r.get("target"), str) else None,
-                    target=str(r["target"]) if isinstance(r.get("source"), str) and isinstance(r.get("target"), str) else None,
-                    start=str(r["start"]) if isinstance(r.get("start"), str) else None,
-                    end=str(r["end"]) if isinstance(r.get("start"), str) and isinstance(r.get("end"), str) else None,
-                    status=str(r["status"]) if isinstance(r.get("start"), str) and isinstance(r.get("status"), str) else None,
-                    grade=str(r["grade"]) if isinstance(r.get("start"), str) and isinstance(r.get("grade"), str) else None,
-                    latitude=_coordinate(r, "latitude"), longitude=_coordinate(r, "longitude"),
-                    across=str(r["across"]) if isinstance(r.get("across"), str) and isinstance(r.get("down"), str) else None,
-                    down=str(r["down"]) if isinstance(r.get("across"), str) and isinstance(r.get("down"), str) else None)
-            for r in (data.get("rows") or []) if isinstance(r, dict)
-        ]
+        rows = [_row_from_dict(r) for r in (data.get("rows") or []) if isinstance(r, dict)]
         labels = data.get("measure_labels")
         return cls(
             investigation_id=str(data.get("investigation_id", "")), query=str(data.get("query", "")),
@@ -161,6 +150,27 @@ class VisualData:
     @property
     def catalog_entry(self) -> QuerySpec:
         return QUERY_CATALOG[self.query]
+
+
+def _row_from_dict(r: dict[str, Any]) -> DataRow:
+    """One stored row, keeping only the fields its kind of row carries."""
+    row = DataRow(label=str(r.get("label", "")), value=float(r.get("value", 0)),
+                  record_refs=[RecordRef(str(ref["record_type"]), str(ref["record_id"])) for ref in (r.get("record_refs") or [])
+                               if isinstance(ref, dict) and ref.get("record_type") and ref.get("record_id")],
+                  record_count=int(r.get("record_count", 0)), key=str(r.get("key", "")),
+                  x=float(r["x"]) if isinstance(r.get("x"), (int, float)) and not isinstance(r.get("x"), bool) else None,
+                  source=str(r["source"]) if isinstance(r.get("source"), str) and isinstance(r.get("target"), str) else None,
+                  target=str(r["target"]) if isinstance(r.get("source"), str) and isinstance(r.get("target"), str) else None,
+                  start=str(r["start"]) if isinstance(r.get("start"), str) else None,
+                  end=str(r["end"]) if isinstance(r.get("start"), str) and isinstance(r.get("end"), str) else None,
+                  status=str(r["status"]) if isinstance(r.get("start"), str) and isinstance(r.get("status"), str) else None,
+                  grade=str(r["grade"]) if isinstance(r.get("start"), str) and isinstance(r.get("grade"), str) else None,
+                  latitude=_coordinate(r, "latitude"), longitude=_coordinate(r, "longitude"),
+                  across=str(r["across"]) if isinstance(r.get("across"), str) and isinstance(r.get("down"), str) else None,
+                  down=str(r["down"]) if isinstance(r.get("across"), str) and isinstance(r.get("down"), str) else None)
+    if row.latitude is not None and isinstance(r.get("events"), list):
+        row.events = [_row_from_dict(e) for e in r["events"] if isinstance(e, dict) and isinstance(e.get("start"), str)]
+    return row
 
 
 def _coordinate(row: dict[str, Any], name: str) -> float | None:
@@ -494,6 +504,33 @@ def event_span(start: str | None, end: str | None) -> tuple[date, date, bool] | 
     return first[0], last[1], first[2] == "day" and last[2] == "day"
 
 
+def _event_rows(db: Session, kept: list[tuple[date, date, dict]]) -> list[DataRow]:
+    """One "events" row per timeline event, in date order: the days it
+    covers, its verification status and grade, and the records behind it."""
+    # A category axis joins rows of the same name, so two events with the same
+    # title are told apart by their date, then by their id.
+    titles: dict[str, int] = defaultdict(int)
+    for _lo, _hi, event in kept:
+        titles[str(event.get("title") or "Untitled event").strip() or "Untitled event"] += 1
+    rows: list[DataRow] = []
+    used: set[str] = set()
+    for lo, hi, event in kept:
+        title = str(event.get("title") or "Untitled event").strip() or "Untitled event"
+        label = title if titles[title] == 1 else f"{title} ({event.get('date_start')})"
+        if label in used:
+            label = f"{label} [{str(event['id'])[:8]}]"
+        used.add(label)
+        refs = sorted(set(_event_refs(db, event)), key=lambda r: (r.record_type, r.record_id))
+        # One event is one record: its value is 1. The key orders the rows by
+        # date, then by title, so events on the same day keep one order.
+        rows.append(DataRow(label, 1.0, refs, 1, f"{lo.isoformat()}|{hi.isoformat()}|{label.lower()}|{event['id']}",
+                            start=str(event.get("date_start")), end=str(event["date_end"]) if event.get("date_end") else None,
+                            status=str(event.get("verification_status") or "asserted"),
+                            grade=str(event["grade"]) if event.get("grade") else None))
+    rows.sort(key=lambda r: (r.key, r.label))
+    return rows
+
+
 def events_in_order(db: Session, investigation_id: str, params: dict[str, str]) -> VisualData:
     """Every dated event on the investigation's timeline, one row each, in
     date order: its title, its date as recorded, its end when it has one, its
@@ -527,27 +564,7 @@ def events_in_order(db: Session, investigation_id: str, params: dict[str, str]) 
         if (window_from and hi < window_from[0]) or (window_to and lo > window_to[1]):
             continue
         kept.append((lo, hi, event))
-    # A category axis joins rows of the same name, so two events with the same
-    # title are told apart by their date, then by their id.
-    titles: dict[str, int] = defaultdict(int)
-    for _lo, _hi, event in kept:
-        titles[str(event.get("title") or "Untitled event").strip() or "Untitled event"] += 1
-    rows: list[DataRow] = []
-    used: set[str] = set()
-    for lo, hi, event in kept:
-        title = str(event.get("title") or "Untitled event").strip() or "Untitled event"
-        label = title if titles[title] == 1 else f"{title} ({event.get('date_start')})"
-        if label in used:
-            label = f"{label} [{str(event['id'])[:8]}]"
-        used.add(label)
-        refs = sorted(set(_event_refs(db, event)), key=lambda r: (r.record_type, r.record_id))
-        # One event is one record: its value is 1. The key orders the rows by
-        # date, then by title, so events on the same day keep one order.
-        rows.append(DataRow(label, 1.0, refs, 1, f"{lo.isoformat()}|{hi.isoformat()}|{label.lower()}|{event['id']}",
-                            start=str(event.get("date_start")), end=str(event["date_end"]) if event.get("date_end") else None,
-                            status=str(event.get("verification_status") or "asserted"),
-                            grade=str(event["grade"]) if event.get("grade") else None))
-    rows.sort(key=lambda r: (r.key, r.label))
+    rows = _event_rows(db, kept)
     return VisualData(
         investigation_id=investigation_id, query="events_in_order", params=params,
         unit="events", unit_kind="count", series_kind="events", record_noun="events",
@@ -555,15 +572,31 @@ def events_in_order(db: Session, investigation_id: str, params: dict[str, str]) 
     )
 
 
+def _place_event_rows(db: Session, place: dict[str, Any], timeline: dict[str, dict]) -> list[DataRow]:
+    """The dated events at one place (app/services/places.py: an event about
+    the place's record, or about a relationship linking something to it), as
+    "events" rows."""
+    kept: list[tuple[date, date, dict]] = []
+    for at in place.get("events") or []:
+        event = timeline.get(str(at["id"]))
+        span = event_span(event.get("date_start"), event.get("date_end")) if event else None
+        if event is not None and span is not None and span[1] >= span[0]:
+            kept.append((span[0], span[1], event))
+    return _event_rows(db, kept)
+
+
 def places_on_map(db: Session, investigation_id: str, params: dict[str, str]) -> VisualData:
     """Every record with a latitude and a longitude, one row each, where its
     record puts it (app/services/places.py: nothing is looked up). A place is
     one record, cited as itself; the records linked to it are context, not
     the source of where it is. Records whose coordinates cannot be used are
-    listed under ``omitted`` with why."""
+    listed under ``omitted`` with why. Each place carries the dated events at
+    it, each cited by its own records, for the map with its timeline."""
     from app.services.places import investigation_places
+    from app.services.timeline import investigation_timeline
 
     found = investigation_places(db, investigation_id)
+    timeline = {str(event["id"]): event for event in investigation_timeline(db, investigation_id)["events"]} if found["places"] else {}
     # Two places of one name are told apart by their record id, as each is
     # named on the map and checked by its name.
     names: dict[str, int] = defaultdict(int)
@@ -571,7 +604,7 @@ def places_on_map(db: Session, investigation_id: str, params: dict[str, str]) ->
         names[place["caption"]] += 1
     rows = [DataRow(place["caption"] if names[place["caption"]] == 1 else f"{place['caption']} [{place['entity_id'][:8]}]",
                     1.0, [RecordRef("entity", place["entity_id"])], 1, f"{place['caption'].lower()}|{place['entity_id']}",
-                    latitude=place["latitude"], longitude=place["longitude"])
+                    latitude=place["latitude"], longitude=place["longitude"], events=_place_event_rows(db, place, timeline))
             for place in found["places"]]
     rows.sort(key=lambda r: r.key)
     omitted = [{"reason": "coordinates not usable", "record_type": "entity", "record_id": o["entity_id"], "detail": f"{o['caption']}: {o['reason']}"}

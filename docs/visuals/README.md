@@ -585,6 +585,38 @@ ADR-0005 line 18 holds the decisions and the numbers behind them.
   The dates are native date fields rather than ECharts' slider: they work
   from the keyboard (WCAG 2.1.1), and the slider's handles did not move on
   a chart of custom series in ECharts 6.1 (checked in Chromium).
+- **The map with its timeline, on a page** (the design doc's export for the
+  map linked to a timeline: "two pictures side by side"). The preset "Map
+  with its timeline" (option `with_timeline`) draws the map on the left and,
+  on the right, a timeline of the dated events at its places
+  (`echarts._beside_timeline`): one row per event at a place, named in two
+  lines (the event, then its place), its date and status written beside its
+  mark as on any timeline; a link between two places is drawn at each. The
+  timeline takes 60% of the width (`BESIDE_SHARE`): it writes text on both
+  sides of its plot, while the map needs room only for its places (at half
+  of 960 px the dates left no plot and ECharts drew the axis backwards; seen
+  with the render service). Each place row of `places_on_map` carries its
+  events, each cited by its own records. The checker reads the timeline back
+  as any timeline (its problems say "the timeline beside the map"). The
+  render service draws each picture its own way and
+  `render_client.render_pair_png` places them on one page; the app's
+  preview splits the same way. A deck holds that picture, or the places and
+  the events at them as two native tables side by side; a brief the
+  picture, then the places and the events (event, place, when, status),
+  each cited. A map with no dated event at its places is refused the preset
+  in plain words. Tests: `backend/tests/test_visuals_map_timeline.py`,
+  `frontend/tests/test-chart-map.test.tsx`.
+- **Rule 14 across, for every timeline.** The rows' names on the left and
+  the dates written on the right must leave the time axis room for its
+  first and last dates (`TIMELINE_PLOT_MIN`, two "Sep 2024" labels and
+  their gaps); a timeline drawn too small for that is refused rather than
+  drawn backwards.
+- **Every name inside the map.** A place's name runs right of its dot, so
+  the view is the largest at which each place's dot and name end inside
+  the padding (`render/map.mjs` `fitView`, `nameRoom`: 0.6 em a character,
+  an average for Noto Sans); the app computes the same view
+  (`frontend/lib/basemap-style.ts` `placesView`) and a test holds the two
+  to the same numbers. Before, a name at the right edge was cut short.
 - Still to come: shaded maps (rule 17).
 
 ## Pass 6: the claim-strength grid

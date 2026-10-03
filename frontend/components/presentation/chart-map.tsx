@@ -17,7 +17,7 @@ import type {ReactElement} from 'react';
 
 import {Chart} from '../charts/chart';
 import {ensureBasemapProtocol, drawDotsOnDemand} from '../places-map';
-import {PLACE_RADIUS, basemapStyle, dotName, placesBounds} from '../../lib/basemap-style';
+import {PLACE_RADIUS, basemapStyle, dotName, placesView} from '../../lib/basemap-style';
 import type {PlaceMarks} from '../../lib/basemap-style';
 import {getBasemapStatusOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {BasemapStatusOut} from '../../lib/generated/types.gen';
@@ -25,13 +25,6 @@ import type {BasemapStatusOut} from '../../lib/generated/types.gen';
 /** One place as the option carries it. */
 export type MapPlace = {name: string; longitude: number; latitude: number; radius?: number; label?: {text?: string; fontWeight?: string}};
 export type MapOption = {places: MapPlace[]; top: number; bottom: number};
-
-// The view the render service picks (render/map.mjs fitView): the places
-// with 60 px to spare, never more than two zoom levels past the base map's
-// own, and a city-scale view for a single place.
-const FIT_PADDING = 60;
-const MAX_OVERZOOM = 2;
-const ONE_PLACE_ZOOM = 8;
 
 /** The option's places as the base map style's marks. */
 export function chartMarks(places: MapPlace[]): PlaceMarks {
@@ -49,28 +42,52 @@ export function mapOf(option: unknown): MapOption | null {
   return map as MapOption;
 }
 
-function PlacesArea({status, places}: {status: BasemapStatusOut; places: MapPlace[]}): ReactElement {
+function PlacesArea({status, places, width, height}: {status: BasemapStatusOut; places: MapPlace[]; width: number; height: number}): ReactElement {
   const container = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (!container.current || !places.length) return;
     ensureBasemapProtocol();
-    const limit = (status.max_zoom ?? 6) + MAX_OVERZOOM;
-    const bounds = placesBounds(places);
-    const one = bounds !== null && bounds[0] === bounds[2] && bounds[1] === bounds[3];
+    // The view the render service picks for the export (render/map.mjs fitView), so the two show the same.
+    const view = placesView(places.map(p => ({longitude: p.longitude, latitude: p.latitude, name: p.label?.text || p.name,
+      picked: p.label?.fontWeight === 'bold'})), width, height, status.max_zoom ?? 6);
     const made = new MapLibreMap({
       container: container.current, style: basemapStyle(status, chartMarks(places), {everyName: true}),
-      ...(one || !bounds ? {center: [places[0].longitude, places[0].latitude], zoom: Math.min(ONE_PLACE_ZOOM, limit)}
-        : {bounds, fitBoundsOptions: {padding: FIT_PADDING, maxZoom: limit}}),
-      interactive: false, attributionControl: false,
+      center: view.center, zoom: view.zoom, interactive: false, attributionControl: false,
     });
     drawDotsOnDemand(made);
     return () => { made.remove(); };
-  }, [status, places]);
+  }, [status, places, width, height]);
   return <div ref={container} style={{position: 'absolute', inset: 0}} data-testid="chart-map-area"/>;
 }
 
-/** The map chart at its design size: the frame, and the places in the area the option gives them. */
+// The timeline's share of the width (backend app/visuals/echarts.py BESIDE_SHARE):
+// it writes text on both sides of its plot; the map needs room only for its places.
+export const BESIDE_SHARE = 0.6;
+
+/** The timeline drawn beside a map (the "Map with its timeline" preset), or null. */
+export function besideOf(option: unknown): EChartsOption | null {
+  const beside = (option as {beside?: unknown} | null)?.beside;
+  return beside && typeof beside === 'object' ? beside as EChartsOption : null;
+}
+
+/** The map chart at its design size: the frame, and the places in the area
+ * the option gives them. With its timeline, the map takes the left 40% and
+ * the timeline the rest, as the export places the two pictures
+ * (backend/app/visuals/render_client.py, render_pair_png). */
 export function ChartMap({option, width, height, ariaLabel}: {option: Record<string, unknown>; width: number; height: number; ariaLabel: string}): ReactElement {
+  const beside = besideOf(option);
+  if (!beside) return <MapPicture option={option} width={width} height={height} ariaLabel={ariaLabel}/>;
+  const right = Math.round(width * BESIDE_SHARE);
+  const own = Object.fromEntries(Object.entries(option).filter(([key]) => key !== 'beside'));
+  return <div style={{display: 'flex', width, height}} data-testid="chart-map-with-timeline">
+    <MapPicture option={own} width={width - right} height={height} ariaLabel={ariaLabel}/>
+    <div style={{width: right, height}}>
+      <Chart option={beside} height={height} ariaLabel="Timeline of the dated events at the places on the map, each naming its place" theme={null}/>
+    </div>
+  </div>;
+}
+
+function MapPicture({option, width, height, ariaLabel}: {option: Record<string, unknown>; width: number; height: number; ariaLabel: string}): ReactElement {
   const map = mapOf(option);
   const frame = useMemo(() => Object.fromEntries(Object.entries(option).filter(([key]) => key !== 'map')) as EChartsOption, [option]);
   const statusQuery = useQuery(getBasemapStatusOptions());
@@ -79,7 +96,7 @@ export function ChartMap({option, width, height, ariaLabel}: {option: Record<str
   return <div style={{position: 'relative', width, height}}>
     <Chart option={frame} height={height} ariaLabel={ariaLabel} theme={null}/>
     {map && <div style={{position: 'absolute', left: 0, right: 0, top: map.top, bottom: map.bottom}}>
-      {status?.available ? <PlacesArea status={status} places={places}/>
+      {status?.available ? <PlacesArea status={status} places={places} width={width} height={height - map.top - map.bottom}/>
         : status && <p data-testid="chart-map-no-basemap" style={{margin: 0, padding: 16, fontSize: 13}}>
           No base map is installed here, so the places are listed in the data table only. Install it once with the compose
           profile <code>maps</code> (see DEPLOYMENT.md).</p>}

@@ -296,13 +296,23 @@ export function SlideChart({visual, region}: {visual: ChartVisual, region: Regio
     data-drawing={drawing ? (drawing.note ? (listed ? listed.name : 'bars') : 'slide') : 'design'}>
     {drawing?.note && <div style={{fontFamily: sans, fontSize: pt(11), fontStyle: 'italic', color: c('alert')}}>{drawing.note}</div>}
     {shown ? <div style={{flex: 1, minHeight: 0}}><ScaledChart visual={shown} fill/></div> : null}
-    {listed && <table style={{fontFamily: sans, fontSize: pt(11), color: c('text'), borderCollapse: 'collapse', marginTop: pt(6)}}>
+    {listed && <div style={{display: 'flex', gap: pt(14), alignItems: 'flex-start'}}>
+    <table style={{fontFamily: sans, fontSize: pt(11), color: c('text'), borderCollapse: 'collapse', marginTop: pt(6), flex: 1}}>
       <thead><tr>{listed.columns.map(([heading]) => <th key={heading} scope="col" style={{textAlign: 'left', paddingRight: pt(10)}}>{heading}</th>)}</tr></thead>
       <tbody>{visual.text.data_table.rows.map(r => <tr key={r.label}>
         {listed.columns.map(([heading, cell]) => <td key={heading}
           style={heading === 'Status' ? {color: c('muted')} : {paddingRight: pt(10)}}>{cell(r)}</td>)}
       </tr>)}</tbody>
+    </table>
+    {visual.text.data_table.events && <table data-testid="slide-chart-events"
+      style={{fontFamily: sans, fontSize: pt(11), color: c('text'), borderCollapse: 'collapse', marginTop: pt(6), flex: 1}}>
+      {/* A map with its timeline lists its events beside its places, as the export's second table does. */}
+      <thead><tr>{['Event', 'Place', 'When'].map(heading => <th key={heading} scope="col" style={{textAlign: 'left', paddingRight: pt(10)}}>{heading}</th>)}</tr></thead>
+      <tbody>{visual.text.data_table.events.rows.map(r => <tr key={r.label}>
+        <td style={{paddingRight: pt(10)}}>{r.label}</td><td style={{paddingRight: pt(10)}}>{r.place}</td><td>{r.formatted}</td>
+      </tr>)}</tbody>
     </table>}
+    </div>}
   </div>;
 }
 

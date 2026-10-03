@@ -473,12 +473,16 @@ TABLE_STAND_INS: dict[ChartKind, tuple[tuple[str, str, float], ...]] = {
 }
 
 
-def stand_in(kind: ChartKind) -> str:
+# A map with its timeline beside it lists its events beside its places.
+BESIDE_STAND_IN: tuple[tuple[str, str, float], ...] = (("Event", "label", 0.4), ("Place", "place", 0.3), ("When", "formatted", 0.3))
+
+
+def stand_in(kind: ChartKind, *, with_timeline: bool = False) -> str:
     """What stands in for a kind's picture when there is none."""
     if kind == ChartKind.timeline:
         return "the events are listed instead"
     if kind == ChartKind.map:
-        return "the places are listed instead"
+        return "the places and the events at them are listed instead" if with_timeline else "the places are listed instead"
     if kind == ChartKind.heatmap:
         return "the cells are listed instead"
     return "the same parts are shown as bars"
@@ -496,7 +500,8 @@ def slide_picture(visual: dict, theme: Theme, width_in: float, height_in: float)
         label = KIND_LABELS.get(sized.spec.kind, sized.spec.kind.value)
         first = sized.report.errors[0] if sized.report and sized.report.errors else None
         reason = f"rule {first.rule}: {first.message.split(';')[0]}" if first else (sized.problem or "it cannot be drawn")
-        return sized, f"{label} not drawn at this size ({reason}). {stand_in(sized.spec.kind)[0].upper()}{stand_in(sized.spec.kind)[1:]}."
+        instead = stand_in(sized.spec.kind, with_timeline=bool(sized.built and sized.built.beside_rows))
+        return sized, f"{label} not drawn at this size ({reason}). {instead[0].upper()}{instead[1:]}."
     return sized, None
 
 
@@ -1278,17 +1283,26 @@ class _DeckRenderer:
         (TABLE_STAND_INS: a timeline's events in date order with when and how
         far each is verified; a map's places with where each is), under a
         line that says why. Bars would draw nothing true here: every event
-        and every place counts one."""
-        from pptx.util import Pt
+        and every place counts one. A map with its timeline lists its events
+        in a second table beside the places, as its pictures stand side by side."""
         built = checked.built
         assert built is not None
-        columns = TABLE_STAND_INS[built.kind]
         lines = max(1, math.ceil(block_width(note, 10) * TEXT_SLACK / (w * 72)))
         note_h = lines * 10 * 1.2 / 72 + 0.12
         self.text(slide, x, y, w, note_h, note, size=10, color=self.t.alert, italic=True, line_spacing=1.05)
-        table_rows = built.data_table.get("rows") or []
-        frame = slide.shapes.add_table(len(table_rows) + 1, len(columns), self.Inches(x), self.Inches(y + note_h), self.Inches(w),
-                                       self.Inches(min(h - note_h, 0.32 * (len(table_rows) + 1))))
+        events = (built.data_table.get("events") or {}).get("rows") or [] if built.beside_rows else []
+        gap = 0.2 if events else 0.0
+        width = (w - gap) / 2 if events else w
+        frame = self._table(slide, x, y + note_h, width, h - note_h, TABLE_STAND_INS[built.kind], built.data_table.get("rows") or [])
+        if events:
+            self._table(slide, x + width + gap, y + note_h, width, h - note_h, BESIDE_STAND_IN, events)
+        return frame
+
+    def _table(self, slide: Any, x: float, y: float, w: float, h: float, columns: tuple[tuple[str, str, float], ...],
+               table_rows: list[dict]) -> Any:
+        from pptx.util import Pt
+        frame = slide.shapes.add_table(len(table_rows) + 1, len(columns), self.Inches(x), self.Inches(y), self.Inches(w),
+                                       self.Inches(min(h, 0.32 * (len(table_rows) + 1))))
         table = frame.table
         for column, (_heading, _key, share) in zip(table.columns, columns):
             column.width = self.Inches(w * share)
@@ -1497,7 +1511,7 @@ class _DeckRenderer:
         design_w, design_h = picture_size(w, h)
         sized, note = slide_picture(visual, self.t, w, h)
         label = KIND_LABELS.get(sized.spec.kind, sized.spec.kind.value)
-        instead = stand_in(sized.spec.kind)
+        instead = stand_in(sized.spec.kind, with_timeline=bool(sized.built and sized.built.beside_rows))
         if note is not None or sized.built is None:
             return note or f"{label} cannot be drawn. {instead[0].upper()}{instead[1:]}."
         try:

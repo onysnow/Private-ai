@@ -441,23 +441,29 @@ def _render_data_table(docx: Any, built: Any, data: Any, citation_index: dict[tu
     _set_widths(table, widths)
 
 
-def _render_events_table(docx: Any, rows: list[Any], citation_index: dict[tuple[str, str], int]) -> None:
+def _render_events_table(docx: Any, rows: list[Any], citation_index: dict[tuple[str, str], int],
+                         place_of: dict[str, str] | None = None) -> None:
     """A timeline's events, in date order, when the chart itself cannot be
-    drawn: the event with its records, when, and how far it is verified."""
-    from app.visuals.echarts import status_words, when_text
+    drawn: the event with its records, when, and how far it is verified.
+    Beside a map (`place_of`), each event's place too."""
+    from app.visuals.echarts import event_title, status_words, when_text
 
-    table = docx.add_table(rows=0, cols=3)
+    table = docx.add_table(rows=0, cols=4 if place_of else 3)
     _row_rules(table)
     for row in rows:
         cells = table.add_row().cells
         p = cells[0].paragraphs[0]
-        _set_run(p.add_run(row.label), size=9.5, color=DOCX_INK, font=DOCX_SANS)
+        _set_run(p.add_run(event_title(row.label)), size=9.5, color=DOCX_INK, font=DOCX_SANS)
         marker = _refs_marker([r.as_dict() for r in row.record_refs], citation_index)
         if marker:
             _set_run(p.add_run(" " + marker), size=8, color=DOCX_BRASS, font=DOCX_SANS, superscript=True)
-        _set_run(cells[1].paragraphs[0].add_run(when_text(row)), size=9.5, color=DOCX_INK, font=DOCX_SANS, bold=True)
-        _set_run(cells[2].paragraphs[0].add_run(status_words(row)), size=9.5, color=DOCX_TAUPE, font=DOCX_SANS)
-    _set_widths(table, [3.4, 2.1, 1.0])
+        rest = cells[1:]
+        if place_of:
+            _set_run(rest[0].paragraphs[0].add_run(place_of.get(row.label, "")), size=9.5, color=DOCX_INK, font=DOCX_SANS)
+            rest = rest[1:]
+        _set_run(rest[0].paragraphs[0].add_run(when_text(row)), size=9.5, color=DOCX_INK, font=DOCX_SANS, bold=True)
+        _set_run(rest[1].paragraphs[0].add_run(status_words(row)), size=9.5, color=DOCX_TAUPE, font=DOCX_SANS)
+    _set_widths(table, [2.4, 1.6, 1.6, 0.9] if place_of else [3.4, 2.1, 1.0])
 
 
 def _render_places_table(docx: Any, rows: list[Any], citation_index: dict[tuple[str, str], int]) -> None:
@@ -476,6 +482,14 @@ def _render_places_table(docx: Any, rows: list[Any], citation_index: dict[tuple[
             _set_run(p.add_run(" " + marker), size=8, color=DOCX_BRASS, font=DOCX_SANS, superscript=True)
         _set_run(cells[1].paragraphs[0].add_run(coordinates_text(row)), size=9.5, color=DOCX_INK, font=DOCX_SANS, bold=True)
     _set_widths(table, [4.0, 2.5])
+
+
+def _render_beside_events(docx: Any, built: Any, citation_index: dict[tuple[str, str], int]) -> None:
+    """A map with its timeline: the events beside the map, each with its
+    place, after the places (rule 13: every mark the pictures draw is listed)."""
+    if built.beside_rows:
+        _para(docx, space_after=2)
+        _render_events_table(docx, built.beside_rows, citation_index, built.place_of)
 
 
 def _render_chart(docx: Any, visual: dict, citation_index: dict[tuple[str, str], int]) -> None:
@@ -533,6 +547,7 @@ def _render_chart(docx: Any, visual: dict, citation_index: dict[tuple[str, str],
         # Word's Alt Text field (wp:docPr/@descr), which screen readers announce.
         picture._inline.docPr.set("descr", built.alt_text)
         _render_data_table(docx, built, data, citation_index)
+        _render_beside_events(docx, built, citation_index)
         return
     heading()
     warn = _para(docx, space_after=4)
@@ -543,6 +558,7 @@ def _render_chart(docx: Any, visual: dict, citation_index: dict[tuple[str, str],
         _render_bar_table(docx, chart_bar_items(built.rows, chart_row_labels(data, built.rows)), unit, citation_index)
     else:
         _render_data_table(docx, built, data, citation_index)
+        _render_beside_events(docx, built, citation_index)
     source = _para(docx, space_before=2, space_after=4)
     _set_run(source.add_run(built.source_line), size=8.5, color=DOCX_TAUPE, font=DOCX_SANS)
 

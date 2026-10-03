@@ -63,7 +63,8 @@ as rich text, never HTML, because labels come from the records.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from collections import defaultdict
+from dataclasses import dataclass, field, replace
 from datetime import date, datetime, timezone
 from decimal import Decimal
 from typing import Any
@@ -132,6 +133,7 @@ class DrawOptions:
     binning: str = DEFAULT_BINNING  # histogram: the rule that sets the number of bins
     label_points: str = "auto"      # scatter: "auto" (every point when few, else outliers) | "outliers"
     stages: bool = False            # sankey: the parties at each place in the chain of payments grouped into one stage
+    with_timeline: bool = False     # map: the dated events at the places drawn beside it, as a second picture
 
 
 @dataclass
@@ -153,6 +155,8 @@ class BuiltChart:
     bins: list[tuple[float, float]] = field(default_factory=list)  # histogram: each row's [start, end)
     labelled_points: list[str] = field(default_factory=list)   # scatter: the points named on the chart
     stages: dict[str, list[str]] = field(default_factory=dict)   # a staged flow: each stage and the parties in it
+    beside_rows: list[DataRow] = field(default_factory=list)     # a map with its timeline: the events beside it, as drawn ...
+    place_of: dict[str, str] = field(default_factory=dict)       # ... and the place each event is at, by its label
 
     def text(self) -> dict[str, Any]:
         """The words stored beside the chart in a draft (rule 13)."""
@@ -459,14 +463,14 @@ def _tooltip(theme: Theme) -> dict[str, Any]:
 
 
 def _axis_category(theme: Theme, rows: list[DataRow], highlighted: set[str], *, axis_line: bool = True, boundary_gap: bool = True,
-                   all_labels: bool = True) -> dict[str, Any]:
+                   all_labels: bool = True, label_width: int = _AXIS_LABEL_WIDTH) -> dict[str, Any]:
     axis: dict[str, Any] = {
         "type": "category",
         "data": [{"value": row.label, "textStyle": {"fontWeight": "bold" if row.label in highlighted else "normal"}} for row in rows],
         # The dark zero line (BBC style): the category axis sits at zero.
         "axisLine": {"show": axis_line, "lineStyle": {"color": _hex(theme.text), "width": 1.5}},
         "axisTick": {"show": False},
-        "axisLabel": {**_text_style(theme, MIN_FONT_PX), "width": _AXIS_LABEL_WIDTH, "overflow": "truncate"},
+        "axisLabel": {**_text_style(theme, MIN_FONT_PX), "width": label_width, "overflow": "truncate"},
         "splitLine": {"show": False},
     }
     if all_labels:
@@ -1065,6 +1069,12 @@ def _sankey(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
 TIMELINE_TOP, TIMELINE_BOTTOM = 96, 70     # px: the title block above, the source line and the date axis below
 TIMELINE_AXIS = 24                         # px the date labels take under the plot
 TIMELINE_ROW_MIN = MIN_FONT_PX + 6         # px: a row must be this tall to hold its name and its date (rule 14)
+TIMELINE_LINE_PX = MIN_FONT_PX + 4         # px: each further line of a row's name
+ECHARTS_LABEL_MARGIN = 8                   # px: ECharts' default gap between an axis and its labels (axisLabel.margin)
+# The time axis must hold at least its first and last dates side by side: two
+# "Sep 2024"-wide labels and a gap each (rule 14). Narrower, ECharts drew the
+# axis backwards (seen at half of 960 px with the render service).
+TIMELINE_PLOT_MIN = math.ceil(2 * (block_width("Sep 2024", MIN_FONT_PX) * TEXT_SLACK + LABEL_GAP))
 _STATUS_WORDS = {"reporter_reviewed": "reporter reviewed", "system_recorded": "system recorded"}
 # A map's marks, as the app and the render service draw them
 # (frontend/lib/basemap-style.ts, render/map.mjs): a dark brick red, 3.3:1
@@ -1148,7 +1158,28 @@ def timeline_row_room(rows: int, height: int) -> float:
     return (height - TIMELINE_TOP - TIMELINE_BOTTOM - TIMELINE_AXIS) / max(rows, 1)
 
 
-def _timeline(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
+def timeline_row_need(rows: list[DataRow]) -> int:
+    """The height a row needs for its name: TIMELINE_ROW_MIN for one line,
+    a line more for each further line (a row beside a map names its place)."""
+    lines = max((row.label.count("\n") + 1 for row in rows), default=1)
+    return TIMELINE_ROW_MIN + (lines - 1) * TIMELINE_LINE_PX
+
+
+def timeline_plot_room(option: dict[str, Any], width: int) -> float:
+    """The px the time axis gets across: the picture less the grid's sides,
+    the widest line of the rows' names (as far as the axis lets a name run)
+    and the axis label's margin. The dates beside the events are in the
+    grid's right side (_timeline)."""
+    grid = option.get("grid") or {}
+    axis = option.get("yAxis") or {}
+    label = axis.get("axisLabel") or {}
+    cap = float(label.get("width") or _AXIS_LABEL_WIDTH)
+    names = [str(item.get("value") if isinstance(item, dict) else item) for item in axis.get("data") or []]
+    widest = max((min(block_width(line, MIN_FONT_PX) * TEXT_SLACK, cap) for name in names for line in name.split("\n")), default=0.0)
+    return width - float(grid.get("left") or 0) - float(grid.get("right") or 0) - widest - ECHARTS_LABEL_MARGIN
+
+
+def _timeline(p: _Parts, frame: dict[str, Any], *, label_width: int = _AXIS_LABEL_WIDTH) -> dict[str, Any]:
     """timeline: one row per event, earliest at the top (the rows are given
     to the axis latest first, since a category axis runs upward; no axis is
     turned upside down, rule 7). A dot for a day, a line from start to end
@@ -1193,7 +1224,7 @@ def _timeline(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
     # A picked event is marked in bold beside its mark; its name on the axis
     # stays regular, since the axis cuts a long name to fit at the regular
     # weight and a bold one then runs off the picture's left edge.
-    y_axis = _axis_category(theme, list(reversed(rows)), set(), axis_line=False)
+    y_axis = _axis_category(theme, list(reversed(rows)), set(), axis_line=False, label_width=label_width)
     x_axis = {
         "type": "time", "min": int(lo - pad), "max": int(hi + pad),
         "axisLine": {"show": True, "lineStyle": {"color": _hex(theme.text), "width": 1.5}}, "axisTick": {"show": True},
@@ -1374,6 +1405,94 @@ def _subtitle(spec: VisualSpec, data: VisualData, kind: ChartKind) -> str:
     return f"{data.unit_kind.capitalize()}s in {unit}" if data.unit_kind == "amount" and unit else f"Number of {data.record_noun}"
 
 
+# The map with its timeline (the design doc's "map linked to a timeline":
+# Bellingcat's map of civilian harm in Ukraine filters by a timeline strip
+# under it; Forensic Architecture's TimeMap drives a map and a timeline from
+# one set of filters). On a page the two are pictures side by side: the map
+# on the left, and on the right the dated events at its places. Each row is
+# named in two lines, the event and its place, and the date and status are
+# written beside its mark as on any timeline. The timeline takes the larger
+# share of the width: it writes text on both sides of its plot, while the
+# map needs room only for its places (checked at 960 x 540 with the render
+# service: at half the width the dates beside the events left no plot).
+BESIDE_TITLE = "When: the dated events at these places"
+BESIDE_SHARE = 0.6
+BESIDE_LABEL_WIDTH = 160   # px: each line of a row's name, cut short beyond (the data table has it whole)
+
+
+def beside_width(width: int) -> int:
+    """The width of the timeline beside a map; the map takes the rest."""
+    return round(width * BESIDE_SHARE)
+
+
+def event_title(label: str) -> str:
+    """An event's own title, without the place a row beside a map adds under it."""
+    return label.split("\n", 1)[0]
+
+
+def place_events(rows: list[DataRow]) -> tuple[list[DataRow], dict[str, str]]:
+    """The dated events at the places, earliest first, each named with its
+    place on a second line, and the place of each by that name. An event at
+    two places (a link between them) is drawn at each; the same title twice
+    at one place is told apart by its date, then by a number."""
+    pairs = sorted(((event, place.label) for place in rows for event in place.events or []), key=lambda pair: (pair[0].key, pair[1]))
+    out: list[DataRow] = []
+    place_of: dict[str, str] = {}
+    for event, place in pairs:
+        label = f"{event.label}\n{place}"
+        if label in place_of:
+            label = f"{event.label} ({event.start})\n{place}"
+        base, n = label, 2
+        while label in place_of:
+            title, _, where = base.partition("\n")
+            label, n = f"{title} [{n}]\n{where}", n + 1
+        out.append(replace(event, label=label, events=None))
+        place_of[label] = place
+    return out, place_of
+
+
+def beside_highlight(events: list[DataRow], place_of: dict[str, str], places: set[str] | list[str]) -> set[str]:
+    """The events picked out beside a map: those at the places picked on it."""
+    return {row.label for row in events if place_of.get(row.label) in set(places)}
+
+
+def beside_source(events: list[DataRow]) -> str:
+    count = len(events)
+    return f"Source: {count} dated event{'s' if count != 1 else ''} at these places, from this investigation's timeline"
+
+
+def _beside_timeline(p: _Parts, events: list[DataRow], place_of: dict[str, str], width: int) -> dict[str, Any]:
+    """The timeline drawn beside a map, in its own frame, a picked place's
+    events picked out with it."""
+    theme = p.theme
+    highlighted = beside_highlight(events, place_of, p.highlighted)
+    spec = p.spec.model_copy(update={"title": BESIDE_TITLE, "subtitle": None, "highlight": sorted(highlighted)})
+    subtitle = "One row per event and its place, earliest at the top"
+    alt = f"Timeline beside the map: {len(events)} dated event{'s' if len(events) != 1 else ''} at these places."
+    frame = _frame(spec, theme, subtitle, beside_source(events), alt, width, colours=[mark_colour(theme)])
+    parts = _Parts(spec, p.data, theme, events, highlighted, p.draw, width, p.height)
+    return _timeline(parts, frame, label_width=BESIDE_LABEL_WIDTH)
+
+
+def _beside_words(words: dict[str, Any], events: list[DataRow], place_of: dict[str, str]) -> None:
+    """The map's words say what the timeline beside it shows, and its data
+    table lists every event with its place (rule 13)."""
+    first, last = events[0], events[-1]
+    count = len(events)
+    sentence = (f" Beside it, a timeline of {count} dated event{'s' if count != 1 else ''} at these places, from "
+                f"{when_text(first)} ({event_title(first.label)}, {place_of[first.label]}) to "
+                f"{when_text(last)} ({event_title(last.label)}, {place_of[last.label]}).")
+    words["alt_text"] += sentence
+    lines = " ".join(f"{event_title(row.label)}, {place_of[row.label]}: {timeline_text(row)}." for row in events)
+    words["description"] = f"{words['description']}{sentence} {lines}"
+    words["data_table"]["events"] = {
+        "columns": ["Event", "Place", "When", "Status", "Records"],
+        "rows": [{"label": event_title(row.label), "place": place_of[row.label], "formatted": when_text(row), "start": row.start,
+                  "status": status_words(row), **({"end": row.end} if row.end else {}), "record_count": row.record_count,
+                  "record_refs": [ref.as_dict() for ref in row.record_refs]} for row in events],
+    }
+
+
 def build_chart(spec: VisualSpec, data: VisualData, theme: Theme, *, width: int = DEFAULT_WIDTH, height: int = DEFAULT_HEIGHT,
                 draw: DrawOptions | None = None) -> BuiltChart:
     """The option and its words for one chart. Raises UnsupportedChartKind
@@ -1417,7 +1536,9 @@ def build_chart(spec: VisualSpec, data: VisualData, theme: Theme, *, width: int 
         unit = data.unit or spec.unit or ""
         subtitle = ("Money paid from stage to stage" + (f", band width by amount in {unit}" if unit else "")
                     + "; a stage groups the parties at the same place in the chain of payments")
-    frame = _frame(spec, theme, subtitle, source, words["alt_text"], width, colours=colours)
+    # A map with its timeline beside it is drawn on the left of the picture.
+    frame_width = width - beside_width(width) if kind == ChartKind.map and draw.with_timeline else width
+    frame = _frame(spec, theme, subtitle, source, words["alt_text"], frame_width, colours=colours)
     parts = _Parts(spec, data, theme, rows, highlighted, draw, width, height)
     if kind in (ChartKind.bar, ChartKind.column):
         option = _bars(parts, frame)
@@ -1437,15 +1558,26 @@ def build_chart(spec: VisualSpec, data: VisualData, theme: Theme, *, width: int 
         option = _timeline(parts, frame)
     elif kind == ChartKind.map:
         option = _map(parts, frame)
+        if draw.with_timeline:
+            beside_rows, place_of = place_events(rows)
+            if not beside_rows:
+                raise ChartDoesNotFit("no event on the timeline is dated at these places, so there is no timeline to put beside the map; "
+                                      "draw the map alone")
+            # Side by side (app/visuals/render_client.py joins them).
+            option["beside"] = _beside_timeline(parts, beside_rows, place_of, beside_width(width))
+            _beside_words(words, beside_rows, place_of)
     elif kind == ChartKind.heatmap:
         option = _heatmap(parts, frame)
     else:
         option = _scatter(parts, frame, labelled)
+    if "beside" not in option:
+        beside_rows, place_of = [], {}
     return BuiltChart(
         option=option, alt_text=words["alt_text"], description=words["description"], data_table=words["data_table"],
         source_line=source, rows=rows, highlighted_labels=sorted(highlighted),
         single_record_labels=[row.label for row in rows if row.record_count == 1], width=width, height=height,
         kind=kind, draw=draw, shares=shares, total=total, bins=bins, labelled_points=sorted(labelled), stages=stages,
+        beside_rows=beside_rows, place_of=place_of,
     )
 
 

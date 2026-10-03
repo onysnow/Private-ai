@@ -23,6 +23,48 @@ export const PLACE_RADIUS = 7;    // px
 export const PLACE_RING = 2;      // px of white around each dot
 export const PLACE_LABEL_PX = 13;
 export const PICKED_LABEL_PX = 15;   // a picked place's name: the base map's fonts have no bold face
+// A name runs to the right of its dot, NAME_OFFSET_EM off it and wrapped at
+// NAME_MAX_EM. A chart's view keeps every name inside the picture, as the
+// render service does (render/map.mjs nameRoom, fitView: 0.6 em a character,
+// an average for Noto Sans).
+export const NAME_OFFSET_EM = 0.9;
+export const NAME_MAX_EM = 14;
+export const NAME_EM_PER_CHAR = 0.6;
+export const TILE_SIZE = 512;      // MapLibre's tile size, px a world-width at zoom 0
+export const VIEW_PADDING = 60;    // px kept clear around a chart's places
+export const MAX_OVERZOOM = 2;     // zoom levels past the base map's own
+export const ONE_PLACE_ZOOM = 8;   // a single place's view
+
+/** The px a place's name takes to the right of its dot. */
+export function nameRoom(name: string, picked: boolean): number {
+  const size = picked ? PICKED_LABEL_PX : PLACE_LABEL_PX;
+  return Math.ceil((NAME_OFFSET_EM + Math.min(name.length * NAME_EM_PER_CHAR, NAME_MAX_EM)) * size);
+}
+
+const mercatorX = (lon: number): number => (lon + 180) / 360;
+const mercatorY = (lat: number): number => {
+  const s = Math.sin(Math.max(-85.0511287, Math.min(85.0511287, lat)) * Math.PI / 180);
+  return 0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI);
+};
+
+/** A chart map's view: every place with VIEW_PADDING px to spare and its
+ * name inside the picture, as render/map.mjs fitView picks it for the export. */
+export function placesView(places: {longitude: number; latitude: number; name: string; picked: boolean}[], width: number, height: number,
+  maxZoom: number): {center: [number, number]; zoom: number} {
+  const xs = places.map(p => mercatorX(p.longitude)), ys = places.map(p => mercatorY(p.latitude));
+  const x0 = Math.min(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const names = places.map(p => nameRoom(p.name, p.picked));
+  const across = width - 2 * VIEW_PADDING;
+  const limit = maxZoom + MAX_OVERZOOM;
+  const scales = xs.map((x, i) => (x > x0 ? Math.max(across - names[i], 0) / (x - x0) : Infinity));
+  scales.push(y1 > y0 ? (height - 2 * VIEW_PADDING) / (y1 - y0) : Infinity);
+  const fitted = Math.min(...scales);
+  const zoom = Number.isFinite(fitted) ? Math.max(0, Math.min(Math.log2(fitted / TILE_SIZE), limit)) : Math.min(ONE_PLACE_ZOOM, limit);
+  const scale = TILE_SIZE * 2 ** zoom;
+  const reach = Math.max(...xs.map((x, i) => (x - x0) * scale + names[i]));
+  const centreY = (y0 + y1) / 2;
+  return {center: [(x0 + reach / 2 / scale) * 360 - 180, Math.atan(Math.sinh(Math.PI * (1 - 2 * centreY))) * 180 / Math.PI], zoom};
+}
 
 /** A dot's image name, by its radius; places-map.tsx makes the image when MapLibre first asks for it. */
 export function dotName(radius: number): string {
@@ -116,8 +158,8 @@ export function basemapStyle(status: BasemapStatusOut, marks: PlaceMarks, {every
     // Every place is named beside its dot (rule 12: not by colour or position alone).
     {id: 'places-name', type: 'symbol', source: PLACES_SOURCE,
       layout: {'text-field': ['get', 'caption'], 'text-font': PLACE_LABEL_FONT,
-        'text-size': ['case', ['boolean', ['get', 'picked'], false], PICKED_LABEL_PX, PLACE_LABEL_PX], 'text-offset': [0.9, 0],
-        'text-anchor': 'left', 'text-max-width': 14, 'text-allow-overlap': everyName},
+        'text-size': ['case', ['boolean', ['get', 'picked'], false], PICKED_LABEL_PX, PLACE_LABEL_PX], 'text-offset': [NAME_OFFSET_EM, 0],
+        'text-anchor': 'left', 'text-max-width': NAME_MAX_EM, 'text-allow-overlap': everyName},
       paint: {'text-color': '#1F1B16', 'text-halo-color': '#FFFFFF', 'text-halo-width': 1.5}},
   ];
   return {

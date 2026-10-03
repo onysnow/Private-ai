@@ -290,6 +290,7 @@ CHART_OPTIONS: dict[str, dict[str, dict]] = {
     # would vanish into the grayscale base map).
     "map": {
         "highlight": {"type": "labels", "label": "Highlight places (drawn larger)"},
+        "with_timeline": {"type": "bool", "label": "Put the timeline of the events at the places beside the map", "kinds": ["map"]},
     },
     # A grid's cells sit where their grades meet and are shaded by their
     # counts; a picked cell is outlined and its count written bold.
@@ -347,6 +348,11 @@ CHART_PRESETS: dict[str, list[dict]] = {
     "map": [
         {"id": "map", "label": "Map", "description": "Each place where its record puts it, named beside its dot, on the self-hosted base map.",
          "kind": "map", "options": {}},
+        # The design doc's "map linked to a timeline": Bellingcat's map of
+        # civilian harm in Ukraine and Forensic Architecture's TimeMap show
+        # where and when together; on a page the two are pictures side by side.
+        {"id": "map_timeline", "label": "Map with its timeline", "description": "The map, and beside it the dated events at its places, "
+         "each event naming its place.", "kind": "map", "options": {"with_timeline": True}},
     ],
 }
 

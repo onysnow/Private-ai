@@ -26,6 +26,8 @@ const require = createRequire(import.meta.url);
 export const TILE_SIZE = 512;            // MapLibre's vector tile size, in px at zoom 0
 export const PIXEL_RATIO = 2;            // drawn at twice the size, for print
 export const FIT_PADDING = 60;           // px kept clear around the places
+export const NAME_PX = 13;               // a place's name, and a picked place's (the base map's fonts have no bold face)
+export const PICKED_NAME_PX = 15;
 export const MAX_OVERZOOM = 2;           // zoom levels past the base map's own, where its tiles are stretched
 export const ONE_PLACE_ZOOM = 8;         // the zoom for a single place (capped by the overzoom)
 // The same marks as the app (frontend/lib/basemap-style.ts): a dark brick
@@ -117,18 +119,45 @@ function mercatorY(lat) {
 function longitude(x) { return x * 360 - 180; }
 function latitude(y) { return Math.atan(Math.sinh(Math.PI * (1 - 2 * y))) * 180 / Math.PI; }
 
-/** The centre and zoom that show every place with FIT_PADDING px to spare. */
+// A place's name runs to the right of its dot ('text-anchor': 'left', 0.9 em
+// off it, wrapped at 14 em; mapStyle below). The view keeps every place's
+// name inside the picture as well as its dot (a name was cut at the edge of
+// a map drawn at 40% of 960 px). A name's width is estimated at 0.6 em a
+// character, an average for Noto Sans.
+export const NAME_EM_PER_CHAR = 0.6;
+export const NAME_MAX_EM = 14;
+export const NAME_OFFSET_EM = 0.9;
+
+/** The px a place's name takes to the right of its dot. */
+export function nameRoom(place) {
+  const size = place.picked ? PICKED_NAME_PX : NAME_PX;
+  const ems = Math.min(String(place.label ?? '').length * NAME_EM_PER_CHAR, NAME_MAX_EM);
+  return Math.ceil((NAME_OFFSET_EM + ems) * size);
+}
+
+/** The centre and zoom that show every place with FIT_PADDING px to spare
+ * and its name inside the picture. Across, a place sits as far right of the
+ * westernmost place as the scale puts it, and its name runs on from there:
+ * the scale is the largest at which every place's dot and name end
+ * FIT_PADDING short of the right edge, and the whole is centred. Up and
+ * down, the places alone fit within FIT_PADDING. The app computes the same
+ * view (frontend/lib/basemap-style.ts placesView). */
 export function fitView(places, width, height, maxZoom) {
   const xs = places.map(p => mercatorX(p.longitude));
   const ys = places.map(p => mercatorY(p.latitude));
   const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
-  const centre = [longitude((x0 + x1) / 2), latitude((y0 + y1) / 2)];
+  const names = places.map(nameRoom);
+  const across = width - 2 * FIT_PADDING;
   const limit = maxZoom + MAX_OVERZOOM;
-  if (x1 - x0 === 0 && y1 - y0 === 0) return {center: centre, zoom: Math.min(ONE_PLACE_ZOOM, limit)};
-  const fits = [x1 - x0 > 0 ? (width - 2 * FIT_PADDING) / ((x1 - x0) * TILE_SIZE) : Infinity,
-    y1 - y0 > 0 ? (height - 2 * FIT_PADDING) / ((y1 - y0) * TILE_SIZE) : Infinity];
-  const zoom = Math.log2(Math.min(...fits));
-  return {center: centre, zoom: Math.max(0, Math.min(zoom, limit))};
+  // The largest scale (px a world-width) at which each place's name ends inside, and the places fit up and down.
+  const scales = xs.map((x, i) => (x > x0 ? Math.max(across - names[i], 0) / (x - x0) : Infinity));
+  scales.push(y1 > y0 ? (height - 2 * FIT_PADDING) / (y1 - y0) : Infinity);
+  const fitted = Math.min(...scales);
+  const zoom = Number.isFinite(fitted) ? Math.max(0, Math.min(Math.log2(fitted / TILE_SIZE), limit)) : Math.min(ONE_PLACE_ZOOM, limit);
+  const scale = TILE_SIZE * 2 ** zoom;
+  // What is drawn across: from the westernmost dot to the furthest end of a name.
+  const reach = Math.max(...xs.map((x, i) => (x - x0) * scale + names[i]));
+  return {center: [longitude(x0 + reach / 2 / scale), latitude((y0 + y1) / 2)], zoom};
 }
 
 // --- the style --------------------------------------------------------------------
@@ -151,8 +180,8 @@ export function mapStyle(places, maxZoom) {
         layout: {'icon-image': ['get', 'dot'], 'icon-allow-overlap': true}},
       {id: 'places-name', type: 'symbol', source: 'places',
         // A picked place's name is larger: the base map's fonts have no bold face.
-        layout: {'text-field': ['get', 'label'], 'text-font': PLACE_LABEL_FONT, 'text-size': ['case', ['get', 'picked'], 15, 13], 'text-offset': [0.9, 0],
-          'text-anchor': 'left', 'text-max-width': 14, 'text-allow-overlap': true},
+        layout: {'text-field': ['get', 'label'], 'text-font': PLACE_LABEL_FONT, 'text-size': ['case', ['get', 'picked'], PICKED_NAME_PX, NAME_PX],
+          'text-offset': [NAME_OFFSET_EM, 0], 'text-anchor': 'left', 'text-max-width': NAME_MAX_EM, 'text-allow-overlap': true},
         paint: {'text-color': '#1F1B16', 'text-halo-color': '#FFFFFF', 'text-halo-width': 1.5}},
     ],
   };

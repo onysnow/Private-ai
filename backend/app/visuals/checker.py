@@ -71,7 +71,7 @@ from __future__ import annotations
 
 import math
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any
 
 from app.services.presentation_style import Theme, contrast_ratio
@@ -79,7 +79,8 @@ from app.visuals.data_service import DataRow, VisualData
 from app.visuals.echarts import (
     DEFAULT_HEIGHT, DEFAULT_WIDTH, GRAPHIC_CONTRAST, HOLLOW_SYMBOL, MIN_FONT_PX, SINGLE_RECORD_MARK, TIMELINE_ROW_MIN, TREEMAP_LABEL_PADDING,
     MAP_LABEL_PX, MAP_PLACE_COLOUR, BuiltChart, heatmap_axes, UnsupportedChartKind, build_chart, count_phrase, format_value, prepare_rows, timeline_marks,
-    timeline_row_room, timeline_text,
+    timeline_row_room, timeline_text, BESIDE_TITLE, beside_highlight, beside_width, timeline_plot_room, TIMELINE_PLOT_MIN,
+    timeline_row_need,
 )
 from app.visuals.layout import LABEL_GAP, block_width, treemap_rects, wrapped_lines
 from app.visuals.spec import (
@@ -466,7 +467,7 @@ class _Checker:
         found = {name: sorted(days) for name, days in drawn.items()}
         if found != expected:
             wrong = sorted(set(found) ^ set(expected) | {n for n in found if n in expected and found[n] != expected[n]})
-            self.error(0, f"the dates drawn do not match the events' records for: {', '.join(wrong)}")
+            self.error(0, f"the dates drawn do not match the events' records for: {', '.join(_row_name(name) for name in wrong)}")
 
     def _recount_bins(self) -> None:
         """Count every record into the drawn bins again, with plain
@@ -822,9 +823,9 @@ class _Checker:
             written = self.label_text()
             for row in self.rows:
                 if row.label not in named:
-                    self.error(12, f"the event '{row.label}' is not named on the timeline's axis")
+                    self.error(12, f"the event '{_row_name(row.label)}' is not named on the timeline's axis")
                 if written.get(row.label) != timeline_text(row):
-                    self.error(12, f"the date and status of '{row.label}' are not written beside it")
+                    self.error(12, f"the date and status of '{_row_name(row.label)}' are not written beside it")
         if kind == ChartKind.heatmap and self.needs_option(12):
             # The shade says "more" or "fewer"; the count written in each cell says how many.
             texts = self.label_text()
@@ -875,11 +876,17 @@ class _Checker:
             if small:
                 self.error(14, f"text of {', '.join(f'{s:g}px' for s in small)} is under the {MIN_FONT_PX}px minimum")
             if self.kind == ChartKind.timeline:
-                _width, height = self.picture_size()
+                width, height = self.picture_size()
                 room = timeline_row_room(len(self.rows), height)
-                if room < TIMELINE_ROW_MIN:
-                    self.error(14, f"{len(self.rows)} events leave each row {room:.0f}px, under the {TIMELINE_ROW_MIN}px its name and date need; "
+                need = timeline_row_need(self.rows)
+                if room < need:
+                    self.error(14, f"{len(self.rows)} events leave each row {room:.0f}px, under the {need}px its name and date need; "
                                    "narrow the timeline with from, to or status")
+                # The names on the left and the dates on the right leave the time axis what is between.
+                plot = timeline_plot_room(self.option or {}, width)
+                if plot < TIMELINE_PLOT_MIN:
+                    self.error(14, f"the events' names and the dates written beside them leave the time axis {max(plot, 0):.0f}px, "
+                                   f"under the {TIMELINE_PLOT_MIN}px it needs; give the chart more room or fewer words")
             crowded = self.crowded_values()
             if crowded:
                 if self.kind in (ChartKind.line, ChartKind.area):
@@ -974,6 +981,11 @@ class _Checker:
         self.passed(20)
 
 
+def _row_name(label: str) -> str:
+    """A row's name in a message: an event beside a map is named with its place."""
+    return label.replace("\n", " at ")
+
+
 def _number(value: Any) -> float | None:
     if isinstance(value, bool) or value is None:
         return None
@@ -1052,4 +1064,30 @@ def check_visual(spec: VisualSpec, data: VisualData, theme: Theme, built: BuiltC
             built = build_chart(spec, data, theme)
         except UnsupportedChartKind:
             built = None
-    return _Checker(spec, data, theme, built).run()
+    report = _Checker(spec, data, theme, built).run()
+    if built is not None and isinstance(built.option.get("beside"), dict):
+        _add_beside(report, _beside_report(spec, data, theme, built))
+    return report
+
+
+def _beside_report(spec: VisualSpec, data: VisualData, theme: Theme, built: BuiltChart) -> CheckReport:
+    """The timeline beside a map, checked as the timeline it is: its events,
+    each at the days its record holds and named with its place."""
+    events = replace(data, query="events_in_order", unit="events", unit_kind="count", series_kind="events", record_noun="events",
+                     rows=built.beside_rows, record_count=len(built.beside_rows), omitted=[])
+    picked = sorted(beside_highlight(built.beside_rows, built.place_of, spec.highlight))
+    beside_spec = spec.model_copy(update={"kind": ChartKind.timeline, "title": BESIDE_TITLE, "subtitle": None, "highlight": picked})
+    beside = BuiltChart(option=built.option["beside"], alt_text=built.alt_text, description=built.description,
+                        data_table=built.data_table.get("events") or {}, source_line=built.source_line, rows=built.beside_rows,
+                        width=beside_width(built.width), height=built.height, kind=ChartKind.timeline, draw=built.draw,
+                        place_of=built.place_of)
+    return _Checker(beside_spec, events, theme, beside).run()
+
+
+def _add_beside(report: CheckReport, beside: CheckReport) -> None:
+    """One report for the two pictures: the timeline's problems say which
+    picture they are in."""
+    report.errors.extend(CheckItem(e.rule, f"the timeline beside the map: {e.message}") for e in beside.errors)
+    report.warnings.extend(CheckItem(w.rule, f"the timeline beside the map: {w.message}") for w in beside.warnings)
+    report.checked_rules = sorted(set(report.checked_rules) | set(beside.checked_rules))
+    report.ok = not report.errors

@@ -41,6 +41,13 @@ export function asChart(v: JsonObject): ChartVisual | null {
       ...(typeof r.x_formatted === 'string' ? {x_formatted: r.x_formatted} : {}),
       ...(typeof r.latitude === 'number' && typeof r.longitude === 'number' ? {latitude: r.latitude, longitude: r.longitude} : {}),
       ...(typeof r.across === 'string' && typeof r.down === 'string' ? {across: r.across, down: r.down} : {})}));
+  // A map with its timeline beside it: the events, each with its place.
+  const eventsTable = isObj(table.events) && Array.isArray(table.events.columns) && Array.isArray(table.events.rows) ? table.events : null;
+  const events = eventsTable ? {columns: (eventsTable.columns as JsonValue[]).map(c => str(c)), rows: (eventsTable.rows as JsonValue[]).filter(isObj)
+    .filter(r => typeof r.label === 'string' && typeof r.place === 'string')
+    .map(r => ({label: r.label as string, place: r.place as string, formatted: str(r.formatted), status: str(r.status),
+      ...(typeof r.start === 'string' ? {start: r.start} : {}), ...(typeof r.end === 'string' ? {end: r.end} : {}),
+      record_count: typeof r.record_count === 'number' ? r.record_count : 0, record_refs: refs(r.record_refs)}))} : null;
   // What a deck slide shows for a kind PowerPoint cannot hold natively (the treemap).
   const drawing = isObj(v.slide_drawing) && typeof v.slide_drawing.width === 'number' && typeof v.slide_drawing.height === 'number'
     ? {option: isObj(v.slide_drawing.option) ? v.slide_drawing.option : null, width: v.slide_drawing.width, height: v.slide_drawing.height,
@@ -51,7 +58,7 @@ export function asChart(v: JsonObject): ChartVisual | null {
     ...(drawing ? {slide_drawing: drawing} : {}),
     width: typeof v.width === 'number' ? v.width : undefined, height: typeof v.height === 'number' ? v.height : undefined,
     text: {alt_text: str(text.alt_text), description: str(text.description), source_line: str(text.source_line),
-      data_table: {columns: table.columns.map(c => str(c)), rows: tableRows}},
+      data_table: {columns: table.columns.map(c => str(c)), rows: tableRows, ...(events ? {events} : {})}},
   };
 }
 

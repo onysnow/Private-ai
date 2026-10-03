@@ -6,7 +6,9 @@ A map (an option with "map": the places for MapLibre; ADR-0005, line 18) is
 drawn in two steps: the render service draws the places on the base map
 (POST /map, a PNG), and that picture goes into the chart's own frame (its
 title, unit and source line, as every chart picture carries them) as an
-ECharts image, drawn and converted like any chart.
+ECharts image, drawn and converted like any chart. A map with its timeline
+beside it (an option with "beside") is two pictures drawn that way, placed
+side by side on one page.
 
 Callers never let a missing render service fail an export. `render_svg`
 raises RenderUnavailable when the service cannot be reached or answers with
@@ -24,7 +26,7 @@ import base64
 import httpx
 
 from app.core.config import Settings, settings as default_settings
-from app.visuals.echarts import MAP_BOTTOM, MAP_TOP
+from app.visuals.echarts import MAP_BOTTOM, MAP_TOP, beside_width
 
 PNG_SCALE = 2.0   # twice the pixel size: crisp on a projector and in print
 
@@ -67,6 +69,8 @@ def render_png(option: dict[str, Any], width: int, height: int, *, scale: float 
                transport: httpx.BaseTransport | None = None) -> bytes:
     """The whole bridge: option -> SVG (render service) -> PNG (vl-convert),
     `scale` PNG pixels to a design pixel. A map's option takes the map's way."""
+    if isinstance(option.get("beside"), dict):
+        return render_pair_png(option, width, height, scale=scale, settings=settings, transport=transport)
     if isinstance(option.get("map"), dict):
         return render_map_png(option, width, height, scale=scale, settings=settings, transport=transport)
     return svg_to_png(render_svg(option, width, height, settings=settings, transport=transport), scale=scale)
@@ -112,6 +116,24 @@ def render_map_png(option: dict[str, Any], width: int, height: int, *, scale: fl
                           "style": {"image": "data:image/png;base64," + base64.b64encode(area).decode("ascii"),
                                     "width": width, "height": height - top - bottom}}]
     return svg_to_png(render_svg(framed, width, height, settings=settings, transport=transport), scale=scale)
+
+
+def render_pair_png(option: dict[str, Any], width: int, height: int, *, scale: float = PNG_SCALE, settings: Settings = default_settings,
+                    transport: httpx.BaseTransport | None = None) -> bytes:
+    """Two pictures side by side in one (a map with its timeline beside it):
+    the option on the left, its "beside" option on the right (its share,
+    echarts.beside_width), each drawn the way its own kind is drawn, then
+    placed on one page."""
+    right_w = beside_width(width)
+    half = width - right_w
+    left = render_png({key: value for key, value in option.items() if key != "beside"}, half, height, scale=scale,
+                      settings=settings, transport=transport)
+    right = render_png(option["beside"], right_w, height, scale=scale, settings=settings, transport=transport)
+    page = {"animation": False, "backgroundColor": option.get("backgroundColor"),
+            "graphic": [{"type": "image", "left": left_px, "top": 0, "silent": True,
+                         "style": {"image": "data:image/png;base64," + base64.b64encode(png).decode("ascii"), "width": w, "height": height}}
+                        for left_px, w, png in ((0, half, left), (half, right_w, right))]}
+    return svg_to_png(render_svg(page, width, height, settings=settings, transport=transport), scale=scale)
 
 
 def render_service_status(*, settings: Settings = default_settings, transport: httpx.BaseTransport | None = None) -> dict[str, Any]:

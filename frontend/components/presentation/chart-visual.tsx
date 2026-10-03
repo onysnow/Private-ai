@@ -115,6 +115,21 @@ export function ChartFigure({visual, renderCitations}: {visual: ChartVisual, ren
           {renderCitations ? <td className="border-b py-1">{renderCitations(row.record_refs)}</td> : null}
         </tr>)}</tbody>
       </table>
+      {table.events ? <table className="mt-3 w-full border-collapse text-left" data-testid="chart-visual-events">
+        <caption className="pb-1 text-left font-semibold">The events beside the map</caption>
+        <thead><tr>
+          {table.events.columns.map(column => <th key={column} className="border-b py-1 pr-3 font-semibold">{column}</th>)}
+          {renderCitations ? <th className="border-b py-1 font-semibold">Sources</th> : null}
+        </tr></thead>
+        <tbody>{table.events.rows.map(row => <tr key={row.label}>
+          <td className="border-b py-1 pr-3">{row.label}</td>
+          <td className="border-b py-1 pr-3">{row.place}</td>
+          <td className="border-b py-1 pr-3">{row.formatted}</td>
+          <td className="border-b py-1 pr-3">{row.status}</td>
+          <td className="border-b py-1 pr-3 tabular-nums">{row.record_count}</td>
+          {renderCitations ? <td className="border-b py-1">{renderCitations(row.record_refs)}</td> : null}
+        </tr>)}</tbody>
+      </table> : null}
     </details>
   </figure>;
 }
