@@ -35,7 +35,7 @@ from app.services.cross_references import (
     decide_cross_reference, import_cross_references, list_cross_references, matched_properties, send_pending_judgements,
 )
 from app.services.entities import create_entity
-from app.services.resolution import canonical_duplicate_candidates
+from app.services.resolution import canonical_duplicate_candidates, record_canonical_resolution
 from tests.openaleph_corpus_fake import BASE_URL, FakeOpenAleph
 from tests.test_openaleph_corpus_push import RecordingQueue, _merge
 
@@ -203,6 +203,64 @@ def test_a_match_between_our_own_records_is_a_duplicate_candidate(openaleph):
         assert all(row["entity_id"] != b.id for row in canonical_duplicate_candidates(db, db.get(Entity, a.id)))
         assert import_cross_references(db, inv.id, [_row(b_served, a_served)])["skipped"] == 1
         assert import_cross_references(db, inv.id, [_row(a_served, b_served)])["skipped"] == 1
+
+
+def _duplicate_pair(db, openaleph):
+    inv = _investigation(db, "Harbour contracts")
+    a = _entity(db, inv, "Company", "Meridian Holdings Ltd", registrationNumber=["09876543"])
+    b = _entity(db, inv, "Organization", "MHL (UK)", registrationNumber=["09876543"])
+    push_confirmed_records(db, inv.id, gateway=openaleph.gateway())
+    openaleph.finish_indexing()
+    ns = Namespace("fake-ns-1")
+    a_served, b_served = _served(openaleph, "1", ns.sign(a.id)), _served(openaleph, "1", ns.sign(b.id))
+    import_cross_references(db, inv.id, [_row(a_served, b_served, 0.8)])
+    return inv, a, b, a_served, b_served
+
+
+def test_a_decision_on_a_duplicate_openaleph_raised_goes_back_as_a_judgement(openaleph):
+    """The dossier's same/different decision on two of our own records,
+    when OpenAleph proposed the pair, is recorded in OpenAleph too."""
+    with SessionLocal() as db:
+        inv, a, b, a_served, b_served = _duplicate_pair(db, openaleph)
+        record_canonical_resolution(db, db.get(Entity, b.id), db.get(Entity, a.id), decision="different", confidence=1.0,
+                                    rationale="Different registries")
+        proposal = db.scalars(select(CrossReferenceProposal)).one()
+        assert proposal.status == "decided"
+        decision = db.scalars(select(CrossReferenceDecision)).one()
+        assert (decision.decision, decision.judgement, decision.judgement_status, decision.note) == (
+            "different", "negative", "pending", "Different registries")
+
+        assert send_pending_judgements(db, inv.id, gateway=openaleph.gateway()) == {"sent": 1, "failed": 0}
+        assert len(openaleph.pairwise) == 1
+        assert {openaleph.pairwise[0]["entity_id"], openaleph.pairwise[0]["match_id"]} == {a_served["id"], b_served["id"]}
+        assert openaleph.pairwise[0]["judgement"] == "negative"
+
+        # Changing one's mind before the push supersedes the unsent decision.
+        record_canonical_resolution(db, db.get(Entity, a.id), db.get(Entity, b.id), decision="unsure", confidence=0.5, rationale=None)
+        record_canonical_resolution(db, db.get(Entity, a.id), db.get(Entity, b.id), decision="same", confidence=0.9, rationale=None)
+        statuses = [row.judgement_status for row in db.scalars(select(CrossReferenceDecision).order_by(CrossReferenceDecision.created_at))]
+        assert statuses == ["sent", "superseded", "pending"]
+
+
+def test_a_merged_pair_needs_no_judgement(openaleph):
+    """After a merge the push removes the merged-away record from OpenAleph;
+    a judgement on it would only fail, so it is marked superseded."""
+    with SessionLocal() as db:
+        inv, a, b, _a_served, _b_served = _duplicate_pair(db, openaleph)
+        _merge(db, db.get(Entity, b.id), db.get(Entity, a.id))   # records "same", then merges
+        assert send_pending_judgements(db, inv.id, gateway=openaleph.gateway()) == {"sent": 0, "failed": 0}
+        assert openaleph.pairwise == []
+        assert db.scalars(select(CrossReferenceDecision)).one().judgement_status == "superseded"
+        assert db.scalars(select(OpenAlephOperationFailure)).all() == []
+
+
+def test_a_pair_openaleph_never_raised_stays_in_the_workbench(openaleph):
+    with SessionLocal() as db:
+        inv = _investigation(db, "Harbour contracts")
+        a = _entity(db, inv, "Company", "Meridian Holdings Ltd")
+        b = _entity(db, inv, "Company", "Meridian Holdings")
+        record_canonical_resolution(db, a, b, decision="different", confidence=1.0, rationale=None)
+        assert db.scalars(select(CrossReferenceDecision)).all() == []
 
 
 def test_the_review_list_hides_matches_the_reader_may_not_see(two):

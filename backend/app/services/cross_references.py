@@ -32,7 +32,7 @@ from typing import Any
 
 from followthemoney import model
 from followthemoney.compare import compare_scores
-from sqlalchemy import or_, select
+from sqlalchemy import and_, or_, select
 from sqlalchemy.orm import Session
 
 from app.core.authorization import AuthorizationScope
@@ -381,6 +381,10 @@ def send_pending_judgements(db: Session, investigation_id: str, *, gateway: Corp
         CrossReferenceDecision.judgement_status == "pending").order_by(CrossReferenceDecision.created_at)))
     for row in rows:
         proposal = db.get(CrossReferenceProposal, row.proposal_id)
+        if proposal is not None and proposal.match_kind == KIND_DUPLICATE and _merged_away(db, proposal):
+            row.judgement_status = "superseded"
+            db.commit()
+            continue
         link = db.scalar(select(OpenAlephEntityLink).where(OpenAlephEntityLink.record_id == proposal.entity_id)) if proposal else None
         error: str | None = None
         profile_id: str | None = None
@@ -413,6 +417,45 @@ def send_pending_judgements(db: Session, investigation_id: str, *, gateway: Corp
 
 
 # --- duplicates for the existing merge flow -------------------------------------------
+
+def record_duplicate_judgement(db: Session, entity_a_id: str, entity_b_id: str, *, decision: str,
+                               note: str | None) -> CrossReferenceDecision | None:
+    """A reporter's same/different/unsure decision on two of the
+    investigation's own records (the dossier's duplicate review,
+    app/services/resolution.py record_canonical_resolution), queued for
+    OpenAleph as a pairwise judgement when OpenAleph itself proposed the
+    pair, so its profiles agree with the Workbench as they do for corpus
+    matches. A pair OpenAleph never raised is left to the Workbench alone.
+    The caller commits."""
+    if decision not in JUDGEMENTS:
+        return None
+    proposal = db.scalar(select(CrossReferenceProposal).where(
+        CrossReferenceProposal.match_kind == KIND_DUPLICATE,
+        or_(and_(CrossReferenceProposal.entity_id == entity_a_id, CrossReferenceProposal.other_entity_id == entity_b_id),
+            and_(CrossReferenceProposal.entity_id == entity_b_id, CrossReferenceProposal.other_entity_id == entity_a_id))))
+    if proposal is None:
+        return None
+    for older in db.scalars(select(CrossReferenceDecision).where(
+            CrossReferenceDecision.proposal_id == proposal.id, CrossReferenceDecision.judgement_status == "pending")):
+        older.judgement_status = "superseded"
+    row = CrossReferenceDecision(investigation_id=proposal.investigation_id, proposal_id=proposal.id, decision=decision,
+                                 note=(note or "").strip() or None, judgement=JUDGEMENTS[decision], judgement_status="pending")
+    db.add(row)
+    proposal.status = "decided"
+    db.flush()
+    return row
+
+
+def _merged_away(db: Session, proposal: CrossReferenceProposal) -> bool:
+    """Whether either of a duplicate pair has since been merged: the push
+    then removes it from OpenAleph, which says more than a judgement would,
+    and a judgement on a removed entity would only fail."""
+    for entity_id in (proposal.entity_id, proposal.other_entity_id):
+        entity = db.get(Entity, entity_id) if entity_id else None
+        if entity is None or entity.merged_into_entity_id:
+            return True
+    return False
+
 
 def duplicate_matches(db: Session, entity_id: str) -> list[CrossReferenceProposal]:
     """OpenAleph's matches between this record and another of the

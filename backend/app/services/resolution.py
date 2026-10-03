@@ -83,14 +83,22 @@ def record_canonical_resolution(db: Session, entity: Entity, other: Entity, *, d
         raise ValueError("An entity cannot be resolved against itself")
     if entity.investigation_id != other.investigation_id:
         raise ValueError("Both entities must belong to the same investigation")
+    from app.jobs.corpus import request_corpus_sync
+    from app.services.cross_references import record_duplicate_judgement
+
     a, b = sorted((entity.id, other.id))
     row = CanonicalResolutionDecision(
         investigation_id=entity.investigation_id, entity_a_id=a, entity_b_id=b,
         decision=decision, confidence=confidence, rationale=rationale,
     )
     db.add(row)
+    # When OpenAleph proposed this pair, the decision goes back to it as a
+    # pairwise judgement with the next corpus push (ADR-0006, Wave B).
+    judgement = record_duplicate_judgement(db, a, b, decision=decision, note=rationale)
     if commit:
         db.commit(); db.refresh(row)
+        if judgement is not None:
+            request_corpus_sync(db, entity.investigation_id)
     else:
         db.flush()
     return row
