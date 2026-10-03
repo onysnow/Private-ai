@@ -431,7 +431,7 @@ describe('AiReasoningPanel', () => {
     // The deck goes out in the look picked in the style panel.
     const deckCall = fetchMock.mock.calls[10];
     expect(requestUrl(deckCall)).toBe('http://api.test/api/ai-analysis-candidates/cand-9/promote-to-deck');
-    expect(JSON.parse(String((deckCall[1] as RequestInit).body))).toEqual({style: {theme: 'newsprint', fonts: 'theme'}, visual_styles: {'0': {preset: 'row', options: {}}}});
+    expect(JSON.parse(String((deckCall[1] as RequestInit).body))).toEqual({style: {theme: 'newsprint', fonts: 'theme'}, visual_styles: {'0': {preset: 'row', options: {}}}, deck_kind: 'presenting'});
   });
 
   it('lets presentation drafts run when the TAS spec is missing, and starts on that module', async () => {

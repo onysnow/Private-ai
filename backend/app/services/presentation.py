@@ -172,14 +172,22 @@ def writeup_content_from_payload(payload: dict, labels: dict[tuple[str, str], di
     return {"type": "doc", "content": content}
 
 
-def deck_slides_from_payload(payload: dict, visual_styles: dict | None = None) -> list[dict]:
+DECK_KINDS = ("presenting", "slidedoc")
+
+
+def deck_slides_from_payload(payload: dict, visual_styles: dict | None = None, deck_kind: str = "presenting") -> list[dict]:
     """title -> takeaway statement -> one content slide per section (the
     section's prose goes to speaker notes) -> open questions. Normalized
     with the same rules a saved deck gets.
 
     `visual_styles` maps a section's index ("0", "1", ...) to the
     {"preset", "options"} the reporter picked in the preview; it only
-    changes how that section's visual is drawn, never its data."""
+    changes how that section's visual is drawn, never its data.
+
+    `deck_kind` is one of Duarte's two kinds of deck ("Slidedocs"): a deck
+    for presenting keeps each slide to its bullets, the prose in the notes;
+    a slidedoc, read without a presenter, puts the section's prose on the
+    slide in place of the bullets."""
     visual_styles = visual_styles or {}
     slides: list[dict] = [{
         "kind": "title", "heading": payload.get("title") or "Untitled", "bullets": [payload["goal_restated"]] if payload.get("goal_restated") else [],
@@ -204,6 +212,7 @@ def deck_slides_from_payload(payload: dict, visual_styles: dict | None = None) -
             "evidence": section.get("evidence") or [],
             "notes": section.get("body") or "",
             "visual": visual,
+            **({"prose": section.get("body") or ""} if deck_kind == "slidedoc" else {}),
         })
 
     slides.append({"kind": "questions", "heading": "How we know, and our limits", "bullets": [how_we_know(payload), *_limits(payload)],
@@ -234,9 +243,9 @@ def promote_candidate_to_writeup(db: Session, candidate: AIAnalysisCandidate, *,
 
 
 def promote_candidate_to_deck(db: Session, candidate: AIAnalysisCandidate, *, title: str | None = None, created_by: str | None = None,
-                              style: dict | None = None, visual_styles: dict | None = None) -> Deck:
+                              style: dict | None = None, visual_styles: dict | None = None, deck_kind: str = "presenting") -> Deck:
     payload = _require_promotable(candidate)
-    slides = deck_slides_from_payload(payload, visual_styles)
+    slides = deck_slides_from_payload(payload, visual_styles, deck_kind)
     if title:
         slides[0]["heading"] = title
     return create_deck(

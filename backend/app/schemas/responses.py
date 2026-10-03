@@ -2987,6 +2987,8 @@ class DeckSlideOut(ResponseModel):
     evidence: list[RecordRefOut]
     notes: str
     visual: DeckVisualOut | None
+    # A slidedoc's prose, shown in place of the bullets; empty on a deck for presenting.
+    prose: str = ""
 
 
 class DeckOut(ResponseModel):

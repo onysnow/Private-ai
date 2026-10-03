@@ -209,6 +209,7 @@ def promote_ai_analysis_candidate_to_deck_endpoint(candidate_id: str, body: Prom
             db, row, title=body.title,
             style=body.style.model_dump() if body.style else None,
             visual_styles={key: value.model_dump() for key, value in body.visual_styles.items()},
+            deck_kind=body.deck_kind,
         )
     except ValueError as exc:
         raise HTTPException(400, str(exc))

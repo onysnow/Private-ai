@@ -27,6 +27,7 @@ import {Download, FileText, Presentation} from 'lucide-react';
 import {RecordPicker} from './presentation/record-picker';
 import type {SelectedRef} from './presentation/record-picker';
 import {DraftPreview} from './presentation/draft-preview';
+import type {DeckKind} from './presentation/draft-preview';
 import type {TraceHandler} from './presentation/draft-preview';
 
 // onTraceRecord: opens the page's provenance drawer for a cited record (an
@@ -111,6 +112,8 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
   const [styleCatalog,setStyleCatalog]=useState<PresentationStyleCatalog|null>(null);
   const [deckStyle,setDeckStyle]=useState<DeckStyle>({theme:'dark_academia',fonts:'theme'});
   const [visualStyles,setVisualStyles]=useState<Record<string,VisualStyle>>({});
+  // Duarte's two kinds of deck: to present, or a slidedoc to read alone.
+  const [deckKind,setDeckKind]=useState<DeckKind>('presenting');
   const catalogRequested=useRef(false);
   // A checked chart in the draft, drawn again and checked again by the
   // backend in the style and theme picked (POST .../visuals/restyle), by
@@ -253,7 +256,7 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
         setPromoteStatus(`Promoted to write-up "${row.title}" (${row.word_count} word(s), status ${row.status}).`);
         setPromoted({kind:'writeup',id:row.id,title:row.title});
       }else{
-        const styled=styleCatalog?{...body,style:deckStyle,visual_styles:visualStyles}:body;
+        const styled={...(styleCatalog?{...body,style:deckStyle,visual_styles:visualStyles}:body),deck_kind:deckKind};
         const row=await api.object(`/api/ai-analysis-candidates/${selected.id}/${path}`,'deck',isDeck,{method:'POST',body:styled});
         setPromoteStatus(`Promoted to deck "${row.title}" (${row.slide_count} slide(s)).`);
         setPromoted({kind:'deck',id:row.id,title:row.title});
@@ -306,7 +309,7 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
             {payload&&'scope_and_limitations' in payload&&<p className="muted"><b>Scope & limitations:</b> {asStr(payload.scope_and_limitations)}</p>}
             {isPresentationDraft&&payload&&<div className="mt-3">
               <WritingReport report={selected.trace?asObj(selected.trace.writing_check):null}/>
-              <DraftPreview payload={payload} slides={selected.deck_preview||[]} citationDetails={selected.citation_details||[]} onTrace={onTraceRecord} howWeKnow={selected.how_we_know}
+              <DraftPreview payload={payload} slides={selected.deck_preview||[]} citationDetails={selected.citation_details||[]} onTrace={onTraceRecord} howWeKnow={selected.how_we_know} deckKind={deckKind}
                 catalog={styleCatalog} deckStyle={deckStyle} onDeckStyleChange={setDeckStyle}
                 visualStyles={visualStyles} onVisualStyleChange={(section,style)=>setVisualStyles(prev=>({...prev,[section]:style}))}
                 chartLooks={chartLooks} chartProblems={chartProblems}/>
@@ -348,6 +351,10 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <Input aria-label="Promoted title" value={promoteTitle} onChange={(e:ChangeEvent<HTMLInputElement>)=>setPromoteTitle(e.target.value)} placeholder={asStr(payload?.title)||'Title (optional — defaults to the draft title)'} className="min-w-[14rem] flex-1"/>
                 <Button type="button" size="sm" onClick={()=>void promote('writeup')}><FileText className="mr-1.5 h-4 w-4"/>Promote to write-up</Button>
+                <select aria-label="Kind of deck" className="h-8 rounded-md border border-input bg-transparent px-2 text-sm text-foreground" value={deckKind} onChange={(e:ChangeEvent<HTMLSelectElement>)=>setDeckKind(e.target.value as DeckKind)}>
+                  <option value="presenting">Deck to present (prose in the notes)</option>
+                  <option value="slidedoc">Slidedoc to read alone (prose on the slides)</option>
+                </select>
                 <Button type="button" size="sm" variant="outline" onClick={()=>void promote('deck')}><Presentation className="mr-1.5 h-4 w-4"/>Promote to deck</Button>
               </div>
               {promoteStatus&&<p className="mt-2 text-sm text-muted-foreground" data-testid="promote-status">{promoteStatus}</p>}

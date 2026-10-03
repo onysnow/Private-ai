@@ -10339,6 +10339,17 @@
             ],
             "title": "Notes"
           },
+          "prose": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prose"
+          },
           "visual": {
             "anyOf": [
               {
@@ -10388,6 +10399,11 @@
           },
           "notes": {
             "title": "Notes",
+            "type": "string"
+          },
+          "prose": {
+            "default": "",
+            "title": "Prose",
             "type": "string"
           },
           "visual": {
@@ -19745,6 +19761,15 @@
       },
       "PromoteToDeckRequest": {
         "properties": {
+          "deck_kind": {
+            "default": "presenting",
+            "enum": [
+              "presenting",
+              "slidedoc"
+            ],
+            "title": "Deck Kind",
+            "type": "string"
+          },
           "style": {
             "anyOf": [
               {

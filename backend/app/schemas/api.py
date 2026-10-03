@@ -414,6 +414,9 @@ class PromoteToDeckRequest(BaseModel):
     # app/services/presentation_style.py; unknown values fall back to defaults.
     style: DeckStyle | None = None
     visual_styles: dict[str, VisualStyle] = Field(default_factory=dict)
+    # Duarte's two kinds of deck: sparse slides to present (the prose goes to
+    # the speaker notes), or a slidedoc to read alone (the prose on the slide).
+    deck_kind: Literal["presenting", "slidedoc"] = "presenting"
 
 
 class WatchlistEntryCreate(BaseModel):
@@ -436,6 +439,7 @@ class DeckSlideIn(BaseModel):
     evidence: list[dict[str, Any]] = Field(default_factory=list)
     notes: str | None = None
     visual: dict[str, Any] | None = None
+    prose: str | None = None   # a slidedoc's prose (app/services/presentation.py deck_kind)
 
 
 class DeckUpdate(BaseModel):

@@ -638,6 +638,7 @@ and never removes):
 | Clear attribution | a statement on one record carries † in the brief and on its slide | Reuters Handbook; NPR |
 | How we know, and our limits | the draft's `limits` and the records it rests on close the brief and the deck | The Markup |
 | Document beside the claim | the brief quotes each key point's record under its section, cited | ICIJ, Luanda Leaks |
+| Two kinds of deck | "Promote to deck" makes a deck to present (prose in the notes) or a slidedoc to read alone (each section's prose on its slide, plain paragraphs) | Duarte, Slidedocs |
 | Confidence grade, grading scale | see "Pass 6: the claim-strength grid" | IPCC AR5; Bellingcat |
 
 ## What pass 3 built, and what is left

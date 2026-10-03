@@ -66,7 +66,7 @@ export type CitationDetail={record_type:string,record_id:string,trace_record_typ
 // Promotion targets for an accepted presentation_draft candidate (app/services/presentation.py).
 export type Writeup={id:string,investigation_id:string,title:string,status:string,cited_record_refs:AiCitationRef[],content_json?:JsonObject,preview?:string,source_ai_candidate_id?:string|null,created_by?:string|null,created_at:string,updated_at:string,word_count:number};
 export type DeckSlideKind='title'|'statement'|'content'|'questions';
-export type DeckSlide={heading:string,bullets:string[],evidence:AiCitationRef[],kind?:DeckSlideKind,notes?:string,visual?:PresentationVisual|null};
+export type DeckSlide={heading:string,bullets:string[],evidence:AiCitationRef[],kind?:DeckSlideKind,notes?:string,visual?:PresentationVisual|null,prose?:string};
 // Deck-wide look: a theme and a font pairing, both ids from GET /api/presentation-styles.
 export type DeckStyle={theme:string,fonts:string};
 export type DeckTheme={id:string,label:string,description:string,cover_bg:string,cover_line:string,cover_text:string,cover_muted:string,cover_accent:string,accent:string,accent_text:string,alert:string,page:string,panel:string,rule:string,text:string,muted:string,bar_muted:string,heading_font:string,body_font:string};

@@ -3564,6 +3564,10 @@ export type DeckSlideIn = {
    */
   notes?: string | null;
   /**
+   * Prose
+   */
+  prose?: string | null;
+  /**
    * Visual
    */
   visual?: {
@@ -3597,6 +3601,10 @@ export type DeckSlideOut = {
    * Notes
    */
   notes: string;
+  /**
+   * Prose
+   */
+  prose?: string;
   /**
    * Visual
    */
@@ -9146,6 +9154,10 @@ export type PresentationStyleCatalogOut = {
  * PromoteToDeckRequest
  */
 export type PromoteToDeckRequest = {
+  /**
+   * Deck Kind
+   */
+  deck_kind?: 'presenting' | 'slidedoc';
   style?: DeckStyle | null;
   /**
    * Title

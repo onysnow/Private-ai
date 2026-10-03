@@ -92,6 +92,16 @@ describe('DraftPreview', () => {
     expect(within(brief).getAllByTitle('Evidence: Ex. 14, p. 3').length).toBeGreaterThan(0);
   });
 
+  it('shows a slidedoc\'s prose on its slides in place of the bullets', async () => {
+    const user = userEvent.setup();
+    render(<DraftPreview payload={payload} slides={slides} citationDetails={[detail()]} deckKind="slidedoc"/>);
+    await user.click(screen.getByRole('tab', {name: 'Go to slide 2'}));
+    const prose = screen.getAllByTestId('slide-prose')[0];
+    expect(within(prose).getByText('First para.')).toBeInTheDocument();
+    expect(within(prose).getByText('Second para.')).toBeInTheDocument();
+    expect(within(prose).queryByText('Agreement then wire')).toBeNull();
+  });
+
   it('marks a section resting on one record and closes with how we know and the limits', async () => {
     const user = userEvent.setup();
     const limited: JsonObject = {...payload, limits: ['The ledger is the payer\'s own account.']};

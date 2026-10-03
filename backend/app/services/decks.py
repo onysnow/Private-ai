@@ -26,6 +26,8 @@ render_deck_pptx.
 """
 from __future__ import annotations
 
+import functools
+
 import math
 from dataclasses import dataclass
 from datetime import date
@@ -576,6 +578,8 @@ def _normalize_slides(slides: list[Any] | None) -> list[dict]:
             "evidence": _clean_refs(slide.get("evidence")),
             "notes": str(slide.get("notes") or "")[:20000],
             "visual": normalize_visual(slide.get("visual")),
+            # A slidedoc's prose, shown in place of the bullets (empty on a deck for presenting).
+            "prose": str(slide.get("prose") or "")[:4000] if kind == "content" else "",
         })
     return normalized
 
@@ -837,7 +841,12 @@ class _DeckRenderer:
         self._run(p, text, size=size, color=color, font=self.t.heading_font)
         return shape
 
-    def bullets(self, slide: Any, x: float, y: float, w: float, h: float, items: list[str], *, color: str | None = None, bullet_color: str | None = None, sizes: tuple[int, ...] = (28, 26, 24, 22, 20, 18, 16, 15, 14)) -> Any:
+    def bullets(self, slide: Any, x: float, y: float, w: float, h: float, items: list[str], *, color: str | None = None, bullet_color: str | None = None, sizes: tuple[int, ...] = (28, 26, 24, 22, 20, 18, 16, 15, 14),
+                plain: bool = False) -> Any:
+        """Bulleted points, or with `plain` paragraphs of prose (a slidedoc),
+        at the largest size that fits, prose no larger than 20 pt."""
+        if plain:
+            sizes = tuple(size for size in (*sizes, 13, 12) if size <= 20)
         color = color or self.t.text
         bullet_color = bullet_color or self.t.accent
         from lxml import etree
@@ -852,6 +861,9 @@ class _DeckRenderer:
             p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
             p.line_spacing = 1.12
             p.space_after = Pt(16 if size >= 22 else 10)
+            if plain:
+                self._run(p, item, size=size, color=color)
+                continue
             pPr = p._p.get_or_add_pPr()
             pPr.set("marL", str(indent))
             pPr.set("indent", str(-indent))
@@ -1538,6 +1550,12 @@ class _DeckRenderer:
         self.place_title(slide, MARGIN_IN, 0.72, 11.8, 0.95, heading, size=h_size, color=self.t.text, anchor="middle")
         self.rect(slide, MARGIN_IN, 1.78, 0.9, 0.045, self.t.accent)
         bullets = slide_data.get("bullets") or []
+        # A slidedoc's slide carries the section's prose instead of its bullets
+        # (Duarte, "Slidedocs": dense enough to be read alone); same places, plain paragraphs.
+        prose = [para.strip() for para in str(slide_data.get("prose") or "").split("\n\n") if para.strip()]
+        if prose:
+            bullets = prose
+        put = functools.partial(self.bullets, plain=bool(prose))
         refs = list(slide_data.get("evidence") or [])
         vis: dict = visual if isinstance(visual, dict) else {}
         kind = vis.get("type")
@@ -1548,34 +1566,34 @@ class _DeckRenderer:
             layout = style["layout"]
             if layout.get("direction") == "vertical":
                 if bullets:
-                    self.bullets(slide, MARGIN_IN, 2.1, 5.0, 4.55, bullets, sizes=(22, 20, 18, 16, 15, 14))
+                    put(slide, MARGIN_IN, 2.1, 5.0, 4.55, bullets, sizes=(22, 20, 18, 16, 15, 14))
                 self._timeline(slide, 6.0 if bullets else MARGIN_IN, 2.1, 6.55 if bullets else 11.8, 4.55, vis["items"], style)
             else:
                 compact = bool(layout.get("compact"))
                 band = 1.75 if compact else 2.45
                 if bullets:
-                    self.bullets(slide, MARGIN_IN, 2.05, 11.8, 4.6 - band, bullets, sizes=(22, 20, 18, 16, 15, 14))
+                    put(slide, MARGIN_IN, 2.05, 11.8, 4.6 - band, bullets, sizes=(22, 20, 18, 16, 15, 14))
                 self._timeline(slide, MARGIN_IN + 0.1, (6.7 - band) if bullets else 2.6, 11.6, band if bullets else 3.6, vis["items"], style)
         elif kind == "bar":
             if bullets:
-                self.bullets(slide, MARGIN_IN, 2.1, 5.3, 4.55, bullets, sizes=(22, 20, 18, 16, 15, 14))
+                put(slide, MARGIN_IN, 2.1, 5.3, 4.55, bullets, sizes=(22, 20, 18, 16, 15, 14))
             self._bar_chart(slide, 6.45 if bullets else MARGIN_IN, 2.0, 6.1 if bullets else 11.8, 4.7, vis, style)
         elif kind == CHART_VISUAL:
             if bullets:
-                self.bullets(slide, MARGIN_IN, 2.1, 5.3, 4.55, bullets, sizes=(22, 20, 18, 16, 15, 14))
+                put(slide, MARGIN_IN, 2.1, 5.3, 4.55, bullets, sizes=(22, 20, 18, 16, 15, 14))
             chart_description = self._chart(slide, *chart_region(bool(bullets)), vis)
         elif kind == "figures":
             if style["layout"].get("arrangement") == "row":
                 if bullets:
-                    self.bullets(slide, MARGIN_IN, 2.05, 11.8, 2.3, bullets, sizes=(22, 20, 18, 16, 15, 14))
+                    put(slide, MARGIN_IN, 2.05, 11.8, 2.3, bullets, sizes=(22, 20, 18, 16, 15, 14))
                 self._figures(slide, MARGIN_IN, 4.6 if bullets else 2.3, 11.8, 2.0 if bullets else 3.0, vis["items"], style)
             else:
                 if bullets:
-                    self.bullets(slide, MARGIN_IN, 2.1, 6.9, 4.55, bullets)
+                    put(slide, MARGIN_IN, 2.1, 6.9, 4.55, bullets)
                 self._figures(slide, 8.15 if bullets else MARGIN_IN, 2.05, 4.45 if bullets else 11.8, 4.6, vis["items"], style)
         else:
             if bullets:
-                self.bullets(slide, MARGIN_IN, 2.1, 6.9, 4.55, bullets)
+                put(slide, MARGIN_IN, 2.1, 6.9, 4.55, bullets)
             self._evidence_panel(slide, 8.15, 2.05, 4.45, 4.6, refs)
         for item in (visual or {}).get("items") or []:
             refs.extend(item.get("evidence") or [])

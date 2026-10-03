@@ -189,10 +189,27 @@ export function applyVisualStyles(slides: DeckSlide[], visualStyles: Record<stri
   });
 }
 
+/** Duarte's two kinds of deck: sparse slides to present, or a slidedoc to
+ *  read alone, whose content slides carry each section's prose in place of
+ *  its bullets (backend deck_slides_from_payload, deck_kind). */
+export type DeckKind = 'presenting' | 'slidedoc';
+
+export function applyDeckKind(slides: DeckSlide[], draft: PresentationDraftPayload, kind: DeckKind): DeckSlide[] {
+  if (kind !== 'slidedoc') return slides;
+  let section = -1;
+  return slides.map(slide => {
+    if ((slide.kind || 'content') !== 'content') return slide;
+    section += 1;
+    return {...slide, prose: draft.sections[section]?.body ?? ''};
+  });
+}
+
 export type DraftPreviewProps = {
   payload: JsonObject, slides: DeckSlide[], citationDetails: CitationDetail[], onTrace?: TraceHandler,
   // The brief's "how we know" line, as the backend writes it (the candidate's how_we_know).
   howWeKnow?: string,
+  // Which kind of deck the Slides tab shows (presenting unless said).
+  deckKind?: DeckKind,
   // Style (optional): with a catalogue and change handlers, the Slides tab shows the style panel.
   catalog?: PresentationStyleCatalog | null,
   deckStyle?: DeckStyle,
@@ -205,9 +222,10 @@ export type DraftPreviewProps = {
   chartProblems?: Record<string, string>,
 };
 
-export function DraftPreview({payload, slides: baseSlides, citationDetails, onTrace, howWeKnow, catalog, deckStyle, onDeckStyleChange, visualStyles, onVisualStyleChange, chartLooks, chartProblems}: DraftPreviewProps): ReactElement {
+export function DraftPreview({payload, slides: baseSlides, citationDetails, onTrace, howWeKnow, deckKind = 'presenting', catalog, deckStyle, onDeckStyleChange, visualStyles, onVisualStyleChange, chartLooks, chartProblems}: DraftPreviewProps): ReactElement {
   const draft = useMemo(() => asDraft(payload), [payload]);
-  const slides = useMemo(() => applyVisualStyles(baseSlides, visualStyles || {}, chartLooks), [baseSlides, visualStyles, chartLooks]);
+  const slides = useMemo(() => applyDeckKind(applyVisualStyles(baseSlides, visualStyles || {}, chartLooks), draft, deckKind),
+    [baseSlides, visualStyles, chartLooks, draft, deckKind]);
   const theme = useMemo(() => resolveTheme(catalog, deckStyle), [catalog, deckStyle]);
   const lookup = useMemo(() => buildCitationLookup(slides, citationDetails), [slides, citationDetails]);
   const frames = useMemo<Frame[]>(() => {

@@ -169,9 +169,16 @@ function Footer({refs, lookup, title, page, dark}: {refs: AiCitationRef[], looku
   </>;
 }
 
-function Bullets({x, y, w, h, items, sizes = [28, 26, 24, 22, 20, 18, 16, 15, 14]}: {x: number, y: number, w: number, h: number, items: string[], sizes?: number[]}): ReactElement {
+function Bullets({x, y, w, h, items, sizes = [28, 26, 24, 22, 20, 18, 16, 15, 14], plain = false}: {x: number, y: number, w: number, h: number, items: string[], sizes?: number[], plain?: boolean}): ReactElement {
   const {c, sans} = useTheme();
-  const size = fitSize(items, w - 0.35, h, sizes, {gapPt: 16});
+  // A slidedoc's prose: plain paragraphs no larger than 20 pt (decks.py bullets, plain=True).
+  const fit = plain ? [...sizes, 13, 12].filter(size => size <= 20) : sizes;
+  const size = fitSize(items, w - 0.35, h, fit, {gapPt: 16});
+  if (plain) {
+    return <div style={{...box(x, y, w, h), fontFamily: sans, fontSize: pt(size), lineHeight: 1.12, color: c('text')}} data-testid="slide-prose">
+      {items.map((item, i) => <p key={i} style={{margin: 0, marginBottom: pt(size >= 22 ? 16 : 10)}}>{item}</p>)}
+    </div>;
+  }
   return <ul style={{...box(x, y, w, h), margin: 0, padding: 0, listStyle: 'none', fontFamily: sans, fontSize: pt(size), lineHeight: 1.12, color: c('text')}}>
     {items.map((item, i) => <li key={i} style={{display: 'flex', gap: pt(10), marginBottom: pt(size >= 22 ? 16 : 10)}}>
       <span aria-hidden style={{color: c('accent'), fontSize: '0.62em', lineHeight: 1.12 / 0.62, flex: 'none'}}>■</span><span>{item}</span>
@@ -390,7 +397,9 @@ export function SlideCanvas({slide, page, contentIndex, contentTotal, deckTitle,
   }
 
   const visual = slide.visual || null;
-  const bullets = slide.bullets;
+  // A slidedoc carries the section's prose in place of the bullets (Duarte, "Slidedocs").
+  const prose = (slide.prose ?? '').split(/\n\n+/).map(para => para.trim()).filter(Boolean);
+  const bullets = prose.length ? prose : slide.bullets;
   const has = bullets.length > 0;
   const refs = [...slide.evidence, ...visualRefs(visual)];
   const headingSize = fitSize([slide.heading], 11.8, 0.9, [34, 30, 28, 26, 24], {charW: 0.58, lineSpacing: 1.1});
@@ -399,38 +408,38 @@ export function SlideCanvas({slide, page, contentIndex, contentTotal, deckTitle,
   if (visual?.type === 'chart') {
     // Same split as the export's native chart (decks.py content_slide).
     body = <>
-      {has && <Bullets x={0.75} y={2.1} w={5.3} h={4.55} items={bullets} sizes={[22, 20, 18, 16, 15, 14]}/>}
+      {has && <Bullets x={0.75} y={2.1} w={5.3} h={4.55} items={bullets} plain={prose.length > 0} sizes={[22, 20, 18, 16, 15, 14]}/>}
       <SlideChart visual={visual} region={has ? [6.45, 2.0, 6.1, 4.7] : [0.75, 2.0, 11.8, 4.7]}/>
     </>;
   } else if (visual?.type === 'timeline' && style) {
     if (style.layout.direction === 'vertical') {
       body = <>
-        {has && <Bullets x={0.75} y={2.1} w={5.0} h={4.55} items={bullets} sizes={[22, 20, 18, 16, 15, 14]}/>}
+        {has && <Bullets x={0.75} y={2.1} w={5.0} h={4.55} items={bullets} plain={prose.length > 0} sizes={[22, 20, 18, 16, 15, 14]}/>}
         <Timeline visual={visual} style={style} lookup={lookup} region={has ? [6.0, 2.1, 6.55, 4.55] : [0.75, 2.1, 11.8, 4.55]}/>
       </>;
     } else {
       const band = style.layout.compact ? 1.75 : 2.45;
       body = <>
-        {has && <Bullets x={0.75} y={2.05} w={11.8} h={4.6 - band} items={bullets} sizes={[22, 20, 18, 16, 15, 14]}/>}
+        {has && <Bullets x={0.75} y={2.05} w={11.8} h={4.6 - band} items={bullets} plain={prose.length > 0} sizes={[22, 20, 18, 16, 15, 14]}/>}
         <Timeline visual={visual} style={style} lookup={lookup} region={has ? [0.85, 6.7 - band, 11.6, band] : [0.85, 2.6, 11.6, 3.6]}/>
       </>;
     }
   } else if (visual?.type === 'bar' && style) {
     body = <>
-      {has && <Bullets x={0.75} y={2.1} w={5.3} h={4.55} items={bullets} sizes={[22, 20, 18, 16, 15, 14]}/>}
+      {has && <Bullets x={0.75} y={2.1} w={5.3} h={4.55} items={bullets} plain={prose.length > 0} sizes={[22, 20, 18, 16, 15, 14]}/>}
       <BarChart visual={visual} style={style} region={has ? [6.45, 2.0, 6.1, 4.7] : [0.75, 2.0, 11.8, 4.7]}/>
     </>;
   } else if (visual?.type === 'figures' && style) {
     body = style.layout.arrangement === 'row' ? <>
-      {has && <Bullets x={0.75} y={2.05} w={11.8} h={2.3} items={bullets} sizes={[22, 20, 18, 16, 15, 14]}/>}
+      {has && <Bullets x={0.75} y={2.05} w={11.8} h={2.3} items={bullets} plain={prose.length > 0} sizes={[22, 20, 18, 16, 15, 14]}/>}
       <Figures visual={visual} style={style} lookup={lookup} region={has ? [0.75, 4.6, 11.8, 2.0] : [0.75, 2.3, 11.8, 3.0]}/>
     </> : <>
-      {has && <Bullets x={0.75} y={2.1} w={6.9} h={4.55} items={bullets}/>}
+      {has && <Bullets x={0.75} y={2.1} w={6.9} h={4.55} items={bullets} plain={prose.length > 0}/>}
       <Figures visual={visual} style={style} lookup={lookup} region={has ? [8.15, 2.05, 4.45, 4.6] : [0.75, 2.05, 11.8, 4.6]}/>
     </>;
   } else {
     body = <>
-      {has && <Bullets x={0.75} y={2.1} w={6.9} h={4.55} items={bullets}/>}
+      {has && <Bullets x={0.75} y={2.1} w={6.9} h={4.55} items={bullets} plain={prose.length > 0}/>}
       <EvidencePanel refs={slide.evidence} lookup={lookup}/>
     </>;
   }

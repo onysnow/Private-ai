@@ -111,4 +111,5 @@ def test_a_stored_slide_of_the_wrong_shape_still_opens():
     fetched = client.get(f"/api/decks/{deck_id}")
     assert fetched.status_code == 200
     assert fetched.json()["slide_count"] == 1
-    assert fetched.json()["slides"] == [{"kind": "content", "heading": "Kept", "bullets": [], "evidence": [], "notes": "", "visual": None}]
+    assert fetched.json()["slides"] == [{"kind": "content", "heading": "Kept", "bullets": [], "evidence": [], "notes": "", "visual": None,
+                                         "prose": ""}]

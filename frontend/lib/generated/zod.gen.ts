@@ -1353,6 +1353,7 @@ export const zDeckSlideIn = z.object({
   heading: z.string().nullish(),
   kind: z.string().nullish(),
   notes: z.string().nullish(),
+  prose: z.string().nullish(),
   visual: z.record(z.unknown()).nullish(),
 });
 
@@ -5630,6 +5631,10 @@ export const zChartToSave = z.object({
  * PromoteToDeckRequest
  */
 export const zPromoteToDeckRequest = z.object({
+  deck_kind: z
+    .enum(['presenting', 'slidedoc'])
+    .optional()
+    .default('presenting'),
   style: zDeckStyle.nullish(),
   title: z.string().nullish(),
   visual_styles: z.record(zVisualStyle).optional(),
@@ -5735,6 +5740,7 @@ export const zDeckSlideOut = z.object({
   heading: z.string(),
   kind: z.enum(['title', 'statement', 'content', 'questions']),
   notes: z.string(),
+  prose: z.string().optional().default(''),
   visual: z
     .discriminatedUnion('type', [
       zFiguresVisualOut,

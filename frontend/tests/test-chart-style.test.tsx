@@ -234,7 +234,8 @@ describe('restyling a chart in a presentation draft', () => {
     // Promotion sends the style; the deck draws and checks its charts once more itself.
     await user.click(screen.getByRole('button', {name: 'Promote to deck'}));
     await waitFor(() => expect(api.calls(DECK)).toHaveLength(1));
-    expect(api.lastBody(DECK)).toEqual({style: {theme: 'dark_academia', fonts: 'theme'}, visual_styles: {'0': {preset: 'donut', options: {centre_total: false}}}});
+    expect(api.lastBody(DECK)).toEqual({style: {theme: 'dark_academia', fonts: 'theme'}, visual_styles: {'0': {preset: 'donut', options: {centre_total: false}}},
+      deck_kind: 'presenting'});
     expect(api.unmatched()).toEqual([]);
   });
 });

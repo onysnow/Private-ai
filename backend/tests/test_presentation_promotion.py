@@ -356,3 +356,26 @@ def test_promoted_writeup_counts_visual_citations_and_exports_tables(monkeypatch
     assert "THE TAKEAWAY" in cells and "OPEN QUESTIONS" in cells
     assert "3 Nov 2023" in cells and "$2.4M" in cells
     assert "Sources" in paragraphs
+
+
+def test_a_slidedoc_puts_each_sections_prose_on_its_slide_and_the_export_writes_it_plain(monkeypatch):
+    """Duarte's two kinds of deck: a deck to present keeps the prose in the
+    speaker notes; a slidedoc, read alone, puts it on the slide in place of
+    the bullets, as plain paragraphs."""
+    from io import BytesIO
+
+    from pptx import Presentation
+
+    seeded = _accepted_candidate(monkeypatch)
+    presenting = client.post(f"/api/ai-analysis-candidates/{seeded['candidate_id']}/promote-to-deck", json={}).json()
+    assert all(slide["prose"] == "" for slide in presenting["slides"])
+    deck = client.post(f"/api/ai-analysis-candidates/{seeded['candidate_id']}/promote-to-deck", json={"deck_kind": "slidedoc"}).json()
+    slide = deck["slides"][2]
+    assert slide["prose"].startswith("Meridian paid Bellcastle Holdings") and slide["notes"] == slide["prose"]
+    assert client.post(f"/api/ai-analysis-candidates/{seeded['candidate_id']}/promote-to-deck", json={"deck_kind": "poster"}).status_code == 422
+
+    prs = Presentation(BytesIO(client.get(f"/api/decks/{deck['id']}/export.pptx").content))
+    shapes = [shape for shape in list(prs.slides)[2].shapes if shape.has_text_frame and shape.text_frame.text.startswith("Meridian paid Bellcastle Holdings")]
+    assert shapes, "the prose is on the slide"
+    paragraph = shapes[0].text_frame.paragraphs[0]._p
+    assert paragraph.find(".//{http://schemas.openxmlformats.org/drawingml/2006/main}buChar") is None   # plain prose, no bullet
