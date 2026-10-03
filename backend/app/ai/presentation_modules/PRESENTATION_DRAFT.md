@@ -59,8 +59,10 @@ forms for every section, every time.
       (e.g. several payments in USD). Never mix units, never chart a single
       value, never derive totals or percentages the evidence doesn't state.
     Every item carries its own `evidence` list citing the record(s) that
-    state that exact value or date. If you can't cite it, it doesn't go in
-    the visual. A section with no visual is always acceptable; a visual
+    state that exact value or date, and an item's `quote` contains the
+    value or date itself (`"transfer of $2,400,000"`, not `"the transfer"`):
+    an item whose quotes do not state its value is removed. If you can't
+    cite it, it doesn't go in the visual. A section with no visual is always acceptable; a visual
     with an unsupported number is not.
     - `chart`: an order the Workbench cooks from the investigation's own
       records. You write `{"type": "chart", "spec": {...}}` and never a

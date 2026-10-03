@@ -45,8 +45,14 @@ def _accepted_candidate(monkeypatch) -> dict:
     inv = client.post("/api/investigations", json={"name": "Style tests"}).json()
     claim = client.post("/api/claims", json={"investigation_id": inv["id"], "text": "Meridian paid Bellcastle a fee."}).json()
     source = client.post("/api/sources", json={"investigation_id": inv["id"], "title": "Wire log", "source_type": "filing"}).json()
-    evidence = client.post("/api/evidence", json={"source_id": source["id"], "quote": "$2.4M wired to Bellcastle.", "locator": "row 41"}).json()
+    evidence = client.post("/api/evidence", json={"source_id": source["id"], "locator": "row 41", "quote": (
+        "$2.4M wired to Bellcastle. Agreement signed on 2023-11-03; paid on 2023-11-14, 11 days after signing. "
+        "Fees: Arden 285,000 USD; Bellcastle 2,400,000 USD; Corvo 900,000 USD.")}).json()
     ev = [{"record_type": "evidence", "record_id": evidence["id"], "quote": "$2.4M wired to Bellcastle."}]
+
+    def cites(quote: str) -> list[dict]:
+        # Each visual item cites the words that state its own value or date.
+        return [{"record_type": "evidence", "record_id": evidence["id"], "quote": quote}]
     payload = {
         "title": "The Bellcastle fee",
         "goal_restated": "Explain the fee.",
@@ -54,15 +60,15 @@ def _accepted_candidate(monkeypatch) -> dict:
         "sections": [
             {"heading": "Headline", "body": "The fee was $2.4M.", "key_points": [{"text": "$2.4M", "evidence": ev}], "evidence": ev,
              "visual": {"type": "figures", "items": [{"value": "$2.4M", "label": "to Bellcastle", "evidence": ev},
-                                                     {"value": "11 days", "label": "after signing", "evidence": ev}]}},
+                                                     {"value": "11 days", "label": "after signing", "evidence": cites("11 days after signing")}]}},
             {"heading": "Sequence", "body": "Signed, then wired.", "key_points": [{"text": "Signed, then wired", "evidence": ev}], "evidence": ev,
-             "visual": {"type": "timeline", "items": [{"date": "2023-11-03", "label": "Signed", "evidence": ev},
-                                                      {"date": "2023-11-14", "label": "Wired", "evidence": ev}]}},
+             "visual": {"type": "timeline", "items": [{"date": "2023-11-03", "label": "Signed", "evidence": cites("Agreement signed on 2023-11-03")},
+                                                      {"date": "2023-11-14", "label": "Wired", "evidence": cites("paid on 2023-11-14")}]}},
             {"heading": "Compared", "body": "Largest of three.", "key_points": [{"text": "Largest fee", "evidence": ev}], "evidence": ev,
              "visual": {"type": "bar", "title": "Consulting fees", "unit": "USD", "items": [
-                 {"label": "Arden", "value": 285000, "evidence": ev},
-                 {"label": "Bellcastle", "value": 2400000, "evidence": ev},
-                 {"label": "Corvo", "value": 900000, "evidence": ev},
+                 {"label": "Arden", "value": 285000, "evidence": cites("Arden 285,000 USD")},
+                 {"label": "Bellcastle", "value": 2400000, "evidence": cites("Bellcastle 2,400,000 USD")},
+                 {"label": "Corvo", "value": 900000, "evidence": cites("Corvo 900,000 USD")},
              ]}},
         ],
         "open_questions": ["Who owns Bellcastle?"],

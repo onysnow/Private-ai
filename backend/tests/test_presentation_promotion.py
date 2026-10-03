@@ -41,7 +41,8 @@ def _seeded_investigation() -> dict:
     inv = client.post("/api/investigations", json={"name": "Promotion tests"}).json()
     claim = client.post("/api/claims", json={"investigation_id": inv["id"], "text": "Meridian paid Bellcastle a consulting fee in November 2023."}).json()
     source = client.post("/api/sources", json={"investigation_id": inv["id"], "title": "Wire transfer log", "source_type": "filing", "url": "https://example.test/wire-log"}).json()
-    evidence = client.post("/api/evidence", json={"source_id": source["id"], "quote": "$2.4M wired to Bellcastle Holdings on 2023-11-14.", "locator": "row 41"}).json()
+    evidence = client.post("/api/evidence", json={"source_id": source["id"], "locator": "row 41",
+                                                  "quote": "$2.4M wired to Bellcastle Holdings on 2023-11-14. Agreement signed 2023-11-03. Arden was paid 285,000 USD."}).json()
     return {"investigation": inv, "claim": claim, "evidence": evidence}
 
 
@@ -234,19 +235,24 @@ def _run_draft(monkeypatch, seeded: dict, payload: dict):
 def _payload_with_visuals(claim_id: str, evidence_id: str, **section_overrides) -> dict:
     payload = json.loads(_draft_response(claim_id, evidence_id))
     ev = [{"record_type": "evidence", "record_id": evidence_id, "quote": "$2.4M wired to Bellcastle"}]
+
+    def cites(quote: str) -> list[dict]:
+        # Each visual item cites the words that state its own value or date.
+        return [{"record_type": "evidence", "record_id": evidence_id, "quote": quote}]
+
     payload["sections"][0]["visual"] = {"type": "figures", "items": [{"value": "$2.4M", "label": "wired 14 Nov 2023", "evidence": ev}]}
     payload["sections"].append({
         "heading": "Sequence", "body": "The wire followed the agreement.", "key_points": [{"text": "Agreement, then wire", "evidence": ev}], "evidence": ev,
         "visual": {"type": "timeline", "items": [
-            {"date": "2023-11-03", "label": "Agreement signed", "evidence": ev},
-            {"date": "2023-11-14", "label": "$2.4M wired", "evidence": ev},
+            {"date": "2023-11-03", "label": "Agreement signed", "evidence": cites("Agreement signed 2023-11-03")},
+            {"date": "2023-11-14", "label": "$2.4M wired", "evidence": cites("Bellcastle Holdings on 2023-11-14")},
         ]},
     })
     payload["sections"].append({
         "heading": "Compared", "body": "The fee dwarfs the others.", "key_points": [{"text": "Largest fee", "evidence": ev}], "evidence": ev,
         "visual": {"type": "bar", "title": "Consulting fees", "unit": "USD", "items": [
             {"label": "Bellcastle", "value": 2400000, "evidence": ev},
-            {"label": "Arden", "value": 285000, "evidence": ev},
+            {"label": "Arden", "value": 285000, "evidence": cites("Arden was paid 285,000 USD")},
         ]},
     })
     payload["sections"][-1].update(section_overrides)

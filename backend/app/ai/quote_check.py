@@ -8,7 +8,9 @@ ignores only differences in whitespace. A match is kept with where it was
 found (the field or document chunk, and character offsets into that text)
 so the review screen can highlight it. Anything without a matching quote is
 removed before the draft reaches the review queue, and the removals are
-recorded with their reasons.
+recorded with their reasons. A figure, bar or timeline item must also have
+its value or date stated in its found quotes (app/ai/value_check.py), or it
+is removed the same way.
 
 Applies to presentation drafts only: their output format is the
 Workbench's own. The two TAS analysis modules follow their vendored spec.
@@ -23,6 +25,8 @@ from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+
+from app.ai.value_check import unstated_value
 
 MIN_QUOTE_WORDS = 3            # "the board" proves nothing about where a point came from
 MAX_RECORD_TEXT_CHARS = 12000  # per record, in the prompt; quotes are searched in the full text
@@ -199,9 +203,13 @@ def check_presentation_quotes(db: Session, payload: dict) -> tuple[dict, dict]:
                 label = item.get("label") if isinstance(item, dict) else None
                 kept = _verify_refs(db, item.get("evidence") if isinstance(item, dict) else None,
                                     f"{heading}: {visual.get('type')} item {k + 1}", removed, cache)
-                if kept:
+                unstated = unstated_value(str(visual.get("type")), item, [ref["quote"] for ref in kept],
+                                          unit=visual.get("unit")) if kept else None
+                if kept and unstated is None:
                     items.append({**item, "evidence": kept})
                     verified += len(kept)
+                elif kept:
+                    removed.append({"where": f"{heading}: {visual.get('type')} item {k + 1}", "text": label, "reason": unstated})
                 else:
                     removed.append({"where": f"{heading}: {visual.get('type')} item {k + 1}", "text": label,
                                     "reason": "no cited quote could be found"})
@@ -210,7 +218,7 @@ def check_presentation_quotes(db: Session, payload: dict) -> tuple[dict, dict]:
             low = VISUAL_TYPES.get(str(visual.get("type")), (1, 99))[0]
             if len(items) < low:
                 section["visual"] = None
-                removed.append({"where": f"{heading}: {visual.get('type')}", "reason": f"fewer than {low} item(s) left with a found quote"})
+                removed.append({"where": f"{heading}: {visual.get('type')}", "reason": f"fewer than {low} item(s) left with a found quote stating the value"})
             else:
                 section["visual"] = {**visual, "items": items}
 

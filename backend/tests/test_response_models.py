@@ -1001,12 +1001,16 @@ class _DraftModel:
         return self.text
 
 
-def _presentation_draft(claim_id: str, evidence_id: str) -> str:
+def _presentation_draft(claim_id: str, evidence_id: str, fee_id: str) -> str:
     """A draft with one section per kind of visual: a chart the Workbench
     cooks, figures, a timeline and a bar of whole and fractional values.
-    Every quote is in the demo seed's own words, so the quote check keeps it."""
+    Every quote is in its record's own words and states the value or date
+    its item shows, so the quote check keeps it."""
     claim = {"record_type": "claim", "record_id": claim_id, "quote": "wholly owned by Bellcastle"}
     evidence = {"record_type": "evidence", "record_id": evidence_id, "quote": "transfer of $2,400,000 from Bellcastle"}
+    november = {"record_type": "evidence", "record_id": evidence_id, "quote": "to Meridian Holdings Ltd in November 2023"}
+    fee_date = {"record_type": "evidence", "record_id": fee_id, "quote": "On 2024-01-09 Meridian was charged"}
+    fee = {"record_type": "evidence", "record_id": fee_id, "quote": "a handling fee of 1,250.50 USD"}
 
     def section(heading: str, visual: dict) -> dict:
         return {"heading": heading, "body": f"{heading}: what the bank records show.",
@@ -1015,10 +1019,10 @@ def _presentation_draft(claim_id: str, evidence_id: str) -> str:
     chart = {"type": "chart", "spec": {"kind": "bar", "title": "Meridian received all of the money",
                                        "query": {"name": "payments_by_party", "params": {"direction": "received"}}}}
     figures = {"type": "figures", "items": [{"value": "$2.4M", "label": "paid to Meridian", "evidence": [evidence]}]}
-    timeline = {"type": "timeline", "items": [{"date": "2023-11", "label": "The transfer", "evidence": [evidence]},
-                                              {"date": "2024-01", "label": "Ownership on file", "evidence": [claim]}]}
+    timeline = {"type": "timeline", "items": [{"date": "2023-11", "label": "The transfer", "evidence": [november]},
+                                              {"date": "2024-01", "label": "The handling fee", "evidence": [fee_date]}]}
     bar = {"type": "bar", "title": "Paid", "unit": "USD", "items": [{"value": 2400000, "label": "Meridian", "evidence": [evidence]},
-                                                                    {"value": 0.5, "label": "Others", "evidence": [claim]}]}
+                                                                    {"value": 1250.5, "label": "Handling fee", "evidence": [fee]}]}
     return json.dumps({
         "title": "Where the Bellcastle money went", "goal_restated": "Show who received the money.",
         "executive_takeaway": "Meridian received the whole $2.4M.",
@@ -1066,11 +1070,14 @@ def test_ai_reasoning_replies(demo, ai_on, monkeypatch):
     db, inv, _doc, _candidates, _accepted = demo
     claim = db.query(Claim).filter(Claim.investigation_id == inv.id, Claim.text.like("Meridian Holdings Ltd is wholly%")).one()
     evidence = db.query(Evidence).filter(Evidence.quote.like("Bank records show%")).one()
+    fee = create_evidence(db, {"source_id": evidence.source_id, "locator": "paragraph 7",
+                               "quote": "On 2024-01-09 Meridian was charged a handling fee of 1,250.50 USD."})
     body = PresentationDraftRequest(goal="Show who received the money.", record_refs=[
-        {"record_type": "claim", "record_id": claim.id}, {"record_type": "evidence", "record_id": evidence.id}])
+        {"record_type": "claim", "record_id": claim.id}, {"record_type": "evidence", "record_id": evidence.id},
+        {"record_type": "evidence", "record_id": fee.id}])
 
     # Run in the request (developer mode and this suite): the proposal and the finished job.
-    monkeypatch.setattr(reasoning, "get_llm_client", lambda *a, **k: _DraftModel(_presentation_draft(claim.id, evidence.id)))
+    monkeypatch.setattr(reasoning, "get_llm_client", lambda *a, **k: _DraftModel(_presentation_draft(claim.id, evidence.id, fee.id)))
     ran = _run(investigation_presentation_draft(inv.id, body, SimpleNamespace(app=workbench), Response(), db))
     assert ran["candidate_id"] and ran["job"]["status"] == "succeeded"
     assert [s["visual"]["type"] for s in ran["payload"]["sections"]] == ["chart", "figures", "timeline", "bar"]

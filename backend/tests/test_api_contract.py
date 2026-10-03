@@ -352,9 +352,13 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     session = ok(client.post(f"/api/entities/{meridian}/enrich", json={"providers": ["fake-a", "fake-b"]}))
 
     # An AI proposal from the stand-in model, accepted, and the write-up and deck made from it.
-    monkeypatch.setattr(reasoning, "get_llm_client", lambda *a, **k: _DraftModel(_presentation_draft(claim["id"], payment["evidence"]["id"])))
+    # The draft's handling fee is stated by its own record (the quote check holds every value to its quote).
+    fee = ok(client.post("/api/evidence", json={"source_id": payment["source"]["id"], "locator": "paragraph 7",
+                                                "quote": "On 2024-01-09 Meridian was charged a handling fee of 1,250.50 USD."}))["id"]
+    monkeypatch.setattr(reasoning, "get_llm_client", lambda *a, **k: _DraftModel(_presentation_draft(claim["id"], payment["evidence"]["id"], fee)))
     draft = ok(client.post(f"{base}/assistant/presentation-draft", json={"goal": "Show who received the money.", "record_refs": [
-        {"record_type": "claim", "record_id": claim["id"]}, {"record_type": "evidence", "record_id": payment["evidence"]["id"]}]}))
+        {"record_type": "claim", "record_id": claim["id"]}, {"record_type": "evidence", "record_id": payment["evidence"]["id"]},
+        {"record_type": "evidence", "record_id": fee}]}))
     ai_candidate = draft["candidate_id"]
     ok(client.post(f"/api/ai-analysis-candidates/{ai_candidate}/review", json={"decision": "accept"}))
     writeup = ok(client.post(f"/api/ai-analysis-candidates/{ai_candidate}/promote-to-writeup", json={"title": "The brief"}))
