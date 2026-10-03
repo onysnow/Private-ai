@@ -38,8 +38,9 @@ reversed; the code built on it says which ADR line it rests on.
    browser (an export then needs an open browser tab).
 3. **Sigma.js replaces vis-network everywhere** when the network pass is built;
    until then vis-network stays as it is. Reason: one network library, one
-   style; vis-network is two major versions behind (research doc). Not done in
-   the overnight build.
+   style; vis-network is two major versions behind (research doc). Built in
+   visuals pass 4 (2026-10-03): `components/entity-graph.tsx` on Sigma.js 3 and
+   graphology, laid out with ForceAtlas2; vis-network and vis-data removed.
 4. **Maps use a self-hosted Protomaps base map.** Reason: the fixed constraint
    that nothing leaves the machine without a click; a hosted tile server sees
    every place a reporter looks at. Not done in the overnight build.

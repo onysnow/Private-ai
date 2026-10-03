@@ -1,24 +1,34 @@
 'use client';
 
-// Issue #39: reusable interactive entity-relationship graph on vis-network.
-// Used by app/page.tsx's relationship graph section (lazy-loaded, client
-// only).
+// The relationship network, drawn with Sigma.js (WebGL) over a graphology
+// graph (visuals pass 4; ADR-0005 line 3: Sigma.js replaces vis-network,
+// which was two major versions behind). The research doc picked Sigma for
+// networks of thousands of nodes; it is used for every network so the app
+// has one network library and one look.
 //
-// DataSet reactivity: nodes/edges DataSets are created once (in a ref) and
-// kept in sync with the `nodes`/`edges` props via diff-and-update on every
-// change, rather than tearing down and recreating the vis Network -- that
-// preserves the user's current pan/zoom/drag layout across data refreshes.
+// Layout: lib/network-layout.ts (ForceAtlas2 from a circle, deterministic),
+// computed again only when the parties or links change. The camera (pan
+// and zoom) is the reporter's and survives a change of data.
 //
-// Physics: runs only long enough to stabilize the initial layout, then is
-// turned off (`stabilizationIterationsDone`) so the graph stops jittering,
-// while drag/zoom/pan interaction stays enabled throughout.
+// Evidentiary status (TAS-style, from the caller; the graph never infers
+// it) is drawn as the node's fill and border, and a tentative status
+// (inferred, hypothesized, contested) also as a second ring inside the
+// border: WebGL draws no dashed borders, and colour must not be the only
+// cue (design rule 12). On a link, a tentative status is a thinner line.
+//
+// Interaction: click a party or a link (the callers open its dossier or its
+// relationship); hovering a party dims everything not linked to it, and
+// names it with its schema under the drawing.
 import * as React from 'react';
-import {useEffect, useRef} from 'react';
-import {DataSet} from 'vis-data';
-import {Network} from 'vis-network';
-import type {Edge as VisEdge, Node as VisNode, Options as VisOptions} from 'vis-network';
+import {useEffect, useMemo, useRef, useState} from 'react';
+import type Graph from 'graphology';
+import Sigma from 'sigma';
+import {EdgeArrowProgram} from 'sigma/rendering';
+import {createNodeBorderProgram} from '@sigma/node-border';
 
 import type {EntityGraphEdge, EntityGraphNode, EvidenceStatus} from '@/lib/entity-graph-types';
+import {countCrossings, layoutNetwork, networkGraph} from '@/lib/network-layout';
+import type {Point} from '@/lib/network-layout';
 
 export type EntityGraphProps = {
   nodes: EntityGraphNode[];
@@ -26,149 +36,142 @@ export type EntityGraphProps = {
   height?: number;
   onNodeClick?: (nodeId: string) => void;
   onEdgeClick?: (edgeId: string) => void;
+  /** Told the places and how many links cross each time the drawing is laid out (rule 18). */
+  onLayout?: (drawn: {positions: Record<string, Point>, crossings: number}) => void;
 };
 
-// Color encoding for TAS-style evidentiary status. Keyed off the actual
-// current Dark Academia HSL design tokens (app/globals.css) where one maps
-// cleanly; statuses with no existing token get an explicit, clearly-labeled
-// color built from the same palette family rather than an unrelated hue.
-// (Fixed 2026-09-29: this map still held its pre-redesign blue-ish values
-// after the "Redesign Phase 1: trace every palette token to its swatch
-// half" commits changed globals.css -- the comments claimed a token mapping
-// the hardcoded hex/HSL values didn't actually have. The graph rendered
-// off-palette against the rest of the redesigned app.)
-const STATUS_COLOR: Record<EvidenceStatus, {border: string; background: string; dashed?: boolean}> = {
-  documented: {border: 'hsl(40 56% 46%)', background: 'hsl(14 60% 14%)'}, // --primary gold border on a --secondary-hue dark surface
-  corroborated: {border: 'hsl(162 55% 45%)', background: 'hsl(162 30% 12%)'}, // brightened --accent forest green: independently supported
-  alleged: {border: 'hsl(7 53% 35%)', background: 'hsl(7 53% 12%)'}, // --destructive brick red
-  inferred: {border: 'hsl(36 60% 58%)', background: 'hsl(36 40% 12%)', dashed: true}, // --ring brighter gold, dashed: not directly stated
-  hypothesized: {border: 'hsl(36 60% 58%)', background: 'hsl(202 21% 13%)', dashed: true}, // --ring gold on --card surface, dashed: tentative
-  contested: {border: 'hsl(7 53% 35%)', background: 'hsl(7 53% 12%)', dashed: true}, // --destructive + dashed: disputed
-  unknown: {border: 'hsl(37 22% 47%)', background: 'hsl(202 21% 13%)'}, // --muted-foreground / --card
+type StatusStyle = {border: string; background: string; tentative?: boolean};
+
+// The app's Dark Academia tokens (app/globals.css), as in the previous
+// drawing, written as hex: Sigma's colour parser reads hex and rgb(a), not
+// hsl (an hsl colour came out black).
+const STATUS_STYLE: Record<EvidenceStatus, StatusStyle> = {
+  documented: {border: '#b78b34', background: '#39180e'},     // --primary gold on a --secondary-hue dark
+  corroborated: {border: '#34b28c', background: '#152822'},   // brightened --accent forest green
+  alleged: {border: '#89352a', background: '#2f120e'},        // --destructive brick red
+  inferred: {border: '#d4a154', background: '#2b2112', tentative: true},       // --ring gold
+  hypothesized: {border: '#d4a154', background: '#1a2328', tentative: true},   // --ring gold on --card
+  contested: {border: '#89352a', background: '#2f120e', tentative: true},      // --destructive
+  unknown: {border: '#927e5d', background: '#1a2328'},        // --muted-foreground on --card
 };
+const LABEL_COLOUR = '#caaf9c';     // --da-parchment
+const DIMMED = '#313a3f';
+const NODE_SIZE = 10;
+// Past this many links their names are written only beside the hovered
+// party's links: more, and they cover each other.
+const EDGE_LABEL_LIMIT = 8;
 
-function statusColor(status: EvidenceStatus | undefined): {border: string; background: string; dashed?: boolean} {
-  return STATUS_COLOR[status ?? 'unknown'];
+export function statusStyle(status: EvidenceStatus | undefined): StatusStyle {
+  return STATUS_STYLE[status ?? 'unknown'];
 }
 
-function toVisNode(node: EntityGraphNode): VisNode {
-  const color = statusColor(node.status);
-  return {
-    id: node.id,
-    label: node.schema ? `${node.label}\n${node.schema}` : node.label,
-    title: node.title ?? node.label,
-    shape: 'box',
-    color: {border: color.border, background: color.background, highlight: color},
-    font: {color: '#caaf9c'}, // --da-parchment: on-theme light tone, legible against the dark node fills above
-  };
+/** The graphology graph Sigma draws: the layout's places plus each party's
+ * and link's look. Exported for the tests, which cannot run WebGL. */
+export function drawnGraph(nodes: EntityGraphNode[], edges: EntityGraphEdge[]): {graph: Graph, positions: Record<string, Point>} {
+  const graph = networkGraph(nodes.map(n => ({id: n.id, label: n.label})), edges.map(e => ({id: e.id, from: e.from, to: e.to, label: e.label})));
+  const positions = layoutNetwork(graph);
+  const byNode = new Map(nodes.map(n => [n.id, n]));
+  graph.forEachNode(id => {
+    const node = byNode.get(id) as EntityGraphNode;
+    const style = statusStyle(node.status);
+    graph.mergeNodeAttributes(id, {
+      label: node.label, size: NODE_SIZE, color: style.background, borderColor: style.border,
+      // The inner ring: the border's colour for a tentative status, else the fill (no ring shows).
+      ringColor: style.tentative ? style.border : style.background,
+      title: [node.label, node.schema, node.title && node.title !== node.label ? node.title : null].filter(Boolean).join(' · '),
+    });
+  });
+  const byEdge = new Map(edges.map(e => [e.id, e]));
+  graph.forEachEdge(id => {
+    const edge = byEdge.get(id) as EntityGraphEdge;
+    const style = statusStyle(edge.status);
+    graph.mergeEdgeAttributes(id, {label: edge.label ?? '', color: style.border, size: style.tentative ? 1 : 2, type: 'arrow'});
+  });
+  return {graph, positions};
 }
 
-function toVisEdge(edge: EntityGraphEdge): VisEdge {
-  const color = statusColor(edge.status);
-  return {
-    id: edge.id,
-    from: edge.from,
-    to: edge.to,
-    label: edge.label,
-    title: edge.title ?? edge.label,
-    color: {color: color.border, highlight: color.border},
-    dashes: Boolean(color.dashed),
-    arrows: 'to',
-    font: {color: '#caaf9c', strokeWidth: 0}, // --da-parchment: matches node labels, legible against the near-black canvas
-  };
-}
+const BorderedNode = createNodeBorderProgram({
+  borders: [
+    {size: {value: 0.2}, color: {attribute: 'borderColor'}},
+    {size: {value: 0.1}, color: {attribute: 'color'}},
+    {size: {value: 0.14}, color: {attribute: 'ringColor'}},
+    {size: {fill: true}, color: {attribute: 'color'}},
+  ],
+});
 
-/** Upserts every incoming item and removes any DataSet item whose id is no
- * longer present, without ever clearing the whole DataSet (which would
- * flash/reset vis-network's internal state for unchanged items). Two
- * concrete (non-generic) helpers rather than one generic<T>: vis-data's
- * DataSet<T>.update() wants DeepPartial<T>[] and IdType (string|number),
- * which a shared `T extends {id: string}` constraint can't satisfy for
- * both vis-network's Node and Edge types at once. */
-function syncNodeDataSet(dataset: DataSet<VisNode>, items: VisNode[]): void {
-  const incomingIds = new Set(items.map((item) => String(item.id)));
-  const staleIds = dataset.getIds().filter((id) => !incomingIds.has(String(id)));
-  if (staleIds.length > 0) {
-    dataset.remove(staleIds);
-  }
-  if (items.length > 0) {
-    dataset.update(items);
-  }
-}
-
-function syncEdgeDataSet(dataset: DataSet<VisEdge>, items: VisEdge[]): void {
-  const incomingIds = new Set(items.map((item) => String(item.id)));
-  const staleIds = dataset.getIds().filter((id) => !incomingIds.has(String(id)));
-  if (staleIds.length > 0) {
-    dataset.remove(staleIds);
-  }
-  if (items.length > 0) {
-    dataset.update(items);
-  }
-}
-
-const BASE_OPTIONS: VisOptions = {
-  autoResize: true,
-  interaction: {dragNodes: true, dragView: true, zoomView: true, hover: true},
-  physics: {
-    enabled: true,
-    stabilization: {iterations: 200},
-    barnesHut: {gravitationalConstant: -8000, springLength: 140, springConstant: 0.04},
-  },
-  edges: {smooth: {enabled: true, type: 'dynamic', roundness: 0.5}},
-};
-
-export function EntityGraph({nodes, edges, height = 480, onNodeClick, onEdgeClick}: EntityGraphProps): React.ReactElement {
+export function EntityGraph({nodes, edges, height = 480, onNodeClick, onEdgeClick, onLayout}: EntityGraphProps): React.ReactElement {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const networkRef = useRef<Network | null>(null);
-  const nodesDataSetRef = useRef<DataSet<VisNode> | null>(null);
-  const edgesDataSetRef = useRef<DataSet<VisEdge> | null>(null);
-  const onNodeClickRef = useRef(onNodeClick);
-  const onEdgeClickRef = useRef(onEdgeClick);
-  onNodeClickRef.current = onNodeClick;
-  onEdgeClickRef.current = onEdgeClick;
+  const sigmaRef = useRef<Sigma | null>(null);
+  // The reporter's pan and zoom, kept across a new drawing of new data.
+  const cameraRef = useRef<ReturnType<ReturnType<Sigma['getCamera']>['getState']> | null>(null);
+  const handlers = useRef({onNodeClick, onEdgeClick});
+  handlers.current = {onNodeClick, onEdgeClick};
+  const [hovered, setHovered] = useState<string | null>(null);
+  const hoveredRef = useRef<string | null>(null);
+  hoveredRef.current = hovered;
+
+  // Laid out again only when what is drawn changes, not when a caller
+  // passes equal arrays anew (the camera and the places stay put).
+  const signature = JSON.stringify([nodes, edges]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const drawn = useMemo(() => drawnGraph(nodes, edges), [signature]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const crossings = useMemo(() => countCrossings(edges.map(e => ({id: e.id, from: e.from, to: e.to})), drawn.positions), [drawn]);
 
   useEffect(() => {
-    if (!containerRef.current) return;
-    const nodesDataSet = new DataSet<VisNode>(nodes.map(toVisNode));
-    const edgesDataSet = new DataSet<VisEdge>(edges.map(toVisEdge));
-    nodesDataSetRef.current = nodesDataSet;
-    edgesDataSetRef.current = edgesDataSet;
-
-    const network = new Network(containerRef.current, {nodes: nodesDataSet, edges: edgesDataSet}, BASE_OPTIONS);
-    networkRef.current = network;
-
-    network.once('stabilizationIterationsDone', () => {
-      network.setOptions({physics: {enabled: false}});
-    });
-    network.on('click', (event: {nodes: string[]; edges: string[]}) => {
-      if (event.nodes.length > 0) {
-        onNodeClickRef.current?.(String(event.nodes[0]));
-      } else if (event.edges.length > 0) {
-        onEdgeClickRef.current?.(String(event.edges[0]));
-      }
-    });
-
-    return () => {
-      network.destroy();
-      networkRef.current = null;
-      nodesDataSetRef.current = null;
-      edgesDataSetRef.current = null;
-    };
-    // Only re-initialize the Network on mount/unmount; node/edge updates
-    // flow through the DataSet-sync effects below instead of a rebuild.
+    onLayout?.({positions: drawn.positions, crossings});
+    // Told once per layout; a new callback alone is not a new layout.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [drawn, crossings]);
 
   useEffect(() => {
-    if (!nodesDataSetRef.current) return;
-    syncNodeDataSet(nodesDataSetRef.current, nodes.map(toVisNode));
-  }, [nodes]);
+    const container = containerRef.current;
+    if (!container) return;
+    const renderer = new Sigma(drawn.graph, container, {
+      renderEdgeLabels: true,
+      enableEdgeEvents: true,
+      defaultNodeType: 'bordered',
+      defaultEdgeType: 'arrow',
+      nodeProgramClasses: {bordered: BorderedNode},
+      edgeProgramClasses: {arrow: EdgeArrowProgram},
+      labelColor: {color: LABEL_COLOUR},
+      edgeLabelColor: {color: LABEL_COLOUR},
+      labelRenderedSizeThreshold: 0,
+      // Every party's name is written (Sigma otherwise keeps one per crowded patch).
+      labelDensity: 1,
+      labelGridCellSize: 1,
+      zIndex: true,
+      nodeReducer: (id, attrs) => {
+        const focus = hoveredRef.current;
+        if (!focus || focus === id || drawn.graph.areNeighbors(focus, id)) return {...attrs, zIndex: focus === id ? 1 : 0};
+        return {...attrs, color: DIMMED, borderColor: DIMMED, ringColor: DIMMED, label: '', zIndex: 0};
+      },
+      edgeReducer: (id, attrs) => {
+        const focus = hoveredRef.current;
+        if (focus && drawn.graph.hasExtremity(id, focus)) return attrs;
+        if (focus) return {...attrs, color: DIMMED, label: ''};
+        return drawn.graph.size > EDGE_LABEL_LIMIT ? {...attrs, label: ''} : attrs;
+      },
+    });
+    if (cameraRef.current) renderer.getCamera().setState(cameraRef.current);
+    renderer.on('clickNode', ({node}) => handlers.current.onNodeClick?.(node));
+    renderer.on('clickEdge', ({edge}) => handlers.current.onEdgeClick?.(edge));
+    renderer.on('enterNode', ({node}) => setHovered(node));
+    renderer.on('leaveNode', () => setHovered(null));
+    sigmaRef.current = renderer;
+    return () => {
+      cameraRef.current = renderer.getCamera().getState();
+      renderer.kill();
+      if (sigmaRef.current === renderer) sigmaRef.current = null;
+    };
+  }, [drawn]);
 
-  useEffect(() => {
-    if (!edgesDataSetRef.current) return;
-    syncEdgeDataSet(edgesDataSetRef.current, edges.map(toVisEdge));
-  }, [edges]);
+  useEffect(() => { sigmaRef.current?.refresh(); }, [hovered]);
 
-  return <div ref={containerRef} className="entity-graph" style={{height, width: '100%'}} data-testid="entity-graph" />;
+  const title = hovered && drawn.graph.hasNode(hovered) ? String(drawn.graph.getNodeAttribute(hovered, 'title') ?? '') : '';
+  return <div>
+    <div ref={containerRef} className="entity-graph" style={{height, width: '100%'}} data-testid="entity-graph"
+      role="img" aria-label={`Network of ${nodes.length} parties and ${edges.length} links; the connection grid and the relationship list hold the same links as text.`}/>
+    <p className="muted text-xs" aria-live="polite" style={{minHeight: '1.25rem'}}>{title}</p>
+  </div>;
 }

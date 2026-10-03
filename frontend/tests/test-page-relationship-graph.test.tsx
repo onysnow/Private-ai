@@ -17,9 +17,9 @@
 // selects without any user interaction -- no need to drive the <select>
 // elements by hand.
 //
-// The <Graph> component now renders the vis-network <EntityGraph> (issue
-// #39 wiring). vis-network needs a real canvas 2D context, which jsdom does
-// not have, so <EntityGraph> is replaced below with a DOM stub that renders
+// The <Graph> component renders the Sigma.js <EntityGraph> (issue #39
+// wiring; visuals pass 4). Sigma draws with WebGL, which jsdom does not
+// have, so <EntityGraph> is replaced below with a DOM stub that renders
 // one button per node and edge and calls the same onNodeClick/onEdgeClick
 // props -- matching the convention in tests/test-entity-graph.test.tsx of
 // asserting what the page passes down rather than third-party rendering.

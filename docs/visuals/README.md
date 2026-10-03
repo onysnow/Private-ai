@@ -375,6 +375,38 @@ rows rank as bars.
 - Tests: `tests/test_visuals_flows.py`, and the `sankey` fixture in
   `frontend/test-support/chart-kinds.json`.
 
+## Pass 4: the network and the connection grid
+
+The relationship network is drawn with Sigma.js 3 (WebGL) over a
+graphology graph (ADR-0005, line 3; vis-network is gone).
+
+- **Layout** (`frontend/lib/network-layout.ts`): ForceAtlas2 (Jacomy et al.
+  2014), started from a circle in id order and run synchronously, so the
+  same records give the same picture; its own `inferSettings` (Barnes-Hut
+  for large graphs). Laid out again only when the parties or links change;
+  the reporter's pan and zoom survive a change of data.
+- **Status** (the caller's; the graph infers none): fill and border, and a
+  second ring inside the border for a tentative status (inferred,
+  hypothesized, contested), since WebGL draws no dashed border and colour
+  must not be the only cue (rule 12); a tentative link is thinner. Colours
+  are hex: Sigma's parser reads no hsl.
+- **Words**: every party named; link names beside the hovered party's links
+  only past eight links (they covered each other); the hovered party's
+  name and schema under the drawing.
+- **Rule 18**: the drawing counts the pairs of links that cross, as
+  straight lines between their parties, and says so under it. Past twenty
+  parties the panel offers the connection grid
+  (`frontend/components/connection-grid.tsx`): a row and a column per
+  party, most-linked first, a cell per pair holding its links; matrices read
+  better than node-link drawings for most tasks past about twenty nodes
+  (Ghoniem, Fekete and Castagliola, InfoVis 2004). It is an HTML table
+  rather than an ECharts heatmap, so every name and count is text a screen
+  reader reads; each count keeps 4.5:1 against its shade.
+- Tests: `frontend/tests/test-network-layout.test.ts`,
+  `test-entity-graph.test.tsx` (Sigma faked: jsdom has no WebGL),
+  `test-graph-views.test.tsx`. Checked by eye in Chromium (SwiftShader
+  WebGL).
+
 ## What pass 3 built, and what is left
 
 Built: the drawing of the seven statistical kinds, the two queries they

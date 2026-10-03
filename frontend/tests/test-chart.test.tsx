@@ -6,7 +6,7 @@
 // module, theme, option, renderer) -- actually rendering pixels to canvas
 // is echarts's own tested responsibility, not this wrapper's. (A quick
 // manual probe confirmed real echarts-for-react does not crash under
-// jsdom -- unlike vis-network, which needs getContext('2d') --  but
+// jsdom -- unlike a WebGL drawing such as the Sigma network --  but
 // asserting on canvas pixel output still isn't a meaningful test here.)
 import {cleanup, render, screen} from '@testing-library/react';
 import {afterEach, describe, expect, it, vi} from 'vitest';

@@ -3,7 +3,7 @@
 // generated client (Foundation Fixes fixes 2 and 3): the relationship form
 // (endpoints pre-selected from the entity list, Payment properties), the
 // manual entity form, the schema filter, the duplicate-edge toggle, the
-// drawing (vis-network replaced by a DOM stub, as in test-entity-graph),
+// drawing (the Sigma network replaced by a DOM stub, as in test-entity-graph),
 // one opened relationship with its evidence attached and assessed, the
 // relationship list, the money flows, and the requests other panels make
 // through the shared store.
