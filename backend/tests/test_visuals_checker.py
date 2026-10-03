@@ -12,6 +12,7 @@ from app.visuals.checker import NOT_CHECKABLE_HERE, CheckReport, check_visual
 from app.visuals.data_service import DataRow, RecordRef, VisualData
 from app.visuals.echarts import build_chart
 from app.visuals.spec import ChartKind, VisualSpec, parse_spec
+from visuals_helpers import withhold_kind
 
 DARK = theme_for("dark_academia")
 
@@ -291,17 +292,19 @@ def test_rule_20_values_resting_on_one_record_are_flagged():
     assert 20 not in _rules(check_visual(_spec(), GOOD, DARK).warnings)
 
 
-def test_a_kind_that_is_not_drawn_yet_is_checked_on_spec_and_data_only():
+def test_a_kind_that_is_not_drawn_yet_is_checked_on_spec_and_data_only(monkeypatch):
+    withhold_kind(monkeypatch, ChartKind.timeline)
     over_time = _data([("2020", 5, 1), ("2021", 7, 2)], series_kind="time", query="payments_over_time")
     report = check_visual(_spec(kind="timeline", query="payments_over_time"), over_time, DARK)
     assert report.ok
     # Rule 12 needs the option only when something is highlighted.
-    assert {0, 6, 7, 9, 10, 13, 14, 15, 16, 20} <= set(report.not_checked)
+    assert {0, 6, 7, 9, 10, 13, 14, 15} <= set(report.not_checked)
     assert "not drawn yet" in report.not_checked[6]
     # What the order slip, the data and the theme can tell is judged ...
     assert {2, 4, 11, 19} <= set(report.checked_rules)
     # ... and rules about other kinds of chart are not applicable, not "checked".
-    assert {1, 3, 5, 8} <= set(report.not_applicable)
+    # (A timeline's mark is one event, one record: rules 16 and 20 are about groups of records.)
+    assert {1, 3, 5, 8, 16, 20} <= set(report.not_applicable)
     assert not set(report.not_applicable) & set(report.checked_rules)
 
 

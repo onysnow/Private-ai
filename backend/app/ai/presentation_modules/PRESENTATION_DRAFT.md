@@ -67,7 +67,12 @@ forms for every section, every time.
         `bar`; `column` only for a few short labels.
       - `change_over_time` -- how a value rises and falls across periods:
         `line`; `column` for a handful of periods; `area` when the total
-        built up over time is the point.
+        built up over time is the point. What happened when, and for how
+        long: `timeline`, only over `events_in_order` (narrow it with
+        `from`, `to` or `status` when there are many events); it takes no
+        `sort` or `limit`, and its `highlight` names events by title.
+        Prefer it to the hand-typed `timeline` visual above: its dates
+        come from the records, not from you.
       - `part_of_whole` -- how a total splits into parts (each recipient's
         share): `stacked_bar_100`; `donut` only with four parts at most
         (set `limit: 3` and the rest fold into "Other"); `treemap` for
@@ -90,8 +95,8 @@ forms for every section, every time.
       its `params` (e.g. `{"name": "payments_by_party", "params":
       {"direction": "received"}}`). Optional: `sort` (`value_desc`,
       `value_asc`, `label`, `time`) and `limit` (keep the top N; the rest
-      fold into "Other"), neither for a histogram, a scatter plot or a
-      flow diagram, whose order and points come from the data; `highlight` (labels to
+      fold into "Other"), neither for a histogram, a scatter plot, a
+      flow diagram or a timeline, whose order and points come from the data; `highlight` (labels to
       pick out). The Workbench runs the query, tags every value with its
       records, draws the chart and checks it against the design rules; a
       chart that fails is removed from the draft and you may be asked once

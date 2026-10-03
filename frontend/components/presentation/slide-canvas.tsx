@@ -263,19 +263,28 @@ function Timeline({visual, style, lookup, region}: {visual: Extract<Presentation
 }
 
 /** A checked chart placed in a slide region, scaled to fit it. A kind
- * PowerPoint cannot hold natively (the treemap) shows what the deck stored
- * for this slide -- the drawing at the slide's own scale, or its parts as
- * bars with the reason -- so the preview is what the export will be. */
+ * PowerPoint cannot hold natively (the treemap, the sankey, the timeline)
+ * shows what the deck stored for this slide -- the drawing at the slide's
+ * own scale, or, with the reason, its parts as bars (a timeline: its events
+ * listed, as the export's table lists them) -- so the preview is what the
+ * export will be. */
 export function SlideChart({visual, region}: {visual: ChartVisual, region: Region}): ReactElement {
   const {c, sans} = useTheme();
   const [x, y, w, h] = region;
   const drawing = visual.slide_drawing;
   const shown: ChartVisual | null = !drawing ? visual
     : drawing.option ? {...visual, option: drawing.option, width: drawing.width, height: drawing.height} : null;
+  const listed = drawing?.note && !shown && visual.spec.kind === 'timeline';
   return <div style={{...box(x, y, w, h), background: '#fff0', display: 'flex', flexDirection: 'column'}} data-testid="slide-chart"
-    data-drawing={drawing ? (drawing.note ? 'bars' : 'slide') : 'design'}>
+    data-drawing={drawing ? (drawing.note ? (listed ? 'events' : 'bars') : 'slide') : 'design'}>
     {drawing?.note && <div style={{fontFamily: sans, fontSize: pt(11), fontStyle: 'italic', color: c('alert')}}>{drawing.note}</div>}
     {shown ? <div style={{flex: 1, minHeight: 0}}><ScaledChart visual={shown} fill/></div> : null}
+    {listed && <table style={{fontFamily: sans, fontSize: pt(11), color: c('text'), borderCollapse: 'collapse', marginTop: pt(6)}}>
+      <thead><tr>{['Event', 'When', 'Status'].map(h => <th key={h} scope="col" style={{textAlign: 'left', paddingRight: pt(10)}}>{h}</th>)}</tr></thead>
+      <tbody>{visual.text.data_table.rows.map(r => <tr key={r.label}>
+        <td style={{paddingRight: pt(10)}}>{r.label}</td><td style={{paddingRight: pt(10)}}>{r.formatted}</td><td style={{color: c('muted')}}>{r.status ?? ''}</td>
+      </tr>)}</tbody>
+    </table>}
   </div>;
 }
 

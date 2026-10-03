@@ -441,7 +441,14 @@ def _fixture_orders() -> dict[str, tuple[str, VisualData]]:
                DataRow("Meridian Holdings Ltd → Orrin Ltd", 150000, ref("f4", "f5", "f6"), 3, "Meridian Holdings Ltd → Orrin Ltd",
                        source="Meridian Holdings Ltd", target="Orrin Ltd")]
     flows = VisualData("inv", "payment_flows", {}, "USD", "amount", "flows", "payments", flowing, "USD", 6)
+    happened = [DataRow("Alaric Voss appointed director", 1.0, [RecordRef("timeline_event", "e1")], 1, "2019-06-11", start="2019-06-11", status="verified"),
+                DataRow("Bellcastle becomes sole owner", 1.0, [RecordRef("timeline_event", "e2")], 1, "2021-02-01", start="2021-02", status="verified"),
+                DataRow("Consulting contract runs", 1.0, [RecordRef("timeline_event", "e3")], 1, "2022-03-01", start="2022-03-01", end="2023-08-31",
+                        status="asserted"),
+                DataRow("Disputed $2.4M payment", 1.0, [RecordRef("timeline_event", "e4")], 1, "2023-11-14", start="2023-11-14", status="disputed")]
+    events = VisualData("inv", "events_in_order", {}, "events", "count", "events", "events", happened, record_count=4)
     return {
+        "timeline": ("The payment came two years after Bellcastle took control", events),
         "sankey": ("Most of Meridian's money went to Bellcastle", flows),
         "bar": ("Meridian received most of the money", by_party),
         "column": ("Payments fell after the November transfer", by_month),

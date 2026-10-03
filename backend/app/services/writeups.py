@@ -108,7 +108,12 @@ def extract_plain_text(content_json: dict) -> str:
                 if title:
                     lines.append(str(title))
                 for row in ((visual.get("data") or {}).get("rows") or []):
-                    lines.append(f"{row.get('value')} — {row.get('label', '')}")
+                    if isinstance(row.get("start"), str):
+                        # An event's line leads with its date as recorded, as a hand-made timeline item does.
+                        when = row["start"] + (f" to {row['end']}" if isinstance(row.get("end"), str) else "")
+                        lines.append(f"{when} — {row.get('label', '')}")
+                    else:
+                        lines.append(f"{row.get('value')} — {row.get('label', '')}")
             return
         if node_type == "callout":
             flush()
@@ -395,14 +400,18 @@ def _render_data_table(docx: Any, built: Any, data: Any, citation_index: dict[tu
     """The data behind the chart, every row with its records (rules 13, 15,
     16 and 20): its label with the record count and the single-record mark,
     then the columns its kind writes (a scatter plot's x, a part's share),
-    the value and the number of records."""
+    the value (a timeline: when), an event's status, and the number of
+    records."""
     from app.services.decks import chart_row_labels
 
     decorate = chart_row_labels(data, built.rows)
     table_rows = built.data_table.get("rows") or []
     with_x = any("x_formatted" in r for r in table_rows)
     with_share = any("share" in r for r in table_rows)
-    widths = [4.3, 1.2, 1.0] if not (with_x or with_share) else [3.4, 1.0, 1.2, 0.9]
+    with_status = any("status" in r for r in table_rows)
+    widths = [4.3, 1.2, 1.0] if not (with_x or with_share or with_status) else [3.4, 1.0, 1.2, 0.9]
+    if with_status:
+        widths = [3.0, 2.0, 1.0, 0.5]
     table = docx.add_table(rows=0, cols=len(widths))
     _row_rules(table)
     for row, cells_in in zip(built.rows, table_rows):
@@ -416,10 +425,31 @@ def _render_data_table(docx: Any, built: Any, data: Any, citation_index: dict[tu
         values.append(str(cells_in.get("formatted", "")))
         if with_share:
             values.append(f"{cells_in['share']:.1f}%" if isinstance(cells_in.get("share"), (int, float)) else "")
+        if with_status:
+            values.append(str(cells_in.get("status") or ""))
         for cell, text in zip(cells[1:-1], values):
             _set_run(cell.paragraphs[0].add_run(text), size=9.5, color=DOCX_INK, font=DOCX_SANS, bold=True)
         _set_run(cells[-1].paragraphs[0].add_run(f"{row.record_count}"), size=9.5, color=DOCX_TAUPE, font=DOCX_SANS)
     _set_widths(table, widths)
+
+
+def _render_events_table(docx: Any, rows: list[Any], citation_index: dict[tuple[str, str], int]) -> None:
+    """A timeline's events, in date order, when the chart itself cannot be
+    drawn: the event with its records, when, and how far it is verified."""
+    from app.visuals.echarts import status_words, when_text
+
+    table = docx.add_table(rows=0, cols=3)
+    _row_rules(table)
+    for row in rows:
+        cells = table.add_row().cells
+        p = cells[0].paragraphs[0]
+        _set_run(p.add_run(row.label), size=9.5, color=DOCX_INK, font=DOCX_SANS)
+        marker = _refs_marker([r.as_dict() for r in row.record_refs], citation_index)
+        if marker:
+            _set_run(p.add_run(" " + marker), size=8, color=DOCX_BRASS, font=DOCX_SANS, superscript=True)
+        _set_run(cells[1].paragraphs[0].add_run(when_text(row)), size=9.5, color=DOCX_INK, font=DOCX_SANS, bold=True)
+        _set_run(cells[2].paragraphs[0].add_run(status_words(row)), size=9.5, color=DOCX_TAUPE, font=DOCX_SANS)
+    _set_widths(table, [3.4, 2.1, 1.0])
 
 
 def _render_chart(docx: Any, visual: dict, citation_index: dict[tuple[str, str], int]) -> None:
@@ -456,7 +486,11 @@ def _render_chart(docx: Any, visual: dict, citation_index: dict[tuple[str, str],
         warn = _para(docx, space_after=4)
         _set_run(warn.add_run(checked.problem or "Chart not available."), size=9, color=DOCX_OXBLOOD, font=DOCX_SANS, italic=True)
         _spec, _data, rows = chart_rows(visual)
-        _render_bar_table(docx, chart_bar_items(rows, chart_row_labels(data, rows)), data.unit, citation_index)
+        if spec.kind.value == "timeline":
+            # Every event counts one, so bars would say nothing: list them with their dates.
+            _render_events_table(docx, rows, citation_index)
+        else:
+            _render_bar_table(docx, chart_bar_items(rows, chart_row_labels(data, rows)), data.unit, citation_index)
         return
 
     image: bytes | None = None

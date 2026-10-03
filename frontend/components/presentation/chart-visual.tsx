@@ -65,16 +65,19 @@ type TableRow = ChartVisual['text']['data_table']['rows'][number];
 /** A data-table row's cells in the order the backend lists its columns
  * (backend/app/visuals/echarts.py): the label, a flow's payer and recipient
  * when the chart shows flows, a scatter plot's second number when the chart
- * has one, the value, a part's share when the chart shows parts of a whole,
- * and the number of records behind the value. */
+ * has one, the value (a timeline's: when the event happened), a part's
+ * share when the chart shows parts of a whole, an event's verification
+ * status on a timeline, and the number of records behind the value. */
 export function tableCells(rows: TableRow[], row: TableRow): {key: string, text: string, numeric: boolean}[] {
   const cells = [];
   if (rows.some(r => r.source !== undefined)) {
     cells.push({key: 'source', text: row.source ?? '', numeric: false}, {key: 'target', text: row.target ?? '', numeric: false});
   }
   if (rows.some(r => r.x_formatted !== undefined)) cells.push({key: 'x', text: row.x_formatted ?? '', numeric: true});
-  cells.push({key: 'value', text: row.formatted, numeric: true});
+  const events = rows.some(r => r.status !== undefined);
+  cells.push({key: 'value', text: row.formatted, numeric: !events});
   if (rows.some(r => r.share !== undefined)) cells.push({key: 'share', text: row.share === undefined ? '' : `${row.share.toFixed(1)}%`, numeric: true});
+  if (events) cells.push({key: 'status', text: row.status ?? '', numeric: false});
   cells.push({key: 'records', text: String(row.record_count), numeric: true});
   return cells;
 }
@@ -96,7 +99,8 @@ export function ChartFigure({visual, renderCitations}: {visual: ChartVisual, ren
           {renderCitations ? <th className="border-b py-1 font-semibold">Sources</th> : null}
         </tr></thead>
         <tbody>{table.rows.map(row => <tr key={row.label}>
-          <td className="border-b py-1 pr-3">{row.label}{row.record_count === 1 ? <span title="Rests on a single record"> †</span> : null}</td>
+          {/* A timeline's event is one record by what it is (rules 16 and 20 do not apply), so it carries no mark. */}
+          <td className="border-b py-1 pr-3">{row.label}{row.record_count === 1 && row.status === undefined ? <span title="Rests on a single record"> †</span> : null}</td>
           {tableCells(table.rows, row).map(cell => <td key={cell.key} className="border-b py-1 pr-3 tabular-nums">{cell.text}</td>)}
           {renderCitations ? <td className="border-b py-1">{renderCitations(row.record_refs)}</td> : null}
         </tr>)}</tbody>

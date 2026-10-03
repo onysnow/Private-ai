@@ -12,10 +12,11 @@ import pytest
 from app.services.presentation_style import resolved_theme, theme as theme_for
 from app.visuals.data_service import DataRow, RecordRef, VisualData
 from app.visuals.echarts import (
-    MIN_FONT_PX, OTHER_LABEL, SINGLE_RECORD_MARK, UnsupportedChartKind, build_chart, build_option, format_value, prepare_rows,
+    BOLD_SLACK, MIN_FONT_PX, OTHER_LABEL, SINGLE_RECORD_MARK, UnsupportedChartKind, build_chart, build_option, format_value, prepare_rows,
     singular,
 )
-from app.visuals.spec import parse_spec
+from app.visuals.spec import ChartKind, parse_spec
+from visuals_helpers import withhold_kind
 
 DARK = theme_for("dark_academia")
 
@@ -95,6 +96,10 @@ def test_highlight_colours_the_picked_bar_and_marks_its_label_without_colour():
     assert axis == {"Arden Partners": "bold", "Meridian Holdings Ltd": "normal", "Harborline Civic Trust": "normal"}
     assert built.highlighted_labels == ["Arden Partners"]
     assert "Highlighted: Arden Partners." in built.description
+    # The bold name is wider than the regular-weight cut the axis keeps in view;
+    # the grid leaves the difference on the left (it was cut off, seen in the render service).
+    assert built.option["grid"]["left"] == BOLD_SLACK
+    assert build_chart(_spec(), RANKED, DARK).option["grid"]["left"] == 0
 
 
 def test_a_limit_folds_the_rest_into_other_keeping_every_record():
@@ -172,7 +177,8 @@ def test_format_value_is_compact_and_honest():
     assert singular("entities") == "entity" and singular("payments") == "payment" and singular("evidence records") == "evidence record"
 
 
-def test_kinds_not_drawn_yet_raise_a_clear_error():
+def test_kinds_not_drawn_yet_raise_a_clear_error(monkeypatch):
+    withhold_kind(monkeypatch, ChartKind.timeline)
     with pytest.raises(UnsupportedChartKind, match="not drawn yet"):
         build_chart(parse_spec({"kind": "timeline", "title": "The payments came in one burst", "query": {"name": "payments_by_party"}}), RANKED, DARK)
 

@@ -46,8 +46,8 @@ export type VisualOptionValue=boolean|string|string[];
 export type VisualStyle={preset?:string,options?:Record<string,VisualOptionValue>};
 export type StyledVisual=({type:'figures',items:FigureItem[]}|{type:'timeline',items:TimelineItem[]}|{type:'bar',title?:string,unit?:string,items:BarItem[]})&{style?:VisualStyle|null};
 export type ChartDataRow={label:string,value:number,record_refs:AiCitationRef[],record_count:number,[key:string]:JsonValue|undefined};
-// A part's share of the whole (100% bar, donut, treemap), a scatter plot's second number and a flow's two parties come only with those kinds.
-export type ChartDataTableRow={label:string,value:number,formatted:string,record_count:number,record_refs:AiCitationRef[],share?:number,x?:number,x_formatted?:string,source?:string,target?:string};
+// A part's share of the whole (100% bar, donut, treemap), a scatter plot's second number, a flow's two parties and an event's verification status (timeline) come only with those kinds.
+export type ChartDataTableRow={label:string,value:number,formatted:string,record_count:number,record_refs:AiCitationRef[],share?:number,x?:number,x_formatted?:string,source?:string,target?:string,status?:string};
 /** A chart the AI ordered and the data service cooked (backend/app/visuals): the rows, the checked ECharts drawing and the words that go with it (alt text, description, data table, source line). */
 // slide_drawing: what a deck slide shows for a kind PowerPoint cannot hold
 // natively (the treemap) -- the drawing at the slide's own scale, or its

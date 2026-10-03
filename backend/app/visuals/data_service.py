@@ -23,8 +23,11 @@ Rules kept here:
 
 from __future__ import annotations
 
+import calendar
+import re
 from collections import defaultdict
 from dataclasses import asdict, dataclass, field
+from datetime import date
 from typing import Any, Callable
 
 from sqlalchemy import select
@@ -55,6 +58,9 @@ class DataRow:
     x: float | None = None   # the second number of a "pairs" row (a scatter plot's x); `value` is its y
     source: str | None = None   # a "flows" row: who the money came from ...
     target: str | None = None   # ... and who it went to; `label` is "source → target"
+    start: str | None = None    # an "events" row: its date as recorded (a year, a month or a day) ...
+    end: str | None = None      # ... the date it ended, when it has one ...
+    status: str | None = None   # ... and how far it is verified (app/services/timeline.py)
 
     def as_dict(self) -> dict[str, Any]:
         out: dict[str, Any] = {"label": self.label, "value": self.value, "record_refs": [r.as_dict() for r in self.record_refs],
@@ -65,6 +71,11 @@ class DataRow:
         if self.source is not None and self.target is not None:
             # Likewise only flows rows.
             out["source"], out["target"] = self.source, self.target
+        if self.start is not None:
+            # And only events rows (an end only when the event has one).
+            out["start"], out["status"] = self.start, self.status
+            if self.end is not None:
+                out["end"] = self.end
         return out
 
 
@@ -109,7 +120,10 @@ class VisualData:
                     record_count=int(r.get("record_count", 0)), key=str(r.get("key", "")),
                     x=float(r["x"]) if isinstance(r.get("x"), (int, float)) and not isinstance(r.get("x"), bool) else None,
                     source=str(r["source"]) if isinstance(r.get("source"), str) and isinstance(r.get("target"), str) else None,
-                    target=str(r["target"]) if isinstance(r.get("source"), str) and isinstance(r.get("target"), str) else None)
+                    target=str(r["target"]) if isinstance(r.get("source"), str) and isinstance(r.get("target"), str) else None,
+                    start=str(r["start"]) if isinstance(r.get("start"), str) else None,
+                    end=str(r["end"]) if isinstance(r.get("start"), str) and isinstance(r.get("end"), str) else None,
+                    status=str(r["status"]) if isinstance(r.get("start"), str) and isinstance(r.get("status"), str) else None)
             for r in (data.get("rows") or []) if isinstance(r, dict)
         ]
         labels = data.get("measure_labels")
@@ -413,6 +427,108 @@ def events_over_time(db: Session, investigation_id: str, params: dict[str, str])
     )
 
 
+_PARTIAL = re.compile(r"^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$")
+
+
+def date_bounds(text: str | None) -> tuple[date, date, str] | None:
+    """The first and last day a recorded date can mean, and how precise it
+    is: '2021' -> 1 Jan to 31 Dec 2021 ("year"), '2021-03' -> 1 to 31 March
+    ("month"), '2021-03-04' -> that day ("day"). None for anything else. The
+    timeline keeps dates at the precision they were recorded at and never
+    fills in a missing day (app/services/timeline.py), so neither does a chart
+    of it: a date known only to the month covers the month."""
+    match = _PARTIAL.match((text or "").strip()[:10])
+    if not match:
+        return None
+    year, month, day = match.groups()
+    try:
+        if day:
+            one = date(int(year), int(month), int(day))
+            return one, one, "day"
+        if month:
+            last = calendar.monthrange(int(year), int(month))[1]
+            return date(int(year), int(month), 1), date(int(year), int(month), last), "month"
+        return date(int(year), 1, 1), date(int(year), 12, 31), "year"
+    except ValueError:
+        return None
+
+
+def event_span(start: str | None, end: str | None) -> tuple[date, date, bool] | None:
+    """The days an event covers: from the first day its start can mean to the
+    last day its end (or, with no end, its start) can mean, and whether both
+    are known to the day. None when the start is not a date, or the end is
+    given but is not one."""
+    first = date_bounds(start)
+    if first is None:
+        return None
+    if end in (None, ""):
+        return first[0], first[1], first[2] == "day"
+    last = date_bounds(end)
+    if last is None:
+        return None
+    return first[0], last[1], first[2] == "day" and last[2] == "day"
+
+
+def events_in_order(db: Session, investigation_id: str, params: dict[str, str]) -> VisualData:
+    """Every dated event on the investigation's timeline, one row each, in
+    date order: its title, its date as recorded, its end when it has one, its
+    verification status, and the records behind it (the event itself for a
+    reporter's event, otherwise the record whose date it is, and the evidence,
+    source, claim or lead it points to). `from` and `to` keep the events that
+    overlap that stretch of time; `status` keeps one verification status.
+    An event with no usable date, or one that ends before it starts, is
+    listed under ``omitted``, never placed by a guess."""
+    from app.services.timeline import investigation_timeline
+
+    statuses = {params["status"]} if params.get("status") else None
+    events = investigation_timeline(db, investigation_id, verification_statuses=statuses)["events"]
+    window_from = date_bounds(params.get("from"))
+    window_to = date_bounds(params.get("to"))
+    omitted: list[dict[str, Any]] = []
+    kept: list[tuple[date, date, dict]] = []
+    for event in sorted(events, key=lambda e: str(e["id"])):
+        record_type = "timeline_event" if event.get("kind") == "reporter_event" else str(event.get("kind"))
+        span = event_span(event.get("date_start"), event.get("date_end"))
+        if span is None:
+            omitted.append({"reason": "date not known", "record_type": record_type, "record_id": str(event["id"]),
+                            "detail": f"{event.get('title')}: {event.get('date_start') or 'no date'}"
+                                      + (f" to {event.get('date_end')}" if event.get("date_end") else "")})
+            continue
+        lo, hi, _exact = span
+        if hi < lo:
+            omitted.append({"reason": "ends before it starts", "record_type": record_type, "record_id": str(event["id"]),
+                            "detail": f"{event.get('title')}: {event.get('date_start')} to {event.get('date_end')}"})
+            continue
+        if (window_from and hi < window_from[0]) or (window_to and lo > window_to[1]):
+            continue
+        kept.append((lo, hi, event))
+    # A category axis joins rows of the same name, so two events with the same
+    # title are told apart by their date, then by their id.
+    titles: dict[str, int] = defaultdict(int)
+    for _lo, _hi, event in kept:
+        titles[str(event.get("title") or "Untitled event").strip() or "Untitled event"] += 1
+    rows: list[DataRow] = []
+    used: set[str] = set()
+    for lo, hi, event in kept:
+        title = str(event.get("title") or "Untitled event").strip() or "Untitled event"
+        label = title if titles[title] == 1 else f"{title} ({event.get('date_start')})"
+        if label in used:
+            label = f"{label} [{str(event['id'])[:8]}]"
+        used.add(label)
+        refs = sorted(set(_event_refs(db, event)), key=lambda r: (r.record_type, r.record_id))
+        # One event is one record: its value is 1. The key orders the rows by
+        # date, then by title, so events on the same day keep one order.
+        rows.append(DataRow(label, 1.0, refs, 1, f"{lo.isoformat()}|{hi.isoformat()}|{label.lower()}|{event['id']}",
+                            start=str(event.get("date_start")), end=str(event["date_end"]) if event.get("date_end") else None,
+                            status=str(event.get("verification_status") or "asserted")))
+    rows.sort(key=lambda r: (r.key, r.label))
+    return VisualData(
+        investigation_id=investigation_id, query="events_in_order", params=params,
+        unit="events", unit_kind="count", series_kind="events", record_noun="events",
+        rows=rows, record_count=len(rows), omitted=omitted,
+    )
+
+
 def links_by_type(db: Session, investigation_id: str, params: dict[str, str]) -> VisualData:
     from app.services.relationships import RELATIONSHIP_SCHEMAS, investigation_relationships
 
@@ -494,6 +610,7 @@ QUERIES: dict[str, QueryRunner] = {
     "payments_by_party": payments_by_party,
     "payments_over_time": payments_over_time,
     "events_over_time": events_over_time,
+    "events_in_order": events_in_order,
     "links_by_type": links_by_type,
     "claims_by_status": claims_by_status,
     "entities_by_schema": entities_by_schema,

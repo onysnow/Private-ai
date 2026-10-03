@@ -141,6 +141,16 @@ describe('every chart kind in the preview (visuals pass 3)', () => {
     const rows = within(screen.getByRole('table')).getAllByRole('row').slice(1).map(r => within(r).getAllByRole('cell').map(c => c.textContent));
     expect(rows).toContainEqual(['Alaric Voss', '2', '$295K', '2']);
     expect(tableCells(scatter.text.data_table.rows, scatter.text.data_table.rows[0]).map(c => c.key)).toEqual(['x', 'value', 'records']);
+    cleanup();
+
+    // A timeline: each event with when it happened and how far it is verified, and no single-record mark (an event is one record).
+    const timeline = asDraft(draftWith(stored('timeline'))).sections[0].visual as ChartVisual;
+    render(<ChartFigure visual={timeline}/>);
+    await userEvent.setup().click(screen.getByText('Description and data table'));
+    const events = within(screen.getByRole('table')).getAllByRole('row').map(r => within(r).queryAllByRole('cell').map(c => c.textContent));
+    expect(within(screen.getByRole('table')).getAllByRole('columnheader').map(h => h.textContent)).toEqual(['Event', 'When', 'Status', 'Records']);
+    expect(events).toContainEqual(['Alaric Voss appointed director', '11 Jun 2019', 'verified', '1']);
+    expect(events).toContainEqual(['Bellcastle becomes sole owner', 'Feb 2021 (month only)', 'verified', '1']);
   });
 
   it('shows each kind on its slide', async () => {
@@ -182,6 +192,20 @@ describe('a treemap slide shows what the deck export will (slide_drawing)', () =
     expect(screen.getByText(note)).toBeInTheDocument();
     await screen.findByTestId('echarts-canvas');
     expect(drawnOption()).toEqual(bars);
+  });
+
+  it('lists a timeline\'s events when the slide is too small to draw them', async () => {
+    const fixture = (kinds as unknown as Record<string, JsonObject>).timeline;
+    const visual = {type: 'chart', spec: fixture.spec, data: fixture.data, report: {ok: true, errors: [], warnings: []}, text: fixture.text,
+      option: fixture.option, width: fixture.width, height: fixture.height,
+      slide_drawing: {option: null, width: 400, height: 140, note: 'Timeline not drawn at this size (rule 14). The events are listed instead.'}};
+    render(slideWith(visual));
+    const slide = await screen.findByTestId('slide-chart');
+    expect(slide.dataset.drawing).toBe('events');
+    const rows = within(slide).getAllByRole('row').map(r => r.textContent);
+    expect(rows[0]).toBe('EventWhenStatus');
+    expect(rows).toContain('Consulting contract runs1 Mar 2022 – 31 Aug 2023asserted');
+    expect(screen.queryByTestId('echarts-canvas')).toBeNull();
   });
 
   it('draws the checked option when the deck stored no slide drawing (native kinds, older decks)', async () => {

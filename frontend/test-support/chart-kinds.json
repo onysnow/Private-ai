@@ -3127,6 +3127,485 @@
   },
   "width": 960
  },
+ "timeline": {
+  "data": {
+   "currency": null,
+   "investigation_id": "inv",
+   "omitted": [],
+   "params": {},
+   "query": "events_in_order",
+   "record_count": 4,
+   "record_noun": "events",
+   "rows": [
+    {
+     "key": "2019-06-11",
+     "label": "Alaric Voss appointed director",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "e1",
+       "record_type": "timeline_event"
+      }
+     ],
+     "start": "2019-06-11",
+     "status": "verified",
+     "value": 1.0
+    },
+    {
+     "key": "2021-02-01",
+     "label": "Bellcastle becomes sole owner",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "e2",
+       "record_type": "timeline_event"
+      }
+     ],
+     "start": "2021-02",
+     "status": "verified",
+     "value": 1.0
+    },
+    {
+     "end": "2023-08-31",
+     "key": "2022-03-01",
+     "label": "Consulting contract runs",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "e3",
+       "record_type": "timeline_event"
+      }
+     ],
+     "start": "2022-03-01",
+     "status": "asserted",
+     "value": 1.0
+    },
+    {
+     "key": "2023-11-14",
+     "label": "Disputed $2.4M payment",
+     "record_count": 1,
+     "record_refs": [
+      {
+       "record_id": "e4",
+       "record_type": "timeline_event"
+      }
+     ],
+     "start": "2023-11-14",
+     "status": "disputed",
+     "value": 1.0
+    }
+   ],
+   "series_kind": "events",
+   "unit": "events",
+   "unit_kind": "count"
+  },
+  "height": 540,
+  "option": {
+   "animation": false,
+   "aria": {
+    "enabled": true,
+    "label": {
+     "description": "Timeline: The payment came two years after Bellcastle took control. 4 events from 11 Jun 2019 (Alaric Voss appointed director) to 14 Nov 2023 (Disputed $2.4M payment).",
+     "enabled": true
+    }
+   },
+   "backgroundColor": "#F7F2E8",
+   "color": [
+    "#8A6420"
+   ],
+   "grid": {
+    "bottom": 70,
+    "containLabel": true,
+    "left": 8,
+    "right": 255,
+    "top": 96
+   },
+   "series": [
+    {
+     "data": [
+      {
+       "itemStyle": {
+        "color": "#8A6420"
+       },
+       "label": {
+        "show": false
+       },
+       "name": "Bellcastle becomes sole owner",
+       "tooltip": {
+        "formatter": "Bellcastle becomes sole owner: Feb 2021 (month only) · verified"
+       },
+       "value": [
+        1612137600000,
+        "Bellcastle becomes sole owner"
+       ]
+      },
+      {
+       "itemStyle": {
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "Feb 2021 (month only) · verified",
+        "position": "right",
+        "show": true
+       },
+       "name": "Bellcastle becomes sole owner",
+       "tooltip": {
+        "formatter": "Bellcastle becomes sole owner: Feb 2021 (month only) · verified"
+       },
+       "value": [
+        1614556800000,
+        "Bellcastle becomes sole owner"
+       ]
+      }
+     ],
+     "itemStyle": {
+      "color": "#8A6420"
+     },
+     "lineStyle": {
+      "color": "#8A6420",
+      "type": "dashed",
+      "width": 4
+     },
+     "name": "Bellcastle becomes sole owner",
+     "showSymbol": true,
+     "symbol": "circle",
+     "symbolSize": 7,
+     "type": "line",
+     "z": 2
+    },
+    {
+     "data": [
+      {
+       "itemStyle": {
+        "color": "#8A6420"
+       },
+       "label": {
+        "show": false
+       },
+       "name": "Consulting contract runs",
+       "tooltip": {
+        "formatter": "Consulting contract runs: 1 Mar 2022 – 31 Aug 2023 · asserted"
+       },
+       "value": [
+        1646092800000,
+        "Consulting contract runs"
+       ]
+      },
+      {
+       "itemStyle": {
+        "color": "#8A6420"
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "1 Mar 2022 – 31 Aug 2023 · asserted",
+        "position": "right",
+        "show": true
+       },
+       "name": "Consulting contract runs",
+       "tooltip": {
+        "formatter": "Consulting contract runs: 1 Mar 2022 – 31 Aug 2023 · asserted"
+       },
+       "value": [
+        1693526400000,
+        "Consulting contract runs"
+       ]
+      }
+     ],
+     "itemStyle": {
+      "color": "#8A6420"
+     },
+     "lineStyle": {
+      "color": "#8A6420",
+      "type": "solid",
+      "width": 6
+     },
+     "name": "Consulting contract runs",
+     "showSymbol": true,
+     "symbol": "circle",
+     "symbolSize": 7,
+     "type": "line",
+     "z": 2
+    },
+    {
+     "data": [
+      {
+       "itemStyle": {
+        "color": "#8A6420",
+        "opacity": 1
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "11 Jun 2019 · verified",
+        "position": "right",
+        "show": true
+       },
+       "name": "Alaric Voss appointed director",
+       "symbol": "circle",
+       "symbolSize": 10,
+       "tooltip": {
+        "formatter": "Alaric Voss appointed director: 11 Jun 2019 · verified"
+       },
+       "value": [
+        1560211200000,
+        "Alaric Voss appointed director"
+       ]
+      },
+      {
+       "itemStyle": {
+        "color": "#8A6420",
+        "opacity": 1
+       },
+       "label": {
+        "color": "#1F1B16",
+        "fontFamily": "'Calibri', sans-serif",
+        "fontSize": 12,
+        "formatter": "14 Nov 2023 · disputed",
+        "position": "right",
+        "show": true
+       },
+       "name": "Disputed $2.4M payment",
+       "symbol": "circle",
+       "symbolSize": 10,
+       "tooltip": {
+        "formatter": "Disputed $2.4M payment: 14 Nov 2023 · disputed"
+       },
+       "value": [
+        1699920000000,
+        "Disputed $2.4M payment"
+       ]
+      }
+     ],
+     "name": "The payment came two years after Bellcastle took control",
+     "type": "scatter",
+     "z": 3
+    }
+   ],
+   "textStyle": {
+    "color": "#1F1B16",
+    "fontFamily": "'Calibri', sans-serif",
+    "fontSize": 12
+   },
+   "title": [
+    {
+     "id": "title",
+     "left": 0,
+     "subtext": "Each event at its date, earliest first; a line runs from start to end, dashed where a date is known only to the month or year",
+     "subtextStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 13,
+      "overflow": "break",
+      "width": 912
+     },
+     "text": "The payment came two years after Bellcastle took control",
+     "textStyle": {
+      "color": "#1F1B16",
+      "fontFamily": "'Georgia', serif, sans-serif",
+      "fontSize": 18,
+      "fontWeight": "bold",
+      "overflow": "break",
+      "width": 912
+     },
+     "top": 0
+    },
+    {
+     "bottom": 0,
+     "id": "source",
+     "left": 0,
+     "text": "Source: 4 events in this investigation's records (events_in_order)",
+     "textStyle": {
+      "color": "#6B5B44",
+      "fontFamily": "'Calibri', sans-serif",
+      "fontSize": 12,
+      "overflow": "break",
+      "width": 912
+     }
+    }
+   ],
+   "tooltip": {
+    "renderMode": "richText",
+    "show": true,
+    "textStyle": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12
+    },
+    "trigger": "item"
+   },
+   "useUTC": true,
+   "xAxis": {
+    "axisLabel": {
+     "color": "#6B5B44",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12,
+     "hideOverlap": true
+    },
+    "axisLine": {
+     "lineStyle": {
+      "color": "#1F1B16",
+      "width": 1.5
+     },
+     "show": true
+    },
+    "axisTick": {
+     "show": true
+    },
+    "max": 1705508352000,
+    "min": 1554622848000,
+    "splitLine": {
+     "show": false
+    },
+    "type": "time"
+   },
+   "yAxis": {
+    "axisLabel": {
+     "color": "#1F1B16",
+     "fontFamily": "'Calibri', sans-serif",
+     "fontSize": 12,
+     "interval": 0,
+     "overflow": "truncate",
+     "width": 220
+    },
+    "axisLine": {
+     "lineStyle": {
+      "color": "#1F1B16",
+      "width": 1.5
+     },
+     "show": false
+    },
+    "axisTick": {
+     "show": false
+    },
+    "data": [
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Disputed $2.4M payment"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Consulting contract runs"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Bellcastle becomes sole owner"
+     },
+     {
+      "textStyle": {
+       "fontWeight": "normal"
+      },
+      "value": "Alaric Voss appointed director"
+     }
+    ],
+    "splitLine": {
+     "show": false
+    },
+    "type": "category"
+   }
+  },
+  "spec": {
+   "highlight": [],
+   "kind": "timeline",
+   "limit": null,
+   "query": {
+    "name": "events_in_order",
+    "params": {}
+   },
+   "question": null,
+   "scale": "linear",
+   "sort": null,
+   "stack": false,
+   "subtitle": null,
+   "theme": "dark_academia",
+   "title": "The payment came two years after Bellcastle took control",
+   "unit": null
+  },
+  "text": {
+   "alt_text": "Timeline: The payment came two years after Bellcastle took control. 4 events from 11 Jun 2019 (Alaric Voss appointed director) to 14 Nov 2023 (Disputed $2.4M payment).",
+   "data_table": {
+    "columns": [
+     "Event",
+     "When",
+     "Status",
+     "Records"
+    ],
+    "rows": [
+     {
+      "formatted": "11 Jun 2019",
+      "label": "Alaric Voss appointed director",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "e1",
+        "record_type": "timeline_event"
+       }
+      ],
+      "start": "2019-06-11",
+      "status": "verified",
+      "value": 1.0
+     },
+     {
+      "formatted": "Feb 2021 (month only)",
+      "label": "Bellcastle becomes sole owner",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "e2",
+        "record_type": "timeline_event"
+       }
+      ],
+      "start": "2021-02",
+      "status": "verified",
+      "value": 1.0
+     },
+     {
+      "end": "2023-08-31",
+      "formatted": "1 Mar 2022 – 31 Aug 2023",
+      "label": "Consulting contract runs",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "e3",
+        "record_type": "timeline_event"
+       }
+      ],
+      "start": "2022-03-01",
+      "status": "asserted",
+      "value": 1.0
+     },
+     {
+      "formatted": "14 Nov 2023",
+      "label": "Disputed $2.4M payment",
+      "record_count": 1,
+      "record_refs": [
+       {
+        "record_id": "e4",
+        "record_type": "timeline_event"
+       }
+      ],
+      "start": "2023-11-14",
+      "status": "disputed",
+      "value": 1.0
+     }
+    ]
+   },
+   "description": "Timeline: The payment came two years after Bellcastle took control. 4 events from 11 Jun 2019 (Alaric Voss appointed director) to 14 Nov 2023 (Disputed $2.4M payment). Alaric Voss appointed director: 11 Jun 2019 · verified. Bellcastle becomes sole owner: Feb 2021 (month only) · verified. Consulting contract runs: 1 Mar 2022 – 31 Aug 2023 · asserted. Disputed $2.4M payment: 14 Nov 2023 · disputed. Source: 4 events in this investigation's records (events_in_order).",
+   "source_line": "Source: 4 events in this investigation's records (events_in_order)"
+  },
+  "width": 960
+ },
  "treemap": {
   "data": {
    "currency": "USD",

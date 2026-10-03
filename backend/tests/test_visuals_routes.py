@@ -21,7 +21,8 @@ from app.services.presentation_style import theme as theme_for
 from app.visuals.checker import check_visual
 from app.visuals.data_service import describe_catalog, run_query
 from app.visuals.echarts import build_chart
-from app.visuals.spec import parse_spec
+from app.visuals.spec import ChartKind, parse_spec
+from visuals_helpers import withhold_kind
 
 client = TestClient(app)
 
@@ -51,7 +52,7 @@ def test_catalog_lists_the_menu_for_this_investigation():
     assert by_name["payments_by_party"]["has_data"] is True
     assert by_name["payments_by_party"]["params"]["currency"]["choices"] is None
     assert by_name["documents_by_status"]["has_data"] is False
-    assert body["drawn_kinds"] == ["area", "bar", "column", "donut", "histogram", "line", "sankey", "scatter", "stacked_bar_100", "treemap"]
+    assert body["drawn_kinds"] == ["area", "bar", "column", "donut", "histogram", "line", "sankey", "scatter", "stacked_bar_100", "timeline", "treemap"]
     assert [q["id"] for q in body["questions"]] == ["ranking", "change_over_time", "part_of_whole", "distribution", "correlation", "flow"]
     assert by_name["payment_amounts"]["questions"] == ["ranking", "distribution"]
     assert client.get("/api/investigations/nope/visuals/catalog").status_code == 404
@@ -83,7 +84,8 @@ def test_preview_returns_a_failing_report_rather_than_hiding_it():
     assert [e["rule"] for e in body["report"]["errors"]] == [13]
 
 
-def test_preview_refuses_bad_orders_and_kinds_not_drawn_yet():
+def test_preview_refuses_bad_orders_and_kinds_not_drawn_yet(monkeypatch):
+    withhold_kind(monkeypatch, ChartKind.timeline)
     inv_id = _demo_id()
     bad = client.post(f"/api/investigations/{inv_id}/visuals/preview", json={**SPEC, "query": {"name": "nope"}})
     assert bad.status_code == 422
@@ -110,6 +112,20 @@ def test_response_models_keep_every_field():
             "source_line": built.source_line, "width": built.width, "height": built.height,
         }
         _same_through_model(r.VisualPreviewOut, reply)
+        # A flow's two parties and an event's dates and status come through too.
+        for order in ({"kind": "sankey", "title": "Bellcastle's money went to Meridian", "query": {"name": "payment_flows"}},
+                      {"kind": "timeline", "title": "The payment came two years after the takeover", "query": {"name": "events_in_order"}}):
+            spec = parse_spec(order)
+            data = run_query(db, inv_id, spec.query)
+            built = build_chart(spec, data, theme)
+            reply = {
+                "spec": spec.model_dump(mode="json"), "data": data.as_dict(), "option": built.option,
+                "report": check_visual(spec, data, theme, built).as_dict(), "alt_text": built.alt_text, "description": built.description,
+                "data_table": built.data_table, "source_line": built.source_line, "width": built.width, "height": built.height,
+            }
+            _same_through_model(r.VisualPreviewOut, reply)
+        event_row = data.as_dict()["rows"][0]     # the last order's: the timeline
+        assert set(event_row) >= {"start", "status"}
 
 
 def _demo_with_payments() -> str:

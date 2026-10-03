@@ -151,7 +151,10 @@ def chart_row_labels(data: VisualData, rows: list[DataRow], *, separator: str = 
     exports, which write both on the category label. A chart whose labels
     sit side by side under it puts the count on a line of its own
     (`separator` "\\n"), so a period's label stays level instead of being
-    turned on its side to fit."""
+    turned on its side to fit. An event on a timeline is one record by
+    what it is (rules 16 and 20 do not apply), so its label stays as it is."""
+    if data.series_kind == "events":
+        return {row.label: row.label for row in rows}
     labels: dict[str, str] = {}
     for row in rows:
         label = row.label
@@ -468,7 +471,8 @@ def slide_picture(visual: dict, theme: Theme, width_in: float, height_in: float)
         label = KIND_LABELS.get(sized.spec.kind, sized.spec.kind.value)
         first = sized.report.errors[0] if sized.report and sized.report.errors else None
         reason = f"rule {first.rule}: {first.message.split(';')[0]}" if first else (sized.problem or "it cannot be drawn")
-        return sized, f"{label} not drawn at this size ({reason}). The same parts are shown as bars."
+        instead = "The events are listed instead." if sized.spec.kind == ChartKind.timeline else "The same parts are shown as bars."
+        return sized, f"{label} not drawn at this size ({reason}). {instead}"
     return sized, None
 
 
@@ -1086,6 +1090,8 @@ class _DeckRenderer:
             frame = self._native_histogram(slide, x, top, w, plot_h, checked)
         elif kind == ChartKind.scatter:
             frame = self._native_scatter(slide, x, top, w, plot_h, checked)
+        elif kind == ChartKind.timeline:
+            frame = self._events_as_table(slide, x, top, w, plot_h, checked, missing or "")
         else:
             frame = self._parts_as_bars(slide, x, top, w, plot_h, checked, missing or "")
         _set_alt_text(frame, built.alt_text)
@@ -1228,6 +1234,35 @@ class _DeckRenderer:
         self._style_value_axis(chart.value_axis, minimum=min(0.0, min((row.value for row in rows), default=0.0)),
                                number_format=_number_format(data), gridlines=draw.gridlines)
         self._style_category_axis(chart.category_axis)
+        return frame
+
+    def _events_as_table(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart, note: str) -> Any:
+        """A timeline with no picture: its events as a native table, in date
+        order (the event, when, and how far it is verified), under a line
+        that says why. Bars would draw nothing true here: every event counts
+        one."""
+        from pptx.util import Pt
+        built = checked.built
+        assert built is not None
+        lines = max(1, math.ceil(block_width(note, 10) * TEXT_SLACK / (w * 72)))
+        note_h = lines * 10 * 1.2 / 72 + 0.12
+        self.text(slide, x, y, w, note_h, note, size=10, color=self.t.alert, italic=True, line_spacing=1.05)
+        table_rows = built.data_table.get("rows") or []
+        frame = slide.shapes.add_table(len(table_rows) + 1, 3, self.Inches(x), self.Inches(y + note_h), self.Inches(w),
+                                       self.Inches(min(h - note_h, 0.32 * (len(table_rows) + 1))))
+        table = frame.table
+        for column, width in zip(table.columns, (0.5, 0.32, 0.18)):
+            column.width = self.Inches(w * width)
+        cells = [["Event", "When", "Status"]] + [[str(r.get("label", "")), str(r.get("formatted", "")), str(r.get("status", ""))] for r in table_rows]
+        for i, values in enumerate(cells):
+            for j, value in enumerate(values):
+                cell = table.cell(i, j)
+                cell.text = value
+                run = cell.text_frame.paragraphs[0].runs[0] if cell.text_frame.paragraphs[0].runs else None
+                if run is not None:
+                    run.font.size = Pt(11)
+                    run.font.bold = i == 0
+                    run.font.name = self.t.body_font
         return frame
 
     def _parts_as_bars(self, slide: Any, x: float, y: float, w: float, h: float, checked: CheckedChart, note: str) -> Any:
@@ -1423,12 +1458,14 @@ class _DeckRenderer:
         design_w, design_h = picture_size(w, h)
         sized, note = slide_picture(visual, self.t, w, h)
         label = KIND_LABELS.get(sized.spec.kind, sized.spec.kind.value)
+        # What stands in for the picture: a timeline's events as a table, anything else's parts as bars.
+        instead = "the events are listed instead" if sized.spec.kind == ChartKind.timeline else "the same parts are shown as bars"
         if note is not None or sized.built is None:
-            return note or f"{label} cannot be drawn. The same parts are shown as bars."
+            return note or f"{label} cannot be drawn. {instead[0].upper()}{instead[1:]}."
         try:
             png = render_png(sized.built.option, design_w, design_h, scale=PICTURE_SCALE)
         except RenderUnavailable as exc:
-            return f"{label} image not available ({exc}); the same parts are shown as bars."
+            return f"{label} image not available ({exc}); {instead}."
         return slide.shapes.add_picture(BytesIO(png), self.Inches(x), self.Inches(y), self.Inches(w), self.Inches(h))
 
     def _timeline(self, slide: Any, x: float, y: float, w: float, h: float, items: list[dict], style: dict) -> None:

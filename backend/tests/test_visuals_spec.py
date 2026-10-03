@@ -37,8 +37,8 @@ def test_every_chart_kind_is_accepted_and_the_statistical_kinds_are_drawn():
         query = {"name": "events_over_time"} if kind in (ChartKind.line, ChartKind.area) else {"name": "links_by_type"}
         spec = parse_spec({"kind": kind.value, "title": "Something happened over time", "query": query})
         assert spec.drawable == (kind in DRAWN_KINDS)
-    # Pass 3 drew the statistical kinds, pass 4 the flow diagram; the timeline is still to come.
-    assert {k.value for k in DRAWN_KINDS} == {"bar", "column", "line", "area", "stacked_bar_100", "donut", "treemap", "histogram", "scatter", "sankey"}
+    # Pass 3 drew the statistical kinds, pass 4 the flow diagram and the timeline: every kind is drawn.
+    assert {k.value for k in DRAWN_KINDS} == {k.value for k in ChartKind}
 
 
 def test_each_question_names_the_kinds_and_query_shapes_that_answer_it():
@@ -54,6 +54,10 @@ def test_each_question_names_the_kinds_and_query_shapes_that_answer_it():
     assert QUERY_CATALOG["payment_amounts"].questions == ("ranking", "distribution")
     assert QUERY_CATALOG["payments_count_and_total_by_party"].questions == ("correlation",)
     assert QUERY_CATALOG["events_over_time"].questions == ("change_over_time",)
+    # The FT Visual Vocabulary's "Priestley timeline" sits under change over time.
+    assert QUESTIONS["change_over_time"].kinds[-1] == ChartKind.timeline and "events" in QUESTIONS["change_over_time"].series_kinds
+    assert QUERY_CATALOG["events_in_order"].questions == ("change_over_time",)
+    assert QUERY_CATALOG["events_in_order"].kinds == (ChartKind.timeline,)
     assert QUERY_CATALOG["payment_amounts"].kinds[0] == ChartKind.histogram
     assert QUERY_CATALOG["payments_count_and_total_by_party"].kinds == (ChartKind.scatter,)
 

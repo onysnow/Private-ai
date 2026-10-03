@@ -130,12 +130,12 @@ def test_describe_catalog_lists_every_query_and_whether_it_has_data(demo):
     by_name = {q["name"]: q for q in catalog["queries"]}
     assert set(by_name) == {"payments_by_party", "payments_over_time", "events_over_time", "links_by_type", "claims_by_status",
                             "entities_by_schema", "evidence_by_stance", "documents_by_status", "leads_by_status",
-                            "payment_amounts", "payments_count_and_total_by_party", "payment_flows"}
+                            "payment_amounts", "payments_count_and_total_by_party", "payment_flows", "events_in_order"}
     assert by_name["payments_by_party"]["has_data"] and by_name["payments_by_party"]["currencies"] == ["USD"]
     assert by_name["payments_by_party"]["params"]["direction"] == {"description": "Rank who received the money, or who paid it.", "choices": ["received", "paid"], "default": "received"}
     assert by_name["documents_by_status"]["has_data"] is False
-    assert catalog["drawn_kinds"] == ["area", "bar", "column", "donut", "histogram", "line", "sankey", "scatter", "stacked_bar_100", "treemap"]
-    assert "timeline" in catalog["kinds"] and "timeline" not in catalog["drawn_kinds"]
+    assert catalog["drawn_kinds"] == ["area", "bar", "column", "donut", "histogram", "line", "sankey", "scatter", "stacked_bar_100", "timeline", "treemap"]
+    assert sorted(catalog["kinds"]) == catalog["drawn_kinds"]
     # Each query says which drawn kinds can draw it and which questions it answers.
     assert by_name["payments_by_party"]["kinds"] == ["bar", "column", "stacked_bar_100", "donut", "treemap"]
     assert by_name["payments_by_party"]["questions"] == ["ranking", "part_of_whole"]
@@ -147,6 +147,9 @@ def test_describe_catalog_lists_every_query_and_whether_it_has_data(demo):
     assert "payments_by_party" in questions["part_of_whole"]["queries"] and "payments_over_time" not in questions["part_of_whole"]["queries"]
     assert questions["flow"]["drawn_kinds"] == ["sankey"] and questions["flow"]["queries"] == ["payment_flows"]
     assert by_name["payment_flows"]["kinds"] == ["sankey", "bar"] and by_name["payment_flows"]["has_data"]
+    assert by_name["events_in_order"]["kinds"] == ["timeline"] and by_name["events_in_order"]["has_data"]
+    assert questions["change_over_time"]["drawn_kinds"] == ["line", "column", "area", "timeline"]
+    assert "events_in_order" in questions["change_over_time"]["queries"]
 
 
 def _add_payment(db, inv_id: str, payer: str, beneficiary: str, props: dict) -> str:

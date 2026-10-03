@@ -151,7 +151,11 @@ def _kind_data() -> dict[str, tuple[str, VisualData]]:
     pairs = [DataRow(row.label, row.value, row.record_refs, row.record_count, row.key, x=float(row.record_count)) for row in parties]
     pair_data = VisualData("inv", "payments_count_and_total_by_party", {}, "USD", "amount", "pairs", "payments", pairs, "USD", 5,
                            x_unit="payments", x_unit_kind="count", measure_labels={"x": "Number of payments received", "y": "Total received (USD)"})
-    return {"line": ("payments_over_time", time_data), "area": ("payments_over_time", time_data), "stacked_bar_100": ("payments_by_party", category),
+    happened = [DataRow("Alaric Voss appointed director", 1.0, [RecordRef("timeline_event", "e1")], 1, "2019-06-11", start="2019-06-11", status="verified"),
+                DataRow("Consulting contract runs", 1.0, [RecordRef("timeline_event", "e2")], 1, "2022-03-01", start="2022-03", end="2023-08-31",
+                        status="asserted")]
+    events = VisualData("inv", "events_in_order", {}, "events", "count", "events", "events", happened, record_count=2)
+    return {"timeline": ("events_in_order", events), "line": ("payments_over_time", time_data), "area": ("payments_over_time", time_data), "stacked_bar_100": ("payments_by_party", category),
             "donut": ("payments_by_party", category), "treemap": ("payments_by_party", category), "histogram": ("payment_amounts", distribution),
             "scatter": ("payments_count_and_total_by_party", pair_data)}
 

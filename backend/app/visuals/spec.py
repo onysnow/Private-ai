@@ -13,9 +13,9 @@ before anything touches the database. The code that runs each query lives
 in data_service.py and must cover every entry in QUERY_CATALOG.
 
 Pass 2 drew bar and column charts end to end; pass 3 draws the statistical
-kinds (line, area, 100% bar, donut, treemap, histogram, scatter).
-DRAWN_KINDS says which kinds can be drawn today: timeline and sankey wait
-for the money-flow and network pass (ADR-0005, line 6).
+kinds (line, area, 100% bar, donut, treemap, histogram, scatter); pass 4
+draws money flows (sankey) and the timeline of events. DRAWN_KINDS says
+which kinds can be drawn today.
 
 QUESTIONS is the chart chooser: the question a chart answers, after the
 FT Visual Vocabulary (https://ft-interactive.github.io/visual-vocabulary/),
@@ -51,11 +51,11 @@ class ChartKind(str, Enum):
     sankey = "sankey"
 
 
-# What app/visuals/echarts.py draws. The sankey came with the money-flow
-# pass (pass 4); the timeline is still to come.
+# What app/visuals/echarts.py draws. The sankey and the timeline came with
+# pass 4.
 DRAWN_KINDS: frozenset[ChartKind] = frozenset({
     ChartKind.bar, ChartKind.column, ChartKind.line, ChartKind.area, ChartKind.stacked_bar_100, ChartKind.donut,
-    ChartKind.treemap, ChartKind.histogram, ChartKind.scatter, ChartKind.sankey,
+    ChartKind.treemap, ChartKind.histogram, ChartKind.scatter, ChartKind.sankey, ChartKind.timeline,
 })
 
 # Kinds that show a value as a length (rule 9: the easiest to read) ...
@@ -82,14 +82,17 @@ POINT_KINDS: frozenset[ChartKind] = frozenset({ChartKind.line, ChartKind.area, C
 # order; "distribution": one row per record, whose values a histogram bins;
 # "pairs": one row per group with two numbers, x and y, for a scatter plot;
 # "flows": one row per pair of parties, from one (`source`) to the other
-# (`target`), for a flow diagram, or ranked as bars.
-SERIES_KINDS = ("category", "time", "distribution", "pairs", "flows")
+# (`target`), for a flow diagram, or ranked as bars; "events": one row per
+# dated event, with its `start`, its `end` when it has one, and its
+# verification `status`, for a timeline.
+SERIES_KINDS = ("category", "time", "distribution", "pairs", "flows", "events")
 KINDS_FOR_SERIES: dict[str, tuple[ChartKind, ...]] = {
     "category": (ChartKind.bar, ChartKind.column, ChartKind.stacked_bar_100, ChartKind.donut, ChartKind.treemap),
     "time": (ChartKind.line, ChartKind.column, ChartKind.area, ChartKind.bar),
     "distribution": (ChartKind.histogram, ChartKind.bar, ChartKind.column),
     "pairs": (ChartKind.scatter,),
     "flows": (ChartKind.sankey, ChartKind.bar),
+    "events": (ChartKind.timeline,),
 }
 # The shapes a kind needs; any other shape cannot be drawn by it at all (a
 # histogram of periods, a scatter plot of one number). A line over
@@ -99,6 +102,7 @@ SERIES_FOR_KIND: dict[ChartKind, tuple[str, ...]] = {
     ChartKind.histogram: ("distribution",),
     ChartKind.scatter: ("pairs",),
     ChartKind.sankey: ("flows",),
+    ChartKind.timeline: ("events",),
 }
 
 
@@ -146,6 +150,11 @@ class QuerySpec:
 _CURRENCY = ParamSpec("ISO 4217 currency code, e.g. USD. Each currency is its own series; omit it to get the currency with the most payments.",
                       pattern=r"^[A-Za-z]{3}$")
 _GRANULARITY = ParamSpec("How to group dates.", choices=("month", "year"), default="month")
+# A date as the timeline records it: a year, a month or a day (app/services/timeline.py).
+_PARTIAL_DATE = r"^\d{4}(-\d{2}(-\d{2})?)?$"
+# The verification statuses a timeline event can carry (app/services/timeline.py:
+# the reporter's own five, and the two it gives the dates it reads from records).
+EVENT_STATUSES = ("asserted", "verified", "approximate", "disputed", "unresolved", "reporter_reviewed", "system_recorded")
 
 QUERY_CATALOG: dict[str, QuerySpec] = {q.name: q for q in (
     QuerySpec(
@@ -166,6 +175,15 @@ QUERY_CATALOG: dict[str, QuerySpec] = {q.name: q for q in (
         "How many dated events fall in each month or year, from the timeline.",
         {"granularity": _GRANULARITY},
         series_kind="time", unit_kind="count", record_noun="events",
+    ),
+    QuerySpec(
+        "events_in_order", "Events in order",
+        "Every dated event on the timeline, in date order, with its start, its end when it has one, and how far it is verified: "
+        "one row per event, for a timeline.",
+        {"from": ParamSpec("Only events that end on or after this date (YYYY, YYYY-MM or YYYY-MM-DD).", pattern=_PARTIAL_DATE),
+         "to": ParamSpec("Only events that start on or before this date (YYYY, YYYY-MM or YYYY-MM-DD).", pattern=_PARTIAL_DATE),
+         "status": ParamSpec("Only events with this verification status.", choices=EVENT_STATUSES)},
+        series_kind="events", unit_kind="count", record_noun="events",
     ),
     QuerySpec(
         "links_by_type", "Links by type",
@@ -236,8 +254,11 @@ class Question:
 QUESTIONS: dict[str, Question] = {q.id: q for q in (
     Question("ranking", "Ranking", "Where an item sits in an ordered list: who received the most, which status holds the most claims.",
              (ChartKind.bar, ChartKind.column), ("category", "distribution")),
-    Question("change_over_time", "Change over time", "How a value rises and falls across periods: payments by month, events by year.",
-             (ChartKind.line, ChartKind.column, ChartKind.area), ("time",)),
+    # The FT Visual Vocabulary puts the timeline here too ("Priestley
+    # timeline: great when date and duration are key elements of the story").
+    Question("change_over_time", "Change over time", "How a value rises and falls across periods: payments by month, events by year; "
+             "or what happened when, and for how long: the events themselves on a timeline.",
+             (ChartKind.line, ChartKind.column, ChartKind.area, ChartKind.timeline), ("time", "events")),
     Question("part_of_whole", "Part of a whole", "How a total splits into parts that do not overlap: each recipient's share of the money.",
              (ChartKind.stacked_bar_100, ChartKind.donut, ChartKind.treemap), ("category",)),
     Question("distribution", "Distribution", "How the values are spread: how many payments are small, middling or very large.",
@@ -356,10 +377,10 @@ class VisualSpec(BaseModel):
     @model_validator(mode="after")
     def _order_fits_the_query(self) -> VisualSpec:
         query = self.query.catalog_entry
-        if self.sort == SortOrder.time and query.series_kind != "time":
+        if self.sort == SortOrder.time and query.series_kind not in ("time", "events"):
             raise ValueError(f"sort 'time' needs a time query; {self.query.name!r} is grouped by category")
-        if self.limit is not None and query.series_kind == "time":
-            raise ValueError("limit cannot cut a time series; it only folds ranked categories into 'Other'")
+        if self.limit is not None and query.series_kind in ("time", "events"):
+            raise ValueError("limit cannot cut a time series or a list of events; it only folds ranked categories into 'Other'")
         # An unknown question is a malformed order. A kind or query that does
         # not answer a known question is a choice the model can fix, so it
         # is refused when the chart is drawn (echarts.check_fit), which asks
@@ -395,7 +416,7 @@ class VisualSpec(BaseModel):
         time series in time order, everything else largest first."""
         if self.sort is not None:
             return self.sort
-        return SortOrder.time if self.catalog_entry.series_kind == "time" else SortOrder.value_desc
+        return SortOrder.time if self.catalog_entry.series_kind in ("time", "events") else SortOrder.value_desc
 
 
 def spec_errors(raw: Any) -> list[str]:

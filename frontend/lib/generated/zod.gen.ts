@@ -3837,11 +3837,16 @@ export const zBarItemOut = z.object({
  * DataTableRowOut
  */
 export const zDataTableRowOut = z.object({
+  end: z.string().nullish(),
   formatted: z.string(),
   label: z.string(),
   record_count: z.number().int(),
   record_refs: z.array(zRecordRefOut),
   share: z.number().nullish(),
+  source: z.string().nullish(),
+  start: z.string().nullish(),
+  status: z.string().nullish(),
+  target: z.string().nullish(),
   value: z.number(),
   x: z.number().nullish(),
   x_formatted: z.string().nullish(),
@@ -5264,10 +5269,15 @@ export const zValidationErrorOut = z.object({
  * VisualDataRowOut
  */
 export const zVisualDataRowOut = z.object({
+  end: z.string().nullish(),
   key: z.string(),
   label: z.string(),
   record_count: z.number().int(),
   record_refs: z.array(zRecordRefOut),
+  source: z.string().nullish(),
+  start: z.string().nullish(),
+  status: z.string().nullish(),
+  target: z.string().nullish(),
   value: z.number(),
   x: z.number().nullish(),
 });

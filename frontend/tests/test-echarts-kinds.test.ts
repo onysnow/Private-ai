@@ -30,7 +30,7 @@ function draw(fixture: Fixture): string {
 
 describe('every chart kind draws with the app\'s registered ECharts parts', () => {
   it('has a fixture for each drawn kind', () => {
-    expect(Object.keys(fixtures).sort()).toEqual(['area', 'bar', 'column', 'donut', 'histogram', 'line', 'sankey', 'scatter', 'stacked_bar_100', 'treemap']);
+    expect(Object.keys(fixtures).sort()).toEqual(['area', 'bar', 'column', 'donut', 'histogram', 'line', 'sankey', 'scatter', 'stacked_bar_100', 'timeline', 'treemap']);
   });
 
   it.each(Object.keys(kinds))('draws a %s with its title, its labels and its source line', kind => {
@@ -42,8 +42,14 @@ describe('every chart kind draws with the app\'s registered ECharts parts', () =
     expect(text).toContain('Source: ');
     // A part, a point or a bin is named on the chart, not only in a key.
     const named = {line: '$52K', area: '$52K', column: '$52K', histogram: '$500K', scatter: 'Meridian Holdings Ltd',
-      sankey: 'Bellcastle Trading Group'}[kind] ?? 'Alaric Voss';
+      sankey: 'Bellcastle Trading Group', timeline: 'Alaric Voss appointed director'}[kind] ?? 'Alaric Voss';
     expect(text).toContain(named);
+  });
+
+  it('writes each event\'s date and status beside it on a timeline', () => {
+    const text = draw(fixtures.timeline);
+    expect(text).toContain('11 Jun 2019 · verified');
+    expect(text).toContain('1 Mar 2022 – 31 Aug 2023 · asserted');
   });
 
   it('writes a flow\'s amount on its band', () => {

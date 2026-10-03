@@ -225,7 +225,7 @@ VISUAL_PRESETS: dict[str, list[dict]] = {
 CHART_FAMILIES: dict[str, str] = {
     "bar": "bars", "column": "bars", "line": "lines", "area": "lines",
     "stacked_bar_100": "parts", "donut": "parts", "treemap": "parts", "histogram": "histogram", "scatter": "scatter",
-    "sankey": "flows",
+    "sankey": "flows", "timeline": "timeline",
 }
 # Rows a sort applies to: groups, records, and flows ranked as bars.
 _RANKED_SERIES = ["category", "distribution", "flows"]
@@ -276,6 +276,11 @@ CHART_OPTIONS: dict[str, dict[str, dict]] = {
     "flows": {
         "highlight": {"type": "labels", "label": "Highlight a party or a flow (the others turn grey)"},
     },
+    # A timeline's rows run in date order and every mark sits at its own
+    # dates; what can be chosen is which events stand out.
+    "timeline": {
+        "highlight": {"type": "labels", "label": "Highlight events (the others turn grey)"},
+    },
 }
 # Each preset is a kind of its family plus option defaults; the first preset
 # with the chart's own kind is how the chart looks as it was ordered.
@@ -313,6 +318,10 @@ CHART_PRESETS: dict[str, list[dict]] = {
     "flows": [
         {"id": "flow", "label": "Flow diagram", "description": "Payers on the left, recipients to the right, each band as wide as the money.",
          "kind": "sankey", "options": {}},
+    ],
+    "timeline": [
+        {"id": "timeline", "label": "Timeline", "description": "One row per event, earliest first: a dot for a day, a line from start to end.",
+         "kind": "timeline", "options": {}},
     ],
 }
 

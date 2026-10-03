@@ -35,6 +35,12 @@ One builder per kind, all reading the same rows:
   refuses a cycle: "Sankey is a DAG"); when it does (A pays B, B pays A),
   payers are drawn in one column and recipients in the other, and the
   subtitle says so, rather than dropping the flow that closes the circle.
+* timeline (pass 4, the FT Visual Vocabulary's "Priestley timeline"): one
+  row per event in date order, earliest at the top, named on the axis; a
+  dot on the day of an event known to the day, a line from start to end
+  for one that lasted, and a dashed line across the month or year for a
+  date known only that far (the timeline never fills in a missing day).
+  Every event's date and verification status are written beside it.
 
 The numbers the drawing needs beyond the query's own (shares, bins,
 outliers) come from app/visuals/stats.py; the drawing only places them.
@@ -53,11 +59,12 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
+from datetime import date, datetime, timezone
 from decimal import Decimal
 from typing import Any
 
 from app.services.presentation_style import INK_DARK, INK_LIGHT, Theme, contrast_ratio, font_stack
-from app.visuals.data_service import DataRow, RecordRef, VisualData
+from app.visuals.data_service import DataRow, RecordRef, VisualData, date_bounds, event_span
 from app.visuals.layout import LABEL_GAP, TEXT_SLACK, block_width, place_on_line
 from app.visuals.spec import (
     COLOUR_PER_CATEGORY_KINDS, DRAWN_KINDS, PART_OF_WHOLE_KINDS, SERIES_FOR_KIND, ChartKind, Scale, SortOrder, VisualSpec,
@@ -80,6 +87,8 @@ KIND_LABELS = {
     ChartKind.stacked_bar_100: "100% bar", ChartKind.donut: "Donut chart", ChartKind.treemap: "Treemap",
     ChartKind.histogram: "Histogram", ChartKind.scatter: "Scatter plot", ChartKind.timeline: "Timeline", ChartKind.sankey: "Flow diagram",
 }
+_AXIS_LABEL_WIDTH = 220                    # px: a category name longer than this is cut short (the data table has it whole)
+BOLD_SLACK = math.ceil(_AXIS_LABEL_WIDTH * 0.1)   # px: how much wider a bold name may run than its regular-weight cut
 _BAR_WIDTH = {"thin": 18, "regular": 36, "thick": 56}
 _BAR_GAP = {"thin": "60%", "regular": "35%", "thick": "15%"}
 _WHOLE_BAR_WIDTH = {"thin": 36, "regular": 56, "thick": 84}
@@ -226,7 +235,8 @@ def value_label(row: DataRow, data: VisualData) -> str:
 
 def source_line(data: VisualData, rows: list[DataRow], kind: ChartKind | None = None) -> str:
     parts = [f"Source: {data.record_count} {data.record_noun if data.record_count != 1 else singular(data.record_noun)} in this investigation's records ({data.query})"]
-    if any(row.record_count == 1 for row in rows):
+    if kind != ChartKind.timeline and any(row.record_count == 1 for row in rows):
+        # (A timeline's mark is one event, always one record: nothing to flag.)
         parts.append(f"{SINGLE_RECORD_MARK} hollow markers rest on one record" if kind in (ChartKind.line, ChartKind.area, ChartKind.scatter)
                      else f"{SINGLE_RECORD_MARK} rests on one record")
     other = [o for o in data.omitted if o.get("reason") == "other currency"]
@@ -275,7 +285,7 @@ def check_fit(spec: VisualSpec, data: VisualData) -> None:
     needs = SERIES_FOR_KIND.get(kind)
     if needs and data.series_kind not in needs:
         wanted = {"distribution": "one value per record, such as payment_amounts", "pairs": "two numbers per party, such as payments_count_and_total_by_party",
-                  "flows": "money moving between parties, such as payment_flows"}
+                  "flows": "money moving between parties, such as payment_flows", "events": "dated events, such as events_in_order"}
         raise ChartDoesNotFit(f"a {kind.value} needs {' or '.join(wanted[n] for n in needs)}; the query {data.query!r} has {data.series_kind} rows")
     if data.series_kind == "pairs" and kind != ChartKind.scatter:
         raise ChartDoesNotFit(f"the query {data.query!r} holds two numbers per party; draw it as a scatter plot")
@@ -288,6 +298,13 @@ def check_fit(spec: VisualSpec, data: VisualData) -> None:
                                   "leave limit out, or rank the flows as bars")
         if spec.sort is not None:
             raise ChartDoesNotFit("sort does not apply to a flow diagram: each flow sits between its payer and its recipient; leave sort out")
+    if data.series_kind == "events" and kind != ChartKind.timeline:
+        raise ChartDoesNotFit(f"the query {data.query!r} holds dated events; draw them as a timeline, or count them by period with events_over_time")
+    if kind == ChartKind.timeline:
+        if spec.sort is not None and spec.sort != SortOrder.time:
+            raise ChartDoesNotFit("a timeline runs in date order; leave sort out")
+        if spec.scale == Scale.log:
+            raise ChartDoesNotFit("a timeline's axis is time; a log scale does not apply to it")
     if kind in (ChartKind.histogram, ChartKind.scatter):
         if spec.limit is not None:
             raise ChartDoesNotFit(f"limit folds ranked categories into 'Other'; a {kind.value} has none to fold, so leave limit out")
@@ -421,7 +438,7 @@ def _axis_category(theme: Theme, rows: list[DataRow], highlighted: set[str], *, 
         # The dark zero line (BBC style): the category axis sits at zero.
         "axisLine": {"show": axis_line, "lineStyle": {"color": _hex(theme.text), "width": 1.5}},
         "axisTick": {"show": False},
-        "axisLabel": {**_text_style(theme, MIN_FONT_PX), "width": 220, "overflow": "truncate"},
+        "axisLabel": {**_text_style(theme, MIN_FONT_PX), "width": _AXIS_LABEL_WIDTH, "overflow": "truncate"},
         "splitLine": {"show": False},
     }
     if all_labels:
@@ -493,9 +510,13 @@ def _bars(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
     # reaches the plot's edge: `containLabel` keeps only axis labels in
     # view, so the grid leaves room for the widest value (it was cut off).
     right = max(24, label_room([value_label(row, data) for row in drawn])) if horizontal else 8
+    # A picked bar's name is bold: the axis cuts a long name to its width at
+    # the regular weight, and `containLabel` keeps that width in view, so the
+    # bold name, about a tenth wider, needs the difference as room on the left.
+    left = BOLD_SLACK if horizontal and highlighted else 0
     option = {
         **frame,
-        "grid": {"left": 0, "right": right, "top": 84 if horizontal else 96, "bottom": 44, "containLabel": True},
+        "grid": {"left": left, "right": right, "top": 84 if horizontal else 96, "bottom": 44, "containLabel": True},
         "xAxis": value_axis if horizontal else category_axis,
         "yAxis": category_axis if horizontal else value_axis,
         "series": [{"type": "bar", "name": p.spec.title, "barMaxWidth": _BAR_WIDTH[p.draw.thickness], "barCategoryGap": _BAR_GAP[p.draw.thickness], "data": points}],
@@ -949,6 +970,143 @@ def _sankey(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
         }],
     }
 
+TIMELINE_TOP, TIMELINE_BOTTOM = 96, 70     # px: the title block above, the source line and the date axis below
+TIMELINE_AXIS = 24                         # px the date labels take under the plot
+TIMELINE_ROW_MIN = MIN_FONT_PX + 6         # px: a row must be this tall to hold its name and its date (rule 14)
+_STATUS_WORDS = {"reporter_reviewed": "reporter reviewed", "system_recorded": "system recorded"}
+_MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+
+def status_words(row: DataRow) -> str:
+    """An event's verification status in plain words."""
+    status = row.status or "asserted"
+    return _STATUS_WORDS.get(status, status)
+
+
+def _date_words(text: str | None) -> str:
+    bounds = date_bounds(text)
+    if bounds is None:
+        return str(text or "")
+    day, _last, precision = bounds
+    if precision == "day":
+        return f"{day.day} {_MONTH_NAMES[day.month - 1]} {day.year}"
+    if precision == "month":
+        return f"{_MONTH_NAMES[day.month - 1]} {day.year}"
+    return str(day.year)
+
+
+def when_text(row: DataRow) -> str:
+    """An event's date as recorded, in words: '4 Mar 2021', 'Mar 2021
+    (month only)', '4 Mar 2021 – 9 Jun 2022'."""
+    start = date_bounds(row.start)
+    if not row.end:
+        if start is not None and start[2] != "day":
+            return f"{_date_words(row.start)} ({start[2]} only)"
+        return _date_words(row.start)
+    span = event_span(row.start, row.end)
+    text = f"{_date_words(row.start)} – {_date_words(row.end)}"
+    return text if span is None or span[2] else f"{text} (not known to the day)"
+
+
+def timeline_text(row: DataRow) -> str:
+    """What is written beside an event: its date and how far it is verified."""
+    return f"{when_text(row)} · {status_words(row)}"
+
+
+def _utc_ms(day: date) -> int:
+    return int(datetime(day.year, day.month, day.day, tzinfo=timezone.utc).timestamp() * 1000)
+
+
+def timeline_marks(row: DataRow) -> tuple[int, ...]:
+    """Where an event is drawn, in ms since 1970 (UTC): (day,) for a dot on
+    an event known to the day, or (from, to) for a line from the start of
+    its first day to the end of its last, so a month known only as a month
+    covers the whole month. Empty when the row has no date."""
+    span = event_span(row.start, row.end)
+    if span is None:
+        return ()
+    lo, hi, exact = span
+    if exact and not row.end:
+        return (_utc_ms(lo),)
+    return (_utc_ms(lo), _utc_ms(hi) + 86_400_000)
+
+
+def timeline_exact(row: DataRow) -> bool:
+    span = event_span(row.start, row.end)
+    return bool(span and span[2])
+
+
+def timeline_row_room(rows: int, height: int) -> float:
+    """The height each event's row gets, in px."""
+    return (height - TIMELINE_TOP - TIMELINE_BOTTOM - TIMELINE_AXIS) / max(rows, 1)
+
+
+def _timeline(p: _Parts, frame: dict[str, Any]) -> dict[str, Any]:
+    """timeline: one row per event, earliest at the top (the rows are given
+    to the axis latest first, since a category axis runs upward; no axis is
+    turned upside down, rule 7). A dot for a day, a line from start to end
+    for an event that lasted (dashed when either end is known only to the
+    month or year), and the date and status written beside every event."""
+    theme, rows, highlighted = p.theme, p.rows, p.highlighted
+    base = mark_colour(theme)
+    points: list[dict[str, Any]] = []
+    series: list[dict[str, Any]] = []
+    ticks: list[int] = []
+    for row in rows:
+        marks = timeline_marks(row)
+        if not marks:
+            continue
+        ticks.extend(marks)
+        picked = row.label in highlighted
+        colour = _hex(base if picked or not highlighted else theme.bar_muted)
+        text = timeline_text(row)
+        label = {"show": True, "position": "right", "formatter": _literal(text), **_text_style(theme, MIN_FONT_PX, bold=picked)}
+        tip = {"formatter": _literal(f"{row.label}: {text}")}
+        if len(marks) == 1:
+            # Opaque, as the lines are (ECharts draws scatter points at 0.8 unless told).
+            points.append({"name": row.label, "value": [marks[0], row.label], "symbol": FILLED_SYMBOL, "symbolSize": 12 if picked else 10,
+                           "itemStyle": {"color": colour, "opacity": 1}, "label": label, "tooltip": tip})
+            continue
+        exact = timeline_exact(row)
+        series.append({
+            "type": "line", "name": row.label, "z": 2,
+            "symbol": FILLED_SYMBOL, "symbolSize": 7, "showSymbol": True,
+            "lineStyle": {"color": colour, "width": 6 if exact else 4, "type": "solid" if exact else "dashed"},
+            "itemStyle": {"color": colour},
+            # The date is written at the end of the line, inside the picture (the grid leaves it room).
+            "data": [{"name": row.label, "value": [marks[0], row.label], "itemStyle": {"color": colour}, "label": {"show": False}, "tooltip": tip},
+                     {"name": row.label, "value": [marks[1], row.label], "itemStyle": {"color": colour}, "label": label, "tooltip": tip}],
+        })
+    if points:
+        series.append({"type": "scatter", "name": p.spec.title, "z": 3, "data": points})
+    lo, hi = (min(ticks), max(ticks)) if ticks else (0, 0)
+    # A little room either side of the first and last date (4% of the span,
+    # or a month when there is one date), so no mark sits on the plot's edge.
+    pad = max((hi - lo) * 0.04, 30 * 86_400_000 if hi == lo else 86_400_000)
+    # A picked event is marked in bold beside its mark; its name on the axis
+    # stays regular, since the axis cuts a long name to fit at the regular
+    # weight and a bold one then runs off the picture's left edge.
+    y_axis = _axis_category(theme, list(reversed(rows)), set(), axis_line=False)
+    x_axis = {
+        "type": "time", "min": int(lo - pad), "max": int(hi + pad),
+        "axisLine": {"show": True, "lineStyle": {"color": _hex(theme.text), "width": 1.5}}, "axisTick": {"show": True},
+        "axisLabel": {**_text_style(theme, MIN_FONT_PX, colour=theme.muted), "hideOverlap": True},
+        # Only horizontal gridlines in the house style; a timeline's rows are its lines.
+        "splitLine": {"show": False},
+    }
+    right = max(24, label_room([timeline_text(row) for row in rows]) + 12)
+    return {
+        **frame,
+        # Dates are placed and written in UTC, as the data service reads them.
+        "useUTC": True,
+        "tooltip": _tooltip(theme),
+        "grid": {"left": 8, "right": right, "top": TIMELINE_TOP, "bottom": TIMELINE_BOTTOM, "containLabel": True},
+        "xAxis": x_axis,
+        "yAxis": y_axis,
+        "series": series,
+    }
+
+
 def scatter_labels(rows: list[DataRow], label_points: str) -> set[str]:
     """Which points a scatter plot names: all of them when there are few
     (POINT_LABEL_LIMIT), else the outliers by Tukey's fences, unless the
@@ -987,6 +1145,11 @@ def _subtitle(spec: VisualSpec, data: VisualData, kind: ChartKind) -> str:
             base += ("; the money also runs back the other way, so payers are drawn on the left and recipients on the right, "
                      "and a party can appear on both sides")
         return base
+    if kind == ChartKind.timeline:
+        base = "Each event at its date, earliest first; a line runs from start to end"
+        if any(timeline_marks(row) and not timeline_exact(row) for row in data.rows):
+            base += ", dashed where a date is known only to the month or year"
+        return base
     if kind in PART_OF_WHOLE_KINDS:
         base = f"Share of the total, amounts in {unit}" if data.unit_kind == "amount" and unit else f"Share of all {data.record_noun}"
         return base
@@ -1019,7 +1182,7 @@ def build_chart(spec: VisualSpec, data: VisualData, theme: Theme, *, width: int 
     labelled = scatter_labels(rows, draw.label_points) if kind == ChartKind.scatter else set()
     source = source_line(data, rows, kind)
     words = _words(spec, data, rows, highlighted, kind, shares=shares, total=total, bins=bins, labelled=labelled)
-    colours = part_colours(rows, theme, highlighted) if kind in PART_OF_WHOLE_KINDS else [mark_colour(theme) if kind in (ChartKind.line, ChartKind.area, ChartKind.scatter) else theme.accent]
+    colours = part_colours(rows, theme, highlighted) if kind in PART_OF_WHOLE_KINDS else [mark_colour(theme) if kind in (ChartKind.line, ChartKind.area, ChartKind.scatter, ChartKind.timeline) else theme.accent]
     frame = _frame(spec, theme, _subtitle(spec, data, kind), source, words["alt_text"], width, colours=colours)
     parts = _Parts(spec, data, theme, rows, highlighted, draw, width, height)
     if kind in (ChartKind.bar, ChartKind.column):
@@ -1036,6 +1199,8 @@ def build_chart(spec: VisualSpec, data: VisualData, theme: Theme, *, width: int 
         option = _histogram(parts, frame)
     elif kind == ChartKind.sankey:
         option = _sankey(parts, frame)
+    elif kind == ChartKind.timeline:
+        option = _timeline(parts, frame)
     else:
         option = _scatter(parts, frame, labelled)
     return BuiltChart(
@@ -1099,6 +1264,17 @@ def _words(spec: VisualSpec, data: VisualData, rows: list[DataRow], highlighted:
         for row, share, table_row in zip(rows, shares, table_rows):
             table_row["share"] = round(share, 1)
             lines.append(f"{row.label}: {part_value_text(row, share, data)}.")
+    elif kind == ChartKind.timeline:
+        first, last = rows[0], rows[-1]
+        alt = (f"{name}: {spec.title}. {count} event{'s' if count != 1 else ''} from {when_text(first)} ({first.label}) "
+               f"to {when_text(last)} ({last.label}).")
+        columns = ["Event", "When", "Status", "Records"]
+        for row, table_row in zip(rows, table_rows):
+            table_row["formatted"] = when_text(row)
+            table_row["start"], table_row["status"] = row.start, status_words(row)
+            if row.end:
+                table_row["end"] = row.end
+            lines.append(f"{row.label}: {timeline_text(row)}.")
     elif data.series_kind == "flows":
         parties = {row.source for row in rows} | {row.target for row in rows}
         alt = (f"{name}: {spec.title}. {count} flow{'s' if count != 1 else ''} between {len(parties)} parties, amounts in {unit}. "

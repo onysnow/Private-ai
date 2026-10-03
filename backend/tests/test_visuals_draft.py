@@ -20,6 +20,8 @@ from app.main import app
 from app.models.domain import AIAnalysisCandidate, Claim, Evidence
 from app.services.demo_seed import seed_demo_investigation
 from app.visuals.render_client import RenderUnavailable
+from app.visuals.spec import ChartKind
+from visuals_helpers import withhold_kind
 
 client = TestClient(app)
 
@@ -176,6 +178,7 @@ def test_a_chart_over_a_query_with_no_records_is_removed_under_rule_15(monkeypat
 
 
 def test_a_kind_not_drawn_yet_is_removed_with_a_plain_reason(monkeypatch, demo):
+    withhold_kind(monkeypatch, ChartKind.timeline)
     fake = _FakeLLMClient(_draft(demo, _chart(kind="timeline", title="The payments came in one burst in March")))
     response = _run(monkeypatch, demo, fake)
     assert response.status_code == 200, response.text

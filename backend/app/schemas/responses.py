@@ -194,6 +194,13 @@ class VisualDataRowOut(ResponseModel):
     key: str
     # A pairs row's second number (a scatter plot's x); `value` is its y.
     x: float | None = Field(default=None, exclude_if=_absent_when_none)
+    # A flows row's payer and recipient (a sankey).
+    source: str | None = Field(default=None, exclude_if=_absent_when_none)
+    target: str | None = Field(default=None, exclude_if=_absent_when_none)
+    # An events row's date as recorded, its end when it has one, and its verification status (a timeline).
+    start: str | None = Field(default=None, exclude_if=_absent_when_none)
+    end: str | None = Field(default=None, exclude_if=_absent_when_none)
+    status: str | None = Field(default=None, exclude_if=_absent_when_none)
 
 
 class VisualDataOut(ResponseModel):
@@ -241,6 +248,13 @@ class DataTableRowOut(ResponseModel):
     # A scatter plot's x, and as written.
     x: float | None = Field(default=None, exclude_if=_absent_when_none)
     x_formatted: str | None = Field(default=None, exclude_if=_absent_when_none)
+    # A flow's payer and recipient (a sankey).
+    source: str | None = Field(default=None, exclude_if=_absent_when_none)
+    target: str | None = Field(default=None, exclude_if=_absent_when_none)
+    # An event's date as recorded, its end, and its verification status in words (a timeline; `formatted` says when).
+    start: str | None = Field(default=None, exclude_if=_absent_when_none)
+    end: str | None = Field(default=None, exclude_if=_absent_when_none)
+    status: str | None = Field(default=None, exclude_if=_absent_when_none)
 
 
 class DataTableOut(ResponseModel):

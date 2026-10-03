@@ -3327,6 +3327,10 @@ export type DataTableOut = {
  */
 export type DataTableRowOut = {
   /**
+   * End
+   */
+  end?: string | null;
+  /**
    * Formatted
    */
   formatted: string;
@@ -3346,6 +3350,22 @@ export type DataTableRowOut = {
    * Share
    */
   share?: number | null;
+  /**
+   * Source
+   */
+  source?: string | null;
+  /**
+   * Start
+   */
+  start?: string | null;
+  /**
+   * Status
+   */
+  status?: string | null;
+  /**
+   * Target
+   */
+  target?: string | null;
   /**
    * Value
    */
@@ -11725,6 +11745,10 @@ export type VisualDataOut = {
  */
 export type VisualDataRowOut = {
   /**
+   * End
+   */
+  end?: string | null;
+  /**
    * Key
    */
   key: string;
@@ -11740,6 +11764,22 @@ export type VisualDataRowOut = {
    * Record Refs
    */
   record_refs: Array<RecordRefOut>;
+  /**
+   * Source
+   */
+  source?: string | null;
+  /**
+   * Start
+   */
+  start?: string | null;
+  /**
+   * Status
+   */
+  status?: string | null;
+  /**
+   * Target
+   */
+  target?: string | null;
   /**
    * Value
    */

@@ -7,7 +7,8 @@ with bars: a horizontal ranked `bar` and a vertical `column`. Pass 3 draws
 the statistical kinds on the same foundation: `line`, `area`,
 `stacked_bar_100` (the 100% bar the design uses instead of small pies),
 `donut`, `treemap`, `histogram` and `scatter`. Pass 4 draws money flows as a
-`sankey` (below, "Pass 4: the flow diagram"); `timeline` is still to come.
+`sankey` (below, "Pass 4: the flow diagram") and the events themselves as a
+`timeline` ("Pass 4: the timeline").
 
 The promise, in one line: **the AI never types a number.** It writes a short
 order; the Workbench cooks every value from the investigation's own records,
@@ -375,6 +376,54 @@ rows rank as bars.
 - Tests: `tests/test_visuals_flows.py`, and the `sankey` fixture in
   `frontend/test-support/chart-kinds.json`.
 
+## Pass 4: the timeline
+
+What happened when, and for how long, drawn from the timeline's own records
+(the FT Visual Vocabulary's "Priestley timeline", under change over time:
+"great when date and duration are key elements of the story"). It answers
+`change_over_time` beside the line and column, which count events per
+period (`events_over_time`); the timeline shows the events.
+
+- **The query** `events_in_order` (rows of the new `events` shape): every
+  dated event on the investigation's timeline (`app/services/timeline.py`:
+  the reporter's events and the dates the records hold), one row each, in
+  date order and then by title, with its date as recorded, its end when it
+  has one, its verification status and the records behind it. `from` and
+  `to` keep the events that overlap that stretch of time, `status` one
+  verification status. An event with no usable date, or one that ends
+  before it starts, is listed under `omitted`, never placed by a guess. Two
+  events with one title are told apart by their date, since a category axis
+  joins rows of the same name.
+- **Dates as recorded.** The timeline keeps a date at the precision it was
+  recorded at and never fills in a missing day, so neither does the chart:
+  `2021-03` covers 1 to 31 March, `2021` the whole year. An event known to
+  the day is a dot on that day; one that lasted, a line from the start of
+  its first day to the end of its last; either drawn dashed when a date is
+  known only to the month or year, and its words say so ("Feb 2021 (month
+  only)"), so the uncertainty is shown by more than colour (rule 12).
+- **Layout.** One row per event, earliest at the top (the rows are given to
+  the category axis latest first, since it runs upward; no axis is turned
+  over, rule 7), named on the axis, its date and verification status written
+  beside its mark. A time axis across, placed in UTC, as the data service
+  reads the dates. A highlight names events: they stay in colour and their
+  words turn bold; the rest turn grey.
+- **Checks.** Rule 0 reads every mark's dates back off the drawing against
+  the record's; 7 asks for date order; 12 that every event is named and its
+  date and status written; 14 that each row has room for its words (at
+  least 18 px; otherwise "narrow the timeline with from, to or status").
+  One mark is one event, which is one record, so rules 16 and 20 do not
+  apply and no event carries the single-record mark. A timeline takes no
+  `sort`, `limit` or log scale.
+- **Exports.** PowerPoint has no timeline chart, so a deck holds the render
+  service's picture; when the service is down, or the slide is too small for
+  the rows, the events go in as a native table (event, when, status) with
+  the reason, and the slide preview lists them the same way. A brief holds
+  the picture and the table with the status beside each date.
+- Tests: `tests/test_visuals_timeline.py`, the `timeline` fixture in
+  `frontend/test-support/chart-kinds.json`, and the live render test.
+  `tests/visuals_helpers.py` withholds a kind from the drawn ones, so the
+  path a kind takes before it is drawn stays tested now that every kind is.
+
 ## Pass 4: the network and the connection grid
 
 The relationship network is drawn with Sigma.js 3 (WebGL) over a
@@ -463,7 +512,7 @@ reporter uses without the AI. The app's side is tested in
 
 Left for later passes:
 
-- `timeline` (pass 4), the staged flow and the who-pays-whom circle (chord).
+- The staged flow and the who-pays-whom circle (chord).
 - Parts of a whole over time (a stacked area), which needs a query with a
   second series.
 - Reading the values back out of the rendered SVG (the image-level half of

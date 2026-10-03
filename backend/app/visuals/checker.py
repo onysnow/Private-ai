@@ -51,6 +51,14 @@ A flow diagram (sankey) is read through its bands (``links``): rule 0
 compares their values with the rows, rules 16 and 20 read each band's
 tooltip, rule 12 asks that every party is named, rule 11 that the parties'
 bars stand 3:1 against the page, and rule 10 warns past twenty parties.
+
+A timeline is read through its marks' dates: rule 0 compares the days each
+event is drawn at (a dot, or a line from start to end) with the dates its
+record holds; rule 7 asks that the events run in date order; rule 12 that
+every event is named on the axis and its date and status written beside
+it; rule 14 that every row is tall enough for its text. Each mark is one
+event, which is one record, so rules 16 and 20 (records behind a value)
+do not apply to it.
 """
 
 from __future__ import annotations
@@ -63,8 +71,8 @@ from typing import Any
 from app.services.presentation_style import Theme, contrast_ratio
 from app.visuals.data_service import DataRow, VisualData
 from app.visuals.echarts import (
-    DEFAULT_HEIGHT, DEFAULT_WIDTH, GRAPHIC_CONTRAST, HOLLOW_SYMBOL, MIN_FONT_PX, SINGLE_RECORD_MARK, TREEMAP_LABEL_PADDING, BuiltChart,
-    UnsupportedChartKind, build_chart, count_phrase, format_value, prepare_rows,
+    DEFAULT_HEIGHT, DEFAULT_WIDTH, GRAPHIC_CONTRAST, HOLLOW_SYMBOL, MIN_FONT_PX, SINGLE_RECORD_MARK, TIMELINE_ROW_MIN, TREEMAP_LABEL_PADDING,
+    BuiltChart, UnsupportedChartKind, build_chart, count_phrase, format_value, prepare_rows, timeline_marks, timeline_row_room, timeline_text,
 )
 from app.visuals.layout import LABEL_GAP, block_width, treemap_rects, wrapped_lines
 from app.visuals.spec import (
@@ -372,6 +380,10 @@ class _Checker:
         if self.option is None:
             self.not_checked[0] = f"needs the drawn option; chart kind {self.kind.value!r} is not drawn yet"
             return
+        if self.kind == ChartKind.timeline:
+            self._timeline_dates()
+            self.passed(0)
+            return
         expected: list[tuple[Any, ...]]
         if self.kind == ChartKind.scatter:
             expected = sorted(((row.label, _number(row.x), _number(row.value)) for row in self.rows), key=str)
@@ -392,6 +404,26 @@ class _Checker:
         if any(s.get("smooth") for s in self.series()):
             self.warn(0, "the line is smoothed: a curve between the points follows no record and can overshoot them (Datawrapper); a straight line shows only what was recorded")
         self.passed(0)
+
+    def _timeline_dates(self) -> None:
+        """Every event is drawn on its own row at the days its record holds:
+        one mark at its day, or a line from the start of its first day to the
+        end of its last (echarts.timeline_marks), and nothing else."""
+        drawn: dict[str, list[int]] = {}
+        for _series, item in self.items():
+            value = item.get("value")
+            if not (isinstance(value, list) and len(value) == 2):
+                self.error(0, f"a mark for '{item.get('name')}' has no date and row")
+                continue
+            if str(value[1]) != str(item.get("name")):
+                self.error(0, f"'{item.get('name')}' is drawn on the row of '{value[1]}'")
+            when = _number(value[0])
+            drawn.setdefault(str(item.get("name")), []).append(int(when) if when is not None else -1)
+        expected = {row.label: sorted(timeline_marks(row)) for row in self.rows}
+        found = {name: sorted(days) for name, days in drawn.items()}
+        if found != expected:
+            wrong = sorted(set(found) ^ set(expected) | {n for n in found if n in expected and found[n] != expected[n]})
+            self.error(0, f"the dates drawn do not match the events' records for: {', '.join(wrong)}")
 
     def _recount_bins(self) -> None:
         """Count every record into the drawn bins again, with plain
@@ -538,6 +570,11 @@ class _Checker:
             if self.kind == ChartKind.histogram:
                 self._even_bins()
             self.passed(7)
+        if self.kind == ChartKind.timeline and len(rows) > 1:
+            starts = [timeline_marks(row)[:1] for row in rows]
+            if starts != sorted(starts):
+                self.error(7, "the events are not in date order, so the rows do not read down the timeline")
+            self.passed(7)
         if data.series_kind == "time" and len(rows) > 1:
             keys = [row.key for row in rows]
             if keys != sorted(keys) or len(set(keys)) != len(keys) or not _consecutive_periods(keys):
@@ -561,6 +598,9 @@ class _Checker:
 
     # 8. Never join unrelated categories with a line.
     def rule_8(self) -> None:
+        if self.kind == ChartKind.timeline:
+            self.does_not_apply(8, "a timeline's lines run along time, from an event's start to its end; none joins one event to another")
+            return
         if self.kind not in LINE_KINDS:
             self.does_not_apply(8, f"a {self.kind.value} joins no points with a line")
             return
@@ -587,6 +627,9 @@ class _Checker:
             allowed = 2 if spec.highlight else 1
             if kind in LENGTH_KINDS and len(colours) > allowed:
                 self.error(9, f"the bars are ordered but drawn in {len(colours)} colours, which reads as a second meaning; use one colour, or a highlight and grey")
+            if kind == ChartKind.timeline and len(colours) > allowed:
+                self.error(9, f"the events are drawn in {len(colours)} colours, which reads as groups the data does not have; use one colour, "
+                              "or a highlight and grey")
             if kind in POINT_KINDS and len(colours) > 1:
                 self.error(9, f"the points are drawn in {len(colours)} colours, which reads as groups the data does not have; use one colour")
             self.passed(9)
@@ -692,6 +735,14 @@ class _Checker:
                 label = self.label_of(series, node)
                 if not label.get("show", True) or not str(label.get("formatter", "")).strip():
                     self.error(12, f"the party drawn as '{node.get('name')}' is not named on the chart")
+        if kind == ChartKind.timeline and self.needs_option(12):
+            named = self.category_axis_labels()
+            written = self.label_text()
+            for row in self.rows:
+                if row.label not in named:
+                    self.error(12, f"the event '{row.label}' is not named on the timeline's axis")
+                if written.get(row.label) != timeline_text(row):
+                    self.error(12, f"the date and status of '{row.label}' are not written beside it")
         if self.spec.highlight and self.needs_option(12):
             picked = [name for name in self.spec.highlight if any(row.label == name for row in self.rows)]
             if kind in (ChartKind.bar, ChartKind.column, ChartKind.histogram):
@@ -735,6 +786,12 @@ class _Checker:
             small = sorted({size for size in _font_sizes(self.option) if size < MIN_FONT_PX})
             if small:
                 self.error(14, f"text of {', '.join(f'{s:g}px' for s in small)} is under the {MIN_FONT_PX}px minimum")
+            if self.kind == ChartKind.timeline:
+                _width, height = self.picture_size()
+                room = timeline_row_room(len(self.rows), height)
+                if room < TIMELINE_ROW_MIN:
+                    self.error(14, f"{len(self.rows)} events leave each row {room:.0f}px, under the {TIMELINE_ROW_MIN}px its name and date need; "
+                                   "narrow the timeline with from, to or status")
             crowded = self.crowded_values()
             if crowded:
                 if self.kind in (ChartKind.line, ChartKind.area):
@@ -758,6 +815,9 @@ class _Checker:
     # 16. Show how many records sit behind each group; flag groups more than 10x apart.
     def rule_16(self) -> None:
         kind, data = self.kind, self.data
+        if kind == ChartKind.timeline:
+            self.does_not_apply(16, "each mark on a timeline is one event, which is one record; there is no group of records to count")
+            return
         drawn = self.drawn_rows()
         counts = [row.record_count for row in drawn if row.record_count]
         if len(counts) > 1 and max(counts) > RECORD_COUNT_SPREAD * min(counts):
@@ -797,6 +857,9 @@ class _Checker:
 
     # 20. A value that rests on one record is visibly flagged.
     def rule_20(self) -> None:
+        if self.kind == ChartKind.timeline:
+            self.does_not_apply(20, "each mark on a timeline is one event, which is one record; resting on one record is what an event is")
+            return
         singles = [row.label for row in self.drawn_rows() if row.record_count == 1]
         if singles:
             self.warn(20, "these values rest on one record each: " + ", ".join(singles))
