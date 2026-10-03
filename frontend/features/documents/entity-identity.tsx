@@ -114,8 +114,8 @@ export function EntityIdentity({candidateId, caption, schemaBlocked, onAccept, o
     </div>}
 
     <div className="flex gap-2 mt-1">
-      <Button size="sm" onClick={() => onAccept(identityFields(choice, strong?.entity_id ?? null))} disabled={schemaBlocked || waiting || required}>Accept</Button>
-      <Button size="sm" variant="outline" onClick={onReject}>Reject</Button>
+      <Button size="sm" data-action="accept" onClick={() => onAccept(identityFields(choice, strong?.entity_id ?? null))} disabled={schemaBlocked || waiting || required}>Accept</Button>
+      <Button size="sm" data-action="reject" variant="outline" onClick={onReject}>Reject</Button>
     </div>
   </div>;
 }

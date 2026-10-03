@@ -195,6 +195,50 @@ describe('Document review queue: issues and clarifying questions', () => {
     expect(api.unmatched()).toEqual([]);
   });
 
+  it('reviews from the keyboard: arrows move between proposals, A and R press their buttons', async () => {
+    setParams('inv=inv-1&docs=doc-1');
+    const second = evidenceCandidate({id: 'cand-evidence-2', payload: {quote: 'A second ordinary sentence.', locator: 'line 2'}});
+    const api = mockApi({
+      [documentRoute('doc-1')]: docFixture(),
+      [candidatesRoute('doc-1')]: [evidenceCandidate(), second],
+      'POST /api/extraction-candidates/cand-evidence/review': {candidate: {}, record: {}},
+      'POST /api/extraction-candidates/cand-evidence-2/review': {candidate: {}, record: {}},
+    });
+    const ReviewPage = await importReviewPage();
+    render(<ReviewPage />);
+    const first = await screen.findByTestId('candidate-cand-evidence');
+    expect(screen.getByTestId('review-keys')).toHaveTextContent('A accepts · R rejects');
+
+    const user = userEvent.setup();
+    first.focus();
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByTestId('candidate-cand-evidence-2')).toHaveFocus();
+    await user.keyboard('r');
+    expect(api.lastBody('POST /api/extraction-candidates/cand-evidence-2/review')).toMatchObject({decision: 'reject'});
+    screen.getByTestId('candidate-cand-evidence').focus();
+    await user.keyboard('a');
+    expect(api.lastBody('POST /api/extraction-candidates/cand-evidence/review')).toMatchObject({decision: 'accept'});
+  });
+
+  it('leaves a held-back Accept alone from the keyboard', async () => {
+    setParams('inv=inv-1&docs=doc-1');
+    const review = 'POST /api/extraction-candidates/cand-entity/review';
+    const api = mockApi({
+      [documentRoute('doc-1')]: docFixture(),
+      [candidatesRoute('doc-1')]: [ambiguousEntityCandidate()],
+      [review]: {candidate: {}, record: {}},
+      'GET /api/extraction-candidates/cand-entity/entity-matches': {candidate_id: 'cand-entity', caption: 'Alaric Voss', schema: 'Person',
+        matches: [], strong_match: null, provider_lead: {provider: null, provider_entity_id: null, provider_resolved_entity_id: null}, identity_rule: ''},
+      'GET /api/extraction-candidates/cand-entity/openaleph-matches': {candidate_id: 'cand-entity', schema: 'Person', state: 'ok', detail: null, hidden: 0, results: []},
+    });
+    const ReviewPage = await importReviewPage();
+    render(<ReviewPage />);
+    const card = await screen.findByTestId('candidate-cand-entity');
+    card.focus();
+    await userEvent.setup().keyboard('a');   // the kind is not answered yet
+    expect(api.calls(review)).toHaveLength(0);
+  });
+
   it('falls back to every document in the investigation that still has proposed candidates when no ?docs= is given', async () => {
     setParams('inv=inv-1');
     const api = mockApi({

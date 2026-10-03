@@ -12,6 +12,7 @@ import {confidenceBand, confidenceLabel} from '../../features/documents/confiden
 import type {ConfidenceBand} from '../../features/documents/confidence';
 import {EntityIdentity, identityFields} from '../../features/documents/entity-identity';
 import {IdentifierOwner} from '../../features/documents/identifier-owner';
+import {reviewKey} from '../../features/documents/review-keys';
 import {reviewOrderFrom} from '../../features/documents/ingestion-batch';
 import {getIngestionBatch} from '../../lib/generated/sdk.gen';
 import {SchemaQuestion, needsSchemaAnswer} from '../../features/documents/schema-question';
@@ -61,6 +62,7 @@ function renderChunkBody(chunk: DocumentChunk, active: {chunk_id?: string, paylo
 // An email or phone proposal asks whose it is (identifier-owner.tsx).
 
 const REVIEW_NOTE = 'Reviewed in bulk-import review queue';
+
 // Low waits for an answer (red); medium is proposed but marked (brass).
 const BAND_CLASS: Record<ConfidenceBand, string> = {high: '', medium: 'text-primary', low: 'text-destructive'};
 
@@ -274,6 +276,8 @@ function ReviewPageInner(): ReactElement {
             {current.candidates.length === 0 && !hasIssues && <p className="muted">Nothing left to review in this document.</p>}
             {current.candidates.length === 0 && hasIssues && <p className="muted">No proposals were generated from what could be parsed.</p>}
 
+            {current.candidates.length > 0 && <p className="muted text-xs" data-testid="review-keys">
+              Keys: ↑ ↓ (or J K) move between proposals · A accepts · R rejects</p>}
             {current.candidates.map(c => {
               const clarify = needsSchemaAnswer(c);
               const answered = answers[c.id];
@@ -285,8 +289,13 @@ function ReviewPageInner(): ReactElement {
                   className={`candidate ${isActive ? 'ring-1 ring-accent' : ''}`}
                   key={c.id}
                   data-testid={`candidate-${c.id}`}
+                  data-candidate
+                  tabIndex={0}
+                  role="group"
+                  aria-label={`${c.candidate_type} proposal: ${c.payload.caption || c.payload.text || c.payload.quote || ''}`.slice(0, 120)}
                   onMouseEnter={() => setActiveCandidateId(c.id)}
                   onMouseLeave={() => setActiveCandidateId(cur => (cur === c.id ? null : cur))}
+                  onKeyDown={reviewKey}
                   onFocus={() => setActiveCandidateId(c.id)}
                   onBlur={() => setActiveCandidateId(cur => (cur === c.id ? null : cur))}
                 >
@@ -304,8 +313,8 @@ function ReviewPageInner(): ReactElement {
                     ? <EntityIdentity candidateId={c.id} caption={String(c.payload.caption || '')} schemaBlocked={acceptBlocked}
                         onAccept={identity => decide(c, 'accept', identity)} onReject={() => decide(c, 'reject')}/>
                     : <div className="flex gap-2 mt-1">
-                      <Button size="sm" onClick={() => decide(c, 'accept')} disabled={acceptBlocked}>Accept</Button>
-                      <Button size="sm" variant="outline" onClick={() => decide(c, 'reject')}>Reject</Button>
+                      <Button size="sm" data-action="accept" onClick={() => decide(c, 'accept')} disabled={acceptBlocked}>Accept</Button>
+                      <Button size="sm" data-action="reject" variant="outline" onClick={() => decide(c, 'reject')}>Reject</Button>
                     </div>}
                 </div>
               );
