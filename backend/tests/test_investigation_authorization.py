@@ -215,6 +215,9 @@ def test_decks_writeups_and_relationships_stay_inside_their_investigation(monkey
 _NOT_INVESTIGATION_RECORDS = {
     "investigation_id", "user_id", "provider", "prop", "name", "kind", "pk", "asset", "source",
     "aid", "bid", "cid", "qid", "rid", "tid", "uid",
+    # The base map (routes_basemap.py): a tile's zoom and column and row, a font
+    # stack and glyph range, a sprite file. The same for every investigation.
+    "z", "x", "y", "stack", "glyph_range",
 }
 
 
