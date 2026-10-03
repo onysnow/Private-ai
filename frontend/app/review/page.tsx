@@ -3,7 +3,6 @@ import type {ReactElement} from 'react';
 import {Suspense, useCallback, useEffect, useRef, useState} from 'react';
 import Link from 'next/link';
 import {useSearchParams} from 'next/navigation';
-import {api} from '../../lib/api-instance';
 import {errorMessage} from '../../lib/api-client';
 import {isDocItem, isExtractionCandidate} from '../../lib/api-validate';
 import type {DocItem, DocumentChunk, ExtractionCandidate} from '../../lib/api-types';
@@ -14,7 +13,8 @@ import {EntityIdentity, identityFields} from '../../features/documents/entity-id
 import {IdentifierOwner} from '../../features/documents/identifier-owner';
 import {reviewKey} from '../../features/documents/review-keys';
 import {reviewOrderFrom} from '../../features/documents/ingestion-batch';
-import {getIngestionBatch} from '../../lib/generated/sdk.gen';
+import {getDocument, getIngestionBatch, listDocumentCandidatesEndpoint, listDocuments, reviewExtractionCandidate} from '../../lib/generated/sdk.gen';
+import {narrowed, narrowedList} from '../../lib/narrow';
 import {SchemaQuestion, needsSchemaAnswer} from '../../features/documents/schema-question';
 import {QueryProvider} from '../../lib/query-client';
 import {Button} from '@/components/ui/button';
@@ -119,10 +119,10 @@ function ReviewPageInner(): ReactElement {
     (async () => {
       setResolvingQueue(true);
       try {
-        const docs = await api.array(`/api/investigations/${invId}/documents`, 'documents', isDocItem);
+        const docs = (await listDocuments({path: {investigation_id: invId}, throwOnError: true})).data;
         const withPending = await Promise.all(docs.map(async d => {
           try {
-            const proposed = await api.array(`/api/documents/${d.id}/candidates?status=proposed`, 'candidates', isExtractionCandidate);
+            const proposed = (await listDocumentCandidatesEndpoint({path: {document_id: d.id}, query: {status: 'proposed'}, throwOnError: true})).data;
             return proposed.length > 0 ? d.id : null;
           } catch { return null }
         }));
@@ -139,10 +139,12 @@ function ReviewPageInner(): ReactElement {
   const loadDoc = useCallback(async (id: string) => {
     setLoading(true); setAnswers({}); setStatus(''); setActiveCandidateId(null);
     try {
-      const [doc, candidates] = await Promise.all([
-        api.object(`/api/documents/${id}`, 'document', isDocItem),
-        api.array(`/api/documents/${id}/candidates?status=proposed&explain=true`, 'candidates', isExtractionCandidate),
+      const [detail, proposed] = await Promise.all([
+        getDocument({path: {document_id: id}, throwOnError: true}),
+        listDocumentCandidatesEndpoint({path: {document_id: id}, query: {status: 'proposed', explain: true}, throwOnError: true}),
       ]);
+      const doc = narrowed(detail.data, isDocItem, '/api/documents/{document_id}', 'document');
+      const candidates = narrowedList(proposed.data, isExtractionCandidate, '/api/documents/{document_id}/candidates', 'candidates');
       setCurrent({doc, candidates, accepted: 0, rejected: 0});
     } catch (error) {
       setStatus(errorMessage(error, 'Could not load this document'));
@@ -179,7 +181,7 @@ function ReviewPageInner(): ReactElement {
       Object.assign(body, identity);
     }
     try {
-      await api.unknown(`/api/extraction-candidates/${candidate.id}/review`, {method: 'POST', body});
+      await reviewExtractionCandidate({path: {candidate_id: candidate.id}, body, throwOnError: true});
       recorded(candidate.id, decision);
     } catch (error) {
       setStatus(errorMessage(error, 'Review action failed'));

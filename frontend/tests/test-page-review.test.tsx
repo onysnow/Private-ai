@@ -46,9 +46,9 @@ const candidatesRoute = (id: string) => `GET /api/documents/${id}/candidates`;
 
 function docFixture(overrides: Record<string, unknown> = {}) {
   return {
-    id: 'doc-1', investigation_id: 'inv-1', filename: 'memo.txt', source_id: 'src-1',
+    id: 'doc-1', investigation_id: 'inv-1', filename: 'memo.txt', source_id: 'src-1', sha256: 'a'.repeat(64),
     extraction_status: 'complete', extraction_error: null, extraction_issues: [],
-    chunk_count: 2, candidate_counts: {evidence: 1},
+    chunk_count: 2, candidate_counts: {evidence: 1}, chunks: [], created_at: '2026-10-03T01:00:00',
     ...overrides,
   };
 }
@@ -60,8 +60,10 @@ function docWithChunksFixture(overrides: Record<string, unknown> = {}) {
   return {
     ...docFixture(),
     chunks: [
-      {id: 'chunk-1', document_id: 'doc-1', ordinal: 1, locator: 'line 1', page_number: null, text: 'Alpha Corporation signed the deal.'},
-      {id: 'chunk-2', document_id: 'doc-1', ordinal: 2, locator: 'line 2', page_number: null, text: 'A second, unrelated paragraph.'},
+      {id: 'chunk-1', document_id: 'doc-1', ordinal: 1, locator: 'line 1', page_number: null, text: 'Alpha Corporation signed the deal.',
+        created_at: '2026-10-03T01:00:00'},
+      {id: 'chunk-2', document_id: 'doc-1', ordinal: 2, locator: 'line 2', page_number: null, text: 'A second, unrelated paragraph.',
+        created_at: '2026-10-03T01:00:00'},
     ],
     ...overrides,
   };
@@ -71,7 +73,7 @@ function evidenceCandidate(overrides: Record<string, unknown> = {}) {
   return {
     id: 'cand-evidence', candidate_type: 'evidence',
     payload: {quote: 'A perfectly ordinary sentence.', locator: 'line 1'},
-    review_status: 'proposed', confidence: 1.0,
+    review_status: 'proposed', confidence: 1.0, document_id: 'doc-1', investigation_id: 'inv-1', created_at: '2026-10-03T01:00:00',
     ...overrides,
   };
 }
@@ -80,9 +82,14 @@ function ambiguousEntityCandidate(overrides: Record<string, unknown> = {}) {
   return {
     id: 'cand-entity', candidate_type: 'entity',
     payload: {caption: 'Alaric Voss', suggested_schema: 'Person'},
-    review_status: 'proposed', confidence: 0.4,
+    review_status: 'proposed', confidence: 0.4, document_id: 'doc-1', investigation_id: 'inv-1', created_at: '2026-10-03T01:00:00',
     ...overrides,
   };
+}
+
+// The reply to a review: the proposal as it now stands (the API schema's ExtractionReviewOut).
+function reviewed(candidate: Record<string, unknown>, review_status: string) {
+  return {candidate: {...candidate, review_status, reviewed_at: '2026-10-03T01:05:00'}, record: {}};
 }
 
 describe('Document review queue: issues and clarifying questions', () => {
@@ -92,7 +99,7 @@ describe('Document review queue: issues and clarifying questions', () => {
     const api = mockApi({
       [documentRoute('doc-1')]: docFixture({extraction_issues: ['1 of 2 page(s) produced no extractable text.']}),
       [candidatesRoute('doc-1')]: [evidenceCandidate()],
-      [review]: {candidate: {id: 'cand-evidence', review_status: 'accepted'}, record: {}},
+      [review]: reviewed(evidenceCandidate(), 'accepted'),
     });
 
     const ReviewPage = await importReviewPage();
@@ -119,7 +126,7 @@ describe('Document review queue: issues and clarifying questions', () => {
     const api = mockApi({
       [documentRoute('doc-1')]: docFixture(),
       [candidatesRoute('doc-1')]: [ambiguousEntityCandidate()],
-      [review]: {candidate: {}, record: {}},
+      [review]: reviewed(ambiguousEntityCandidate(), 'accepted'),
       // No record shares its words and OpenAleph holds nothing like it.
       'GET /api/extraction-candidates/cand-entity/entity-matches': {candidate_id: 'cand-entity', caption: 'Alaric Voss', schema: 'Person',
         matches: [], strong_match: null, provider_lead: {provider: null, provider_entity_id: null, provider_resolved_entity_id: null}, identity_rule: ''},
@@ -201,8 +208,8 @@ describe('Document review queue: issues and clarifying questions', () => {
     const api = mockApi({
       [documentRoute('doc-1')]: docFixture(),
       [candidatesRoute('doc-1')]: [evidenceCandidate(), second],
-      'POST /api/extraction-candidates/cand-evidence/review': {candidate: {}, record: {}},
-      'POST /api/extraction-candidates/cand-evidence-2/review': {candidate: {}, record: {}},
+      'POST /api/extraction-candidates/cand-evidence/review': reviewed(evidenceCandidate(), 'accepted'),
+      'POST /api/extraction-candidates/cand-evidence-2/review': reviewed(second, 'rejected'),
     });
     const ReviewPage = await importReviewPage();
     render(<ReviewPage />);
@@ -226,7 +233,7 @@ describe('Document review queue: issues and clarifying questions', () => {
     const api = mockApi({
       [documentRoute('doc-1')]: docFixture(),
       [candidatesRoute('doc-1')]: [ambiguousEntityCandidate()],
-      [review]: {candidate: {}, record: {}},
+      [review]: reviewed(ambiguousEntityCandidate(), 'accepted'),
       'GET /api/extraction-candidates/cand-entity/entity-matches': {candidate_id: 'cand-entity', caption: 'Alaric Voss', schema: 'Person',
         matches: [], strong_match: null, provider_lead: {provider: null, provider_entity_id: null, provider_resolved_entity_id: null}, identity_rule: ''},
       'GET /api/extraction-candidates/cand-entity/openaleph-matches': {candidate_id: 'cand-entity', schema: 'Person', state: 'ok', detail: null, hidden: 0, results: []},

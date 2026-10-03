@@ -54,13 +54,9 @@ function listed(overrides: Record<string, unknown> = {}) {
   };
 }
 
+/** A document as GET /api/documents/{id} returns it (the generated DocumentDetailOut shape). */
 function docFixture(overrides: Record<string, unknown> = {}) {
-  return {
-    id: 'doc-1', investigation_id: 'inv-1', filename: 'clean.txt', source_id: 'src-1',
-    extraction_status: 'complete', extraction_error: null, extraction_issues: [],
-    chunk_count: 1, candidate_counts: {evidence: 1},
-    ...overrides,
-  };
+  return {...listed(), chunks: [], ...overrides};
 }
 
 describe('Batch triage table', () => {

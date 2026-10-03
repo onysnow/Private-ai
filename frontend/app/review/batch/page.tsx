@@ -4,18 +4,15 @@ import type {ReactElement} from 'react';
 import {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
 import Link from 'next/link';
 import {useRouter, useSearchParams} from 'next/navigation';
-import {api} from '../../../lib/api-instance';
 import {errorMessage} from '../../../lib/api-client';
-import {isDocItem} from '../../../lib/api-validate';
-import type {DocItem} from '../../../lib/api-types';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {nestDocuments} from '../../../features/documents/document-tree';
 import {getIngestionBatchOptions, listDocumentsOptions} from '../../../lib/generated/@tanstack/react-query.gen';
-import {retryJobEndpoint} from '../../../lib/generated/sdk.gen';
-import type {DocumentOut, IngestionBatchDocumentOut} from '../../../lib/generated/types.gen';
+import {getDocument, retryJobEndpoint} from '../../../lib/generated/sdk.gen';
+import type {DocumentDetailOut, DocumentOut, IngestionBatchDocumentOut} from '../../../lib/generated/types.gen';
 import {stillReading} from '../../../features/documents/ingestion-batch';
 import {QueryProvider} from '../../../lib/query-client';
 
@@ -39,10 +36,10 @@ import {QueryProvider} from '../../../lib/query-client';
 // again every few seconds while any file is still being read, and a read that
 // failed can be retried here. The older ?docs=<ids> link still works.
 
-type Row = Pick<DocItem, 'id' | 'filename' | 'extraction_status' | 'extraction_error' | 'extraction_issues' | 'candidate_counts'>;
+type Row = Pick<DocumentOut, 'id' | 'filename' | 'extraction_status' | 'extraction_error' | 'extraction_issues' | 'candidate_counts'>;
 
 /** The files found in the batch's documents, each after its container, at any depth. */
-function withFilesInside(batch: DocItem[], all: DocumentOut[]): {document: Row; depth: number; parent: Row | null}[] {
+function withFilesInside(batch: DocumentDetailOut[], all: DocumentOut[]): {document: Row; depth: number; parent: Row | null}[] {
   const batchIds = new Set(batch.map(d => d.id));
   const inside = new Map<string, DocumentOut>();
   let grew = true;
@@ -119,7 +116,7 @@ function DocsTriage(): ReactElement {
   const invId = params.get('inv') || '';
   const docIds = useMemo(() => (params.get('docs') || '').split(',').map(s => s.trim()).filter(Boolean), [params]);
 
-  const [docs, setDocs] = useState<DocItem[] | null>(null);
+  const [docs, setDocs] = useState<DocumentDetailOut[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState('');
 
@@ -127,7 +124,7 @@ function DocsTriage(): ReactElement {
     if (docIds.length === 0) { setDocs([]); setLoading(false); return }
     setLoading(true); setStatus('');
     try {
-      const rows = await Promise.all(docIds.map(id => api.object(`/api/documents/${id}`, 'document', isDocItem)));
+      const rows = await Promise.all(docIds.map(async id => (await getDocument({path: {document_id: id}, throwOnError: true})).data));
       setDocs(rows);
     } catch (error) {
       setStatus(errorMessage(error, 'Could not load this batch'));

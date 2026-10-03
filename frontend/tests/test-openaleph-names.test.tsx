@@ -239,7 +239,7 @@ describe('Review queue and OpenAleph\'s names', () => {
     const acceptMeridian = 'POST /api/extraction-candidates/cand-meridian/review';
     const meridian = candidate('cand-meridian', 'entity', {caption: 'Meridian Holdings Ltd', suggested_schema: 'Company'});
     const api = mockApi({
-      'GET /api/documents/doc-1': docFixture(),
+      'GET /api/documents/doc-1': {...docFixture(), chunks: []},   // the document's detail carries its chunks
       [CANDIDATES]: [unknownName, meridian, emailProposal],
       [TARGETS]: targets(),
       [reviewName]: accepted('cand-name', 'entity'),
