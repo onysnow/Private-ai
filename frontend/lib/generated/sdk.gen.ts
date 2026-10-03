@@ -201,6 +201,9 @@ import type {
   GetExtractionEntityMatchesData,
   GetExtractionEntityMatchesErrors,
   GetExtractionEntityMatchesResponses,
+  GetExtractionOpenalephMatchesData,
+  GetExtractionOpenalephMatchesErrors,
+  GetExtractionOpenalephMatchesResponses,
   GetIdentifierTargetsData,
   GetIdentifierTargetsErrors,
   GetIdentifierTargetsResponses,
@@ -649,6 +652,8 @@ import {
   zGetExtractionCandidateLineageResponse,
   zGetExtractionEntityMatchesPath,
   zGetExtractionEntityMatchesResponse,
+  zGetExtractionOpenalephMatchesPath,
+  zGetExtractionOpenalephMatchesResponse,
   zGetIdentifierTargetsPath,
   zGetIdentifierTargetsResponse,
   zGetInvestigationFinancialFlowsPath,
@@ -3325,6 +3330,41 @@ export const getExtractionCandidateLineage = <
     responseValidator: async (data) =>
       await zGetExtractionCandidateLineageResponse.parseAsync(data),
     url: '/api/extraction-candidates/{candidate_id}/lineage',
+    ...options,
+  });
+
+/**
+ * Get Extraction Openaleph Matches
+ *
+ * What OpenAleph holds that looks like this proposed name, across every
+ * collection the reader may see (ADR-0006, POST /api/2/match). OpenAleph
+ * being off or unreachable is a state in the reply, not an error.
+ */
+export const getExtractionOpenalephMatches = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetExtractionOpenalephMatchesData, ThrowOnError>,
+): RequestResult<
+  GetExtractionOpenalephMatchesResponses,
+  GetExtractionOpenalephMatchesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetExtractionOpenalephMatchesResponses,
+    GetExtractionOpenalephMatchesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetExtractionOpenalephMatchesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetExtractionOpenalephMatchesResponse.parseAsync(data),
+    url: '/api/extraction-candidates/{candidate_id}/openaleph-matches',
     ...options,
   });
 

@@ -16951,6 +16951,166 @@
         "title": "OpenAlephEvidenceImportOut",
         "type": "object"
       },
+      "OpenAlephMatchOut": {
+        "description": "One entity OpenAleph holds that looks like the proposed name\n(app/services/openaleph_match.py). ``score`` is OpenAleph's relevance\nscore: it ranks, it is not a probability.",
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "collection_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collection Id"
+          },
+          "collection_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collection Label"
+          },
+          "in_this_investigation": {
+            "title": "In This Investigation",
+            "type": "boolean"
+          },
+          "investigation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Investigation Id"
+          },
+          "openaleph_id": {
+            "title": "Openaleph Id",
+            "type": "string"
+          },
+          "properties": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Properties",
+            "type": "object"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "workbench_entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The Workbench record this match was pushed from, when it is one of this investigation's.",
+            "title": "Workbench Entity Id"
+          }
+        },
+        "required": [
+          "openaleph_id",
+          "caption",
+          "schema",
+          "properties",
+          "score",
+          "collection_id",
+          "collection_label",
+          "investigation_id",
+          "in_this_investigation",
+          "workbench_entity_id",
+          "url"
+        ],
+        "title": "OpenAlephMatchOut",
+        "type": "object"
+      },
+      "OpenAlephMatchesOut": {
+        "description": "What OpenAleph's /match found for an entity proposal. ``state`` is ok,\ndisabled or unavailable; ``hidden`` counts matches held in investigations\nthe reader may not see.",
+        "properties": {
+          "candidate_id": {
+            "title": "Candidate Id",
+            "type": "string"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "hidden": {
+            "title": "Hidden",
+            "type": "integer"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/OpenAlephMatchOut"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "ok",
+              "disabled",
+              "unavailable"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "schema",
+          "state",
+          "detail",
+          "hidden",
+          "results"
+        ],
+        "title": "OpenAlephMatchesOut",
+        "type": "object"
+      },
       "OpenAlephOperationFailureOut": {
         "description": "A failed OpenAleph operation, kept for the reporter and the operator\n(and so a 502 can be explained later).",
         "properties": {
@@ -34392,6 +34552,56 @@
           }
         },
         "summary": "Get Extraction Candidate Lineage"
+      }
+    },
+    "/api/extraction-candidates/{candidate_id}/openaleph-matches": {
+      "get": {
+        "description": "What OpenAleph holds that looks like this proposed name, across every\ncollection the reader may see (ADR-0006, POST /api/2/match). OpenAleph\nbeing off or unreachable is a state in the reply, not an error.",
+        "operationId": "get_extraction_openaleph_matches",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "candidate_id",
+            "required": true,
+            "schema": {
+              "title": "Candidate Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenAlephMatchesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Extraction Openaleph Matches"
       }
     },
     "/api/extraction-candidates/{candidate_id}/review": {

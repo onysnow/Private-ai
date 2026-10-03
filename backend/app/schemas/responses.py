@@ -2951,6 +2951,39 @@ class ProviderLeadOut(ResponseModel):
     provider_resolved_entity_id: str | None
 
 
+class OpenAlephMatchOut(ResponseModel):
+    """One entity OpenAleph holds that looks like the proposed name
+    (app/services/openaleph_match.py). ``score`` is OpenAleph's relevance
+    score: it ranks, it is not a probability."""
+    openaleph_id: str
+    caption: str
+    schema_: str = Field(alias="schema")
+    properties: dict[str, list[str]]
+    score: float | None
+    collection_id: str | None
+    collection_label: str | None
+    investigation_id: str | None
+    in_this_investigation: bool
+    workbench_entity_id: str | None = Field(description="The Workbench record this match was pushed from, when it is one of this investigation's.")
+    url: str
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
+class OpenAlephMatchesOut(ResponseModel):
+    """What OpenAleph's /match found for an entity proposal. ``state`` is ok,
+    disabled or unavailable; ``hidden`` counts matches held in investigations
+    the reader may not see."""
+    candidate_id: str
+    schema_: str = Field(alias="schema")
+    state: Literal["ok", "disabled", "unavailable"]
+    detail: str | None
+    hidden: int
+    results: list[OpenAlephMatchOut]
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+
 class EntityMatchPreviewOut(ResponseModel):
     """Canonical entities an entity proposal may be, before the reporter decides."""
     model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)

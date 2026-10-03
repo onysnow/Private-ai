@@ -3009,6 +3009,43 @@ export const zOpenAlephEvidenceImportOut = z.object({
 });
 
 /**
+ * OpenAlephMatchOut
+ *
+ * One entity OpenAleph holds that looks like the proposed name
+ * (app/services/openaleph_match.py). ``score`` is OpenAleph's relevance
+ * score: it ranks, it is not a probability.
+ */
+export const zOpenAlephMatchOut = z.object({
+  caption: z.string(),
+  collection_id: z.string().nullable(),
+  collection_label: z.string().nullable(),
+  in_this_investigation: z.boolean(),
+  investigation_id: z.string().nullable(),
+  openaleph_id: z.string(),
+  properties: z.record(z.array(z.string())),
+  schema: z.string(),
+  score: z.number().nullable(),
+  url: z.string(),
+  workbench_entity_id: z.string().nullable(),
+});
+
+/**
+ * OpenAlephMatchesOut
+ *
+ * What OpenAleph's /match found for an entity proposal. ``state`` is ok,
+ * disabled or unavailable; ``hidden`` counts matches held in investigations
+ * the reader may not see.
+ */
+export const zOpenAlephMatchesOut = z.object({
+  candidate_id: z.string(),
+  detail: z.string().nullable(),
+  hidden: z.number().int(),
+  results: z.array(zOpenAlephMatchOut),
+  schema: z.string(),
+  state: z.enum(['ok', 'disabled', 'unavailable']),
+});
+
+/**
  * OpenAlephOperationFailureOut
  *
  * A failed OpenAleph operation, kept for the reporter and the operator
@@ -6002,6 +6039,15 @@ export const zGetExtractionCandidateLineagePath = z.object({
  * Successful Response
  */
 export const zGetExtractionCandidateLineageResponse = zExtractionLineageOut;
+
+export const zGetExtractionOpenalephMatchesPath = z.object({
+  candidate_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetExtractionOpenalephMatchesResponse = zOpenAlephMatchesOut;
 
 export const zReviewExtractionCandidateBody = zExtractionCandidateReviewRequest;
 

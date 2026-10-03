@@ -72,6 +72,7 @@ import {
   getExtractionCandidateExplanation,
   getExtractionCandidateLineage,
   getExtractionEntityMatches,
+  getExtractionOpenalephMatches,
   getIdentifierTargets,
   getInvestigationFinancialFlows,
   getInvestigationGraph,
@@ -366,6 +367,9 @@ import type {
   GetExtractionEntityMatchesData,
   GetExtractionEntityMatchesError,
   GetExtractionEntityMatchesResponse,
+  GetExtractionOpenalephMatchesData,
+  GetExtractionOpenalephMatchesError,
+  GetExtractionOpenalephMatchesResponse,
   GetIdentifierTargetsData,
   GetIdentifierTargetsError,
   GetIdentifierTargetsResponse,
@@ -2874,6 +2878,38 @@ export const getExtractionCandidateLineageOptions = (
       return data;
     },
     queryKey: getExtractionCandidateLineageQueryKey(options),
+  });
+
+export const getExtractionOpenalephMatchesQueryKey = (
+  options: Options<GetExtractionOpenalephMatchesData>,
+) => createQueryKey('getExtractionOpenalephMatches', options);
+
+/**
+ * Get Extraction Openaleph Matches
+ *
+ * What OpenAleph holds that looks like this proposed name, across every
+ * collection the reader may see (ADR-0006, POST /api/2/match). OpenAleph
+ * being off or unreachable is a state in the reply, not an error.
+ */
+export const getExtractionOpenalephMatchesOptions = (
+  options: Options<GetExtractionOpenalephMatchesData>,
+) =>
+  queryOptions<
+    GetExtractionOpenalephMatchesResponse,
+    GetExtractionOpenalephMatchesError,
+    GetExtractionOpenalephMatchesResponse,
+    ReturnType<typeof getExtractionOpenalephMatchesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getExtractionOpenalephMatches({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getExtractionOpenalephMatchesQueryKey(options),
   });
 
 /**

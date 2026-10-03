@@ -63,9 +63,9 @@ def get_json(path: str, params: Params = None, *, transport: httpx.BaseTransport
     return response.json()
 
 
-def post(path: str, json: Any = None, *, transport: httpx.BaseTransport | None = None) -> httpx.Response:
+def post(path: str, json: Any = None, *, params: Params = None, transport: httpx.BaseTransport | None = None) -> httpx.Response:
     with _client(transport) as client:
-        return client.post(f"{base_url()}{path}", json=json, headers=_headers(transport))
+        return client.post(f"{base_url()}{path}", json=json, params=params, headers=_headers(transport))
 
 
 def download(url: str, *, max_bytes: int, transport: httpx.BaseTransport | None = None) -> bytes | None:

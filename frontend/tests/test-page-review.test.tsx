@@ -120,6 +120,10 @@ describe('Document review queue: issues and clarifying questions', () => {
       [documentRoute('doc-1')]: docFixture(),
       [candidatesRoute('doc-1')]: [ambiguousEntityCandidate()],
       [review]: {candidate: {}, record: {}},
+      // No record shares its words and OpenAleph holds nothing like it.
+      'GET /api/extraction-candidates/cand-entity/entity-matches': {candidate_id: 'cand-entity', caption: 'Alaric Voss', schema: 'Person',
+        matches: [], strong_match: null, provider_lead: {provider: null, provider_entity_id: null, provider_resolved_entity_id: null}, identity_rule: ''},
+      'GET /api/extraction-candidates/cand-entity/openaleph-matches': {candidate_id: 'cand-entity', schema: 'Person', state: 'ok', detail: null, hidden: 0, results: []},
     });
 
     const ReviewPage = await importReviewPage();
@@ -139,9 +143,10 @@ describe('Document review queue: issues and clarifying questions', () => {
 
     await user.click(acceptButton);
     expect(api.calls(review)).toHaveLength(1);
-    expect(api.lastBody(review)).toMatchObject({
-      decision: 'accept', caption: 'Alaric Voss', entity_schema: 'Person',
+    expect(api.lastBody(review)).toEqual({
+      decision: 'accept', note: 'Reviewed in bulk-import review queue', caption: 'Alaric Voss', entity_schema: 'Person',
     });
+    expect(api.unmatched()).toEqual([]);
   });
 
   it('paginates Next across documents and reaches a final summary with running totals', async () => {

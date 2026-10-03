@@ -7496,6 +7496,98 @@ export type OpenAlephEvidenceImportOut = {
 };
 
 /**
+ * OpenAlephMatchOut
+ *
+ * One entity OpenAleph holds that looks like the proposed name
+ * (app/services/openaleph_match.py). ``score`` is OpenAleph's relevance
+ * score: it ranks, it is not a probability.
+ */
+export type OpenAlephMatchOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Collection Id
+   */
+  collection_id: string | null;
+  /**
+   * Collection Label
+   */
+  collection_label: string | null;
+  /**
+   * In This Investigation
+   */
+  in_this_investigation: boolean;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string | null;
+  /**
+   * Openaleph Id
+   */
+  openaleph_id: string;
+  /**
+   * Properties
+   */
+  properties: {
+    [key: string]: Array<string>;
+  };
+  /**
+   * Schema
+   */
+  schema: string;
+  /**
+   * Score
+   */
+  score: number | null;
+  /**
+   * Url
+   */
+  url: string;
+  /**
+   * Workbench Entity Id
+   *
+   * The Workbench record this match was pushed from, when it is one of this investigation's.
+   */
+  workbench_entity_id: string | null;
+};
+
+/**
+ * OpenAlephMatchesOut
+ *
+ * What OpenAleph's /match found for an entity proposal. ``state`` is ok,
+ * disabled or unavailable; ``hidden`` counts matches held in investigations
+ * the reader may not see.
+ */
+export type OpenAlephMatchesOut = {
+  /**
+   * Candidate Id
+   */
+  candidate_id: string;
+  /**
+   * Detail
+   */
+  detail: string | null;
+  /**
+   * Hidden
+   */
+  hidden: number;
+  /**
+   * Results
+   */
+  results: Array<OpenAlephMatchOut>;
+  /**
+   * Schema
+   */
+  schema: string;
+  /**
+   * State
+   */
+  state: 'ok' | 'disabled' | 'unavailable';
+};
+
+/**
  * OpenAlephOperationFailureOut
  *
  * A failed OpenAleph operation, kept for the reporter and the operator
@@ -13873,6 +13965,42 @@ export type GetExtractionCandidateLineageResponses = {
 
 export type GetExtractionCandidateLineageResponse =
   GetExtractionCandidateLineageResponses[keyof GetExtractionCandidateLineageResponses];
+
+export type GetExtractionOpenalephMatchesData = {
+  body?: never;
+  path: {
+    /**
+     * Candidate Id
+     */
+    candidate_id: string;
+  };
+  query?: never;
+  url: '/api/extraction-candidates/{candidate_id}/openaleph-matches';
+};
+
+export type GetExtractionOpenalephMatchesErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetExtractionOpenalephMatchesError =
+  GetExtractionOpenalephMatchesErrors[keyof GetExtractionOpenalephMatchesErrors];
+
+export type GetExtractionOpenalephMatchesResponses = {
+  /**
+   * Successful Response
+   */
+  200: OpenAlephMatchesOut;
+};
+
+export type GetExtractionOpenalephMatchesResponse =
+  GetExtractionOpenalephMatchesResponses[keyof GetExtractionOpenalephMatchesResponses];
 
 export type ReviewExtractionCandidateData = {
   body: ExtractionCandidateReviewRequest;

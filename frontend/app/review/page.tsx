@@ -8,6 +8,7 @@ import {errorMessage} from '../../lib/api-client';
 import {isDocItem, isExtractionCandidate} from '../../lib/api-validate';
 import type {DocItem, DocumentChunk, ExtractionCandidate} from '../../lib/api-types';
 import {ExtractionExplanationView} from '../../components/extraction-explanation';
+import {EntityIdentity, identityFields} from '../../features/documents/entity-identity';
 import {IdentifierOwner} from '../../features/documents/identifier-owner';
 import {SchemaQuestion, needsSchemaAnswer} from '../../features/documents/schema-question';
 import {QueryProvider} from '../../lib/query-client';
@@ -139,14 +140,15 @@ function ReviewPageInner(): ReactElement {
     setTotals(t => ({accepted: t.accepted + (decision === 'accept' ? 1 : 0), rejected: t.rejected + (decision === 'reject' ? 1 : 0)}));
   };
 
-  const decide = async (candidate: ExtractionCandidate, decision: 'accept' | 'reject') => {
+  const decide = async (candidate: ExtractionCandidate, decision: 'accept' | 'reject', identity: ReturnType<typeof identityFields> = {}) => {
     if (!current) return;
-    const body: {decision: 'accept' | 'reject', note: string, caption?: string, entity_schema?: string} = {
+    const body: {decision: 'accept' | 'reject', note: string, caption?: string, entity_schema?: string} & ReturnType<typeof identityFields> = {
       decision, note: REVIEW_NOTE,
     };
     if (decision === 'accept' && candidate.candidate_type === 'entity') {
       body.caption = candidate.payload.caption;
       body.entity_schema = answers[candidate.id] || candidate.payload.suggested_schema || 'Thing';
+      Object.assign(body, identity);
     }
     try {
       await api.unknown(`/api/extraction-candidates/${candidate.id}/review`, {method: 'POST', body});
@@ -271,6 +273,9 @@ function ReviewPageInner(): ReactElement {
                     ? <IdentifierOwner candidateId={c.id} kind={String(c.payload.kind || 'email')} note={REVIEW_NOTE}
                         onReviewed={decision => recorded(c.id, decision)}
                         onEntityAccepted={entityCandidateId => recorded(entityCandidateId, 'accept')}/>
+                    : c.candidate_type === 'entity'
+                    ? <EntityIdentity candidateId={c.id} caption={String(c.payload.caption || '')} schemaBlocked={acceptBlocked}
+                        onAccept={identity => decide(c, 'accept', identity)} onReject={() => decide(c, 'reject')}/>
                     : <div className="flex gap-2 mt-1">
                       <Button size="sm" onClick={() => decide(c, 'accept')} disabled={acceptBlocked}>Accept</Button>
                       <Button size="sm" variant="outline" onClick={() => decide(c, 'reject')}>Reject</Button>
@@ -295,7 +300,7 @@ function ReviewPageInner(): ReactElement {
 }
 
 export default function ReviewPage(): ReactElement {
-  // The email/phone owner choice reads its options through TanStack Query.
+  // The email/phone owner choice and a name's possible matches read through TanStack Query.
   return (
     <QueryProvider>
       <Suspense fallback={<main className="p-6"><p className="muted">Loading…</p></main>}>

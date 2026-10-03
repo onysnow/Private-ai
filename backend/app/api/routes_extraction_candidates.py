@@ -4,19 +4,35 @@ app/services/documents.py; this module just wires 404s and the
 review-validation ValueError to HTTP status codes.
 """
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource
+from app.core.authorization import scope_for_request
 from app.db.session import get_db
 from app.models.domain import ExtractionCandidate
 from app.schemas.api import ExtractionCandidateReviewRequest
 from app.services.documents import preview_entity_candidate_matches, review_candidate, serialize_extraction_lineage
 from app.services.extraction_explanations import explain_extraction_candidate
-from app.schemas.responses import EntityMatchPreviewOut, ExtractionExplanationOut, ExtractionLineageOut, ExtractionReviewOut, IdentifierTargetsOut
+from app.schemas.responses import EntityMatchPreviewOut, OpenAlephMatchesOut, ExtractionExplanationOut, ExtractionLineageOut, ExtractionReviewOut, IdentifierTargetsOut
 from app.services.identifier_proposals import identifier_targets
+from app.services.openaleph_match import openaleph_matches
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
+
+
+@router.get("/extraction-candidates/{candidate_id}/openaleph-matches", response_model=OpenAlephMatchesOut)
+def get_extraction_openaleph_matches(candidate_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
+    """What OpenAleph holds that looks like this proposed name, across every
+    collection the reader may see (ADR-0006, POST /api/2/match). OpenAleph
+    being off or unreachable is a state in the reply, not an error."""
+    row = db.get(ExtractionCandidate, candidate_id)
+    if row is None:
+        raise HTTPException(404, "Extraction candidate not found")
+    try:
+        return openaleph_matches(db, row, scope=scope_for_request(request))
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
 
 
 @router.get("/extraction-candidates/{candidate_id}/entity-matches", response_model=EntityMatchPreviewOut)
