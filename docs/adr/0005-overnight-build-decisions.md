@@ -134,6 +134,47 @@ reversed; the code built on it says which ADR line it rests on.
     connection grid lists who is linked to whom. Revisit when ECharts' chord
     writes ribbon labels, or if a reader needs the circle anyway.
 
+18. **How the maps pass carries out line 4** (researched and tried on
+    2026-10-03; versions as of that day).
+    - *The base map* is a world extract of the Protomaps daily build to zoom
+      6: 45 MB, cut in 17 s by the official `protomaps/go-pmtiles:v1.31.2`
+      image (`pmtiles extract https://build.protomaps.com/<date>.pmtiles
+      world.pmtiles --maxzoom=6`; the docs: "extracting a full sub-pyramid
+      from 0 to maxzoom is always an efficient operation"). Zoom 7 would be
+      189 MB and zoom 8 557 MB (measured from the 20261003 build's
+      directory), so zoom 6 (country and city level) is the default and a
+      larger extract a setting. It is fetched once, at setup, by a compose
+      profile `maps`: a public world map, so nothing about an investigation
+      leaves the machine. Tiles are ODbL: every map carries "© OpenStreetMap".
+    - *Serving*: the backend reads the file with the `pmtiles` Python package
+      (3.8.1, BSD-3) and serves tiles and the style's fonts under `/api/basemap`,
+      behind the same sign-in as everything else; the browser never asks
+      another host (the default glyph URL on protomaps.github.io is replaced
+      by our own copy of `basemaps-assets`, fonts under the SIL Open Font
+      License).
+    - *In the app*: MapLibre GL JS (6.11.2, BSD-3) with the style from
+      `@protomaps/basemaps` (5.7.2, BSD-3; the `grayscale` flavor, so the
+      data, not the base map, carries the colour).
+    - *In decks and briefs*: the render service draws the same style with
+      `@maplibre/maplibre-gl-native` (6.4.1, BSD-2), its `request` hook
+      answering every tile and glyph from the local files and refusing
+      anything else. Tried here: a 960 x 540 map at 2x in 0.8 s, on Ubuntu
+      24.04 with Mesa's software renderer under `xvfb-run` (the module needs
+      `libopengl0`, `libegl1` and an X display). The render image gains
+      those packages.
+    - *Coordinates come from the records*: FollowTheMoney's `latitude` and
+      `longitude` on Address and RealEstate, and an entity's `addressEntity`
+      that has them. Nothing is geocoded automatically. A self-hosted
+      geocoder is out of proportion (Photon's planet index is 62.6 GB, its
+      README recommends 64 GB of RAM; Nominatim's planet needs 128 GB and
+      1 TB); the public Nominatim service allows one request a second with
+      attribution and forbids bulk use, and would see the address, so it is
+      offered later, if at all, only as an explicit per-address click.
+    - *Rule 17* (shaded maps): rates, not counts; Datawrapper keys show the
+      lowest and highest values plus two to four colours between (4 to 6
+      classes); ECharts' `geo.projection` takes a d3-geo projection such as
+      `geoEqualEarth`. Shaded country maps wait until a query yields rates.
+
 ## Consequences
 
 Easier: the build can continue without waiting on answers; each line is a

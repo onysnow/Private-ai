@@ -180,6 +180,18 @@ import type {
   GetAiAnalysisCandidateEndpointData,
   GetAiAnalysisCandidateEndpointErrors,
   GetAiAnalysisCandidateEndpointResponses,
+  GetBasemapFontData,
+  GetBasemapFontErrors,
+  GetBasemapFontResponses,
+  GetBasemapSpriteData,
+  GetBasemapSpriteErrors,
+  GetBasemapSpriteResponses,
+  GetBasemapStatusData,
+  GetBasemapStatusErrors,
+  GetBasemapStatusResponses,
+  GetBasemapTileData,
+  GetBasemapTileErrors,
+  GetBasemapTileResponses,
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceErrors,
   GetClaimReviewWorkspaceResponses,
@@ -698,6 +710,13 @@ import {
   zFindOpenalephChildrenResponse,
   zGetAiAnalysisCandidateEndpointPath,
   zGetAiAnalysisCandidateEndpointResponse,
+  zGetBasemapFontPath,
+  zGetBasemapFontResponse,
+  zGetBasemapSpritePath,
+  zGetBasemapSpriteResponse,
+  zGetBasemapStatusResponse,
+  zGetBasemapTilePath,
+  zGetBasemapTileResponse,
   zGetClaimReviewWorkspacePath,
   zGetClaimReviewWorkspaceResponse,
   zGetCorpusInsightsPath,
@@ -1256,6 +1275,116 @@ export const restoreBackup = <ThrowOnError extends boolean = false>(
       'Content-Type': null,
       ...options.headers,
     },
+  });
+
+/**
+ * Get Basemap Status
+ *
+ * Whether a base map is installed, the zoom levels and area it covers, and its fonts.
+ */
+export const getBasemapStatus = <ThrowOnError extends boolean = false>(
+  options?: Options<GetBasemapStatusData, ThrowOnError>,
+): RequestResult<
+  GetBasemapStatusResponses,
+  GetBasemapStatusErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetBasemapStatusResponses,
+    GetBasemapStatusErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetBasemapStatusResponse.parseAsync(data),
+    url: '/api/basemap',
+    ...options,
+  });
+
+/**
+ * Get Basemap Font
+ */
+export const getBasemapFont = <ThrowOnError extends boolean = false>(
+  options: Options<GetBasemapFontData, ThrowOnError>,
+): RequestResult<GetBasemapFontResponses, GetBasemapFontErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetBasemapFontResponses,
+    GetBasemapFontErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetBasemapFontPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetBasemapFontResponse.parseAsync(data),
+    url: '/api/basemap/fonts/{stack}/{glyph_range}.pbf',
+    ...options,
+  });
+
+/**
+ * Get Basemap Sprite
+ */
+export const getBasemapSprite = <ThrowOnError extends boolean = false>(
+  options: Options<GetBasemapSpriteData, ThrowOnError>,
+): RequestResult<
+  GetBasemapSpriteResponses,
+  GetBasemapSpriteErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetBasemapSpriteResponses,
+    GetBasemapSpriteErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetBasemapSpritePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetBasemapSpriteResponse.parseAsync(data),
+    url: '/api/basemap/sprites/{name}',
+    ...options,
+  });
+
+/**
+ * Get Basemap Tile
+ */
+export const getBasemapTile = <ThrowOnError extends boolean = false>(
+  options: Options<GetBasemapTileData, ThrowOnError>,
+): RequestResult<GetBasemapTileResponses, GetBasemapTileErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetBasemapTileResponses,
+    GetBasemapTileErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetBasemapTilePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetBasemapTileResponse.parseAsync(data),
+    url: '/api/basemap/tiles/{z}/{x}/{y}.mvt',
+    ...options,
   });
 
 /**

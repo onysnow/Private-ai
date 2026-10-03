@@ -432,6 +432,24 @@ export const zBackupRestoreResultOut = z.object({
 });
 
 /**
+ * BasemapStatusOut
+ *
+ * Whether the self-hosted base map is installed (app/services/basemap.py),
+ * and when it is, the zoom levels and area it covers and its version.
+ */
+export const zBasemapStatusOut = z.object({
+  attribution: z.string().nullish(),
+  available: z.boolean(),
+  bounds: z.array(z.number()).nullish(),
+  built: z.string().nullish(),
+  fonts: z.array(z.string()),
+  max_zoom: z.number().int().nullish(),
+  min_zoom: z.number().int().nullish(),
+  reason: z.string().nullish(),
+  version: z.string().nullish(),
+});
+
+/**
  * Body_inspect_backup
  */
 export const zBodyInspectBackup = z.object({
@@ -5907,6 +5925,41 @@ export const zRestoreBackupBody = zBodyRestoreBackup;
  * Successful Response
  */
 export const zRestoreBackupResponse = zBackupRestoreResultOut;
+
+/**
+ * Successful Response
+ */
+export const zGetBasemapStatusResponse = zBasemapStatusOut;
+
+export const zGetBasemapFontPath = z.object({
+  stack: z.string(),
+  glyph_range: z.string(),
+});
+
+/**
+ * One range of 256 glyphs of a font the base map style uses
+ */
+export const zGetBasemapFontResponse = z.string();
+
+export const zGetBasemapSpritePath = z.object({
+  name: z.string(),
+});
+
+/**
+ * A sprite sheet (PNG) or its index (JSON)
+ */
+export const zGetBasemapSpriteResponse = z.record(z.unknown());
+
+export const zGetBasemapTilePath = z.object({
+  z: z.number().int(),
+  x: z.number().int(),
+  y: z.number().int(),
+});
+
+/**
+ * One vector tile, as stored (gzip-encoded)
+ */
+export const zGetBasemapTileResponse = z.string();
 
 /**
  * Successful Response

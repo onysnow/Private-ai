@@ -55,6 +55,7 @@ import httpx
 import hypothesis
 import pytest
 import schemathesis
+from basemap_helpers import install_basemap
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from hypothesis import HealthCheck, Phase
@@ -182,8 +183,10 @@ def contract(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[tuple[
     # Files the routes write go to this test's folder.
     for name, value in {"document_storage_dir": tmp_path / "documents", "connector_credentials_file": tmp_path / "connectors.json",
                         "audit_log_file": tmp_path / "audit.jsonl", "app_log_file": tmp_path / "app.jsonl",
-                        "console_dir": tmp_path / "console"}.items():
+                        "console_dir": tmp_path / "console", "basemap_dir": tmp_path / "basemap"}.items():
         monkeypatch.setattr(settings, name, str(value))
+    # A small base map, so its tiles, fonts and sprites answer (app/services/basemap.py).
+    install_basemap(tmp_path / "basemap")
     # AI on, answered by a stand-in model; connectors are stand-ins only.
     monkeypatch.setattr(settings, "enable_ai_features", True)
     monkeypatch.setattr(settings, "ai_provider", "anthropic")
@@ -387,9 +390,11 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             "user_id": user["id"], "aid": activity, "bid": backup["id"], "kind": "investigation_export", "qid": saved["id"],
             "name": "investigations", "pk": inv, "source": "app", "uid": user["id"], "tid": token["token_id"],
             "watch_id": watched, "hit_id": watch_hit,
+            "z": "0", "x": "0", "y": "0", "stack": "Noto Sans Regular", "glyph_range": "0-255",
         },
         per_operation={
             ("GET", "/api/ai-analysis-candidates/{candidate_id}"): {"candidate_id": ai_candidate},
+            ("GET", "/api/basemap/sprites/{name}"): {"name": "grayscale.json"},
             **{(method, path): {"candidate_id": ai_candidate} for method, path in (
                 ("POST", "/api/ai-analysis-candidates/{candidate_id}/promote-to-deck"),
                 ("POST", "/api/ai-analysis-candidates/{candidate_id}/promote-to-writeup"),

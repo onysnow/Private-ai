@@ -28,3 +28,6 @@ openaleph-client==1.1.4
 # alembic/sql/; upgrading this pin needs a migration that runs procrastinate's
 # own migration files for the versions in between.
 procrastinate==3.10.0
+# The self-hosted base map's tiles, read from its PMTiles file (app/services/basemap.py;
+# ADR-0005 line 18; BSD-3).
+pmtiles==3.8.1

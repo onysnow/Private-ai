@@ -997,6 +997,51 @@ export type BarVisualOut = {
 };
 
 /**
+ * BasemapStatusOut
+ *
+ * Whether the self-hosted base map is installed (app/services/basemap.py),
+ * and when it is, the zoom levels and area it covers and its version.
+ */
+export type BasemapStatusOut = {
+  /**
+   * Attribution
+   */
+  attribution?: string | null;
+  /**
+   * Available
+   */
+  available: boolean;
+  /**
+   * Bounds
+   */
+  bounds?: Array<number> | null;
+  /**
+   * Built
+   */
+  built?: string | null;
+  /**
+   * Fonts
+   */
+  fonts: Array<string>;
+  /**
+   * Max Zoom
+   */
+  max_zoom?: number | null;
+  /**
+   * Min Zoom
+   */
+  min_zoom?: number | null;
+  /**
+   * Reason
+   */
+  reason?: string | null;
+  /**
+   * Version
+   */
+  version?: string | null;
+};
+
+/**
  * Body_inspect_backup
  */
 export type BodyInspectBackup = {
@@ -12676,6 +12721,163 @@ export type RestoreBackupResponses = {
 
 export type RestoreBackupResponse =
   RestoreBackupResponses[keyof RestoreBackupResponses];
+
+export type GetBasemapStatusData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/basemap';
+};
+
+export type GetBasemapStatusErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetBasemapStatusError =
+  GetBasemapStatusErrors[keyof GetBasemapStatusErrors];
+
+export type GetBasemapStatusResponses = {
+  /**
+   * Successful Response
+   */
+  200: BasemapStatusOut;
+};
+
+export type GetBasemapStatusResponse =
+  GetBasemapStatusResponses[keyof GetBasemapStatusResponses];
+
+export type GetBasemapFontData = {
+  body?: never;
+  path: {
+    /**
+     * Stack
+     */
+    stack: string;
+    /**
+     * Glyph Range
+     */
+    glyph_range: string;
+  };
+  query?: never;
+  url: '/api/basemap/fonts/{stack}/{glyph_range}.pbf';
+};
+
+export type GetBasemapFontErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetBasemapFontError =
+  GetBasemapFontErrors[keyof GetBasemapFontErrors];
+
+export type GetBasemapFontResponses = {
+  /**
+   * One range of 256 glyphs of a font the base map style uses
+   */
+  200: Blob | File;
+};
+
+export type GetBasemapFontResponse =
+  GetBasemapFontResponses[keyof GetBasemapFontResponses];
+
+export type GetBasemapSpriteData = {
+  body?: never;
+  path: {
+    /**
+     * Name
+     */
+    name: string;
+  };
+  query?: never;
+  url: '/api/basemap/sprites/{name}';
+};
+
+export type GetBasemapSpriteErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetBasemapSpriteError =
+  GetBasemapSpriteErrors[keyof GetBasemapSpriteErrors];
+
+export type GetBasemapSpriteResponses = {
+  /**
+   * A sprite sheet (PNG) or its index (JSON)
+   */
+  200: {
+    [key: string]: unknown;
+  };
+};
+
+export type GetBasemapSpriteResponse =
+  GetBasemapSpriteResponses[keyof GetBasemapSpriteResponses];
+
+export type GetBasemapTileData = {
+  body?: never;
+  path: {
+    /**
+     * Z
+     */
+    z: number;
+    /**
+     * X
+     */
+    x: number;
+    /**
+     * Y
+     */
+    y: number;
+  };
+  query?: never;
+  url: '/api/basemap/tiles/{z}/{x}/{y}.mvt';
+};
+
+export type GetBasemapTileErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * No base map is installed here: the compose profile 'maps' has not run
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetBasemapTileError =
+  GetBasemapTileErrors[keyof GetBasemapTileErrors];
+
+export type GetBasemapTileResponses = {
+  /**
+   * One vector tile, as stored (gzip-encoded)
+   */
+  200: Blob | File;
+};
+
+export type GetBasemapTileResponse =
+  GetBasemapTileResponses[keyof GetBasemapTileResponses];
 
 export type CapabilitiesData = {
   body?: never;

@@ -65,6 +65,10 @@ import {
   findingCandidates,
   findOpenalephChildren,
   getAiAnalysisCandidateEndpoint,
+  getBasemapFont,
+  getBasemapSprite,
+  getBasemapStatus,
+  getBasemapTile,
   getClaimReviewWorkspace,
   getCorpusInsights,
   getCorpusStatus,
@@ -365,6 +369,18 @@ import type {
   GetAiAnalysisCandidateEndpointData,
   GetAiAnalysisCandidateEndpointError,
   GetAiAnalysisCandidateEndpointResponse,
+  GetBasemapFontData,
+  GetBasemapFontError,
+  GetBasemapFontResponse,
+  GetBasemapSpriteData,
+  GetBasemapSpriteError,
+  GetBasemapSpriteResponse,
+  GetBasemapStatusData,
+  GetBasemapStatusError,
+  GetBasemapStatusResponse,
+  GetBasemapTileData,
+  GetBasemapTileError,
+  GetBasemapTileResponse,
   GetClaimReviewWorkspaceData,
   GetClaimReviewWorkspaceError,
   GetClaimReviewWorkspaceResponse,
@@ -992,6 +1008,114 @@ export const restoreBackupMutation = (
   };
   return mutationOptions;
 };
+
+export const getBasemapStatusQueryKey = (
+  options?: Options<GetBasemapStatusData>,
+) => createQueryKey('getBasemapStatus', options);
+
+/**
+ * Get Basemap Status
+ *
+ * Whether a base map is installed, the zoom levels and area it covers, and its fonts.
+ */
+export const getBasemapStatusOptions = (
+  options?: Options<GetBasemapStatusData>,
+) =>
+  queryOptions<
+    GetBasemapStatusResponse,
+    GetBasemapStatusError,
+    GetBasemapStatusResponse,
+    ReturnType<typeof getBasemapStatusQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getBasemapStatus({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getBasemapStatusQueryKey(options),
+  });
+
+export const getBasemapFontQueryKey = (options: Options<GetBasemapFontData>) =>
+  createQueryKey('getBasemapFont', options);
+
+/**
+ * Get Basemap Font
+ */
+export const getBasemapFontOptions = (options: Options<GetBasemapFontData>) =>
+  queryOptions<
+    GetBasemapFontResponse,
+    GetBasemapFontError,
+    GetBasemapFontResponse,
+    ReturnType<typeof getBasemapFontQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getBasemapFont({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getBasemapFontQueryKey(options),
+  });
+
+export const getBasemapSpriteQueryKey = (
+  options: Options<GetBasemapSpriteData>,
+) => createQueryKey('getBasemapSprite', options);
+
+/**
+ * Get Basemap Sprite
+ */
+export const getBasemapSpriteOptions = (
+  options: Options<GetBasemapSpriteData>,
+) =>
+  queryOptions<
+    GetBasemapSpriteResponse,
+    GetBasemapSpriteError,
+    GetBasemapSpriteResponse,
+    ReturnType<typeof getBasemapSpriteQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getBasemapSprite({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getBasemapSpriteQueryKey(options),
+  });
+
+export const getBasemapTileQueryKey = (options: Options<GetBasemapTileData>) =>
+  createQueryKey('getBasemapTile', options);
+
+/**
+ * Get Basemap Tile
+ */
+export const getBasemapTileOptions = (options: Options<GetBasemapTileData>) =>
+  queryOptions<
+    GetBasemapTileResponse,
+    GetBasemapTileError,
+    GetBasemapTileResponse,
+    ReturnType<typeof getBasemapTileQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getBasemapTile({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getBasemapTileQueryKey(options),
+  });
 
 export const capabilitiesQueryKey = (options?: Options<CapabilitiesData>) =>
   createQueryKey('capabilities', options);

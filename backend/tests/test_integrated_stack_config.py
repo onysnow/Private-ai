@@ -145,8 +145,9 @@ def test_production_compose_has_no_dev_shortcuts():
     compose = yaml.safe_load(text)
     services = compose["services"]
     openaleph = {"postgres", "elasticsearch", "redis", "ingest", "analyze", "worker", "api", "ui"}
-    # `translate` is OpenAleph's optional translation worker, behind its own profile (ADR-0006, Wave C).
-    assert set(services) == {"workbench-db", "backend", "openaleph-setup", "render", "translate"} | openaleph, "workbench + render + OpenAleph, nothing dev-only (no adminer, no separate frontend: ADR-0004)"
+    # `translate` is OpenAleph's optional translation worker, behind its own profile (ADR-0006, Wave C);
+    # `basemap-extract` and `basemap-assets` install the self-hosted base map, behind the `maps` profile (ADR-0005, line 18).
+    assert set(services) == {"workbench-db", "backend", "openaleph-setup", "render", "translate", "basemap-extract", "basemap-assets"} | openaleph, "workbench + render + OpenAleph, nothing dev-only (no adminer, no separate frontend: ADR-0004)"
     _assert_openaleph_setup_runs_first(services)
     _assert_render_service(services, production=True)
     _assert_ingest_keeps_document_text(services)
@@ -166,7 +167,9 @@ def test_production_compose_has_no_dev_shortcuts():
     assert not any(v.startswith("./") for v in services["backend"].get("volumes", [])), "no source bind-mount in production"
     assert "workbench-data:/app/data" in services["backend"]["volumes"]
     assert set(compose["volumes"]) == {"workbench-pgdata", "workbench-data", "openaleph-pgdata", "openaleph-elasticsearch-data", "openaleph-redis-data", "openaleph-archive",
-                                       "translate-models", "translate-cache"}  # downloaded language models (translate profile)
+                                       "translate-models", "translate-cache",  # downloaded language models (translate profile)
+                                       "basemap"}                              # the base map (maps profile)
+    _assert_basemap_profile(compose)
 
     env = services["backend"]["environment"]
     for required in ("POSTGRES_PASSWORD", "API_AUTH_TOKEN", "PUBLIC_ORIGIN", "PUBLIC_OPENALEPH_URL", "OPENALEPH_SECRET_KEY", "OPENALEPH_DB_PASSWORD"):
@@ -178,3 +181,33 @@ def test_production_compose_has_no_dev_shortcuts():
     assert "NEXT_PUBLIC_API_AUTH_TOKEN" not in text, "the shared token must not be baked into the public bundle"
     assert services["backend"]["build"] == {"context": ".", "dockerfile": "backend/Dockerfile"}, "no build args: nothing baked into the screen"
     assert (root / "DEPLOYMENT.md").read_text(encoding="utf-8").count("alembic downgrade") >= 1, "runbook must cover schema rollback"
+
+
+def _assert_basemap_profile(compose: dict) -> None:
+    """The self-hosted base map (ADR-0005, line 18): two one-shot services
+    behind the `maps` profile fill the `basemap` volume, which the backend
+    reads (read-only) from BASEMAP_DIR."""
+    services = compose["services"]
+    extract, assets = services["basemap-extract"], services["basemap-assets"]
+    assert extract["profiles"] == assets["profiles"] == ["maps"]
+    assert extract["restart"] == assets["restart"] == "no"
+    assert extract["image"] == "protomaps/go-pmtiles:${PMTILES_TAG:-v1.31.2}"
+    assert extract["command"] == ["extract", "https://build.protomaps.com/${BASEMAP_BUILD:-20261003}.pmtiles", "/basemap/world.pmtiles",
+                                  "--maxzoom=${BASEMAP_MAXZOOM:-6}"]
+    assert assets["image"] == "alpine:3.22" and "protomaps.github.io/basemaps-assets" in assets["command"][2]
+    for font in ("Noto Sans Regular", "Noto Sans Medium", "Noto Sans Italic"):
+        assert font in assets["command"][2]
+    assert extract["volumes"] == assets["volumes"] == ["basemap:/basemap"]
+    backend = services["backend"]
+    assert backend["environment"]["BASEMAP_DIR"] == "/data/basemap"
+    assert "basemap:/data/basemap:ro" in backend["volumes"]
+    assert "basemap" in compose["volumes"]
+
+
+def test_both_compose_files_install_the_base_map_the_same_way():
+    root = Path(__file__).resolve().parents[2]
+    dev = yaml.safe_load((root / "docker-compose.yml").read_text())
+    prod = yaml.safe_load((root / "docker-compose.prod.yml").read_text())
+    _assert_basemap_profile(dev)
+    assert dev["services"]["basemap-extract"] == prod["services"]["basemap-extract"]
+    assert dev["services"]["basemap-assets"] == prod["services"]["basemap-assets"]

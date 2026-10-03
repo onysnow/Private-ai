@@ -3373,6 +3373,20 @@ API_REFUSALS: dict[int | str, dict[str, Any]] = {
 
 
 
+class BasemapStatusOut(ResponseModel):
+    """Whether the self-hosted base map is installed (app/services/basemap.py),
+    and when it is, the zoom levels and area it covers and its version."""
+    available: bool
+    reason: str | None = Field(default=None, exclude_if=_absent_when_none)
+    min_zoom: int | None = Field(default=None, exclude_if=_absent_when_none)
+    max_zoom: int | None = Field(default=None, exclude_if=_absent_when_none)
+    bounds: list[float] | None = Field(default=None, exclude_if=_absent_when_none)   # west, south, east, north
+    version: str | None = Field(default=None, exclude_if=_absent_when_none)
+    built: str | None = Field(default=None, exclude_if=_absent_when_none)            # the OpenStreetMap data's date
+    attribution: str | None = Field(default=None, exclude_if=_absent_when_none)
+    fonts: list[str]
+
+
 class TableRowOut(ResponseModel):
     """A spreadsheet row: its number in the sheet (the header is row 1) and its cells by column."""
     number: int

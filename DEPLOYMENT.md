@@ -93,6 +93,25 @@ splitter) from the internet into the `translate-models` and `translate-cache`
 volumes; after that, translation needs no network. Translations are a reading
 aid: quotes, evidence and claims are always taken from the original.
 
+### Optional: maps (`maps` profile)
+
+Maps draw on a base map kept on this machine, so no map provider learns which
+places a reporter looks at (ADR-0005, lines 4 and 18). Install it once:
+
+```bash
+docker compose -f docker-compose.prod.yml --profile maps up basemap-extract basemap-assets
+```
+
+`basemap-extract` cuts a world map out of the Protomaps daily build (45 MB to
+zoom 6, about a minute); `basemap-assets` fetches the map's fonts and symbols
+from Protomaps (13 MB, about two minutes). Both are public map data and write
+only to the `basemap` volume, which the backend reads. To take a newer build or
+more detail, set `BASEMAP_BUILD` (a date listed at
+<https://maps.protomaps.com/builds/>) or `BASEMAP_MAXZOOM` in `.env` and run the
+command again; each zoom level above 6 makes the file about three times larger
+(7: 189 MB, 8: 557 MB). Without it, maps say that no base map is installed. The
+map data is © OpenStreetMap contributors (ODbL); every map says so.
+
 ## 4. Upgrade
 
 ```bash
@@ -153,7 +172,8 @@ backup (below) and start the previous tag.
   survives a restart. It is still per-process: if you ever run more than one backend
   replica, rate-limit at the proxy as well.
 - Data lives in six named volumes (eight with the `translate` profile, whose
-  `translate-models` and `translate-cache` only hold downloaded language models): `workbench-pgdata` (workbench Postgres),
+  `translate-models` and `translate-cache` only hold downloaded language models,
+  and `basemap`, which holds the base map the `maps` profile downloads): `workbench-pgdata` (workbench Postgres),
   `workbench-data` (documents, audit log, connector secrets, limiter state), and
   OpenAleph's `openaleph-pgdata`, `openaleph-elasticsearch-data`, `openaleph-redis-data`,
   `openaleph-archive`. Back up the two Postgres volumes and `workbench-data` /

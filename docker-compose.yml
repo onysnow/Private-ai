@@ -268,6 +268,7 @@ services:
       API_AUTH_INVESTIGATION_IDS: ${API_AUTH_INVESTIGATION_IDS:-}
       ENABLE_AI_FEATURES: "false"
       RENDER_SERVICE_URL: http://render:8070
+      BASEMAP_DIR: /data/basemap
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
@@ -281,9 +282,63 @@ services:
     # when the render service is down (ADR-0005, line 2).
     volumes:
       - ./backend:/app
+      # The base map the `maps` profile installs (empty until it has run).
+      - basemap:/data/basemap:ro
 
   # Chart images for PowerPoint and Word exports (ADR-0005, line 2): ECharts
   # drawn as SVG on the server, no browser. See render/README.md.
+  # The self-hosted base map (ADR-0005, lines 4 and 18), installed once with
+  # `docker compose --profile maps up basemap-extract basemap-assets`: a world
+  # extract of the Protomaps build (45 MB at zoom 6; each zoom level more is
+  # about three times larger) and the style's fonts and sprites from
+  # Protomaps' basemaps-assets. Both are public map data, so nothing about an
+  # investigation leaves the machine; the backend then serves them to the
+  # app and the render service. Run it again to take a newer build.
+  basemap-extract:
+    image: protomaps/go-pmtiles:${PMTILES_TAG:-v1.31.2}
+    profiles: ["maps"]
+    command:
+      - extract
+      - https://build.protomaps.com/${BASEMAP_BUILD:-20261003}.pmtiles
+      - /basemap/world.pmtiles
+      - --maxzoom=${BASEMAP_MAXZOOM:-6}
+    restart: "no"
+    volumes:
+      - basemap:/basemap
+
+  basemap-assets:
+    image: alpine:3.22
+    profiles: ["maps"]
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        site=https://protomaps.github.io/basemaps-assets
+        # The three fonts the @protomaps/basemaps style names, every range of 256
+        # glyphs the fonts have (a range they lack answers 404 and is skipped).
+        for font in "Noto Sans Regular" "Noto Sans Medium" "Noto Sans Italic"; do
+          mkdir -p "/basemap/fonts/$$font"
+          start=0
+          while [ $$start -le 65280 ]; do
+            range="$$start-$$((start + 255))"
+            file="/basemap/fonts/$$font/$$range.pbf"
+            [ -s "$$file" ] || wget -q -O "$$file" "$$site/fonts/$$(echo "$$font" | sed 's/ /%20/g')/$$range.pbf" || rm -f "$$file"
+            start=$$((start + 256))
+          done
+        done
+        mkdir -p /basemap/sprites/v4
+        for flavor in light dark grayscale; do
+          for name in "$$flavor.json" "$$flavor.png" "$$flavor@2x.json" "$$flavor@2x.png"; do
+            [ -s "/basemap/sprites/v4/$$name" ] || wget -q -O "/basemap/sprites/v4/$$name" "$$site/sprites/v4/$$name" || {
+              rm -f "/basemap/sprites/v4/$$name"; echo "Could not fetch sprite $$name; run this again."; exit 1; }
+          done
+        done
+        echo "Base map fonts and sprites are in place."
+    restart: "no"
+    volumes:
+      - basemap:/basemap
+
   render:
     build:
       context: ./render
@@ -311,3 +366,4 @@ volumes:
   openaleph-archive:
   translate-models:
   translate-cache:
+  basemap:
