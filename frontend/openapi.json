@@ -219,6 +219,17 @@
             ],
             "title": "Deck Preview"
           },
+          "how_we_know": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "How We Know"
+          },
           "id": {
             "title": "Id",
             "type": "string"

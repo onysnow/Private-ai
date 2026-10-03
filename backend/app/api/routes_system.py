@@ -41,7 +41,9 @@ from app.services.decks import serialize_deck
 from app.services.evidence import create_evidence
 from app.services.openaleph import probe_openaleph
 from app.services.assistant_context import describe_record_refs
-from app.services.presentation import PROMOTABLE_MODULE, deck_slides_from_payload, payload_citation_refs, promote_candidate_to_deck, promote_candidate_to_writeup
+from app.services.presentation import (
+    PROMOTABLE_MODULE, deck_slides_from_payload, how_we_know, payload_citation_refs, promote_candidate_to_deck, promote_candidate_to_writeup,
+)
 from app.services.promotion import promote_assessment
 from app.services.presentation_style import catalog as presentation_style_catalog
 from app.services.relationships import RELATIONSHIP_SCHEMAS
@@ -162,6 +164,8 @@ def get_ai_analysis_candidate_endpoint(candidate_id: str, db: Session = Depends(
         data["citation_details"] = describe_record_refs(db, investigation_id=row.investigation_id, refs=payload_citation_refs(row.payload))
         # The exact slides a promotion would create, for the panel's preview.
         data["deck_preview"] = deck_slides_from_payload(row.payload or {})
+        # The brief's "how we know" line, as the promoted brief and deck write it.
+        data["how_we_know"] = how_we_know(row.payload or {})
     return data
 
 

@@ -121,12 +121,16 @@ def test_a_good_chart_order_is_cooked_and_stored_with_the_draft(monkeypatch, dem
         assert row.trace["chart_check"]["removed"] == []
         assert row.trace["chart_check"]["resolved"][0]["where"] == "Who got paid: chart"
         assert "chart_retries" not in row.trace
+        # The writing check ran and changed nothing (app/ai/writing_check.py).
+        assert row.trace["writing_check"]["checked"] == ["short_sentences", "likelihood", "headline", "main_point", "single_source"]
+        assert isinstance(row.trace["writing_check"]["findings"], list)
 
     detail = client.get(f"/api/ai-analysis-candidates/{body['candidate_id']}").json()
     by_type = {d["record_type"]: d for d in detail["citation_details"]}
     assert "relationship" in by_type and not by_type["relationship"]["missing"]
     assert by_type["relationship"]["label"] == "Bellcastle Trading Group — Payment → Meridian Holdings Ltd"
     assert detail["deck_preview"][2]["visual"]["type"] == "chart"
+    assert detail["how_we_know"].startswith("This rests on ")
 
 
 def test_a_failing_chart_goes_back_to_the_model_and_the_fixed_order_is_kept(monkeypatch, demo):

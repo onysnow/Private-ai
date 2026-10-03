@@ -140,11 +140,15 @@ def test_promote_to_deck_builds_one_slide_per_section_plus_takeaway_and_open_que
     assert body["title"] == "The Bellcastle consulting fee"
     assert body["source_ai_candidate_id"] == seeded["candidate_id"]
     kinds = [slide["kind"] for slide in body["slides"]]
-    assert kinds == ["title", "statement", "content", "questions"]
+    # The last slide before the open questions says how we know and what the evidence cannot show.
+    assert kinds == ["title", "statement", "content", "questions", "questions"]
+    assert body["slides"][3]["heading"] == "How we know, and our limits"
+    assert body["slides"][3]["bullets"][0].startswith("This rests on ") and body["slides"][3]["bullets"][0].endswith("† marks a statement that rests on one record.")
     assert body["slides"][0]["heading"] == "The Bellcastle consulting fee"
     payment_slide = body["slides"][2]
     assert payment_slide["heading"] == "The payment"
-    assert payment_slide["bullets"] == ["$2.4M paid to Bellcastle", "Dated November 2023"]
+    # Each key point rests on one record here, so each carries the single-record mark.
+    assert payment_slide["bullets"] == ["$2.4M paid to Bellcastle †", "Dated November 2023 †"]
     # The section's full prose rides along as speaker notes.
     assert payment_slide["notes"].startswith("Meridian paid Bellcastle Holdings")
     assert {"record_type": "claim", "record_id": seeded["claim"]["id"]} in payment_slide["evidence"]
@@ -291,7 +295,7 @@ def test_candidate_detail_has_readable_citations_and_a_deck_preview(monkeypatch)
     assert by_type["evidence"]["quote"].startswith("$2.4M wired to Bellcastle")
     assert by_type["claim"]["label"].startswith("Meridian paid Bellcastle a consulting fee")
     kinds = [s["kind"] for s in detail["deck_preview"]]
-    assert kinds == ["title", "statement", "content", "content", "content", "questions"]
+    assert kinds == ["title", "statement", "content", "content", "content", "questions", "questions"]
     assert [s["visual"]["type"] for s in detail["deck_preview"] if s.get("visual")] == ["figures", "timeline", "bar"]
 
 
@@ -321,8 +325,8 @@ def test_promoted_deck_exports_native_chart_timeline_and_speaker_notes(monkeypat
     assert exported.status_code == 200
     prs = Presentation(BytesIO(exported.content))
     slides = list(prs.slides)
-    # title, takeaway, 3 content, questions, sources
-    assert len(slides) == 7
+    # title, takeaway, 3 content, how we know, questions, sources
+    assert len(slides) == 8
     assert sum(1 for s in slides for sh in s.shapes if sh.has_chart) == 1
     text = "\n".join(sh.text_frame.text for s in slides for sh in s.shapes if sh.has_text_frame)
     assert "3 Nov 2023" in text and "14 Nov 2023" in text  # timeline dates, human-formatted

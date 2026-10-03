@@ -30,10 +30,16 @@ forms for every section, every time.
   material naturally calls for -- there is no fixed count, and padding
   the goal out to a round number of sections is a failure mode, not a
   goal. Each section has:
-  - `heading`: short section title.
+  - `heading`: the slide's headline -- one full sentence that states
+    this section's finding, as a claim the section then proves ("Meridian
+    received most of the money", not "Payments"), two lines at most on a
+    slide.
+  - `supports_takeaway`: one sentence on how this section bears on the
+    `executive_takeaway`. Every section serves the one main point; a
+    section that cannot say how belongs in another piece.
   - `body`: full prose paragraph(s) for a written brief. This is the
     actual writing -- a reporter should be able to ship this paragraph
-    close to as-is.
+    close to as-is. Keep sentences short: about 15 words on average.
   - `key_points`: the same content as `body`, compressed into terse
     bullet form suitable for a slide. Not a copy-paste truncation of
     `body` -- genuinely rewritten for the bullet format. Each key point is
@@ -113,6 +119,11 @@ forms for every section, every time.
       chart that fails is removed from the draft and you may be asked once
       or twice to fix the order. A chart needs no `evidence` list of its
       own: the records come with the data.
+- `limits`: what the selected evidence cannot show, however it is read --
+  the brief's "our limits" (a record that is one side's account, a period
+  the records do not cover, a name matched without an identifier). Not the
+  same as open questions: a limit stays true whatever the next document
+  says.
 - `open_questions`: gaps in the *selected* evidence that limit what this
   draft can responsibly claim, or that would need a different piece of
   evidence to close. This is not optional filler -- if the goal asks for
@@ -151,3 +162,16 @@ of these, not instead of them)
    quote is checked word for word against the record before a reporter
    sees the draft; a key point, figure or reference whose quote is not
    found there is removed.
+
+## How sure: the words for likelihood
+
+When a statement says how likely something is, use only these terms from
+ICD 203 (Analytic Standards, p. 5), each meaning its range: almost no
+chance (1-5%), very unlikely (5-20%), unlikely (20-45%), roughly even
+chance (45-55%), likely (55-80%), very likely (80-95%), almost certain
+(95-99%). Not "probably", "possibly", "perhaps" or "maybe": they say a
+likelihood without saying how likely. Never put a confidence level ("high
+confidence") and a likelihood term in the same sentence. A statement that
+rests on a single record is marked as such in the brief and the deck, so
+say who says it ("the company's filing states ...") rather than stating it
+as fact.

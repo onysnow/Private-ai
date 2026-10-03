@@ -27,6 +27,7 @@ from typing import Any
 
 from sqlalchemy.orm import Session
 
+from app.ai.writing_check import SINGLE_SOURCE_MARK, key_point_refs, single_source
 from app.models.domain import AIAnalysisCandidate, Deck, Writeup
 from app.services.assistant_context import describe_record_refs
 from app.services.decks import _normalize_slides, create_deck, normalize_visual
@@ -87,6 +88,28 @@ def _text(text: str) -> list[dict]:
     return [{"type": "text", "text": text}] if text else []
 
 
+_RECORD_NOUNS = {"evidence": ("evidence record", "evidence records"), "source": ("source", "sources"), "entity": ("entity", "entities"),
+                 "relationship": ("relationship", "relationships"), "claim": ("claim", "claims"), "document": ("document", "documents"),
+                 "lead": ("lead", "leads"), "reporting_task": ("reporting task", "reporting tasks"), "timeline_event": ("timeline event", "timeline events")}
+
+
+def how_we_know(payload: dict) -> str:
+    """The brief's and the deck's "how we know" line: how many records the
+    draft rests on, of which kinds, and what the single-record mark means
+    (The Markup, "Show your work": the data links up front)."""
+    refs = payload_citation_refs(payload)
+    counts: dict[str, int] = {}
+    for ref in refs:
+        counts[ref["record_type"]] = counts.get(ref["record_type"], 0) + 1
+    kinds = ", ".join(f"{n} {_RECORD_NOUNS.get(t, (t, t + 's'))[0 if n == 1 else 1]}" for t, n in counts.items())
+    line = f"This rests on {len(refs)} record{'s' if len(refs) != 1 else ''} in the investigation" + (f": {kinds}." if kinds else ".")
+    return line + f" {SINGLE_SOURCE_MARK} marks a statement that rests on one record."
+
+
+def _limits(payload: dict) -> list[str]:
+    return [str(limit) for limit in payload.get("limits") or [] if str(limit).strip()]
+
+
 def writeup_content_from_payload(payload: dict, labels: dict[tuple[str, str], dict] | None = None) -> dict:
     """The brief as a TipTap/ProseMirror document. The write-up's title is
     its own field (Writeup.title), so it is not repeated as a heading here.
@@ -114,10 +137,21 @@ def writeup_content_from_payload(payload: dict, labels: dict[tuple[str, str], di
             inline = _text(paragraph)
             if i == len(paragraphs) - 1:
                 inline.extend(_citation_node(r, labels) for r in refs)
+                if single_source(refs):
+                    # Clear attribution: a section resting on one record says so (Reuters Handbook).
+                    inline.append({"type": "text", "text": f" {SINGLE_SOURCE_MARK}"})
             content.append({"type": "paragraph", "content": inline})
         visual = normalize_visual(section.get("visual"))
         if visual:
             content.append({"type": "evidenceVisual", "attrs": {"visual": visual}})
+
+    # How we know, and our limits (The Markup's "Show your work": the data up front, and what it cannot show).
+    limits = _limits(payload)
+    known: list[dict] = [{"type": "paragraph", "content": _text(how_we_know(payload))}]
+    if limits:
+        known.append({"type": "bulletList", "content": [
+            {"type": "listItem", "content": [{"type": "paragraph", "content": _text(limit)}]} for limit in limits]})
+    content.append({"type": "callout", "attrs": {"tone": "limits", "title": "How we know, and our limits"}, "content": known})
 
     open_questions = payload.get("open_questions") or []
     if open_questions:
@@ -150,15 +184,20 @@ def deck_slides_from_payload(payload: dict, visual_styles: dict | None = None) -
         style = visual_styles.get(str(index))
         if isinstance(visual, dict) and isinstance(style, dict):
             visual = {**visual, "style": style}
+        # A key point resting on one record carries the mark (clear attribution).
+        bullets = [f"{point} {SINGLE_SOURCE_MARK}" if single_source(refs) else str(point)
+                   for point, refs in zip(section.get("key_points") or [], key_point_refs(section))]
         slides.append({
             "kind": "content",
             "heading": section.get("heading") or "Untitled section",
-            "bullets": section.get("key_points") or [],
+            "bullets": bullets,
             "evidence": section.get("evidence") or [],
             "notes": section.get("body") or "",
             "visual": visual,
         })
 
+    slides.append({"kind": "questions", "heading": "How we know, and our limits", "bullets": [how_we_know(payload), *_limits(payload)],
+                   "evidence": [], "notes": ""})
     open_questions = payload.get("open_questions") or []
     if open_questions:
         slides.append({"kind": "questions", "heading": "What the record doesn't yet show", "bullets": [str(q) for q in open_questions],

@@ -3151,6 +3151,8 @@ class AiAnalysisCandidateOut(AiAnalysisCandidateSummaryOut):
     trace: dict[str, Any] | None
     citation_details: list[CitationDetailOut] | None = Field(default=None, exclude_if=_absent_when_none)
     deck_preview: list[DeckSlideOut] | None = Field(default=None, exclude_if=_absent_when_none)
+    # A presentation draft's "how we know" line (app/services/presentation.py how_we_know).
+    how_we_know: str | None = Field(default=None, exclude_if=_absent_when_none)
 
 
 class AiAnalysisCandidateReviewOut(ResponseModel):

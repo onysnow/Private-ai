@@ -58,8 +58,8 @@ export type PresentationVisual=StyledVisual|ChartVisual;
 export type VisualKind=StyledVisual['type'];
 // A quote the backend found word for word in the cited record (app/ai/quote_check.py).
 export type QuotedRef=AiCitationRef&{matched_text:string,field?:string,locator?:string|null,start_char?:number,end_char?:number};
-export type PresentationSection={heading:string,body:string,key_points:string[],key_point_evidence?:QuotedRef[][],evidence:AiCitationRef[],visual?:PresentationVisual|null};
-export type PresentationDraftPayload={title:string,goal_restated:string,executive_takeaway:string,sections:PresentationSection[],open_questions:string[]};
+export type PresentationSection={heading:string,supports_takeaway?:string,body:string,key_points:string[],key_point_evidence?:QuotedRef[][],evidence:AiCitationRef[],visual?:PresentationVisual|null};
+export type PresentationDraftPayload={title:string,goal_restated:string,executive_takeaway:string,sections:PresentationSection[],open_questions:string[],limits:string[]};
 // Readable details for a cited record (backend describe_record_refs) -- what the
 // review panel shows instead of a UUID, and what an evidence chip traces.
 export type CitationDetail={record_type:string,record_id:string,trace_record_type:string,type_label:string,label:string,quote:string|null,locator:string|null,source_title:string|null,source_url:string|null,detail:string|null,missing:boolean};
@@ -81,7 +81,7 @@ export type PresentationStyleCatalog={defaults:DeckStyle,themes:DeckTheme[],font
   chart_families?:Record<string,string>,chart_presets?:Record<string,ChartPresetSpec[]>,chart_options?:Record<string,Record<string,ChartOptionSpec>>};
 export type Deck={id:string,investigation_id:string,title:string,slides:DeckSlide[],slide_count:number,style?:DeckStyle,source_ai_candidate_id?:string|null,created_by?:string|null,created_at:string,updated_at:string};
 export type AiAnalysisCandidateSummary={id:string,investigation_id:string,module:AiModuleName|string,request:AiAnalysisRequest,review_status:AiReviewStatus|string,confidence:number,reviewer_note:string|null,accepted_record_type:string|null,accepted_record_id:string|null,created_at:string,reviewed_at:string|null,checked_citation_count:number};
-export type AiAnalysisCandidate=AiAnalysisCandidateSummary&{payload:JsonObject,checked_citation_ids:AiCitationRef[],trace?:JsonObject|null,citation_details?:CitationDetail[],deck_preview?:DeckSlide[]};
+export type AiAnalysisCandidate=AiAnalysisCandidateSummary&{payload:JsonObject,checked_citation_ids:AiCitationRef[],trace?:JsonObject|null,citation_details?:CitationDetail[],deck_preview?:DeckSlide[],how_we_know?:string};
 export type AiReasoningRunResult={candidate_id:string,review_status:AiReviewStatus|string,payload:JsonObject};
 export type AiAnalysisCandidateReview={id:string,module:string,review_status:AiReviewStatus|string,reviewer_note:string|null,reviewed_at:string|null};
 

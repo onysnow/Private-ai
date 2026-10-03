@@ -30,6 +30,7 @@ from app.ai.chart_check import (
 )
 from app.ai.governor import governor
 from app.ai.quote_check import check_presentation_quotes, prompt_record_texts
+from app.ai.writing_check import check_presentation_writing
 from app.ai.llm_client import LLMConfigurationError, coerce_response, get_llm_client, is_local_endpoint
 from app.core.authorization import current_authorization_scope, ensure_scope_can_mutate_ids
 from app.core.config import Settings, settings as default_settings
@@ -134,8 +135,9 @@ OUTPUT_SCHEMAS = {
         "executive_takeaway": "string - the one or two sentences a reader should walk away with; a real conclusion, not a restatement of the goal",
         "sections": [
             {
-                "heading": "string",
-                "body": "string - full prose paragraph(s), for a written brief",
+                "heading": "string - the slide's headline: one full sentence stating this section's finding (a claim, not a topic), two lines at most",
+                "supports_takeaway": "string - one sentence: how this section bears on the executive takeaway",
+                "body": "string - full prose paragraph(s), for a written brief; sentences of about 15 words on average",
                 "key_points": [{"text": "string - one terse slide bullet; together they carry the same content as body",
                                 "evidence": [{"record_type": "string", "record_id": "string", "quote": QUOTE_RULE}]}],
                 "evidence": [{"record_type": "string", "record_id": "string", "quote": QUOTE_RULE}],
@@ -153,6 +155,7 @@ OUTPUT_SCHEMAS = {
             }
         ],
         "open_questions": ["string - gaps in the selected evidence that limit what this draft can claim"],
+        "limits": ["string - what the selected evidence cannot show, however it is read (the brief's 'our limits')"],
     },
 }
 
@@ -625,6 +628,8 @@ QUOTE_CHECKED_MODULES = {"presentation_draft"}
 # Modules whose output may order charts the chart check cooks and tests
 # (app/ai/chart_check.py); they see the query catalogue in their packet.
 CHART_CHECKED_MODULES = {"presentation_draft"}
+# Modules whose prose the writing check reads (app/ai/writing_check.py).
+WRITING_CHECKED_MODULES = {"presentation_draft"}
 
 
 def _chart_retry_feedback(db: Session, investigation_id: str, module: str, raw_text: str) -> tuple[str | None, dict | None]:
@@ -788,6 +793,9 @@ def run_reasoning_module(
         # failing chart is removed and the reasons travel with the draft.
         payload, chart_report = check_presentation_charts(db, investigation_id, payload)
         trace["chart_check"] = chart_report
+    if module in WRITING_CHECKED_MODULES and not shape_errors and not bad_refs and not nothing_quoted:
+        # What a reporter should look at before accepting: never removes anything (app/ai/writing_check.py).
+        trace["writing_check"] = check_presentation_writing(payload)
 
     if shape_errors:
         note = f"{REJECTION_REASONS['schema']}: {shape_errors}"

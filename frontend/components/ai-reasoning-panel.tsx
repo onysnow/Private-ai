@@ -50,6 +50,23 @@ export function moduleCallable(status:AiReasoningStatus|null|undefined,module:Ai
 const runFailureMessage=(error:unknown):string=>errorMessage(error,'Reasoning run failed');
 
 const asObj=(v:JsonValue|undefined):JsonObject|null=>(typeof v==='object'&&v!==null&&!Array.isArray(v))?v:null;
+
+// The writing check's practices in words (backend app/ai/writing_check.py).
+const WRITING_PRACTICES:Record<string,string>={short_sentences:'Short sentences',likelihood:'Likelihood words (ICD 203)',headline:'Slide headline is a claim',main_point:'One main point',single_source:'Rests on one record'};
+
+/** What the writing check found in a presentation draft: nothing is removed;
+ *  each finding names the practice, where it is and what to do. */
+export function WritingReport({report}:{report:JsonObject|null}):ReactElement|null{
+  if(!report)return null;
+  const findings=(Array.isArray(report.findings)?report.findings:[]).map(f=>asObj(f)).filter((f):f is JsonObject=>f!==null);
+  return <details className="candidate" data-testid="writing-report" open={findings.length>0}>
+    <summary><b>Writing check</b> · {findings.length===0?'nothing to look at':`${findings.length} thing${findings.length===1?'':'s'} to look at before accepting`}</summary>
+    <ul className="mt-1 space-y-1">{findings.map((f,i)=><li key={i}>
+      <b>{WRITING_PRACTICES[String(f.practice)]??String(f.practice)}</b> · {String(f.where??'')}: {String(f.message??'')}
+      {typeof f.sentence==='string'&&f.sentence&&<div><small>“{f.sentence}”</small></div>}
+    </li>)}</ul>
+  </details>;
+}
 const asArr=(v:JsonValue|undefined):JsonValue[]=>Array.isArray(v)?v:[];
 const asStr=(v:JsonValue|undefined):string=>typeof v==='string'?v:(v===undefined||v===null?'':JSON.stringify(v));
 const refLabel=(v:JsonValue):string=>{const o=asObj(v);return o?`${asStr(o.record_type)}:${asStr(o.record_id)}`:asStr(v)};
@@ -288,7 +305,8 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
             {payload&&'executive_summary' in payload&&<p><b>Summary:</b> {asStr(payload.executive_summary)}</p>}
             {payload&&'scope_and_limitations' in payload&&<p className="muted"><b>Scope & limitations:</b> {asStr(payload.scope_and_limitations)}</p>}
             {isPresentationDraft&&payload&&<div className="mt-3">
-              <DraftPreview payload={payload} slides={selected.deck_preview||[]} citationDetails={selected.citation_details||[]} onTrace={onTraceRecord}
+              <WritingReport report={selected.trace?asObj(selected.trace.writing_check):null}/>
+              <DraftPreview payload={payload} slides={selected.deck_preview||[]} citationDetails={selected.citation_details||[]} onTrace={onTraceRecord} howWeKnow={selected.how_we_know}
                 catalog={styleCatalog} deckStyle={deckStyle} onDeckStyleChange={setDeckStyle}
                 visualStyles={visualStyles} onVisualStyleChange={(section,style)=>setVisualStyles(prev=>({...prev,[section]:style}))}
                 chartLooks={chartLooks} chartProblems={chartProblems}/>

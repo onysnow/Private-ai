@@ -1091,7 +1091,7 @@ def test_ai_reasoning_replies(demo, ai_on, monkeypatch):
 
     # The full proposal: a presentation draft carries its citations in words and the slides it would make.
     full = get_ai_analysis_candidate_endpoint(ran["candidate_id"], db)
-    assert full["citation_details"] and [slide["kind"] for slide in full["deck_preview"]] == ["title", "statement", "content", "content", "content", "content", "questions"]
+    assert full["citation_details"] and [slide["kind"] for slide in full["deck_preview"]] == ["title", "statement", "content", "content", "content", "content", "questions", "questions"]
     _same_through_model(r.AiAnalysisCandidateOut, full)
     raw = get_ai_analysis_candidate_endpoint(rejected.id, db)
     assert "raw_output" in raw["payload"] and raw["rejection_reason"]

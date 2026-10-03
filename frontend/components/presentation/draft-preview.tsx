@@ -43,7 +43,7 @@ function asVisual(v: JsonValue | undefined): PresentationVisual | null {
 export function asDraft(payload: JsonObject | null | undefined): PresentationDraftPayload {
   const p = payload || {};
   const sections: PresentationSection[] = (Array.isArray(p.sections) ? p.sections : []).filter(isObj).map(s => ({
-    heading: str(s.heading), body: str(s.body),
+    heading: str(s.heading), supports_takeaway: str(s.supports_takeaway), body: str(s.body),
     key_points: Array.isArray(s.key_points) ? s.key_points.map(k => str(k)).filter(Boolean) : [],
     key_point_evidence: Array.isArray(s.key_point_evidence) ? s.key_point_evidence.map(quotedRefs) : [],
     evidence: refs(s.evidence), visual: asVisual(s.visual),
@@ -51,6 +51,7 @@ export function asDraft(payload: JsonObject | null | undefined): PresentationDra
   return {
     title: str(p.title), goal_restated: str(p.goal_restated), executive_takeaway: str(p.executive_takeaway), sections,
     open_questions: Array.isArray(p.open_questions) ? p.open_questions.map(q => str(q)).filter(Boolean) : [],
+    limits: Array.isArray(p.limits) ? p.limits.map(q => str(q)).filter(Boolean) : [],
   };
 }
 
@@ -131,7 +132,12 @@ function CheckedQuotes({section, lookup}: {section: PresentationSection, lookup:
   </details>;
 }
 
-function BriefView({draft, lookup, onTrace}: {draft: PresentationDraftPayload, lookup: CitationLookup, onTrace?: TraceHandler}): ReactElement {
+// The mark a statement resting on one record carries in the brief and the
+// deck (backend app/ai/writing_check.py SINGLE_SOURCE_MARK).
+const SINGLE_SOURCE_MARK = '†';
+const recordCount = (items: AiCitationRef[]): number => new Set(items.map(r => `${r.record_type}:${r.record_id}`)).size;
+
+function BriefView({draft, lookup, onTrace, howWeKnow}: {draft: PresentationDraftPayload, lookup: CitationLookup, onTrace?: TraceHandler, howWeKnow?: string}): ReactElement {
   return <article data-testid="brief-preview" className="mx-auto max-w-[46rem] rounded-md px-8 py-9 shadow-lg sm:px-12" style={{background: DECK.paper, color: DECK.ink, fontFamily: 'Georgia, serif'}}>
     <div className="text-[11px] font-bold uppercase tracking-[0.22em]" style={{color: DECK.brassDeep, fontFamily: 'Inter, sans-serif'}}>Investigation brief</div>
     <h2 className="mt-1 text-[28px] leading-tight" style={{color: DECK.ink}}>{draft.title}</h2>
@@ -143,10 +149,16 @@ function BriefView({draft, lookup, onTrace}: {draft: PresentationDraftPayload, l
     </aside>}
     {draft.sections.map((s, i) => <section key={i} className="mt-6">
       <h3 className="text-[20px]" style={{color: DECK.ink}}>{s.heading}</h3>
-      {s.body.split(/\n\n+/).map((para, j, all) => <p key={j} className="mt-2 text-[15px] leading-[1.7]">{para}{j === all.length - 1 && <Cite items={s.evidence} lookup={lookup} onTrace={onTrace}/>}</p>)}
+      {s.body.split(/\n\n+/).map((para, j, all) => <p key={j} className="mt-2 text-[15px] leading-[1.7]">{para}{j === all.length - 1 && <Cite items={s.evidence} lookup={lookup} onTrace={onTrace}/>}
+        {j === all.length - 1 && recordCount(s.evidence) === 1 && <span title="Rests on one record"> {SINGLE_SOURCE_MARK}</span>}</p>)}
       {s.visual && <BriefVisual visual={s.visual} lookup={lookup} onTrace={onTrace}/>}
       <CheckedQuotes section={s} lookup={lookup}/>
     </section>)}
+    {(howWeKnow || draft.limits.length > 0) && <aside className="mt-7 rounded-sm px-5 py-4" data-testid="brief-limits" style={{background: DECK.panel, borderLeft: `4px solid ${DECK.brass}`}}>
+      <div className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{color: DECK.brassDeep, fontFamily: 'Inter, sans-serif'}}>How we know, and our limits</div>
+      {howWeKnow && <p className="mt-1.5 text-[15px]">{howWeKnow}</p>}
+      {draft.limits.length > 0 && <ul className="mt-2 list-disc space-y-1 pl-5 text-[15px]">{draft.limits.map((limit, i) => <li key={i}>{limit}</li>)}</ul>}
+    </aside>}
     {draft.open_questions.length > 0 && <aside className="mt-7 rounded-sm px-5 py-4" style={{background: DECK.panel, borderLeft: `4px solid ${DECK.oxblood}`}}>
       <div className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{color: DECK.oxblood, fontFamily: 'Inter, sans-serif'}}>Open questions</div>
       <ol className="mt-2 space-y-1.5">{draft.open_questions.map((q, i) => <li key={i} className="flex gap-3 text-[15px]"><span style={{color: DECK.oxblood}}>{String(i + 1).padStart(2, '0')}</span><span>{q}</span></li>)}</ol>
@@ -179,6 +191,8 @@ export function applyVisualStyles(slides: DeckSlide[], visualStyles: Record<stri
 
 export type DraftPreviewProps = {
   payload: JsonObject, slides: DeckSlide[], citationDetails: CitationDetail[], onTrace?: TraceHandler,
+  // The brief's "how we know" line, as the backend writes it (the candidate's how_we_know).
+  howWeKnow?: string,
   // Style (optional): with a catalogue and change handlers, the Slides tab shows the style panel.
   catalog?: PresentationStyleCatalog | null,
   deckStyle?: DeckStyle,
@@ -191,7 +205,7 @@ export type DraftPreviewProps = {
   chartProblems?: Record<string, string>,
 };
 
-export function DraftPreview({payload, slides: baseSlides, citationDetails, onTrace, catalog, deckStyle, onDeckStyleChange, visualStyles, onVisualStyleChange, chartLooks, chartProblems}: DraftPreviewProps): ReactElement {
+export function DraftPreview({payload, slides: baseSlides, citationDetails, onTrace, howWeKnow, catalog, deckStyle, onDeckStyleChange, visualStyles, onVisualStyleChange, chartLooks, chartProblems}: DraftPreviewProps): ReactElement {
   const draft = useMemo(() => asDraft(payload), [payload]);
   const slides = useMemo(() => applyVisualStyles(baseSlides, visualStyles || {}, chartLooks), [baseSlides, visualStyles, chartLooks]);
   const theme = useMemo(() => resolveTheme(catalog, deckStyle), [catalog, deckStyle]);
@@ -259,7 +273,7 @@ export function DraftPreview({payload, slides: baseSlides, citationDetails, onTr
       </div>
     </TabsContent>
 
-    <TabsContent value="brief"><BriefView draft={draft} lookup={lookup} onTrace={onTrace}/></TabsContent>
+    <TabsContent value="brief"><BriefView draft={draft} lookup={lookup} onTrace={onTrace} howWeKnow={howWeKnow}/></TabsContent>
 
     <TabsContent value="sources">
       {orderedDetails.length === 0 ? <p className="text-sm text-muted-foreground">This draft cites no records.</p> : <ol className="space-y-2" data-testid="sources-list">

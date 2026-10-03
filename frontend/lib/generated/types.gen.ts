@@ -147,6 +147,10 @@ export type AiAnalysisCandidateOut = {
    */
   deck_preview?: Array<DeckSlideOut> | null;
   /**
+   * How We Know
+   */
+  how_we_know?: string | null;
+  /**
    * Id
    */
   id: string;

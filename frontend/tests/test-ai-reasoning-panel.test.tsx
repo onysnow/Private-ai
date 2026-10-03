@@ -7,7 +7,7 @@ import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 
-import {AiReasoningPanel, describeAiStatus} from '../components/ai-reasoning-panel';
+import {AiReasoningPanel, WritingReport, describeAiStatus} from '../components/ai-reasoning-panel';
 import {ApiClient} from '../lib/api-client';
 import type {AiReasoningStatus} from '../lib/api-types';
 
@@ -89,6 +89,27 @@ describe('describeAiStatus', () => {
       .toMatch(/Ready: provider ollama, model llama3.2 \(runs on this computer\), TAS spec v1.8/);
     expect(describeAiStatus({...readyStatus, model: 'claude-x', runs_on_this_computer: false})).toMatch(/runs on the provider's servers/);
     expect(describeAiStatus({...readyStatus, provider: 'ollama', provider_key_configured: false})).toMatch(/no model is chosen/);
+  });
+});
+
+describe('WritingReport', () => {
+  it('lists what the writing check found, each with its practice, where it is, and the sentence', () => {
+    render(<WritingReport report={{checked: ['likelihood'], findings: [
+      {practice: 'likelihood', where: 'section 1 (\'The payment\')', sentence: 'It was probably a loan.', message: "'probably' is on ICD 203's second row"},
+      {practice: 'single_source', where: 'section 1 (\'The payment\')', sentence: '$2.4M paid', message: 'rests on one record'},
+    ]}}/>);
+    const report = screen.getByTestId('writing-report');
+    expect(report).toHaveTextContent('Writing check · 2 things to look at before accepting');
+    expect(report).toHaveTextContent("Likelihood words (ICD 203) · section 1 ('The payment'): 'probably' is on ICD 203's second row");
+    expect(report).toHaveTextContent('“It was probably a loan.”');
+    expect(report).toHaveTextContent('Rests on one record');
+  });
+
+  it('says so when there is nothing to look at, and shows nothing for a run without the check', () => {
+    const {container} = render(<WritingReport report={null}/>);
+    expect(container).toBeEmptyDOMElement();
+    render(<WritingReport report={{checked: [], findings: []}}/>);
+    expect(screen.getByTestId('writing-report')).toHaveTextContent('nothing to look at');
   });
 });
 

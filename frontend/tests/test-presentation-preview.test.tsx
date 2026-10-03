@@ -92,6 +92,19 @@ describe('DraftPreview', () => {
     expect(within(brief).getAllByTitle('Evidence: Ex. 14, p. 3').length).toBeGreaterThan(0);
   });
 
+  it('marks a section resting on one record and closes with how we know and the limits', async () => {
+    const user = userEvent.setup();
+    const limited: JsonObject = {...payload, limits: ['The ledger is the payer\'s own account.']};
+    render(<DraftPreview payload={limited} slides={slides} citationDetails={[detail()]} howWeKnow="This rests on 1 record in the investigation: 1 evidence record. † marks a statement that rests on one record."/>);
+    await user.click(screen.getByRole('tab', {name: 'Brief'}));
+    const brief = screen.getByTestId('brief-preview');
+    // Each section here cites one evidence record, so each carries the mark.
+    expect(within(brief).getAllByTitle('Rests on one record')).toHaveLength(2);
+    const limits = within(screen.getByTestId('brief-limits'));
+    expect(limits.getByText(/^This rests on 1 record/)).toBeInTheDocument();
+    expect(limits.getByText('The ledger is the payer\'s own account.')).toBeInTheDocument();
+  });
+
   it('lists each key point with the words the quote check found in its record', async () => {
     const user = userEvent.setup();
     const checked: JsonObject = {...payload, sections: [{...(payload.sections as JsonObject[])[0],
