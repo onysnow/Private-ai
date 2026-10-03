@@ -141,6 +141,16 @@ def writeup_content_from_payload(payload: dict, labels: dict[tuple[str, str], di
                     # Clear attribution: a section resting on one record says so (Reuters Handbook).
                     inline.append({"type": "text", "text": f" {SINGLE_SOURCE_MARK}"})
             content.append({"type": "paragraph", "content": inline})
+        # The document beside the claim (ICIJ, Luanda Leaks): each key point with the
+        # words its record says, as the quote check found them, and its citation.
+        excerpts = []
+        for point, refs_for_point in zip(section.get("key_points") or [], key_point_refs(section)):
+            for ref in refs_for_point or []:
+                quote = str(ref.get("matched_text") or ref.get("quote") or "").strip() if isinstance(ref, dict) else ""
+                if quote:
+                    excerpts.append({"type": "paragraph", "content": [*_text(f"{point}: “{quote}”"), _citation_node(ref, labels)]})
+        if excerpts:
+            content.append({"type": "blockquote", "content": excerpts})
         visual = normalize_visual(section.get("visual"))
         if visual:
             content.append({"type": "evidenceVisual", "attrs": {"visual": visual}})

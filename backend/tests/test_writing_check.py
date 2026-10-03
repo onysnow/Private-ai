@@ -64,3 +64,12 @@ def test_the_brief_and_the_deck_mark_single_record_statements_and_say_how_we_kno
     limits = next(node for node in doc["content"] if node["type"] == "callout" and node["attrs"]["tone"] == "limits")
     assert limits["attrs"]["title"] == "How we know, and our limits"
     assert limits["content"][1]["content"][0]["content"][0]["content"][0]["text"] == "The ledger is the payer's own account."
+
+
+def test_the_brief_puts_the_document_beside_each_claim():
+    quoted = {**EV1, "quote": "$2,400,000.00 WIRE OUT", "matched_text": "$2,400,000.00 WIRE OUT BELLCASTLE"}
+    doc = writeup_content_from_payload(_draft(key_points=["$2.4M paid to Bellcastle"], key_point_evidence=[[quoted]]))
+    excerpts = next(node for node in doc["content"] if node["type"] == "blockquote")
+    first = excerpts["content"][0]["content"]
+    assert first[0]["text"] == "$2.4M paid to Bellcastle: “$2,400,000.00 WIRE OUT BELLCASTLE”"
+    assert first[1]["type"] == "citation" and first[1]["attrs"]["recordId"] == "ev-1"

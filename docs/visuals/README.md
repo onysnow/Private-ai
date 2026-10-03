@@ -622,6 +622,24 @@ ADR-0005 line 18 holds the decisions and the numbers behind them.
   `frontend/test-support/chart-kinds.json`, `frontend/tests/test-claims.test.tsx`., `backend/tests/test_timeline_grade.py`,
   `frontend/tests/test-timeline-grade.test.tsx`.
 
+## Pass 6: the writing practices
+
+The design doc's "Briefs, decks and summaries" practices that were Partly or
+Missing, now fields in the draft, an automatic check, or both
+(`backend/app/ai/writing_check.py`, shown in the review panel; it reports
+and never removes):
+
+| Practice | What the Workbench does | Source |
+|---|---|---|
+| Short sentences | reports a section averaging over 15 words a sentence, with its longest | AR 25-50, para 1-37b |
+| Fixed likelihood words | the prompt gives ICD 203's first row; a second-row word, an off-scale hedge, or a confidence level beside a likelihood is reported | ICD 203, p. 5 |
+| Slide headline is a claim | headings are full sentences; one under four words or over two lines at 24 pt is reported | Garner and Alley 2013 |
+| One main point | each section says how it bears on the takeaway (`supports_takeaway`) | Minto |
+| Clear attribution | a statement on one record carries † in the brief and on its slide | Reuters Handbook; NPR |
+| How we know, and our limits | the draft's `limits` and the records it rests on close the brief and the deck | The Markup |
+| Document beside the claim | the brief quotes each key point's record under its section, cited | ICIJ, Luanda Leaks |
+| Confidence grade, grading scale | see "Pass 6: the claim-strength grid" | IPCC AR5; Bellingcat |
+
 ## What pass 3 built, and what is left
 
 Built: the drawing of the seven statistical kinds, the two queries they
