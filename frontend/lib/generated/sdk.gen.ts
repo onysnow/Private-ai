@@ -18,6 +18,9 @@ import type {
   AddChartToWriteupEndpointData,
   AddChartToWriteupEndpointErrors,
   AddChartToWriteupEndpointResponses,
+  AddWatchlistEntryData,
+  AddWatchlistEntryErrors,
+  AddWatchlistEntryResponses,
   AnalyzeOpenalephDocumentData,
   AnalyzeOpenalephDocumentErrors,
   AnalyzeOpenalephDocumentResponses,
@@ -36,6 +39,9 @@ import type {
   CapabilitiesData,
   CapabilitiesErrors,
   CapabilitiesResponses,
+  CheckWatchlistNowData,
+  CheckWatchlistNowErrors,
+  CheckWatchlistNowResponses,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchErrors,
@@ -114,6 +120,9 @@ import type {
   DeleteWriteupEndpointData,
   DeleteWriteupEndpointErrors,
   DeleteWriteupEndpointResponses,
+  DismissHitData,
+  DismissHitErrors,
+  DismissHitResponses,
   EnrichEntityData,
   EnrichEntityErrors,
   EnrichEntityMultiData,
@@ -261,6 +270,9 @@ import type {
   GetSimilarDocumentsData,
   GetSimilarDocumentsErrors,
   GetSimilarDocumentsResponses,
+  GetWatchlistData,
+  GetWatchlistErrors,
+  GetWatchlistResponses,
   GetWriteupEndpointData,
   GetWriteupEndpointErrors,
   GetWriteupEndpointResponses,
@@ -411,6 +423,9 @@ import type {
   ListWriteupsEndpointData,
   ListWriteupsEndpointErrors,
   ListWriteupsEndpointResponses,
+  MakeLeadFromHitData,
+  MakeLeadFromHitErrors,
+  MakeLeadFromHitResponses,
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusErrors,
   OpenalephIntegrationStatusResponses,
@@ -447,6 +462,9 @@ import type {
   RemoveInvestigationData,
   RemoveInvestigationErrors,
   RemoveInvestigationResponses,
+  RemoveWatchlistEntryData,
+  RemoveWatchlistEntryErrors,
+  RemoveWatchlistEntryResponses,
   ResolveFindingData,
   ResolveFindingErrors,
   ResolveFindingResponses,
@@ -530,6 +548,9 @@ import {
   zAddChartToWriteupEndpointBody,
   zAddChartToWriteupEndpointPath,
   zAddChartToWriteupEndpointResponse,
+  zAddWatchlistEntryBody,
+  zAddWatchlistEntryPath,
+  zAddWatchlistEntryResponse,
   zAnalyzeOpenalephDocumentPath,
   zAnalyzeOpenalephDocumentResponse,
   zAssessStatementBody,
@@ -544,6 +565,8 @@ import {
   zCanonicalEntityResolutionPath,
   zCanonicalEntityResolutionResponse,
   zCapabilitiesResponse,
+  zCheckWatchlistNowPath,
+  zCheckWatchlistNowResponse,
   zConnectorSearchBody,
   zConnectorSearchPath,
   zConnectorSearchResponse,
@@ -604,6 +627,8 @@ import {
   zDeleteInvestigationMembershipResponse,
   zDeleteWriteupEndpointPath,
   zDeleteWriteupEndpointResponse,
+  zDismissHitPath,
+  zDismissHitResponse,
   zEnrichEntityMultiBody,
   zEnrichEntityMultiPath,
   zEnrichEntityMultiResponse,
@@ -706,6 +731,8 @@ import {
   zGetSimilarDocumentsPath,
   zGetSimilarDocumentsQuery,
   zGetSimilarDocumentsResponse,
+  zGetWatchlistPath,
+  zGetWatchlistResponse,
   zGetWriteupEndpointPath,
   zGetWriteupEndpointResponse,
   zHealthResponse,
@@ -826,6 +853,8 @@ import {
   zListWriteupsEndpointPath,
   zListWriteupsEndpointQuery,
   zListWriteupsEndpointResponse,
+  zMakeLeadFromHitPath,
+  zMakeLeadFromHitResponse,
   zOpenalephIntegrationStatusResponse,
   zPresentationStylesResponse,
   zPreviewBackupRestoreBody,
@@ -852,6 +881,8 @@ import {
   zRemoveInvestigationPath,
   zRemoveInvestigationQuery,
   zRemoveInvestigationResponse,
+  zRemoveWatchlistEntryPath,
+  zRemoveWatchlistEntryResponse,
   zResolveFindingBody,
   zResolveFindingPath,
   zResolveFindingResponse,
@@ -4733,6 +4764,99 @@ export const investigationVisualRestyle = <
   });
 
 /**
+ * Get Watchlist
+ *
+ * The watched names and the documents each was found in.
+ */
+export const getWatchlist = <ThrowOnError extends boolean = false>(
+  options: Options<GetWatchlistData, ThrowOnError>,
+): RequestResult<GetWatchlistResponses, GetWatchlistErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetWatchlistResponses,
+    GetWatchlistErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetWatchlistPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetWatchlistResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/watchlist',
+    ...options,
+  });
+
+/**
+ * Add Watchlist Entry
+ *
+ * Watch a name: it is searched whenever OpenAleph has read a new document of the investigation.
+ */
+export const addWatchlistEntry = <ThrowOnError extends boolean = false>(
+  options: Options<AddWatchlistEntryData, ThrowOnError>,
+): RequestResult<
+  AddWatchlistEntryResponses,
+  AddWatchlistEntryErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    AddWatchlistEntryResponses,
+    AddWatchlistEntryErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAddWatchlistEntryBody,
+          path: zAddWatchlistEntryPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAddWatchlistEntryResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/watchlist',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Check Watchlist Now
+ *
+ * Search every watched name now. OpenAleph being off or unreachable is each entry's check state.
+ */
+export const checkWatchlistNow = <ThrowOnError extends boolean = false>(
+  options: Options<CheckWatchlistNowData, ThrowOnError>,
+): RequestResult<
+  CheckWatchlistNowResponses,
+  CheckWatchlistNowErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CheckWatchlistNowResponses,
+    CheckWatchlistNowErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCheckWatchlistNowPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCheckWatchlistNowResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/watchlist/check',
+    ...options,
+  });
+
+/**
  * List Writeups Endpoint
  */
 export const listWriteupsEndpoint = <ThrowOnError extends boolean = false>(
@@ -6059,6 +6183,93 @@ export const createTimelineEventEndpoint = <
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Dismiss Hit
+ */
+export const dismissHit = <ThrowOnError extends boolean = false>(
+  options: Options<DismissHitData, ThrowOnError>,
+): RequestResult<DismissHitResponses, DismissHitErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    DismissHitResponses,
+    DismissHitErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zDismissHitPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDismissHitResponse.parseAsync(data),
+    url: '/api/watchlist-hits/{hit_id}/dismiss',
+    ...options,
+  });
+
+/**
+ * Make Lead From Hit
+ *
+ * Make a hit a lead, linked to the source of the document it was found in.
+ */
+export const makeLeadFromHit = <ThrowOnError extends boolean = false>(
+  options: Options<MakeLeadFromHitData, ThrowOnError>,
+): RequestResult<
+  MakeLeadFromHitResponses,
+  MakeLeadFromHitErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    MakeLeadFromHitResponses,
+    MakeLeadFromHitErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zMakeLeadFromHitPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zMakeLeadFromHitResponse.parseAsync(data),
+    url: '/api/watchlist-hits/{hit_id}/lead',
+    ...options,
+  });
+
+/**
+ * Remove Watchlist Entry
+ *
+ * Stop watching a name. Its hits go; leads made from them stay.
+ */
+export const removeWatchlistEntry = <ThrowOnError extends boolean = false>(
+  options: Options<RemoveWatchlistEntryData, ThrowOnError>,
+): RequestResult<
+  RemoveWatchlistEntryResponses,
+  RemoveWatchlistEntryErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    RemoveWatchlistEntryResponses,
+    RemoveWatchlistEntryErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zRemoveWatchlistEntryPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRemoveWatchlistEntryResponse.parseAsync(data),
+    url: '/api/watchlist/{watch_id}',
+    ...options,
   });
 
 /**

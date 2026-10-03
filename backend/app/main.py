@@ -33,6 +33,7 @@ from app.api.routes_writeups import router as writeups_router
 from app.api.routes_decks import router as decks_router
 from app.api.routes_jobs import router as jobs_router
 from app.api.routes_corpus import router as corpus_router
+from app.api.routes_watchlists import router as watchlists_router
 from app.api.routes_visuals import router as visuals_router
 from app.core.config import Settings, settings as default_settings
 from app.core.access import bearer_token, enforce_api_access, enforce_browser_write_access, request_is_local_request
@@ -84,6 +85,7 @@ def register_domain_routers(app: FastAPI) -> None:
     app.include_router(jobs_router)
     app.include_router(visuals_router)
     app.include_router(corpus_router)
+    app.include_router(watchlists_router)
 
 
 def operation_id(route: APIRoute) -> str:

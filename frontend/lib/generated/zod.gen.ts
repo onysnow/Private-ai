@@ -5349,6 +5349,81 @@ export const zDecksOut = z.object({
 });
 
 /**
+ * WatchlistEntryCreate
+ */
+export const zWatchlistEntryCreate = z.object({
+  note: z.string().max(2000).nullish(),
+  query: z.string().min(1).max(512),
+});
+
+/**
+ * WatchlistHitOut
+ *
+ * A document a watched name was found in (app/services/watchlists.py).
+ */
+export const zWatchlistHitOut = z.object({
+  document_id: z.string().nullable(),
+  found_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  highlights: z.array(z.array(zHighlightSegmentOut)),
+  id: z.string(),
+  lead_id: z.string().nullable(),
+  page_number: z.number().int().nullable(),
+  status: z.enum(['new', 'lead', 'dismissed']),
+  title: z.string(),
+});
+
+/**
+ * WatchlistEntryOut
+ *
+ * A watched name, when it was last checked (``check_state`` as the corpus
+ * search reports it), and the documents it was found in, newest first.
+ */
+export const zWatchlistEntryOut = z.object({
+  check_detail: z.string().nullable(),
+  check_state: z.string().nullable(),
+  checked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  created_by: z.string().nullable(),
+  hits: z.array(zWatchlistHitOut),
+  id: z.string(),
+  note: z.string().nullable(),
+  query: z.string(),
+});
+
+/**
+ * WatchlistCheckOut
+ *
+ * The watchlist after a check, and how many documents it newly turned up.
+ */
+export const zWatchlistCheckOut = z.object({
+  checked: z.number().int(),
+  entries: z.array(zWatchlistEntryOut),
+  investigation_id: z.string(),
+  new_hits: z.number().int(),
+});
+
+/**
+ * WatchlistOut
+ */
+export const zWatchlistOut = z.object({
+  entries: z.array(zWatchlistEntryOut),
+  investigation_id: z.string(),
+});
+
+/**
  * WriteupCreate
  */
 export const zWriteupCreate = z.object({
@@ -6758,6 +6833,35 @@ export const zInvestigationVisualRestylePath = z.object({
  */
 export const zInvestigationVisualRestyleResponse = zChartRestyleOut;
 
+export const zGetWatchlistPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetWatchlistResponse = zWatchlistOut;
+
+export const zAddWatchlistEntryBody = zWatchlistEntryCreate;
+
+export const zAddWatchlistEntryPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zAddWatchlistEntryResponse = zWatchlistOut;
+
+export const zCheckWatchlistNowPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCheckWatchlistNowResponse = zWatchlistCheckOut;
+
 export const zListWriteupsEndpointPath = z.object({
   investigation_id: z.string(),
 });
@@ -7166,6 +7270,33 @@ export const zCreateTimelineEventEndpointBody = zTimelineEventCreate;
  * Successful Response
  */
 export const zCreateTimelineEventEndpointResponse = zTimelineEventRowOut;
+
+export const zDismissHitPath = z.object({
+  hit_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zDismissHitResponse = zWatchlistOut;
+
+export const zMakeLeadFromHitPath = z.object({
+  hit_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zMakeLeadFromHitResponse = zLeadOut;
+
+export const zRemoveWatchlistEntryPath = z.object({
+  watch_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRemoveWatchlistEntryResponse = zWatchlistOut;
 
 export const zCreateWriteupEndpointBody = zWriteupCreate;
 

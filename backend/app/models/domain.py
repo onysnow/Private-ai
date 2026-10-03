@@ -65,6 +65,10 @@ from app.models.documents import (
     IngestionBatch,
     IngestionBatchItem,
 )
+from app.models.watchlists import (
+    WatchlistEntry,
+    WatchlistHit,
+)
 from app.models.ai import (
     AIAnalysisCandidate,
 )
@@ -131,6 +135,8 @@ __all__ = [
     "ExtractionCandidate",
     "IngestionBatch",
     "IngestionBatchItem",
+    "WatchlistEntry",
+    "WatchlistHit",
     "AIAnalysisCandidate",
     "Writeup",
     "Deck",

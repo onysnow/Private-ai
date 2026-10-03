@@ -25,6 +25,7 @@ import {decideInvestigationCrossReference, syncCorpusNow} from '../../lib/genera
 import type {CorpusSyncOut, CrossReferenceOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {CorpusInsights} from './corpus-insights';
+import {Watchlist} from './watchlist';
 
 type Props = {investigationId: string};
 type Decision = 'same' | 'different' | 'unsure';
@@ -115,6 +116,7 @@ export function CorpusPanel({investigationId}: Props): ReactElement {
       </div>
       {status && <p className="muted">{status}</p>}
       <CorpusInsights investigationId={investigationId}/>
+      <Watchlist investigationId={investigationId}/>
       <h4>Cross-references to review</h4>
       {xrefQuery.isError && <p className="muted">{errorMessage(xrefQuery.error, 'Could not load the cross-references')}</p>}
       {crossReferences.length === 0 ? <p className="muted">No cross-reference waits for review.</p> : crossReferences.map(row => <div className="statement" key={row.id}>

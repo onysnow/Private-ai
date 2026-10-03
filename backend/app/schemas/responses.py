@@ -1359,6 +1359,43 @@ class CrossReferenceDecisionOut(ResponseModel):
     created_at: Timestamp
 
 
+class WatchlistHitOut(ResponseModel):
+    """A document a watched name was found in (app/services/watchlists.py)."""
+    id: str
+    document_id: str | None
+    title: str
+    page_number: int | None
+    highlights: list[list[HighlightSegmentOut]]
+    status: Literal["new", "lead", "dismissed"]
+    lead_id: str | None
+    found_at: Timestamp
+
+
+class WatchlistEntryOut(ResponseModel):
+    """A watched name, when it was last checked (``check_state`` as the corpus
+    search reports it), and the documents it was found in, newest first."""
+    id: str
+    query: str
+    note: str | None
+    created_by: str | None
+    created_at: Timestamp
+    checked_at: Timestamp | None
+    check_state: str | None
+    check_detail: str | None
+    hits: list[WatchlistHitOut]
+
+
+class WatchlistOut(ResponseModel):
+    investigation_id: str
+    entries: list[WatchlistEntryOut]
+
+
+class WatchlistCheckOut(WatchlistOut):
+    """The watchlist after a check, and how many documents it newly turned up."""
+    checked: int
+    new_hits: int
+
+
 class CorpusInsightNameOut(ResponseModel):
     """A name found alongside a discovered one, and in how many of its documents."""
     kind: Literal["people", "companies", "places", "names"]

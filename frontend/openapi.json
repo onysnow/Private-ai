@@ -23490,6 +23490,266 @@
         "title": "VisualStyleOut",
         "type": "object"
       },
+      "WatchlistCheckOut": {
+        "description": "The watchlist after a check, and how many documents it newly turned up.",
+        "properties": {
+          "checked": {
+            "title": "Checked",
+            "type": "integer"
+          },
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/WatchlistEntryOut"
+            },
+            "title": "Entries",
+            "type": "array"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "new_hits": {
+            "title": "New Hits",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "entries",
+          "checked",
+          "new_hits"
+        ],
+        "title": "WatchlistCheckOut",
+        "type": "object"
+      },
+      "WatchlistEntryCreate": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "query": {
+            "description": "A name, searched as a phrase, or a search in OpenAleph's syntax.",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Query",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "WatchlistEntryCreate",
+        "type": "object"
+      },
+      "WatchlistEntryOut": {
+        "description": "A watched name, when it was last checked (``check_state`` as the corpus\nsearch reports it), and the documents it was found in, newest first.",
+        "properties": {
+          "check_detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Check Detail"
+          },
+          "check_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Check State"
+          },
+          "checked_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked At"
+          },
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "hits": {
+            "items": {
+              "$ref": "#/components/schemas/WatchlistHitOut"
+            },
+            "title": "Hits",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "query",
+          "note",
+          "created_by",
+          "created_at",
+          "checked_at",
+          "check_state",
+          "check_detail",
+          "hits"
+        ],
+        "title": "WatchlistEntryOut",
+        "type": "object"
+      },
+      "WatchlistHitOut": {
+        "description": "A document a watched name was found in (app/services/watchlists.py).",
+        "properties": {
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "found_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Found At",
+            "type": "string"
+          },
+          "highlights": {
+            "items": {
+              "items": {
+                "$ref": "#/components/schemas/HighlightSegmentOut"
+              },
+              "type": "array"
+            },
+            "title": "Highlights",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "lead_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Id"
+          },
+          "page_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Number"
+          },
+          "status": {
+            "enum": [
+              "new",
+              "lead",
+              "dismissed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "document_id",
+          "title",
+          "page_number",
+          "highlights",
+          "status",
+          "lead_id",
+          "found_at"
+        ],
+        "title": "WatchlistHitOut",
+        "type": "object"
+      },
+      "WatchlistOut": {
+        "properties": {
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/WatchlistEntryOut"
+            },
+            "title": "Entries",
+            "type": "array"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "entries"
+        ],
+        "title": "WatchlistOut",
+        "type": "object"
+      },
       "WriteupCreate": {
         "properties": {
           "content_json": {
@@ -38303,6 +38563,164 @@
         "summary": "Investigation Visual Restyle"
       }
     },
+    "/api/investigations/{investigation_id}/watchlist": {
+      "get": {
+        "description": "The watched names and the documents each was found in.",
+        "operationId": "get_watchlist",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WatchlistOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Watchlist"
+      },
+      "post": {
+        "description": "Watch a name: it is searched whenever OpenAleph has read a new document of the investigation.",
+        "operationId": "add_watchlist_entry",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WatchlistEntryCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WatchlistOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Add Watchlist Entry"
+      }
+    },
+    "/api/investigations/{investigation_id}/watchlist/check": {
+      "post": {
+        "description": "Search every watched name now. OpenAleph being off or unreachable is each entry's check state.",
+        "operationId": "check_watchlist_now",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WatchlistCheckOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Check Watchlist Now"
+      }
+    },
     "/api/investigations/{investigation_id}/writeups": {
       "get": {
         "operationId": "list_writeups_endpoint",
@@ -40705,6 +41123,155 @@
           }
         },
         "summary": "Create Timeline Event Endpoint"
+      }
+    },
+    "/api/watchlist-hits/{hit_id}/dismiss": {
+      "post": {
+        "operationId": "dismiss_hit",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "hit_id",
+            "required": true,
+            "schema": {
+              "title": "Hit Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WatchlistOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Dismiss Hit"
+      }
+    },
+    "/api/watchlist-hits/{hit_id}/lead": {
+      "post": {
+        "description": "Make a hit a lead, linked to the source of the document it was found in.",
+        "operationId": "make_lead_from_hit",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "hit_id",
+            "required": true,
+            "schema": {
+              "title": "Hit Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Make Lead From Hit"
+      }
+    },
+    "/api/watchlist/{watch_id}": {
+      "delete": {
+        "description": "Stop watching a name. Its hits go; leads made from them stay.",
+        "operationId": "remove_watchlist_entry",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "watch_id",
+            "required": true,
+            "schema": {
+              "title": "Watch Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WatchlistOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Remove Watchlist Entry"
       }
     },
     "/api/writeups": {

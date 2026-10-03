@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from typing import TYPE_CHECKING, NoReturn
 
 from sqlalchemy.orm import Session
@@ -12,6 +14,8 @@ from app.models.jobs import BackgroundJob
 
 if TYPE_CHECKING:
     from app.services.openaleph_reader import OpenAlephText, OpenAlephUnavailable
+
+logger = logging.getLogger("journalism.jobs")
 
 EXTRACT_DOCUMENT = "extract_document"
 ANALYZE_DOCUMENT = "openaleph_analyze"
@@ -189,7 +193,8 @@ def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str
                 _fail_openaleph_only_read(db, document_id, stored.filename, exc)
             fallback_reason = str(exc)
         else:
-            return _finish_openaleph_read(db, document_id, read, report, runner=job.runner)
+            message = _finish_openaleph_read(db, document_id, read, report, runner=job.runner)
+            return _check_watchlist_after_read(db, document_id, message)
 
     report(5, "Reading the document")
     doc = extract_document(db, document_id)
@@ -209,6 +214,27 @@ def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str
             return f"Document read; sending it to OpenAleph failed: {sync.error}"
         message = "Document read and sent to OpenAleph"
     return message
+
+
+def _check_watchlist_after_read(db: Session, document_id: str, message: str | None) -> str | None:
+    """OpenAleph has read and indexed the document: search the investigation's
+    watched names (app/services/watchlists.py). A watchlist problem never
+    fails the read; it only goes unmentioned."""
+    from app.models.domain import Document
+    from app.services.watchlists import check_watchlist
+
+    doc = db.get(Document, document_id)
+    if doc is None:
+        return message
+    try:
+        found = check_watchlist(db, doc.investigation_id)
+    except Exception:
+        db.rollback()
+        logger.warning("watchlist check after a read failed", exc_info=True, extra={"document_id": document_id})
+        return message
+    if not found["new_hits"]:
+        return message
+    return f"{message or 'Document read'}; the watchlist found {found['new_hits']} new document(s)"
 
 
 def analyze_document_job(db: Session, job: BackgroundJob, report: Report) -> dict:

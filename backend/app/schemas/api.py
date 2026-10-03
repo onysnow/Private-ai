@@ -405,6 +405,11 @@ class PromoteToDeckRequest(BaseModel):
     visual_styles: dict[str, VisualStyle] = Field(default_factory=dict)
 
 
+class WatchlistEntryCreate(BaseModel):
+    query: str = Field(min_length=1, max_length=512, description="A name, searched as a phrase, or a search in OpenAleph's syntax.")
+    note: str | None = Field(default=None, max_length=2000)
+
+
 class IngestionBatchCreate(BaseModel):
     label: str | None = Field(default=None, max_length=512, description="What the import holds; 'Bulk import' when left out.")
 

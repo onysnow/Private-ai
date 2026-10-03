@@ -278,6 +278,24 @@ def _cross_reference(investigation_id: str, entity_id: str) -> str:
         return row.id
 
 
+def _watchlist_hit(entry_id: str, document_id: str) -> str:
+    """A document a watched name was found in, as a check keeps it
+    (app/services/watchlists.py check_entry); the demo investigation is never
+    sent to OpenAleph, so it is written directly."""
+    from app.db.session import SessionLocal
+    from app.models.domain import WatchlistEntry, WatchlistHit
+
+    with SessionLocal() as db:
+        entry = db.get(WatchlistEntry, entry_id)
+        assert entry is not None
+        row = WatchlistHit(investigation_id=entry.investigation_id, entry_id=entry_id, document_key="1.upload",
+                           document_id=document_id, title="memo.txt", page_number=None,
+                           highlights=[[{"text": "Meridian Holdings Ltd", "match": True}, {"text": " paid Bellcastle.", "match": False}]])
+        db.add(row)
+        db.commit()
+        return row.id
+
+
 def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, reasoning: Any) -> Seeded:
     """The demo investigation and one of everything else the API can read."""
     def ok(response: httpx.Response) -> Any:
@@ -311,6 +329,9 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     # the fallback reader used here has no analysis, so it is written directly.
     identifier = _identifier_proposal(document["id"])
     email = _email_document(document["id"])
+    # A watched name and a document it was found in.
+    watched = ok(client.post(f"{base}/watchlist", json={"query": "Meridian Holdings", "note": "The holding company"}))["entries"][0]["id"]
+    watch_hit = _watchlist_hit(watched, document["id"])
 
     # Connector findings, a statement assessment, an external relationship review, an enrichment session.
     findings = ok(client.post("/api/connectors/fake-a/search", json={"investigation_id": inv, "query": "Meridian"}))
@@ -362,6 +383,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             "task_id": task, "cross_reference_id": _cross_reference(inv, meridian), "batch_id": batch["id"],
             "user_id": user["id"], "aid": activity, "bid": backup["id"], "kind": "investigation_export", "qid": saved["id"],
             "name": "investigations", "pk": inv, "source": "app", "uid": user["id"], "tid": token["token_id"],
+            "watch_id": watched, "hit_id": watch_hit,
         },
         per_operation={
             ("GET", "/api/ai-analysis-candidates/{candidate_id}"): {"candidate_id": ai_candidate},

@@ -11,12 +11,14 @@ import { client } from '../client.gen';
 import {
   addChartToDeckEndpoint,
   addChartToWriteupEndpoint,
+  addWatchlistEntry,
   analyzeOpenalephDocument,
   assessStatement,
   attachRelationshipEvidenceEndpoint,
   cancelJobEndpoint,
   canonicalEntityResolution,
   capabilities,
+  checkWatchlistNow,
   connectors,
   connectorSearch,
   convertLeadEndpoint,
@@ -43,6 +45,7 @@ import {
   deleteDeckEndpoint,
   deleteInvestigationMembership,
   deleteWriteupEndpoint,
+  dismissHit,
   enrichEntity,
   enrichEntityMulti,
   enrichmentSessionClusters,
@@ -92,6 +95,7 @@ import {
   getSecurityAuditRetentionPreview,
   getSecurityAuditSummary,
   getSimilarDocuments,
+  getWatchlist,
   getWriteupEndpoint,
   health,
   importOpenalephDocumentEntities,
@@ -142,6 +146,7 @@ import {
   listSourceEvidenceEndpoint,
   listSources,
   listWriteupsEndpoint,
+  makeLeadFromHit,
   openalephIntegrationStatus,
   type Options,
   presentationStyles,
@@ -155,6 +160,7 @@ import {
   refreshOpenalephDocumentReview,
   relationshipSchemas,
   removeInvestigation,
+  removeWatchlistEntry,
   resolveFinding,
   restoreBackup,
   retryJobEndpoint,
@@ -188,6 +194,9 @@ import type {
   AddChartToWriteupEndpointData,
   AddChartToWriteupEndpointError,
   AddChartToWriteupEndpointResponse,
+  AddWatchlistEntryData,
+  AddWatchlistEntryError,
+  AddWatchlistEntryResponse,
   AnalyzeOpenalephDocumentData,
   AnalyzeOpenalephDocumentError,
   AnalyzeOpenalephDocumentResponse,
@@ -206,6 +215,9 @@ import type {
   CapabilitiesData,
   CapabilitiesError,
   CapabilitiesResponse,
+  CheckWatchlistNowData,
+  CheckWatchlistNowError,
+  CheckWatchlistNowResponse,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchError,
@@ -284,6 +296,9 @@ import type {
   DeleteWriteupEndpointData,
   DeleteWriteupEndpointError,
   DeleteWriteupEndpointResponse,
+  DismissHitData,
+  DismissHitError,
+  DismissHitResponse,
   EnrichEntityData,
   EnrichEntityError,
   EnrichEntityMultiData,
@@ -431,6 +446,9 @@ import type {
   GetSimilarDocumentsData,
   GetSimilarDocumentsError,
   GetSimilarDocumentsResponse,
+  GetWatchlistData,
+  GetWatchlistError,
+  GetWatchlistResponse,
   GetWriteupEndpointData,
   GetWriteupEndpointError,
   GetWriteupEndpointResponse,
@@ -581,6 +599,9 @@ import type {
   ListWriteupsEndpointData,
   ListWriteupsEndpointError,
   ListWriteupsEndpointResponse,
+  MakeLeadFromHitData,
+  MakeLeadFromHitError,
+  MakeLeadFromHitResponse,
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusError,
   OpenalephIntegrationStatusResponse,
@@ -617,6 +638,9 @@ import type {
   RemoveInvestigationData,
   RemoveInvestigationError,
   RemoveInvestigationResponse,
+  RemoveWatchlistEntryData,
+  RemoveWatchlistEntryError,
+  RemoveWatchlistEntryResponse,
   ResolveFindingData,
   ResolveFindingError,
   ResolveFindingResponse,
@@ -4930,6 +4954,91 @@ export const investigationVisualRestyleMutation = (
   return mutationOptions;
 };
 
+export const getWatchlistQueryKey = (options: Options<GetWatchlistData>) =>
+  createQueryKey('getWatchlist', options);
+
+/**
+ * Get Watchlist
+ *
+ * The watched names and the documents each was found in.
+ */
+export const getWatchlistOptions = (options: Options<GetWatchlistData>) =>
+  queryOptions<
+    GetWatchlistResponse,
+    GetWatchlistError,
+    GetWatchlistResponse,
+    ReturnType<typeof getWatchlistQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getWatchlist({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getWatchlistQueryKey(options),
+  });
+
+/**
+ * Add Watchlist Entry
+ *
+ * Watch a name: it is searched whenever OpenAleph has read a new document of the investigation.
+ */
+export const addWatchlistEntryMutation = (
+  options?: Partial<Options<AddWatchlistEntryData>>,
+): UseMutationOptions<
+  AddWatchlistEntryResponse,
+  AddWatchlistEntryError,
+  Options<AddWatchlistEntryData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AddWatchlistEntryResponse,
+    AddWatchlistEntryError,
+    Options<AddWatchlistEntryData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await addWatchlistEntry({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Check Watchlist Now
+ *
+ * Search every watched name now. OpenAleph being off or unreachable is each entry's check state.
+ */
+export const checkWatchlistNowMutation = (
+  options?: Partial<Options<CheckWatchlistNowData>>,
+): UseMutationOptions<
+  CheckWatchlistNowResponse,
+  CheckWatchlistNowError,
+  Options<CheckWatchlistNowData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CheckWatchlistNowResponse,
+    CheckWatchlistNowError,
+    Options<CheckWatchlistNowData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await checkWatchlistNow({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const listWriteupsEndpointQueryKey = (
   options: Options<ListWriteupsEndpointData>,
 ) => createQueryKey('listWriteupsEndpoint', options);
@@ -6155,6 +6264,91 @@ export const createTimelineEventEndpointMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await createTimelineEventEndpoint({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Dismiss Hit
+ */
+export const dismissHitMutation = (
+  options?: Partial<Options<DismissHitData>>,
+): UseMutationOptions<
+  DismissHitResponse,
+  DismissHitError,
+  Options<DismissHitData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DismissHitResponse,
+    DismissHitError,
+    Options<DismissHitData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await dismissHit({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Make Lead From Hit
+ *
+ * Make a hit a lead, linked to the source of the document it was found in.
+ */
+export const makeLeadFromHitMutation = (
+  options?: Partial<Options<MakeLeadFromHitData>>,
+): UseMutationOptions<
+  MakeLeadFromHitResponse,
+  MakeLeadFromHitError,
+  Options<MakeLeadFromHitData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MakeLeadFromHitResponse,
+    MakeLeadFromHitError,
+    Options<MakeLeadFromHitData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await makeLeadFromHit({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Remove Watchlist Entry
+ *
+ * Stop watching a name. Its hits go; leads made from them stay.
+ */
+export const removeWatchlistEntryMutation = (
+  options?: Partial<Options<RemoveWatchlistEntryData>>,
+): UseMutationOptions<
+  RemoveWatchlistEntryResponse,
+  RemoveWatchlistEntryError,
+  Options<RemoveWatchlistEntryData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RemoveWatchlistEntryResponse,
+    RemoveWatchlistEntryError,
+    Options<RemoveWatchlistEntryData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await removeWatchlistEntry({
         ...options,
         ...fnOptions,
         throwOnError: true,

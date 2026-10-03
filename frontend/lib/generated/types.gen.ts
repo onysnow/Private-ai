@@ -11383,6 +11383,149 @@ export type VisualStyleOut = {
 };
 
 /**
+ * WatchlistCheckOut
+ *
+ * The watchlist after a check, and how many documents it newly turned up.
+ */
+export type WatchlistCheckOut = {
+  /**
+   * Checked
+   */
+  checked: number;
+  /**
+   * Entries
+   */
+  entries: Array<WatchlistEntryOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * New Hits
+   */
+  new_hits: number;
+};
+
+/**
+ * WatchlistEntryCreate
+ */
+export type WatchlistEntryCreate = {
+  /**
+   * Note
+   */
+  note?: string | null;
+  /**
+   * Query
+   *
+   * A name, searched as a phrase, or a search in OpenAleph's syntax.
+   */
+  query: string;
+};
+
+/**
+ * WatchlistEntryOut
+ *
+ * A watched name, when it was last checked (``check_state`` as the corpus
+ * search reports it), and the documents it was found in, newest first.
+ */
+export type WatchlistEntryOut = {
+  /**
+   * Check Detail
+   */
+  check_detail: string | null;
+  /**
+   * Check State
+   */
+  check_state: string | null;
+  /**
+   * Checked At
+   */
+  checked_at: string | null;
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by: string | null;
+  /**
+   * Hits
+   */
+  hits: Array<WatchlistHitOut>;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Note
+   */
+  note: string | null;
+  /**
+   * Query
+   */
+  query: string;
+};
+
+/**
+ * WatchlistHitOut
+ *
+ * A document a watched name was found in (app/services/watchlists.py).
+ */
+export type WatchlistHitOut = {
+  /**
+   * Document Id
+   */
+  document_id: string | null;
+  /**
+   * Found At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  found_at: string;
+  /**
+   * Highlights
+   */
+  highlights: Array<Array<HighlightSegmentOut>>;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Lead Id
+   */
+  lead_id: string | null;
+  /**
+   * Page Number
+   */
+  page_number: number | null;
+  /**
+   * Status
+   */
+  status: 'new' | 'lead' | 'dismissed';
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * WatchlistOut
+ */
+export type WatchlistOut = {
+  /**
+   * Entries
+   */
+  entries: Array<WatchlistEntryOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+};
+
+/**
  * WriteupCreate
  */
 export type WriteupCreate = {
@@ -16189,6 +16332,113 @@ export type InvestigationVisualRestyleResponses = {
 export type InvestigationVisualRestyleResponse =
   InvestigationVisualRestyleResponses[keyof InvestigationVisualRestyleResponses];
 
+export type GetWatchlistData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/watchlist';
+};
+
+export type GetWatchlistErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetWatchlistError = GetWatchlistErrors[keyof GetWatchlistErrors];
+
+export type GetWatchlistResponses = {
+  /**
+   * Successful Response
+   */
+  200: WatchlistOut;
+};
+
+export type GetWatchlistResponse =
+  GetWatchlistResponses[keyof GetWatchlistResponses];
+
+export type AddWatchlistEntryData = {
+  body: WatchlistEntryCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/watchlist';
+};
+
+export type AddWatchlistEntryErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AddWatchlistEntryError =
+  AddWatchlistEntryErrors[keyof AddWatchlistEntryErrors];
+
+export type AddWatchlistEntryResponses = {
+  /**
+   * Successful Response
+   */
+  200: WatchlistOut;
+};
+
+export type AddWatchlistEntryResponse =
+  AddWatchlistEntryResponses[keyof AddWatchlistEntryResponses];
+
+export type CheckWatchlistNowData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/watchlist/check';
+};
+
+export type CheckWatchlistNowErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CheckWatchlistNowError =
+  CheckWatchlistNowErrors[keyof CheckWatchlistNowErrors];
+
+export type CheckWatchlistNowResponses = {
+  /**
+   * Successful Response
+   */
+  200: WatchlistCheckOut;
+};
+
+export type CheckWatchlistNowResponse =
+  CheckWatchlistNowResponses[keyof CheckWatchlistNowResponses];
+
 export type ListWriteupsEndpointData = {
   body?: never;
   path: {
@@ -17755,6 +18005,112 @@ export type CreateTimelineEventEndpointResponses = {
 
 export type CreateTimelineEventEndpointResponse =
   CreateTimelineEventEndpointResponses[keyof CreateTimelineEventEndpointResponses];
+
+export type DismissHitData = {
+  body?: never;
+  path: {
+    /**
+     * Hit Id
+     */
+    hit_id: string;
+  };
+  query?: never;
+  url: '/api/watchlist-hits/{hit_id}/dismiss';
+};
+
+export type DismissHitErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DismissHitError = DismissHitErrors[keyof DismissHitErrors];
+
+export type DismissHitResponses = {
+  /**
+   * Successful Response
+   */
+  200: WatchlistOut;
+};
+
+export type DismissHitResponse = DismissHitResponses[keyof DismissHitResponses];
+
+export type MakeLeadFromHitData = {
+  body?: never;
+  path: {
+    /**
+     * Hit Id
+     */
+    hit_id: string;
+  };
+  query?: never;
+  url: '/api/watchlist-hits/{hit_id}/lead';
+};
+
+export type MakeLeadFromHitErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MakeLeadFromHitError =
+  MakeLeadFromHitErrors[keyof MakeLeadFromHitErrors];
+
+export type MakeLeadFromHitResponses = {
+  /**
+   * Successful Response
+   */
+  200: LeadOut;
+};
+
+export type MakeLeadFromHitResponse =
+  MakeLeadFromHitResponses[keyof MakeLeadFromHitResponses];
+
+export type RemoveWatchlistEntryData = {
+  body?: never;
+  path: {
+    /**
+     * Watch Id
+     */
+    watch_id: string;
+  };
+  query?: never;
+  url: '/api/watchlist/{watch_id}';
+};
+
+export type RemoveWatchlistEntryErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RemoveWatchlistEntryError =
+  RemoveWatchlistEntryErrors[keyof RemoveWatchlistEntryErrors];
+
+export type RemoveWatchlistEntryResponses = {
+  /**
+   * Successful Response
+   */
+  200: WatchlistOut;
+};
+
+export type RemoveWatchlistEntryResponse =
+  RemoveWatchlistEntryResponses[keyof RemoveWatchlistEntryResponses];
 
 export type CreateWriteupEndpointData = {
   body: WriteupCreate;

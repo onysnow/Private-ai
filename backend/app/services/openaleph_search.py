@@ -123,8 +123,10 @@ def _unavailable(reply: dict[str, Any], state: str, detail: str) -> dict[str, An
 
 
 def search_corpus(db: Session, investigation_id: str, q: str, *, limit: int = 20, offset: int = 0,
-                  fetch: Fetch = _get) -> dict[str, Any]:
-    """Raises ValueError for an unknown investigation."""
+                  fetch: Fetch | None = None) -> dict[str, Any]:
+    """Raises ValueError for an unknown investigation. ``fetch`` replaces the
+    call to OpenAleph (tests)."""
+    fetch = fetch or _get
     if db.get(Investigation, investigation_id) is None:
         raise ValueError("Investigation not found")
     reply: dict[str, Any] = {"investigation_id": investigation_id, "query": q, "state": "ok", "detail": None,

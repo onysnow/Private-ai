@@ -216,6 +216,11 @@ export type LeadQueueBody = {investigation_id: string; total: number; counts: Re
  * panel checks; its counts are tallied from the leads given. */
 /** A lead as the API returns it (the generated LeadOut shape): an unreviewed
  * question with no links, tasks or triage signals, unless a test says otherwise. */
+/** The investigation's watchlist (GET /api/investigations/{id}/watchlist). */
+export function watchlistBody(investigationId: string, entries: Fixture[] = []): Fixture {
+  return {investigation_id: investigationId, entries};
+}
+
 export function leadBody(overrides: Fixture = {}): Fixture {
   return {
     id: 'lead-1', investigation_id: 'inv-1', title: 'Who approved this contract?', status: 'unreviewed', priority: 'normal', owner: null,
@@ -306,6 +311,7 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/ai-analysis-candidates`]: {candidates: records.aiCandidates ?? []},
     [`GET ${base}/corpus/sync`]: corpusSyncBody(id),
     [`GET ${base}/cross-references`]: [],
+    [`GET ${base}/watchlist`]: watchlistBody(id),
   };
 }
 
