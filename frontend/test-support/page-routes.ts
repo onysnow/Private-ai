@@ -14,7 +14,7 @@
 //   const api = mockApi(pageRoutes({investigations: [investigation], leads: [leadFixture()]}));
 //   api.add({'POST /api/leads': {id: 'lead-2'}});           // a route the test's action needs
 //   api.add({...investigationRoutes('inv-restored')});       // a case opened later
-import type {CorpusSearchOut, CorpusStatusOut, DocumentFormatsOut, DossierExternalOut, DossierSummaryOut, InvestigationOut, PostMergeReconciliationOut} from '../lib/generated/types.gen';
+import type {CorpusSearchOut, CorpusStatusOut, DocumentFormatsOut, DossierExternalOut, DossierSummaryOut, InvestigationOut, OwnershipChainOut, PostMergeReconciliationOut} from '../lib/generated/types.gen';
 import type {Routes} from './mock-api';
 
 /** A reply as a test writes it: the generated shape, with whatever a test overrides. */
@@ -151,12 +151,19 @@ export function emptyReconciliation(entityId = 'ent-1'): PostMergeReconciliation
   };
 }
 
-/** The three routes opening an entity's dossier requests. */
-export function dossierRoutes(entityId: string, dossier: unknown, duplicates: unknown[] = [], reconciliation: unknown = emptyReconciliation(entityId)): Routes {
+/** An ownership chain with no links (GET /api/entities/{id}/ownership-chain). */
+export function emptyOwnershipChain(entityId: string): OwnershipChainOut {
+  return {entity_id: entityId, nodes: [{id: entityId, caption: 'Entity', schema: 'Company', level: 0, is_subject: true}], links: [], owners: [], max_depth: 6, truncated: false};
+}
+
+/** The routes opening an entity's dossier requests. */
+export function dossierRoutes(entityId: string, dossier: unknown, duplicates: unknown[] = [], reconciliation: unknown = emptyReconciliation(entityId),
+  chain: unknown = emptyOwnershipChain(entityId)): Routes {
   return {
     [`GET /api/entities/${entityId}/dossier`]: dossier,
     [`GET /api/entities/${entityId}/duplicate-candidates`]: duplicates,
     [`GET /api/entities/${entityId}/post-merge-reconciliation`]: reconciliation,
+    [`GET /api/entities/${entityId}/ownership-chain`]: chain,
   };
 }
 

@@ -19,7 +19,7 @@ import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
 import type {Routes} from '../test-support/mock-api';
-import {dossierFixture, dossierRoutes, emptyReconciliation, entityFixture, findingFixture, leadQueueBody, relationshipFixture} from '../test-support/page-routes';
+import {dossierFixture, dossierRoutes, emptyOwnershipChain, emptyReconciliation, entityFixture, findingFixture, leadQueueBody, relationshipFixture} from '../test-support/page-routes';
 
 const wrap = (node: ReactElement) => render(<QueryProvider>{node}</QueryProvider>);
 
@@ -252,7 +252,8 @@ describe('DossierPanel', () => {
   it('answers a request for a merged alias with the surviving record, and moves the selected entity to it', async () => {
     const alias = entityFixture('ent-9', 'Kestrelwood Holdings LLC', 'Company', {merged_into_entity_id: 'ent-1'});
     const resolved = dossierFixture(entityA, {alias_resolution: {requested_entity_id: 'ent-9', requested_caption: 'Kestrelwood Holdings LLC', active_entity_id: 'ent-1', active_caption: 'Kestrelwood Holdings Ltd', alias_chain: [{id: 'ent-9', caption: 'Kestrelwood Holdings LLC', merged_into_entity_id: 'ent-1'}]}});
-    const api = mockApi({'GET /api/entities/ent-9/dossier': resolved, [DUPLICATES]: [], [RECONCILIATION]: emptyReconciliation('ent-1')});
+    const api = mockApi({'GET /api/entities/ent-9/dossier': resolved, [DUPLICATES]: [], [RECONCILIATION]: emptyReconciliation('ent-1'),
+      'GET /api/entities/ent-1/ownership-chain': emptyOwnershipChain('ent-1')});
     wrap(<DossierPanel investigationId="inv-1"/>);
     useWorkbenchStore.getState().openDossier(alias.id);
     await screen.findByText('Kestrelwood Holdings Ltd dossier');

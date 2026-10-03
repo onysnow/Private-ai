@@ -261,6 +261,9 @@ import type {
   GetOrphanStoragePreviewData,
   GetOrphanStoragePreviewErrors,
   GetOrphanStoragePreviewResponses,
+  GetOwnershipChainData,
+  GetOwnershipChainErrors,
+  GetOwnershipChainResponses,
   GetRecordProvenanceTraceData,
   GetRecordProvenanceTraceErrors,
   GetRecordProvenanceTraceResponses,
@@ -749,6 +752,8 @@ import {
   zGetOpenalephDocumentSyncPath,
   zGetOpenalephDocumentSyncResponse,
   zGetOrphanStoragePreviewResponse,
+  zGetOwnershipChainPath,
+  zGetOwnershipChainResponse,
   zGetRecordProvenanceTraceQuery,
   zGetRecordProvenanceTraceResponse,
   zGetSecurityAlertsQuery,
@@ -3150,6 +3155,38 @@ export const entityMergePreview = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zEntityMergePreviewResponse.parseAsync(data),
     url: '/api/entities/{entity_id}/merge-preview',
+    ...options,
+  });
+
+/**
+ * Get Ownership Chain
+ *
+ * Who owns and controls the entity, and what it owns, from the
+ * investigation's Ownership and Directorship links.
+ */
+export const getOwnershipChain = <ThrowOnError extends boolean = false>(
+  options: Options<GetOwnershipChainData, ThrowOnError>,
+): RequestResult<
+  GetOwnershipChainResponses,
+  GetOwnershipChainErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetOwnershipChainResponses,
+    GetOwnershipChainErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetOwnershipChainPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetOwnershipChainResponse.parseAsync(data),
+    url: '/api/entities/{entity_id}/ownership-chain',
     ...options,
   });
 

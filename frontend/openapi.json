@@ -18745,6 +18745,223 @@
         "title": "OrphanStoragePreviewOut",
         "type": "object"
       },
+      "OwnershipChainLinkOut": {
+        "description": "An Ownership or Directorship link as the records state it.",
+        "properties": {
+          "circular": {
+            "title": "Circular",
+            "type": "boolean"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "ended": {
+            "title": "Ended",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percentage"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "schema",
+          "source",
+          "target",
+          "ended",
+          "circular"
+        ],
+        "title": "OwnershipChainLinkOut",
+        "type": "object"
+      },
+      "OwnershipChainNodeOut": {
+        "description": "A party in the chain: level 0 is the entity asked about, negative levels\nare its owners (and directors), positive levels what it owns.",
+        "properties": {
+          "caption": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caption"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "is_subject": {
+            "title": "Is Subject",
+            "type": "boolean"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "schema",
+          "level",
+          "is_subject"
+        ],
+        "title": "OwnershipChainNodeOut",
+        "type": "object"
+      },
+      "OwnershipChainOut": {
+        "description": "Who owns and controls an entity, and what it owns (app/services/ownership_chain.py).",
+        "properties": {
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "links": {
+            "items": {
+              "$ref": "#/components/schemas/OwnershipChainLinkOut"
+            },
+            "title": "Links",
+            "type": "array"
+          },
+          "max_depth": {
+            "title": "Max Depth",
+            "type": "integer"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/OwnershipChainNodeOut"
+            },
+            "title": "Nodes",
+            "type": "array"
+          },
+          "owners": {
+            "items": {
+              "$ref": "#/components/schemas/OwnershipChainOwnerOut"
+            },
+            "title": "Owners",
+            "type": "array"
+          },
+          "truncated": {
+            "title": "Truncated",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "entity_id",
+          "nodes",
+          "links",
+          "owners",
+          "max_depth",
+          "truncated"
+        ],
+        "title": "OwnershipChainOut",
+        "type": "object"
+      },
+      "OwnershipChainOwnerOut": {
+        "description": "The share an owner holds through every path, or why it is not known.",
+        "properties": {
+          "direct": {
+            "title": "Direct",
+            "type": "boolean"
+          },
+          "effective_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective Percentage"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "not_known_because": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Not Known Because"
+          },
+          "paths": {
+            "title": "Paths",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "entity_id",
+          "paths",
+          "direct"
+        ],
+        "title": "OwnershipChainOwnerOut",
+        "type": "object"
+      },
       "PlanIn": {
         "properties": {
           "target": {
@@ -35962,6 +36179,56 @@
           }
         },
         "summary": "Entity Merge Preview"
+      }
+    },
+    "/api/entities/{entity_id}/ownership-chain": {
+      "get": {
+        "description": "Who owns and controls the entity, and what it owns, from the\ninvestigation's Ownership and Directorship links.",
+        "operationId": "get_ownership_chain",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entity_id",
+            "required": true,
+            "schema": {
+              "title": "Entity Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnershipChainOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Ownership Chain"
       }
     },
     "/api/entities/{entity_id}/post-merge-reconciliation": {

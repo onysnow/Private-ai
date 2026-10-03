@@ -8593,6 +8593,143 @@ export type OrphanStoragePreviewOut = {
 };
 
 /**
+ * OwnershipChainLinkOut
+ *
+ * An Ownership or Directorship link as the records state it.
+ */
+export type OwnershipChainLinkOut = {
+  /**
+   * Circular
+   */
+  circular: boolean;
+  /**
+   * End Date
+   */
+  end_date?: string | null;
+  /**
+   * Ended
+   */
+  ended: boolean;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Percentage
+   */
+  percentage?: number | null;
+  /**
+   * Role
+   */
+  role?: string | null;
+  /**
+   * Schema
+   */
+  schema: string;
+  /**
+   * Source
+   */
+  source: string;
+  /**
+   * Start Date
+   */
+  start_date?: string | null;
+  /**
+   * Target
+   */
+  target: string;
+};
+
+/**
+ * OwnershipChainNodeOut
+ *
+ * A party in the chain: level 0 is the entity asked about, negative levels
+ * are its owners (and directors), positive levels what it owns.
+ */
+export type OwnershipChainNodeOut = {
+  /**
+   * Caption
+   */
+  caption?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Is Subject
+   */
+  is_subject: boolean;
+  /**
+   * Level
+   */
+  level: number;
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
+ * OwnershipChainOut
+ *
+ * Who owns and controls an entity, and what it owns (app/services/ownership_chain.py).
+ */
+export type OwnershipChainOut = {
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Links
+   */
+  links: Array<OwnershipChainLinkOut>;
+  /**
+   * Max Depth
+   */
+  max_depth: number;
+  /**
+   * Nodes
+   */
+  nodes: Array<OwnershipChainNodeOut>;
+  /**
+   * Owners
+   */
+  owners: Array<OwnershipChainOwnerOut>;
+  /**
+   * Truncated
+   */
+  truncated: boolean;
+};
+
+/**
+ * OwnershipChainOwnerOut
+ *
+ * The share an owner holds through every path, or why it is not known.
+ */
+export type OwnershipChainOwnerOut = {
+  /**
+   * Direct
+   */
+  direct: boolean;
+  /**
+   * Effective Percentage
+   */
+  effective_percentage?: number | null;
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Not Known Because
+   */
+  not_known_because?: string | null;
+  /**
+   * Paths
+   */
+  paths: number;
+};
+
+/**
  * PlatformsOut
  */
 export type PlatformsOut = {
@@ -14750,6 +14887,42 @@ export type EntityMergePreviewResponses = {
 
 export type EntityMergePreviewResponse =
   EntityMergePreviewResponses[keyof EntityMergePreviewResponses];
+
+export type GetOwnershipChainData = {
+  body?: never;
+  path: {
+    /**
+     * Entity Id
+     */
+    entity_id: string;
+  };
+  query?: never;
+  url: '/api/entities/{entity_id}/ownership-chain';
+};
+
+export type GetOwnershipChainErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetOwnershipChainError =
+  GetOwnershipChainErrors[keyof GetOwnershipChainErrors];
+
+export type GetOwnershipChainResponses = {
+  /**
+   * Successful Response
+   */
+  200: OwnershipChainOut;
+};
+
+export type GetOwnershipChainResponse =
+  GetOwnershipChainResponses[keyof GetOwnershipChainResponses];
 
 export type EntityPostMergeReconciliationData = {
   body?: never;

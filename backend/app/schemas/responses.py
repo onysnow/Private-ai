@@ -2328,6 +2328,51 @@ class DossierExternalOut(ResponseModel):
     cross_provider_decisions: list[CrossProviderDecisionOut]
 
 
+class OwnershipChainNodeOut(ResponseModel):
+    """A party in the chain: level 0 is the entity asked about, negative levels
+    are its owners (and directors), positive levels what it owns."""
+    id: str
+    caption: str | None = None
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+    schema_: str = Field(alias="schema")
+    level: int
+    is_subject: bool
+
+
+class OwnershipChainLinkOut(ResponseModel):
+    """An Ownership or Directorship link as the records state it."""
+    id: str
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+    schema_: str = Field(alias="schema")
+    source: str
+    target: str
+    percentage: float | None = None
+    role: str | None = None
+    start_date: str | None = None
+    end_date: str | None = None
+    ended: bool
+    circular: bool
+
+
+class OwnershipChainOwnerOut(ResponseModel):
+    """The share an owner holds through every path, or why it is not known."""
+    entity_id: str
+    paths: int
+    direct: bool
+    effective_percentage: float | None = None
+    not_known_because: str | None = None
+
+
+class OwnershipChainOut(ResponseModel):
+    """Who owns and controls an entity, and what it owns (app/services/ownership_chain.py)."""
+    entity_id: str
+    nodes: list[OwnershipChainNodeOut]
+    links: list[OwnershipChainLinkOut]
+    owners: list[OwnershipChainOwnerOut]
+    max_depth: int
+    truncated: bool
+
+
 class EntityDossierOut(ResponseModel):
     """Everything the workbench holds about one canonical entity."""
     entity: EntityOut

@@ -3545,6 +3545,65 @@ export const zOrphanFileOut = z.object({
 });
 
 /**
+ * OwnershipChainLinkOut
+ *
+ * An Ownership or Directorship link as the records state it.
+ */
+export const zOwnershipChainLinkOut = z.object({
+  circular: z.boolean(),
+  end_date: z.string().nullish(),
+  ended: z.boolean(),
+  id: z.string(),
+  percentage: z.number().nullish(),
+  role: z.string().nullish(),
+  schema: z.string(),
+  source: z.string(),
+  start_date: z.string().nullish(),
+  target: z.string(),
+});
+
+/**
+ * OwnershipChainNodeOut
+ *
+ * A party in the chain: level 0 is the entity asked about, negative levels
+ * are its owners (and directors), positive levels what it owns.
+ */
+export const zOwnershipChainNodeOut = z.object({
+  caption: z.string().nullish(),
+  id: z.string(),
+  is_subject: z.boolean(),
+  level: z.number().int(),
+  schema: z.string(),
+});
+
+/**
+ * OwnershipChainOwnerOut
+ *
+ * The share an owner holds through every path, or why it is not known.
+ */
+export const zOwnershipChainOwnerOut = z.object({
+  direct: z.boolean(),
+  effective_percentage: z.number().nullish(),
+  entity_id: z.string(),
+  not_known_because: z.string().nullish(),
+  paths: z.number().int(),
+});
+
+/**
+ * OwnershipChainOut
+ *
+ * Who owns and controls an entity, and what it owns (app/services/ownership_chain.py).
+ */
+export const zOwnershipChainOut = z.object({
+  entity_id: z.string(),
+  links: z.array(zOwnershipChainLinkOut),
+  max_depth: z.number().int(),
+  nodes: z.array(zOwnershipChainNodeOut),
+  owners: z.array(zOwnershipChainOwnerOut),
+  truncated: z.boolean(),
+});
+
+/**
  * PlatformsOut
  */
 export const zPlatformsOut = z.object({
@@ -6477,6 +6536,15 @@ export const zEntityMergePreviewQuery = z.object({
  * Successful Response
  */
 export const zEntityMergePreviewResponse = zCanonicalMergePreviewOut;
+
+export const zGetOwnershipChainPath = z.object({
+  entity_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetOwnershipChainResponse = zOwnershipChainOut;
 
 export const zEntityPostMergeReconciliationPath = z.object({
   entity_id: z.string(),

@@ -22,6 +22,7 @@ from app.schemas.api import (
 )
 from app.services.connectors import enrich_entity as _enrich_entity_single
 from app.services.dossier import entity_dossier
+from app.services.ownership_chain import ownership_chain
 from app.services.entity_merge import execute_entity_merge, preview_entity_merge
 from app.services.post_merge_reconciliation import (
     detect_post_merge_reconciliation,
@@ -33,7 +34,7 @@ from app.services.resolution import canonical_duplicate_candidates, record_canon
 from app.schemas.responses import (
     CanonicalDuplicateCandidateOut, CanonicalEntityMergeAuditOut, CanonicalMergeExecuteOut, CanonicalMergePreviewOut,
     CanonicalResolutionDecisionOut, ConnectorFindingOut, CrossProviderDecisionOut, EnrichmentSessionDetailOut,
-    EnrichmentSessionRowOut, EntityDossierOut, EntityOut, EntityRelationshipOut, EntityStatementOut,
+    EnrichmentSessionRowOut, EntityDossierOut, EntityOut, OwnershipChainOut, EntityRelationshipOut, EntityStatementOut,
     ExternalRelationshipPromotionOut, PostMergeReconciliationOut, PropertyConflictDecisionOut,
     ReconciliationDecisionOut, StatementHistoryRowOut, StatementPromotionOut, upstream,
 )
@@ -93,6 +94,16 @@ def get_entity_dossier(entity_id: str, db: Session = Depends(get_db)) -> Any:
         return entity_dossier(db, entity_id)
     except ValueError as exc:
         raise HTTPException(404, str(exc))
+
+
+@router.get("/entities/{entity_id}/ownership-chain", response_model=OwnershipChainOut)
+def get_ownership_chain(entity_id: str, db: Session = Depends(get_db)) -> Any:
+    """Who owns and controls the entity, and what it owns, from the
+    investigation's Ownership and Directorship links."""
+    entity = db.get(Entity, entity_id)
+    if entity is None:
+        raise HTTPException(404, "entity not found")
+    return ownership_chain(db, entity)
 
 
 @router.post("/entities/{entity_id}/property-conflicts/{prop}/decisions", response_model=PropertyConflictDecisionOut)

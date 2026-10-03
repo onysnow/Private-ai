@@ -25,7 +25,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {mockApi} from '../test-support/mock-api';
 import type {MockApi} from '../test-support/mock-api';
-import {dossierFixture as baseDossier, emptyReconciliation, entityFixture, pageRoutes} from '../test-support/page-routes';
+import {dossierFixture as baseDossier, emptyOwnershipChain, emptyReconciliation, entityFixture, pageRoutes} from '../test-support/page-routes';
 
 beforeEach(() => {
   if (!window.matchMedia) {
@@ -110,6 +110,7 @@ async function bootstrapAndOpenDossier(dossier: unknown): Promise<MockApi> {
     [DOSSIER]: dossier,
     [DUPLICATES]: [],
     [RECONCILIATION]: emptyReconciliation(),
+    'GET /api/entities/ent-1/ownership-chain': emptyOwnershipChain('ent-1'),
   });
 
   const Home = await importHome();

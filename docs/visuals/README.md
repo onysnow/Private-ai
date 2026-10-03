@@ -407,6 +407,45 @@ graphology graph (ADR-0005, line 3; vis-network is gone).
   `test-graph-views.test.tsx`. Checked by eye in Chromium (SwiftShader
   WebGL).
 
+## Pass 4: the ownership and control chain
+
+Who owns and controls a company, and what it owns (the design doc's
+"Ownership and control chain"), on every dossier: a structure chart and,
+beside it, the owners as a table.
+
+- **The chain** (`backend/app/services/ownership_chain.py`,
+  `GET /api/entities/{id}/ownership-chain`): from the entity, the
+  investigation's Ownership links are followed up to its owners and down to
+  its holdings, at most six steps each way (breadth first, so each party sits
+  at its nearest distance), and the Directorship links into every company on
+  the chain add its directors beside it. A reconciled duplicate of a link is
+  not followed, so no stake counts twice. Each link carries what the records
+  state: its percentage (FollowTheMoney's `percentage`), role and dates. A
+  stake whose end date has passed is marked ended, not dropped, and a link
+  that comes back round (A owns B, B owns A, or longer) is marked circular.
+- **Shares through several companies** are the percentages multiplied along
+  each path and added over the paths, as HMRC computes an indirect ownership
+  interest ([MTT17040](https://www.gov.uk/hmrc-internal-manuals/multinational-top-up-tax-and-domestic-top-up-tax/mtt17040))
+  and the FCC computes equity held through intervening companies
+  (47 CFR 1.5002). A share is worked out only when every link on every path
+  states a percentage, none has ended and none runs in a circle; otherwise
+  the table says it is not known and why. It is equity arithmetic, not a
+  finding of control or beneficial ownership, and the panel says so.
+- **The drawing** (`frontend/components/ownership-diagram.tsx`): React Flow
+  (`@xyflow/react` 12, MIT) at places from dagre (`@dagrejs/dagre` 3, MIT),
+  the layered layout React Flow's own examples use
+  (<https://reactflow.dev/examples/layout/dagre>). Owners above what they
+  own and directors above their company, as structure charts are drawn;
+  dagre orders each rank to cut crossings. React Flow draws the parties as
+  HTML, so names wrap and stay text, and brings pan, zoom and keyboard focus;
+  nothing can be dragged or connected. Each link says its share or role in
+  words; an ended stake is dashed and a directorship dotted, so neither rests
+  on colour alone (rule 12). Clicking a party opens its dossier. React Flow
+  is loaded only when a dossier with links is open.
+- Tests: `backend/tests/test_ownership_chain.py`,
+  `frontend/tests/test-ownership-chain.test.tsx` (React Flow stubbed: jsdom
+  does not lay out the page).
+
 ## What pass 3 built, and what is left
 
 Built: the drawing of the seven statistical kinds, the two queries they

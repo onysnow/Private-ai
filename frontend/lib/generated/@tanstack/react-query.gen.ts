@@ -92,6 +92,7 @@ import {
   getOpenalephDocumentReviewStatus,
   getOpenalephDocumentSync,
   getOrphanStoragePreview,
+  getOwnershipChain,
   getRecordProvenanceTrace,
   getSecurityAlerts,
   getSecurityAudit,
@@ -445,6 +446,9 @@ import type {
   GetOrphanStoragePreviewData,
   GetOrphanStoragePreviewError,
   GetOrphanStoragePreviewResponse,
+  GetOwnershipChainData,
+  GetOwnershipChainError,
+  GetOwnershipChainResponse,
   GetRecordProvenanceTraceData,
   GetRecordProvenanceTraceError,
   GetRecordProvenanceTraceResponse,
@@ -2706,6 +2710,37 @@ export const entityMergePreviewOptions = (
       return data;
     },
     queryKey: entityMergePreviewQueryKey(options),
+  });
+
+export const getOwnershipChainQueryKey = (
+  options: Options<GetOwnershipChainData>,
+) => createQueryKey('getOwnershipChain', options);
+
+/**
+ * Get Ownership Chain
+ *
+ * Who owns and controls the entity, and what it owns, from the
+ * investigation's Ownership and Directorship links.
+ */
+export const getOwnershipChainOptions = (
+  options: Options<GetOwnershipChainData>,
+) =>
+  queryOptions<
+    GetOwnershipChainResponse,
+    GetOwnershipChainError,
+    GetOwnershipChainResponse,
+    ReturnType<typeof getOwnershipChainQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getOwnershipChain({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getOwnershipChainQueryKey(options),
   });
 
 export const entityPostMergeReconciliationQueryKey = (

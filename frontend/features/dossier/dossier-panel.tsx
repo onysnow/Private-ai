@@ -35,6 +35,7 @@ import {leadQueueKey} from '../leads/leads-panel';
 import {CorpusExpand} from './corpus-expand';
 import {DuplicateCandidates} from './duplicate-candidates';
 import type {DuplicateDecision} from './duplicate-candidates';
+import {OwnershipChain} from './ownership-chain';
 import {PropertyConflicts} from './property-conflicts';
 import type {PendingConflict} from './property-conflicts';
 import {ReconciliationReview} from './reconciliation-review';
@@ -262,6 +263,7 @@ export function DossierPanel({investigationId}: Props): ReactElement | null {
           </div>;
         })}
       </div>
+      <OwnershipChain key={`chain-${entity.id}`} entityId={entity.id} onParty={openDossier}/>
       <div><b>Claims</b>{dossier.claims.slice(0, 8).map(x => <div key={x.claim.id}><Button onClick={() => openClaim(x.claim.id)}>{x.claim.status}: {x.claim.text}</Button></div>)}</div>
       <div><b>Leads / questions</b>{dossier.leads.slice(0, 8).map(x => <div key={x.lead.id}>{x.lead.status}: {x.lead.title}{x.lead.provider && <small> · {x.lead.provider}</small>}</div>)}</div>
       <div><b>Reporting tasks</b>{dossier.tasks.slice(0, 8).map(t => <div key={t.id}>{t.status}: {t.title}{t.priority && <small> · {t.priority}</small>}{t.owner && <small> · {t.owner}</small>}</div>)}</div>
