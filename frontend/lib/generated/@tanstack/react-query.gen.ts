@@ -73,6 +73,7 @@ import {
   getDocument,
   getDocumentEmail,
   getDocumentFormats,
+  getDocumentTable,
   getEntityDossier,
   getExtractionCandidateExplanation,
   getExtractionCandidateLineage,
@@ -85,6 +86,7 @@ import {
   getInvestigationTimeline,
   getJobEndpoint,
   getLead,
+  getMappingSchemas,
   getOpenalephCorpusBinding,
   getOpenalephDocumentReviewStatus,
   getOpenalephDocumentSync,
@@ -122,6 +124,7 @@ import {
   listDecksEndpoint,
   listDocumentCandidatesEndpoint,
   listDocuments,
+  listDocumentTableMappings,
   listEntities,
   listEntityEnrichmentSessions,
   listEntityPromotions,
@@ -151,6 +154,7 @@ import {
   type Options,
   presentationStyles,
   previewBackupRestore,
+  previewTableMapping,
   promoteAiAnalysisCandidateToDeckEndpoint,
   promoteAiAnalysisCandidateToWriteupEndpoint,
   promoteExternalRelationship,
@@ -171,6 +175,7 @@ import {
   reviewRelationshipEvidenceEndpoint,
   revokeAppUserToken,
   rotateAppUserToken,
+  runTableMapping,
   saveConnectorCredential,
   searchInvestigationCorpus,
   searchWorkbench,
@@ -380,6 +385,9 @@ import type {
   GetDocumentFormatsError,
   GetDocumentFormatsResponse,
   GetDocumentResponse,
+  GetDocumentTableData,
+  GetDocumentTableError,
+  GetDocumentTableResponse,
   GetEntityDossierData,
   GetEntityDossierError,
   GetEntityDossierResponse,
@@ -416,6 +424,9 @@ import type {
   GetLeadData,
   GetLeadError,
   GetLeadResponse,
+  GetMappingSchemasData,
+  GetMappingSchemasError,
+  GetMappingSchemasResponse,
   GetOpenalephCorpusBindingData,
   GetOpenalephCorpusBindingError,
   GetOpenalephCorpusBindingResponse,
@@ -527,6 +538,9 @@ import type {
   ListDocumentsData,
   ListDocumentsError,
   ListDocumentsResponse,
+  ListDocumentTableMappingsData,
+  ListDocumentTableMappingsError,
+  ListDocumentTableMappingsResponse,
   ListEntitiesData,
   ListEntitiesError,
   ListEntitiesResponse,
@@ -611,6 +625,9 @@ import type {
   PreviewBackupRestoreData,
   PreviewBackupRestoreError,
   PreviewBackupRestoreResponse,
+  PreviewTableMappingData,
+  PreviewTableMappingError,
+  PreviewTableMappingResponse,
   PromoteAiAnalysisCandidateToDeckEndpointData,
   PromoteAiAnalysisCandidateToDeckEndpointError,
   PromoteAiAnalysisCandidateToDeckEndpointResponse,
@@ -671,6 +688,9 @@ import type {
   RotateAppUserTokenData,
   RotateAppUserTokenError,
   RotateAppUserTokenResponse,
+  RunTableMappingData,
+  RunTableMappingError,
+  RunTableMappingResponse,
   SaveConnectorCredentialData,
   SaveConnectorCredentialError,
   SaveConnectorCredentialResponse,
@@ -2058,6 +2078,124 @@ export const getSimilarDocumentsOptions = (
     },
     queryKey: getSimilarDocumentsQueryKey(options),
   });
+
+export const getDocumentTableQueryKey = (
+  options: Options<GetDocumentTableData>,
+) => createQueryKey('getDocumentTable', options);
+
+/**
+ * Get Document Table
+ *
+ * The document read as a table: its sheets, columns and first rows.
+ */
+export const getDocumentTableOptions = (
+  options: Options<GetDocumentTableData>,
+) =>
+  queryOptions<
+    GetDocumentTableResponse,
+    GetDocumentTableError,
+    GetDocumentTableResponse,
+    ReturnType<typeof getDocumentTableQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDocumentTable({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDocumentTableQueryKey(options),
+  });
+
+export const listDocumentTableMappingsQueryKey = (
+  options: Options<ListDocumentTableMappingsData>,
+) => createQueryKey('listDocumentTableMappings', options);
+
+/**
+ * List Document Table Mappings
+ *
+ * The mappings run on this document, newest first.
+ */
+export const listDocumentTableMappingsOptions = (
+  options: Options<ListDocumentTableMappingsData>,
+) =>
+  queryOptions<
+    ListDocumentTableMappingsResponse,
+    ListDocumentTableMappingsError,
+    ListDocumentTableMappingsResponse,
+    ReturnType<typeof listDocumentTableMappingsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listDocumentTableMappings({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listDocumentTableMappingsQueryKey(options),
+  });
+
+/**
+ * Run Table Mapping
+ *
+ * Run the mapping on every row: each entity and link becomes a proposal to review.
+ */
+export const runTableMappingMutation = (
+  options?: Partial<Options<RunTableMappingData>>,
+): UseMutationOptions<
+  RunTableMappingResponse,
+  RunTableMappingError,
+  Options<RunTableMappingData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RunTableMappingResponse,
+    RunTableMappingError,
+    Options<RunTableMappingData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await runTableMapping({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Preview Table Mapping
+ *
+ * What the mapping makes from the first rows, and what it would leave out. Nothing is saved.
+ */
+export const previewTableMappingMutation = (
+  options?: Partial<Options<PreviewTableMappingData>>,
+): UseMutationOptions<
+  PreviewTableMappingResponse,
+  PreviewTableMappingError,
+  Options<PreviewTableMappingData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PreviewTableMappingResponse,
+    PreviewTableMappingError,
+    Options<PreviewTableMappingData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await previewTableMapping({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const enrichmentSessionDetailQueryKey = (
   options: Options<EnrichmentSessionDetailData>,
@@ -6246,6 +6384,36 @@ export const promoteStatementAssessmentMutation = (
   };
   return mutationOptions;
 };
+
+export const getMappingSchemasQueryKey = (
+  options?: Options<GetMappingSchemasData>,
+) => createQueryKey('getMappingSchemas', options);
+
+/**
+ * Get Mapping Schemas
+ *
+ * The entity and link kinds a mapping can make, with the properties each takes from a column.
+ */
+export const getMappingSchemasOptions = (
+  options?: Options<GetMappingSchemasData>,
+) =>
+  queryOptions<
+    GetMappingSchemasResponse,
+    GetMappingSchemasError,
+    GetMappingSchemasResponse,
+    ReturnType<typeof getMappingSchemasQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getMappingSchemas({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getMappingSchemasQueryKey(options),
+  });
 
 /**
  * Create Timeline Event Endpoint

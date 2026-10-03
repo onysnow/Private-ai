@@ -17158,6 +17158,385 @@
         "title": "LineageSourceOut",
         "type": "object"
       },
+      "MappedEntityIn": {
+        "additionalProperties": false,
+        "properties": {
+          "key_literal": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Key Literal"
+          },
+          "keys": {
+            "description": "The columns whose values identify the entity: rows with the same values make one entity.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "minItems": 1,
+            "title": "Keys",
+            "type": "array"
+          },
+          "properties": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/MappedPropertyIn"
+            },
+            "title": "Properties",
+            "type": "object"
+          },
+          "schema": {
+            "description": "Person, Company, Organization, PublicBody, LegalEntity, or a link kind.",
+            "maxLength": 64,
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema",
+          "keys"
+        ],
+        "title": "MappedEntityIn",
+        "type": "object"
+      },
+      "MappedEntityOut": {
+        "description": "One entity or link a previewed row makes; a link names its two ends.",
+        "properties": {
+          "caption": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caption"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "properties": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Properties",
+            "type": "object"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target"
+          }
+        },
+        "required": [
+          "name",
+          "schema",
+          "caption",
+          "properties"
+        ],
+        "title": "MappedEntityOut",
+        "type": "object"
+      },
+      "MappedPropertyIn": {
+        "additionalProperties": false,
+        "description": "Where one property's values come from: a FollowTheMoney property\nmapping (https://followthemoney.tech/docs/mappings/), limited to what the\nWorkbench's mapping screen sets.",
+        "properties": {
+          "column": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The column whose cell is the value.",
+            "title": "Column"
+          },
+          "columns": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 20,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Several columns, joined by `join`.",
+            "title": "Columns"
+          },
+          "entity": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A link's end: the name of another entity of this mapping.",
+            "title": "Entity"
+          },
+          "format": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How a date is written in the cells, as strptime reads it (e.g. %d/%m/%Y).",
+            "title": "Format"
+          },
+          "join": {
+            "anyOf": [
+              {
+                "maxLength": 10,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Join"
+          },
+          "literal": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The same value for every row.",
+            "title": "Literal"
+          },
+          "required": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Required"
+          },
+          "split": {
+            "anyOf": [
+              {
+                "maxLength": 10,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Split one cell into several values on this text.",
+            "title": "Split"
+          }
+        },
+        "title": "MappedPropertyIn",
+        "type": "object"
+      },
+      "MappedRowOut": {
+        "properties": {
+          "cells": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Cells",
+            "type": "object"
+          },
+          "entities": {
+            "items": {
+              "$ref": "#/components/schemas/MappedEntityOut"
+            },
+            "title": "Entities",
+            "type": "array"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "problems": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Problems",
+            "type": "array"
+          }
+        },
+        "required": [
+          "number",
+          "cells",
+          "entities",
+          "problems"
+        ],
+        "title": "MappedRowOut",
+        "type": "object"
+      },
+      "MappingEntitySchemaOut": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "properties": {
+            "items": {
+              "$ref": "#/components/schemas/MappingPropertyOut"
+            },
+            "title": "Properties",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "label",
+          "properties"
+        ],
+        "title": "MappingEntitySchemaOut",
+        "type": "object"
+      },
+      "MappingLinkSchemaOut": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "properties": {
+            "items": {
+              "$ref": "#/components/schemas/MappingPropertyOut"
+            },
+            "title": "Properties",
+            "type": "array"
+          },
+          "source_label": {
+            "title": "Source Label",
+            "type": "string"
+          },
+          "source_prop": {
+            "title": "Source Prop",
+            "type": "string"
+          },
+          "target_label": {
+            "title": "Target Label",
+            "type": "string"
+          },
+          "target_prop": {
+            "title": "Target Prop",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "label",
+          "properties",
+          "source_prop",
+          "target_prop",
+          "source_label",
+          "target_label"
+        ],
+        "title": "MappingLinkSchemaOut",
+        "type": "object"
+      },
+      "MappingPropertyOut": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "label",
+          "type"
+        ],
+        "title": "MappingPropertyOut",
+        "type": "object"
+      },
+      "MappingSchemasOut": {
+        "description": "The kinds a spreadsheet mapping can make, from the FollowTheMoney model.",
+        "properties": {
+          "entities": {
+            "items": {
+              "$ref": "#/components/schemas/MappingEntitySchemaOut"
+            },
+            "title": "Entities",
+            "type": "array"
+          },
+          "links": {
+            "items": {
+              "$ref": "#/components/schemas/MappingLinkSchemaOut"
+            },
+            "title": "Links",
+            "type": "array"
+          }
+        },
+        "required": [
+          "entities",
+          "links"
+        ],
+        "title": "MappingSchemasOut",
+        "type": "object"
+      },
       "MatchedPropertyOut": {
         "description": "One kind of property both entities have, and how well it agrees\n(followthemoney's compare_scores).",
         "properties": {
@@ -21089,6 +21468,24 @@
         "title": "SimilarDocumentsOut",
         "type": "object"
       },
+      "SkippedRowOut": {
+        "properties": {
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "row": {
+            "title": "Row",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "row",
+          "reason"
+        ],
+        "title": "SkippedRowOut",
+        "type": "object"
+      },
       "SlideDrawingOut": {
         "description": "What a deck slide shows for a chart kind PowerPoint cannot hold\nnatively (app/services/decks.py _slide_drawing): the drawing at the\nslide's own scale, or its parts as ranked bars with ``note`` saying why.\n``option`` is null only when not even the bars can be drawn.",
         "properties": {
@@ -21673,6 +22070,265 @@
           "message"
         ],
         "title": "StyleWarningOut",
+        "type": "object"
+      },
+      "TableMappingIn": {
+        "description": "A spreadsheet mapping: the ``entities`` of a FollowTheMoney mapping,\nkeyed by a name the mapping uses to point one entity at another.",
+        "properties": {
+          "entities": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/MappedEntityIn"
+            },
+            "maxProperties": 20,
+            "minProperties": 1,
+            "title": "Entities",
+            "type": "object"
+          },
+          "sheet": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The workbook's sheet; the first when left out.",
+            "title": "Sheet"
+          }
+        },
+        "required": [
+          "entities"
+        ],
+        "title": "TableMappingIn",
+        "type": "object"
+      },
+      "TableMappingOut": {
+        "description": "A mapping that was run, and what it proposed.",
+        "properties": {
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "entities_proposed": {
+            "title": "Entities Proposed",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "links_proposed": {
+            "title": "Links Proposed",
+            "type": "integer"
+          },
+          "query": {
+            "additionalProperties": true,
+            "title": "Query",
+            "type": "object"
+          },
+          "rows_read": {
+            "title": "Rows Read",
+            "type": "integer"
+          },
+          "sheet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sheet"
+          }
+        },
+        "required": [
+          "id",
+          "document_id",
+          "sheet",
+          "query",
+          "created_by",
+          "created_at",
+          "rows_read",
+          "entities_proposed",
+          "links_proposed"
+        ],
+        "title": "TableMappingOut",
+        "type": "object"
+      },
+      "TableMappingPreviewOut": {
+        "properties": {
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/MappedRowOut"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "sheet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sheet"
+          }
+        },
+        "required": [
+          "document_id",
+          "sheet",
+          "rows"
+        ],
+        "title": "TableMappingPreviewOut",
+        "type": "object"
+      },
+      "TableMappingRunOut": {
+        "description": "What a mapping proposed: entities and links to review, how many were\nalready proposed by an earlier mapping of the document, and what it left\nout, row by row.",
+        "properties": {
+          "already_proposed": {
+            "title": "Already Proposed",
+            "type": "integer"
+          },
+          "entities_proposed": {
+            "title": "Entities Proposed",
+            "type": "integer"
+          },
+          "links_proposed": {
+            "title": "Links Proposed",
+            "type": "integer"
+          },
+          "mapping": {
+            "$ref": "#/components/schemas/TableMappingOut"
+          },
+          "skipped": {
+            "items": {
+              "$ref": "#/components/schemas/SkippedRowOut"
+            },
+            "title": "Skipped",
+            "type": "array"
+          }
+        },
+        "required": [
+          "mapping",
+          "entities_proposed",
+          "links_proposed",
+          "already_proposed",
+          "skipped"
+        ],
+        "title": "TableMappingRunOut",
+        "type": "object"
+      },
+      "TableOut": {
+        "description": "A CSV, TSV or XLSX document read as a table (app/services/table_mappings.py):\nits columns, the first rows, and how many rows a mapping would read.",
+        "properties": {
+          "columns": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Columns",
+            "type": "array"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "row_count": {
+            "title": "Row Count",
+            "type": "integer"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/TableRowOut"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "sheet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sheet"
+          },
+          "sheets": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Sheets",
+            "type": "array"
+          },
+          "truncated": {
+            "title": "Truncated",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "document_id",
+          "filename",
+          "sheets",
+          "sheet",
+          "columns",
+          "row_count",
+          "truncated",
+          "rows"
+        ],
+        "title": "TableOut",
+        "type": "object"
+      },
+      "TableRowOut": {
+        "description": "A spreadsheet row: its number in the sheet (the header is row 1) and its cells by column.",
+        "properties": {
+          "cells": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Cells",
+            "type": "object"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "number",
+          "cells"
+        ],
+        "title": "TableRowOut",
         "type": "object"
       },
       "TaskWorkflowEventOut": {
@@ -33827,6 +34483,244 @@
         "summary": "Get Similar Documents"
       }
     },
+    "/api/documents/{document_id}/table": {
+      "get": {
+        "description": "The document read as a table: its sheets, columns and first rows.",
+        "operationId": "get_document_table",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sheet",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sheet"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Document Table"
+      }
+    },
+    "/api/documents/{document_id}/table-mappings": {
+      "get": {
+        "description": "The mappings run on this document, newest first.",
+        "operationId": "list_document_table_mappings",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TableMappingOut"
+                  },
+                  "title": "Response List Document Table Mappings",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "List Document Table Mappings"
+      },
+      "post": {
+        "description": "Run the mapping on every row: each entity and link becomes a proposal to review.",
+        "operationId": "run_table_mapping",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TableMappingIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableMappingRunOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Run Table Mapping"
+      }
+    },
+    "/api/documents/{document_id}/table-mappings/preview": {
+      "post": {
+        "description": "What the mapping makes from the first rows, and what it would leave out. Nothing is saved.",
+        "operationId": "preview_table_mapping",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TableMappingIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableMappingPreviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Preview Table Mapping"
+      }
+    },
     "/api/enrichment-sessions/{session_id}": {
       "get": {
         "operationId": "enrichment_session_detail",
@@ -41075,6 +41969,45 @@
           }
         },
         "summary": "Promote Statement Assessment"
+      }
+    },
+    "/api/table-mapping/schemas": {
+      "get": {
+        "description": "The entity and link kinds a mapping can make, with the properties each takes from a column.",
+        "operationId": "get_mapping_schemas",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingSchemasOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Mapping Schemas"
       }
     },
     "/api/timeline-events": {

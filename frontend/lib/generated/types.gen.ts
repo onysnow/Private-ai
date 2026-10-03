@@ -7578,6 +7578,232 @@ export type LineageSourceOut = {
 };
 
 /**
+ * MappedEntityIn
+ */
+export type MappedEntityIn = {
+  /**
+   * Key Literal
+   */
+  key_literal?: string | null;
+  /**
+   * Keys
+   *
+   * The columns whose values identify the entity: rows with the same values make one entity.
+   */
+  keys: Array<string>;
+  /**
+   * Properties
+   */
+  properties?: {
+    [key: string]: MappedPropertyIn;
+  };
+  /**
+   * Schema
+   *
+   * Person, Company, Organization, PublicBody, LegalEntity, or a link kind.
+   */
+  schema: string;
+};
+
+/**
+ * MappedEntityOut
+ *
+ * One entity or link a previewed row makes; a link names its two ends.
+ */
+export type MappedEntityOut = {
+  /**
+   * Caption
+   */
+  caption: string | null;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Properties
+   */
+  properties: {
+    [key: string]: Array<string>;
+  };
+  /**
+   * Schema
+   */
+  schema: string;
+  /**
+   * Source
+   */
+  source?: string | null;
+  /**
+   * Target
+   */
+  target?: string | null;
+};
+
+/**
+ * MappedPropertyIn
+ *
+ * Where one property's values come from: a FollowTheMoney property
+ * mapping (https://followthemoney.tech/docs/mappings/), limited to what the
+ * Workbench's mapping screen sets.
+ */
+export type MappedPropertyIn = {
+  /**
+   * Column
+   *
+   * The column whose cell is the value.
+   */
+  column?: string | null;
+  /**
+   * Columns
+   *
+   * Several columns, joined by `join`.
+   */
+  columns?: Array<string> | null;
+  /**
+   * Entity
+   *
+   * A link's end: the name of another entity of this mapping.
+   */
+  entity?: string | null;
+  /**
+   * Format
+   *
+   * How a date is written in the cells, as strptime reads it (e.g. %d/%m/%Y).
+   */
+  format?: string | null;
+  /**
+   * Join
+   */
+  join?: string | null;
+  /**
+   * Literal
+   *
+   * The same value for every row.
+   */
+  literal?: string | null;
+  /**
+   * Required
+   */
+  required?: boolean | null;
+  /**
+   * Split
+   *
+   * Split one cell into several values on this text.
+   */
+  split?: string | null;
+};
+
+/**
+ * MappedRowOut
+ */
+export type MappedRowOut = {
+  /**
+   * Cells
+   */
+  cells: {
+    [key: string]: string;
+  };
+  /**
+   * Entities
+   */
+  entities: Array<MappedEntityOut>;
+  /**
+   * Number
+   */
+  number: number;
+  /**
+   * Problems
+   */
+  problems: Array<string>;
+};
+
+/**
+ * MappingEntitySchemaOut
+ */
+export type MappingEntitySchemaOut = {
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Properties
+   */
+  properties: Array<MappingPropertyOut>;
+};
+
+/**
+ * MappingLinkSchemaOut
+ */
+export type MappingLinkSchemaOut = {
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Properties
+   */
+  properties: Array<MappingPropertyOut>;
+  /**
+   * Source Label
+   */
+  source_label: string;
+  /**
+   * Source Prop
+   */
+  source_prop: string;
+  /**
+   * Target Label
+   */
+  target_label: string;
+  /**
+   * Target Prop
+   */
+  target_prop: string;
+};
+
+/**
+ * MappingPropertyOut
+ */
+export type MappingPropertyOut = {
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Type
+   */
+  type: string;
+};
+
+/**
+ * MappingSchemasOut
+ *
+ * The kinds a spreadsheet mapping can make, from the FollowTheMoney model.
+ */
+export type MappingSchemasOut = {
+  /**
+   * Entities
+   */
+  entities: Array<MappingEntitySchemaOut>;
+  /**
+   * Links
+   */
+  links: Array<MappingLinkSchemaOut>;
+};
+
+/**
  * MatchedPropertyOut
  *
  * One kind of property both entities have, and how well it agrees
@@ -9966,6 +10192,20 @@ export type SimilarDocumentsOut = {
 };
 
 /**
+ * SkippedRowOut
+ */
+export type SkippedRowOut = {
+  /**
+   * Reason
+   */
+  reason: string;
+  /**
+   * Row
+   */
+  row: number;
+};
+
+/**
  * SlideDrawingOut
  *
  * What a deck slide shows for a chart kind PowerPoint cannot hold
@@ -10341,6 +10581,179 @@ export type StyleWarningOut = {
    * Option
    */
   option: string;
+};
+
+/**
+ * TableMappingIn
+ *
+ * A spreadsheet mapping: the ``entities`` of a FollowTheMoney mapping,
+ * keyed by a name the mapping uses to point one entity at another.
+ */
+export type TableMappingIn = {
+  /**
+   * Entities
+   */
+  entities: {
+    [key: string]: MappedEntityIn;
+  };
+  /**
+   * Sheet
+   *
+   * The workbook's sheet; the first when left out.
+   */
+  sheet?: string | null;
+};
+
+/**
+ * TableMappingOut
+ *
+ * A mapping that was run, and what it proposed.
+ */
+export type TableMappingOut = {
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by: string | null;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Entities Proposed
+   */
+  entities_proposed: number;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Links Proposed
+   */
+  links_proposed: number;
+  /**
+   * Query
+   */
+  query: {
+    [key: string]: unknown;
+  };
+  /**
+   * Rows Read
+   */
+  rows_read: number;
+  /**
+   * Sheet
+   */
+  sheet: string | null;
+};
+
+/**
+ * TableMappingPreviewOut
+ */
+export type TableMappingPreviewOut = {
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Rows
+   */
+  rows: Array<MappedRowOut>;
+  /**
+   * Sheet
+   */
+  sheet: string | null;
+};
+
+/**
+ * TableMappingRunOut
+ *
+ * What a mapping proposed: entities and links to review, how many were
+ * already proposed by an earlier mapping of the document, and what it left
+ * out, row by row.
+ */
+export type TableMappingRunOut = {
+  /**
+   * Already Proposed
+   */
+  already_proposed: number;
+  /**
+   * Entities Proposed
+   */
+  entities_proposed: number;
+  /**
+   * Links Proposed
+   */
+  links_proposed: number;
+  mapping: TableMappingOut;
+  /**
+   * Skipped
+   */
+  skipped: Array<SkippedRowOut>;
+};
+
+/**
+ * TableOut
+ *
+ * A CSV, TSV or XLSX document read as a table (app/services/table_mappings.py):
+ * its columns, the first rows, and how many rows a mapping would read.
+ */
+export type TableOut = {
+  /**
+   * Columns
+   */
+  columns: Array<string>;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * Row Count
+   */
+  row_count: number;
+  /**
+   * Rows
+   */
+  rows: Array<TableRowOut>;
+  /**
+   * Sheet
+   */
+  sheet: string | null;
+  /**
+   * Sheets
+   */
+  sheets: Array<string>;
+  /**
+   * Truncated
+   */
+  truncated: boolean;
+};
+
+/**
+ * TableRowOut
+ *
+ * A spreadsheet row: its number in the sheet (the header is row 1) and its cells by column.
+ */
+export type TableRowOut = {
+  /**
+   * Cells
+   */
+  cells: {
+    [key: string]: string;
+  };
+  /**
+   * Number
+   */
+  number: number;
 };
 
 /**
@@ -13360,6 +13773,157 @@ export type GetSimilarDocumentsResponses = {
 
 export type GetSimilarDocumentsResponse =
   GetSimilarDocumentsResponses[keyof GetSimilarDocumentsResponses];
+
+export type GetDocumentTableData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: {
+    /**
+     * Sheet
+     */
+    sheet?: string | null;
+  };
+  url: '/api/documents/{document_id}/table';
+};
+
+export type GetDocumentTableErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetDocumentTableError =
+  GetDocumentTableErrors[keyof GetDocumentTableErrors];
+
+export type GetDocumentTableResponses = {
+  /**
+   * Successful Response
+   */
+  200: TableOut;
+};
+
+export type GetDocumentTableResponse =
+  GetDocumentTableResponses[keyof GetDocumentTableResponses];
+
+export type ListDocumentTableMappingsData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/table-mappings';
+};
+
+export type ListDocumentTableMappingsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListDocumentTableMappingsError =
+  ListDocumentTableMappingsErrors[keyof ListDocumentTableMappingsErrors];
+
+export type ListDocumentTableMappingsResponses = {
+  /**
+   * Response List Document Table Mappings
+   *
+   * Successful Response
+   */
+  200: Array<TableMappingOut>;
+};
+
+export type ListDocumentTableMappingsResponse =
+  ListDocumentTableMappingsResponses[keyof ListDocumentTableMappingsResponses];
+
+export type RunTableMappingData = {
+  body: TableMappingIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/table-mappings';
+};
+
+export type RunTableMappingErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RunTableMappingError =
+  RunTableMappingErrors[keyof RunTableMappingErrors];
+
+export type RunTableMappingResponses = {
+  /**
+   * Successful Response
+   */
+  200: TableMappingRunOut;
+};
+
+export type RunTableMappingResponse =
+  RunTableMappingResponses[keyof RunTableMappingResponses];
+
+export type PreviewTableMappingData = {
+  body: TableMappingIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/table-mappings/preview';
+};
+
+export type PreviewTableMappingErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PreviewTableMappingError =
+  PreviewTableMappingErrors[keyof PreviewTableMappingErrors];
+
+export type PreviewTableMappingResponses = {
+  /**
+   * Successful Response
+   */
+  200: TableMappingPreviewOut;
+};
+
+export type PreviewTableMappingResponse =
+  PreviewTableMappingResponses[keyof PreviewTableMappingResponses];
 
 export type EnrichmentSessionDetailData = {
   body?: never;
@@ -17974,6 +18538,37 @@ export type PromoteStatementAssessmentResponses = {
 
 export type PromoteStatementAssessmentResponse =
   PromoteStatementAssessmentResponses[keyof PromoteStatementAssessmentResponses];
+
+export type GetMappingSchemasData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/table-mapping/schemas';
+};
+
+export type GetMappingSchemasErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetMappingSchemasError =
+  GetMappingSchemasErrors[keyof GetMappingSchemasErrors];
+
+export type GetMappingSchemasResponses = {
+  /**
+   * Successful Response
+   */
+  200: MappingSchemasOut;
+};
+
+export type GetMappingSchemasResponse =
+  GetMappingSchemasResponses[keyof GetMappingSchemasResponses];
 
 export type CreateTimelineEventEndpointData = {
   body: TimelineEventCreate;

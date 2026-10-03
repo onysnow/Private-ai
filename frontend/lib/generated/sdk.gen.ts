@@ -204,6 +204,9 @@ import type {
   GetDocumentFormatsErrors,
   GetDocumentFormatsResponses,
   GetDocumentResponses,
+  GetDocumentTableData,
+  GetDocumentTableErrors,
+  GetDocumentTableResponses,
   GetEntityDossierData,
   GetEntityDossierErrors,
   GetEntityDossierResponses,
@@ -240,6 +243,9 @@ import type {
   GetLeadData,
   GetLeadErrors,
   GetLeadResponses,
+  GetMappingSchemasData,
+  GetMappingSchemasErrors,
+  GetMappingSchemasResponses,
   GetOpenalephCorpusBindingData,
   GetOpenalephCorpusBindingErrors,
   GetOpenalephCorpusBindingResponses,
@@ -351,6 +357,9 @@ import type {
   ListDocumentsData,
   ListDocumentsErrors,
   ListDocumentsResponses,
+  ListDocumentTableMappingsData,
+  ListDocumentTableMappingsErrors,
+  ListDocumentTableMappingsResponses,
   ListEntitiesData,
   ListEntitiesErrors,
   ListEntitiesResponses,
@@ -435,6 +444,9 @@ import type {
   PreviewBackupRestoreData,
   PreviewBackupRestoreErrors,
   PreviewBackupRestoreResponses,
+  PreviewTableMappingData,
+  PreviewTableMappingErrors,
+  PreviewTableMappingResponses,
   PromoteAiAnalysisCandidateToDeckEndpointData,
   PromoteAiAnalysisCandidateToDeckEndpointErrors,
   PromoteAiAnalysisCandidateToDeckEndpointResponses,
@@ -495,6 +507,9 @@ import type {
   RotateAppUserTokenData,
   RotateAppUserTokenErrors,
   RotateAppUserTokenResponses,
+  RunTableMappingData,
+  RunTableMappingErrors,
+  RunTableMappingResponses,
   SaveConnectorCredentialData,
   SaveConnectorCredentialErrors,
   SaveConnectorCredentialResponses,
@@ -686,6 +701,9 @@ import {
   zGetDocumentFormatsResponse,
   zGetDocumentPath,
   zGetDocumentResponse,
+  zGetDocumentTablePath,
+  zGetDocumentTableQuery,
+  zGetDocumentTableResponse,
   zGetEntityDossierPath,
   zGetEntityDossierResponse,
   zGetExtractionCandidateExplanationPath,
@@ -712,6 +730,7 @@ import {
   zGetJobEndpointResponse,
   zGetLeadPath,
   zGetLeadResponse,
+  zGetMappingSchemasResponse,
   zGetOpenalephCorpusBindingPath,
   zGetOpenalephCorpusBindingResponse,
   zGetOpenalephDocumentReviewStatusPath,
@@ -797,6 +816,8 @@ import {
   zListDocumentsPath,
   zListDocumentsQuery,
   zListDocumentsResponse,
+  zListDocumentTableMappingsPath,
+  zListDocumentTableMappingsResponse,
   zListEntitiesPath,
   zListEntitiesQuery,
   zListEntitiesResponse,
@@ -859,6 +880,9 @@ import {
   zPresentationStylesResponse,
   zPreviewBackupRestoreBody,
   zPreviewBackupRestoreResponse,
+  zPreviewTableMappingBody,
+  zPreviewTableMappingPath,
+  zPreviewTableMappingResponse,
   zPromoteAiAnalysisCandidateToDeckEndpointBody,
   zPromoteAiAnalysisCandidateToDeckEndpointPath,
   zPromoteAiAnalysisCandidateToDeckEndpointResponse,
@@ -909,6 +933,9 @@ import {
   zRevokeAppUserTokenResponse,
   zRotateAppUserTokenPath,
   zRotateAppUserTokenResponse,
+  zRunTableMappingBody,
+  zRunTableMappingPath,
+  zRunTableMappingResponse,
   zSaveConnectorCredentialBody,
   zSaveConnectorCredentialPath,
   zSaveConnectorCredentialResponse,
@@ -2431,6 +2458,138 @@ export const getSimilarDocuments = <ThrowOnError extends boolean = false>(
       await zGetSimilarDocumentsResponse.parseAsync(data),
     url: '/api/documents/{document_id}/similar',
     ...options,
+  });
+
+/**
+ * Get Document Table
+ *
+ * The document read as a table: its sheets, columns and first rows.
+ */
+export const getDocumentTable = <ThrowOnError extends boolean = false>(
+  options: Options<GetDocumentTableData, ThrowOnError>,
+): RequestResult<
+  GetDocumentTableResponses,
+  GetDocumentTableErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetDocumentTableResponses,
+    GetDocumentTableErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetDocumentTablePath,
+          query: zGetDocumentTableQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDocumentTableResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/table',
+    ...options,
+  });
+
+/**
+ * List Document Table Mappings
+ *
+ * The mappings run on this document, newest first.
+ */
+export const listDocumentTableMappings = <ThrowOnError extends boolean = false>(
+  options: Options<ListDocumentTableMappingsData, ThrowOnError>,
+): RequestResult<
+  ListDocumentTableMappingsResponses,
+  ListDocumentTableMappingsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ListDocumentTableMappingsResponses,
+    ListDocumentTableMappingsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListDocumentTableMappingsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListDocumentTableMappingsResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/table-mappings',
+    ...options,
+  });
+
+/**
+ * Run Table Mapping
+ *
+ * Run the mapping on every row: each entity and link becomes a proposal to review.
+ */
+export const runTableMapping = <ThrowOnError extends boolean = false>(
+  options: Options<RunTableMappingData, ThrowOnError>,
+): RequestResult<
+  RunTableMappingResponses,
+  RunTableMappingErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    RunTableMappingResponses,
+    RunTableMappingErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zRunTableMappingBody,
+          path: zRunTableMappingPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRunTableMappingResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/table-mappings',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Preview Table Mapping
+ *
+ * What the mapping makes from the first rows, and what it would leave out. Nothing is saved.
+ */
+export const previewTableMapping = <ThrowOnError extends boolean = false>(
+  options: Options<PreviewTableMappingData, ThrowOnError>,
+): RequestResult<
+  PreviewTableMappingResponses,
+  PreviewTableMappingErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    PreviewTableMappingResponses,
+    PreviewTableMappingErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPreviewTableMappingBody,
+          path: zPreviewTableMappingPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPreviewTableMappingResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/table-mappings/preview',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -6148,6 +6307,37 @@ export const promoteStatementAssessment = <
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Get Mapping Schemas
+ *
+ * The entity and link kinds a mapping can make, with the properties each takes from a column.
+ */
+export const getMappingSchemas = <ThrowOnError extends boolean = false>(
+  options?: Options<GetMappingSchemasData, ThrowOnError>,
+): RequestResult<
+  GetMappingSchemasResponses,
+  GetMappingSchemasErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetMappingSchemasResponses,
+    GetMappingSchemasErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetMappingSchemasResponse.parseAsync(data),
+    url: '/api/table-mapping/schemas',
+    ...options,
   });
 
 /**

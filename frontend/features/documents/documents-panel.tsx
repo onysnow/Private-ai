@@ -39,6 +39,7 @@ import {CorpusStatus} from './corpus-status';
 import {CONTAINER_SCHEMATA, nestDocuments} from './document-tree';
 import {EmailView} from './email-view';
 import {SimilarDocuments} from './similar-documents';
+import {isTable, TableMapper} from './table-mapper';
 import {IdentifierOwner} from './identifier-owner';
 import {SchemaQuestion} from './schema-question';
 
@@ -106,6 +107,7 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
   const [bulkStatus, setBulkStatus] = useState('');
   // The email whose headers and thread are open.
   const [emailOpen, setEmailOpen] = useState<string | null>(null);
+  const [mapOpen, setMapOpen] = useState<string | null>(null);
   // The document whose similar documents are shown, and the one last opened from elsewhere.
   const [similarOpen, setSimilarOpen] = useState<string | null>(null);
   const [opened, setOpened] = useState<string | null>(null);
@@ -466,11 +468,13 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
             {container && d.extraction_status === 'complete' && <Button onClick={() => findChildrenAgain(d)}>Look for files inside again</Button>}
             {d.openaleph_schema === 'Email' && <Button aria-expanded={emailOpen === d.id} onClick={() => setEmailOpen(cur => (cur === d.id ? null : d.id))}>Headers & thread</Button>}
             {d.openaleph_document_id && <Button aria-expanded={similarOpen === d.id} onClick={() => setSimilarOpen(cur => (cur === d.id ? null : d.id))}>Similar documents</Button>}
+            {isTable(d.filename) && <Button aria-expanded={mapOpen === d.id} onClick={() => setMapOpen(cur => (cur === d.id ? null : d.id))}>Map columns to entities</Button>}
             <Button onClick={() => openProvenance({title: d.filename, kind: 'document', sourceId: d.source_id, documentId: d.id})}>Trace document</Button>
             {d.extraction_status === 'failed' && <Button onClick={() => retryDocumentRead(d)}>Retry reading</Button>}
             {(d.extraction_status === 'queued' || d.extraction_status === 'extracting') && <Button onClick={() => retryDocumentRead(d)}>Check reading progress</Button>}
           </div>
           {similarOpen === d.id && <SimilarDocuments documentId={d.id}/>}
+          {mapOpen === d.id && <TableMapper documentId={d.id} onProposed={() => loadCandidates(d.id)}/>}
           {emailOpen === d.id && <EmailView documentId={d.id} onOpenDocument={documentId => loadCandidates(documentId)}/>}
         </div>;
       })}
@@ -479,10 +483,12 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
         <div>{shownText(c) || ''}</div>
         {text(c.payload.locator) && <small>{text(c.payload.locator)}</small>}
         {c.explanation && <ExtractionExplanationView explanation={c.explanation}/>}
-        {c.candidate_type === 'relationship' && <div>
-          <small>Machine suggestion: no · Reporter staged: yes · Canonical relationship: {c.review_status === 'accepted' ? 'yes' : 'no'}</small>
-          <div>{String(c.payload.schema || 'Relationship')}: {entityCaption(c.payload.source_entity_id, 'source')} → {entityCaption(c.payload.target_entity_id, 'target')}</div>
-        </div>}
+        {c.candidate_type === 'relationship' && (c.payload.source_candidate_id
+          ? <div><small>From a column mapping, {text(c.payload.locator)} · accepted after both its ends · Canonical relationship: {c.review_status === 'accepted' ? 'yes' : 'no'}</small></div>
+          : <div>
+            <small>Machine suggestion: no · Reporter staged: yes · Canonical relationship: {c.review_status === 'accepted' ? 'yes' : 'no'}</small>
+            <div>{String(c.payload.schema || 'Relationship')}: {entityCaption(c.payload.source_entity_id, 'source')} → {entityCaption(c.payload.target_entity_id, 'target')}</div>
+          </div>)}
         {c.reviewer_note && <div><small>Reporter note: {c.reviewer_note}</small></div>}
         {c.review_status === 'proposed' && c.payload.schema_question === true &&
           <SchemaQuestion candidate={c} answer={schemaAnswers[c.id]} onAnswer={choice => setSchemaAnswers(cur => ({...cur, [c.id]: choice}))}/>}

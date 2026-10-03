@@ -329,6 +329,9 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     # the fallback reader used here has no analysis, so it is written directly.
     identifier = _identifier_proposal(document["id"])
     email = _email_document(document["id"])
+    # A ledger, which can be mapped to entities (app/services/table_mappings.py).
+    ledger = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Ledger"}, files={
+        "file": ("ledger.csv", b"Payer,Payee,Amount\nMeridian Holdings Ltd,Bellcastle Trading Group,2400000\n", "text/csv")}))
     # A watched name and a document it was found in.
     watched = ok(client.post(f"{base}/watchlist", json={"query": "Meridian Holdings", "note": "The holding company"}))["entries"][0]["id"]
     watch_hit = _watchlist_hit(watched, document["id"])
@@ -393,6 +396,10 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
                 ("POST", "/api/ai-analysis-candidates/{candidate_id}/review"))},
             ("GET", "/api/extraction-candidates/{candidate_id}/identifier-targets"): {"candidate_id": identifier},
             ("GET", "/api/documents/{document_id}/email"): {"document_id": email},
+            **{(method, path): {"document_id": ledger["id"]} for method, path in (
+                ("GET", "/api/documents/{document_id}/table"),
+                ("POST", "/api/documents/{document_id}/table-mappings/preview"),
+                ("POST", "/api/documents/{document_id}/table-mappings"))},
             **{(method, path): {"candidate_id": proposal} for method, path in (
                 ("GET", "/api/extraction-candidates/{candidate_id}/entity-matches"),
                 ("GET", "/api/extraction-candidates/{candidate_id}/openaleph-matches"),

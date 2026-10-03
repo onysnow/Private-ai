@@ -82,6 +82,13 @@ METHODS: dict[str, dict[str, Any]] = {
         "description": "A reporter chose the relationship schema and both endpoints from an already-accepted extracted claim. No automated matcher chose any part of it.",
         "automated": False,
     },
+    "column_mapping": {
+        "label": "Spreadsheet column mapping",
+        "description": ("A reporter mapped the spreadsheet's columns to FollowTheMoney entities and links, and FollowTheMoney's "
+                        "mapping engine (the one OpenAleph runs for its mappings) read every row with it. Each value is the cell's "
+                        "text, cleaned by FollowTheMoney for its property; rows with the same key values make one entity."),
+        "automated": False,
+    },
     "unknown": {
         "label": "Unrecorded method",
         "description": "This proposal does not record which rule or provider produced it.",
@@ -461,6 +468,61 @@ def _explain_relationship(db: Session, candidate: ExtractionCandidate, payload: 
     }
 
 
+def _as_dict(value: Any) -> dict:
+    return value if isinstance(value, dict) else {}
+
+
+def _explain_mapped(db: Session, candidate: ExtractionCandidate, payload: dict, lineage: dict) -> dict[str, Any]:
+    """An entity or link a spreadsheet mapping made (app/services/table_mappings.py)."""
+    rationale = _as_dict(payload.get("rationale"))
+    columns = _as_dict(rationale.get("columns"))
+    document = _document_refs(lineage)[:1]
+    where = payload.get("locator") or "the spreadsheet"
+
+    def column_reason(prop: str) -> str:
+        used = columns.get(prop) or []
+        return f"Read from the column {', '.join(f'“{c}”' for c in used)}, at {where}." if used else f"Set by the mapping for every row, at {where}."
+
+    parts = []
+    caveats = ["The mapping reads what the cells say; check the spreadsheet itself is a reliable record before relying on it."]
+    if candidate.candidate_type == "relationship":
+        schema = payload.get("schema") or "Link"
+        ends = []
+        for key, label in (("source_candidate_id", "From"), ("target_candidate_id", "To")):
+            end = db.get(ExtractionCandidate, payload.get(key)) if isinstance(payload.get(key), str) else None
+            end_payload = end.payload if end is not None and isinstance(end.payload, dict) else {}
+            caption = end_payload.get("caption") or "unknown"
+            ends.append(caption)
+            ref, _ = _entity_ref(db, end.accepted_record_id) if end is not None and end.review_status == "accepted" else (None, None)
+            state = {"accepted": "accepted", "rejected": "rejected", "proposed": "not decided yet"}.get(end.review_status if end else "", "missing")
+            parts.append(_part(key.split("_")[0], label, caption,
+                               [f"The mapping's “{rationale.get(key.split('_')[0]) or '?'}” entity in the same row; its proposal is {state}."], [ref, *document]))
+        parts.insert(0, _part("schema", "Relationship type", schema, ["Chosen by the reporter in the mapping."], document))
+        props = _as_dict(payload.get("properties"))
+        for prop, values in props.items():
+            parts.append(_part(f"property:{prop}", prop, values, [column_reason(prop)], document))
+        caveats.insert(0, "Accept both ends first. Accepting the link records the row it was read from as its evidence.")
+        summary = f"{schema}: {ends[0]} → {ends[1]}"
+    else:
+        caption = payload.get("caption") or ""
+        schema = payload.get("suggested_schema") or "Thing"
+        parts.append(_part("caption", "Name", caption, [column_reason("name")], document))
+        parts.append(_part("schema", "Type", schema, ["Chosen by the reporter in the mapping."], document))
+        props = _as_dict(payload.get("properties"))
+        for prop, values in props.items():
+            if prop != "name":
+                parts.append(_part(f"property:{prop}", prop, values, [column_reason(prop)], document))
+        caveats.append("If a likely match to an existing entity exists, accepting requires you to choose same, different, or create new. Nothing is merged automatically.")
+        summary = f"{schema} named “{caption}”"
+    return {
+        "summary": summary, "method_id": METHOD_COLUMN_MAPPING, "rationale_basis": "reporter", "parts": parts, "caveats": caveats,
+        "confidence_basis": "Fixed value of 1.0: the reporter chose the kind and the columns, and each value is read exactly from its cell.",
+    }
+
+
+METHOD_COLUMN_MAPPING = "column_mapping"
+
+
 def explain_extraction_candidate(db: Session, candidate: ExtractionCandidate) -> dict[str, Any]:
     """Return the per-part reasoning and sources behind one extraction candidate. Read-only."""
     payload = candidate.payload if isinstance(candidate.payload, dict) else {}
@@ -468,7 +530,10 @@ def explain_extraction_candidate(db: Session, candidate: ExtractionCandidate) ->
     provenance: dict = raw_provenance if isinstance(raw_provenance, dict) else {}
     lineage = serialize_extraction_lineage(db, candidate)
     kind = candidate.candidate_type
-    if kind == "evidence":
+    rationale = _as_dict(payload.get("rationale"))
+    if rationale.get("rule") == METHOD_COLUMN_MAPPING and kind in {"entity", "relationship"}:
+        body = _explain_mapped(db, candidate, payload, lineage)
+    elif kind == "evidence":
         body = _explain_evidence(candidate, payload, lineage, provenance)
     elif kind == "claim":
         body = _explain_claim(candidate, payload, lineage, provenance)

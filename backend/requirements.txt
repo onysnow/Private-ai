@@ -5,6 +5,9 @@ psycopg[binary]==3.3.5
 pydantic-settings==2.15.0
 httpx==0.28.1
 followthemoney==4.11.0
+# XLSX sheets read for spreadsheet mappings (app/services/table_mappings.py; MIT).
+# Already installed with followthemoney; pinned because the Workbench imports it.
+openpyxl==3.1.5
 
 python-multipart==0.0.32
 python-docx==1.2.0

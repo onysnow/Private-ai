@@ -3312,3 +3312,97 @@ API_REFUSALS: dict[int | str, dict[str, Any]] = {
     422: {"model": ValidationErrorOut, "description": "The request's input does not match what the route declares"},
 }
 
+
+
+class TableRowOut(ResponseModel):
+    """A spreadsheet row: its number in the sheet (the header is row 1) and its cells by column."""
+    number: int
+    cells: dict[str, str]
+
+
+class TableOut(ResponseModel):
+    """A CSV, TSV or XLSX document read as a table (app/services/table_mappings.py):
+    its columns, the first rows, and how many rows a mapping would read."""
+    document_id: str
+    filename: str
+    sheets: list[str]
+    sheet: str | None
+    columns: list[str]
+    row_count: int
+    truncated: bool
+    rows: list[TableRowOut]
+
+
+class MappingPropertyOut(ResponseModel):
+    name: str
+    label: str
+    type: str
+
+
+class MappingEntitySchemaOut(ResponseModel):
+    name: str
+    label: str
+    properties: list[MappingPropertyOut]
+
+
+class MappingLinkSchemaOut(MappingEntitySchemaOut):
+    source_prop: str
+    target_prop: str
+    source_label: str
+    target_label: str
+
+
+class MappingSchemasOut(ResponseModel):
+    """The kinds a spreadsheet mapping can make, from the FollowTheMoney model."""
+    entities: list[MappingEntitySchemaOut]
+    links: list[MappingLinkSchemaOut]
+
+
+class MappedEntityOut(ResponseModel):
+    """One entity or link a previewed row makes; a link names its two ends."""
+    name: str
+    schema_: str = Field(alias="schema")
+    caption: str | None
+    properties: dict[str, list[str]]
+    source: str | None = None
+    target: str | None = None
+
+
+class MappedRowOut(TableRowOut):
+    entities: list[MappedEntityOut]
+    problems: list[str]
+
+
+class TableMappingPreviewOut(ResponseModel):
+    document_id: str
+    sheet: str | None
+    rows: list[MappedRowOut]
+
+
+class TableMappingOut(ResponseModel):
+    """A mapping that was run, and what it proposed."""
+    id: str
+    document_id: str
+    sheet: str | None
+    query: dict[str, Any]
+    created_by: str | None
+    created_at: Timestamp
+    rows_read: int
+    entities_proposed: int
+    links_proposed: int
+
+
+class SkippedRowOut(ResponseModel):
+    row: int
+    reason: str
+
+
+class TableMappingRunOut(ResponseModel):
+    """What a mapping proposed: entities and links to review, how many were
+    already proposed by an earlier mapping of the document, and what it left
+    out, row by row."""
+    mapping: TableMappingOut
+    entities_proposed: int
+    links_proposed: int
+    already_proposed: int
+    skipped: list[SkippedRowOut]

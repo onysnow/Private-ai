@@ -2959,6 +2959,99 @@ export const zExtractionLineageLookupOut = z.object({
 });
 
 /**
+ * MappedEntityOut
+ *
+ * One entity or link a previewed row makes; a link names its two ends.
+ */
+export const zMappedEntityOut = z.object({
+  caption: z.string().nullable(),
+  name: z.string(),
+  properties: z.record(z.array(z.string())),
+  schema: z.string(),
+  source: z.string().nullish(),
+  target: z.string().nullish(),
+});
+
+/**
+ * MappedPropertyIn
+ *
+ * Where one property's values come from: a FollowTheMoney property
+ * mapping (https://followthemoney.tech/docs/mappings/), limited to what the
+ * Workbench's mapping screen sets.
+ */
+export const zMappedPropertyIn = z.object({
+  column: z.string().max(255).nullish(),
+  columns: z.array(z.string()).max(20).nullish(),
+  entity: z.string().max(64).nullish(),
+  format: z.string().max(64).nullish(),
+  join: z.string().max(10).nullish(),
+  literal: z.string().max(500).nullish(),
+  required: z.boolean().nullish(),
+  split: z.string().max(10).nullish(),
+});
+
+/**
+ * MappedEntityIn
+ */
+export const zMappedEntityIn = z.object({
+  key_literal: z.string().max(64).nullish(),
+  keys: z.array(z.string()).min(1).max(10),
+  properties: z.record(zMappedPropertyIn).optional(),
+  schema: z.string().max(64),
+});
+
+/**
+ * MappedRowOut
+ */
+export const zMappedRowOut = z.object({
+  cells: z.record(z.string()),
+  entities: z.array(zMappedEntityOut),
+  number: z.number().int(),
+  problems: z.array(z.string()),
+});
+
+/**
+ * MappingPropertyOut
+ */
+export const zMappingPropertyOut = z.object({
+  label: z.string(),
+  name: z.string(),
+  type: z.string(),
+});
+
+/**
+ * MappingEntitySchemaOut
+ */
+export const zMappingEntitySchemaOut = z.object({
+  label: z.string(),
+  name: z.string(),
+  properties: z.array(zMappingPropertyOut),
+});
+
+/**
+ * MappingLinkSchemaOut
+ */
+export const zMappingLinkSchemaOut = z.object({
+  label: z.string(),
+  name: z.string(),
+  properties: z.array(zMappingPropertyOut),
+  source_label: z.string(),
+  source_prop: z.string(),
+  target_label: z.string(),
+  target_prop: z.string(),
+});
+
+/**
+ * MappingSchemasOut
+ *
+ * The kinds a spreadsheet mapping can make, from the FollowTheMoney model.
+ */
+export const zMappingSchemasOut = z.object({
+  entities: z.array(zMappingEntitySchemaOut),
+  links: z.array(zMappingLinkSchemaOut),
+});
+
+/**
  * MatchedPropertyOut
  *
  * One kind of property both entities have, and how well it agrees
@@ -4165,6 +4258,14 @@ export const zSimilarDocumentsOut = z.object({
 });
 
 /**
+ * SkippedRowOut
+ */
+export const zSkippedRowOut = z.object({
+  reason: z.string(),
+  row: z.number().int(),
+});
+
+/**
  * SlideDrawingOut
  *
  * What a deck slide shows for a chart kind PowerPoint cannot hold
@@ -4549,6 +4650,89 @@ export const zStatementPromotionRequest = z.object({
 export const zStyleWarningOut = z.object({
   message: z.string(),
   option: z.string(),
+});
+
+/**
+ * TableMappingIn
+ *
+ * A spreadsheet mapping: the ``entities`` of a FollowTheMoney mapping,
+ * keyed by a name the mapping uses to point one entity at another.
+ */
+export const zTableMappingIn = z.object({
+  entities: z.record(zMappedEntityIn),
+  sheet: z.string().max(255).nullish(),
+});
+
+/**
+ * TableMappingOut
+ *
+ * A mapping that was run, and what it proposed.
+ */
+export const zTableMappingOut = z.object({
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  created_by: z.string().nullable(),
+  document_id: z.string(),
+  entities_proposed: z.number().int(),
+  id: z.string(),
+  links_proposed: z.number().int(),
+  query: z.record(z.unknown()),
+  rows_read: z.number().int(),
+  sheet: z.string().nullable(),
+});
+
+/**
+ * TableMappingPreviewOut
+ */
+export const zTableMappingPreviewOut = z.object({
+  document_id: z.string(),
+  rows: z.array(zMappedRowOut),
+  sheet: z.string().nullable(),
+});
+
+/**
+ * TableMappingRunOut
+ *
+ * What a mapping proposed: entities and links to review, how many were
+ * already proposed by an earlier mapping of the document, and what it left
+ * out, row by row.
+ */
+export const zTableMappingRunOut = z.object({
+  already_proposed: z.number().int(),
+  entities_proposed: z.number().int(),
+  links_proposed: z.number().int(),
+  mapping: zTableMappingOut,
+  skipped: z.array(zSkippedRowOut),
+});
+
+/**
+ * TableRowOut
+ *
+ * A spreadsheet row: its number in the sheet (the header is row 1) and its cells by column.
+ */
+export const zTableRowOut = z.object({
+  cells: z.record(z.string()),
+  number: z.number().int(),
+});
+
+/**
+ * TableOut
+ *
+ * A CSV, TSV or XLSX document read as a table (app/services/table_mappings.py):
+ * its columns, the first rows, and how many rows a mapping would read.
+ */
+export const zTableOut = z.object({
+  columns: z.array(z.string()),
+  document_id: z.string(),
+  filename: z.string(),
+  row_count: z.number().int(),
+  rows: z.array(zTableRowOut),
+  sheet: z.string().nullable(),
+  sheets: z.array(z.string()),
+  truncated: z.boolean(),
 });
 
 /**
@@ -5961,6 +6145,52 @@ export const zGetSimilarDocumentsQuery = z.object({
  */
 export const zGetSimilarDocumentsResponse = zSimilarDocumentsOut;
 
+export const zGetDocumentTablePath = z.object({
+  document_id: z.string(),
+});
+
+export const zGetDocumentTableQuery = z.object({
+  sheet: z.string().nullish(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetDocumentTableResponse = zTableOut;
+
+export const zListDocumentTableMappingsPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Response List Document Table Mappings
+ *
+ * Successful Response
+ */
+export const zListDocumentTableMappingsResponse = z.array(zTableMappingOut);
+
+export const zRunTableMappingBody = zTableMappingIn;
+
+export const zRunTableMappingPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRunTableMappingResponse = zTableMappingRunOut;
+
+export const zPreviewTableMappingBody = zTableMappingIn;
+
+export const zPreviewTableMappingPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zPreviewTableMappingResponse = zTableMappingPreviewOut;
+
 export const zEnrichmentSessionDetailPath = z.object({
   session_id: z.string(),
 });
@@ -7263,6 +7493,11 @@ export const zPromoteStatementAssessmentPath = z.object({
  * Successful Response
  */
 export const zPromoteStatementAssessmentResponse = zStatementPromotionOut;
+
+/**
+ * Successful Response
+ */
+export const zGetMappingSchemasResponse = zMappingSchemasOut;
 
 export const zCreateTimelineEventEndpointBody = zTimelineEventCreate;
 

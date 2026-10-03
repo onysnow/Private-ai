@@ -1,6 +1,6 @@
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.visuals.spec import VisualSpec
 
@@ -431,3 +431,38 @@ class DeckUpdate(BaseModel):
     title: str | None = None
     slides_json: list[DeckSlideIn] | None = None
     style_json: dict | None = None
+
+
+class MappedPropertyIn(BaseModel):
+    """Where one property's values come from: a FollowTheMoney property
+    mapping (https://followthemoney.tech/docs/mappings/), limited to what the
+    Workbench's mapping screen sets."""
+    model_config = ConfigDict(extra="forbid")
+    column: str | None = Field(default=None, max_length=255, description="The column whose cell is the value.")
+    columns: list[str] | None = Field(default=None, max_length=20, description="Several columns, joined by `join`.")
+    join: str | None = Field(default=None, max_length=10)
+    split: str | None = Field(default=None, max_length=10, description="Split one cell into several values on this text.")
+    literal: str | None = Field(default=None, max_length=500, description="The same value for every row.")
+    entity: str | None = Field(default=None, max_length=64, description="A link's end: the name of another entity of this mapping.")
+    format: str | None = Field(default=None, max_length=64, description="How a date is written in the cells, as strptime reads it (e.g. %d/%m/%Y).")
+    required: bool | None = None
+
+
+class MappedEntityIn(BaseModel):
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    schema_: str = Field(alias="schema", max_length=64, description="Person, Company, Organization, PublicBody, LegalEntity, or a link kind.")
+    keys: list[str] = Field(min_length=1, max_length=10, description="The columns whose values identify the entity: rows with the same values make one entity.")
+    key_literal: str | None = Field(default=None, max_length=64)
+    properties: dict[str, MappedPropertyIn] = Field(default_factory=dict)
+
+
+class TableMappingIn(BaseModel):
+    """A spreadsheet mapping: the ``entities`` of a FollowTheMoney mapping,
+    keyed by a name the mapping uses to point one entity at another."""
+    sheet: str | None = Field(default=None, max_length=255, description="The workbook's sheet; the first when left out.")
+    entities: dict[str, MappedEntityIn] = Field(min_length=1, max_length=20)
+
+    def query(self) -> dict:
+        return {name: {**entity.model_dump(by_alias=True, exclude_none=True),
+                       "properties": {prop: spec.model_dump(exclude_none=True) for prop, spec in entity.properties.items()}}
+                for name, entity in self.entities.items()}

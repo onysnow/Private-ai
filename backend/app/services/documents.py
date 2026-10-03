@@ -454,7 +454,9 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
     span_suffix = ''
     if isinstance(span, dict) and isinstance(span.get('start_char'), int) and isinstance(span.get('end_char'), int):
         span_suffix = f"@chars:{span['start_char']}-{span['end_char']}"
-    origin=f'document:{doc.id}#{chunk.locator if chunk else "document"}{span_suffix}'
+    # A proposal without a chunk (a spreadsheet row, table_mappings.py) points at its own locator.
+    payload_locator = candidate.payload.get('locator') if isinstance(candidate.payload, dict) else None
+    origin=f'document:{doc.id}#{chunk.locator if chunk else (payload_locator or "document")}{span_suffix}'
     # One typed slot per accepted-record kind: the branches below produce different
     # ORM types, and the serialized `record_out` is built after the commit so it
     # reflects persisted state (ids, defaults) exactly as before.
@@ -559,6 +561,30 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
             # Record the reporter's explicit negative identity decision without auto-merging.
             record_canonical_resolution(db, entity_record, matched, decision='different', confidence=confidence if confidence is not None else 1.0, rationale=note, commit=False)
         rtype='entity'
+    elif candidate.candidate_type=='relationship' and (candidate.payload or {}).get('source_candidate_id'):
+        # A link a spreadsheet mapping made (table_mappings.py): its two ends are
+        # entity proposals of the same mapping, which the reporter decides first;
+        # the rows it was read from become its evidence.
+        from app.services.relationships import create_relationship
+        payload = candidate.payload or {}
+        ends = []
+        for key in ('source_candidate_id', 'target_candidate_id'):
+            end = db.get(ExtractionCandidate, payload.get(key))
+            caption = ((end.payload or {}).get('caption') if end else None) or 'the other entity'
+            if end is None or end.review_status == 'rejected':
+                raise ValueError(f'“{caption}” was rejected, so this link cannot be accepted')
+            if end.review_status != 'accepted' or end.accepted_record_type != 'entity' or db.get(Entity, end.accepted_record_id) is None:
+                raise ValueError(f'Accept “{caption}” first')
+            ends.append(str(end.accepted_record_id))
+        evidence_record = Evidence(source_id=source.id, quote=payload.get('row_text'), locator=payload.get('locator'),
+                                   notes=f'The spreadsheet row(s) a column mapping read this link from (proposal {candidate.id})')
+        db.add(evidence_record); db.flush()
+        edge_record = create_relationship(
+            db, investigation_id=doc.investigation_id, schema=str(payload.get('schema') or ''),
+            source_entity_id=ends[0], target_entity_id=ends[1], properties=payload.get('properties') or {},
+            dataset=f'document:{doc.id}', origin=f'extraction-candidate:{candidate.id}', evidence_id=evidence_record.id, commit=False,
+        )
+        rtype='relationship'; accepted_id=edge_record.id
     elif candidate.candidate_type=='relationship':
         from app.services.relationships import create_relationship
         payload = candidate.payload or {}

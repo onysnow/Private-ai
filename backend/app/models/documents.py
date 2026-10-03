@@ -143,3 +143,23 @@ class IngestionBatchItem(Base):
     document_id: Mapped[str | None] = mapped_column(ForeignKey("documents.id"), nullable=True, index=True)
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
+
+
+class TableMapping(Base):
+    """A spreadsheet's columns mapped to FollowTheMoney entities (ADR-0006,
+    Wave C, "Spreadsheets to entities"). ``query`` is the ``entities`` part
+    of a FollowTheMoney mapping, the format OpenAleph's ``/mappings`` stores
+    and runs (followthemoney.mapping.QueryMapping); the Workbench runs it
+    itself and every entity and link it makes is a proposal the reporter
+    reviews (app/services/table_mappings.py)."""
+    __tablename__ = "table_mappings"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=uid)
+    investigation_id: Mapped[str] = mapped_column(ForeignKey("investigations.id"), index=True)
+    document_id: Mapped[str] = mapped_column(ForeignKey("documents.id"), index=True)
+    sheet: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    query: Mapped[dict] = mapped_column(JSON, default=dict)
+    created_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
+    rows_read: Mapped[int] = mapped_column(default=0)
+    entities_proposed: Mapped[int] = mapped_column(default=0)
+    links_proposed: Mapped[int] = mapped_column(default=0)
