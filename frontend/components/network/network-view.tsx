@@ -21,10 +21,11 @@
 // Pointing at (or tabbing to) a party lights it, its links and the parties
 // they reach, dims the rest, and writes each lit link's kind on it; pointing
 // at a link writes its kind. Clicking a party or a link opens it.
-import {BaseEdge, EdgeLabelRenderer, Handle, MarkerType, Position, ReactFlow, ViewportPortal} from '@xyflow/react';
+import {BaseEdge, EdgeLabelRenderer, Handle, MarkerType, Position, ReactFlow, ReactFlowProvider, ViewportPortal, useReactFlow} from '@xyflow/react';
+import {Maximize2, Minus, Plus} from 'lucide-react';
 import type {Edge, EdgeProps, Node, NodeProps} from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import {createContext, useContext, useEffect, useMemo, useState} from 'react';
+import {createContext, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {arrange} from '@/lib/network-arrange';
@@ -155,7 +156,7 @@ function Guides({guides, width, height}: {guides: Guide[]; width: number; height
     {guides.map((g, i) => {
       if (g.type === 'band') return <g key={i}>
         <rect x={g.x0} y={g.y0} width={g.x1 - g.x0} height={g.y1 - g.y0} rx={8} fill={i % 2 ? '#1f292e' : '#222d32'}/>
-        <text x={g.x0 + 12} y={g.y0 + 20} fontSize={11} letterSpacing=".07em" fill={TEXT.muted} style={{textTransform: 'uppercase'}}>{g.label.toUpperCase()}</text>
+        <text x={g.x0 + 12} y={g.y0 + 18} fontSize={11} letterSpacing=".07em" fill={TEXT.muted} style={{textTransform: 'uppercase'}}>{g.label.toUpperCase()}</text>
       </g>;
       if (g.type === 'ring') return <g key={i}>
         <circle cx={g.cx} cy={g.cy} r={g.r} fill="none" stroke="#33414a" strokeWidth={1.5}/>
@@ -200,6 +201,8 @@ export function NetworkView({parties, links, arrangement, focus, onPlaced, onPar
       const at = placed.positions[p.id];
       return {id: p.id, type: 'party', position: {x: at.x - box.width / 2, y: at.y - MAX_RADIUS - 2}, width: box.width, height: box.height,
         draggable: false, connectable: false, selectable: false, focusable: false,
+        // React Flow turns pointer events off on a node it cannot drag or select; the party's own button needs them.
+        style: {pointerEvents: 'all'},
         data: {party: p, links: degree.get(p.id) ?? 0, lines: box.lines, width: box.width, height: box.height, onParty}} as Node<PartyData>;
     })];
     // Links between the same two parties bend apart; so does a link along a column (both ends at one x).
@@ -243,17 +246,58 @@ export function NetworkView({parties, links, arrangement, focus, onPlaced, onPar
     return null;
   }, [hover, links]);
 
-  const height = Math.round(Math.min(maxHeight, Math.max(300, placed.height + 48)));
-  return <HoverContext.Provider value={{hover, setHover, lit}}>
-    <div className="net-view" style={{height}} data-testid="network-view" data-arrangement={arrangement}>
+  // As tall as the drawing is when fitted to the box's width (so a narrow
+  // screen does not get a tall, mostly empty box), between 260 px and maxHeight.
+  const box = useRef<HTMLDivElement | null>(null);
+  const [boxWidth, setBoxWidth] = useState(0);
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    setBoxWidth(el.clientWidth);
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(entries => setBoxWidth(entries[0].contentRect.width));
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  const scale = boxWidth > 0 && placed.width > 0 ? Math.min(1.2, (boxWidth * 0.94) / placed.width) : 1;
+  const height = Math.round(Math.min(maxHeight, Math.max(260, placed.height * scale + 48)));
+  return <HoverContext.Provider value={{hover, setHover, lit}}><ReactFlowProvider>
+    <ZoomBar/>
+    <FitWhenResized height={height}/>
+    <div ref={box} className="net-view" style={{height}} data-testid="network-view" data-arrangement={arrangement}>
       {/* A new arrangement or a new set of links is a new drawing, fitted to the frame anew. */}
-      <ReactFlow key={`${arrangement}|${focus ?? ''}|${parties.length}|${links.length}`} nodes={nodes} edges={edges} nodeTypes={NODE_TYPES} edgeTypes={EDGE_TYPES} colorMode="dark"
+      {/* Drawn once the box's width is known, so the first fit is to the box's final height. */}
+      {boxWidth > 0 && <ReactFlow key={`${arrangement}|${focus ?? ''}|${parties.length}|${links.length}`} nodes={nodes} edges={edges} nodeTypes={NODE_TYPES} edgeTypes={EDGE_TYPES} colorMode="dark"
         fitView fitViewOptions={{padding: 0.06, maxZoom: 1.2}} minZoom={0.15} maxZoom={2}
         nodesDraggable={false} nodesConnectable={false} nodesFocusable={false} edgesFocusable={false} elementsSelectable={false}
         onEdgeMouseEnter={(_event, edge) => setHover({party: null, link: edge.id})} onEdgeMouseLeave={() => setHover({party: null, link: null})}
         onEdgeClick={(_event, edge) => onLink?.(edge.id)}>
         <ViewportPortal><Guides guides={placed.guides} width={placed.width} height={placed.height}/></ViewportPortal>
-      </ReactFlow>
+      </ReactFlow>}
     </div>
-  </HoverContext.Provider>;
+  </ReactFlowProvider></HoverContext.Provider>;
+}
+
+/** Fits the drawing again when its box changes height (React Flow fits it
+ * once, when it first draws). */
+function FitWhenResized({height}: {height: number}): null {
+  const flow = useReactFlow();
+  useEffect(() => {
+    // After React Flow has seen the new size (it measures with its own observer).
+    const timer = setTimeout(() => { void flow.fitView({padding: 0.06, maxZoom: 1.2}); }, 80);
+    return () => clearTimeout(timer);
+  }, [height, flow]);
+  return null;
+}
+
+/** Zoom in, zoom out, and fit the whole drawing again -- above the drawing,
+ * not over it, so the buttons never cover a party. Names too small to read
+ * on a narrow screen are read zoomed in (or with two fingers). */
+function ZoomBar(): ReactElement {
+  const flow = useReactFlow();
+  return <div className="net-zoom" role="group" aria-label="Zoom">
+    <button type="button" className="cf-tool" onClick={() => void flow.zoomIn({duration: 150})} aria-label="Zoom in"><Plus size={14}/></button>
+    <button type="button" className="cf-tool" onClick={() => void flow.zoomOut({duration: 150})} aria-label="Zoom out"><Minus size={14}/></button>
+    <button type="button" className="cf-tool" onClick={() => void flow.fitView({padding: 0.06, maxZoom: 1.2, duration: 200})}><Maximize2 size={13}/> Fit</button>
+  </div>;
 }

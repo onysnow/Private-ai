@@ -1,34 +1,35 @@
 'use client';
-
-// STRUCT-0040 / issue #40: Case Timeline chart.
+// The investigation's timeline drawn with ECharts (a custom series): left to
+// right by date, one row per kind of event (the rows are named in words --
+// "Events you recorded", "Dates in records" -- not by their internal names).
 //
-// Renders timeline events (the API's timeline reply, whose event shape
-// matches the TAS Timeline Reconstruction module's -- see
-// backend/app/ai/tas_spec/PROMPT_MODULES/03_TIMELINE_RECONSTRUCTION.md)
-// as a horizontal timeline, grouped into lanes by `kind`. The chart asks
-// only for the six fields it draws, so any event record with them fits. An event with a
-// `date_end` after `date_start` draws as a bar spanning the range; an event
-// with no end (or an equal/earlier one) draws as a point. Color follows
-// `verification_status`, reusing the direct/verified/disputed/unresolved
-// color vocabulary already used by components/entity-graph.tsx and
-// components/charts/financial-flow-sankey.tsx, extended with the exact
-// TimelineEvent verification statuses
-// (backend/app/services/timeline.py's TIMELINE_EVENT_VERIFICATION_STATUSES:
-// asserted/verified/approximate/disputed/unresolved) plus a neutral fallback
-// for the synthetic statuses that module also emits
-// (reporter_reviewed/system_recorded), so an unrecognized status never
-// crashes rendering.
-//
-// Events with an unparseable date_start are excluded and counted rather
-// than silently dropped or crashing the chart.
-//
-// Used by app/page.tsx's investigation timeline section (lazy-loaded).
-
+// What the marks say (lib/viz-tokens.ts EVENT_KIND, EVENT_STATUS):
+//   row and colour   the kind of event (position first, colour again, so
+//                    the row is found either way)
+//   mark's fill      how sure its date is: filled when verified, half-filled
+//                    when asserted, an empty ring when unresolved, a dashed
+//                    ring when approximate, filled with a red "!" when
+//                    disputed (hue is kept for the kind; MacEachren et al.
+//                    2012 found fill value and pattern read as certainty)
+//   a soft band      a date known only to the month or the year covers that
+//                    whole month or year -- where the event could be -- with
+//                    the mark at its middle (location uncertainty drawn as
+//                    a blurred extent, the variable MacEachren et al. rated
+//                    most intuitive)
+//   a bar            an event that runs from one date to another
+// Each mark is named beside it where there is room (ECharts hides a name
+// that would overlap another); every name is in the tooltip and the list
+// under the chart. The bar under the axis and the mouse wheel pick a stretch
+// of time. Events whose date cannot be read are left out and counted.
 import * as React from 'react';
-import {useMemo} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import type {CustomSeriesRenderItem, EChartsOption} from 'echarts';
 
 import {Chart} from './chart';
+import {dateWords} from '@/lib/dates';
+import {EVENT_KIND_ORDER, SWATCH, eventKind, eventStatus} from '@/lib/viz-tokens';
+
+export {dateWords};
 
 export type CaseTimelineEvent = {
   id: string;
@@ -37,6 +38,8 @@ export type CaseTimelineEvent = {
   date_start: string;
   date_end?: string | null;
   verification_status: string;
+  precision?: string;
+  grade?: string | null;
 };
 
 export type CaseTimelineProps = {
@@ -45,141 +48,153 @@ export type CaseTimelineProps = {
   className?: string;
 };
 
-type StatusStyle = {fill: string; stroke: string};
-
-// Fixed 2026-09-29: matches the real current Dark Academia tokens now used
-// by components/entity-graph.tsx and lib/echarts-setup.ts -- this map had
-// copied their pre-redesign blue-ish values and never picked up the update.
-const STATUS_STYLE: Record<string, StatusStyle> = {
-  asserted: {fill: 'hsl(40, 56%, 46%)', stroke: 'hsl(40, 56%, 46%)'}, // --primary gold
-  verified: {fill: 'hsl(162, 55%, 45%)', stroke: 'hsl(162, 55%, 45%)'}, // brightened --accent
-  approximate: {fill: 'hsl(36, 60%, 58%)', stroke: 'hsl(36, 60%, 58%)'}, // --ring brighter gold
-  disputed: {fill: 'hsl(7, 53%, 35%)', stroke: 'hsl(7, 53%, 35%)'}, // --destructive
-  unresolved: {fill: 'hsl(37, 22%, 47%)', stroke: 'hsl(37, 22%, 47%)'}, // --muted-foreground
-};
-const FALLBACK_STYLE: StatusStyle = STATUS_STYLE.unresolved;
-
-function statusStyle(status: string): StatusStyle {
-  return STATUS_STYLE[status] ?? FALLBACK_STYLE;
+/** Where an event sits in time: its start, its end, and whether that end
+ * is the end of a month or year the date is known only to. */
+export function eventSpan(event: Pick<CaseTimelineEvent, 'date_start' | 'date_end' | 'precision'>): {start: number; end: number; fuzzy: boolean} | null {
+  const start = Date.parse(event.date_start);
+  if (Number.isNaN(start)) return null;
+  const end = event.date_end ? Date.parse(event.date_end) : NaN;
+  if (Number.isFinite(end) && end > start) return {start, end, fuzzy: false};
+  const at = new Date(start);
+  if (event.precision === 'month') return {start, end: Date.UTC(at.getUTCFullYear(), at.getUTCMonth() + 1, 1), fuzzy: true};
+  if (event.precision === 'year') return {start, end: Date.UTC(at.getUTCFullYear() + 1, 0, 1), fuzzy: true};
+  return {start, end: start, fuzzy: false};
 }
 
-type TimelineDatum = {
-  start: number;
-  laneIndex: number;
-  end: number;
-  status: string;
-  eventId: string;
-  title: string;
-};
+type Datum = {value: [number, number, number, number]; event: CaseTimelineEvent; fuzzy: boolean};
 
-const renderItem: CustomSeriesRenderItem = (_params, api) => {
-  const start = api.value(0) as number;
-  const laneIndex = api.value(1) as number;
-  const end = api.value(2) as number;
-  const status = api.value(3) as string;
-  const style = statusStyle(status);
-  const startPoint = api.coord([start, laneIndex]);
-  const laneHeight = Math.max(4, (api.size ? (api.size([0, 1]) as number[])[1] : 20) * 0.45);
+const MARK_R = 6;
 
-  if (Number.isFinite(end) && end > start) {
-    const endPoint = api.coord([end, laneIndex]);
-    return {
-      type: 'rect',
-      shape: {
-        x: startPoint[0],
-        y: startPoint[1] - laneHeight / 2,
-        width: Math.max(2, endPoint[0] - startPoint[0]),
-        height: laneHeight,
-        r: 3,
+function renderItemFor(data: Datum[]): CustomSeriesRenderItem {
+  return (params, api) => {
+    const datum = data[params.dataIndex as number];
+    const {event, fuzzy} = datum;
+    const kind = eventKind(event.kind), status = eventStatus(event.verification_status);
+    const [start, lane, end] = [api.value(0) as number, api.value(1) as number, api.value(2) as number];
+    const from = api.coord([start, lane]), to = api.coord([end, lane]);
+    const spans = end > start;
+    const centre = spans ? (fuzzy ? [(from[0] + to[0]) / 2, from[1]] : from) : from;
+    // The name goes on whichever side of the mark has more room in the plot,
+    // cut to fit that room (about 6.5 px a character at 11.5 px).
+    const plot = (params as unknown as {coordSys?: {x: number; width: number}}).coordSys ?? {x: 0, width: Infinity};
+    const roomRight = plot.x + plot.width - centre[0] - (spans && !fuzzy ? Math.max(0, to[0] - from[0]) : 0) - 14;
+    const roomLeft = centre[0] - plot.x - 14;
+    const nearRight = roomLeft > roomRight;
+    const fits = Math.max(4, Math.floor((nearRight ? roomLeft : roomRight) / 6.5));
+    const name = event.title.length > Math.min(34, fits) ? `${event.title.slice(0, Math.min(34, fits) - 1).trimEnd()}…` : event.title;
+    const children: Record<string, unknown>[] = [];
+    if (spans) {
+      children.push(fuzzy
+        ? {type: 'rect', shape: {x: from[0], y: from[1] - 9, width: Math.max(2, to[0] - from[0]), height: 18, r: 9},
+          style: {fill: kind.colour, opacity: 0.22}}
+        : {type: 'rect', shape: {x: from[0], y: from[1] - 4, width: Math.max(2, to[0] - from[0]), height: 8, r: 4},
+          style: {fill: kind.colour, opacity: 0.85}});
+    }
+    children.push({
+      type: 'circle', shape: {cx: centre[0], cy: centre[1], r: MARK_R},
+      style: {
+        fill: status.fill === 'solid' ? kind.colour : status.fill === 'half' ? `${kind.colour}73` : SWATCH.card,
+        stroke: kind.colour, lineWidth: 2, lineDash: status.dashed ? [3, 2] : undefined,
       },
-      style: {fill: style.fill, opacity: 0.75, stroke: style.stroke},
-    };
-  }
-
-  return {
-    type: 'circle',
-    shape: {cx: startPoint[0], cy: startPoint[1], r: Math.max(3, laneHeight / 2)},
-    style: {fill: style.fill, stroke: style.stroke},
+      // The event's name to the right of its mark (past the end of a bar),
+      // hidden by the series' label layout where it would overlap another.
+      textContent: {style: {text: name, fill: SWATCH.parchment, fontSize: 11.5,
+        textBorderColor: '#1c262b', textBorderWidth: 3}},
+      textConfig: nearRight ? {position: 'left', distance: 8} : {position: 'right', distance: 8 + (spans && !fuzzy ? Math.max(0, to[0] - from[0]) : 0)},
+    });
+    if (status.contested) {
+      children.push({type: 'circle', shape: {cx: centre[0] + 7, cy: centre[1] - 7, r: 5}, style: {fill: SWATCH.brick, stroke: SWATCH.card, lineWidth: 1}});
+      children.push({type: 'text', x: centre[0] + 7, y: centre[1] - 7, style: {text: '!', fill: SWATCH.ink, fontSize: 8, fontWeight: 700, align: 'center', verticalAlign: 'middle'}});
+    }
+    return {
+      type: 'group', children,
+    } as unknown as ReturnType<CustomSeriesRenderItem>;
   };
-};
+}
+
+/** The width of the box the chart is drawn in, as it changes. */
+function useWidth(): [React.RefObject<HTMLDivElement | null>, number] {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    const box = ref.current;
+    if (!box) return;
+    setWidth(box.clientWidth);
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(entries => setWidth(entries[0].contentRect.width));
+    observer.observe(box);
+    return () => observer.disconnect();
+  }, []);
+  return [ref, width];
+}
+
+/** Below this width the row names move inside the plot, above each row, so the dates keep the width. */
+const NARROW_PX = 560;
 
 export function CaseTimeline({events, height = 420, className}: CaseTimelineProps): React.ReactElement {
-  const {option, excludedCount, laneCount} = useMemo(() => {
-    const lanes = Array.from(new Set(events.map((event) => event.kind))).sort();
+  const [box, width] = useWidth();
+  const narrow = width > 0 && width < NARROW_PX;
+  const {option, excludedCount, laneCount, shown} = useMemo(() => {
+    const present = Array.from(new Set(events.map(e => e.kind)));
+    const lanes = [...EVENT_KIND_ORDER.filter(k => present.includes(k)), ...present.filter(k => !EVENT_KIND_ORDER.includes(k)).sort()];
     const laneIndexOf = new Map(lanes.map((kind, index) => [kind, index]));
-
-    const data: (TimelineDatum & {value: [number, number, number, string]})[] = [];
+    const data: Datum[] = [];
     let excluded = 0;
-
     for (const event of events) {
-      const start = Date.parse(event.date_start);
-      if (Number.isNaN(start)) {
-        excluded += 1;
-        continue;
-      }
-      const end = event.date_end ? Date.parse(event.date_end) : NaN;
-      const laneIndex = laneIndexOf.get(event.kind) ?? 0;
-      data.push({
-        start,
-        laneIndex,
-        end,
-        status: event.verification_status,
-        eventId: event.id,
-        title: event.title,
-        value: [start, laneIndex, end, event.verification_status],
-      });
+      const span = eventSpan(event);
+      if (!span) { excluded += 1; continue; }
+      data.push({value: [span.start, laneIndexOf.get(event.kind) ?? 0, span.end, data.length], event, fuzzy: span.fuzzy});
     }
-
+    const times = data.flatMap(d => [d.value[0], d.value[2]]);
+    const pad = Math.max(30 * 86_400_000, (Math.max(...times) - Math.min(...times)) * 0.06);
     const chartOption: EChartsOption = {
       tooltip: {
-        trigger: 'item',
+        trigger: 'item', backgroundColor: SWATCH.card, borderColor: '#4e4234', textStyle: {color: SWATCH.parchment, fontSize: 12},
         formatter: (params: unknown) => {
-          const {dataIndex} = params as {dataIndex: number};
-          const datum = data[dataIndex];
+          const datum = data[(params as {dataIndex: number}).dataIndex];
           if (!datum) return '';
-          const dateLabel = Number.isFinite(datum.end)
-            ? `${new Date(datum.start).toLocaleDateString()} – ${new Date(datum.end).toLocaleDateString()}`
-            : new Date(datum.start).toLocaleDateString();
-          return `${datum.title}<br/>${dateLabel}<br/>${datum.status}`;
+          const e = datum.event;
+          const when = e.date_end && Date.parse(e.date_end) > Date.parse(e.date_start)
+            ? `${dateWords(e.date_start, e.precision)} to ${dateWords(e.date_end, e.precision)}` : dateWords(e.date_start, e.precision);
+          const escape = (s: string) => s.replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c] as string);
+          return `<b>${escape(e.title)}</b><br/>${escape(when)}${datum.fuzzy ? ' (known only to the ' + (e.precision ?? '') + ')' : ''}<br/>`
+            + `${escape(eventKind(e.kind).name)} · ${escape(eventStatus(e.verification_status).name)}${e.grade ? ` · graded ${escape(e.grade)}` : ''}`;
         },
       },
-      grid: {left: 140, right: 24, top: 24, bottom: 48},
-      xAxis: {type: 'time'},
+      grid: {left: narrow ? 8 : 172, right: narrow ? 12 : 40, top: 16, bottom: 64},
+      xAxis: {
+        type: 'time', min: Math.min(...times) - pad, max: Math.max(...times) + pad,
+        axisLine: {lineStyle: {color: '#4e4234'}}, axisLabel: {color: SWATCH.tan, fontSize: 11, hideOverlap: true},
+        splitLine: {show: true, lineStyle: {color: '#2a353b'}},
+      },
       yAxis: {
-        type: 'category',
-        data: lanes,
-        inverse: true,
+        type: 'category', data: lanes.map(k => eventKind(k).name), inverse: true,
+        axisLine: {show: false}, axisTick: {show: false},
+        axisLabel: narrow
+          ? {inside: true, verticalAlign: 'bottom', lineHeight: 36, color: SWATCH.parchment, fontSize: 11, fontWeight: 600}
+          : {color: SWATCH.parchment, fontSize: 12, fontWeight: 600, width: 160, overflow: 'truncate'},
+        splitArea: {show: true, areaStyle: {color: ['#1f292e', '#1c262b']}},
       },
-      dataZoom: [{type: 'slider', xAxisIndex: 0}, {type: 'inside', xAxisIndex: 0}],
-      series: [
-        {
-          type: 'custom',
-          renderItem,
-          encode: {x: [0, 2], y: 1},
-          data: data.map((datum) => datum.value),
-        },
+      dataZoom: [
+        {type: 'slider', xAxisIndex: 0, height: 22, bottom: 14, borderColor: '#4e4234', backgroundColor: '#1a2328',
+          fillerColor: 'rgba(212,161,82,0.18)', handleStyle: {color: SWATCH.amber, borderColor: SWATCH.amber},
+          moveHandleStyle: {color: '#4e4234'}, textStyle: {color: SWATCH.tan, fontSize: 10},
+          dataBackground: {lineStyle: {color: '#4e4234'}, areaStyle: {color: '#2a353b'}}, labelFormatter: (value: number) => dateWords(new Date(value).toISOString(), 'month')},
+        {type: 'inside', xAxisIndex: 0},
       ],
+      series: [{
+        type: 'custom', renderItem: renderItemFor(data), encode: {x: [0, 2], y: 1},
+        data: data.map(d => d.value), labelLayout: {hideOverlap: true}, clip: true,
+      }],
     };
+    return {option: chartOption, excludedCount: excluded, laneCount: lanes.length, shown: data.length};
+  }, [events, narrow]);
 
-    return {option: chartOption, excludedCount: excluded, laneCount: lanes.length};
-  }, [events]);
+  if (events.length === 0) return <p className="text-sm text-muted-foreground">No timeline events to chart.</p>;
 
-  if (events.length === 0) {
-    return <p className="text-sm text-muted-foreground">No timeline events to chart.</p>;
-  }
-
-  return (
-    <div className={className}>
-      {excludedCount > 0 && (
-        <p className="mb-2 text-xs text-muted-foreground">
-          {excludedCount} event{excludedCount === 1 ? '' : 's'} excluded (unparseable date).
-        </p>
-      )}
-      <Chart
-        option={option}
-        height={height}
-        ariaLabel={`Timeline of ${events.length - excludedCount} events across ${laneCount} categories`}
-      />
-    </div>
-  );
+  return <div className={className} ref={box}>
+    {excludedCount > 0 && <p className="mb-2 text-xs" style={{color: SWATCH.tan}}>
+      {excludedCount} event{excludedCount === 1 ? '' : 's'} left out: the date could not be read.</p>}
+    <Chart option={option} height={height} ariaLabel={`Timeline of ${shown} event${shown === 1 ? '' : 's'} in ${laneCount} row${laneCount === 1 ? '' : 's'}; the list under it holds every event in words`}/>
+  </div>;
 }

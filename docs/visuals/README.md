@@ -437,77 +437,102 @@ period (`events_over_time`); the timeline shows the events.
 
 ## Pass 4: the network and the connection grid
 
-The relationship network is drawn with Sigma.js 3 (WebGL) over a
-graphology graph (ADR-0005, line 3; vis-network is gone).
+Redrawn on 2026-10-04 after Ony's review ("why are things where they are,
+and how do I know?"). Mockup agreed before the build: arrangement by
+rule, one meaning per channel, palette colours, a frame per chart kind.
 
-- **Layout** (`frontend/lib/network-layout.ts`), in pixels:
-  - Each linked group on its own (graphology-components): one ForceAtlas2
-    run over the whole network pushed unlinked groups to opposite corners
-    and left the drawing mostly empty.
-  - ForceAtlas2 (Jacomy et al. 2014) from a circle in id order, run
-    synchronously, so the same records give the same picture; its own
-    `inferSettings` (Barnes-Hut for large graphs). Scaled so a typical link
-    is 130 px.
-  - Turned so the group's principal axis runs along the box's longer side
-    (left to right on a desktop, top to bottom on a phone). ForceAtlas2's
-    forces do not depend on rotation, so turning changes nothing it shows.
-  - Noverlap (graphology-layout-noverlap, Gephi's Noverlap) pushes apart
-    parties whose footprints meet; a footprint is the dot and the name
-    centred under it.
-  - Groups packed in rows, largest first, the rows about as wide as the
-    box's shape asks (shelf packing; Freivalds, Dogrusoz and Kikusts,
-    "Disconnected graph layout and the polyomino packing approach", Graph
-    Drawing 2001).
-  - Sigma draws it at that scale (`autoRescale` off). It zooms out only as
-    far as the whole drawing, names included, needs, and writes names
-    smaller by as much (down to 10 px). The drawing is no taller than it
-    needs. A view the reporter moved survives a change of data; an unmoved
-    one is fitted anew.
-- **Status** (the caller's; the graph infers none): fill and border, and a
-  second ring inside the border for a tentative status (inferred,
-  hypothesized, contested), since WebGL draws no dashed border and colour
-  must not be the only cue (rule 12); a tentative link is thinner. Colours
-  are hex: Sigma's parser reads no hsl.
-- **What a party is**: a pictogram in the dot (Lucide's user, building,
-  ship, plane and house, ISC licence; `frontend/lib/network-pictograms.ts`)
-  for Person; Company, Organization and PublicBody; Vessel; Airplane;
-  RealEstate. Any other schema, a bare LegalEntity included (Person extends
-  it too), is a plain dot. Colour already carries the status, so the
-  category gets shape instead. A key under the drawing lists the pictograms
-  in use.
-- **Size**: a dot's area grows with its number of links (radius 10 px plus
-  2.5 x the square root of links past the first, up to 20 px).
-- **Links**: two or more links between the same two parties are curves side
-  by side (@sigma/edge-curve, as in its parallel-edges example).
-- **Words**: every party named, centred under its dot over a halo of the
-  background so a link behind it does not cut the letters. A link's kind is
-  written only while it, or one of its parties, is pointed at; written on
-  every link, the kinds covered the names. The hovered party's name and
-  schema, or the hovered link's ends and kind, are written under the
-  drawing.
-- **Rule 18**: the drawing counts the pairs of links that cross, as
-  straight lines between their parties, and says so under it. Past twenty
-  parties the panel offers the connection grid
-  (`frontend/components/connection-grid.tsx`): a row and a column per
-  party, most-linked first. Matrices read better than node-link drawings
-  for most tasks past about twenty nodes (Ghoniem, Fekete and Castagliola,
-  InfoVis 2004).
-  - A link sits in the row of the party it runs from and the column of the
-    party it runs to, as in a directed graph's adjacency matrix, so who
-    owns and who paid stays readable. The corner says "From ↓ · To →".
-  - The diagonal is hatched.
-  - Three shades (one, two, three or more links) with a key. Each count
-    keeps 4.5:1 against its shade (tested).
-  - Pointing at or tabbing to a cell lights its row, column and both names.
-  - Column names run upwards on one line each.
-  - It is an HTML table rather than an ECharts heatmap, so every name and
-    count is text a screen reader reads.
-- Tests: `frontend/tests/test-network-layout.test.ts`,
-  `test-entity-graph.test.tsx` (Sigma faked: jsdom has no WebGL),
-  `test-graph-views.test.tsx`. Checked by eye in Chromium (SwiftShader
-  WebGL) at 1100 px and 390 px wide. On a phone a wide network is zoomed
-  out to fit; where its names would fall below 10 px, two may touch until
-  the reporter zooms in.
+**Where a party sits** (`frontend/lib/network-arrange.ts`, rules in words
+in `network-rules.ts`). A force layout alone places parties by the
+layout's physics: "data is subordinate to layout" (Krzywinski et al.,
+"Hive plots", Briefings in Bioinformatics 2012). So each arrangement has
+one rule, printed in the frame's header and drawn as labelled guides:
+- *Who controls whom*: each owner or director above what it owns or
+  directs, in bands "Top of the chain", "1 step down"… (layered drawing,
+  Sugiyama et al. 1981; dagre). Other links move nothing. Parties in no
+  ownership or directorship sit in a band of their own.
+- *Around a party*: rings by links away (breadth-first). Each party sits
+  near its links inward, with one barycentre sweep back.
+- *By kind*: a column per kind, most-linked at the top (the hive plot's
+  rule).
+- *Linked groups*: ForceAtlas2, with its weaker rule said plainly.
+
+The arrangement is chosen from the links: ownership or directorship
+means control; otherwise by kind. The header says why; any other is one
+press away. Every party is a box of its dot and its name, wrapped to two
+lines of about 20 characters. Every arrangement spaces whole boxes, so no
+two names overlap (tested for all four on the eleven-party case).
+
+**What the marks mean** (`frontend/lib/viz-tokens.ts`). Channels follow
+Munzner (2014, ch. 5): hue and shape for kinds, area and thickness for
+amounts. Certainty follows MacEachren et al. (IEEE TVCG 2012): hue and
+shape were judged not intuitive for uncertainty; fuzziness, value and
+pattern were.
+
+| Channel | Meaning |
+| --- | --- |
+| Dot hue and icon | Person (blue), company (gold), organisation (green), vessel or vehicle (rust), property (tan), other (slate) |
+| Line hue | Owns (amber), directs or works for (sage), paid or owes (copper), family or associate (blue), other (taupe) |
+| Line pattern | Solid: supported by a reviewed claim or evidence. Dashed: not yet. Dashed with a red "!": a supporting claim is disputed or rejected, or evidence contradicts it. Read from the review advisory only. |
+| Dot area | Number of links (radius 11 px + 3 × √(links − 1), at most 20 px) |
+| Line thickness | Payments in one currency: how much (log scale, 1.5–6 px) |
+| Arrowhead | FtM direction; none on Family, Associate, UnknownLink |
+
+All colours are swatches of the Dark Academia palette image. Every line
+and ring is 3:1 or more on the card (WCAG 1.4.11). Every text colour is
+4.5:1 or more (1.4.3; taupe at 4.1:1 is not used for small text). Tests:
+`test-viz-tokens.test.ts`.
+
+**Drawing.** Up to 150 parties the drawing is SVG with React Flow:
+- dashed lines, two-line names, and link labels while a link or its
+  party is pointed at;
+- lines bent round parties they do not join, and links between the same
+  two parties bent apart;
+- zoom buttons above the drawing;
+- the box only as tall as the fitted drawing.
+
+Past 150 the drawing is Sigma (WebGL), in the same colours, in linked
+groups only.
+
+**Connection grid**: the same codes. A link sits in its from-row and
+to-column. Cells are coloured by link kind (stripes for several), dashed
+when not yet supported, with "!" when contested. Counts are in
+near-black, 4.5:1 or more on every link colour. The diagonal is hatched.
+Pointing at a cell lights its row and column.
+
+**The chart frame** (`frontend/components/charts/chart-frame.tsx`) holds
+every chart in the workbench:
+- a header with the title, the question and the rule (and why it was
+  chosen);
+- tools;
+- the canvas;
+- a key of only the codes drawn, beside the canvas when the frame is
+  900 px or wider, under it otherwise (container query);
+- a footer of counts.
+
+Grouping a chart with its own key inside one bounded region follows
+Palmer's common region (Cognitive Psychology 24, 1992). Each kind fills
+the frame with its own parts:
+- *network*: arrangement, view (network or grid), link-kind chips with
+  counts, duplicates;
+- *ownership chain*: the dossier's entity ringed twice, owns and directs
+  in the network's colours, ended links dashed, the owners table;
+- *timeline*: rows named in words. Hue is the kind. The mark's fill
+  shows how sure the date is (filled verified, half asserted, empty
+  unresolved, dashed approximate, "!" disputed). A soft band covers a
+  date known only to the month or year. Names sit beside marks on the
+  side with room. On narrow screens the row names move inside the plot.
+  The event list under it uses dark rows, not parchment cards;
+- *money flows*: blocks coloured by what a party does (only pays, pays
+  and receives, only receives). Copper bands; an inferred flow is
+  fainter;
+- *places*: the map and its time strip, with the dot and window keys;
+- *chart builder*: the drawn chart with its description as the rule.
+
+Tests: `test-network-arrange.test.ts`, `test-network-view.test.tsx`,
+`test-graph-views.test.tsx`, `test-chart-frame.test.tsx`,
+`test-case-timeline.test.tsx`, `test-financial-flow-sankey.test.tsx`,
+`test-ownership-chain.test.tsx`, `test-entity-graph.test.tsx`. Checked
+by eye in Chromium at 1440, 1360 and 390 px wide.
 
 ## Pass 4: the ownership and control chain
 

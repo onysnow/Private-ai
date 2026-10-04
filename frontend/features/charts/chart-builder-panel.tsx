@@ -26,6 +26,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/compo
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {chartFromPreview, isChartKind, kindName} from '../../components/presentation/chart-data';
+import {ChartFrame} from '../../components/charts/chart-frame';
 import {CheckReportView} from '../../components/presentation/check-report';
 import {ApiHttpError, errorMessage} from '../../lib/api-client';
 import type {AiCitationRef} from '../../lib/api-types';
@@ -198,13 +199,19 @@ export function ChartBuilderPanel({investigationId}: Props): ReactElement {
 
           {preview.isError && <p className="muted" role="alert">{problemText(preview.error)}</p>}
           {report && <CheckReportView report={report} kindName={kindName(kind)}/>}
-          {drawn && <ChartFigure visual={drawn} renderCitations={refs => <span>{refs.map((ref, index) => {
+          {drawn && <ChartFrame kind="built-chart" title={drawnTitle} question={`${kindName(drawn.spec.kind as string)}, drawn from this investigation's records and checked against the design rules.`}
+            rule={{label: 'What it shows:', text: drawn.text.description}}
+            footer={<><span>{drawn.text.source_line}</span><span>Numbered buttons in the data table trace each value to its record.</span></>}>
+            <div style={{padding: '12px 16px'}}>
+            <ChartFigure visual={drawn} renderCitations={refs => <span>{refs.map((ref, index) => {
             const request = traceRequest(ref, `${drawnTitle}: record ${index + 1}`);
             return request
               ? <Button key={`${ref.record_type}:${ref.record_id}`} size="sm" variant="outline" title={`Trace this ${ref.record_type.replace('_', ' ')}`}
                 onClick={() => openProvenance(request)}>{index + 1}</Button>
               : <span key={`${ref.record_type}:${ref.record_id}`}>{index + 1} </span>;
-          })}</span>}/>}
+          })}</span>}/>
+            </div>
+          </ChartFrame>}
           {drawn && report?.ok && spec && <KeepChart investigationId={investigationId} spec={spec}/>}
         </div>}
       </>}

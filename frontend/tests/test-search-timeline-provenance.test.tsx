@@ -113,10 +113,11 @@ describe('TimelinePanel', () => {
       'POST /api/timeline-events': () => { events = [...events, {...event, ...stored, kind: 'reporter_event', synthetic: false, refs: {}, provenance: {}, context: null, sort_key: '2024-03-01'}]; return {status: 201, body: stored}; },
     });
     wrap(<TimelinePanel investigationId="inv-1"/>);
-    await screen.findByText('2024-04-01 · Board meeting');
-    expect(screen.getByText('asserted: 1')).toBeInTheDocument();
+    await screen.findByText('Board meeting', {selector: 'b'});
+    expect(screen.getByText('1 Apr 2024')).toBeInTheDocument();
+    expect(screen.getByText('asserted, not yet verified').parentElement).toHaveTextContent('1 asserted, not yet verified');
     expect(screen.getByText('Claim: disputed · confidence 45%')).toBeInTheDocument();
-    expect(screen.getByText('⚠ Linked claim requires review; this timeline event is preserved.')).toBeInTheDocument();
+    expect(screen.getByText('Linked claim needs review; this event is kept.')).toBeInTheDocument();
     expect(screen.getByText('Evidence stance: supports')).toBeInTheDocument();
     expect(screen.getByTestId('timeline-chart')).toBeInTheDocument();
 
@@ -125,7 +126,8 @@ describe('TimelinePanel', () => {
     await user.type(screen.getByPlaceholderText('Event title'), 'Filing');
     await user.type(screen.getByPlaceholderText('YYYY-MM-DD, YYYY-MM, or YYYY'), '2024-03');
     await user.click(screen.getByRole('button', {name: 'Add event'}));
-    await screen.findByText('2024-03 · Filing');
+    await screen.findByText('Filing', {selector: 'b'});
+    expect(screen.getByText('Mar 2024')).toBeInTheDocument();
     expect(api.lastBody('POST /api/timeline-events')).toEqual({investigation_id: 'inv-1', title: 'Filing', date_start: '2024-03', precision: 'day', verification_status: 'asserted'});
     expect(api.calls('GET /api/investigations/inv-1/timeline')).toHaveLength(2);
     expect(screen.getByPlaceholderText('Event title')).toHaveValue('');

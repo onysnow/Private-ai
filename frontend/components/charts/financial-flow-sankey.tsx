@@ -10,9 +10,12 @@
 // currency's subset at a time and surfaces the others via a selector plus an
 // explicit "not shown" note, rather than silently combining or hiding them.
 //
-// Link color follows section D's "whether direct or inferred" distinction,
-// reusing the same direct/inferred visual vocabulary (solid vs. dashed,
-// amber for inferred) already established in components/entity-graph.tsx.
+// Bands are drawn in the network's colour for payments (copper,
+// lib/viz-tokens.ts); a flow inferred from other records rather than
+// recorded directly is a fainter band (section D's "direct or inferred";
+// transparency reads as uncertainty, MacEachren et al. 2012). A party's
+// block is coloured by what it does here -- only pays, pays and receives,
+// only receives -- and named with the total that passed through it.
 //
 // Used by app/page.tsx's money-flow panel (lazy-loaded), fed from
 // GET /api/investigations/{id}/financial-flows.
@@ -28,6 +31,8 @@ import {
   type FinancialFlowTransaction,
 } from '@/lib/financial-flow-types';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {LINK, SWATCH} from '@/lib/viz-tokens';
+import {FLOW_ROLE, flowRole} from './flow-roles';
 
 export type FinancialFlowSankeyProps = {
   transactions: FinancialFlowTransaction[];
@@ -40,9 +45,7 @@ export type FinancialFlowSankeyProps = {
 // Fixed 2026-09-29: matches the real current Dark Academia tokens now used
 // by components/entity-graph.tsx and lib/echarts-setup.ts -- these were
 // still the pre-redesign blue/unrelated-amber values.
-const DIRECT_COLOR = 'hsl(40, 56%, 46%)'; // --primary gold
-const INFERRED_COLOR = 'hsl(36, 60%, 58%)'; // --ring brighter gold, dashed
-
+const BAND = LINK.money.colour;
 function pickDefaultCurrency(byCurrency: Map<string, {links: {transactionIds: string[]}[]}>): string | undefined {
   let best: string | undefined;
   let bestCount = -1;
@@ -81,7 +84,7 @@ export function FinancialFlowSankey({
     }
     return {
       tooltip: {
-        trigger: 'item',
+        trigger: 'item', backgroundColor: SWATCH.card, borderColor: '#4e4234', textStyle: {color: SWATCH.parchment, fontSize: 12},
         formatter: (rawParams: unknown) => {
           const params = rawParams as {dataType?: string; name?: string; value?: number; data?: {flowType?: string}};
           if (params.dataType === 'edge') {
@@ -94,25 +97,28 @@ export function FinancialFlowSankey({
       series: [
         {
           type: 'sankey',
-          data: aggregation.nodes,
+          left: 8, right: 160, top: 12, bottom: 12, nodeWidth: 14, nodeGap: 14,
+          data: aggregation.nodes.map(node => ({...node, itemStyle: {color: FLOW_ROLE[flowRole(node.name, aggregation.links)].colour, borderColor: SWATCH.card}})),
           links: aggregation.links.map((link) => ({
             source: link.source,
             target: link.target,
             value: link.value,
             flowType: link.flowType ?? 'direct',
-            lineStyle: {
-              color: link.flowType === 'inferred' ? INFERRED_COLOR : DIRECT_COLOR,
-              type: link.flowType === 'inferred' ? 'dashed' : 'solid',
-              opacity: 0.55,
-              curveness: 0.5,
-            },
+            lineStyle: {color: BAND, opacity: link.flowType === 'inferred' ? 0.2 : 0.5, curveness: 0.5},
           })),
-          emphasis: {focus: 'adjacency'},
-          label: {color: 'hsl(25, 30%, 70%)'}, // --da-parchment, matches the theme's textStyle
+          emphasis: {focus: 'adjacency', lineStyle: {opacity: 0.8}},
+          label: {
+            color: SWATCH.parchment, fontSize: 12, fontWeight: 600, textBorderColor: '#1c262b', textBorderWidth: 3,
+            formatter: (p: unknown) => {
+              const {name, value} = p as {name: string; value?: number};
+              return `${name}\n{amount|${activeCurrency} ${Math.round(value ?? 0).toLocaleString('en-GB')}}`;
+            },
+            rich: {amount: {color: SWATCH.tan, fontSize: 11, fontWeight: 400, lineHeight: 15}},
+          },
           nodeAlign: 'justify',
         },
       ],
-    };
+    } as EChartsOption;
   }, [aggregation, activeCurrency]);
 
   if (transactions.length === 0) {

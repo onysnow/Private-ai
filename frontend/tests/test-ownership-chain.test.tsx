@@ -103,9 +103,10 @@ describe('OwnershipDiagram', () => {
     expect(nodes.find(n => n.id === 'm')?.ariaLabel).toBe('Meridian Holdings Ltd, Company, the entity this chain is for');
     const ended = edges.find(e => e.id === 'l3');
     expect(ended?.label).toBe('40% · ended 2021');
-    expect(ended?.style?.strokeDasharray).toBe('6 4');
+    expect(ended?.style?.strokeDasharray).toBe('6 5');                              // ended: dashed
+    expect(edges.find(e => e.id === 'l2')?.style).toMatchObject({stroke: '#d4a152'}); // owns: amber, as on the network
     expect(edges.find(e => e.id === 'l2')?.style?.strokeDasharray).toBeUndefined();
-    expect(edges.find(e => e.id === 'l4')?.style?.strokeDasharray).toBe('2 3');     // a directorship is dotted
+    expect(edges.find(e => e.id === 'l4')?.style).toMatchObject({stroke: '#baac91'}); // directs: sage, as on the network
     expect(edges.every(e => e.sourceHandle === 'out' && e.type === 'default')).toBe(true);   // no circle here: every link runs down
     expect(edges.find(e => e.id === 'l2')?.ariaLabel).toBe('Bellcastle Ltd to Meridian Holdings Ltd: Ownership, 60%');
     expect(screen.getByRole('group')).toHaveAttribute('aria-label', 'Ownership and control chart: 6 parties and 5 links');

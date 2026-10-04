@@ -20,6 +20,10 @@ import {getBasemapStatusOptions, getInvestigationPlacesOptions} from '../../lib/
 import type {PlaceOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {placesInWindow} from '../../lib/place-times';
+import {ChartFrame, FootStat, KeyRow, KeySection} from '../../components/charts/chart-frame';
+
+// The map's dot colour (lib/basemap-style.ts PLACE_COLOUR), named here so the key does not load the base map style.
+const PLACE_DOT = '#8A2F1E';
 import type {TimeWindow} from '../../lib/place-times';
 
 const PlacesTimeline = dynamic(() => import('./places-timeline').then(m => m.PlacesTimeline),
@@ -48,23 +52,42 @@ export function PlacesPanel({investigationId}: Props): ReactElement {
   const statusQuery = useQuery({...getBasemapStatusOptions(), enabled: all.length > 0});
   const omitted = placesQuery.data?.omitted ?? [];
   const status = statusQuery.data;
+  const linked = all.reduce((n, p) => n + p.links.length, 0);
   return <Card>
     <CardHeader>
       <CardTitle>Places</CardTitle>
-      <CardDescription>Records with a latitude and a longitude, and what is linked to them. Places come only from the records; nothing is looked up.</CardDescription>
+      <CardDescription>Records that say where they are, and what is linked to them.</CardDescription>
     </CardHeader>
     <CardContent>
       {placesQuery.isError && <p className="muted">{errorMessage(placesQuery.error, 'Could not read the places')}</p>}
       {placesQuery.data && all.length === 0 && <p className="muted">No record in this investigation holds both a latitude and a longitude.
         An Address or a RealEstate record with coordinates shows here.</p>}
-      {all.length > 0 && status?.available && <PlacesMap status={status} places={places} onPlace={pick} picked={picked}/>}
-      {all.length > 0 && <PlacesTimeline places={all} picked={picked} timeWindow={timeWindow} onWindow={setTimeWindow} onPick={pick}/>}
-      {timeWindow && places.length < all.length && <p className="muted text-sm" data-testid="places-window">
-        {places.length} of {all.length} places have an event in this stretch of time; the others are hidden until you show all dates.</p>}
-      {all.length > 0 && status && !status.available && <p className="muted" data-testid="no-basemap">
-        No base map is installed here, so the places are listed only. To draw them on a map, install the base map once with the
-        compose profile <code>maps</code> (see DEPLOYMENT.md).</p>}
-      {places.length > 0 && <table className="text-sm" aria-label="Places">
+      {all.length > 0 && <ChartFrame kind="places" title="Where things are"
+        rule={{label: 'On the map:', text: 'each dot sits at the latitude and longitude its record gives; nothing is looked up, so no address leaves this machine. Under the map, pick a stretch of time to keep the places with an event in it.'}}
+        legend={<>
+          <KeySection title="Places" channel="dot: a place a record gives">
+            <KeyRow swatch={<svg width="22" height="22"><circle cx="11" cy="11" r="7" fill={PLACE_DOT} stroke="#ffffff" strokeWidth="2"/></svg>}>A place, named beside its dot</KeyRow>
+            <KeyRow swatch={<svg width="24" height="24"><circle cx="12" cy="12" r="10" fill={PLACE_DOT} stroke="#ffffff" strokeWidth="2"/></svg>}>The place you picked: a larger dot, a larger name</KeyRow>
+          </KeySection>
+          <KeySection title="Time" channel="the strip under the map">
+            <KeyRow swatch={<svg width="36" height="14"><rect x="1" y="2" width="34" height="10" fill={PLACE_DOT} opacity=".22"/></svg>}>The stretch of time picked</KeyRow>
+          </KeySection>
+        </>}
+        footer={<>
+          <FootStat value={places.length === all.length ? all.length : `${places.length} of ${all.length}`}>places</FootStat>
+          <FootStat value={linked}>links to them</FootStat>
+          {omitted.length > 0 && <FootStat value={omitted.length}>records with unusable coordinates, listed below</FootStat>}
+          {status?.available && <span>Map data © OpenStreetMap contributors (ODbL), Protomaps build {status.version}{status.built ? ` of ${status.built.slice(0, 10)}` : ''}.</span>}
+        </>}>
+        {status?.available && <PlacesMap status={status} places={places} onPlace={pick} picked={picked}/>}
+        {status && !status.available && <p className="muted p-4" data-testid="no-basemap">
+          No base map is installed here, so the places are listed only. To draw them on a map, install the base map once with the
+          compose profile <code>maps</code> (see DEPLOYMENT.md).</p>}
+        <div style={{padding: '4px 12px 8px'}}><PlacesTimeline places={all} picked={picked} timeWindow={timeWindow} onWindow={setTimeWindow} onPick={pick}/></div>
+        {timeWindow && places.length < all.length && <p className="muted text-sm px-4 pb-2" data-testid="places-window">
+          {places.length} of {all.length} places have an event in this stretch of time; the others are hidden until you show all dates.</p>}
+      </ChartFrame>}
+      {places.length > 0 && <table className="oc-table" aria-label="Places">
         <thead><tr><th scope="col">Place</th><th scope="col">Where</th><th scope="col">Linked</th></tr></thead>
         <tbody>{places.map(place => <tr key={place.entity_id}>
           <th scope="row"><Button variant="link" size="sm" onClick={() => pick(place.entity_id)}>{place.caption}</Button>
@@ -76,9 +99,7 @@ export function PlacesPanel({investigationId}: Props): ReactElement {
           </div>)}</td>
         </tr>)}</tbody>
       </table>}
-      {status?.available && places.length > 0 && <p className="muted text-xs">Map data © OpenStreetMap contributors (ODbL), Protomaps build {status.version}
-        {status.built ? ` of ${status.built.slice(0, 10)}` : ''}.</p>}
-      {omitted.length > 0 && <div>
+      {omitted.length > 0 && <div style={{marginTop: 12}}>
         <b>Coordinates that cannot be used</b>
         {omitted.map(o => <div key={o.entity_id}><small><Button variant="link" size="sm" onClick={() => openDossier(o.entity_id)}>{o.caption}</Button>: {o.reason}</small></div>)}
       </div>}

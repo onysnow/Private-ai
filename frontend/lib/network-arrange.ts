@@ -41,7 +41,8 @@ export type {ArrLink, ArrParty, Arrangement, Placed, Guide};
 
 const GAP_X = 26;
 const GAP_Y = 64;
-const BAND_LABEL_WIDTH = 132;       // room on the left for a level's label
+const BAND_LABEL_WIDTH = 16;        // a level's label sits on its own line at the top of its band, so only a margin is kept
+const BAND_LABEL_HEIGHT = 24;
 
 
 const byKindThenName = (a: ArrParty, b: ArrParty) => PARTY_ORDER.indexOf(a.kind) - PARTY_ORDER.indexOf(b.kind) || a.label.localeCompare(b.label) || a.id.localeCompare(b.id);
@@ -73,23 +74,25 @@ export function arrangeControl(parties: ArrParty[], links: ArrLink[]): Placed {
   if (chain.length) dagre.layout(g);
   const positions: Record<string, {x: number; y: number}> = {};
   const height = partyBox('').height;
-  for (const p of chain) { const n = g.node(p.id); positions[p.id] = {x: n.x + BAND_LABEL_WIDTH, y: n.y - height / 2 + MAX_RADIUS + 14}; }
+  // Each level's band holds its label on a line of its own above the parties.
+  const top = BAND_LABEL_HEIGHT + 8;
+  for (const p of chain) { const n = g.node(p.id); positions[p.id] = {x: n.x + BAND_LABEL_WIDTH, y: n.y - height / 2 + top + MAX_RADIUS + 2}; }
   const levelYs = [...new Set(chain.map(p => Math.round(positions[p.id].y)))].sort((a, b) => a - b);
   const chainWidth = chain.length ? (g.graph().width ?? 0) : 0;
-  const width = Math.max(chainWidth + BAND_LABEL_WIDTH + 20, 640);
+  const width = Math.max(chainWidth + 2 * BAND_LABEL_WIDTH, 320);
   const guides: Guide[] = levelYs.map((y, i) => ({
-    type: 'band', x0: 0, x1: width, y0: y - MAX_RADIUS - 14, y1: y - MAX_RADIUS - 14 + height + 18,
+    type: 'band', x0: 0, x1: width, y0: y - MAX_RADIUS - 2 - top, y1: y - MAX_RADIUS - 2 + height + 6,
     label: i === 0 ? 'Top of the chain' : `${i} step${i > 1 ? 's' : ''} down`,
   }));
   const last = guides[guides.length - 1];
   let bottom = last && last.type === 'band' ? last.y1 : 0;
   const loose = parties.filter(p => !inChain.has(p.id)).sort(byKindThenName);
   if (loose.length) {
-    const top = bottom + 18;
-    const placed = rows(loose, BAND_LABEL_WIDTH, top + 14, width - BAND_LABEL_WIDTH - 20);
+    const bandTop = bottom + 18;
+    const placed = rows(loose, BAND_LABEL_WIDTH, bandTop + top, width - 2 * BAND_LABEL_WIDTH);
     Object.assign(positions, placed.positions);
-    guides.push({type: 'band', x0: 0, x1: width, y0: top, y1: top + placed.height + 28, label: 'In no ownership or directorship'});
-    bottom = top + placed.height + 28;
+    guides.push({type: 'band', x0: 0, x1: width, y0: bandTop, y1: bandTop + top + placed.height + 6, label: 'In no ownership or directorship'});
+    bottom = bandTop + top + placed.height + 6;
   }
   return {positions, guides, width, height: bottom};
 }
@@ -172,10 +175,10 @@ export function arrangeAround(parties: ArrParty[], links: ArrLink[], focus: stri
   let height = 2 * reach;
   if (unreached.length) {
     const top = reach + 20;
-    const placed = rows(unreached, -reach + BAND_LABEL_WIDTH, top + 14, 2 * reach - BAND_LABEL_WIDTH);
+    const placed = rows(unreached, -reach + BAND_LABEL_WIDTH, top + BAND_LABEL_HEIGHT + 8, 2 * reach - 2 * BAND_LABEL_WIDTH);
     Object.assign(positions, placed.positions);
-    guides.push({type: 'band', x0: -reach, x1: reach, y0: top, y1: top + placed.height + 28, label: `Not linked to ${byId.get(focus)?.label ?? 'it'}`});
-    height += placed.height + 48;
+    guides.push({type: 'band', x0: -reach, x1: reach, y0: top, y1: top + BAND_LABEL_HEIGHT + 8 + placed.height + 6, label: `Not linked to ${byId.get(focus)?.label ?? 'it'}`});
+    height += BAND_LABEL_HEIGHT + 8 + placed.height + 26;
   }
   return shift({positions, guides, width: 2 * reach, height}, reach, reach);
 }

@@ -53,7 +53,7 @@ describe('FinancialFlowSankey', () => {
     expect(option.series[0].links).toHaveLength(2);
   });
 
-  it('styles a direct link solid/gold and an inferred link dashed/brighter-gold', () => {
+  it('draws payments in copper, an inferred one fainter, and each party by what it does', () => {
     render(
       <FinancialFlowSankey
         transactions={[
@@ -62,16 +62,14 @@ describe('FinancialFlowSankey', () => {
         ]}
       />,
     );
-    const links = chartSpy.mock.calls[0][0].option.series[0].links as Array<{
-      source: string;
-      lineStyle: {type: string; color: string};
-    }>;
+    const series = chartSpy.mock.calls[0][0].option.series[0];
+    const links = series.links as Array<{source: string; lineStyle: {color: string; opacity: number}}>;
     const direct = links.find((l) => l.source === 'A');
     const inferred = links.find((l) => l.source === 'B');
-    expect(direct?.lineStyle.type).toBe('solid');
-    expect(direct?.lineStyle.color).toBe('hsl(40, 56%, 46%)');
-    expect(inferred?.lineStyle.type).toBe('dashed');
-    expect(inferred?.lineStyle.color).toBe('hsl(36, 60%, 58%)');
+    expect(direct?.lineStyle).toMatchObject({color: '#a16948', opacity: 0.5});
+    expect(inferred?.lineStyle).toMatchObject({color: '#a16948', opacity: 0.2});
+    const colour = (name: string) => (series.data as Array<{name: string; itemStyle: {color: string}}>).find(n => n.name === name)?.itemStyle.color;
+    expect([colour('A'), colour('B'), colour('C')]).toEqual(['#a16948', '#d4a152', '#baac91']);   // only pays, both, only receives
   });
 
   it('defaults to the currency with the most transactions and lists the others as not shown', () => {

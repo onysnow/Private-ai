@@ -153,3 +153,36 @@ export function certaintyOf(advisory: {
 /** Text colours on the card, each at least 4.5:1 (WCAG 1.4.3): parchment
  * 7.7:1, tan 5.9:1. (Taupe, 4.1:1, is too faint for small text.) */
 export const TEXT = {strong: SWATCH.parchment, muted: SWATCH.tan, ink: SWATCH.ink};
+
+// ---- the timeline -------------------------------------------------------
+
+/** Each kind of dated event: its row's name in words and its colour (every
+ * one 3:1 or more on the card). Kinds are backend app/services/timeline.py's. */
+export const EVENT_KIND: Record<string, {name: string; colour: string}> = {
+  reporter_event: {name: 'Events you recorded', colour: SWATCH.amber},
+  relationship_date: {name: 'Dates of relationships', colour: SWATCH.sage},
+  entity_date: {name: 'Dates in records', colour: SWATCH.gold},
+  property_temporal_interval: {name: 'Reviewed periods', colour: SWATCH.tan},
+  statement_observed: {name: 'When data was seen', colour: SWATCH.taupe},
+  source_date: {name: 'Dates of sources', colour: SWATCH.steelBlue},
+};
+export const EVENT_KIND_ORDER = ['reporter_event', 'relationship_date', 'entity_date', 'property_temporal_interval', 'source_date', 'statement_observed'];
+
+export function eventKind(kind: string): {name: string; colour: string} {
+  return EVENT_KIND[kind] ?? {name: kind.replace(/_/g, ' '), colour: SWATCH.taupe};
+}
+
+/** How sure the date is (the event's verification status), drawn as the
+ * mark's fill and outline -- not its hue, which says the kind (MacEachren
+ * et al. 2012: fill value and pattern read as certainty, hue does not). */
+export const EVENT_STATUS: Record<string, {name: string; fill: 'solid' | 'half' | 'none'; dashed: boolean; contested: boolean}> = {
+  verified: {name: 'Verified', fill: 'solid', dashed: false, contested: false},
+  asserted: {name: 'Asserted, not yet verified', fill: 'half', dashed: false, contested: false},
+  approximate: {name: 'Approximate', fill: 'none', dashed: true, contested: false},
+  unresolved: {name: 'Unresolved', fill: 'none', dashed: false, contested: false},
+  disputed: {name: 'Disputed', fill: 'solid', dashed: false, contested: true},
+};
+
+export function eventStatus(status: string): {name: string; fill: 'solid' | 'half' | 'none'; dashed: boolean; contested: boolean} {
+  return EVENT_STATUS[status] ?? {name: status.replace(/_/g, ' '), fill: 'half', dashed: false, contested: false};
+}

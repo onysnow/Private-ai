@@ -72,10 +72,12 @@ async function bootstrap(events: unknown[]): Promise<void> {
 describe('Home investigation timeline chart', () => {
   it('renders the case timeline chart from the loaded events, above the unchanged event list', async () => {
     await bootstrap([timelineEvent]);
-    await screen.findByText('2024-03-02 · Board approves transfer');
+    await screen.findByText('Board approves transfer', {selector: 'b'});
+    expect(screen.getByText('2 Mar 2024')).toBeInTheDocument();
     expect(await screen.findByTestId('chart-stub')).toBeInTheDocument();
     const option = chartSpy.mock.calls.at(-1)?.[0].option as {series: Array<{data: unknown[][]}>};
-    expect(option.series[0].data[0]).toEqual([Date.parse('2024-03-02'), 0, NaN, 'verified']);
+    // [start, row, end, index]: a day-precise date is a point (end = start).
+    expect(option.series[0].data[0]).toEqual([Date.parse('2024-03-02'), 0, Date.parse('2024-03-02'), 0]);
   });
 
   it('does not render the chart when there are no events', async () => {
