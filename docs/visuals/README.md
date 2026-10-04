@@ -440,32 +440,74 @@ period (`events_over_time`); the timeline shows the events.
 The relationship network is drawn with Sigma.js 3 (WebGL) over a
 graphology graph (ADR-0005, line 3; vis-network is gone).
 
-- **Layout** (`frontend/lib/network-layout.ts`): ForceAtlas2 (Jacomy et al.
-  2014), started from a circle in id order and run synchronously, so the
-  same records give the same picture; its own `inferSettings` (Barnes-Hut
-  for large graphs). Laid out again only when the parties or links change;
-  the reporter's pan and zoom survive a change of data.
+- **Layout** (`frontend/lib/network-layout.ts`), in pixels:
+  - Each linked group on its own (graphology-components): one ForceAtlas2
+    run over the whole network pushed unlinked groups to opposite corners
+    and left the drawing mostly empty.
+  - ForceAtlas2 (Jacomy et al. 2014) from a circle in id order, run
+    synchronously, so the same records give the same picture; its own
+    `inferSettings` (Barnes-Hut for large graphs). Scaled so a typical link
+    is 130 px.
+  - Turned so the group's principal axis runs along the box's longer side
+    (left to right on a desktop, top to bottom on a phone). ForceAtlas2's
+    forces do not depend on rotation, so turning changes nothing it shows.
+  - Noverlap (graphology-layout-noverlap, Gephi's Noverlap) pushes apart
+    parties whose footprints meet; a footprint is the dot and the name
+    centred under it.
+  - Groups packed in rows, largest first, the rows about as wide as the
+    box's shape asks (shelf packing; Freivalds, Dogrusoz and Kikusts,
+    "Disconnected graph layout and the polyomino packing approach", Graph
+    Drawing 2001).
+  - Sigma draws it at that scale (`autoRescale` off). It zooms out only as
+    far as the whole drawing, names included, needs, and writes names
+    smaller by as much (down to 10 px). The drawing is no taller than it
+    needs. A view the reporter moved survives a change of data; an unmoved
+    one is fitted anew.
 - **Status** (the caller's; the graph infers none): fill and border, and a
   second ring inside the border for a tentative status (inferred,
   hypothesized, contested), since WebGL draws no dashed border and colour
   must not be the only cue (rule 12); a tentative link is thinner. Colours
   are hex: Sigma's parser reads no hsl.
-- **Words**: every party named; link names beside the hovered party's links
-  only past eight links (they covered each other); the hovered party's
-  name and schema under the drawing.
+- **What a party is**: a pictogram in the dot (Lucide's user, building,
+  ship, plane and house, ISC licence; `frontend/lib/network-pictograms.ts`)
+  for Person; Company, Organization and PublicBody; Vessel; Airplane;
+  RealEstate. Any other schema, a bare LegalEntity included (Person extends
+  it too), is a plain dot. Colour already carries the status, so the
+  category gets shape instead. A key under the drawing lists the pictograms
+  in use.
+- **Size**: a dot's area grows with its number of links (radius 10 px plus
+  2.5 x the square root of links past the first, up to 20 px).
+- **Links**: two or more links between the same two parties are curves side
+  by side (@sigma/edge-curve, as in its parallel-edges example).
+- **Words**: every party named, centred under its dot over a halo of the
+  background so a link behind it does not cut the letters. A link's kind is
+  written only while it, or one of its parties, is pointed at; written on
+  every link, the kinds covered the names. The hovered party's name and
+  schema, or the hovered link's ends and kind, are written under the
+  drawing.
 - **Rule 18**: the drawing counts the pairs of links that cross, as
   straight lines between their parties, and says so under it. Past twenty
   parties the panel offers the connection grid
   (`frontend/components/connection-grid.tsx`): a row and a column per
-  party, most-linked first, a cell per pair holding its links; matrices read
-  better than node-link drawings for most tasks past about twenty nodes
-  (Ghoniem, Fekete and Castagliola, InfoVis 2004). It is an HTML table
-  rather than an ECharts heatmap, so every name and count is text a screen
-  reader reads; each count keeps 4.5:1 against its shade.
+  party, most-linked first. Matrices read better than node-link drawings
+  for most tasks past about twenty nodes (Ghoniem, Fekete and Castagliola,
+  InfoVis 2004).
+  - A link sits in the row of the party it runs from and the column of the
+    party it runs to, as in a directed graph's adjacency matrix, so who
+    owns and who paid stays readable. The corner says "From ↓ · To →".
+  - The diagonal is hatched.
+  - Three shades (one, two, three or more links) with a key. Each count
+    keeps 4.5:1 against its shade (tested).
+  - Pointing at or tabbing to a cell lights its row, column and both names.
+  - Column names run upwards on one line each.
+  - It is an HTML table rather than an ECharts heatmap, so every name and
+    count is text a screen reader reads.
 - Tests: `frontend/tests/test-network-layout.test.ts`,
   `test-entity-graph.test.tsx` (Sigma faked: jsdom has no WebGL),
   `test-graph-views.test.tsx`. Checked by eye in Chromium (SwiftShader
-  WebGL).
+  WebGL) at 1100 px and 390 px wide. On a phone a wide network is zoomed
+  out to fit; where its names would fall below 10 px, two may touch until
+  the reporter zooms in.
 
 ## Pass 4: the ownership and control chain
 
