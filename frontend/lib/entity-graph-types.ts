@@ -36,4 +36,6 @@ export type EntityGraphEdge = {
   label?: string;
   status?: EvidenceStatus;
   title?: string;
+  /** What the link is (lib/viz-tokens.ts), for its colour when no status is given. */
+  family?: import('./viz-tokens').LinkFamily;
 };

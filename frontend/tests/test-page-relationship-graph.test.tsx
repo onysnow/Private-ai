@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 // STRUCT-0015 remainder, cycle 10: the "FollowTheMoney relationship graph"
-// flow on app/page.tsx (createRelationship, the schema-filter checkboxes,
+// flow on app/page.tsx (createRelationship, the link filters,
 // openGraphEdge, attachEvidenceToRelationship, reviewRelationshipEvidence).
 // Like cycles 4/6/7, these all need `inv` set, so an investigation is opened
 // by loadAppBootstrap()'s auto-select, which starts every per-investigation
@@ -53,16 +53,17 @@ vi.mock('../components/charts/financial-flow-sankey', () => ({
   },
 }));
 
-vi.mock('../components/entity-graph', () => ({
-  EntityGraph: ({nodes, edges, onNodeClick, onEdgeClick}: {
-    nodes: Array<{id: string; label: string; schema?: string}>;
-    edges: Array<{id: string; from: string; to: string; label?: string}>;
-    onNodeClick?: (id: string) => void;
-    onEdgeClick?: (id: string) => void;
+// The SVG network (React Flow) is replaced by a DOM stub that lists what it is handed.
+vi.mock('../components/network/network-view', () => ({
+  NetworkView: ({parties, links, onParty, onLink}: {
+    parties: Array<{id: string; label: string; schema?: string}>;
+    links: Array<{id: string; from: string; to: string; label?: string}>;
+    onParty?: (id: string) => void;
+    onLink?: (id: string) => void;
   }) => (
     <div data-testid="entity-graph-stub">
-      {nodes.map(n => <button key={n.id} type="button" data-testid={`graph-node-${n.id}`} onClick={() => onNodeClick?.(n.id)}>{`${n.label} (${n.schema ?? ''})`}</button>)}
-      {edges.map(e => <button key={e.id} type="button" data-testid={`graph-edge-${e.id}`} onClick={() => onEdgeClick?.(e.id)}>{`${e.from}->${e.to}:${e.label ?? ''}`}</button>)}
+      {parties.map(n => <button key={n.id} type="button" data-testid={`graph-node-${n.id}`} onClick={() => onParty?.(n.id)}>{`${n.label} (${n.schema ?? ''})`}</button>)}
+      {links.map(e => <button key={e.id} type="button" data-testid={`graph-edge-${e.id}`} onClick={() => onLink?.(e.id)}>{`${e.from}->${e.to}:${e.label ?? ''}`}</button>)}
     </div>
   ),
 }));
@@ -322,7 +323,7 @@ describe('Home FollowTheMoney relationship graph', () => {
     });
 
     const user = userEvent.setup();
-    await user.click(screen.getByText('Add an entity manually'));
+    await user.click(screen.getByText('Add to the network: a party or a relationship'));
     await user.type(await screen.findByLabelText('Caption'), 'Harbor Trust');
     await user.type(screen.getByLabelText('FollowTheMoney schema'), 'Company');
     await user.click(screen.getByRole('button', {name: /create entity/i}));

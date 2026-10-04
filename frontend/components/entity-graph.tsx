@@ -50,6 +50,7 @@ import type {EntityGraphEdge, EntityGraphNode, EvidenceStatus} from '@/lib/entit
 import {countCrossings, layoutNetwork, networkGraph} from '@/lib/network-layout';
 import type {Point} from '@/lib/network-layout';
 import {PICTOGRAMS, PICTOGRAM_NAMES, pictogramFor} from '@/lib/network-pictograms';
+import {LINK, PARTY, partyKind} from '@/lib/viz-tokens';
 import type {Pictogram} from '@/lib/network-pictograms';
 import {Building, House, Plane, Ship, User} from 'lucide-react';
 import type {LucideIcon} from 'lucide-react';
@@ -131,7 +132,10 @@ export function drawnGraph(nodes: EntityGraphNode[], edges: EntityGraphEdge[], a
   const byNode = new Map(nodes.map(n => [n.id, n]));
   graph.forEachNode(id => {
     const node = byNode.get(id) as EntityGraphNode;
-    const style = statusStyle(node.status);
+    // A caller's evidentiary status sets the look; without one, the party's
+    // kind does, in the same colours as the SVG network (lib/viz-tokens.ts).
+    const look = PARTY[partyKind(node.schema)];
+    const style = node.status ? statusStyle(node.status) : {border: look.ring, background: look.fill};
     const pictogram = pictogramFor(node.schema);
     graph.mergeNodeAttributes(id, {
       label: node.label, size: radius.get(id), color: style.background, borderColor: style.border,
@@ -144,9 +148,9 @@ export function drawnGraph(nodes: EntityGraphNode[], edges: EntityGraphEdge[], a
   const byEdge = new Map(edges.map(e => [e.id, e]));
   graph.forEachEdge(id => {
     const edge = byEdge.get(id) as EntityGraphEdge;
-    const style = statusStyle(edge.status);
+    const style = edge.status ? statusStyle(edge.status) : {border: LINK[edge.family ?? 'other'].colour};
     const ends = `${byNode.get(edge.from)?.label ?? edge.from} → ${byNode.get(edge.to)?.label ?? edge.to}`;
-    graph.mergeEdgeAttributes(id, {label: edge.label ?? '', color: style.border, size: style.tentative ? 1 : 2, type: 'arrow',
+    graph.mergeEdgeAttributes(id, {label: edge.label ?? '', color: style.border, size: 'tentative' in style && style.tentative ? 1 : 2, type: 'arrow',
       title: edge.title ?? [ends, edge.label].filter(Boolean).join(' · ')});
   });
   // Links between the same two parties: curved side by side, as in

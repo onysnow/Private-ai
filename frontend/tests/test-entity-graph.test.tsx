@@ -10,6 +10,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {EntityGraph, drawnGraph, fitRatio, labelPxAt, labelWidth, nodeTitle, radiusFor, statusStyle, viewSize} from '../components/entity-graph';
 import {PICTOGRAMS} from '../lib/network-pictograms';
+import {PARTY} from '../lib/viz-tokens';
 
 type Handler = (payload: {node?: string; edge?: string}) => void;
 type FakeSigmaInstance = {
@@ -88,7 +89,9 @@ describe('drawnGraph', () => {
     expect(radiusFor(400)).toBe(20);                                 // capped
     expect(graph.getNodeAttributes('j').image).toBe(PICTOGRAMS.person);
     expect(graph.getNodeAttributes('m').image).toBe(PICTOGRAMS.organisation);
-    expect(graph.getNodeAttributes('m').pictoColor).toBe(statusStyle(undefined).border);
+    // No status given: the party's kind sets its colours, as in the SVG network.
+    expect(graph.getNodeAttributes('m').pictoColor).toBe(PARTY.company.ring);
+    expect(graph.getNodeAttributes('j').color).toBe(PARTY.person.fill);
     expect(graph.getEdgeAttributes('e1').title).toBe('Meridian Holdings Ltd → Bellcastle Trading Group · Ownership');
   });
 

@@ -2,8 +2,8 @@
 // The FollowTheMoney relationship graph, moved out of app/page.tsx onto the
 // generated client (Foundation Fixes fixes 2 and 3): the relationship form
 // (endpoints pre-selected from the entity list, Payment properties), the
-// manual entity form, the schema filter, the duplicate-edge toggle, the
-// drawing (the Sigma network replaced by a DOM stub, as in test-entity-graph),
+// manual entity form, the link filters, the duplicate-edge toggle, the
+// drawing (the React Flow network replaced by a DOM stub),
 // one opened relationship with its evidence attached and assessed, the
 // relationship list, the money flows, and the requests other panels make
 // through the shared store.
@@ -25,15 +25,16 @@ const {sankeySpy} = vi.hoisted(() => ({sankeySpy: vi.fn()}));
 vi.mock('../components/charts/financial-flow-sankey', () => ({
   FinancialFlowSankey: (props: Record<string, unknown>) => { sankeySpy(props); return <div data-testid="sankey-stub"/>; },
 }));
-vi.mock('../components/entity-graph', () => ({
-  EntityGraph: ({nodes, edges, onNodeClick, onEdgeClick}: {
-    nodes: Array<{id: string; label: string; schema?: string}>;
-    edges: Array<{id: string; from: string; to: string; label?: string}>;
-    onNodeClick?: (id: string) => void;
-    onEdgeClick?: (id: string) => void;
+// The SVG network (React Flow) is replaced by a DOM stub that lists what it is handed.
+vi.mock('../components/network/network-view', () => ({
+  NetworkView: ({parties, links, onParty, onLink}: {
+    parties: Array<{id: string; label: string; schema?: string}>;
+    links: Array<{id: string; from: string; to: string; label?: string}>;
+    onParty?: (id: string) => void;
+    onLink?: (id: string) => void;
   }) => <div data-testid="entity-graph-stub">
-    {nodes.map(n => <button key={n.id} type="button" data-testid={`graph-node-${n.id}`} onClick={() => onNodeClick?.(n.id)}>{`${n.label} (${n.schema ?? ''})`}</button>)}
-    {edges.map(e => <button key={e.id} type="button" data-testid={`graph-edge-${e.id}`} onClick={() => onEdgeClick?.(e.id)}>{`${e.from}->${e.to}:${e.label ?? ''}`}</button>)}
+    {parties.map(n => <button key={n.id} type="button" data-testid={`graph-node-${n.id}`} onClick={() => onParty?.(n.id)}>{`${n.label} (${n.schema ?? ''})`}</button>)}
+    {links.map(e => <button key={e.id} type="button" data-testid={`graph-edge-${e.id}`} onClick={() => onLink?.(e.id)}>{`${e.from}->${e.to}:${e.label ?? ''}`}</button>)}
   </div>,
 }));
 
@@ -135,8 +136,8 @@ describe('RelationshipGraphPanel', () => {
     expect(screen.getByTestId('graph-edge-rel-1')).toHaveTextContent('ent-1->ent-2:Ownership');
     expect(screen.getByTestId('graph-edge-rel-2')).toHaveTextContent('ent-2->ent-1:Directorship');
 
-    // Unticking a schema takes its edges out of the drawing, not out of the list.
-    await userEvent.setup().click(screen.getByRole('checkbox', {name: 'Directorship'}));
+    // Hiding a kind of link takes its links out of the drawing, not out of the list.
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Directs, works for or belongs to · 1'}));
     expect(screen.queryByTestId('graph-edge-rel-2')).not.toBeInTheDocument();
     expect(screen.getByTestId('graph-edge-rel-1')).toBeInTheDocument();
     expect(screen.getByText('Directorship', {selector: '.relEdge'})).toBeInTheDocument();
@@ -162,9 +163,8 @@ describe('RelationshipGraphPanel', () => {
 
     view.rerender(<QueryProvider><RelationshipGraphPanel investigationId="inv-2"/></QueryProvider>);
 
-    // The first case had only Ownership; the filter used to stay at that and hide this Directorship.
+    // The first case had only Ownership; a filter kept from it would hide this Directorship.
     expect(await screen.findByTestId('graph-edge-rel-9')).toHaveTextContent('ent-4->ent-3:Directorship');
-    expect(screen.getByRole('checkbox', {name: 'Directorship'})).toBeChecked();
     expect(api.unmatched()).toEqual([]);
   });
 
@@ -274,7 +274,7 @@ describe('RelationshipGraphPanel', () => {
     api.add({[GRAPH]: ({url}: RouteCall) => (url.searchParams.get('include_reconciled_duplicates') === 'true'
       ? emptyGraph([relationshipFixture(), relationshipFixture({id: 'rel-2', reconciliation: {decision_id: 'rd-1', decision: 'duplicate', preferred_record_id: 'rel-1', secondary_record_id: 'rel-2', rationale: null, is_preferred: false, suppressed_duplicate: true, suppressed_duplicate_ids: [], suppressed_duplicate_count: 0}})])
       : emptyGraph([relationshipFixture()]))});
-    await userEvent.setup().click(screen.getByRole('checkbox', {name: 'Show reviewed duplicate edge copies'}));
+    await userEvent.setup().click(screen.getByRole('checkbox', {name: 'Reviewed duplicate copies'}));
 
     await screen.findByText('Ownership · duplicate copy', {selector: '.relEdge'});
     expect(api.calls(GRAPH)).toHaveLength(2);
@@ -284,7 +284,7 @@ describe('RelationshipGraphPanel', () => {
   it('creates an entity from the manual form and reads the entities again', async () => {
     const api = await renderPanel({'POST /api/entities': entityFixture('ent-3', 'Harbor Trust', 'Company')});
     const user = userEvent.setup();
-    await user.click(screen.getByText('Add an entity manually'));
+    await user.click(screen.getByText('Add to the network: a party or a relationship'));
     await user.type(await screen.findByLabelText('Caption'), 'Harbor Trust');
     await user.type(screen.getByLabelText('FollowTheMoney schema'), 'Company');
     await user.click(screen.getByRole('button', {name: /create entity/i}));

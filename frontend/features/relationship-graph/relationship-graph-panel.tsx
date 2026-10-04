@@ -52,7 +52,6 @@ export function RelationshipGraphPanel({investigationId}: Props): ReactElement {
   const queryClient = useQueryClient();
   const openDossier = useWorkbenchStore(state => state.openDossier);
   const asked = useWorkbenchStore(state => state.relationship);
-  const [graphSchemas, setGraphSchemas] = useState<Set<string>>(new Set());
   const [includeDuplicates, setIncludeDuplicates] = useState(false);
   const [edge, setEdge] = useState<GraphEdge | null>(null);
   // Counts how often a relationship was opened, so opening one starts its detail afresh.
@@ -82,7 +81,7 @@ export function RelationshipGraphPanel({investigationId}: Props): ReactElement {
   // A new case starts with nothing opened, no ledger asked for, and its own
   // schema filter (set from its graph below; it used to keep the last case's,
   // which could hide every relationship of the new one).
-  useEffect(() => { setEdge(null); setLedgerWanted(false); setGraphSchemas(new Set()); }, [investigationId]);
+  useEffect(() => { setEdge(null); setLedgerWanted(false); }, [investigationId]);
 
   // The form's endpoints follow the entity list: the first two entities
   // unless the chosen ones are still listed.
@@ -92,12 +91,6 @@ export function RelationshipGraphPanel({investigationId}: Props): ReactElement {
     setRelSource(current => (rows.some(x => x.id === current) ? current : rows[0]?.id || ''));
     setRelTarget(current => (rows.some(x => x.id === current) ? current : rows[1]?.id || rows[0]?.id || ''));
   }, [entitiesQuery.data]);
-
-  // The schema filter starts with every schema the case's first loaded graph shows.
-  useEffect(() => {
-    if (!graph) return;
-    setGraphSchemas(current => (current.size ? current : new Set(graph.edges.map(x => x.schema))));
-  }, [graph]);
 
   // A failed graph load is reported the way the page reported it, once per failure.
   const reported = useRef<unknown>(null);
@@ -161,15 +154,19 @@ export function RelationshipGraphPanel({investigationId}: Props): ReactElement {
     + (r.reconciliation?.is_preferred && r.reconciliation.suppressed_duplicate_count > 0 ? ` · preferred (+${r.reconciliation.suppressed_duplicate_count} duplicate)` : r.reconciliation?.suppressed_duplicate ? ' · duplicate copy' : '');
 
   return <section className="card graphCard" id="relationship-graph">
-    <h3>FollowTheMoney relationship graph</h3>
-    <p className="muted">Each edge remains a canonical FtM interstitial entity. Reviewed duplicate edges are collapsed to the reporter-preferred record by default; the originals remain individually traceable.</p>
-    <label><Checkbox checked={includeDuplicates} onCheckedChange={(checked: boolean | 'indeterminate') => toggleDuplicates(checked === true)}/> Show reviewed duplicate edge copies</label>
-    {reconciliation.suppressed_duplicate_count > 0 && <p className="muted">{reconciliation.visible_edge_count} preferred/independent edge(s) shown from {reconciliation.underlying_edge_count} underlying records · {reconciliation.suppressed_duplicate_count} reviewed duplicate edge(s) collapsed.</p>}
+    <h3>Relationships</h3>
+    <p className="muted">Every link is a FollowTheMoney relationship record. Reviewed duplicates are folded into the preferred record unless you show them; the originals stay traceable.</p>
+    <Graph key={investigationId} relationships={relationships} entities={entities} onNode={openDossier} onEdge={openEdge}
+      extraTools={<label className="cf-chip" style={{cursor: 'pointer'}}><Checkbox checked={includeDuplicates}
+        onCheckedChange={(checked: boolean | 'indeterminate') => toggleDuplicates(checked === true)}/> Reviewed duplicate copies</label>}
+      footnote={reconciliation.suppressed_duplicate_count > 0 ? `${reconciliation.visible_edge_count} links shown from ${reconciliation.underlying_edge_count} records; ${reconciliation.suppressed_duplicate_count} reviewed duplicate${reconciliation.suppressed_duplicate_count === 1 ? '' : 's'} folded into the preferred record.` : undefined}/>
+    {edge && <RelationshipDetail key={opened} investigationId={investigationId} edge={edge} evidencePool={evidencePool} onUpdated={setEdge}/>}
     <details className="candidate">
-      <summary>Add an entity manually</summary>
+      <summary>Add to the network: a party or a relationship</summary>
+      <h4>A party</h4>
       <p className="muted">Creates a reporter-entered canonical entity in this investigation (dataset: reporter).</p>
       <EntityForm onSubmit={createEntityManually}/>
-    </details>
+      <h4>A relationship</h4>
     <div className="relationshipForm">
       <Select value={relSchema} onValueChange={setRelSchema}>
         <SelectTrigger className="w-auto"><SelectValue/></SelectTrigger>
@@ -197,13 +194,7 @@ export function RelationshipGraphPanel({investigationId}: Props): ReactElement {
       </select>
       <Button onClick={createRelationship} disabled={!relSource || !relTarget || relSource === relTarget}>Add relationship</Button>
     </div>
-    <div className="searchrow">
-      {Array.from(new Set(relationships.map(r => r.schema))).sort().map(schema => <label key={schema}>
-        <Checkbox checked={graphSchemas.has(schema)} onCheckedChange={(checked: boolean | 'indeterminate') => setGraphSchemas(cur => { const n = new Set(cur); if (checked === true) n.add(schema); else n.delete(schema); return n; })}/> {schema}
-      </label>)}
-    </div>
-    <Graph relationships={relationships.filter(r => graphSchemas.has(r.schema))} entities={entities} onNode={openDossier} onEdge={openEdge}/>
-    {edge && <RelationshipDetail key={opened} investigationId={investigationId} edge={edge} evidencePool={evidencePool} onUpdated={setEdge}/>}
+    </details>
     <div className="relationshipList">
       {relationships.length === 0 ? <p className="muted">No canonical relationships yet.</p> : <Table><TableBody>
         {relationships.map(r => <TableRow className="relationshipRow" key={r.id}>

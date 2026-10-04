@@ -120,3 +120,66 @@ select,input,button,textarea{font:inherit}.searchrow{display:flex;gap:8px;margin
 .section-stack>*+*{margin-top:20px}
 .top{gap:10px 8px;flex-wrap:wrap}
 @media(max-width:960px){.page-grid-2{grid-template-columns:1fr}.shell{padding:28px 16px}.shell>*+*{margin-top:28px}}
+
+/* The chart frame (components/charts/chart-frame.tsx): one anatomy for every
+   chart -- header with the arrangement rule, tools, canvas, key, footer.
+   Colours are palette swatches; small text is parchment (#caaf9c, 7.7:1 on
+   the card) or tan (#bc9574, 5.9:1), never taupe (4.1:1). Spacing is a 4 px
+   scale. The key sits beside the canvas when the frame is wide enough for
+   both (a container query, so a frame in a narrow column stacks too). */
+@layer components {
+  .chart-frame { container-type: inline-size; margin: 0 0 20px; background: #1a2328; border: 1px solid #4e4234; border-radius: 14px; overflow: hidden; color: #caaf9c; }
+  .chart-frame .cf-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px 24px; padding: 16px 20px 12px; border-bottom: 1px solid #393941; }
+  .chart-frame .cf-titles { min-width: 0; flex: 1 1 360px; }
+  .chart-frame .cf-title { margin: 0; font-family: var(--font-heading); font-size: 19px; font-weight: 600; color: #e6d6bf; line-height: 1.25; }
+  .chart-frame .cf-question { margin: 4px 0 0; font-size: 13px; color: #bc9574; line-height: 1.5; max-width: 70ch; }
+  .chart-frame .cf-rule { margin: 10px 0 0; font-size: 12.5px; line-height: 1.5; color: #caaf9c; background: #222c31; border: 1px solid #393941; border-left: 3px solid #d4a152; border-radius: 6px; padding: 7px 11px; max-width: 80ch; }
+  .chart-frame .cf-rule b { color: #d4a152; font-weight: 600; }
+  .chart-frame .cf-why { color: #bc9574; }
+  .chart-frame .cf-tools { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; flex: 0 1 auto; }
+  .chart-frame .cf-body { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .chart-frame .cf-canvas { min-width: 0; position: relative; background: #1c262b; }
+  .chart-frame .cf-key { padding: 14px 18px; font-size: 12.5px; background: #1a2328; border-top: 1px solid #393941; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 4px 20px; }
+  @container (min-width: 900px) {
+    .chart-frame .cf-with-key { grid-template-columns: minmax(0, 1fr) 248px; }
+    .chart-frame .cf-with-key .cf-key { border-top: 0; border-left: 1px solid #393941; display: block; }
+  }
+  .chart-frame .cf-key-section + .cf-key-section { margin-top: 14px; }
+  .chart-frame .cf-key h4 { margin: 0 0 6px; font-family: inherit; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #baac91; }
+  .chart-frame .cf-key h4 small { display: block; margin-top: 2px; font-size: 11px; font-weight: 400; letter-spacing: 0; text-transform: none; color: #bc9574; }
+  .chart-frame .cf-key ul { list-style: none; margin: 0; padding: 0; }
+  .chart-frame .cf-key-row { display: flex; align-items: center; gap: 10px; margin: 5px 0; line-height: 1.35; }
+  .chart-frame .cf-swatch { flex: 0 0 36px; display: inline-flex; justify-content: center; }
+  .chart-frame .cf-foot { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 20px; border-top: 1px solid #393941; font-size: 12px; color: #bc9574; }
+  .chart-frame .cf-stat b { color: #caaf9c; font-weight: 600; }
+  .cf-segmented { display: inline-flex; border: 1px solid #4e4234; border-radius: 9px; overflow: hidden; background: #1a2328; }
+  .cf-segmented button { font: inherit; font-size: 12.5px; padding: 6px 12px; color: #bc9574; background: transparent; border: 0; border-right: 1px solid #4e4234; cursor: pointer; white-space: nowrap; }
+  .cf-segmented button:last-child { border-right: 0; }
+  .cf-segmented button:hover { color: #caaf9c; background: #222c31; }
+  .cf-segmented button.on { background: #3a2f1f; color: #d4a152; }
+  .cf-segmented button:focus-visible { outline: 2px solid #d4a152; outline-offset: -2px; }
+  .cf-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 4px 10px; border-radius: 999px; border: 1px solid #4e4234; background: #1a2328; color: #caaf9c; cursor: pointer; }
+  .cf-chip[aria-pressed="false"] { color: #bc9574; opacity: .7; }
+  .cf-chip[aria-pressed="false"] .cf-chip-line { opacity: .35; }
+  .cf-chip:focus-visible { outline: 2px solid #d4a152; outline-offset: 2px; }
+  .cf-tool { font: inherit; font-size: 12px; padding: 5px 10px; border-radius: 8px; border: 1px solid #4e4234; background: transparent; color: #bc9574; cursor: pointer; }
+  .cf-tool:hover { color: #caaf9c; background: #222c31; }
+  .cf-tool:focus-visible { outline: 2px solid #d4a152; outline-offset: 2px; }
+}
+
+/* The network drawing (components/network/network-view.tsx). */
+@layer components {
+  .net-view { width: 100%; }
+  .net-view .react-flow { --xy-background-color: transparent; background: transparent; }
+  .net-view .react-flow__node-party { padding: 0; border: 0; background: transparent; }
+  .net-party { display: flex; flex-direction: column; align-items: center; padding: 0; margin: 0; border: 0; background: transparent; cursor: pointer; font: inherit; color: #caaf9c; transition: opacity .12s; }
+  .net-party:focus-visible { outline: 2px solid #d4a152; outline-offset: 2px; border-radius: 8px; }
+  .net-name { display: flex; flex-direction: column; align-items: center; margin-top: 2px; font-size: 13px; font-weight: 600; line-height: 16px; color: #caaf9c; text-align: center; white-space: nowrap;
+    text-shadow: 0 0 3px #1c262b, 0 0 3px #1c262b, 0 0 3px #1c262b, 0 0 3px #1c262b; }
+  .net-link-label { position: absolute; pointer-events: none; font-size: 11.5px; font-weight: 600; color: #f3e9d7; background: #1a2328; border: 1px solid; border-radius: 999px; padding: 2px 8px; white-space: nowrap; z-index: 5; }
+  .net-contested { position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #9f3632; color: #f3e9d7; font-size: 11px; font-weight: 700; line-height: 18px; text-align: center; border: 2px solid #1c262b; pointer-events: all; }
+  .net-link-hit { position: absolute; width: 14px; height: 14px; padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: pointer; pointer-events: all; }
+  .net-link-hit:focus-visible { outline: 2px solid #d4a152; outline-offset: 2px; }
+  .net-view .react-flow__attribution { background: transparent; }
+  .net-view .react-flow__attribution a { color: #bc9574; }
+}

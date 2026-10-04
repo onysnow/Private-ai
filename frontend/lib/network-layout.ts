@@ -119,7 +119,8 @@ function layoutGroup(graph: Graph, ids: string[], footprint: (id: string) => num
     positions = scaleToLinks(positions, group);
     group.forEachNode(id => group.mergeNodeAttributes(id, positions[id]));
     noverlap.assign(group, {
-      maxIterations: 300,
+      // It stops as soon as no footprints meet; the cap only bounds a case that will not settle.
+      maxIterations: 3000,
       inputReducer: (id, a) => ({x: a.x as number, y: a.y as number, size: footprint(id)}),
       // gridSize 1: every pair is compared; groups here are small, and the
       // README notes it can be faster with few nodes.
