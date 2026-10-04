@@ -49,7 +49,7 @@ export function MoneyFlows({investigationId, wanted, onLoad}: Props): ReactEleme
       </KeySection>
     </> : undefined}
     footer={ledger ? <>
-      <FootStat value={ledger.transactions.length}>payments charted</FootStat>
+      <FootStat value={ledger.transactions.length}>{ledger.transactions.length === 1 ? 'payment' : 'payments'} charted</FootStat>
       {ledger.incomplete.length > 0 && <FootStat value={ledger.incomplete.length}>not charted, listed below with why</FootStat>}
       <span>{ledger.flow_type_rule}</span>
     </> : undefined}>
