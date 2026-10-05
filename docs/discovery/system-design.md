@@ -375,6 +375,10 @@ are added to the generated client (`lib/generated`), as the repo requires.
 
 ### 3.9 Research runs (F12)
 
+The full design (lifecycles, mistakes catalogue, how corrections propagate,
+data model with `step_refs`, sequence, errors, scale) is in
+`research-design.md`. This section is the summary.
+
 A run is a job (`research.run`) over one party or a pair. It is a fixed
 pipeline, so every run of the same kind does the same steps in the same
 order:
