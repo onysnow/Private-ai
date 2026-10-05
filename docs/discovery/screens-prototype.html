@@ -191,7 +191,7 @@ function drawKind(hot){
     if(a.col===b.col){const k=`${l.f}${l.t}`;same[k]=(same[k]||0)+1;const side=colW/2-62+same[k]*30;const sx=a.x+side;pts=bez({x:a.x,y:a.y},{x:sx,y:a.y},{x:sx,y:b.y},{x:b.x,y:b.y});mid=pts[20];}
     else{const dir=b.x>a.x?1:-1,dx=Math.abs(b.x-a.x)*0.5;pts=bez({x:a.x,y:a.y},{x:a.x+dir*dx,y:a.y},{x:b.x-dir*dx,y:b.y},{x:b.x,y:b.y});mid=pts[20]}
     const w=l.amt?7:5;s+=taper(trim(pts,19,21),w,1.3,l.c,l.sure!=='s',op);
-    if(a.col===b.col)s+=`<text x="${a.x+88}" y="${(a.y+b.y)/2+(same[`${l.f}${l.t}`]===1?-4:14)}" font-size="11" fill="${l.c}" opacity="${op}" stroke="#1f292e" stroke-width="4" paint-order="stroke">${esc(l.lab)}</text>`;
+    if(a.col===b.col)s+=`<text x="${a.x+104}" y="${(a.y+b.y)/2+(same[`${l.f}${l.t}`]===1?-4:14)}" font-size="11" fill="${l.c}" opacity="${op}" stroke="#1f292e" stroke-width="4" paint-order="stroke">${esc(l.lab)}</text>`;
     if(l.sure==='d')s+=`<g transform="translate(${mid.x},${mid.y})" opacity="${op}"><circle r="8" fill="#9f3632" stroke="#1a2328" stroke-width="2"/><text y="4" text-anchor="middle" font-size="11" font-weight="700" fill="#f3e9d7">!</text></g>`});
   for(const p of PARTIES){const {x,y}=pos[p.id],k=K[p.schema],r=11+3*Math.sqrt(p.links-1),op=lit&&hot.type==='party'&&!(hot.id===p.id||LINKS.some(l=>litLinks.has(l)&&(l.f===p.id||l.t===p.id)))?0.3:1;
     s+=`<g data-party="${p.id}" opacity="${op}" style="cursor:pointer"><circle cx="${x}" cy="${y}" r="${r+3}" fill="#1a2328"/><circle cx="${x}" cy="${y}" r="${r}" fill="${k.fill}" stroke="${k.ring}" stroke-width="2.5"/><svg x="${x-r*0.55}" y="${y-r*0.55}" width="${r*1.1}" height="${r*1.1}" viewBox="0 0 24 24" fill="none" stroke="${k.ring}" stroke-width="2.2">${k.ic}</svg>
