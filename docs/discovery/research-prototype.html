@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Research prototype</title>
+<style>
+:root{--page:#13131d;--card:#1a2328;--card2:#1c262b;--well:#26272b;--rule:#2e3a40;--rule2:#393941;--border:#4e4234;
+--ink:#f3e9d7;--text:#caaf9c;--muted:#927e5d;--soft:#bc9574;--night:#010005;--gold:#b98d34;--amber:#d4a152;--sage:#baac91;--copper:#a16948;--steel:#4d7a9b;--plum:#312237;--plumL:#9a83a8;--brick:#9f3632;--forest:#3a5c52;--umber:#61503e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text);font:14px/1.5 Inter,"Segoe UI",system-ui,sans-serif}
+button{font:inherit;color:inherit}
+.top{height:54px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:20px;padding:0 22px;position:sticky;top:0;z-index:30}
+.top b{font:600 17px Georgia,serif;color:var(--ink)}
+.nav{display:flex;gap:4px}.nav button{all:unset;cursor:pointer;padding:6px 12px;border-radius:8px;color:var(--muted);font-size:13px}.nav button.on{background:#2a2a22;color:var(--amber)}
+.nav .c{display:inline-block;min-width:18px;border-radius:9px;background:var(--plum);color:var(--ink);font-size:10.5px;font-weight:700;margin-left:6px;padding:0 5px;text-align:center}
+.live{margin-left:auto;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--amber);animation:pl 1.2s infinite}@keyframes pl{50%{opacity:.25}}
+.view{display:none}.view.on{display:block}
+/* chart view */
+.wrap{max-width:1440px;margin:0 auto;padding:18px 22px 40px;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:18px}
+.frame{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.fh{padding:14px 18px 8px}.fh h3{margin:0;font:600 20px Georgia,serif;color:var(--ink)}.fh p{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.rulebar{padding:7px 18px;background:#222c31;border-top:1px solid var(--rule2);border-bottom:1px solid var(--rule2);font-size:12.5px;color:var(--sage)}.rulebar b{color:var(--amber)}
+.banner{display:none;align-items:center;gap:12px;padding:9px 18px;background:linear-gradient(90deg,#3a2f1f,#2a2a22);border-bottom:1px solid var(--border);color:var(--ink);font-size:13px}
+.banner.on{display:flex}.banner .btn{margin-left:auto}
+.cv{position:relative}
+svg.net{display:block;width:100%;height:520px}
+.dot{cursor:pointer}
+.card{position:absolute;z-index:5;width:300px;background:#10161a;border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 30px #000a;padding:11px 13px;font-size:12.5px;display:none}
+.card .t{color:var(--ink);font-weight:600;font-size:13.5px;display:flex;gap:8px;align-items:center}
+.card .r{display:flex;justify-content:space-between;border-top:1px solid #222c31;padding:4px 0}.card .r span:first-child{color:var(--muted)}
+.card .acts{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+.btn{all:unset;cursor:pointer;border:1px solid var(--rule2);border-radius:8px;padding:5px 11px;font-size:12.5px;color:var(--text);white-space:nowrap;background:var(--well)}
+.btn:hover{border-color:var(--border);color:var(--ink)}.btn.p{background:var(--amber);color:var(--night);border-color:var(--amber);font-weight:600}
+.btn.big{display:flex;align-items:center;gap:8px;padding:7px 11px}
+.side{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;align-self:start;position:sticky;top:72px;max-height:calc(100vh - 90px);overflow:auto}
+.side h4{margin:0 0 4px;font:600 15px Georgia,serif;color:var(--ink)}.side .sub{font-size:12px;color:var(--muted);margin-bottom:10px}
+.mini{border-left:3px solid var(--edge);padding:6px 9px;margin:6px 0;background:var(--card2);border-radius:0 8px 8px 0;font-size:12.5px;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(-4px)}}
+.mini .k{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+.ex{display:inline-block;border:1px dashed var(--plumL);color:var(--plumL);border-radius:6px;font-size:9.5px;font-weight:700;letter-spacing:.06em;padding:0 5px;margin-left:5px;vertical-align:1px}
+/* research view */
+.rwrap{max-width:1500px;margin:0 auto;padding:18px 22px 40px;display:grid;grid-template-columns:250px minmax(0,1fr) 340px;gap:18px}
+.rnav{position:sticky;top:72px;align-self:start}
+.rnav h5{margin:12px 0 6px;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.rn{all:unset;cursor:pointer;display:flex;justify-content:space-between;gap:8px;width:100%;box-sizing:border-box;padding:6px 9px;border-radius:8px;font-size:13px;color:var(--text)}
+.rn:hover{background:#202a2f}.rn.on{background:#2a2a22;color:var(--ink)}.rn em{font-style:normal;font-size:11.5px;color:var(--muted)}
+.run{all:unset;cursor:pointer;display:block;width:100%;box-sizing:border-box;padding:8px 9px;border-radius:9px;border:1px solid var(--rule);margin-bottom:6px;background:var(--card)}
+.run.on{border-color:var(--amber)}.run b{color:var(--ink);font-size:12.5px;display:block}.run span{font-size:11.5px;color:var(--muted)}
+.counts{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}.cnt{font-size:10.5px;border-radius:999px;padding:0 7px;font-weight:700;line-height:17px}
+.rh{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}.rh h2{margin:0;font:600 22px Georgia,serif;color:var(--ink)}.rh span{font-size:12.5px;color:var(--muted)}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin:10px 0 14px}.chip{all:unset;cursor:pointer;border:1px solid var(--rule2);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--text);display:inline-flex;gap:6px;align-items:center}
+.chip.on{border-color:var(--border);background:#2a2a22;color:var(--amber)}.chip i{width:9px;height:9px;border-radius:50%}
+.tl{position:relative;padding-left:34px}
+.tl:before{content:"";position:absolute;left:14px;top:4px;bottom:4px;width:2px;background:var(--rule2)}
+.step{position:relative;background:var(--card);border:1px solid var(--rule);border-left:4px solid var(--edge);border-radius:10px;padding:10px 12px;margin-bottom:10px;cursor:pointer}
+.step.lit{box-shadow:0 0 0 2px var(--amber)}.step.dim{opacity:.35}.step.retracted .st{text-decoration:line-through;color:var(--muted)}
+.step .node{position:absolute;left:-29px;top:10px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--edge);border:3px solid var(--page)}
+.step .hd{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.step .kl{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+.step .who{font-size:11.5px;color:var(--muted)}.step .tm{margin-left:auto;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.step .st{color:var(--ink);font-weight:600;margin-top:3px;line-height:1.4}
+.step .why{font-size:12.5px;margin-top:5px;line-height:1.5}.step .why b{color:var(--amber);font-weight:600}
+.io{display:none;margin-top:8px;border-top:1px solid var(--rule);padding-top:8px;font-size:12px}
+.step.open .io{display:block}
+.io table{width:100%;border-collapse:collapse}.io td{padding:3px 6px;border-bottom:1px solid #222c31;vertical-align:top}.io td:first-child{color:var(--muted);width:120px;white-space:nowrap}
+.io code{font:12px ui-monospace,Menlo,monospace;color:var(--sage);background:#141b1f;border-radius:5px;padding:1px 5px}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:0 8px;font-size:11.5px;font-weight:600;line-height:19px;white-space:nowrap}
+.hash{font:10.5px ui-monospace,monospace;color:#6f5e44}
+.removed{border:1px dashed #9f3632;background:rgba(159,54,50,.10);border-radius:8px;padding:6px 9px;margin-top:6px;font-size:12.5px}
+.removed s{color:#e0a59f}
+.drawer{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;position:sticky;top:72px;align-self:start;max-height:calc(100vh - 90px);overflow:auto;font-size:12.5px}
+.drawer h4{margin:0 0 6px;font:600 15px Georgia,serif;color:var(--ink)}
+.rests{border-left:2px solid var(--amber);padding-left:9px;margin:6px 0}
+table.log{width:100%;border-collapse:collapse;font-size:12.5px}table.log th{text-align:left;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:6px;border-bottom:1px solid var(--rule2)}table.log td{padding:7px 6px;border-bottom:1px solid #222c31;vertical-align:top}
+.ctr{background:var(--card);border:1px solid var(--rule);border-left:4px solid var(--brick);border-radius:10px;padding:11px 13px;margin-bottom:10px}
+.vs{display:grid;grid-template-columns:1fr 34px 1fr;gap:8px;align-items:stretch;margin-top:8px}
+.vs>div{background:var(--card2);border:1px solid var(--rule);border-radius:8px;padding:8px;font-size:12.5px}.vs .x{display:grid;place-items:center;color:#e0a59f;font-weight:700;background:none;border:0}
+.note{max-width:1500px;margin:0 auto;padding:0 22px 30px;font-size:12px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#10161a;border:1px solid var(--amber);color:var(--ink);border-radius:10px;padding:8px 14px;font-size:13px;display:none;z-index:60}
+@keyframes march{to{stroke-dashoffset:-20}}
+.marching{animation:march .6s linear infinite}
+</style></head><body>
+<div class="top"><b>Journalism Workbench</b><div class="nav" id="nav"><button data-v="chart" class="on">Relationships</button><button data-v="research">Research<span class="c" id="navc">1</span></button></div><span class="live" id="live"></span></div>
+
+<!-- ============ CHART VIEW ============ -->
+<section class="view on" id="v-chart"><div class="wrap">
+  <div class="frame"><div class="fh"><h3>Who is linked to whom</h3><p>Demo investigation. Point at a party for what it is and what you can do with it.</p></div>
+    <div class="rulebar"><b>Arranged by control:</b> owners and directors on the left, what they own or run to the right.</div>
+    <div class="banner" id="banner"><span id="bannerText"></span><button class="btn" id="cancelPick">Cancel (Esc)</button></div>
+    <div class="cv"><svg class="net" id="net" viewBox="0 0 900 520"></svg><div class="card" id="card"></div></div></div>
+  <aside class="side" id="side"><h4>Research</h4><div class="sub">Point at a party and choose <b style="color:var(--amber)">Research in connection with…</b>, then click a second party. The app looks for every way the two could be connected, inside the case and outside it, and shows each step as it goes.</div><div id="sideRuns"></div></aside>
+</div></section>
+
+<!-- ============ RESEARCH VIEW ============ -->
+<section class="view" id="v-research"><div class="rwrap">
+  <nav class="rnav"><div id="rnav"></div></nav>
+  <main id="rmain"></main>
+  <aside class="drawer" id="rdrawer"></aside>
+</div></section>
+<p class="note">Prototype for discussion, on the demo investigation. Everything an outside source returns here is made up and marked <span class="ex">EXAMPLE</span>; the prototype contacts no one. The steps inside the case use the demo's real records.</p>
+<div class="toast" id="toast"></div>
+
+<script>
+const C={ink:'#f3e9d7',text:'#caaf9c',muted:'#927e5d',card:'#1a2328',amber:'#d4a152',brick:'#9f3632',plumL:'#9a83a8'};
+const KIND={Person:{fill:'#314d65',ring:'#4d7a9b',name:'Person'},Company:{fill:'#4e4234',ring:'#b98d34',name:'Company'},Organization:{fill:'#3a5c52',ring:'#baac91',name:'Organisation'},Asset:{fill:'#45271f',ring:'#bc9574',name:'Property or asset'}};
+const PARTIES=[
+ {id:'ala',name:'Alaric Voss',schema:'Person',country:'United Kingdom',x:150,y:110},
+ {id:'bel',name:'Bellcastle Trading Group',schema:'Company',country:'Cayman Islands',x:150,y:270},
+ {id:'mer',name:'Meridian Holdings Ltd',schema:'Company',country:'United Kingdom',x:460,y:190},
+ {id:'ves',name:'MV Fair Tern (cargo vessel)',schema:'Asset',country:'unknown',x:760,y:190},
+ {id:'pri',name:'Priya Kavanagh',schema:'Person',country:'unknown',x:150,y:430},
+ {id:'har',name:'Harborline Civic Trust',schema:'Organization',country:'unknown',x:460,y:430}];
+const LINKS=[
+ {f:'bel',t:'mer',fam:'Ownership',c:'#d4a152',sure:'supported',label:'owns · 100%'},
+ {f:'bel',t:'mer',fam:'Payment',c:'#a16948',sure:'disputed',label:'paid USD 2,400,000',bow:.22},
+ {f:'ala',t:'mer',fam:'Directorship',c:'#baac91',sure:'unverified',label:'directs'},
+ {f:'mer',t:'ves',fam:'Ownership',c:'#d4a152',sure:'unverified',label:'owns'},
+ {f:'pri',t:'har',fam:'Employment',c:'#baac91',sure:'unverified',label:'works for'}];
+const P=id=>PARTIES.find(p=>p.id===id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+const S={view:'chart',pick:null,hover:null,runs:[],runSel:null,section:'run',filter:new Set(),litStep:null,openSteps:new Set()};
+
+// ---------- the chart ----------
+function tapered(a,b,c,dashed,bow=0,w0=6,w1=1.4){const mx=(a.x+b.x)/2,my=(a.y+b.y)/2,dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy);const cx=mx-dy*bow,cy=my+dx*bow;
+  const pts=[];for(let i=0;i<=40;i+=1){const t=i/40;pts.push({x:(1-t)**2*a.x+2*(1-t)*t*cx+t*t*b.x,y:(1-t)**2*a.y+2*(1-t)*t*cy+t*t*b.y})}
+  const keep=pts.filter(p=>Math.hypot(p.x-a.x,p.y-a.y)>20&&Math.hypot(p.x-b.x,p.y-b.y)>22);let s='';
+  const seg=(i0,i1)=>{const L=[],R=[];for(let i=i0;i<=i1;i+=1){const p=keep[i],q=keep[Math.min(i+1,keep.length-1)],o=keep[Math.max(i-1,0)];let ux=q.x-o.x,uy=q.y-o.y;const n=Math.hypot(ux,uy)||1;ux/=n;uy/=n;const h=(w0+(w1-w0)*i/(keep.length-1))/2;L.push(`${p.x-uy*h},${p.y+ux*h}`);R.unshift(`${p.x+uy*h},${p.y-ux*h}`)}return`M${L.join(' L')} L${R.join(' L')} Z`};
+  if(!dashed)s=seg(0,keep.length-1);else for(let i=0;i<keep.length-1;i+=5)s+=seg(i,Math.min(i+3,keep.length-1));
+  const m=keep[Math.floor(keep.length/2)];return{d:s,mid:m}}
+function drawNet(){
+  let s='<defs><filter id="glow"><feGaussianBlur stdDeviation="3"/></filter></defs>';
+  s+=`<rect x="0" y="0" width="300" height="520" fill="#1f292e"/><text x="16" y="24" font-size="11" fill="${C.muted}" letter-spacing=".07em">TOP OF THE CHAIN</text><text x="316" y="24" font-size="11" fill="${C.muted}" letter-spacing=".07em">1 STEP DOWN</text><rect x="610" y="0" width="290" height="520" fill="#1f292e"/><text x="626" y="24" font-size="11" fill="${C.muted}" letter-spacing=".07em">2 STEPS DOWN</text>`;
+  for(const l of LINKS){const g=tapered(P(l.f),P(l.t),l.c,l.sure!=='supported',l.bow||0);s+=`<path d="${g.d}" fill="${l.c}" opacity="${S.pick?.25:1}"/>`;if(l.sure==='disputed')s+=`<g transform="translate(${g.mid.x},${g.mid.y})"><circle r="8" fill="${C.brick}" stroke="${C.card}" stroke-width="2"/><text y="4" text-anchor="middle" font-size="11" font-weight="700" fill="${C.ink}">!</text></g>`}
+  // research lines: running = marching, done = dashed plum with a badge
+  for(const r of S.runs){const a=P(r.a),b=P(r.b);const mx=(a.x+b.x)/2-90,my=(a.y+b.y)/2;
+    s+=`<path d="M${a.x},${a.y} Q${mx},${my} ${b.x},${b.y}" fill="none" stroke="${C.plumL}" stroke-width="2.5" stroke-dasharray="6 4" class="${r.done?'':'marching'}" opacity=".95"/>`;
+    s+=`<g transform="translate(${mx+42},${my})"><rect x="-74" y="-12" width="148" height="24" rx="12" fill="#312237" stroke="${C.plumL}"/><text y="4" text-anchor="middle" font-size="11" font-weight="700" fill="${C.ink}">${r.done?(r.waiting?`possible link · ${r.waiting} for you`:'researched'):'researching…'}</text></g>`}
+  for(const p of PARTIES){const k=KIND[p.schema],cand=S.pick&&p.id!==S.pick,src=S.pick===p.id,hov=S.hover===p.id;
+    s+=`<g class="dot" data-id="${p.id}">${cand?`<circle cx="${p.x}" cy="${p.y}" r="26" fill="none" stroke="${C.amber}" stroke-width="2" stroke-dasharray="3 4" opacity="${hov?1:.6}"/>`:''}${src?`<circle cx="${p.x}" cy="${p.y}" r="27" fill="none" stroke="${C.plumL}" stroke-width="3"/>`:''}
+      <circle cx="${p.x}" cy="${p.y}" r="18" fill="${C.card}"/><circle cx="${p.x}" cy="${p.y}" r="15" fill="${k.fill}" stroke="${k.ring}" stroke-width="2.5"/>
+      <text x="${p.x}" y="${p.y+36}" text-anchor="middle" font-size="13" font-weight="600" fill="${C.text}" stroke="${C.card}" stroke-width="4" paint-order="stroke">${esc(p.name.length>24?p.name.slice(0,23)+'…':p.name)}</text>
+      <circle cx="${p.x}" cy="${p.y}" r="30" fill="transparent"/></g>`}
+  document.getElementById('net').innerHTML=s;
+}
+const net=document.getElementById('net'),card=document.getElementById('card');
+function pathBetween(a,b){ // shortest path in the case, ignoring direction
+  const adj={};for(const l of LINKS){(adj[l.f]=adj[l.f]||[]).push([l.t,l]);(adj[l.t]=adj[l.t]||[]).push([l.f,l])}
+  const prev={[a]:null},q=[a];while(q.length){const x=q.shift();if(x===b)break;for(const[y,l]of adj[x]||[])if(!(y in prev)){prev[y]=[x,l];q.push(y)}}
+  if(!(b in prev))return null;const out=[];let x=b;while(prev[x]){out.unshift(prev[x][1]);x=prev[x][0]}return out}
+function showCard(id,ev){
+  const p=P(id),k=KIND[p.schema],box=net.getBoundingClientRect(),cv=net.parentElement.getBoundingClientRect();
+  let h=`<div class="t"><i style="width:10px;height:10px;border-radius:50%;background:${k.ring}"></i>${esc(p.name)}</div><div class="r"><span>Kind · country</span><span>${k.name} · ${p.country}</span></div><div class="r"><span>Links</span><span>${LINKS.filter(l=>l.f===id||l.t===id).length}</span></div>`;
+  if(S.pick){const src=P(S.pick),path=pathBetween(S.pick,id);
+    h+=`<div class="r"><span>Already known</span><span>${path?`${path.length} link${path.length>1?'s':''} apart`:'not connected in the case'}</span></div><div style="margin-top:6px;color:var(--amber)">Click to research ${esc(src.name)} in connection with ${esc(p.name)}</div>`}
+  else h+=`<div class="acts"><button class="btn p big" data-act="pick" data-id="${id}">⇄ Research in connection with…</button><button class="btn big" data-act="solo" data-id="${id}">⌕ Research this party</button><button class="btn big" data-act="note">✎ Add a note</button></div>`;
+  card.innerHTML=h;card.style.display='block';card.style.pointerEvents=S.pick?'none':'auto';
+  const x=(p.x/900)*box.width+(box.left-cv.left)+44,y=(p.y/520)*box.height+(box.top-cv.top)-20;
+  card.style.left=Math.min(cv.width-310,x)+'px';card.style.top=Math.max(6,Math.min(cv.height-card.offsetHeight-6,y))+'px';
+}
+net.addEventListener('mousemove',e=>{const g=e.target.closest('.dot');const id=g?.dataset.id||null;if(id!==S.hover){S.hover=id;drawNet();if(id&&id!==S.pick)showCard(id,e);else if(!id&&!card.matches(':hover'))card.style.display='none'}});
+net.addEventListener('mouseleave',e=>{setTimeout(()=>{if(!card.matches(':hover')){card.style.display='none';S.hover=null;drawNet()}},120)});
+card.addEventListener('mouseleave',()=>{card.style.display='none'});
+card.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;
+  if(b.dataset.act==='pick'){S.pick=b.dataset.id;card.style.display='none';const ban=document.getElementById('banner');ban.classList.add('on');
+    document.getElementById('bannerText').innerHTML=`Pick the party to research <b>${esc(P(S.pick).name)}</b> in connection with. Every other party is a choice; pointing at one shows what is already known.`;drawNet()}
+  if(b.dataset.act==='solo')toast('Researches this one party with every source the router picks for it');
+  if(b.dataset.act==='note')toast('Opens the note box for this party');});
+net.addEventListener('click',e=>{const g=e.target.closest('.dot');if(!g)return;const id=g.dataset.id;
+  if(S.pick&&id!==S.pick){startRun(S.pick,id);cancelPick()}else if(!S.pick)showCard(id,e)});
+function cancelPick(){S.pick=null;document.getElementById('banner').classList.remove('on');card.style.display='none';drawNet()}
+document.getElementById('cancelPick').onclick=cancelPick;document.addEventListener('keydown',e=>{if(e.key==='Escape')cancelPick()});
+
+// ---------- a research run: its steps ----------
+// actor: rule (the app's own logic), source (an outside or corpus search), model (AI, only when switched on), reporter
+const ACTOR={rule:{name:'The app\'s rules',c:'#d4a152',ic:'⚙'},source:{name:'A source',c:'#4d7a9b',ic:'⌕'},model:{name:'AI draft',c:'#9a83a8',ic:'✦'},reporter:{name:'You',c:'#baac91',ic:'●'}};
+const KINDS={plan:'Plan',inside:'Inside the case',search:'Search',match:'Match decision',fact:'Fact found',contradiction:'Contradiction',skipped:'Not run',conclusion:'Conclusion',draft:'AI draft',check:'Check caught a mistake',decision:'Your decision',correction:'Correction'};
+const KC={plan:'#d4a152',inside:'#b98d34',search:'#4d7a9b',match:'#a16948',fact:'#baac91',contradiction:'#9f3632',skipped:'#393941',conclusion:'#d4a152',draft:'#9a83a8',check:'#9f3632',decision:'#baac91',correction:'#3a5c52'};
+function stepsFor(a,b){
+  const A=P(a),B=P(b),path=pathBetween(a,b);
+  const pathText=path?path.map(l=>`${P(l.f).name} ${l.label.split(' ·')[0]} ${P(l.t).name}`).join('; '):'none';
+  const weakest=path?(path.find(l=>l.sure==='disputed')||path.find(l=>l.sure!=='supported')):null;
+  return[
+  {k:'plan',actor:'rule',t:`Plan: ${A.name} (${KIND[A.schema].name.toLowerCase()}, ${A.country}) with ${B.name} (${KIND[B.schema].name.toLowerCase()}, ${B.country})`,
+   why:`The source router picks sources from what each party is and where it is registered (router table, version 1). Outside lookups for this investigation are set to <b>Automatic</b>, so the free sources run now; click-only and paid ones wait.`,
+   io:[['Rule','router v1 (docs/discovery/sources.md, router rules 2–3)'],['For '+A.name,'Companies House officer search · UK Parliament Register of Interests · Electoral Commission donations · Wikidata'],['For '+B.name,'GLEIF · ICIJ Offshore Leaks · OCCRP Aleph Pro · OpenCorporates (no key: skipped)'],['For the pair','Documents naming both (the case\'s OpenAleph collection) · court records naming both (CourtListener: click only)']]},
+  {k:'inside',actor:'rule',t:path?`Inside the case: ${path.length} link${path.length>1?'s':''} apart`:'Inside the case: no path between them',
+   why:path?`Shortest path through the case's reviewed and unreviewed links: ${esc(pathText)}. The chain is only as sure as its weakest link${weakest?`: “${esc(P(weakest.f).name)} ${esc(weakest.label)}” is ${weakest.sure==='disputed'?'<b>disputed</b>':'<b>not yet shown</b> by a reviewed source'}`:''}.`:'Breadth-first search over every link in the case found no chain.',
+   io:[['Rule','shortest paths, up to 4 links, any direction'],['Paths found',path?'1':'0'],['Shared neighbours',path&&path.length===2?esc(P(path[0].f===a?path[0].t:path[0].f).name):'—']]},
+  {k:'search',actor:'source',ex:true,t:`Documents naming both: 0 found`,src:'OpenAleph (this case\'s collection, on this machine)',
+   why:`Searched the case's own documents for both names in the same document. Nothing leaves the machine for this search.`,
+   io:[['Query sent',`<code>"${esc(A.name)}" AND "${esc(B.name)}"</code>`],['Where','local OpenAleph collection'],['Results','0 documents'],['Request','#r-101 · not cached']]},
+  {k:'search',actor:'source',ex:true,t:`Companies House officer search: 3 people named ${A.name}`,src:'Companies House (UK)',
+   why:'Run because the router sends UK nationals to the UK officer register. A record of this search now exists on Companies House\'s side.',
+   io:[['Query sent',`<code>GET /search/officers?q=${encodeURIComponent(A.name)}</code>`],['Results','3 officers'],['Licence','Open Government Licence'],['Request','#r-102 · 412 ms · response hash 9f2c…e1']]},
+  {k:'match',actor:'rule',ex:true,t:`One of the three is probably our ${A.name}: left for you to decide`,
+   why:`Name matches exactly after normalising (rigour). Nationality British agrees. Our record has no birth date, so the match cannot reach the “confident” level. Score 0.86; the app links a person automatically only at 0.90 or above, so this waits for you.`,
+   io:[['Rule','person match v1: exact name +0.6, nationality +0.2, birth date +0.2'],['Their record','Alaric VOSS, born March 1971, British, 112 appointments'],['Score','0.86 (probable)'],['Threshold','0.90 to link without asking']],pending:'match1'},
+  {k:'fact',actor:'source',ex:true,t:'Their record says he was appointed director of Meridian Holdings Ltd on 2 March 2020',
+   io:[['From','Companies House, officer appointments'],['Fact','appointed_on = 2020-03-02 (Meridian Holdings Ltd)']],why:'Carried as a fact of the possible match. It becomes part of the record only if you accept the match.'},
+  {k:'contradiction',actor:'rule',ex:true,t:'Two sources give different appointment dates',
+   why:'The Companies Registry filing in the case (p. 2, Officers section) says “appointed 2019-06-11”. Companies House says 2 March 2020. Both are kept; neither replaces the other.',
+   io:[['Rule','same property, same subject, different values → contradiction'],['Source A','Meridian Holdings Ltd — Companies Registry filing (2024 annual return), p. 2: “Director: Alaric Voss, appointed 2019-06-11.”'],['Source B','Companies House officer appointments (EXAMPLE): 2020-03-02'],['Could be','a re-appointment, a filing error, or two different people']],ctr:true},
+  {k:'search',actor:'source',ex:true,t:`ICIJ Offshore Leaks: 1 entity named ${B.name}, Cayman Islands`,src:'ICIJ Offshore Leaks',
+   why:'Run because the router sends Cayman Islands companies to the offshore leaks data. The search ran against the local copy: nothing left the machine.',
+   io:[['Query sent',`<code>reconcile: "${esc(B.name)}"</code> (local copy)`],['Results','1 entity; officers listed: “A. VOSS”, “Corbel Nominees Ltd”'],['Licence','ODbL; cite ICIJ'],['Request','#r-104 · local · response hash 41b0…7c']]},
+  {k:'match',actor:'rule',ex:true,t:`“A. VOSS” could be ${A.name}: too little to say, left for you`,
+   why:'Only an initial and a surname. Same surname, initial agrees. No date of birth, no address. Score 0.62 (possible). Below 0.75 the app does not even suggest a link on its own; it is shown here because you asked about these two.',
+   io:[['Rule','person match v1'],['Their record','A. VOSS, officer of Bellcastle Trading Group (ICIJ)'],['Score','0.62 (possible)']],pending:'match2'},
+  {k:'search',actor:'source',ex:true,t:'GLEIF: no company identifier found',src:'GLEIF',why:'Nothing found is also kept: it shows the search was made.',io:[['Query sent',`<code>GET /lei-records?filter[entity.legalName]=${encodeURIComponent(B.name)}</code>`],['Results','0'],['Request','#r-105 · 288 ms']]},
+  {k:'skipped',actor:'rule',t:'Not run: OpenCorporates and CourtListener',why:'OpenCorporates needs a key that is not set. CourtListener is click only, because its free limit is 125 requests a day.',io:[['OpenCorporates','add a key in Settings → Outside lookups'],['CourtListener','run it from the plan: one click']]},
+  {k:'conclusion',actor:'rule',t:`So far: ${A.name} and ${B.name} are connected through Meridian Holdings Ltd, 2 links apart. A direct link is possible but not shown.`,
+   why:'Written from the steps it rests on, by the app\'s own template, not by AI. Point at it to light those steps.',rests:[1,4,8],io:[['Rests on','steps 2, 5 and 9'],['Waiting for you','2 match decisions']]},
+  {k:'draft',actor:'model',t:'AI draft of a summary (only when AI is switched on in Settings)',
+   why:'Asked to summarise the steps above in three sentences, citing a step for every claim. Every sentence goes through the quote, number and writing checks before you see it.',
+   io:[['Model','as set in Settings'],['Prompt','the steps above, with their records'],['Kept','1 of 3 sentences']],
+   draft:[{ok:true,t:`${A.name} and ${B.name} are two links apart, through Meridian Holdings Ltd [step 2].`},
+     {ok:false,t:`${A.name} is a director of ${B.name} [step 9].`,why:'Quote check: step 9 says “A. VOSS”, a possible match only. Nothing cited states that he is a director of Bellcastle.'},
+     {ok:false,t:`The two are linked by the $2.6M payment [step 2].`,why:'Number check: no cited record states 2.6 million; the payment on record is USD 2,400,000.'}]},
+  ]}
+function startRun(a,b){
+  const id='run'+(S.runs.length+1);const steps=stepsFor(a,b);
+  const run={id,a,b,steps:[],all:steps,done:false,waiting:0,started:new Date(),decisions:{}};S.runs.unshift(run);S.runSel=id;
+  let i=0;const tick=()=>{if(i<steps.length){run.steps.push({...steps[i],n:i+1,at:new Date(),hash:Math.random().toString(16).slice(2,6)});i+=1;render();setTimeout(tick,520)}else{run.done=true;run.waiting=steps.filter(s=>s.pending).length;render();toast('Research finished: open Research to see every step')}};
+  tick();
+}
+
+// ---------- research page ----------
+function counts(run){const st=run.steps;return{searches:st.filter(s=>s.k==='search').length,found:st.filter(s=>s.k==='fact'||s.k==='search'&&!/0 found|no company/.test(s.t)).length,wait:st.filter(s=>s.pending&&!run.decisions[s.pending]).length,ctr:st.filter(s=>s.k==='contradiction').length,caught:st.filter(s=>s.draft).reduce((n,s)=>n+s.draft.filter(d=>!d.ok).length,0)}}
+const cnt=(n,label,bg,fg='#f3e9d7')=>n?`<span class="cnt" style="background:${bg};color:${fg}">${n} ${label}</span>`:'';
+function renderNav(){
+  const all=S.runs;const ctrN=all.reduce((n,r)=>n+counts(r).ctr,0)+1,mN=all.reduce((n,r)=>n+counts(r).caught,0)+all.reduce((n,r)=>n+r.steps.filter(s=>s.k==='correction').length,0),reqN=all.reduce((n,r)=>n+counts(r).searches,0);
+  document.getElementById('rnav').innerHTML=`<h5>Views</h5>
+  ${[['run','A research run',all.length],['log','Everywhere it searched',reqN],['ctr','Contradictions',ctrN],['mis','Mistakes and corrections',mN],['dec','Waiting for your decision',all.reduce((n,r)=>n+counts(r).wait,0)]].map(([k,l,n])=>`<button class="rn${S.section===k?' on':''}" data-sec="${k}"><span>${l}</span><em>${n}</em></button>`).join('')}
+  <h5>Research runs</h5>${all.length?all.map(r=>{const c=counts(r);return`<button class="run${S.runSel===r.id?' on':''}" data-run="${r.id}"><b>${esc(P(r.a).name)} ⇄ ${esc(P(r.b).name)}</b><span>${r.done?'finished':'running…'} · started ${r.started.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})} · you asked</span><div class="counts">${cnt(c.searches,'searches','#314d65')}${cnt(c.wait,'for you','#d4a152','#010005')}${cnt(c.ctr,'contradiction','#9f3632')}${cnt(c.caught,'caught','#312237')}</div></button>`}).join(''):'<div style="font-size:12px;color:var(--muted)">No runs yet. Start one from a chart.</div>'}
+  <div class="run" style="cursor:default;opacity:.8"><b>Every party · automatic screening</b><span>ran when parties were added · 6 parties · 12 searches</span><div class="counts">${cnt(1,'match set aside','#3a5c52')}</div></div>`;
+}
+function stepCard(s,run){
+  const K=KC[s.k],A=ACTOR[s.actor];const lit=S.litStep!=null,rests=S.litStep!=null&&run.steps[S.litStep]?.rests;
+  const on=rests&&(rests.includes(s.n-1)||S.litStep===s.n-1),dec=s.pending&&run.decisions[s.pending];
+  if(S.filter.size&&!S.filter.has(s.k))return'';
+  let extra='';
+  if(s.draft)extra=s.draft.map(d=>d.ok?`<div style="margin-top:6px;font-size:12.5px;color:var(--ink)">✓ ${esc(d.t)}</div>`:`<div class="removed">Removed before you saw it: <s>${esc(d.t)}</s><br><span style="color:var(--text)">${esc(d.why)}</span></div>`).join('');
+  if(s.pending)extra+=dec?`<div style="margin-top:7px"><span class="pill" style="background:${dec==='yes'?'#3a5c52':'#61503e'};color:#f3e9d7">You decided: ${dec==='yes'?'same person':'not the same person'}</span></div>`:`<div style="margin-top:8px;display:flex;gap:6px"><button class="btn p" data-decide="${s.pending}" data-v="yes">Same person</button><button class="btn" data-decide="${s.pending}" data-v="no">Not the same</button><button class="btn" data-decide="${s.pending}" data-v="later">Decide later</button></div>`;
+  return`<div class="step${s.open||S.openSteps.has(run.id+s.n)?' open':''}${on?' lit':''}${lit&&!on&&rests?' dim':''}${s.retracted?' retracted':''}" style="--edge:${K}" data-step="${s.n-1}">
+   <span class="node" style="--edge:${A.c};color:#010005;font-size:11px;font-weight:700">${A.ic}</span>
+   <div class="hd"><span class="kl" style="color:${K}">${KINDS[s.k]}</span><span class="who">${A.name}${s.src?' · '+esc(s.src):''}</span>${s.ex?'<span class="ex">EXAMPLE</span>':''}<span class="tm">${s.n} · ${s.at.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'})}</span></div>
+   <div class="st">${esc(s.t)}</div>${s.why?`<div class="why"><b>Why.</b> ${s.why}</div>`:''}${extra}
+   <div class="io"><table>${(s.io||[]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')}</table><div class="hash" style="margin-top:6px">step ${s.n} · follows step ${s.n-1||'—'} · chain ${s.hash} (append-only: a later step can correct this one, never change it)</div></div>
+   <div style="font-size:11px;color:var(--muted);margin-top:4px">${s.open||S.openSteps.has(run.id+s.n)?'▾ hide what went in and came out':'▸ what went in and came out'}</div></div>`;
+}
+function renderMain(){
+  const m=document.getElementById('rmain'),run=S.runs.find(r=>r.id===S.runSel);
+  if(S.section==='run'){
+    if(!run){m.innerHTML=`<div class="rh"><h2>Research</h2></div><p style="color:var(--muted)">Start a run from a chart: point at a party, choose “Research in connection with…”, and click another party.</p>`;return}
+    const c=counts(run);
+    m.innerHTML=`<div class="rh"><h2>${esc(P(run.a).name)} ⇄ ${esc(P(run.b).name)}</h2><span>${run.done?'Finished':'<span class="pulse" style="display:inline-block"></span> Running'} · ${run.steps.length} steps · ${c.searches} searches · ${c.wait} waiting for you · ${c.ctr} contradiction · ${c.caught} mistakes caught</span></div>
+    <div class="chips">${Object.keys(KINDS).filter(k=>run.all.some(s=>s.k===k)).map(k=>`<button class="chip${S.filter.has(k)?' on':''}" data-filter="${k}"><i style="background:${KC[k]}"></i>${KINDS[k]}</button>`).join('')}${S.filter.size?'<button class="chip" data-filter="*">Show all</button>':''}</div>
+    <div class="tl">${run.steps.map(s=>stepCard(s,run)).join('')}</div>`;
+  }
+  if(S.section==='log'){
+    const rows=S.runs.flatMap(r=>r.steps.filter(s=>s.k==='search').map(s=>({r,s})));
+    m.innerHTML=`<div class="rh"><h2>Everywhere it searched</h2><span>Every request, local or outside. An outside request leaves a record of the search on that site.</span></div>
+    <table class="log" style="margin-top:12px"><colgroup><col style="width:80px"><col style="width:130px"><col><col style="width:120px"><col style="width:96px"><col style="width:120px"></colgroup><tr><th>Time</th><th>Where</th><th>What was sent</th><th>Result</th><th>Left the machine</th><th>Why</th></tr>
+    ${rows.map(({r,s})=>{const io=Object.fromEntries(s.io);return`<tr><td>${s.at.toLocaleTimeString()}</td><td style="color:var(--ink)">${esc(s.src)}</td><td>${io['Query sent']||''}</td><td>${esc(io['Results']||'')}</td><td>${/local/.test(io['Where']||io['Query sent']||'')?'<span class="pill" style="background:#3a5c52;color:#f3e9d7">no, local</span>':'<span class="pill" style="background:#61503e;color:#f3e9d7">yes</span>'}</td><td>run “${esc(P(r.a).name.split(' ')[0])} ⇄ ${esc(P(r.b).name.split(' ')[0])}”, step ${s.n}</td></tr>`}).join('')||'<tr><td colspan="6" style="color:var(--muted)">No searches yet.</td></tr>'}</table>`;
+  }
+  if(S.section==='ctr'){
+    const items=S.runs.flatMap(r=>r.steps.filter(s=>s.k==='contradiction').map(s=>({r,s})));
+    m.innerHTML=`<div class="rh"><h2>Contradictions</h2><span>Where two records disagree. Both are kept; the app never picks one for you.</span></div>
+    <div class="ctr" style="margin-top:12px"><b style="color:var(--ink)">Bellcastle Trading Group paid Meridian Holdings Ltd $2.4M described as a consulting fee</b> <span class="pill" style="background:#9f3632;color:#f3e9d7">claim disputed</span><div class="vs"><div><b style="color:#baac91">Supports</b><br>“Bank records show a transfer of $2,400,000 from Bellcastle Trading Group to Meridian Holdings Ltd in November 2023…”<br><span style="color:var(--muted)">Riverside Gazette, paragraph 6</span></div><div class="x">≠</div><div><b style="color:#e0a59f">Contradicts</b><br>“A spokesperson for Bellcastle Trading Group denied any ongoing financial relationship with Meridian Holdings Ltd.”<br><span style="color:var(--muted)">Riverside Gazette, paragraph 9</span></div></div><div style="margin-top:8px;font-size:12px;color:var(--muted)">Found by: claim review (both evidence links on one claim with opposite stances) · from the demo's real records</div></div>
+    ${items.map(({r,s})=>{const io=Object.fromEntries(s.io);return`<div class="ctr"><b style="color:var(--ink)">${esc(s.t)}</b> <span class="ex">EXAMPLE</span><div class="vs"><div>${esc(io['Source A'])}</div><div class="x">≠</div><div>${esc(io['Source B'])}</div></div><div style="margin-top:8px;font-size:12px">Could be: ${esc(io['Could be'])}</div><div style="margin-top:8px;display:flex;gap:6px"><button class="btn p">Make it a lead</button><button class="btn" data-goto="${r.id}">See the run (step ${s.n})</button></div></div>`}).join('')}`;
+  }
+  if(S.section==='mis'){
+    const items=S.runs.flatMap(r=>r.steps.flatMap(s=>(s.draft||[]).filter(d=>!d.ok).map(d=>({r,s,d,kind:'caught'})).concat(s.k==='correction'?[{r,s,kind:'corr'}]:[])));
+    m.innerHTML=`<div class="rh"><h2>Mistakes and corrections</h2><span>What the checks caught before you saw it, and every decision that was later reversed.</span></div><div style="margin-top:12px"></div>
+    ${items.map(x=>x.kind==='caught'?`<div class="ctr" style="border-left-color:#9a83a8"><span class="kl" style="color:#9a83a8;font-size:10.5px;font-weight:700;letter-spacing:.08em">AI DRAFT · REMOVED BY A CHECK</span><div class="removed"><s>${esc(x.d.t)}</s></div><div style="margin-top:6px;font-size:12.5px">${esc(x.d.why)}</div><div style="margin-top:6px"><button class="btn" data-goto="${x.r.id}">See the run (step ${x.s.n})</button></div></div>`:`<div class="ctr" style="border-left-color:#3a5c52"><span style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:#baac91">CORRECTION</span><div style="color:var(--ink);font-weight:600;margin-top:3px">${esc(x.s.t)}</div><div style="font-size:12.5px;margin-top:4px">${x.s.why}</div></div>`).join('')||'<p style="color:var(--muted)">Nothing yet.</p>'}`;
+  }
+  if(S.section==='dec'){
+    const items=S.runs.flatMap(r=>r.steps.filter(s=>s.pending&&!r.decisions[s.pending]).map(s=>({r,s})));
+    m.innerHTML=`<div class="rh"><h2>Waiting for your decision</h2><span>The app does not link people or companies on a guess.</span></div><div class="tl" style="margin-top:12px">${items.map(({r,s})=>stepCard(s,r)).join('')||'<p style="color:var(--muted)">Nothing waiting.</p>'}</div>`;
+  }
+}
+function renderDrawer(){
+  const d=document.getElementById('rdrawer'),run=S.runs.find(r=>r.id===S.runSel);
+  if(!run){d.innerHTML='<h4>How a run works</h4><p>Each step says who did it (the app\'s rules, a source, an AI draft, or you), why, what went in and what came out.</p>';return}
+  const c=run.steps.find(s=>s.k==='conclusion');
+  d.innerHTML=`<h4>Where this run stands</h4>${c?`<div class="rests"><div style="color:var(--ink);font-weight:600">${esc(c.t)}</div><div style="font-size:12px;color:var(--muted);margin-top:4px">Rests on steps ${c.rests.map(i=>i+1).join(', ')}. <a href="#" data-light="${c.n-1}" style="color:var(--amber)">${S.litStep===c.n-1?'Stop lighting':'Light them'}</a></div></div>`:'<p style="color:var(--muted)">Still running…</p>'}
+  <h4 style="margin-top:14px">Who did what</h4>${Object.entries(ACTOR).map(([k,a])=>`<div style="display:flex;gap:8px;align-items:center;margin:4px 0"><span style="width:20px;height:20px;border-radius:50%;background:${a.c};display:grid;place-items:center;color:#010005;font-size:11px;font-weight:700">${a.ic}</span>${a.name}<span style="margin-left:auto;color:var(--muted)">${run.steps.filter(s=>s.actor===k).length}</span></div>`).join('')}
+  <h4 style="margin-top:14px">Rules used</h4><div style="color:var(--muted)">router v1 · shortest paths · person match v1 · contradiction (same property, different value) · AI checks: quote, number, writing</div>
+  <h4 style="margin-top:14px">Run again</h4><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn" data-again="1">With the click-only sources</button><button class="btn">Add a site to search</button></div>`;
+}
+function render(){
+  drawNet();
+  const n=S.runs.filter(r=>!r.done).length;document.getElementById('live').innerHTML=n?`<span class="pulse"></span>${n} research run${n>1?'s':''} going`:'';
+  document.getElementById('navc').textContent=S.runs.reduce((k,r)=>k+counts(r).wait,0)||'';document.getElementById('navc').style.display=document.getElementById('navc').textContent?'':'none';
+  const sr=document.getElementById('sideRuns');sr.innerHTML=S.runs.map(r=>`<div style="margin-top:10px;font-weight:600;color:var(--ink)">${esc(P(r.a).name)} ⇄ ${esc(P(r.b).name)} ${r.done?'':'<span class="pulse" style="display:inline-block"></span>'}</div>${r.steps.slice(-6).map(s=>`<div class="mini" style="--edge:${KC[s.k]}"><span class="k" style="color:${KC[s.k]}">${KINDS[s.k]}</span>${s.ex?'<span class="ex">EXAMPLE</span>':''}<div>${esc(s.t)}</div></div>`).join('')}<button class="btn p" data-open="${r.id}" style="margin-top:6px">Open the full trail (${r.steps.length} steps)</button>`).join('');
+  renderNav();renderMain();renderDrawer();
+}
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>el.style.display='none',2600)}
+function setView(v){S.view=v;document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));render()}
+document.getElementById('nav').onclick=e=>{const b=e.target.closest('[data-v]');if(b)setView(b.dataset.v)};
+document.getElementById('side').onclick=e=>{const b=e.target.closest('[data-open]');if(b){S.runSel=b.dataset.open;S.section='run';setView('research')}};
+document.getElementById('rnav').onclick=e=>{const b=e.target.closest('[data-sec],[data-run]');if(!b)return;if(b.dataset.sec)S.section=b.dataset.sec;if(b.dataset.run){S.runSel=b.dataset.run;S.section='run'}S.litStep=null;render()};
+document.getElementById('rdrawer').onclick=e=>{const a=e.target.closest('[data-light]');if(a){e.preventDefault();const i=+a.dataset.light;S.litStep=S.litStep===i?null:i;render()}if(e.target.closest('[data-again]'))toast('Runs CourtListener for this pair (click-only source)')};
+document.getElementById('rmain').onclick=e=>{
+  const f=e.target.closest('[data-filter]');if(f){const k=f.dataset.filter;if(k==='*')S.filter.clear();else S.filter.has(k)?S.filter.delete(k):S.filter.add(k);render();return}
+  const g=e.target.closest('[data-goto]');if(g){S.runSel=g.dataset.goto;S.section='run';render();return}
+  const d=e.target.closest('[data-decide]');if(d){const run=S.runs.find(r=>r.steps.some(s=>s.pending===d.dataset.decide));if(d.dataset.v==='later')return toast('Kept in “Waiting for your decision”');
+    run.decisions[d.dataset.decide]=d.dataset.v;const st=run.steps.find(s=>s.pending===d.dataset.decide);
+    run.steps.push({k:'decision',actor:'reporter',n:run.steps.length+1,at:new Date(),hash:Math.random().toString(16).slice(2,6),t:`You decided step ${st.n}: ${d.dataset.v==='yes'?'same person':'not the same person'}`,why:'Recorded with your name and the time. It can be reversed later; the reversal becomes a new step.',io:[['Decision on',`step ${st.n}`]]});
+    if(d.dataset.decide==='match2'&&d.dataset.v==='no'){const c=run.steps.find(s=>s.k==='conclusion');c.retracted=true;
+      run.steps.push({k:'correction',actor:'rule',n:run.steps.length+1,at:new Date(),hash:Math.random().toString(16).slice(2,6),t:`Conclusion revised: ${P(run.a).name} and ${P(run.b).name} are connected through Meridian Holdings Ltd only. No direct link is open.`,why:`Step ${c.n} said a direct link was possible. You decided “A. VOSS” is not ${P(run.a).name}, so step ${c.n} is struck through and this step replaces it.`,rests:[1],io:[['Corrects',`step ${c.n}`],['Because',`your decision at step ${run.steps.length-1}`]]})}
+    if(d.dataset.decide==='match1'&&d.dataset.v==='yes'){run.steps.push({k:'fact',actor:'rule',n:run.steps.length+1,at:new Date(),hash:Math.random().toString(16).slice(2,6),t:'Added to the record: 112 company appointments (Companies House). Patterns re-checked.',why:'Accepting the match brings its facts in with their source. The pattern engine ran again and raised “mass officer” (more than 100 appointments) in Dig here next.',io:[['New flag','Alaric Voss is an officer of 112 companies']]})}
+    run.waiting=counts(run).wait;render();return}
+  const s=e.target.closest('.step');if(s&&!e.target.closest('button')){const run=S.section==='run'?S.runs.find(r=>r.id===S.runSel):null;const key=(run?run.id:'')+(+s.dataset.step+1);S.openSteps.has(key)?S.openSteps.delete(key):S.openSteps.add(key);render()}
+};
+render();
+</script></body></html>

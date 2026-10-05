@@ -33,6 +33,8 @@ It covers the brief Ony sent on 5 Oct:
 | F9 | Outside results arrive as findings for review. Accepting one adds it to the record and re-runs the patterns, so one discovery can lead to the next. | Ony: "propagation of more discoveries" |
 | F10 | Overlays: one year slider for the whole investigation; layers on the network (money, flags, tags, lookups); pointing at a party highlights it on every chart; "how are these two connected?" | Ony: "overlay information from different charts" |
 | F11 | Free sources first. Paid sources are optional per-source keys. | Ony: "Free first" |
+| F12 | On any chart, point at a party → "Research in connection with…" → click a second party. A research run looks for every way the two could be connected, inside the case and outside it, and shows its steps live. "Research this party" does the same for one party. | Ony, 5 Oct: "click on 'research in connection with' and then … click on another entity and it will start researching" |
+| F13 | Research pages: every run, everywhere it searched, what it found, and every decision, rule, reasoning step and conclusion, traceable to its inputs. Contradictions, mistakes the checks caught, and corrections each have their own view. | Ony, 5 Oct: "trace every single decision, logic, reasoning, conclusion … see when it also finds contradictions, makes mistakes, misspeaks" |
 
 ### Non-functional
 
@@ -371,6 +373,134 @@ are added to the generated client (`lib/generated`), as the repo requires.
 | Crawl target resolves to a private address | Refused before connecting (SSRF guard: private, loopback and link-local ranges; http/https only; 25 MB cap; 30 s timeout; no credentials sent). |
 | Pattern recompute fails | The last good flags stay, marked "as of <time>". The job error is shown in the jobs list. |
 
+### 3.9 Research runs (F12)
+
+A run is a job (`research.run`) over one party or a pair. It is a fixed
+pipeline, so every run of the same kind does the same steps in the same
+order:
+
+1. **Plan.** The router (3.4) picks sources for each party, then pair
+   sources for two parties:
+   - documents naming both, in the case's OpenAleph collection (local)
+   - officer, owner and address overlaps (Companies House officers and PSC,
+     OpenCorporates when keyed)
+   - filings naming both (EDGAR full text)
+   - contributions where one is the donor and the other the employer or
+     recipient (OpenFEC, Electoral Commission)
+   - lobbying where one is the client and the other the registrant
+     (lda.gov)
+   - contracts and grants (USAspending, TED, Find a Tender)
+   - court cases naming both (CourtListener, click only)
+   - leak entities shared by both (ICIJ, local)
+2. **Inside the case.** Every simple path of up to 4 links, with each
+   path's weakest link; shared neighbours; dates that overlap on the
+   timeline. These are computed by the pattern engine's graph (3.3).
+3. **Searches** run through the adapters (3.4–3.8), obeying the
+   investigation's lookup mode. A click-started run counts as a click for
+   "ask" mode, so its automatic sources run; click-only sources still wait
+   for their own click.
+4. **Match decisions.** Each outside record that might be one of our
+   parties is scored by a versioned rule (rigour normalisation plus
+   field agreement). Records are linked automatically only above a
+   threshold set per investigation (default 0.90). Anything lower waits for
+   the reporter.
+5. **Facts and contradictions.** A fact that disagrees with one already in
+   the case (same subject, same property, different value) creates a
+   contradiction. Both values are kept with their sources.
+6. **Conclusion.** Written by a template from the steps it rests on, not by
+   AI. It names those steps.
+7. **AI draft (only when AI is switched on).** A short summary through the
+   existing reasoning path (`app/ai/reasoning.py`), with the quote, number
+   and writing checks (`quote_check.py`, `value_check.py`,
+   `writing_check.py`). What the checks remove is kept as a caught mistake.
+
+On a chart, the pair gets a dashed plum line while the run is going. When
+it finishes, the line carries a badge ("possible link · 2 for you").
+Accepting a match or a fact goes through the findings path (F9), so the
+patterns re-run.
+
+### 3.10 The research trail (F13)
+
+Every run writes an append-only trail. Nothing in it is edited after it is
+written: a reversal or correction is a new step that points at the step it
+corrects.
+
+```
+research_runs   id, investigation_id, subjects JSON (party ids), kind (pair | party | gap | auto_screen),
+                trigger (chart_hover | pattern_gap | auto | manual), started_by, mode_at_start,
+                status, started_at, finished_at, conclusion_step_id
+research_steps  id, run_id, seq, kind (plan | inside | search | match | fact | contradiction | skipped |
+                conclusion | ai_draft | check | decision | correction),
+                actor (rule | source | model | reporter), actor_detail (rule id+version, source name,
+                model name, user id), title, reasoning (the rule's template text, filled in),
+                inputs JSON, outputs JSON, refs JSON (lookup_request_ids, finding_ids, evidence_ids,
+                statement_ids, step ids it rests on), corrects_step_id, status (ok | failed | retracted),
+                created_at, prev_hash, hash  (sha256 of prev_hash + canonical JSON of the step)
+contradictions  id, investigation_id, subject_type, subject_id, property, value_a, ref_a, value_b, ref_b,
+                found_by_step_id, status (open | explained | resolved), resolution_note, resolved_by, resolved_at
+```
+
+**The hash chain** makes the trail tamper-evident: a changed step breaks
+every hash after it. The research page can re-verify a run's chain.
+
+**Contradictions are not only from runs.** A claim whose evidence holds
+both "supports" and "contradicts" links appears in the same list, linked to
+the claim. The demo's $2.4M claim (Riverside Gazette paragraphs 6 and 9) is
+one.
+
+**Caught mistakes.** These are the existing checks' removals:
+
+- a quote not found in its record
+- a number or date its quotes do not state
+- a citation to a record the model was not given (`validate_citations`)
+- a writing-check report
+
+These are already recorded on `AIAnalysisCandidate`. A run's `check` steps
+point at them, so the Mistakes view reads one place.
+
+**Pages** (the Research section in the main navigation):
+
+- **A research run:** a timeline of steps. Each step shows:
+  - who did it (rules, source, AI, you)
+  - why (the rule's own wording)
+  - what went in and came out (the exact query sent, the result count, the
+    response hash, the licence)
+  - its hash
+
+  Filters by kind of step. "Light the steps this rests on" for any
+  conclusion.
+- **Everywhere it searched:** the request log (3.1 `lookup_requests`) across
+  all runs, with a column saying whether the request left the machine.
+- **Contradictions:** side by side, with "make it a lead".
+- **Mistakes and corrections.**
+- **Waiting for your decision:** the match decisions under threshold, from
+  every run.
+- **Automatic screening:** the background runs from F7 appear in the same
+  list as "auto" runs, so automatic work is as traceable as asked-for work.
+
+**API**
+
+```
+POST /api/investigations/{id}/research {subjects:[a] | [a,b]}   → 202 {run_id, job_id}
+GET  /api/investigations/{id}/research-runs                       → list with counts
+GET  /api/research-runs/{rid}?after_seq=n                         → steps (polled every 1 s while running;
+                                                                    the existing job-status polling pattern)
+GET  /api/research-runs/{rid}/verify                              → {ok, broken_at_seq}
+POST /api/research-steps/{sid}/decide {decision, note}            → appends a decision (and a correction when needed)
+GET  /api/investigations/{id}/contradictions | PATCH /api/contradictions/{cid}
+GET  /api/investigations/{id}/mistakes                            → check steps + corrections
+```
+
+**Trade-offs**
+
+- **Fixed pipeline, not an AI agent choosing its next search.** Every step
+  can be explained by a versioned rule, and two runs can be compared. AI
+  appears only as a checked draft. An agent mode can come later as another
+  run kind, writing to the same trail, so it would be just as traceable.
+- **Polling, not server-sent events.** The app already polls job status. At
+  one step per second, polling costs nothing and works behind every proxy.
+  SSE can replace it later without changing the trail.
+
 ---
 
 ## 4. Scale and reliability
@@ -435,6 +565,12 @@ decision.
 4. **Mass-officer threshold.** The plan uses more than 100 appointments, the
    number Global Witness used. It could instead be the top decile of the
    case, or set per investigation.
+5. **Linking automatically.** Should research runs link an outside record
+   to a party without asking when the match is "confident" (0.90 or
+   above)? Or should every link wait for a person, whatever the score?
+6. **AI in research runs.** The plan keeps AI to a checked summary at the
+   end, and only when AI is switched on. Should AI also be allowed to
+   suggest the next search? Every suggestion would go into the trail.
 
 ---
 

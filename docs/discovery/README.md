@@ -200,6 +200,20 @@ Each card shows:
   between them, with how sure each is.
 - **Saved views and story mode** (as discussed on 4 Oct).
 
+## Research in connection with, and the research trail (5 Oct)
+
+- **On any chart:** point at a party and choose "Research in connection
+  with…", then click a second party. The run searches inside the case and
+  outside it. A dashed plum line joins the two while it runs, and its steps
+  show live in the side panel.
+- **Research pages:** every run, everywhere it searched (and whether the
+  request left the machine), contradictions side by side, mistakes the
+  checks caught, corrections, and the matches waiting for a decision.
+- **Each step** says who made it (the app's rules, a source, an AI draft,
+  or you), why, and exactly what went in and came out. Steps are
+  append-only and hash-chained. Design: `system-design.md` 3.9–3.10.
+  Prototype: `research-prototype.html`.
+
 ## Build order
 
 1. **Page structure and colour roles across every page.** Search redesign.
@@ -208,7 +222,8 @@ Each card shows:
    the shared year slider.
 3. **Pattern engine** with the patterns computable from today's records,
    and the "dig here next" panel.
-4. **Router, lookups and crawler.** ADRs for the new packages first.
+4. **Router, lookups and crawler** (ADRs for the new packages first), then
+   research runs and the research pages.
 5. **Patterns that need looked-up data.** Saved views and story mode.
    Dashboard and review page.
 
