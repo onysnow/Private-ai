@@ -178,7 +178,7 @@ function results(){
 }
 function sureBucket(r){const s=sureOf(r);return s==='supported'||s==='verified'||s==='documented'?'shown':s==='disputed'?'disputed':s==='open'||!s?'none':'notyet'}
 
-// ---------- patterns ("dig here next") ----------
+// ---------- patterns ("Red Flags") ----------
 const SECRECY={ky:'Cayman Islands'}; // the app loads the full Tax Justice Network list; the prototype holds the one this case needs
 const SRC={
   A:['FATF/Egmont, Concealment of Beneficial Ownership (2018), Annex E','https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf'],
@@ -307,11 +307,11 @@ function render(){
   $('results').innerHTML=h||'<p style="color:var(--muted)">Nothing matches. Try fewer words, or clear a filter on the left.</p>';
   renderPanel();
 }
-function renderTabs(){const n=PAT.flags.length;$('tabs').innerHTML=[['dig',`Dig here next<span class="c">${n}</span>`],['look',`Lookups${FINDINGS.filter(f=>!S.accepted.has(f.id)&&!S.dismissed.has('f'+f.id)).length?`<span class="c">${FINDINGS.filter(f=>!S.accepted.has(f.id)).length}</span>`:''}`],['coll','Collections & notes']].map(([k,l])=>`<button class="tab${S.tab===k?' on':''}" data-tab="${k}">${l}</button>`).join('')}
+function renderTabs(){const n=PAT.flags.length;$('tabs').innerHTML=[['dig',`Red Flags<span class="c">${n}</span>`],['look',`Lookups${FINDINGS.filter(f=>!S.accepted.has(f.id)&&!S.dismissed.has('f'+f.id)).length?`<span class="c">${FINDINGS.filter(f=>!S.accepted.has(f.id)).length}</span>`:''}`],['coll','Collections & notes']].map(([k,l])=>`<button class="tab${S.tab===k?' on':''}" data-tab="${k}">${l}</button>`).join('')}
 function renderPanel(){
   renderTabs();let h='';
   if(S.tab==='dig'){
-    h+=`<p class="ph">Dig here next</p><p class="psub">Patterns seen in published cases, found in this investigation's records. Each is a lead, not a finding: it says why it matters, where the pattern was documented, and what would confirm or clear it.</p>`;
+    h+=`<p class="ph">Red Flags</p><p class="psub">Patterns seen in published cases, found in this investigation's records. Each is a lead, not a finding: it says why it matters, where the pattern was documented, and what would confirm or clear it.</p>`;
     PAT.flags.forEach((f,i)=>{const max=2;const col={21:'#89352a',2:'#3e6181',12:'#a16948',11:'#61503e',6:'#9f3632',3:'#9f3632'}[f.n]||'#d4a152';
       h+=`<div class="flag" style="--edge:${col}"><div class="ft"><span class="rk">${i+1}</span><span class="fn">${esc(f.name)}${f.fresh?' <span class="pill" style="background:#312237;color:#d9c8e3">new from a lookup</span>':''}</span></div>
       <div class="who">${f.who.map(partyDot).join('')}</div>
@@ -415,7 +415,7 @@ $('results').addEventListener('click',e=>{const c=e.target.closest('.res');if(!c
   if(a){const act=a.dataset.act;if(act==='tag'||act==='note'||act==='collect')openPop(act,k,a);
     if(act==='trace')toast('Opens the provenance trail for this record in a side drawer');
     if(act==='lookup'){S.tab='look';S.open.add(k.slice(2));render()}
-    if(act==='accept'){S.accepted.add(k.slice(2));render();toast('Accepted. Patterns re-checked: see Dig here next');S.tab='dig';render()}
+    if(act==='accept'){S.accepted.add(k.slice(2));render();toast('Accepted. Patterns re-checked: see Red Flags');S.tab='dig';render()}
     if(act==='aside'){S.dismissed.add('f'+k.slice(2));FINDINGS.splice(FINDINGS.findIndex(f=>f.id===k.slice(2)),1);render()}
     return}
   S.sel=k;render()});

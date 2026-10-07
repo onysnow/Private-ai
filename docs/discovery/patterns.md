@@ -1,4 +1,4 @@
-# Red-flag patterns for "dig here next"
+# Red-flag patterns for "Red Flags"
 
 Research done on 5 Oct 2026. Most pages were read through a summarising
 fetcher, so check any quotation against its source before it is shown in

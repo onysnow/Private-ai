@@ -27,7 +27,7 @@ Status: **proposed** (5 Oct 2026). This is the full design behind
 |---|---|
 | R1 | **Start from any chart.** On every chart that shows parties (network, grid, ownership chain, money, timeline), pointing at a party offers "Research in connection with…" and "Research this party". |
 | R2 | **Pick the second party.** After "Research in connection with…", the chart enters a picking state. Every other party is a choice, and pointing at one shows what is already known about the pair. Esc cancels. Clicking starts the run. |
-| R3 | **Start from the system's suggestions.** "Dig here next" flags, "one fact away" gaps and possible links already on a chart offer the same button, with the parties filled in. |
+| R3 | **Start from the system's suggestions.** "Red Flags" flags, "one fact away" gaps and possible links already on a chart offer the same button, with the parties filled in. |
 | R4 | **Progress on the chart.** The pair is joined by a "researching" line. Its steps appear live in a side panel. When the run ends, the line shows the outcome (for example "possible link · 2 for you"). |
 | R5 | **What a run does.** It searches inside the case and outside it, decides matches, records facts, finds contradictions and writes a conclusion. Every one of these is a step. |
 | R6 | **What every step records.** Who made it (the app's rules, a source, an AI draft, or the reporter), why (the rule's wording), what went in and what came out, and what it rests on. |

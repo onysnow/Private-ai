@@ -1,4 +1,4 @@
-# Discovery: search, tags and notes, "dig here next", lookups and overlays
+# Discovery: search, tags and notes, "Red Flags", lookups and overlays
 
 Status: **proposed** (5 Oct 2026). Nothing here is built yet. The prototype is
 `docs/discovery/prototype.html`; the build waits on Ony's word.
@@ -29,7 +29,7 @@ His answers to three questions:
 
 ## Principles
 
-1. **A flag is a lead, not a finding.** Every "dig here next" card says
+1. **A flag is a lead, not a finding.** Every "Red Flags" card says
    what the pattern is, why it matters, where it was documented, the
    innocent explanations, and which document would confirm or clear it.
    "Each flag signals a risk – it is not evidence" (Open Contracting
@@ -68,18 +68,18 @@ Based on the screenshots of 4 Oct 2026 (`/mnt/user-data/outputs/screens`).
 |---|---|---|
 | Workbench page | About 9,700 px long. Cards are in an order that does not follow the work. Uneven gaps. A hero sentence takes the first screen. Beige cards elsewhere. | The five-stage page, as in the approved page mockup: a rail, "Where things stand" tiles, equal-height rows, empty parts as one-line strips. |
 | Search | One beige card per hit. The same relationship appears twice (as an FtM entity and as a relationship row). Raw FtM ids show in snippets. No colour coding. No facets. Nothing on hover. | Redesigned (see Search below). |
-| Provenance trace | A card of instructions with no content until used. | Becomes the right-hand drawer that "Trace" opens from anywhere: a vertical chain from source to record. |
+| Provenance trace → **Chain of Custody** | A card of instructions with no content until used. | Becomes the right-hand drawer that "Trace" opens from anywhere: a vertical chain from source to record. |
 | Timeline | Done in pass 4. | Joins the shared year slider and overlays. |
 | Places | Empty state takes a card. | One-line strip when empty. |
 | Documents / bulk import | Two near-identical upload forms. | One drop zone. Each document's proposals are counted, coloured by status. |
-| Leads (kanban) | Empty columns take full width. The board scrolls sideways. Buttons repeat on every card. | Empty columns fold. Priority edge. Task state dots. Actions on hover. "Dig here next" cards can be turned into leads. |
+| Leads (kanban) | Empty columns take full width. The board scrolls sideways. Buttons repeat on every card. | Empty columns fold. Priority edge. Task state dots. Actions on hover. "Red Flags" cards can be turned into leads. |
 | Chart builder | Question-first flow is good. Choices are plain black buttons. | Each question has a small picture of its chart. A "From a collection" source (see Tags) lets you chart your own picks. |
 | AI reasoning | Disabled controls take a full card. | Collapses to one line when switched off. Plum marks anything a model wrote. |
 | Deletion / backup / restore | Fine. | "Keep" stage. Brick outline for danger. |
 | Sources & evidence | Form with no list. | A list of sources with evidence counts, linked claims and fetch snapshots. |
 | Claims | Beige cards. The right pane is empty until a click. | List and detail (as in the mockup). Status edge, confidence bar. Evidence for and against side by side. |
 | External connectors | Buttons in a row. Results arrive elsewhere. | Merged into one **Paper Trail** panel with OpenAleph (decided by Ony, 6 Oct 2026). Connectors become sources in the router. |
-| Relationships | Network redesign agreed (pass 2 + the radial prototype). | Plus overlays and "dig here next" markers on the dots. |
+| Relationships | Network redesign agreed (pass 2 + the radial prototype). | Plus overlays and "Red Flags" markers on the dots. |
 | Money flows | Sankey for one payment is one block. | Ledger bars under three payers or payees; flow above. Structuring and round-number flags shown on the bars. |
 | Review queue / evidence review / ledger | Three cards, mostly empty. | One "Findings to review" inbox: outside findings, cross-references, crawled pages and AI drafts. Filter chips by kind, accept or set aside in one place. |
 | OpenAleph corpus | Beige subcards. | Merged into the **Paper Trail** panel (decided by Ony, 6 Oct 2026): every source's status, one queue of matches and findings, records by source, what stands out, watchlist, send out. |
@@ -124,7 +124,7 @@ Based on the screenshots of 4 Oct 2026 (`/mnt/user-data/outputs/screens`).
   `collections`, `collection_items`. These are investigation-scoped, are
   included in backup and restore, and are never sent to outside sources.
 
-## Dig here next (pattern engine)
+## Red Flags (pattern engine)
 
 Rules run on the case graph (networkx on the server; graphology in the
 browser for live views). Each card is ranked as follows (method from
@@ -223,6 +223,14 @@ Decided by Ony, 6 October 2026: "I want them to be all the other services in one
 - **Source filter, everywhere.** One filter (any number of sources; "all" by default) on search, the network charts, the timeline, the dossier, the chart builder, the Paper Trail queue and exports. The API takes `sources=` on those endpoints and filters on statement datasets, so "only what OpenSanctions and the registry filing say" is one control on any page.
 - **Open question for Ony:** when the filter is on, does a record show only its facts from the chosen sources, or all its facts with the chosen ones lit?
 
+## Names
+
+Decided by Ony, 7 October 2026: a few main features get reporters' names; everything else keeps a plain name, so nobody has to learn slang to find things.
+
+- **Paper Trail**: the one panel for every source (above).
+- **Red Flags**: the pattern panel ("dig here next" until now).
+- **Chain of Custody**: following one fact back to its document (today's "Provenance trace"), kept apart from Paper Trail, which covers every source at once.
+
 ## Build order
 
 1. **Page structure and colour roles across every page.** Search redesign.
@@ -230,7 +238,7 @@ Decided by Ony, 6 October 2026: "I want them to be all the other services in one
 2. **Network redesign** (agreed) with the radial view, plus overlays and
    the shared year slider.
 3. **Pattern engine** with the patterns computable from today's records,
-   and the "dig here next" panel.
+   and the "Red Flags" panel.
 4. **Router, lookups and crawler** (ADRs for the new packages first), then
    research runs and the research pages.
 5. **Patterns that need looked-up data.** Saved views and story mode.

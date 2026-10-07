@@ -85,7 +85,7 @@ It covers the brief Ony sent on 5 Oct:
   ⌘K Search ─────────── GET /api/search ───────────▶ Search service (dedupe, names, facets)
   Tag / Note / Collect ─ /api/investigations/{id}/ ─▶ Annotations service ──▶ tags, notes, collections
                          tags|notes|collections
-  Dig here next ──────── GET …/patterns ────────────▶ Pattern engine (networkx) ◀── rules/*.py
+  Red Flags ──────── GET …/patterns ────────────▶ Pattern engine (networkx) ◀── rules/*.py
                                                          ▲            │
   Lookups panel ──────── …/lookups (plan, run, log) ─▶ Source router │ flags table
                                                          │            │
