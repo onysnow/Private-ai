@@ -78,11 +78,11 @@ Based on the screenshots of 4 Oct 2026 (`/mnt/user-data/outputs/screens`).
 | Deletion / backup / restore | Fine. | "Keep" stage. Brick outline for danger. |
 | Sources & evidence | Form with no list. | A list of sources with evidence counts, linked claims and fetch snapshots. |
 | Claims | Beige cards. The right pane is empty until a click. | List and detail (as in the mockup). Status edge, confidence bar. Evidence for and against side by side. |
-| External connectors | Buttons in a row. Results arrive elsewhere. | Replaced by Lookups (see below). Connectors become sources in the router. |
+| External connectors | Buttons in a row. Results arrive elsewhere. | Merged into one **Sources** panel with OpenAleph (decided by Ony, 6 Oct 2026). Connectors become sources in the router. |
 | Relationships | Network redesign agreed (pass 2 + the radial prototype). | Plus overlays and "dig here next" markers on the dots. |
 | Money flows | Sankey for one payment is one block. | Ledger bars under three payers or payees; flow above. Structuring and round-number flags shown on the bars. |
 | Review queue / evidence review / ledger | Three cards, mostly empty. | One "Findings to review" inbox: outside findings, cross-references, crawled pages and AI drafts. Filter chips by kind, accept or set aside in one place. |
-| OpenAleph corpus | Beige subcards. | Folded into Collect (sync status) and the findings inbox (cross-references). "What stands out" becomes a ranked list with sparkline counts. |
+| OpenAleph corpus | Beige subcards. | Merged into the **Sources** panel (decided by Ony, 6 Oct 2026): every source's status, one queue of matches and findings, records by source, what stands out, watchlist, send out. |
 | Dashboard | Two short lists. | A home for all investigations: each with its stage tiles, newest flags and what changed since the last visit. |
 | Review page | Empty when there are no documents. Plain list. | Document reader on the left, proposals on the right, keyboard accept and reject. |
 | Settings | Long forms. | Groups: access, outside lookups (the toggle and per-source keys and licences), AI, demo data. |
@@ -213,6 +213,15 @@ Each card shows:
   or you), why, and exactly what went in and came out. Steps are
   append-only and hash-chained. Design: `system-design.md` 3.9–3.10.
   Prototype: `research-prototype.html`.
+
+## Sources: one panel, source tags, source filter
+
+Decided by Ony, 6 October 2026: "I want them to be all the other services in one panel. And entities can simply have tags saying where they came from … And we can use that tag to manipulate the data if we want to filter by source."
+
+- **One panel, "Sources".** It replaces "OpenAleph corpus" and "External connectors". It holds every source's status (your documents, OpenAleph, OpenSanctions, the outside Aleph server, Firecrawl, the planned free registries), one queue of matches and findings from all of them, records by source, what stands out, the watchlist, and the send-outs to OpenAleph. Prototype: the Sources tab of `screens-prototype.html`.
+- **Source tags.** A record's tags are the sources of its facts. Nothing new is stored: every fact is a `Statement` with a `dataset` (`document:<id>`, a connector's dataset name, or the reporter's entry), and relationships and findings carry the same. A fixed map turns dataset values into source names; facts found through OpenAleph cross-references, lookups and the crawler get their source's dataset name when they are accepted.
+- **Source filter, everywhere.** One filter (any number of sources; "all" by default) on search, the network charts, the timeline, the dossier, the chart builder, the Sources queue and exports. The API takes `sources=` on those endpoints and filters on statement datasets, so "only what OpenSanctions and the registry filing say" is one control on any page.
+- **Open question for Ony:** when the filter is on, does a record show only its facts from the chosen sources, or all its facts with the chosen ones lit?
 
 ## Build order
 
