@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>By kind, sources and dossier: redesign</title>
+<title>By kind, Paper Trail and dossier: redesign</title>
 <style>
 :root{--page:#13131d;--card:#1a2328;--card2:#1c262b;--band:#1f292e;--well:#26272b;--rule:#2e3a40;--rule2:#393941;--border:#4e4234;
 --ink:#f3e9d7;--text:#caaf9c;--muted:#927e5d;--soft:#bc9574;--night:#010005;--gold:#b98d34;--amber:#d4a152;--sage:#baac91;--copper:#a16948;--steel:#4d7a9b;--plum:#312237;--plumL:#9a83a8;--brick:#9f3632;--forest:#3a5c52;--umber:#61503e}
@@ -73,7 +73,7 @@ table.props{width:100%;border-collapse:collapse;font-size:12.5px}table.props td{
 .flagc{border:1px dashed var(--rule2);border-left:4px solid #9f3632;border-radius:10px;padding:8px 10px;font-size:12.5px}
 .bugnote{border:1px solid #743a2f;background:rgba(116,58,47,.18);border-radius:10px;padding:8px 12px;font-size:12.5px;color:var(--ink)}
 </style></head><body>
-<div class="top"><b>Journalism Workbench</b><div class="tabs" id="tabs"><button data-p="kind" class="on">Network · by kind</button><button data-p="corpus">Sources</button><button data-p="dossier">Dossier: Alaric Voss</button></div><span style="margin-left:auto;font-size:12px;color:var(--muted)">Redesign prototype · demo investigation's records</span></div>
+<div class="top"><b>Journalism Workbench</b><div class="tabs" id="tabs"><button data-p="kind" class="on">Network · by kind</button><button data-p="corpus">Paper Trail</button><button data-p="dossier">Dossier: Alaric Voss</button></div><span style="margin-left:auto;font-size:12px;color:var(--muted)">Redesign prototype · demo investigation's records</span></div>
 
 <!-- ================= BY KIND ================= -->
 <section class="page on" id="p-kind">
@@ -94,10 +94,10 @@ table.props{width:100%;border-collapse:collapse;font-size:12.5px}table.props td{
   <li><b>Pointing at a party</b> gives its card with Research in connection with…, Research this party, Tag and Note; pointing at a column lights its parties and links; pointing at a band lights the links it counts.</li></ul></div>
 </section>
 
-<!-- ================= SOURCES ================= -->
+<!-- ================= PAPER TRAIL ================= -->
 <section class="page" id="p-corpus">
  <div class="frame" id="corpusFrame">
-  <div class="fh"><div><h3>Sources</h3><p>Every place the case's information comes from, in one panel: your documents, OpenAleph, outside databases and web lookups. Every record carries tags saying where it came from, and every tag is a filter.</p></div>
+  <div class="fh"><div><h3>Paper Trail</h3><p>Every place the case's information comes from, in one panel: your documents, OpenAleph, outside databases and web lookups. Every record carries tags saying where it came from, and every tag is a filter.</p></div>
    <span class="seg" id="corpSeg"><span data-s="on" class="on">Show OpenAleph running (example)</span><span data-s="off">Show it as on this machine (off)</span></span></div>
   <div class="status" id="cstatus"></div>
   <div class="srcfilter" id="sfilter"></div>
