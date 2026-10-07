@@ -71,7 +71,7 @@ Based on the screenshots of 4 Oct 2026 (`/mnt/user-data/outputs/screens`).
 | Provenance trace → **Chain of Custody** | A card of instructions with no content until used. | Becomes the right-hand drawer that "Trace" opens from anywhere: a vertical chain from source to record. |
 | Timeline | Done in pass 4. | Joins the shared year slider and overlays. |
 | Places | Empty state takes a card. | One-line strip when empty. |
-| Documents / bulk import | Two near-identical upload forms. | One drop zone. Each document's proposals are counted, coloured by status. |
+| Documents / bulk import → **The Drop** | Two near-identical upload forms. | One drop zone. Each document's proposals are counted, coloured by status. |
 | Leads (kanban) | Empty columns take full width. The board scrolls sideways. Buttons repeat on every card. | Empty columns fold. Priority edge. Task state dots. Actions on hover. "Red Flags" cards can be turned into leads. |
 | Chart builder | Question-first flow is good. Choices are plain black buttons. | Each question has a small picture of its chart. A "From a collection" source (see Tags) lets you chart your own picks. |
 | AI reasoning | Disabled controls take a full card. | Collapses to one line when switched off. Plum marks anything a model wrote. |
@@ -229,6 +229,7 @@ Decided by Ony, 7 October 2026: a few main features get reporters' names; everyt
 
 - **Paper Trail**: the one panel for every source (above).
 - **Red Flags**: the pattern panel ("dig here next" until now).
+- **The Drop**: where documents are added and read, and their proposals reviewed (today's "Document ingestion" and bulk import), chosen by Ony the same day.
 - **Chain of Custody**: following one fact back to its document (today's "Provenance trace"), kept apart from Paper Trail, which covers every source at once.
 
 ## Build order
