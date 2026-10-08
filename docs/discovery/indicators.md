@@ -22,7 +22,7 @@ Status: proposed, 8 October 2026. The catalogue's data and tools exist (`catalog
 ## Red Flags runs every indicator on every investigation
 
 - **All areas, always.** The investigation's type (procurement, influence, litigation; filled in by the app, changeable by the reporter) only decides the order. Indicators from the investigation's own areas are listed first. Hits from any other area appear in their own group, headed "This may also point to …", so a money-laundering case that starts to show forced-labour signs says so.
-- **Cross-hints.** When a flag fires and its indicator has cross-hints, the flag card names the other area, the reason and the source ("Payments to labour recruiters with deductions from wages: FATF/APG 2018, Annex B"). The cross-hint map in the PDF shows which areas point to which.
+- **Cross-hints.** When a flag fires and its indicator has cross-hints, the flag card names the other area, the reason and the source (for example a financial indicator whose source, such as the FATF/APG 2018 report on financial flows from human trafficking, ties it to trafficking). The cross-hint map in the PDF shows which areas point to which.
 - **Levels.** Faint, Strong, Textbook, from the indicator's own rules. A level with a number uses only the number its source gives; where no source gives one, Faint and Strong are set by Ony (Settings, later in the tutorial) and Textbook means "meets the published definition as worded".
 - **How each indicator runs** follows its `checkable` value:
   - `records`: a rule in the pattern engine (system-design.md §3.3) computes it from the case's own records.
