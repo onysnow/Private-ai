@@ -1,0 +1,3351 @@
+key: PP
+name: Public procurement, non-profits and elections
+scope: public procurement fraud and bid rigging (Open Contracting Partnership red flags and Cardinal,
+  Integrity Watch Red Flags, European Commission, OECD bid-rigging guidelines, Fazekas corruption risk
+  indicators), abuse of charities and non-profits (FATF Recommendation 8 typologies), election irregularities
+  and election forensics, campaign finance violations.
+indicators:
+- id: PP-001
+  name: Single bid received
+  definition: Only one company submitted a bid for a contract that was supposed to be competitive.
+  areas:
+  - PP
+  typology: Restricted competition / favoured bidder
+  status: verified
+  sources:
+  - title: Cardinal red flags list
+    publisher: Open Contracting Partnership
+    url: https://cardinal.readthedocs.io/en/latest/cli/indicators/index.html
+    locator: Red flags table, R018
+    quote: Only one tenderer submitted a bid.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Red flags for integrity: Giving the green light to open data solutions'
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 27 (Tender phase)
+    quote: Single bid received
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Corruption Risks Indicators (CRI) dataset
+    publisher: Quality of Government Institute, University of Gothenburg (Fazekas et al.)
+    url: https://datafinder.qog.gu.se/dataset/cri
+    locator: Single bidding variable
+    quote: Share of contracts with only one bid in total.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Corruption risk measurement presentation (Zagreb)
+    publisher: Corruption Research Center Budapest (Fazekas & Czibik)
+    year: '2015'
+    url: https://www.crcb.eu/wp-content/uploads/2015/06/Fazekas_Czibik_Zagreb_TI_intpact_150609.pdf
+    locator: Slide 6
+    quote: Single bid submitted
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A road-maintenance tender in an open procedure attracts exactly one bid, from a firm that has won
+    the same buyer's previous three tenders.
+  cases: []
+  data_needed:
+  - ContractAward (amount, date)
+  - Contract (authority, procedure, number of bids)
+  - Company (winner)
+  - PublicBody (buyer)
+  checkable: records
+  lookup_sources:
+  - Procurement portal / OCDS feed
+  - TED (EU Tenders Electronic Daily)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded: exactly one bid received in a competitive procedure'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Fazekas defines procurement corruption as steering a contract to a favoured bidder; single
+      bidding is the core proxy for this.
+    source_url: https://www.crcb.eu/wp-content/uploads/2015/06/Fazekas_Czibik_Zagreb_TI_intpact_150609.pdf
+  innocent_explanations:
+  - Highly specialised goods with only one capable supplier
+  - Small or remote markets with few firms
+  - Low contract value making bidding unattractive
+  - Very tight but legitimate emergency timelines
+  jurisdictions: Global (EU, OCDS publishers)
+  version: 1
+- id: PP-002
+  name: Fewer bidders than expected
+  definition: Fewer companies bid than usually bid for similar contracts, or fewer than a set minimum.
+  areas:
+  - PP
+  typology: Bid suppression / restricted competition
+  status: verified
+  sources:
+  - title: Integrity Watch Red Flags – About
+    publisher: Transparency International EU / Integrity Watch
+    url: https://redflags-cz.integritywatch.eu/about.php
+    locator: 'Contract award notices: Number of tenderers received low'
+    quote: this indicator signals less than three tenders received in a procedure (or a part thereof)
+      as a risk
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Price Fixing, Bid Rigging, and Market Allocation Schemes: What They Are and What to Look For'
+    publisher: U.S. Department of Justice, Antitrust Division
+    url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+    locator: 'Warning signs: bid patterns'
+    quote: Fewer than the normal number of competitors submit bids.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 27
+    quote: Fewer than the expected or normal number of bidders, based on prior similar contracts, submit
+      bids
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A cleaning contract that drew six bids each year for five years drew only two this year.
+  cases: []
+  data_needed:
+  - Contract (number of tenderers)
+  - ContractAward
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - Procurement portal history for the same buyer and category
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Fewer than three tenders received (Integrity Watch Red Flags threshold)
+    threshold_source: https://redflags-cz.integritywatch.eu/about.php
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Market consolidation after mergers
+  - Firms busy with other work
+  - Changed requirements that fewer firms can meet
+  - Economic downturn
+  jurisdictions: EU, US, global
+  version: 1
+- id: PP-003
+  name: Short submission or advertisement period
+  definition: Bidders were given unusually little time to prepare and submit bids, which favours a firm
+    that knew in advance.
+  areas:
+  - PP
+  typology: Leaking of bid information / favoured bidder
+  status: verified
+  sources:
+  - title: Cardinal red flags list
+    publisher: Open Contracting Partnership
+    url: https://cardinal.readthedocs.io/en/latest/cli/indicators/index.html
+    locator: Red flags table, R003
+    quote: The submission period is too short.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 26
+    quote: Short notice to bidders to submit expressions of interest or bids
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red Flags Listed by Project Cycle
+    publisher: International Anti-Corruption Resource Center (IACRC)
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Advertisement stage
+    quote: Short or Inadequate Notice to Bidders
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Corruption risk measurement presentation
+    publisher: Corruption Research Center Budapest
+    year: '2015'
+    url: https://www.crcb.eu/wp-content/uploads/2015/06/Fazekas_Czibik_Zagreb_TI_intpact_150609.pdf
+    locator: Slide 6 (sic)
+    quote: Lenght of advertisement period
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A tender published on 20 December with a 2 January deadline.
+  cases: []
+  data_needed:
+  - Contract (publication date, tender deadline)
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - Procurement portal
+  - National procurement law minimum periods
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (period shorter than the legal minimum or a low
+      outlier)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine emergency (disaster, health crisis)
+  - Accelerated procedure legally allowed
+  - Re-tender of a recently cancelled procedure where bidders already have documents
+  jurisdictions: Global
+  version: 1
+- id: PP-004
+  name: Tender not advertised or no prior publication
+  definition: The buyer awarded the contract without publicly advertising it, so other firms could not
+    compete.
+  areas:
+  - PP
+  typology: Unjustified sole source award
+  status: verified
+  sources:
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 26
+    quote: Failure to adequately advertise the request for bids or proposals
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Integrity Watch Red Flags – About
+    publisher: Transparency International EU / Integrity Watch
+    url: https://redflags-cz.integritywatch.eu/about.php
+    locator: 'Contract award notices: Procedure successful without prior publication'
+    quote: signals a risk if the contracting authority opts for a procedure without prior publication
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Corruption Risks Indicators (CRI) dataset
+    publisher: Quality of Government Institute
+    url: https://datafinder.qog.gu.se/dataset/cri
+    locator: No call for tender variable
+    quote: 'A contract is considered to have ''no call for tender'' red flag if two conditions are met:'
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A software contract above the EU threshold appears only as an award notice, with no prior contract
+    notice in TED.
+  cases: []
+  data_needed:
+  - Contract (procedure type, notice publication)
+  - ContractAward
+  - PublicBody
+  - Company
+  checkable: records
+  lookup_sources:
+  - TED / national procurement gazette
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded: award without prior publication outside the legally
+      allowed exceptions'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legal exceptions (extreme urgency, exclusive rights, follow-on works)
+  - Contract below publication threshold
+  - Notice published in a different outlet
+  jurisdictions: EU, global
+  version: 1
+- id: PP-005
+  name: Non-open, negotiated or accelerated procedure without justification
+  definition: The buyer used a less competitive procedure type and did not give the legal reason for doing
+    so.
+  areas:
+  - PP
+  typology: Unjustified sole source award
+  status: verified
+  sources:
+  - title: Integrity Watch Red Flags – About
+    publisher: Transparency International EU / Integrity Watch
+    url: https://redflags-cz.integritywatch.eu/about.php
+    locator: 'Contract notices: Use of competitive negotiated procedure without justification'
+    quote: the contract notice does not or falsely include the grounds for the use of a negotiated procedure
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Integrity Watch Red Flags – About
+    publisher: Transparency International EU / Integrity Watch
+    url: https://redflags-cz.integritywatch.eu/about.php
+    locator: 'Contract notices: Accelerated procedure without justification'
+    quote: it signals a risk when the contracting authority opts for an accelerated procedure
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Fraud in Public Procurement – A collection of Red Flags and Best Practices
+    publisher: European Commission (OLAF)
+    year: '2017'
+    url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+    locator: p. 20
+    quote: The use of sole source procedure for a common type of good or service;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Corruption Risks Indicators (CRI) dataset
+    publisher: Quality of Government Institute
+    url: https://datafinder.qog.gu.se/dataset/cri
+    locator: Non-open procedure variable
+    quote: Whether a procedure is considered non-open depends on procedure type as well as specific country
+      regulation.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Office furniture bought through a negotiated procedure with a call sent to only one operator.
+  cases: []
+  data_needed:
+  - Contract (procedure type, justification text)
+  - PublicBody
+  - Company
+  checkable: records
+  lookup_sources:
+  - Procurement portal
+  - National procurement law
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded: non-open procedure with missing or false legal
+      grounds'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real urgency
+  - Technical or exclusive rights
+  - Earlier open procedure failed with no suitable bids
+  jurisdictions: EU, global
+  version: 1
+- id: PP-006
+  name: Repeated single-source awards to the same supplier
+  definition: One supplier receives several non-competitive contracts from the same buyer within a short
+    time.
+  areas:
+  - PP
+  typology: Unjustified sole source award / favouritism
+  status: verified
+  sources:
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 27 (Contract phase)
+    quote: Supplier receives multiple single-source/noncompetitive contracts from a single procuring entity
+      during a defined time period
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A consultancy gets eight direct awards from one ministry in a year.
+  cases: []
+  data_needed:
+  - ContractAward
+  - Contract (procedure type)
+  - Company
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - Procurement portal
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Supplier holds exclusive licence or maintenance rights
+  - Framework or follow-on work legitimately tied to one firm
+  jurisdictions: Global
+  version: 1
+- id: PP-007
+  name: Split purchases / awards just under thresholds
+  definition: A purchase is divided into smaller contracts so each stays below the value that would require
+    open competition or higher approval.
+  areas:
+  - PP
+  typology: Split purchases
+  status: verified
+  sources:
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Contract awards stage
+    quote: Contract Awards Just Under Procurement Thresholds
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Procurement planning stage
+    quote: Manipulation of Procurement Thresholds
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Fraud in Public Procurement – A collection of Red Flags and Best Practices
+    publisher: European Commission (OLAF)
+    year: '2017'
+    url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+    locator: p. 21
+    quote: Splitting items that are usually purchased together to keep the contract value below threshold;
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Five IT purchases from one vendor on the same week, each just below the direct-award limit.
+  cases: []
+  data_needed:
+  - ContractAward (amount, date)
+  - Company
+  - PublicBody
+  - Contract (subject)
+  checkable: records
+  lookup_sources:
+  - Procurement portal
+  - Published procurement thresholds
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: OLAF also flags work split between related operators to stay below thresholds, which points
+      to hidden links between suppliers and officials.
+    source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  innocent_explanations:
+  - Separate genuine needs arising at different times
+  - Budget released in tranches
+  - Different departments buying independently
+  jurisdictions: Global
+  version: 1
+- id: PP-008
+  name: Rigged, tailored or vague specifications
+  definition: The technical requirements are written so that only one firm can meet them, or so vaguely
+    that the outcome can be steered.
+  areas:
+  - PP
+  typology: Rigged specifications
+  status: verified
+  sources:
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Bidding documents stage
+    quote: Contract Specifications Too Narrow or Too Broad
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Fraud in Public Procurement – A collection of Red Flags and Best Practices
+    publisher: European Commission (OLAF)
+    year: '2017'
+    url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+    locator: p. 18
+    quote: Reference to a brand as opposed to a definition using a generic description.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 26
+    quote: Vague description of the supply terms
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A vehicle tender requiring an exact engine displacement matched by one model only.
+  cases: []
+  data_needed:
+  - Document (tender specification)
+  - Contract
+  - Company
+  checkable: person
+  lookup_sources:
+  - Product catalogues / industry experts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Compatibility with existing equipment
+  - Genuine safety or quality needs
+  - Inexperienced drafting
+  jurisdictions: Global
+  version: 1
+- id: PP-009
+  name: Evaluation criteria open to manipulation
+  definition: Award criteria are too few, poorly defined, heavily subjective, or prequalification rules
+    are unreasonable, giving officials room to pick the winner.
+  areas:
+  - PP
+  typology: Manipulation of bids / excluding qualified bidders
+  status: verified
+  sources:
+  - title: Integrity Watch Red Flags – About
+    publisher: Transparency International EU / Integrity Watch
+    url: https://redflags-cz.integritywatch.eu/about.php
+    locator: 'Contract notices: Too few evaluation criteria'
+    quote: if the constituent factors are not defined in the notice, if no more than two are defined
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Corruption risk measurement presentation
+    publisher: Corruption Research Center Budapest
+    year: '2015'
+    url: https://www.crcb.eu/wp-content/uploads/2015/06/Fazekas_Czibik_Zagreb_TI_intpact_150609.pdf
+    locator: Slide 6
+    quote: Weight of non-price evaluation criteria
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Prequalification and short listing
+    quote: Unreasonable Prequalification Requirements
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 80% of the score given for 'quality of approach' with no scoring guide.
+  cases: []
+  data_needed:
+  - Document (tender notice, evaluation report)
+  - Contract
+  checkable: person
+  lookup_sources:
+  - Procurement portal documents
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Two or fewer award-criteria factors defined (Integrity Watch Red Flags)
+    threshold_source: https://redflags-cz.integritywatch.eu/about.php
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Complex services where quality genuinely matters more than price
+  - Lowest-price-only awards where few criteria are normal
+  jurisdictions: EU, global
+  version: 1
+- id: PP-010
+  name: Decision period abnormally short or long
+  definition: The time between bid deadline and award is unusually short (decision made in advance) or
+    long (possible bribe negotiation or challenge).
+  areas:
+  - PP
+  typology: Corruption / manipulation of award
+  status: verified
+  sources:
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 27 (Award phase)
+    quote: Decision period for submitted bids excessively short
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 27
+    quote: 'Long, unexplained delays in contract negotiations or awards (ex: as bribe demands are negotiated)'
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Corruption risk measurement presentation
+    publisher: Corruption Research Center Budapest
+    year: '2015'
+    url: https://www.crcb.eu/wp-content/uploads/2015/06/Fazekas_Czibik_Zagreb_TI_intpact_150609.pdf
+    locator: Slide 6
+    quote: Lenght of decision period
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A complex 40-bid construction tender awarded the day after bids closed.
+  cases: []
+  data_needed:
+  - Contract (bid deadline)
+  - ContractAward (date)
+  checkable: records
+  lookup_sources:
+  - Procurement portal
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Simple evaluation (one lot, price only)
+  - Legal challenges or complaints causing delay
+  - Staff shortages
+  jurisdictions: Global
+  version: 1
+- id: PP-011
+  name: Bid rotation / same firms always win
+  definition: The same group of firms keeps bidding and they appear to take turns winning, or the same
+    firm always wins a given contract.
+  areas:
+  - PP
+  typology: Bid rotation / market allocation
+  status: verified
+  sources:
+  - title: Price Fixing, Bid Rigging, and Market Allocation Schemes
+    publisher: U.S. DOJ Antitrust Division
+    url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+    locator: 'Warning signs: bid patterns'
+    quote: The same suppliers submit bids and each company seems to take a turn being the successful bidder.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 27
+    quote: The same companies always bid, the same companies always win and the same companies always
+      lose
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Bidding stage
+    quote: Rotation of Winning Bidders
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: OECD Guidelines to fight bid rigging (presentation)
+    publisher: OECD (A. Capobianco) via Malaysia Competition Commission
+    url: https://mycc.gov.my/sites/default/files/pdf/advocacy/Capobianco-OECD-Guidelines-to-fight-bid-rigging_FINAL.pdf
+    locator: Slide 15
+    quote: Suspicious bidding patterns (e.g. ABC, ABC) and pricing patterns
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Three paving firms win a county's quarterly contracts in order A, B, C, A, B, C.
+  cases:
+  - name: SK Energy, GS Caltex and Hanjin – U.S. military fuel supply contracts in South Korea
+    year: '2018'
+    jurisdiction: United States (S.D. Ohio)
+    what_happened: Three South Korean companies agreed to plead guilty to a conspiracy, from about 2005
+      into 2016, 'to suppress and eliminate competition' in bidding for U.S. fuel supply contracts in
+      South Korea; about $82 million in criminal fines and $154 million in civil settlements.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/three-south-korean-companies-agree-plead-guilty-and-enter-civil-settlements-rigging-bids
+    source_title: Three South Korean Companies Agree to Plead Guilty and Enter Civil Settlements for Rigging
+      Bids
+  data_needed:
+  - ContractAward (winner, date)
+  - Contract (bidders list)
+  - Company
+  checkable: records
+  lookup_sources:
+  - Procurement portal history
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - 'Capacity constraints: a firm that just won is too busy to bid low'
+  - Geographic cost advantages
+  - Small market with few qualified firms
+  jurisdictions: Global
+  version: 1
+- id: PP-012
+  name: Cover (complementary) bids and perennial losers
+  definition: Some firms keep submitting bids they never win, often too high or with unacceptable terms,
+    to make the competition look real.
+  areas:
+  - PP
+  typology: Cover bidding
+  status: verified
+  sources:
+  - title: Price Fixing, Bid Rigging, and Market Allocation Schemes
+    publisher: U.S. DOJ Antitrust Division
+    url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+    locator: 'Warning signs: suspicious statements or behavior'
+    quote: A company submits a bid when it is incapable of successfully performing the contract (likely
+      a complementary bid).
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 27
+    quote: Perennial losing bidders give appearance of legitimate competition when they have no intention
+      of actually winning
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Cardinal red flags list
+    publisher: Open Contracting Partnership
+    url: https://cardinal.readthedocs.io/en/latest/cli/indicators/index.html
+    locator: R025 Excessive unsuccessful bids
+    quote: The ratio of winning bids to submitted bids for a top tenderer is a low outlier.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A firm has bid on 40 tenders from one buyer and won none, always pricing 15–20% above the winner.
+  cases: []
+  data_needed:
+  - Contract (bidders, bid amounts)
+  - ContractAward
+  - Company
+  checkable: records
+  lookup_sources:
+  - Procurement portal bid-level data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (Cardinal uses a statistical low-outlier test;
+      no fixed number)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Firm bidding to stay visible or keep pre-qualification
+  - Uncompetitive cost structure
+  - New entrant learning the market
+  jurisdictions: Global
+  version: 1
+- id: PP-013
+  name: Bid suppression and withdrawn bids
+  definition: Firms that would be expected to bid stay out, or withdraw a winning bid, so a chosen competitor
+    wins.
+  areas:
+  - PP
+  typology: Bid suppression
+  status: verified
+  sources:
+  - title: Price Fixing, Bid Rigging, and Market Allocation Schemes
+    publisher: U.S. DOJ Antitrust Division
+    url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+    locator: 'Warning signs: bid patterns'
+    quote: A company withdraws its successful bid and subsequently is subcontracted work by the new winning
+      contractor.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Bidding stage
+    quote: Qualified Companies Fail to Bid
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The two largest regional firms, which bid every year, both skip this year's tender.
+  cases: []
+  data_needed:
+  - Contract (bidders over time)
+  - Company
+  - ContractAward
+  checkable: records
+  lookup_sources:
+  - Procurement portal history
+  - Company registry (capacity, status)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Firms at capacity
+  - Changed business focus
+  - Error found in bid leading to honest withdrawal
+  jurisdictions: Global
+  version: 1
+- id: PP-014
+  name: Losing bidders become subcontractors or partners of the winner
+  definition: After the award, firms that lost the bid get subcontracts or a joint venture share from
+    the winner, which can be a pay-off for not competing.
+  areas:
+  - PP
+  typology: Subcontracting as compensation for bid rigging
+  status: verified
+  sources:
+  - title: Price Fixing, Bid Rigging, and Market Allocation Schemes
+    publisher: U.S. DOJ Antitrust Division
+    url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+    locator: 'Warning signs: bid patterns'
+    quote: A successful bidder subcontracts work to competitors that submitted unsuccessful bids on the
+      same project.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: OECD Guidelines to fight bid rigging (presentation)
+    publisher: OECD (A. Capobianco) via Malaysia Competition Commission
+    url: https://mycc.gov.my/sites/default/files/pdf/advocacy/Capobianco-OECD-Guidelines-to-fight-bid-rigging_FINAL.pdf
+    locator: Slide 15
+    quote: Relationships among bidders (joint bidding and subcontracting)
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The winning contractor's subcontract list names both losing bidders.
+  cases: []
+  data_needed:
+  - Contract (subcontractors)
+  - Company
+  - UnknownLink
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Contract implementation records, subcontractor declarations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Losing firms have specialist skills the winner lacks
+  - Small market where everyone subcontracts to everyone
+  jurisdictions: Global
+  version: 1
+- id: PP-015
+  name: Identical bid prices
+  definition: Different bidders submit exactly the same price, which rarely happens by chance.
+  areas:
+  - PP
+  typology: Price fixing / bid rigging
+  status: verified
+  sources:
+  - title: Cardinal red flags list
+    publisher: Open Contracting Partnership
+    url: https://cardinal.readthedocs.io/en/latest/cli/indicators/index.html
+    locator: R028 Identical bid prices
+    quote: Different tenderers submitted bids with the same price.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Price Fixing, Bid Rigging, and Market Allocation Schemes
+    publisher: U.S. DOJ Antitrust Division
+    url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+    locator: 'Warning signs: prices'
+    quote: 'Identical prices may indicate a price-fixing conspiracy, especially when:'
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Two bids of exactly 1,234,500.00 for a works contract.
+  cases: []
+  data_needed:
+  - Contract (bid amounts per bidder)
+  - Company
+  checkable: records
+  lookup_sources:
+  - Bid opening records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded: two or more bids at the same price'
+    threshold_source: https://cardinal.readthedocs.io/en/latest/cli/indicators/index.html
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Regulated or list prices
+  - Price set by the buyer with bidders competing on other terms
+  - Very simple standard items
+  jurisdictions: Global
+  version: 1
+- id: PP-016
+  name: Bid prices suspiciously close or spaced by fixed percentages
+  definition: The gap between the winning bid and the next one is unusually small, or bids differ by neat
+    round percentages, suggesting the prices were arranged.
+  areas:
+  - PP
+  typology: Cover bidding / bid rigging
+  status: verified
+  sources:
+  - title: Cardinal red flags list
+    publisher: Open Contracting Partnership
+    url: https://cardinal.readthedocs.io/en/latest/cli/indicators/index.html
+    locator: R024 Price close to winning bid
+    quote: The percentage difference between the winning bid and the second-lowest valid bid is a low
+      outlier.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Fraud in Public Procurement – A collection of Red Flags and Best Practices
+    publisher: European Commission (OLAF)
+    year: '2017'
+    url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+    locator: p. 33
+    quote: The offered prices differ by fixed rounded percentages, e.g. by 2%, 3%, 7% etc.;
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Losing bids exactly 3% and 6% above the winner across several tenders.
+  cases: []
+  data_needed:
+  - Contract (all bid amounts)
+  - Company
+  checkable: records
+  lookup_sources:
+  - Bid opening records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded (Cardinal: statistical low outlier)'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Competitive market with similar cost structures
+  - Prices driven by a common published input cost
+  jurisdictions: Global
+  version: 1
+- id: PP-017
+  name: Winning bid heavily discounted versus the runner-up
+  definition: The winner's price is far below the second bid, which can mean the winner knew something
+    others did not (e.g. items that will later be dropped).
+  areas:
+  - PP
+  typology: Unbalanced bidding / leaking of bid information
+  status: verified
+  sources:
+  - title: Cardinal red flags list
+    publisher: Open Contracting Partnership
+    url: https://cardinal.readthedocs.io/en/latest/cli/indicators/index.html
+    locator: R058 Heavily discounted bid
+    quote: The percentage difference between the winning bid and the second-lowest valid bid is a high
+      outlier.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Winning bid 45% below every other bid, followed by large change orders.
+  cases: []
+  data_needed:
+  - Contract (bid amounts)
+  - ContractAward
+  - Company
+  checkable: records
+  lookup_sources:
+  - Bid opening records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (statistical high outlier)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuinely more efficient firm
+  - Firm buying market entry at a loss
+  - Error in the bid
+  jurisdictions: Global
+  version: 1
+- id: PP-018
+  name: Prices above estimates, history or published lists
+  definition: Bids or contract prices are well above cost estimates, earlier prices, or price lists, or
+    prices fall sharply when a new bidder appears.
+  areas:
+  - PP
+  typology: Bid rigging / defective pricing
+  status: verified
+  sources:
+  - title: Price Fixing, Bid Rigging, and Market Allocation Schemes
+    publisher: U.S. DOJ Antitrust Division
+    url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+    locator: 'Warning signs: bid patterns'
+    quote: Bid prices drop whenever a new or infrequent bidder submits a bid.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Price Fixing, Bid Rigging, and Market Allocation Schemes
+    publisher: U.S. DOJ Antitrust Division
+    url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+    locator: 'Warning signs: bid patterns'
+    quote: Some bids are much higher than published price lists, previous bids by the same firms, or engineering
+      cost estimates.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Fraud in Public Procurement – A collection of Red Flags and Best Practices
+    publisher: European Commission (OLAF)
+    year: '2017'
+    url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+    locator: p. 33
+    quote: The winning bid is significantly high compared to cost estimates;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 26
+    quote: Tender value is higher or lower than average for this item category
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Asphalt contracts priced 30% above the engineer's estimate for three years, falling 25% the year an
+    out-of-state firm bids.
+  cases: []
+  data_needed:
+  - Contract (estimated value)
+  - ContractAward (amount)
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - Engineering cost estimates
+  - Historical procurement prices
+  - Market price indices
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Rising input costs
+  - Poor or outdated estimate
+  - Added risk or short deadlines
+  jurisdictions: Global
+  version: 1
+- id: PP-019
+  name: Winning bid very close to the confidential cost estimate
+  definition: The winner's price lands almost exactly on the buyer's internal estimate, suggesting the
+    estimate was leaked.
+  areas:
+  - PP
+  typology: Leaking of bid information
+  status: verified
+  sources:
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Bid evaluation stage
+    quote: Winning Bid Very Close to Cost Estimates
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Estimate 2,000,000; winning bid 1,998,700; other bids 2.4–2.9 million.
+  cases: []
+  data_needed:
+  - Contract (estimated value)
+  - ContractAward (amount)
+  checkable: records
+  lookup_sources:
+  - Internal estimate (often obtained by request or leak)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Published estimate or budget ceiling that all bidders know
+  - Accurate estimate in a mature market
+  jurisdictions: Global
+  version: 1
+- id: PP-020
+  name: Physical similarities between bid documents
+  definition: Bids from supposedly separate firms share typing errors, calculations, handwriting, formatting
+    or file metadata, suggesting one person prepared them.
+  areas:
+  - PP
+  typology: Cover bidding / collusion
+  status: verified
+  sources:
+  - title: Price Fixing, Bid Rigging, and Market Allocation Schemes
+    publisher: U.S. DOJ Antitrust Division
+    url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+    locator: 'Warning signs: suspicious statements or behavior'
+    quote: (such as identical calculations or spelling errors) or similar handwriting, typeface, or stationery.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Bidding stage
+    quote: Physical Similarities in Bids
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: OECD Guidelines to fight bid rigging (presentation)
+    publisher: OECD via Malaysia Competition Commission
+    url: https://mycc.gov.my/sites/default/files/pdf/advocacy/Capobianco-OECD-Guidelines-to-fight-bid-rigging_FINAL.pdf
+    locator: Slide 15
+    quote: Clues in documents submitted by different bidders
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Two bids' PDF metadata list the same author name; both misspell 'guarantee' the same way.
+  cases: []
+  data_needed:
+  - 'Document (bids, metadata: author, created date)'
+  - Company
+  checkable: person
+  lookup_sources:
+  - Bid documents obtained by FOI
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Shared bid-writing consultant
+  - Buyer-supplied templates
+  - Common software defaults
+  jurisdictions: Global
+  version: 1
+- id: PP-021
+  name: Suspicious statements or behaviour by bidders
+  definition: Bidders refer to 'industry' prices, know rivals' prices, say a contract 'belongs' to someone,
+    call a bid a 'courtesy' bid, or submit bids for others.
+  areas:
+  - PP
+  typology: Collusion
+  status: verified
+  sources:
+  - title: Price Fixing, Bid Rigging, and Market Allocation Schemes
+    publisher: U.S. DOJ Antitrust Division
+    url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+    locator: 'Warning signs: suspicious statements or behavior'
+    quote: Statements that a bid was a "courtesy," "complementary," "token," or "cover" bid.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Price Fixing, Bid Rigging, and Market Allocation Schemes
+    publisher: U.S. DOJ Antitrust Division
+    url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+    locator: 'Warning signs: suspicious statements or behavior'
+    quote: A company requests a bid package for itself and a competitor or submits both its and another's
+      bids.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Fraud in Public Procurement – A collection of Red Flags and Best Practices
+    publisher: European Commission (OLAF)
+    year: '2017'
+    url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+    locator: p. 35
+    quote: Bidders have held private meetings before submitting their respective bids;
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A sales rep tells an official 'that district is always Company X's'.
+  cases: []
+  data_needed:
+  - Document (emails, meeting notes)
+  - Email
+  - Person
+  - Company
+  - Associate
+  checkable: person
+  lookup_sources:
+  - Interviews, whistleblowers, FOI emails
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Loose talk about published market prices
+  - Lawful joint bids discussed openly
+  jurisdictions: Global
+  version: 1
+- id: PP-022
+  name: Business links between bidders or suppliers
+  definition: Competing bidders share an address, staff, phone numbers, owners or directors, so they may
+    not be independent.
+  areas:
+  - PP
+  typology: Collusion / fictitious competition
+  status: verified
+  sources:
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 26 (also p. 27 for suppliers)
+    quote: 'Business similarities between bidders: Common addresses, personnel, phone numbers, etc.,'
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Three 'competing' bidders registered at the same flat, with the same director's spouse as shareholder
+    in one.
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Directorship
+  - Ownership
+  - Family
+  - Person
+  - Phone (Company.phone)
+  - Email
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Beneficial ownership register
+  - OpenCorporates / OpenSanctions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: BO
+    reason: Shared addresses and nominee directors are also the standard signs of shell company networks.
+    source_url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+  innocent_explanations:
+  - Shared business centre or registered agent address
+  - Group companies bidding openly as separate lots where allowed
+  jurisdictions: Global
+  version: 1
+- id: PP-023
+  name: Bidder or supplier appears not to be a real business
+  definition: A bidder or supplier cannot be found in directories, online, or has only a PO box, suggesting
+    a shell or fictitious firm.
+  areas:
+  - PP
+  typology: Fictitious contractor / phantom vendor
+  status: verified
+  sources:
+  - title: Fraud in Public Procurement – A collection of Red Flags and Best Practices
+    publisher: European Commission (OLAF)
+    year: '2017'
+    url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+    locator: p. 32
+    quote: Losing bidders are totally unknown or seem not to be real companies
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Fraud in Public Procurement – A collection of Red Flags and Best Practices
+    publisher: European Commission (OLAF)
+    year: '2017'
+    url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+    locator: p. 33
+    quote: A bidder is not found on the internet, neither in telephone registers etc.;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Bidding stage
+    quote: Bidder Not in Directories or on Internet
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 27
+    quote: Supplier address is PO box with no address or phone number
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A supplier incorporated two weeks before the tender, no website, registered to a PO box.
+  cases: []
+  data_needed:
+  - Company (incorporationDate, address, website)
+  - Address
+  - Directorship
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Web/phone directories
+  - Street-view checks
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: AUSTRAC lists use of multiple business structures with no apparent economic rationale as a
+      fraud indicator; phantom vendors are a common route to move stolen public funds.
+    source_url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+  innocent_explanations:
+  - Genuine micro-business or sole trader
+  - Newly formed joint-venture vehicle
+  - Firm with no web presence by choice
+  jurisdictions: Global
+  version: 1
+- id: PP-024
+  name: Conflict of interest between official and supplier
+  definition: A supplier is linked to an official involved in the tender, for example sharing an address,
+    being close to staff, or having helped write the specifications.
+  areas:
+  - PP
+  typology: Hidden interests / conflict of interest
+  status: verified
+  sources:
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 27
+    quote: Supplier address is same as project official's
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Fraud in Public Procurement – A collection of Red Flags and Best Practices
+    publisher: European Commission (OLAF)
+    year: '2017'
+    url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+    locator: p. 23
+    quote: Tenderer is close to the procurement staff or was involved in drafting the specifications.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Bid evaluation stage
+    quote: Pressure to Select Certain Contractor, Sub or Agent
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The winning firm's director is the brother-in-law of the evaluation committee chair.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Family
+  - Associate
+  - Directorship
+  - Ownership
+  - Address
+  - Company
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Asset/interest declarations of officials
+  - Electoral roll / property records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: OLAF lists inclusion of kickbacks in the price paid to the decision-maker as a related red
+      flag.
+    source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  innocent_explanations:
+  - Interest declared and official recused
+  - Small community where links are unavoidable
+  jurisdictions: Global
+  version: 1
+- id: PP-025
+  name: Bids changed or late bids accepted
+  definition: A bid is altered after other prices are known, or a late bid is accepted and wins.
+  areas:
+  - PP
+  typology: Manipulation of bids
+  status: verified
+  sources:
+  - title: Cardinal red flags list
+    publisher: Open Contracting Partnership
+    url: https://cardinal.readthedocs.io/en/latest/cli/indicators/index.html
+    locator: R030 Late bid won
+    quote: The winning bid was received after the submission deadline.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 26
+    quote: Changes to bids after other bid prices are known
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Fraud in Public Procurement – A collection of Red Flags and Best Practices
+    publisher: European Commission (OLAF)
+    year: '2017'
+    url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+    locator: p. 24
+    quote: Indications that changes were made to tenders after they were submitted;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Price Fixing, Bid Rigging, and Market Allocation Schemes
+    publisher: U.S. DOJ Antitrust Division
+    url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+    locator: 'Warning signs: suspicious statements or behavior'
+    quote: Bid or price documents contain whiteouts or other physical alterations indicating last-minute
+      price changes.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The winning bid's timestamp is 40 minutes after the deadline.
+  cases: []
+  data_needed:
+  - Contract (deadline)
+  - Document (bid receipt log)
+  - ContractAward
+  checkable: records
+  lookup_sources:
+  - E-procurement audit logs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - System outage with official deadline extension
+  - Clerical correction allowed by rules
+  jurisdictions: Global
+  version: 1
+- id: PP-026
+  name: Questionable disqualifications
+  definition: The lowest bid, or all bids except the winner's, are disqualified, or many bids are rejected
+    on weak grounds.
+  areas:
+  - PP
+  typology: Excluding qualified bidders
+  status: verified
+  sources:
+  - title: Cardinal red flags list
+    publisher: Open Contracting Partnership
+    url: https://cardinal.readthedocs.io/en/latest/cli/indicators/index.html
+    locator: R036 Lowest bid disqualified
+    quote: The lowest submitted bid is disqualified, while the award criterion is price only.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Cardinal red flags list
+    publisher: Open Contracting Partnership
+    url: https://cardinal.readthedocs.io/en/latest/cli/indicators/index.html
+    locator: R035 All except winning bid disqualified
+    quote: Bids are disqualified if not submitted by the single tenderer of the winning bid.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Cardinal red flags list
+    publisher: Open Contracting Partnership
+    url: https://cardinal.readthedocs.io/en/latest/cli/indicators/index.html
+    locator: R038 Excessive disqualified bids
+    quote: The ratio of disqualified bids to submitted bids is a high outlier per buyer, procuring entity
+      or tenderer.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Bid evaluation stage
+    quote: Poorly Supported Disqualifications
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Fraud in Public Procurement – A collection of Red Flags and Best Practices
+    publisher: European Commission (OLAF)
+    year: '2017'
+    url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+    locator: p. 24
+    quote: Tenders declared null and void due to errors;
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Four of five bids rejected for a missing page number; the remaining bid is the most expensive.
+  cases: []
+  data_needed:
+  - Contract (bid status, disqualification reasons)
+  - Document (evaluation report)
+  - Company
+  checkable: records
+  lookup_sources:
+  - Evaluation reports, complaint decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Bidders genuinely failed mandatory requirements
+  - Abnormally low bids lawfully rejected
+  jurisdictions: Global
+  version: 1
+- id: PP-027
+  name: Unbalanced line-item bidding
+  definition: A bidder prices some line items far too low and others far too high, often because it was
+    told which items will later be dropped or increased.
+  areas:
+  - PP
+  typology: Unbalanced bidding
+  status: verified
+  sources:
+  - title: 'Red Flag: Unreasonable Low Line Item Bids'
+    publisher: IACRC
+    url: https://guide.iacrc.org/red-flag-unreasonable-low-line-item-bids
+    locator: Red flag page
+    quote: An unreasonably low line item bid can indicate an unbalanced bidding scheme, probably as the
+      result of corruption.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 26
+    quote: Certain line items remain in recurring contracts that have never been called for in the past
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Fraud in Public Procurement – A collection of Red Flags and Best Practices
+    publisher: European Commission (OLAF)
+    year: '2017'
+    url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+    locator: p. 23
+    quote: Line items in the tenders are different in the final contract;
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Winner bids 1 cent per unit for rock excavation, which is later deleted, and triple the market rate
+    for concrete, which is later increased.
+  cases: []
+  data_needed:
+  - Document (bill of quantities per bidder)
+  - Contract
+  - ContractAward
+  checkable: person
+  lookup_sources:
+  - Bill of quantities, change orders
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Front-loading pricing for cash flow
+  - Genuine cost differences
+  - Error in a line item
+  jurisdictions: Global
+  version: 1
+- id: PP-028
+  name: Non-transparent bid opening
+  definition: Bids are opened in private, prices are not read out, or the opening date differs from the
+    deadline, leaving room to tamper.
+  areas:
+  - PP
+  typology: Manipulation of bids
+  status: verified
+  sources:
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 26 (also 'Non-public bid opening')
+    quote: Failing to read out bid prices and terms at bid opening
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Integrity Watch Red Flags – About
+    publisher: Transparency International EU / Integrity Watch
+    url: https://redflags-cz.integritywatch.eu/about.php
+    locator: 'Contract notices: Deadline for bids differ from date of opening'
+    quote: The two dates must be the same
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Bid opening stage
+    quote: Non-Transparent Bid-Opening Procedures
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Notice sets deadline 1 March, opening 8 March, with no public session.
+  cases: []
+  data_needed:
+  - Contract (deadline, opening date)
+  - Document (bid opening minutes)
+  checkable: records
+  lookup_sources:
+  - Procurement notices
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Deadline and opening date differ (Integrity Watch rule as worded)
+    threshold_source: https://redflags-cz.integritywatch.eu/about.php
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Electronic opening where prices are published online instead of read aloud
+  - Two-envelope procedures with separate technical and price openings
+  jurisdictions: Global
+  version: 1
+- id: PP-029
+  name: Contract value increases and questionable change orders
+  definition: After award, the contract grows through change orders or modifications, or the final amount
+    is far from the award or estimate.
+  areas:
+  - PP
+  typology: Change order abuse
+  status: verified
+  sources:
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 28 (Implementation)
+    quote: Approval of unnecessary change orders to increase the contract price after award
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 28
+    quote: Large difference between contract award and final contract amount
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Integrity Watch Red Flags – About
+    publisher: Transparency International EU / Integrity Watch
+    url: https://redflags-cz.integritywatch.eu/about.php
+    locator: 'Contract award notices: Large difference between final contract value and estimated value'
+    quote: allows for a (positive or negative) difference of 50% or more
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Corruption risk measurement presentation
+    publisher: Corruption Research Center Budapest
+    year: '2015'
+    url: https://www.crcb.eu/wp-content/uploads/2015/06/Fazekas_Czibik_Zagreb_TI_intpact_150609.pdf
+    locator: Slide 6
+    quote: Contract value/duration increase
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Contract changes stage
+    quote: Questionable Change Orders
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A 10 million bridge contract ends at 17 million after 12 change orders.
+  cases: []
+  data_needed:
+  - Contract (original value, amendments)
+  - ContractAward
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Contract amendment notices
+  - Audit reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Final value differs from estimate by 50% or more (Integrity Watch threshold)
+    threshold_source: https://redflags-cz.integritywatch.eu/about.php
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Unforeseen site conditions
+  - Scope legitimately expanded by the buyer
+  - Inflation clauses
+  jurisdictions: Global
+  version: 1
+- id: PP-030
+  name: Overbilling, inflated or duplicate invoices
+  definition: Payments exceed the contract amount, prices are unjustifiably high, or invoices are false,
+    inflated or duplicated.
+  areas:
+  - PP
+  typology: False, inflated or duplicate invoices
+  status: verified
+  sources:
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 28
+    quote: Total payments to a contractor exceed total contract or purchase order amounts
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 28
+    quote: Payment of unjustified high prices relative to historical average
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Payment stage
+    quote: Incomplete, Questionable Payment Documentation
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Fraud in Public Procurement – A collection of Red Flags and Best Practices
+    publisher: European Commission (OLAF)
+    year: '2017'
+    url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+    locator: p. 20
+    quote: Kickbacks to the decision-maker through subcontracting arrangements or false invoices.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Fuel invoices for port visits billed at volumes the ship's tanks could not hold.
+  cases:
+  - name: Leonard Glenn Francis and Glenn Defense Marine Asia (GDMA) – U.S. Navy husbanding contracts
+    year: '2015'
+    jurisdiction: United States (S.D. California)
+    what_happened: Francis and GDMA pleaded guilty, admitting to defrauding the Navy of 'tens of millions
+      of dollars by routinely overbilling' for fuel, tugboat and sewage services, and giving Navy officials
+      millions in gifts and over $500,000 in cash for classified ship schedules and preferential treatment.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/defense-contractor-and-its-ceo-plead-guilty-corruption-conspiracy-involving-scores-navy
+    source_title: Defense Contractor and its CEO Plead Guilty to Corruption Conspiracy Involving Scores
+      of Navy Officials
+  data_needed:
+  - Payment
+  - Contract
+  - Document (invoices)
+  - Company
+  checkable: records
+  lookup_sources:
+  - Spending data / payment ledgers
+  - Audit reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (payments above contract amount)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: In the GDMA case, overbilling went together with bribes to the officials who approved the
+      invoices.
+    source_url: https://www.justice.gov/opa/pr/defense-contractor-and-its-ceo-plead-guilty-corruption-conspiracy-involving-scores-navy
+  innocent_explanations:
+  - Approved variations not yet recorded
+  - Currency or indexation adjustments
+  - Data entry errors
+  jurisdictions: Global
+  version: 1
+- id: PP-031
+  name: Small first purchase followed by much larger ones
+  definition: A new supplier gets a small order, then much bigger orders, as if testing whether the first
+    would be noticed.
+  areas:
+  - PP
+  typology: Fictitious contractor / favouritism
+  status: verified
+  sources:
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 27
+    quote: Small initial purchase from supplier followed by much larger purchases (first purchase is to
+      test whether it will be accepted)
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A new vendor gets a 2,000 order in January and 400,000 in orders by June.
+  cases: []
+  data_needed:
+  - Payment
+  - ContractAward
+  - Company
+  checkable: records
+  lookup_sources:
+  - Spending data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Normal trial order before scaling up a good supplier
+  jurisdictions: Global
+  version: 1
+- id: PP-032
+  name: Concentration of awards with one supplier
+  definition: One company wins an unusually large share of a buyer's contracts or of a contract type.
+  areas:
+  - PP
+  typology: Favouritism / market allocation
+  status: verified
+  sources:
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 27
+    quote: High number of contract awards to one bidder
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Corruption risk measurement presentation
+    publisher: Corruption Research Center Budapest
+    year: '2015'
+    url: https://www.crcb.eu/wp-content/uploads/2015/06/Fazekas_Czibik_Zagreb_TI_intpact_150609.pdf
+    locator: Slide 6
+    quote: Winner's contract share
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Bidding stage
+    quote: Too Many Contract Awards to One Company
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Price Fixing, Bid Rigging, and Market Allocation Schemes
+    publisher: U.S. DOJ Antitrust Division
+    url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+    locator: 'Warning signs: bid patterns'
+    quote: The same company always wins a particular procurement.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - One firm wins 70% of a municipality's construction spending over four years.
+  cases: []
+  data_needed:
+  - ContractAward
+  - Company
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - Procurement portal
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Market leader with best prices
+  - Few qualified local firms
+  - Long-term framework won competitively
+  jurisdictions: Global
+  version: 1
+- id: PP-033
+  name: First-time bidder wins
+  definition: A company that has never bid before wins, sometimes a sign of a front company set up for
+    the deal.
+  areas:
+  - PP
+  typology: Fictitious contractor / favouritism
+  status: verified
+  sources:
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 27
+    quote: Bidder that has never bid previously wins tender
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A company formed last month with no track record wins a hospital equipment contract.
+  cases: []
+  data_needed:
+  - ContractAward
+  - Company (incorporationDate)
+  checkable: lookups
+  lookup_sources:
+  - Procurement history
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New competitor entering the market
+  - Established firm bidding in a new country under a local subsidiary
+  jurisdictions: Global
+  version: 1
+- id: PP-034
+  name: Supplier sells an unusually wide range of unrelated items
+  definition: A supplier wins contracts for goods or services far outside any single line of business,
+    which can mark a broker or front company.
+  areas:
+  - PP
+  typology: Fictitious contractor / pass-through
+  status: verified
+  sources:
+  - title: Cardinal red flags list
+    publisher: Open Contracting Partnership
+    url: https://cardinal.readthedocs.io/en/latest/cli/indicators/index.html
+    locator: R048 Heterogeneous supplier
+    quote: The variety of items supplied by a tenderer is a high outlier.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - One firm supplies medical masks, road salt, school software and catering.
+  cases: []
+  data_needed:
+  - ContractAward (item classification)
+  - Company
+  checkable: records
+  lookup_sources:
+  - Procurement portal (CPV/UNSPSC codes)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (statistical high outlier)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate general wholesaler or distributor
+  - Large conglomerate
+  jurisdictions: Global
+  version: 1
+- id: PP-035
+  name: Questionable agent, consultant or excessive agent fees
+  definition: An agent or consultant is paid large fees, often a percentage of the contract, or overcharges,
+    which can hide bribes.
+  areas:
+  - PP
+  typology: Corruption / kickbacks
+  status: verified
+  sources:
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 26
+    quote: Agents charge excessive fees, usually expressed as a percentage of the contract value
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Bidding stage
+    quote: Questionable Agent, Consultant or Subcontractor
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A 12% 'success fee' paid to a consultancy owned by a minister's associate.
+  cases: []
+  data_needed:
+  - Payment
+  - Representation
+  - Company
+  - Person
+  - Associate
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - PEP lists
+  - Bank or accounting records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Agent fees are a standard channel for bribe payments; OCP lists this under its corruption
+      and billing schemes.
+    source_url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+  innocent_explanations:
+  - Genuine local representation services in foreign markets
+  - Market-rate commission
+  jurisdictions: Global
+  version: 1
+- id: PP-036
+  name: Key planning or contract documents not public
+  definition: The buyer does not publish planning documents, bidding documents, or the signed contract.
+  areas:
+  - PP
+  typology: Opacity enabling corruption
+  status: verified
+  sources:
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 26 (Planning)
+    quote: Key planning documents are not provided
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 28
+    quote: Contract is not public
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Bidding documents stage
+    quote: Failure to Make Bidding Documents Available
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An award notice exists but the contract is withheld as 'commercially confidential'.
+  cases: []
+  data_needed:
+  - Contract
+  - Document
+  checkable: records
+  lookup_sources:
+  - Procurement portal
+  - FOI requests
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful security or commercial-confidentiality exemptions
+  - Poor IT systems
+  jurisdictions: Global
+  version: 1
+- id: PP-037
+  name: Complaints from losing or excluded bidders
+  definition: Bidders formally complain or challenge the process.
+  areas:
+  - PP
+  typology: General signal of any scheme
+  status: verified
+  sources:
+  - title: Red flags for integrity
+    publisher: Open Contracting Partnership
+    year: '2016'
+    url: https://www.open-contracting.org/wp-content/uploads/2016/11/OCP2016-Red-flags-for-integrityshared-1.pdf
+    locator: Table 1, p. 27
+    quote: Any complaint
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Bidding stage
+    quote: Complaints from Losing or Excluded Bidders
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A losing bidder files a review request alleging the specification was copied from the winner's brochure.
+  cases: []
+  data_needed:
+  - Document (complaint, review decision)
+  - Company
+  - Contract
+  checkable: records
+  lookup_sources:
+  - Procurement review body decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Routine tactical complaints by disappointed bidders
+  jurisdictions: Global
+  version: 1
+- id: PP-038
+  name: Supplier registered in a tax haven
+  definition: The winning supplier is registered in a secrecy jurisdiction in a different country from
+    the buyer, hiding who owns it.
+  areas:
+  - PP
+  typology: Hidden interests / secrecy
+  status: verified
+  sources:
+  - title: Corruption Risks Indicators (CRI) dataset
+    publisher: Quality of Government Institute
+    url: https://datafinder.qog.gu.se/dataset/cri
+    locator: Tax haven variable
+    quote: 'A contract has a ''tax haven'' red flag in case two conditions are met:'
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A municipal IT contract won by a company registered in a jurisdiction ranked high on the Financial
+    Secrecy Index.
+  cases: []
+  data_needed:
+  - Company (jurisdiction)
+  - Ownership
+  - ContractAward
+  - PublicBody (country)
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Tax Justice Network Financial Secrecy Index
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (buyer and supplier in different countries and
+      supplier in a listed tax haven)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: AUSTRAC also treats fund flows to tax havens as a tax-evasion and laundering indicator.
+    source_url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+  innocent_explanations:
+  - Multinational group using a regional holding company
+  - Legitimate foreign supplier
+  jurisdictions: EU, global
+  version: 1
+- id: PP-039
+  name: Long, renewable or single-operator framework agreements
+  definition: Contracts or framework agreements that can be renewed many times, run longer than four years,
+    or lock in one supplier, shutting out competition.
+  areas:
+  - PP
+  typology: Restricted competition
+  status: verified
+  sources:
+  - title: Integrity Watch Red Flags – About
+    publisher: Transparency International EU / Integrity Watch
+    url: https://redflags-cz.integritywatch.eu/about.php
+    locator: 'Contract notices: Contract can be renewed'
+    quote: signals situations as risky when the number of possible renewals may be considered high (3
+      or more)
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Integrity Watch Red Flags – About
+    publisher: Transparency International EU / Integrity Watch
+    url: https://redflags-cz.integritywatch.eu/about.php
+    locator: 'Contract notices: Framework agreement with a single operator'
+    quote: it will exclude competition for a longer period
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A framework agreement with one operator for an indefinite term with unlimited renewals.
+  cases: []
+  data_needed:
+  - Contract (duration, renewals, framework flag)
+  - Company
+  checkable: records
+  lookup_sources:
+  - TED notices
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 3 or more possible renewals, or a term over 4 years (Integrity Watch thresholds)
+    threshold_source: https://redflags-cz.integritywatch.eu/about.php
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Infrastructure or IT systems needing long continuity
+  - Justified in the notice under the law
+  jurisdictions: EU
+  version: 1
+- id: PP-040
+  name: Award without contract, failure without reasons, or annulled and re-launched
+  definition: A winner is named but no contract signed, a procedure fails with no stated reason, or a
+    cancelled tender is re-run, which can be used to steer the outcome.
+  areas:
+  - PP
+  typology: Manipulation of procedure
+  status: verified
+  sources:
+  - title: Integrity Watch Red Flags – About
+    publisher: Transparency International EU / Integrity Watch
+    url: https://redflags-cz.integritywatch.eu/about.php
+    locator: 'Contract award notices: Unsuccessful procedure without statement of reasons'
+    quote: the notice does not specify the reason for the procedure's lack of success
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Integrity Watch Red Flags – About
+    publisher: Transparency International EU / Integrity Watch
+    url: https://redflags-cz.integritywatch.eu/about.php
+    locator: 'Contract award notices: Successful procedure without contracting'
+    quote: signals a risk if the public procurement procedure was successful (there is a winner)
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Corruption risk measurement presentation
+    publisher: Corruption Research Center Budapest
+    year: '2015'
+    url: https://www.crcb.eu/wp-content/uploads/2015/06/Fazekas_Czibik_Zagreb_TI_intpact_150609.pdf
+    locator: Slide 6
+    quote: Annulled procedure re-launched subsequently
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Tender cancelled after an outsider bid lowest; relaunched with new criteria and won by the incumbent.
+  cases: []
+  data_needed:
+  - Contract (status, cancellation reason)
+  - ContractAward
+  - Company
+  checkable: records
+  lookup_sources:
+  - Procurement notices
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Budget withdrawn
+  - Winner withdrew
+  - Specification error discovered
+  jurisdictions: EU
+  version: 1
+- id: PP-041
+  name: Poor quality goods or substitutes accepted
+  definition: Goods or work below specification are delivered and accepted, or cheaper products substituted.
+  areas:
+  - PP
+  typology: Failure to meet contract specs / product substitution
+  status: verified
+  sources:
+  - title: Red Flags Listed by Project Cycle
+    publisher: IACRC
+    url: https://guide.iacrc.org/detection/red-flags-of-corruption-bid-rigging-and-other-schemes/red-flags-listed-by-project-cycle/
+    locator: Contract implementation stage
+    quote: Acceptance of Poor Quality Goods, etc.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Fraud in Public Procurement – A collection of Red Flags and Best Practices
+    publisher: European Commission (OLAF)
+    year: '2017'
+    url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+    locator: p. 10
+    quote: Studies that are paid for in full or in part, but that are never delivered.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A school roof paid in full but inspectors find thinner sheeting than specified.
+  cases: []
+  data_needed:
+  - Contract
+  - Payment
+  - Document (inspection reports)
+  checkable: person
+  lookup_sources:
+  - Site visits, audit and inspection reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Supply shortages with approved substitutions
+  - Weak inspection capacity rather than fraud
+  jurisdictions: Global
+  version: 1
+- id: PP-042
+  name: Market conditions that favour collusion
+  definition: Few sellers, standard products, no substitutes, repeat purchases and close ties between
+    competitors make bid rigging easier.
+  areas:
+  - PP
+  typology: Context for bid rigging
+  status: verified
+  sources:
+  - title: Price Fixing, Bid Rigging, and Market Allocation Schemes
+    publisher: U.S. DOJ Antitrust Division
+    url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+    locator: Conditions favorable to collusion
+    quote: Collusion is more likely to occur if there are few sellers.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Price Fixing, Bid Rigging, and Market Allocation Schemes
+    publisher: U.S. DOJ Antitrust Division
+    url: https://www.justice.gov/atr/price-fixing-bid-rigging-and-market-allocation-schemes
+    locator: Conditions favorable to collusion
+    quote: The more standardized a product is, the easier it is for competing firms to reach agreement
+      on a common price structure.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: OECD Guidelines to fight bid rigging (presentation)
+    publisher: OECD via Malaysia Competition Commission
+    url: https://mycc.gov.my/sites/default/files/pdf/advocacy/Capobianco-OECD-Guidelines-to-fight-bid-rigging_FINAL.pdf
+    locator: Slide 15
+    quote: Opportunities that bidders have to communicate with each other
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Three asphalt plants serve a region; all belong to the same trade association and meet monthly.
+  cases: []
+  data_needed:
+  - Company
+  - Membership
+  - Associate
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - Industry/trade association member lists
+  - Market studies
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (context only, not evidence of collusion by itself)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many concentrated markets are fully competitive
+  jurisdictions: Global
+  version: 1
+- id: PP-043
+  name: NPO cannot account for end use of funds or pays outside its programmes
+  definition: A charity's payments do not match its stated programmes, or it cannot show where its money
+    finally went, a sign of diversion.
+  areas:
+  - PP
+  typology: Diversion of funds (FATF R8)
+  status: verified
+  sources:
+  - title: Indicators of suspicious activity relating to customers who are not-for-profit organisations
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Customer behaviour indicators
+    quote: is unable to account for the final use of all business resources, and/or has inconsistencies
+      in their accounting
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Indicators of suspicious activity relating to NPO customers
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Customer behaviour indicators
+    quote: makes payments that are inconsistent with their business programs and/or activities
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Risk of Terrorist Abuse in Non-Profit Organisations
+    publisher: FATF (copy hosted by Mongolia FIU)
+    year: '2014'
+    url: https://fiu.mongolbank.mn/documents/other2e.pdf
+    locator: Figure 3.1, p. 37
+    quote: An NPO, or an individual acting on behalf of an NPO, diverts funds to a known or suspected
+      terrorist entity
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A relief charity's accounts show transfers to a 'partner' with no reported projects.
+  cases:
+  - name: United States v. Holy Land Foundation for Relief and Development
+    year: '2008'
+    jurisdiction: United States (N.D. Texas)
+    what_happened: A jury convicted HLF and five leaders of providing material support to Hamas; the government
+      said about $12.4 million was sent to Hamas-controlled zakat committees and charitable societies
+      in the West Bank and Gaza. Sentences of 15 to 65 years followed in May 2009.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/federal-judge-hands-downs-sentences-holy-land-foundation-case
+    source_title: Federal Judge Hands Downs Sentences in Holy Land Foundation Case
+  data_needed:
+  - Organization
+  - Payment
+  - Document (annual accounts)
+  - Person
+  checkable: records
+  lookup_sources:
+  - Charity regulator filings
+  - Annual reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF's first abuse type is diversion of NPO funds to terrorist entities; the HLF case is a
+      documented example.
+    source_url: https://www.justice.gov/archives/opa/pr/federal-judge-hands-downs-sentences-holy-land-foundation-case
+  innocent_explanations:
+  - Poor bookkeeping in small volunteer-run charities
+  - Difficult conflict-zone delivery where receipts are hard to obtain
+  jurisdictions: Global (FATF); Australia (AUSTRAC)
+  version: 1
+- id: PP-044
+  name: NPO operating in or sending money to high-risk conflict areas
+  definition: A charity is based in, works in, or sends funds or staff to places where terrorist groups
+    are active.
+  areas:
+  - PP
+  typology: Abuse of programming / diversion (FATF R8)
+  status: verified
+  sources:
+  - title: Indicators of suspicious activity relating to NPO customers
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Terrorism financing indicators
+    quote: operates in higher-risk jurisdictions, or jurisdictions with known terrorist activity
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Risk of Terrorist Abuse in Non-Profit Organisations
+    publisher: FATF (copy hosted by Mongolia FIU)
+    year: '2014'
+    url: https://fiu.mongolbank.mn/documents/other2e.pdf
+    locator: Figure 3.1, p. 37 (Abuse of programming)
+    quote: NPO-funded programmes meant to support legitimate humanitarian purposes are manipulated at
+      the point of delivery
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A small charity with no field staff wires funds to a border town controlled by an armed group.
+  cases: []
+  data_needed:
+  - Organization
+  - Payment (beneficiary country)
+  - Address
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Conflict data (e.g. ACLED)
+  - Government high-risk jurisdiction lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF identifies operations in areas with active terrorist threats as an indicator category
+      for NPO abuse.
+    source_url: https://fiu.mongolbank.mn/documents/other2e.pdf
+  innocent_explanations:
+  - Legitimate humanitarian work where need is greatest
+  - Diaspora charities serving home regions
+  jurisdictions: Global
+  version: 1
+- id: PP-045
+  name: NPO or its people linked to terrorist entities or sanctions lists
+  definition: The charity, its staff or partners match a sanctions list or have known links to terrorist
+    groups.
+  areas:
+  - PP
+  typology: Affiliation with a terrorist entity (FATF R8)
+  status: verified
+  sources:
+  - title: Indicators of suspicious activity relating to NPO customers
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Terrorism financing indicators
+    quote: is matched through screening against an Australian or international sanctions list
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Risk of Terrorist Abuse in Non-Profit Organisations
+    publisher: FATF (copy hosted by Mongolia FIU)
+    year: '2014'
+    url: https://fiu.mongolbank.mn/documents/other2e.pdf
+    locator: Executive summary, para. 13
+    quote: NPOs or directing officials maintained an affiliation with a terrorist entity, either knowingly
+      or unknowingly.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A charity trustee shares a name and date of birth with a person on the UN 1267 list.
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Directorship
+  - Sanction
+  - Associate
+  checkable: lookups
+  lookup_sources:
+  - Sanctions lists (UN, OFAC, EU, OpenSanctions)
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Confirmed match against a sanctions list (meets the published definition as worded)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: A sanctions-list match is itself an AUSTRAC terrorism financing indicator for NPOs.
+    source_url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+  innocent_explanations:
+  - False positive name match
+  - Past link that ended before designation
+  jurisdictions: Global
+  version: 1
+- id: PP-046
+  name: NPO cash intensity and use of personal accounts
+  definition: The charity takes large cash deposits, anonymous donations, or uses staff's personal bank
+    accounts instead of its own.
+  areas:
+  - PP
+  typology: Diversion / laundering through NPO
+  status: verified
+  sources:
+  - title: Indicators of suspicious activity relating to NPO customers
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Customer behaviour indicators
+    quote: uses personal bank accounts to receive donations
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Indicators of suspicious activity relating to NPO customers
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Customer behaviour indicators
+    quote: has an employee or agent who withdraws unusually large amounts of cash
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Indicators of suspicious activity relating to NPO customers
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Customer behaviour indicators
+    quote: structures transactions to avoid mandatory reporting requirements
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A mosque appeal collected in cash and deposited by a trustee into his personal account in amounts
+    just under the reporting threshold.
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - BankAccount
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Bank records (via leak or court)
+  - Charity accounts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Structuring to avoid reporting is a core money laundering indicator listed by AUSTRAC.
+    source_url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+  innocent_explanations:
+  - Faith and community charities that legitimately collect cash
+  - Small charities without their own bank account
+  - Banks having de-risked the charity
+  jurisdictions: Australia (AUSTRAC), global
+  version: 1
+- id: PP-047
+  name: Opaque NPO structure, false identity or sham NPO
+  definition: The charity gives unverifiable details, hides who controls it, has unclear income, or is
+    a fake charity set up to raise money for other ends.
+  areas:
+  - PP
+  typology: False representation and sham NPOs (FATF R8)
+  status: verified
+  sources:
+  - title: Indicators of suspicious activity relating to NPO customers
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Customer identification indicators
+    quote: has opaque beneficial ownership, leadership or decision-making structures
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Indicators of suspicious activity relating to NPO customers
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Customer identification indicators
+    quote: provides identification information that is false, misleading, vague, or cannot be verified
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Risk of Terrorist Abuse in Non-Profit Organisations
+    publisher: FATF (copy hosted by Mongolia FIU)
+    year: '2014'
+    url: https://fiu.mongolbank.mn/documents/other2e.pdf
+    locator: Figure 3.1, p. 37 (False representation and sham NPOs)
+    quote: Under the guise of charitable activity, an organisation or individual raises funds
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A 'charity' not registered with the regulator, whose website lists no trustees and whose bank account
+    is in a third person's name.
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Directorship
+  - Address
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Charity regulator registers
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Informal grassroots groups not yet registered
+  - Privacy concerns of trustees in hostile countries
+  jurisdictions: Global
+  version: 1
+- id: PP-048
+  name: NPO transfers to unrelated third parties or unreported partners
+  definition: Money goes to people or groups that have nothing to do with the charity's declared work,
+    or to partners it never reports.
+  areas:
+  - PP
+  typology: Diversion of funds (FATF R8)
+  status: verified
+  sources:
+  - title: Indicators of suspicious activity relating to NPO customers
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Terrorism financing indicators
+    quote: transfers funds to third parties who are noticeably different to or not associated with their
+      declared programs or activities
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Indicators of suspicious activity relating to NPO customers
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Customer behaviour indicators
+    quote: has unreported activities, programs, or partners
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Indicators of suspicious activity relating to NPO customers
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Terrorism financing indicators
+    quote: uses a shell organisation as a funding conduit to jurisdictions with known terrorist activity
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An education charity pays a trading company abroad for 'consulting'.
+  cases: []
+  data_needed:
+  - Organization
+  - Payment
+  - Company
+  - UnknownLink
+  checkable: records
+  lookup_sources:
+  - Charity accounts
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate local implementing partners with different names
+  - Procurement of goods from commercial suppliers
+  jurisdictions: Global
+  version: 1
+- id: PP-049
+  name: NPO tax-haven flows, multiple structures and insider spending
+  definition: A charity moves money to tax havens, uses many entities without reason, gets dubious invoices
+    from partners, or its leaders spend heavily on travel and cards.
+  areas:
+  - PP
+  typology: Fraud / tax evasion through NPO
+  status: verified
+  sources:
+  - title: Indicators of suspicious activity relating to NPO customers
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Fraud indicators
+    quote: uses multiple business structures with no apparent economic rationale
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Indicators of suspicious activity relating to NPO customers
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Fraud indicators
+    quote: has suspicious invoicing and billing provided by partners and sub-contractors
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Indicators of suspicious activity relating to NPO customers
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Tax evasion indicators
+    quote: and their key personnel use travel and credit cards excessively
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A cancer charity spends most donations on its founder's family and paid fundraisers.
+  cases:
+  - name: FTC and states v. Cancer Fund of America, Cancer Support Services and James Reynolds Sr.
+    year: '2016'
+    jurisdiction: United States
+    what_happened: The FTC and states alleged the entities 'spent the overwhelming majority of donations
+      on their operators, families and friends, and fundraisers'; under the settlement CFA and CSS were
+      dissolved and Reynolds banned from charity fundraising and serving as a director or trustee.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.ftc.gov/news-events/news/press-releases/2016/03/ftc-states-settle-claims-against-two-entities-claiming-be-cancer-charities-orders-require-entities
+    source_title: FTC, States Settle Claims Against Two Entities Claiming to Be Cancer Charities
+  data_needed:
+  - Organization
+  - Payment
+  - Person
+  - Family
+  - Company
+  - Document (Form 990 / annual return)
+  checkable: records
+  lookup_sources:
+  - IRS Form 990 / charity regulator returns
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: AUSTRAC lists fund flows to tax havens and long-unfiled tax returns as NPO tax evasion indicators.
+    source_url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+  innocent_explanations:
+  - High start-up fundraising costs
+  - International charities with legitimate regional structures
+  jurisdictions: Australia (AUSTRAC), US (FTC)
+  version: 1
+- id: PP-050
+  name: NPO crowdfunding, stored-value cards or risky crypto
+  definition: A charity raises money online with no clear purpose, buys large amounts of prepaid cards,
+    or takes crypto from mixers or unregistered exchanges.
+  areas:
+  - PP
+  typology: Cyber-enabled fraud / TF via NPO
+  status: verified
+  sources:
+  - title: Indicators of suspicious activity relating to NPO customers
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Cyber-enabled fraud indicators
+    quote: uses social media and online crowdfunding platforms to solicit donations and raise funds with
+      no reasonable economic rationale
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Indicators of suspicious activity relating to NPO customers
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Cyber-enabled fraud indicators
+    quote: purchases unusually large amounts of stored value cards
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A new 'aid' page asks for crypto donations and receives funds via a mixer.
+  cases: []
+  data_needed:
+  - Organization
+  - Payment
+  - CryptoWallet
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Blockchain explorers / analytics
+  - Crowdfunding platform pages
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Mixer/tumbler and unregistered VASP sources are standard crypto laundering indicators, listed
+      by AUSTRAC.
+    source_url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+  innocent_explanations:
+  - Legitimate emergency appeals online
+  - Crypto donations from privacy-minded donors
+  jurisdictions: Australia (AUSTRAC), global
+  version: 1
+- id: PP-051
+  name: NPO facilities or programmes used for recruitment or extremism
+  definition: Charity-funded events, venues or programmes are used to promote terrorism or recruit people,
+    or open sources link the NPO to extremist ideology.
+  areas:
+  - PP
+  typology: Support for recruitment (FATF R8)
+  status: verified
+  sources:
+  - title: Risk of Terrorist Abuse in Non-Profit Organisations
+    publisher: FATF (copy hosted by Mongolia FIU)
+    year: '2014'
+    url: https://fiu.mongolbank.mn/documents/other2e.pdf
+    locator: Executive summary, para. 13
+    quote: NPOs were abused to provide support to recruitment efforts by terrorist entities.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Indicators of suspicious activity relating to NPO customers
+    publisher: AUSTRAC
+    url: https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-relating-customers-who-are-not-profit-organisations
+    locator: Open source information
+    quote: identifies a customer has links to known terrorist organisations or terrorism activities
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A youth centre run by a charity hosts speakers who are designated terrorists.
+  cases: []
+  data_needed:
+  - Organization
+  - Person
+  - Associate
+  - Document
+  - Event
+  checkable: person
+  lookup_sources:
+  - Court records, media archives, sanctions lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful political or religious speech
+  - Misidentified speakers
+  jurisdictions: Global
+  version: 1
+- id: PP-052
+  name: Turnout and vote-share 'fingerprint' skewed toward 100%
+  definition: Plotting polling stations by turnout and winner's share shows a smear toward the top right
+    and a cluster near 100% turnout with almost all votes for one party, the pattern of ballot stuffing.
+  areas:
+  - PP
+  typology: Ballot stuffing / incremental and extreme fraud
+  status: verified
+  sources:
+  - title: Statistical detection of systematic election irregularities
+    publisher: Klimek, Yegorov, Hanel, Thurner (arXiv; PNAS 2012)
+    year: '2012'
+    url: https://arxiv.org/pdf/1201.3087
+    locator: Parametric model, Figure 1 caption
+    quote: The second peak is situated in the vicinity of the 100% turnout, 100% votes point.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Statistical detection of systematic election irregularities
+    publisher: Klimek et al.
+    year: '2012'
+    url: https://arxiv.org/pdf/1201.3087
+    locator: Parametric model
+    quote: Extreme fraud corresponds to reporting a complete turnout and almost all votes for a single
+      party.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Election Forensics Toolkit and Guide
+    publisher: University of Michigan (Hicken & Mebane) / USAID, hosted by IIE
+    url: https://www.iie.org/wp-content/uploads/2023/01/UM-Election-Forensics-Guide-FINAL.pdf
+    locator: p. 10
+    quote: fi is the probability of incremental fraud and fe is the probability of extreme fraud
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Hundreds of precincts report 99–100% turnout with 99% for the incumbent.
+  cases:
+  - name: Russian Duma election 2011 and presidential election 2012; Uganda 2011
+    year: '2012'
+    jurisdiction: Russia; Uganda
+    what_happened: Klimek et al. found that 'for Russia and Uganda the shape of these fingerprints differ
+      strongly from the other countries', and that reported Russian irregularities were well explained
+      by systematic ballot stuffing. This is a statistical research finding, not a court or official ruling.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://arxiv.org/pdf/1201.3087
+    source_title: Statistical detection of systematic election irregularities
+  data_needed:
+  - 'Document (precinct-level results: registered voters, ballots cast, votes per party)'
+  checkable: records
+  lookup_sources:
+  - Election commission precinct results
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (finite mixture model estimates non-zero incremental
+      or extreme fraud)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real geographic heterogeneity, e.g. strongholds with high mobilisation
+  - Closed communities (military bases, institutions) voting together
+  - Strategic behaviour, which the guide notes can mimic fraud
+  jurisdictions: Global
+  version: 1
+- id: PP-053
+  name: Second-digit (Benford 2BL) deviation in vote counts
+  definition: The average second digit of precinct vote counts differs from the 4.187 expected under Benford's
+    law.
+  areas:
+  - PP
+  typology: Election forensics – digit tests
+  status: verified
+  sources:
+  - title: Election Forensics Toolkit and Guide
+    publisher: University of Michigan / USAID, hosted by IIE
+    url: https://www.iie.org/wp-content/uploads/2023/01/UM-Election-Forensics-Guide-FINAL.pdf
+    locator: Table 1, p. 10; Appendix A, p. 38
+    quote: 2BL to be compared to the mean value Benford's Law specifies 4.187
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Precinct counts for one party have a second-digit mean of 4.6 with a tight confidence interval.
+  cases: []
+  data_needed:
+  - Document (precinct-level vote counts)
+  checkable: records
+  lookup_sources:
+  - Election commission results
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 2BL mean significantly different from 4.187 (Election Forensics Guide)
+    threshold_source: https://www.iie.org/wp-content/uploads/2023/01/UM-Election-Forensics-Guide-FINAL.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Strategic voting and normal political processes; the guide states forensics give 'only of statistical
+    anomalies'
+  - Small precinct sizes
+  jurisdictions: Global
+  version: 1
+- id: PP-054
+  name: Last-digit anomalies (rounding to 0 or 5)
+  definition: Final digits of counts or percentages are not evenly spread, for example too many ending
+    in 0 or 5, a sign of made-up numbers.
+  areas:
+  - PP
+  typology: Election forensics – fabricated tallies
+  status: verified
+  sources:
+  - title: Election Forensics Toolkit and Guide
+    publisher: University of Michigan / USAID, hosted by IIE
+    url: https://www.iie.org/wp-content/uploads/2023/01/UM-Election-Forensics-Guide-FINAL.pdf
+    locator: Appendix A, p. 38 (also LastC = 4.5, P05s = 0.2, Table 1 p. 10)
+    quote: the expected value for the mean of this indicator variable in the absence of frauds is C05s
+      = 0.2
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 35% of precinct turnout percentages end in 0 or 5.
+  cases: []
+  data_needed:
+  - Document (precinct-level counts and percentages)
+  checkable: records
+  lookup_sources:
+  - Election commission results
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Last-digit mean significantly different from 4.5, or 0/5 share significantly different from
+      0.2 (Election Forensics Guide)
+    threshold_source: https://www.iie.org/wp-content/uploads/2023/01/UM-Election-Forensics-Guide-FINAL.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Very small counts where last digits are not uniform
+  - Rounding by data publishers
+  jurisdictions: Global
+  version: 1
+- id: PP-055
+  name: Turnout or vote distribution not unimodal, skewed or heavy-tailed
+  definition: The distribution of turnout or vote share across precincts has more than one peak, or unusual
+    skew or kurtosis, which can signal manipulation in part of the country.
+  areas:
+  - PP
+  typology: Election forensics – distribution tests
+  status: verified
+  sources:
+  - title: Election Forensics Toolkit and Guide
+    publisher: University of Michigan / USAID, hosted by IIE
+    url: https://www.iie.org/wp-content/uploads/2023/01/UM-Election-Forensics-Guide-FINAL.pdf
+    locator: Table 1, p. 10 (DipT; expected p > 0.05; Skew 0; Kurt 3)
+    quote: whether the distribution of a variable departs from unimodality
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Statistical detection of systematic election irregularities
+    publisher: Klimek et al.
+    year: '2012'
+    url: https://arxiv.org/abs/1201.3087
+    locator: Abstract
+    quote: Using a suitable data collapse, we find that vote distributions of elections with alleged fraud
+      show a kurtosis
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Turnout histogram shows a second peak at 95–100%.
+  cases: []
+  data_needed:
+  - Document (precinct-level turnout and votes)
+  checkable: records
+  lookup_sources:
+  - Election commission results
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Dip test p-value of 0.05 or below (Election Forensics Guide)
+    threshold_source: https://www.iie.org/wp-content/uploads/2023/01/UM-Election-Forensics-Guide-FINAL.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Distinct regions or ethnic/party strongholds create multiple peaks
+  - Different voting rules in parts of the country
+  jurisdictions: Global
+  version: 1
+- id: PP-056
+  name: Third-party collection of absentee or postal ballots
+  definition: Paid workers gather absentee or postal ballots from voters, sometimes filling in or signing
+    them, which a board or court may find tainted the result.
+  areas:
+  - PP
+  typology: Absentee ballot fraud / ballot harvesting
+  status: verified
+  sources:
+  - title: Four people plead guilty in North Carolina ballot probe of 2016 and 2018 elections
+    publisher: NBC News
+    year: '2022'
+    url: https://www.nbcnews.com/politics/elections/four-people-plead-guilty-north-carolina-ballot-probe-2016-2018-electio-rcna49534
+    locator: Article body
+    quote: Dowless and his helpers gathered up hundreds of absentee ballots from voters by offering to
+      put them in the mail.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Unusually high absentee-by-mail request and return rates in one county, with many ballots witnessed
+    by the same few people.
+  cases:
+  - name: North Carolina 9th Congressional District election (Bladen County absentee ballots)
+    year: '2019'
+    jurisdiction: United States (North Carolina)
+    what_happened: After hearings on the 2018 race, the State Board of Elections voted unanimously to
+      order a new election; operative McCrae Dowless was indicted on state charges but died before trial,
+      and four helpers pleaded guilty to misdemeanor conspiracy.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.nbcnews.com/politics/elections/four-people-plead-guilty-north-carolina-ballot-probe-2016-2018-electio-rcna49534
+    source_title: Four people plead guilty in North Carolina ballot probe of 2016 and 2018 elections (NBC
+      News)
+  data_needed:
+  - Person (voters, witnesses)
+  - Document (absentee request and return logs)
+  - Employment (paid operatives)
+  - Payment
+  checkable: person
+  lookup_sources:
+  - Board of elections absentee files
+  - Campaign finance reports (payments to operatives)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful assistance to elderly or disabled voters where permitted
+  - Get-out-the-vote drives in high mail-voting areas
+  jurisdictions: United States (North Carolina); UK
+  version: 1
+- id: PP-057
+  name: Corrupt and illegal electoral practices by a candidate
+  definition: A candidate or agents use bribery, undue (including spiritual) influence, or false statements
+    about a rival, which an election court can find voids the result.
+  areas:
+  - PP
+  typology: Electoral corruption
+  status: verified
+  sources:
+  - title: R (Rahman) v The Local Government Election Court [2017] EWHC 1413 (Admin)
+    publisher: High Court of England and Wales (National Archives Find Case Law)
+    year: '2017'
+    url: https://caselaw.nationalarchives.gov.uk/ewhc/admin/2017/1413
+    locator: Para. 6 (summarising the 2015 Election Court judgment, Erlam v Rahman [2015] EWHC 1215 (QB))
+    quote: so extensively prevailed
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Grants steered to community groups before an election in exchange for votes.
+  cases:
+  - name: Erlam v Rahman (Tower Hamlets mayoral election 2014)
+    year: '2015'
+    jurisdiction: England and Wales
+    what_happened: The Election Court found Lutfur Rahman personally and through agents guilty of the
+      corrupt practices of bribery and undue influence and the illegal practice of false statements about
+      a candidate; his election as Mayor was invalidated and he was disqualified from standing (as summarised
+      in the 2017 High Court judgment).
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://caselaw.nationalarchives.gov.uk/ewhc/admin/2017/1413
+    source_title: R (Rahman) v The Local Government Election Court [2017] EWHC 1413 (Admin)
+  data_needed:
+  - Person
+  - Payment
+  - Document (leaflets, grant records)
+  - Associate
+  checkable: person
+  lookup_sources:
+  - Election petitions and court judgments
+  - Council grant records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (finding by an election court)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary campaigning and lawful community engagement
+  - Political criticism that is true or opinion
+  jurisdictions: England and Wales
+  version: 1
+- id: PP-058
+  name: Contributions in the name of another (straw donors)
+  definition: Someone gives money to others, or reimburses them, so they can make political donations
+    that are really from the first person, hiding the true source or getting around limits.
+  areas:
+  - PP
+  typology: Straw donor / conduit contributions
+  status: verified
+  sources:
+  - title: Contributions in the Name of Another are Strictly Prohibited
+    publisher: U.S. Federal Election Commission
+    url: https://www.fec.gov/updates/contributions-in-the-name-of-another-are-strictly-prohibited/
+    locator: Statutory citation
+    quote: 52 U.S.C. §§ 30122 and 30109 (formerly 2 U.S.C. §§ 441f and 437g)
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Several employees of one company each give the maximum on the same day, then receive matching 'bonuses'.
+  - A large donation reported as from a newly formed LLC with no business activity.
+  cases:
+  - name: United States v. Lev Parnas
+    year: '2021'
+    jurisdiction: United States (S.D.N.Y.)
+    what_happened: A jury found Parnas guilty of conspiring to make straw donations and foreign national
+      contributions; DOJ said a $325,000 contribution reported as from Global Energy Producers was among
+      straw donations 'paid for by Fruman', and Russian national Andrey Muraviev agreed to wire $1 million
+      to fund contributions. Sentenced to 20 months in 2022.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/lev-parnas-sentenced-20-months-prison-campaign-finance-wire-fraud-and-false-statements
+    source_title: Lev Parnas Sentenced To 20 Months In Prison For Campaign Finance, Wire Fraud, And False
+      Statements Crimes
+  data_needed:
+  - Person
+  - Company
+  - Employment
+  - Payment
+  - Organization (committee)
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - FEC/state campaign finance databases
+  - Company registry
+  - Payroll records (via court)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Colleagues or family members genuinely giving together after an event
+  - Employer-organised fundraiser with personal funds
+  jurisdictions: United States
+  version: 1
+- id: PP-059
+  name: Foreign national money in elections
+  definition: Contributions or election spending funded by non-citizens without permanent residence, or
+    foreign entities, which is banned; signs include foreign passports, addresses or banks.
+  areas:
+  - PP
+  typology: Foreign national contributions
+  status: verified
+  sources:
+  - title: Foreign nationals
+    publisher: U.S. Federal Election Commission
+    url: https://www.fec.gov/help-candidates-and-committees/foreign-nationals/
+    locator: Red flags
+    quote: Use of a foreign passport or passport number for identification purposes;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Foreign nationals
+    publisher: U.S. Federal Election Commission
+    url: https://www.fec.gov/help-candidates-and-committees/foreign-nationals/
+    locator: Red flags
+    quote: A check or other written instrument drawn on an account or wire transfer from a foreign bank
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A donation wired from a bank in Cyprus by a donor listing a London address.
+  cases: []
+  data_needed:
+  - Person (nationality)
+  - Passport
+  - Address
+  - Payment
+  - BankAccount
+  - Organization (committee)
+  checkable: lookups
+  lookup_sources:
+  - FEC data
+  - Corporate registries for foreign parents
+  - Sanctions/PEP lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (any FEC-listed red flag present)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: In the Parnas case the funds came from a Russian national through a chain of bank accounts.
+    source_url: https://www.justice.gov/usao-sdny/pr/lev-parnas-sentenced-20-months-prison-campaign-finance-wire-fraud-and-false-statements
+  innocent_explanations:
+  - U.S. citizens living abroad (legal donors)
+  - Green-card holders, who may contribute
+  - Dual nationals
+  jurisdictions: United States
+  version: 1
+- id: PP-060
+  name: Campaign funds used for personal expenses
+  definition: Campaign money pays for things the candidate would have bought anyway, such as household
+    food, rent, holidays or entertainment, often disguised as campaign costs.
+  areas:
+  - PP
+  typology: Personal use of campaign funds
+  status: verified
+  sources:
+  - title: Personal use
+    publisher: U.S. Federal Election Commission
+    url: https://www.fec.gov/help-candidates-and-committees/making-disbursements/personal-use/
+    locator: Irrespective test
+    quote: obligation or expense of any person that would exist irrespective of the candidate's campaign
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Personal use
+    publisher: U.S. Federal Election Commission
+    url: https://www.fec.gov/help-candidates-and-committees/making-disbursements/personal-use/
+    locator: Per se personal use examples
+    quote: The campaign may not pay for admission to sporting events, concerts, theater and other forms
+      of entertainment.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Committee disbursements to grocery stores, family holidays and school fees, labelled 'campaign events'.
+  cases:
+  - name: United States v. Duncan D. Hunter
+    year: '2020'
+    jurisdiction: United States (S.D. California)
+    what_happened: Former Congressman Hunter pleaded guilty to conspiracy to steal campaign funds, admitting
+      a 'years-long conspiracy to knowingly and willfully steal $250,000 in campaign funds', and falsely
+      reporting personal charges as 'campaign related'; sentenced to 11 months in prison on 17 March 2020.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdca/pr/former-congressman-duncan-d-hunter-sentenced-11-months-prison-stealing-campaign-funds
+    source_title: Former Congressman Duncan D. Hunter Sentenced to 11 Months in Prison for Stealing Campaign
+      Funds
+  data_needed:
+  - Payment (purpose, payee)
+  - Organization (committee)
+  - Person
+  - Family
+  checkable: records
+  lookup_sources:
+  - FEC disbursement data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (expense fails the irrespective test)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Mixed-use travel properly allocated
+  - Legitimate campaign events at venues that look personal
+  jurisdictions: United States
+  version: 1
+- id: PP-061
+  name: Spending over the limit via coordinated campaign groups and inaccurate returns
+  definition: A campaign exceeds its legal spending cap, for example by working with a supposedly separate
+    group under a common plan, and files a spending return that leaves items out or lacks invoices.
+  areas:
+  - PP
+  typology: Overspending / undeclared joint spending
+  status: verified
+  sources:
+  - title: Vote Leave fined and referred to the police for breaking electoral law
+    publisher: UK Electoral Commission
+    year: '2018'
+    url: https://www.electoralcommission.org.uk/media-centre/vote-leave-fined-and-referred-police-breaking-electoral-law
+    locator: Findings
+    quote: Vote Leave's referendum spending was £7,449,079.34, exceeding its statutory spending limit
+      of £7 million.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Vote Leave fined and referred to the police for breaking electoral law
+    publisher: UK Electoral Commission
+    year: '2018'
+    url: https://www.electoralcommission.org.uk/media-centre/vote-leave-fined-and-referred-police-breaking-electoral-law
+    locator: Findings
+    quote: Vote Leave's spending return was inaccurate in respect of 43 items of spending, totalling £236,501.44.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A lead campaign 'donates' money to a small youth group, which pays the same digital agency the lead
+    campaign uses.
+  cases:
+  - name: Vote Leave, Darren Grimes / BeLeave and Veterans for Britain (EU referendum 2016)
+    year: '2018'
+    jurisdiction: United Kingdom
+    what_happened: The Electoral Commission found 'significant evidence of joint working' between Vote
+      Leave and BeLeave, spending above the £7m limit and an inaccurate return; it fined Vote Leave £61,000
+      (paid), Mr Grimes £20,000 (later withdrawn after a July 2019 judgment) and Veterans for Britain
+      £250.
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.electoralcommission.org.uk/media-centre/vote-leave-fined-and-referred-police-breaking-electoral-law
+    source_title: Vote Leave fined and referred to the police for breaking electoral law
+  data_needed:
+  - Organization
+  - Payment
+  - Company (suppliers)
+  - Document (spending returns, invoices)
+  - Person
+  checkable: records
+  lookup_sources:
+  - Electoral Commission spending returns
+  - Supplier company records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Spending above the statutory limit (meets the published definition as worded)
+    threshold_source: https://www.electoralcommission.org.uk/media-centre/vote-leave-fined-and-referred-police-breaking-electoral-law
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuinely independent groups sharing a common supplier
+  - Late invoices and accounting errors
+  jurisdictions: United Kingdom
+  version: 1
+not_reached:
+- 'OECD Guidelines for Fighting Bid Rigging in Public Procurement (2009 and 2025 update) full text: oecd.org
+  PDF blocked by robots; 2025 component page returned navigation only. Used DOJ Antitrust Division guide
+  and an OECD presentation (slide 15) instead.'
+- 'Fazekas & Kocsis, ''Uncovering High-Level Corruption'' (British Journal of Political Science, 2020):
+  Cambridge page returned a server error; used QoG dataset description and Fazekas & Czibik 2015 presentation.'
+- 'Open Contracting Partnership ''Red Flags in Public Procurement'' (2024, open-contracting.org/redflags)
+  superseding guide: not opened; used the 2016 guide and Cardinal docs.'
+- 'Individual Cardinal indicator pages (thresholds and settings for R003, R024, R025, R038, R048, R058):
+  not opened.'
+- 'FATF 2014 ''Risk of Terrorist Abuse in Non-Profit Organisations'' Chapter 6 indicator lists: fatf-gafi.org
+  blocked by robots; the mirrored copy''s extracted text did not include Chapter 6. Used AUSTRAC NPO indicators
+  instead.'
+- 'FATF Recommendation 8 Interpretive Note and 2023 Best Practices paper: not opened directly.'
+- 'Klimek et al. PNAS 2012 article page: fetch failed; used the arXiv version.'
+- 'Erlam v Rahman [2015] EWHC 1215 (QB) full judgment conclusion: page text truncated before findings;
+  used the 2017 High Court judgment''s summary.'
+- 'BBC report on Tower Hamlets: site blocked.'
+- 'FEC ''contributions in the name of another'' help page: fetch error; used the FEC update page.'
+- 'North Carolina State Board of Elections order (primary source) on the 9th District: not opened; relied
+  on NBC News reporting.'
+- 'European Commission / OLAF case material on specific EU procurement cases (e.g. Hungary): not researched.'
+- Integrity Watch Red Flags page lists 20 indicators but only 17 were visible.

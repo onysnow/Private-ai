@@ -1,0 +1,2773 @@
+key: FR
+name: Tax evasion and fraud
+scope: tax evasion and aggressive avoidance used to hide wrongdoing, investment and securities fraud,
+  Ponzi and pyramid schemes, insurance fraud, healthcare fraud, bankruptcy fraud.
+indicators:
+- id: FR-001
+  name: Omitted income or whole income sources
+  definition: Income that was clearly received is left off the tax return, either item by item or a whole
+    source at once.
+  areas:
+  - FR
+  typology: Tax evasion - unreported income
+  status: verified
+  sources:
+  - title: IRM 25.1.2.3 Indicators of Fraud (Income)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(2)
+    quote: Omitting entire sources of income.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Omitting specific items where similar items are included (IRM 25.1.2.3(2))
+  - Failing to report or explain substantial amounts of income identified as received (IRM 25.1.2.3(2))
+  cases:
+  - name: United States v. Paul Manafort (EDVA)
+    year: '2018'
+    jurisdiction: United States (E.D. Virginia)
+    what_happened: A jury found Manafort guilty of five counts of filing false tax returns, one count
+      of not filing a required IRS form and two counts of bank fraud; prosecutors alleged he hid $65 million
+      from the IRS in overseas accounts. The jury could not agree on the other 10 counts.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://abajournal.com/news/article/jury_finds_paul_manafort_guilty_on_eight_counts_judge_declares_mistrial_on
+    source_title: Jury finds Paul Manafort guilty on eight counts; judge declares mistrial on 10 other
+      counts (ABA Journal)
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - BankAccount
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Honest bookkeeping error or a missing third-party form
+  - Misunderstanding of what counts as taxable income
+  - Income reported on a related entity's return rather than the individual's
+  jurisdictions: US (IRS); concept general
+  version: 1
+- id: FR-002
+  name: Wealth or spending that reported income cannot explain
+  definition: A person's net worth grows, or their personal spending runs, well beyond what their declared
+    income could pay for.
+  areas:
+  - FR
+  - ML
+  typology: Net worth / expenditure method
+  status: verified
+  sources:
+  - title: IRM 25.1.2.3 Indicators of Fraud (Income)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(2)
+    quote: Inability to explain substantial increases in net worth, especially over a period of years.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: IRM 25.1.2.3 Indicators of Fraud (Income)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(2)
+    quote: Substantial personal expenditures exceeding reported resources.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Property, vehicles or luxury goods bought by someone whose returns show modest income
+  cases: []
+  data_needed:
+  - Person
+  - Ownership
+  - RealEstate
+  - Vehicle
+  - Payment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Property and land registries
+  - Vehicle/vessel/aircraft registries
+  - Court filings showing declared income
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Unexplained wealth in public officials is a classic sign of bribe receipt as well as tax evasion.
+    source_url: https://www.irs.gov/irm/part25/irm_25-001-002
+  innocent_explanations:
+  - Inheritance, gifts or loans
+  - Sale of an asset bought long ago
+  - Spouse's or family income
+  - Non-taxable receipts such as insurance payouts
+  version: 1
+- id: FR-003
+  name: Bank deposits larger than reported income
+  definition: Money paid into a person's or business's accounts is much more than the income shown on
+    the tax return, and the source cannot be explained.
+  areas:
+  - FR
+  typology: Bank deposits method
+  status: verified
+  sources:
+  - title: IRM 25.1.2.3 Indicators of Fraud (Income)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(2)
+    quote: Inability to explain sources of bank deposits substantially exceeding reported income.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
+    publisher: Financial Intelligence Analysis Unit, Malta
+    url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+    locator: Annex I, Section 5, p. 22
+    quote: Frequent amounts of deposits from unexplained sources.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - An entity that does not report any revenue but has executed transactions which have been reported
+    by third parties (FIAU Annex I s.2)
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment
+  - Person
+  - Company
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Transfers between a person's own accounts counted twice
+  - Loan proceeds or repayments
+  - Customer deposits held on trust
+  version: 1
+- id: FR-004
+  name: Hidden domestic, foreign or digital-asset accounts
+  definition: Bank, brokerage or crypto accounts are kept from the tax authority, often abroad or in uncooperative
+    jurisdictions.
+  areas:
+  - FR
+  - ML
+  typology: Offshore concealment
+  status: verified
+  sources:
+  - title: IRM 25.1.2.3 Indicators of Fraud (Income)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(2)
+    quote: Concealing domestic or foreign bank accounts, brokerage accounts, digital assets such as convertible…
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
+    publisher: Financial Intelligence Analysis Unit, Malta
+    url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+    locator: Annex I, Section 3, pp. 20-21
+    quote: The customer opens an account and funds are transferred to/from non-cooperative jurisdictions…
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  - title: Report of Foreign Bank and Financial Accounts (FBAR)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/businesses/small-businesses-self-employed/report-of-foreign-bank-and-financial-accounts-fbar
+    quote: the aggregate value of those foreign financial accounts exceeded $10,000 at any time during
+      the calendar year reported.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Customer failed to disclose dual citizenship or tax residence (FIAU Annex I s.1)
+  - UBS staff opening accounts in the names of nominees or sham entities for US clients (DOJ 2009)
+  cases:
+  - name: UBS AG deferred prosecution agreement
+    year: '2009'
+    jurisdiction: United States (S.D. Florida)
+    what_happened: UBS admitted helping US taxpayers hide accounts from the IRS, including opening accounts
+      in the names of nominees and/or sham entities, and agreed to pay $780 million in fines, penalties,
+      interest and restitution under a deferred prosecution agreement.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/2009/February/09-tax-136.html
+    source_title: DOJ press release 09-tax-136, 18 Feb 2009
+  - name: United States v. Paul Manafort (EDVA)
+    year: '2018'
+    jurisdiction: United States (E.D. Virginia)
+    what_happened: Convicted on false tax return counts and one count of not filing a required IRS form;
+      prosecutors alleged $65 million hidden in overseas bank accounts.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://abajournal.com/news/article/jury_finds_paul_manafort_guilty_on_eight_counts_judge_declares_mistrial_on
+    source_title: ABA Journal
+  data_needed:
+  - Person
+  - BankAccount
+  - CryptoWallet
+  - Company
+  - Ownership
+  - Address
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Offshore leak databases (e.g. ICIJ Offshore Leaks)
+  - Company registries in offshore jurisdictions
+  - Court records
+  - Blockchain explorers for crypto
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: A US person with foreign accounts whose combined value exceeded $10,000 during the year
+      and no FBAR filed (FBAR filing duty per IRS); otherwise meets the published definition as worded
+    threshold_source: https://www.irs.gov/businesses/small-businesses-self-employed/report-of-foreign-bank-and-financial-accounts-fbar
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FIAU lists funds moving to or from non-cooperative jurisdictions as a tax-related money laundering
+      red flag.
+    source_url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+  innocent_explanations:
+  - Dual nationals or expatriates with ordinary local accounts abroad
+  - Unaware of reporting duty (non-wilful)
+  - Account was reported but the record is not public
+  jurisdictions: US (FBAR); international (FIAU, Malta)
+  version: 1
+- id: FR-005
+  name: Large unexplained cash in a business that does not normally use cash
+  definition: Big sums of cash are handled or spent without explanation, especially in a business that
+    does not normally deal in cash.
+  areas:
+  - FR
+  - ML
+  typology: Cash skimming / cash concealment
+  status: verified
+  sources:
+  - title: IRM 25.1.2.3 Indicators of Fraud (Income)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(2)
+    quote: Consistent concealment of unexplained currency, especially in a business not routinely requiring
+      large cash transactions.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
+    publisher: Financial Intelligence Analysis Unit, Malta
+    url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+    locator: Annex I, Section 2, pp. 19-20
+    quote: Use of material levels of cash in a non-cash intensive business without a commercial or reasonable
+      justification.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - Inadequately explaining dealings in large sums of currency, or the unexplained expenditure of currency
+    (IRM 25.1.2.3(2))
+  - Health care provider making significant cash withdrawals with no apparent business purpose (FinCEN
+    FIN-2026-A001, p.10)
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment
+  - Company
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Business has legitimately cash-paying customers or suppliers
+  - Cash payroll in some trades
+  - Cultural preference for cash
+  version: 1
+- id: FR-006
+  name: Business receipts kept out of the business account
+  definition: Customer payments are not banked in the business account, or income checks are cashed at
+    check-cashing outlets or other banks.
+  areas:
+  - FR
+  typology: Skimming of receipts
+  status: verified
+  sources:
+  - title: IRM 25.1.2.3 Indicators of Fraud (Income)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(2)
+    quote: Failing to deposit receipts in a business account, contrary to established practices.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: IRM 25.1.2.3 Indicators of Fraud (Income)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(2)
+    quote: Cashing checks, representing income, at check cashing services and at banks where the taxpayer…
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Checks made payable to vendors and other business payees that are cashed by the taxpayer (IRM 25.1.2.3(4))
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment
+  - Company
+  - Person
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Owner has no business account yet
+  - Bank access problems for small or unbanked businesses
+  version: 1
+- id: FR-007
+  name: Years of not filing or not paying tax
+  definition: A person or company has failed to file returns or pay tax for several years despite earning
+    income.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: IRM 25.1.2.3 Indicators of Fraud (Income)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(2)
+    quote: Failing to file a tax return, especially for a period of several years, despite evidence of
+      receipt…
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
+    publisher: Financial Intelligence Analysis Unit, Malta
+    url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+    locator: Annex I, Section 3, p. 21
+    quote: The customer is non-compliant with tax obligations for a number of years.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - Pattern of consistent failure over several years to report income fully (IRM 25.1.2.3(6))
+  - Companies which repeatedly fail to comply with their statutorily duty to file copies of their financial…
+    (FIAU Annex I s.4)
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Tax lien records
+  - Company registry filing history
+  - Court judgments
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Income below filing threshold
+  - Illness, disability or bereavement
+  - Dormant company
+  version: 1
+- id: FR-008
+  name: Fake or personal expenses claimed as business deductions
+  definition: Deductions are invented, inflated, or are really personal spending dressed up as business
+    costs.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: IRM 25.1.2.3 Indicators of Fraud (Expenses or Deductions)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(3)
+    quote: Claiming substantial business expense deductions for personal expenditures.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Claiming fictitious or substantially overstated deductions (IRM 25.1.2.3(3))
+  - Payment of improper expenses by or for officials or trustees (IRM 25.1.2.3(6))
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Mixed-use items (car, phone, home office) honestly apportioned
+  - Bookkeeper miscoding
+  version: 1
+- id: FR-009
+  name: False dependants or falsified supporting papers
+  definition: Tax claims rely on people who do not exist or do not qualify, or on forged or altered papers
+    such as birth certificates or leases.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: IRM 25.1.2.3 Indicators of Fraud (Expenses or Deductions)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(3)
+    quote: Claiming dependency exemptions for nonexistent, deceased, or self-supporting persons.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Providing false or altered documents, such as birth certificates, lease documents, school/medical
+    records… (IRM 25.1.2.3(3))
+  - Use of false social security numbers (IRM 25.1.2.3(6))
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Document
+  - Identification
+  checkable: lookups
+  lookup_sources:
+  - Death records
+  - Civil registries
+  - Court family records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Custody disputes where both parents claim a child
+  - Clerical errors in identity numbers
+  version: 1
+- id: FR-010
+  name: Two sets of books, missing records or refusal to produce records
+  definition: The business keeps parallel accounts, keeps no proper records, or hides or withholds them.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: IRM 25.1.2.3 Indicators of Fraud (Books and Records)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(4)
+    quote: Multiple sets of books or no records.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
+    publisher: Financial Intelligence Analysis Unit, Malta
+    url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+    locator: Annex I, Section 4, p. 21
+    quote: The entity maintains materially incomplete records which would undermine the integrity and
+      reliability of…
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - Failure to keep adequate records, concealment of records, or refusal to make records available (IRM
+    25.1.2.3(4))
+  - Destruction of books and records, especially if just after examination was started (IRM 25.1.2.3(6))
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small business with poor administration
+  - Records lost in fire, flood or system failure
+  - Change of accountant
+  version: 1
+- id: FR-011
+  name: Altered, backdated or irregular documents and invoices
+  definition: Books contain false entries, backdated papers, fake invoices, or invoices with missing,
+    irregular or altered numbering.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: IRM 25.1.2.3 Indicators of Fraud (Books and Records)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(4)
+    quote: Invoices are irregularly numbered, unnumbered or altered.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: IRM 25.1.2.3 Indicators of Fraud (Books and Records)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(4)
+    quote: False entries, or alterations made on the books and records; back-dated or post-dated documents;
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Sales and purchases are not backed by invoices or proper documentation (FIAU Annex I s.5)
+  - Backdated applications and related documents (IRM 25.1.2.3(6))
+  cases: []
+  data_needed:
+  - Document
+  - Company
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Invoicing software change resets numbering
+  - Voided invoices
+  - Legitimate correction notes
+  version: 1
+- id: FR-012
+  name: Payments that loop back to the owner
+  definition: Checks written to third parties or vendors end up endorsed back to, or cashed by, the taxpayer.
+  areas:
+  - FR
+  - ML
+  status: verified
+  sources:
+  - title: IRM 25.1.2.3 Indicators of Fraud (Books and Records)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(4)
+    quote: Checks made payable to third parties that are endorsed back to the taxpayer.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Without credible explanation, a customer routinely cashes high-value checks drawn from accounts associated
+    with a health care provider (FinCEN FIN-2026-A001, p.10)
+  cases: []
+  data_needed:
+  - Payment
+  - BankAccount
+  - Person
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Reimbursement of an expense the owner paid personally
+  - Refund of an overpayment
+  version: 1
+- id: FR-013
+  name: Tax return does not match the books
+  definition: Figures on the return differ from the company's own ledgers, or ledgers differ from source
+    records, or questionable items are parked in the wrong accounts.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: IRM 25.1.2.3 Indicators of Fraud (Books and Records)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(4)
+    quote: Amounts on tax return not in agreement with amounts in books.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Recording income items in suspense or asset accounts (IRM 25.1.2.3(4))
+  - Intentional under- or over-footing of columns in journal or ledger (IRM 25.1.2.3(4))
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Timing differences between book and tax accounting
+  - Legitimate tax adjustments
+  version: 1
+- id: FR-014
+  name: Income shifted to fake partners or lower-taxed relatives
+  definition: Profits are handed to partners who do not exist, or moved onto a related person's return
+    to use a lower tax rate.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: IRM 25.1.2.3 Indicators of Fraud (Allocations of Income)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(5)
+    quote: Inclusion of income or deductions in the tax return of a related taxpayer, when tax rate differences
+      are a factor.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: Abusive trust tax evasion schemes - Questions and answers
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/businesses/small-businesses-self-employed/abusive-trust-tax-evasion-schemes-questions-and-answers
+    quote: Income that is earned by one person cannot be assigned to another for federal income tax purposes.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Distribution of profits to fictitious partners (IRM 25.1.2.3(5))
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Company
+  - Ownership
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family members genuinely work in or own part of the business
+  - Lawful income splitting where permitted
+  version: 1
+- id: FR-015
+  name: Obstructing the examination
+  definition: The subject lies, stalls, refuses records, threatens witnesses or tries to bribe the examiner.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: IRM 25.1.2.3 Indicators of Fraud (Conduct of Taxpayer)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(6)
+    quote: Attempt to hinder or obstruct the examination.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - For example, failure to answer questions; repeated cancelled or rescheduled appointments; refusal
+    to provide records; (IRM 25.1.2.3(6))
+  - Attempt to bribe the examiner (IRM 25.1.2.3(6))
+  - The customer becomes uncooperative when due diligence is carried out (FIAU Annex I s.3)
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Illness or real scheduling conflicts
+  - Acting on a lawyer's advice to limit answers
+  version: 1
+- id: FR-016
+  name: Assets or accounts held in other people's names
+  definition: Property, bank accounts or business deals are put in nominee, relative or false names to
+    hide the real owner.
+  areas:
+  - FR
+  - ML
+  typology: Nominee concealment
+  status: verified
+  sources:
+  - title: IRM 25.1.2.3 Indicators of Fraud (Methods of Concealment)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(7)
+    quote: Deposits into bank accounts under nominee names.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: IRM 25.1.2.3 Indicators of Fraud (Methods of Concealment)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(7)
+    quote: Asset ownership placed in other names.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
+    publisher: Financial Intelligence Analysis Unit, Malta
+    url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+    locator: Annex I, Section 4, p. 21
+    quote: The use of fiduciary shareholders within the entity structure with no clear and legitimate
+      purpose or…
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - Conduct of business transactions in false names (IRM 25.1.2.3(7))
+  - Use of secret bank accounts for income (IRM 25.1.2.3(7))
+  - Payday-loan owner routed about $541,000 of business income into his wife's personal bank account during
+    bankruptcy (DOJ WDMO 2021)
+  cases:
+  - name: UBS AG deferred prosecution agreement
+    year: '2009'
+    jurisdiction: United States (S.D. Florida)
+    what_happened: UBS admitted employees helped US clients open accounts in the names of nominees and/or
+      sham entities; agreed to pay $780 million.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/2009/February/09-tax-136.html
+    source_title: DOJ press release 09-tax-136
+  - name: United States v. Del Hodges Kimball (W.D. Missouri)
+    year: '2021'
+    jurisdiction: United States (W.D. Missouri)
+    what_happened: Pleaded guilty to bankruptcy fraud after hiding assets, accounts and income, including
+      routing business income into his wife's account; sentenced to one year and a day and $909,323 restitution.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-wdmo/pr/owner-payday-loan-company-sentenced-bankruptcy-fraud
+    source_title: Owner of payday loan company sentenced for bankruptcy fraud (DOJ)
+  data_needed:
+  - Person
+  - Family
+  - Associate
+  - Ownership
+  - BankAccount
+  - Company
+  - UnknownLink
+  checkable: lookups
+  lookup_sources:
+  - Company registry and beneficial-ownership registers
+  - Property registries
+  - Offshore leak databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Nominee accounts and fiduciary shareholders are listed by FIAU as tax-related money laundering
+      red flags.
+    source_url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+  innocent_explanations:
+  - Joint family ownership for estate planning
+  - Lawful trust or custodian arrangements
+  - Privacy or safety reasons (e.g. domestic abuse survivors)
+  version: 1
+- id: FR-017
+  name: Transfers to insiders for too little, while insolvent or before a claim
+  definition: Assets are moved to close relations or insiders for less than they are worth, often just
+    before a tax assessment, lawsuit or bankruptcy, while the transferor keeps using them.
+  areas:
+  - FR
+  typology: Fraudulent transfer (badges of fraud)
+  status: verified
+  sources:
+  - title: IRM 25.1.2.3 Indicators of Fraud (Methods of Concealment)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/irm/part25/irm_25-001-002
+    locator: IRM 25.1.2.3(7)
+    quote: Transfer made in anticipation of a tax assessment or while the investigation of a deficiency
+      is pending.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: 11 U.S.C. 548 Fraudulent transfers and obligations
+    publisher: Legal Information Institute, Cornell Law School (US Code)
+    url: https://www.law.cornell.edu/uscode/text/11/548
+    locator: s.548(a)(1)
+    quote: that was made or incurred on or within 2 years before the date of the filing of the petition
+    quote_verified: true
+    licence: 'US Code: public domain'
+    checked: '2026-10-08'
+  examples:
+  - Inadequacy of consideration; Insolvency of transferor; Close relationship between parties to the transfer
+    (IRM 25.1.2.3(7))
+  - Retention of possession or continued use of asset (IRM 25.1.2.3(7))
+  - Kimball omitted about $86,200 of transfers to friends and relatives from his bankruptcy papers (DOJ
+    WDMO 2021)
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Associate
+  - Ownership
+  - RealEstate
+  - Payment
+  - Debt
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Property registry transfer dates and prices
+  - Bankruptcy court dockets (PACER)
+  - Tax lien and judgment records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: In US bankruptcy, a transfer within 2 years before the petition made with actual intent
+      to hinder, delay or defraud creditors, or for less than reasonably equivalent value while insolvent
+      (11 U.S.C. 548)
+    threshold_source: https://www.law.cornell.edu/uscode/text/11/548
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine family gifts made while solvent
+  - Sale at a fair but low market price in a downturn
+  - Estate planning done long before any claim
+  version: 1
+- id: FR-018
+  name: Round-tripping or circular money flows
+  definition: Money leaves and comes back to its starting point through other entities, often disguised
+    as a loan or investment.
+  areas:
+  - FR
+  - ML
+  status: verified
+  sources:
+  - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
+    publisher: Financial Intelligence Analysis Unit, Malta
+    url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+    locator: Annex I, Section 2, pp. 19-20
+    quote: Circular transactions or round-tripping transactions where funds are reinvested into the original…
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - The use of shareholders' loans to finance corporate activities (FIAU Annex I s.2)
+  - Transactions for which there is no economic, commercial or logical explanation (FIAU Annex I s.2)
+  cases: []
+  data_needed:
+  - Payment
+  - BankAccount
+  - Company
+  - Ownership
+  - Debt
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FIAU lists round-tripping as a typology of tax-related money laundering.
+    source_url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+  innocent_explanations:
+  - Intra-group treasury (cash pooling)
+  - Genuine shareholder funding of a start-up
+  version: 1
+- id: FR-019
+  name: Goods or services priced far from their real value
+  definition: Invoices state a value for goods or services that is clearly too high or too low, moving
+    profit or money between parties.
+  areas:
+  - FR
+  - ML
+  typology: Mispricing / trade-based
+  status: verified
+  sources:
+  - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
+    publisher: Financial Intelligence Analysis Unit, Malta
+    url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+    locator: Annex I, Section 2, pp. 19-20
+    quote: Under or overvaluing goods and/or services where the declared value on the invoices for these
+      goods…
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - Syndicated conservation easements relying on inflated appraisals of undeveloped land (IRS 2021 Dirty
+    Dozen)
+  cases: []
+  data_needed:
+  - Contract
+  - Payment
+  - Company
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Customs/trade data
+  - Market price references
+  - Appraisal records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Under/over-invoicing is listed by FIAU as tax-related money laundering.
+    source_url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+  innocent_explanations:
+  - Bulk discounts or distressed sales
+  - Bespoke goods with no market price
+  - Currency swings
+  version: 1
+- id: FR-020
+  name: Vague consulting, marketing or research fees
+  definition: Repeated payments for loosely described consulting or marketing services, often to parties
+    that could not plausibly provide them.
+  areas:
+  - CO
+  - FR
+  - ML
+  status: verified
+  sources:
+  - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
+    publisher: Financial Intelligence Analysis Unit, Malta
+    url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+    locator: Annex I, Section 2, pp. 19-20
+    quote: Transactions involving services such as consultancy, marketing or research when the service
+      provider is…
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  - title: FinCEN Advisory on Health Care Fraud Schemes (FIN-2026-A001)
+    publisher: US Financial Crimes Enforcement Network
+    url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+    locator: Red flag 14, p. 9
+    quote: A customer is a health care provider or supplier with a significant amount of transactional
+      activity consisting of
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - 'FinCEN red flag 14: many repetitive, vaguely described invoices for ''consulting'' or ''marketing''
+    fees (paraphrase)'
+  cases: []
+  data_needed:
+  - Payment
+  - Contract
+  - Company
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: FinCEN notes cash and payments rising with billing may indicate kickback payments; vague fees
+      are a common bribe conduit.
+    source_url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+  innocent_explanations:
+  - Real advisory services that are hard to document
+  - Outsourced marketing
+  version: 1
+- id: FR-021
+  name: Companies with no real presence, quickly abandoned, or cloned names
+  definition: Companies set up where they do nothing, dropped soon after creation, or duplicated with
+    the same name in several countries.
+  areas:
+  - FR
+  - ML
+  typology: Shell companies
+  status: verified
+  sources:
+  - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
+    publisher: Financial Intelligence Analysis Unit, Malta
+    url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+    locator: Annex I, Section 2 and 3, pp. 19-21
+    quote: The incorporation of companies which are then abandoned shortly after their establishment.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
+    publisher: Financial Intelligence Analysis Unit, Malta
+    url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+    locator: Annex I, Section 4, p. 21
+    quote: The absence of a local footprint.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - The setting up of two or more trading companies in different jurisdictions having the same company
+    name (FIAU Annex I s.4)
+  - Health care reimbursements moved quickly to other new companies with the same owners and little online
+    presence (FinCEN FIN-2026-A001 red flag 7, paraphrase)
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Ownership
+  - Directorship
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Company registries (incorporation and dissolution dates)
+  - Registered-agent address lookups
+  - Web presence checks
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Holding or special-purpose vehicles with legitimate roles
+  - Failed start-ups
+  - Brand protection registrations in several countries
+  version: 1
+- id: FR-022
+  name: Needlessly complex structures or bearer shares
+  definition: Ownership chains are far more complicated than the business needs, or use bearer shares,
+    making the real owner hard to see.
+  areas:
+  - FR
+  - ML
+  status: verified
+  sources:
+  - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
+    publisher: Financial Intelligence Analysis Unit, Malta
+    url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+    locator: Annex I, Section 4, p. 21
+    quote: Inexplicably intricate structures.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
+    publisher: Financial Intelligence Analysis Unit, Malta
+    url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+    locator: Annex I, Section 4, p. 21
+    quote: The structure includes the use of bearer shares.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - 'Rubber stamping: a board that manifestly lacks the skill or time to run the entity (FIAU Annex I
+    s.4)'
+  - A discrepancy between the customer's organisation structure and/or transactions and the documentation
+    (FIAU Annex I s.3)
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Directorship
+  - Person
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Company registries across jurisdictions
+  - Beneficial ownership registers
+  - OpenCorporates-style aggregators
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Multinational groups with lawful tax planning
+  - Joint ventures and financing structures
+  - Inherited legacy structures
+  version: 1
+- id: FR-023
+  name: Mixing personal and business money
+  definition: Personal and business accounts are used interchangeably so spending cannot be tracked.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
+    publisher: Financial Intelligence Analysis Unit, Malta
+    url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+    locator: Annex I, Section 4, p. 21
+    quote: Commingling of personal and business accounts.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - Funds are withdrawn in ways that the expenditure cannot be tracked (FIAU Annex I s.2)
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment
+  - Person
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Sole traders without separate accounts
+  - Poor bookkeeping in very small businesses
+  version: 1
+- id: FR-024
+  name: Structuring cash to avoid reporting
+  definition: Cash deals are split into amounts under the reporting threshold, or changed or cancelled
+    once the person learns a report will be filed.
+  areas:
+  - FR
+  - ML
+  typology: Structuring / smurfing
+  status: verified
+  sources:
+  - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
+    publisher: Financial Intelligence Analysis Unit, Malta
+    url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+    locator: Annex I, Section 2, p. 19
+    quote: Structuring/Smurfing.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  - title: FinCEN Advisory on Health Care Fraud Schemes (FIN-2026-A001)
+    publisher: US Financial Crimes Enforcement Network
+    url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+    locator: Red flag 22, p. 10
+    quote: A customer that is a health care provider or supplier, or the customer's employee, engages
+      in behavior
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - 'FinCEN red flag 22: structuring multiple cash transactions under $10,000 or cancelling once told
+    a Currency Transaction Report will be filed (paraphrase)'
+  cases: []
+  data_needed:
+  - Payment
+  - BankAccount
+  - Person
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Repeated cash transactions kept just under the US $10,000 Currency Transaction Report threshold,
+      as described in FinCEN red flag 22
+    threshold_source: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Regular payroll or rent amounts that happen to be under the threshold
+  - ATM daily withdrawal limits
+  version: 1
+- id: FR-025
+  name: Demands for secrecy and avoidance of the tax authority
+  definition: The client asks for unusual confidentiality, refuses contact, or asks advisers not to tell
+    the tax authority.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
+    publisher: Financial Intelligence Analysis Unit, Malta
+    url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+    locator: Annex I, Section 3, pp. 20-21
+    quote: The customer demands exceptionally high and atypical levels of confidentiality.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
+    publisher: Financial Intelligence Analysis Unit, Malta
+    url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
+    locator: Annex I, Section 3, p. 21
+    quote: The customer requests or suggests not to disclose any pertinent information to the tax authorities…
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - The customer shows apparent willingness to pay fees above market rates (FIAU Annex I s.3)
+  - Transactions surrounded by secrecy (IRM 25.1.2.3(7))
+  - Failure to make full disclosure of relevant facts to the accountant, attorney or return preparer (IRM
+    25.1.2.3(6))
+  cases: []
+  data_needed:
+  - Person
+  - Email
+  - Document
+  - Representation
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Public figures or at-risk people seeking privacy
+  - Commercially sensitive deals
+  version: 1
+- id: FR-026
+  name: Promoted 'too good to be true' tax arrangements
+  definition: A promoter sells a packaged scheme promising large deductions or deferrals, often with inflated
+    appraisals, sham insurance or high fees.
+  areas:
+  - FR
+  typology: Abusive tax shelter / listed transaction
+  status: verified
+  sources:
+  - title: IRS wraps up its 2021 Dirty Dozen scams list with warning about promoted abusive arrangements
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/newsroom/irs-wraps-up-its-2021-dirty-dozen-scams-list-with-warning-about-promoted-abusive-arrangements
+    quote: if it sounds too good to be true, it probably is.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: IRS 2021 Dirty Dozen (syndicated conservation easements)
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/newsroom/irs-wraps-up-its-2021-dirty-dozen-scams-list-with-warning-about-promoted-abusive-arrangements
+    quote: take a provision of tax law for conservation easements and twist it
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: Listed transactions
+    publisher: US Internal Revenue Service
+    url: https://www.irs.gov/businesses/corporations/listed-transactions
+    quote: Earlier 2025 regulations formally identified certain micro-captive structures as "Listed transactions"
+      (deemed abusive)
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Micro-captive insurance whose arrangements 'lack many of the attributes of insurance' (IRS 2021)
+  - Monetized installment sales where 'an intermediary purchases appreciated property from a seller in
+    exchange for an installment note' (IRS 2021)
+  - Notice 2017-10 syndicated conservation easements (IRS listed transactions)
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Ownership
+  - Contract
+  - Payment
+  - Document
+  - Representation
+  checkable: lookups
+  lookup_sources:
+  - IRS listed transactions list
+  - Court and Tax Court dockets
+  - Property/easement records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: The arrangement is the same as, or substantially similar to, a transaction on the IRS listed-transactions
+      page
+    threshold_source: https://www.irs.gov/businesses/corporations/listed-transactions
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine conservation donations or captive insurance with real risk
+  - Advice-based planning that is aggressive but lawful
+  version: 1
+- id: FR-027
+  name: Multiple tax refunds claimed for tax paid once (cum-ex pattern)
+  definition: Shares are traded rapidly around the dividend date so that several parties claim back withholding
+    tax that was only paid once.
+  areas:
+  - FR
+  typology: Dividend withholding-tax refund fraud
+  status: verified
+  sources:
+  - title: Key figure in German cum-ex tax evasion scandal jailed for eight years
+    publisher: Euronews (reporting on Bonn regional court verdict)
+    url: https://www.euronews.com/2022/12/13/key-figure-in-german-cum-ex-tax-evasion-scandal-jailed-for-eight-years
+    quote: collect multiple reimbursements for taxes that they had only paid once.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - Shares bought and sold quickly around the dividend payment date to obscure true ownership (Euronews
+    2022)
+  cases:
+  - name: Hanno Berger (Bonn Regional Court)
+    year: '2022'
+    jurisdiction: Germany
+    what_happened: The state court in Bonn convicted Berger of aggravated tax evasion over cum-ex trades;
+      sentenced to eight years and ordered to repay almost EUR 13.7 million. The verdict could be appealed.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.euronews.com/2022/12/13/key-figure-in-german-cum-ex-tax-evasion-scandal-jailed-for-eight-years
+    source_title: Euronews, 13 Dec 2022
+  data_needed:
+  - Security
+  - Company
+  - Person
+  - Payment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Court judgments
+  - Securities trading records
+  - Tax refund records where public
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary dividend-season trading and legitimate refund claims by foreign investors
+  version: 1
+- id: FR-028
+  name: High returns with little or no risk, or 'guaranteed' returns
+  definition: An investment promises big profits with no risk, which real investments cannot offer.
+  areas:
+  - FR
+  typology: Ponzi scheme / offering fraud
+  status: verified
+  sources:
+  - title: Ponzi Scheme
+    publisher: US Securities and Exchange Commission (Investor.gov)
+    url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/ponzi-scheme
+    locator: Red flags
+    quote: Be highly suspicious of any "guaranteed" investment opportunity.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: 'Investor Alert: affinity fraud'
+    publisher: US Securities and Exchange Commission (Investor.gov)
+    url: https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/investor-alert-have-something-common-someone-selling-investment-it-may-make-you-target-fraud
+    quote: Investments have risks.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Stanford International Bank CDs paying more than US banks while the stated conservative strategy was
+    followed for only about 10-15% of assets (DOJ 2012)
+  cases:
+  - name: United States v. Bernard L. Madoff (SDNY)
+    year: '2009'
+    jurisdiction: United States (S.D. New York)
+    what_happened: Madoff pleaded guilty on 12 March 2009 to an eleven-count information for a Ponzi scheme
+      causing billions in losses to thousands of investors; sentenced to 150 years.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archive/usao/nys/pressreleases/June09/madoffbernardsentencingpr.pdf
+    source_title: USAO SDNY sentencing press release, June 2009
+  - name: United States v. R. Allen Stanford (SD Texas)
+    year: '2012'
+    jurisdiction: United States (S.D. Texas)
+    what_happened: Convicted on 13 of 14 counts on 6 March 2012 for a $7 billion fraud selling Stanford
+      International Bank CDs; sentenced to 110 years. DOJ says he paid bribes to the bank's auditor and
+      Antigua's financial regulator.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/allen-stanford-sentenced-110-years-prison-orchestrating-7-billion-investment-fraud-scheme
+    source_title: 'DOJ: Allen Stanford sentenced to 110 years'
+  data_needed:
+  - Company
+  - Person
+  - Document
+  - Security
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: In the Stanford case DOJ states bribes were paid to the bank's auditor and Antigua's financial
+      regulator.
+    source_url: https://www.justice.gov/archives/opa/pr/allen-stanford-sentenced-110-years-prison-orchestrating-7-billion-investment-fraud-scheme
+  innocent_explanations:
+  - Government-insured deposits with modest guaranteed rates
+  - Marketing puffery by a legitimate firm
+  version: 1
+- id: FR-029
+  name: Returns that are too steady
+  definition: An investment reports gains every period regardless of what markets do.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: Ponzi Scheme
+    publisher: US Securities and Exchange Commission (Investor.gov)
+    url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/ponzi-scheme
+    locator: Red flags
+    quote: Be skeptical about an investment that regularly generates positive returns regardless of overall
+      market conditions.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Monthly statements showing near-identical gains through a market crash
+  cases: []
+  data_needed:
+  - Document
+  - Security
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Fixed-income or money-market products
+  - Smoothing in some insurance or pension products
+  version: 1
+- id: FR-030
+  name: Unregistered investment
+  definition: The investment is not registered with the securities regulator, so investors lack official
+    information on it.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: Ponzi Scheme
+    publisher: US Securities and Exchange Commission (Investor.gov)
+    url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/ponzi-scheme
+    locator: Red flags
+    quote: Ponzi schemes typically involve investments that are not registered with the SEC or with state
+      regulators.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Security
+  - Company
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - SEC EDGAR filings
+  - State securities regulator records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful exempt private offerings
+  - Foreign-registered products
+  version: 1
+- id: FR-031
+  name: Unlicensed seller or firm
+  definition: The person or firm selling the investment is not licensed or registered as required.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: Ponzi Scheme
+    publisher: US Securities and Exchange Commission (Investor.gov)
+    url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/ponzi-scheme
+    locator: Red flags
+    quote: Most Ponzi schemes involve unlicensed individuals or unregistered firms.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Representation
+  checkable: lookups
+  lookup_sources:
+  - FINRA BrokerCheck
+  - SEC Investment Adviser Public Disclosure
+  - State regulators
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Licensed in another jurisdiction
+  - Registration lapsed briefly by mistake
+  version: 1
+- id: FR-032
+  name: Secretive or unexplained strategy
+  definition: The seller will not or cannot explain how the money is invested or give full information.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: Ponzi Scheme
+    publisher: US Securities and Exchange Commission (Investor.gov)
+    url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/ponzi-scheme
+    locator: Red flags
+    quote: Avoid investments if you don't understand them or can't get complete information about them.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: 'Investor Alert: affinity fraud'
+    publisher: US Securities and Exchange Commission (Investor.gov)
+    url: https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/investor-alert-have-something-common-someone-selling-investment-it-may-make-you-target-fraud
+    quote: Fraudsters often avoid putting things in writing.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  - Company
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Proprietary trading strategies legitimately kept confidential
+  - Seller lacks expertise rather than intent
+  version: 1
+- id: FR-033
+  name: Statement errors or a sham audit
+  definition: Account statements contain errors, or the fund's auditor did not really audit it.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: Ponzi Scheme
+    publisher: US Securities and Exchange Commission (Investor.gov)
+    url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/ponzi-scheme
+    locator: Red flags
+    quote: Account statement errors may be a sign that funds are not being invested as promised.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - SEC alleged (not a final finding on that page) that Madoff's auditor Friehling & Horowitz 'did not
+    perform a meaningful audit of BMIS' (SEC Lit. Rel. 20959, 2009)
+  cases: []
+  data_needed:
+  - Document
+  - Company
+  - Representation
+  checkable: lookups
+  lookup_sources:
+  - Auditor registration (e.g. PCAOB)
+  - Regulatory filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Administrative or software errors at a legitimate custodian
+  version: 1
+- id: FR-034
+  name: Trouble getting money out
+  definition: Investors cannot withdraw, payments are late, or they are offered higher returns to stay
+    in.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: Ponzi Scheme
+    publisher: US Securities and Exchange Commission (Investor.gov)
+    url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/ponzi-scheme
+    locator: Red flags
+    quote: Be suspicious if you don't receive a payment or have difficulty cashing out.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Customer makes transfers labelled 'taxes', 'fees' or 'penalties' to a virtual asset provider to release
+    funds (FinCEN FIN-2023-Alert005, paraphrase)
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - Company
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lock-up periods disclosed in advance
+  - Market-wide redemption suspensions
+  version: 1
+- id: FR-035
+  name: Pitch through a trusted group, with secrecy or pressure
+  definition: The investment spreads through a religious, ethnic or community group, with pressure to
+    act fast and keep it confidential.
+  areas:
+  - FR
+  typology: Affinity fraud
+  status: verified
+  sources:
+  - title: 'Investor Alert: affinity fraud'
+    publisher: US Securities and Exchange Commission (Investor.gov)
+    url: https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/investor-alert-have-something-common-someone-selling-investment-it-may-make-you-target-fraud
+    quote: Fraudsters may be (or pretend to be) part of the very group they are trying to cheat.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Told to keep the opportunity confidential; 'once-in-a-lifetime' offers with claimed 'inside' information
+    (Investor.gov affinity alert)
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Membership
+  - Organization
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Community-based lending circles and cooperatives operating honestly
+  version: 1
+- id: FR-036
+  name: Pay mainly for recruiting, with a buy-in
+  definition: Participants pay to join and earn mostly from signing up others rather than from selling
+    products.
+  areas:
+  - FR
+  typology: Pyramid scheme
+  status: verified
+  sources:
+  - title: Pyramid Schemes
+    publisher: US Securities and Exchange Commission (Investor.gov)
+    url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/pyramid-schemes
+    quote: Be skeptical if you will receive more compensation for recruiting others than for product sales.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: 'Investor Alert: Beware of Pyramid Schemes Posing as Multi-Level Marketing Programs (2013)'
+    publisher: US Securities and Exchange Commission (Investor.gov)
+    url: https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/investor-30
+    quote: Be careful if you are required to pay a buy-in to participate in the program
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Promises of high returns in a short time period; easy money or passive income (Investor.gov)
+  cases:
+  - name: FTC v. BurnLounge, Inc. (9th Cir.)
+    year: '2014'
+    jurisdiction: United States (Ninth Circuit Court of Appeals)
+    what_happened: 'In an FTC civil action, the appeals court ruled on 2 June 2014: ''We agree with the
+      district court that BurnLounge was an illegal pyramid scheme.'' (Court ruling in a regulator''s
+      case.)'
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.ftc.gov/node/44570
+    source_title: FTC case page
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Contract
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate multi-level marketing with real retail sales and modest starter kits
+  version: 1
+- id: FR-037
+  name: No real product or no sales to outsiders
+  definition: What is sold is worthless or hard to value, and the company cannot show revenue from customers
+    outside the scheme.
+  areas:
+  - FR
+  typology: Pyramid scheme
+  status: verified
+  sources:
+  - title: Pyramid Schemes
+    publisher: US Securities and Exchange Commission (Investor.gov)
+    url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/pyramid-schemes
+    quote: As a general rule, legitimate MLM companies derive revenue primarily from selling products,
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - '''products such as mass-licensed e-books or online advertising on little-used websites'' (Investor.gov)'
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New companies before sales ramp up
+  - Digital products that are genuinely valuable but hard to price
+  version: 1
+- id: FR-038
+  name: Commission plan that cannot be explained
+  definition: Pay depends on a complex structure not tied to sales to outside customers.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: Pyramid Schemes
+    publisher: US Securities and Exchange Commission (Investor.gov)
+    url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/pyramid-schemes
+    quote: If you do not understand how you will be compensated, be cautious.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Document
+  - Contract
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate tiered sales-commission plans
+  version: 1
+- id: FR-039
+  name: Hyped small-company stock with 'inside' tips
+  definition: Spam or social posts push a tiny company's stock with claimed inside information, while
+    promoters sell into the rise.
+  areas:
+  - FR
+  typology: Pump-and-dump
+  status: verified
+  sources:
+  - title: 'Investor Alert: Pump and Dump Schemes'
+    publisher: US Securities and Exchange Commission
+    url: https://www.sec.gov/files/investor/alerts/ia_pumpanddump.htm
+    quote: the fraudsters sending these emails are often paid promoters or company insiders who stand
+      to gain by selling their shares
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Claims of an 'infallible' stock-picking system; subject lines 'designed to quickly pique interest'
+    (SEC alert)
+  cases: []
+  data_needed:
+  - Security
+  - Company
+  - Person
+  - Payment
+  - Email
+  checkable: lookups
+  lookup_sources:
+  - SEC EDGAR and trading suspensions list
+  - Market data (price/volume)
+  - Social media archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine enthusiasm by retail investors
+  - Legitimate disclosed paid research
+  version: 1
+- id: FR-040
+  name: Online stranger steering someone into crypto 'investments'
+  definition: A new online contact pitches a high-return crypto opportunity, the victim suddenly moves
+    large sums or home equity into crypto, then is asked for 'fees' to withdraw.
+  areas:
+  - FR
+  - HT
+  typology: Pig butchering (crypto investment scam)
+  status: verified
+  sources:
+  - title: FinCEN Alert on Prevalent Virtual Currency Investment Scam Commonly Known as 'Pig Butchering'
+      (FIN-2023-Alert005)
+    publisher: US Financial Crimes Enforcement Network
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    quote: These scams are referred to as "pig butchering" as they resemble the practice of fattening
+      a hog before slaughter.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Customer 'takes out a HELOC, home equity loan, or second mortgage' to buy virtual currency (FinCEN)
+  - Customer 'appears distressed or anxious to access funds' (FinCEN)
+  - Early-redeemed CDs wired to a virtual asset service provider (FinCEN, paraphrase)
+  cases: []
+  data_needed:
+  - Person
+  - BankAccount
+  - CryptoWallet
+  - Payment
+  - Email
+  - UserAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: FinCEN says scammers 'use victims of labor trafficking to conduct outreach to millions of
+      unsuspecting individuals around the world.'
+    source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+  innocent_explanations:
+  - Genuine first-time crypto purchase
+  - Real online relationship with lawful investing advice
+  jurisdictions: US alert; scam is global
+  version: 1
+- id: FR-041
+  name: Billing for services never provided
+  definition: A provider bills insurers for care, tests or equipment that patients never got.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: The Challenge of Health Care Fraud
+    publisher: National Health Care Anti-Fraud Association (NHCAA)
+    url: https://www.nhcaa.org/tools-insights/about-health-care-fraud/the-challenge-of-health-care-fraud/
+    quote: Billing for services that were never rendered—by using genuine patient information, …
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  - title: Fraud & Abuse Laws
+    publisher: HHS Office of Inspector General
+    url: https://oig.hhs.gov/compliance/physician-education/fraud-abuse-laws/
+    quote: The civil FCA protects the Government from being overcharged or sold shoddy goods or services.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Esformes billed Medicare and Medicaid for care often unneeded or never provided (DOJ 2019)
+  cases:
+  - name: United States v. Philip Esformes (SD Florida)
+    year: '2019'
+    jurisdiction: United States (S.D. Florida)
+    what_happened: Found guilty in April 2019 of conspiracy to defraud the US, kickback offences, money
+      laundering and obstruction; evidence showed he bribed physicians to admit patients to his facilities
+      and billed for unneeded or unprovided care; sentenced to 20 years.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/south-florida-health-care-facility-owner-sentenced-20-years-prison-role-largest-health-care
+    source_title: 'DOJ: South Florida health care facility owner sentenced to 20 years'
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Billing system errors
+  - Wrong patient record linked
+  version: 1
+- id: FR-042
+  name: Upcoding and unbundling
+  definition: Bills claim a more expensive service than was done, or split one procedure into several
+    billed steps.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: The Challenge of Health Care Fraud
+    publisher: NHCAA
+    url: https://www.nhcaa.org/tools-insights/about-health-care-fraud/the-challenge-of-health-care-fraud/
+    quote: Unbundling—billing for each step of a procedure as if they are separate procedures.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - '''Billing for more expensive services or procedures than were actually provided or performed, commonly
+    known as "upcoding"'' (NHCAA)'
+  cases: []
+  data_needed:
+  - Company
+  - Payment
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Complex coding rules leading to honest errors
+  - Genuinely sicker patient mix
+  version: 1
+- id: FR-043
+  name: Unnecessary treatment or falsified diagnoses
+  definition: Patients get treatment they do not need, or records are altered to make non-covered care
+    look necessary.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: The Challenge of Health Care Fraud
+    publisher: NHCAA
+    url: https://www.nhcaa.org/tools-insights/about-health-care-fraud/the-challenge-of-health-care-fraud/
+    quote: Performing medically unnecessary services solely for the purpose of generating insurance payments
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - Misrepresenting non-covered treatments as medically necessary covered treatments (NHCAA)
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Document
+  - Payment
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Defensive medicine
+  - Clinical disagreement between doctors
+  version: 1
+- id: FR-044
+  name: Kickbacks for patient referrals
+  definition: Money or perks are paid to doctors or others to send patients or orders, often seen as cash
+    withdrawals that rise with billing.
+  areas:
+  - CO
+  - FR
+  status: verified
+  sources:
+  - title: Fraud & Abuse Laws
+    publisher: HHS Office of Inspector General
+    url: https://oig.hhs.gov/compliance/physician-education/fraud-abuse-laws/
+    quote: prohibits the knowing and willful payment of "remuneration" to induce or reward patient referrals
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: The Challenge of Health Care Fraud
+    publisher: NHCAA
+    url: https://www.nhcaa.org/tools-insights/about-health-care-fraud/the-challenge-of-health-care-fraud/
+    quote: Accepting kickbacks for patient referrals.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  - title: FinCEN Advisory on Health Care Fraud Schemes (FIN-2026-A001)
+    publisher: US Financial Crimes Enforcement Network
+    url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+    locator: Red flag 19, p. 10
+    quote: A customer is a health care provider or supplier with a significant increase in cash withdrawals
+      correlating
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - 'OIG examples: free rent, lavish hotel stays and meals, excessive pay for medical directorships (paraphrase)'
+  - High-value checks sent to individuals (FinCEN red flag 20, paraphrase)
+  cases:
+  - name: United States v. Philip Esformes (SD Florida)
+    year: '2019'
+    jurisdiction: United States (S.D. Florida)
+    what_happened: Convicted of kickback offences among others; 'Esformes bribed physicians to admit patients
+      into his facilities.'
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/south-florida-health-care-facility-owner-sentenced-20-years-prison-role-largest-health-care
+    source_title: DOJ press release
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Contract
+  - Employment
+  - BankAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: The Anti-Kickback Statute treats referral payments as bribery-type conduct.
+    source_url: https://oig.hhs.gov/compliance/physician-education/fraud-abuse-laws/
+  innocent_explanations:
+  - Fair-market-value consulting or medical director contracts within legal safe harbours
+  - Legitimate employee payroll
+  version: 1
+- id: FR-045
+  name: Waived co-pays with over-billing
+  definition: Providers waive patients' co-pays or deductibles while over-billing the insurer, or charge
+    patients beyond the co-pay.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: The Challenge of Health Care Fraud
+    publisher: NHCAA
+    url: https://www.nhcaa.org/tools-insights/about-health-care-fraud/the-challenge-of-health-care-fraud/
+    quote: Waiving patient co-pays or deductibles for medical or dental care and over-billing the insurance
+      carrier or benefit plan
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - Billing a patient more than the required co-pay amount for services already paid by the plan (NHCAA)
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Documented financial-hardship waivers allowed by rules
+  version: 1
+- id: FR-046
+  name: New or newly bought provider with sudden large reimbursements
+  definition: A health provider that just opened or changed owners suddenly receives large program payments
+    out of line with its history or peers.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: FinCEN Advisory on Health Care Fraud Schemes (FIN-2026-A001)
+    publisher: US Financial Crimes Enforcement Network
+    url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+    locator: Red flags 8-11, 17, pp. 9-10
+    quote: A customer is a health care provider or supplier that suddenly has a significant increase in
+      reimbursements
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Reimbursements jump shortly after beneficial ownership changes (red flag 9, paraphrase)
+  - Low-to-moderate billing for a year or more, then a sudden surge of claims (red flag 17, paraphrase)
+  - Account beneficiaries changed while name and Tax ID stay the same (red flag 6, paraphrase)
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Payment
+  - BankAccount
+  checkable: lookups
+  lookup_sources:
+  - CMS provider enrollment and payment data
+  - Company registry ownership history
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: FinCEN's case study (Operation Gold Rush, charges only) describes an alleged Russia-based
+      criminal organisation submitting over $10.6 billion in fraudulent DME claims.
+    source_url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+  innocent_explanations:
+  - New owner expanding a genuine practice
+  - Billing backlog cleared at once
+  version: 1
+- id: FR-047
+  name: Owners with past health fraud convictions or shared across providers
+  definition: Owners of a provider were convicted of benefits fraud, are tied to people who were, or appear
+    as owners of several unrelated providers.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: FinCEN Advisory on Health Care Fraud Schemes (FIN-2026-A001)
+    publisher: US Financial Crimes Enforcement Network
+    url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+    locator: Red flags 1-5, p. 8
+    quote: A customer is a health care provider or supplier registered with a Health Care Benefit Program
+      and has nominal
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  - title: Fraud & Abuse Laws (Exclusion Authorities)
+    publisher: HHS Office of Inspector General
+    url: https://oig.hhs.gov/compliance/physician-education/fraud-abuse-laws/
+    quote: OIG is legally required to exclude from participation in all Federal health care programs
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Owner with no US permanent residence and little health care experience (red flag 1, paraphrase)
+  - Account accessed from IP addresses linked to many accounts or foreign jurisdictions (red flag 4, paraphrase)
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Ownership
+  - Family
+  - Associate
+  - Sanction
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - HHS-OIG exclusion list (LEIE)
+  - Court records
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Common names causing false matches
+  - Legitimate multi-site practice groups
+  version: 1
+- id: FR-048
+  name: Reimbursements without matching business spending
+  definition: A provider receives large payments but buys little or none of the supplies or services its
+    claims imply.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: FinCEN Advisory on Health Care Fraud Schemes (FIN-2026-A001)
+    publisher: US Financial Crimes Enforcement Network
+    url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+    locator: Red flag 12, p. 9
+    quote: A customer is a health care provider or supplier that receives significant volumes of reimbursements
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - DME reimbursements with few or no DME purchases (paraphrase)
+  - All reimbursements from a single program, unlike typical providers (red flag 13, paraphrase)
+  cases: []
+  data_needed:
+  - Company
+  - Payment
+  - BankAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Supplies bought through a parent company or another account
+  - Specialist providers paid by one program
+  version: 1
+- id: FR-049
+  name: Health payouts moved to shells, abroad, luxury goods, crypto or betting
+  definition: Program money is quickly sent to residential-address companies, foreign accounts, property,
+    art, jewellery, crypto platforms or gambling sites.
+  areas:
+  - FR
+  - ML
+  status: verified
+  sources:
+  - title: FinCEN Advisory on Health Care Fraud Schemes (FIN-2026-A001)
+    publisher: US Financial Crimes Enforcement Network
+    url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+    locator: Red flags 15, 16, 23, 24, pp. 9-10
+    quote: A customer is a health care provider or supplier that has outgoing transactions to, or expenditures
+      related to,
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Funds sent to virtual asset service providers, brokerage accounts or online betting platforms without
+    apparent business reason (red flag 24, paraphrase)
+  - Large wires to individuals and companies in foreign countries (red flag 23, paraphrase)
+  cases: []
+  data_needed:
+  - Payment
+  - BankAccount
+  - CryptoWallet
+  - Company
+  - Address
+  - RealEstate
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FinCEN cites a Brooklyn banker who pleaded guilty to laundering Medicare fraud proceeds for
+      a transnational criminal organisation (fn. 29).
+    source_url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
+  innocent_explanations:
+  - Owner's legitimate profit distributions later invested personally
+  - Foreign suppliers
+  version: 1
+- id: FR-050
+  name: Staged-crash scene signs
+  definition: A crash happens late at night in a quiet place, with several passengers all claiming the
+    same soft-tissue injuries and refusing treatment at the scene.
+  areas:
+  - FR
+  typology: Staged or caused accident
+  status: verified
+  sources:
+  - title: Scene Indicators for Law Enforcement
+    publisher: National Insurance Crime Bureau (NICB)
+    url: https://www.NICB.org/sites/files/2019-06/Scene_Indicators_for_Law_Enforcement.pdf
+    locator: Staged or Caused Accidents - Regarding Incident
+    quote: Owner/Driver/Passenger(s) have the same or similar soft tissue injury.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  - title: Scene Indicators for Law Enforcement
+    publisher: NICB
+    url: https://www.NICB.org/sites/files/2019-06/Scene_Indicators_for_Law_Enforcement.pdf
+    locator: Regarding Incident
+    quote: Accident occurs late at night in a secluded area.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - Sudden or unwarranted stop or lane change, which may indicate a 'caused accident' (NICB)
+  - Insured describes 'swoop & squat' scenario (NICB)
+  cases:
+  - name: Connecticut staged-accident ring (Mackenzy Noze)
+    year: '2017'
+    jurisdiction: United States (D. Connecticut)
+    what_happened: About 50 single-car crashes staged 2011-2014, usually late at night on remote roads;
+      Noze convicted of conspiracy to commit mail and wire fraud and sentenced to four years; seven others
+      charged and convicted.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.fbi.gov/news/stories/staged-accident-ring
+    source_title: 'FBI: Crash Cows'
+  data_needed:
+  - Person
+  - Vehicle
+  - Address
+  - Event
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: The Connecticut ring involved a ringleader recruiting participants who passed injury payouts
+      back to him.
+    source_url: https://www.fbi.gov/news/stories/staged-accident-ring
+  innocent_explanations:
+  - Real crashes do happen at night on empty roads
+  - Whiplash is genuinely common
+  version: 1
+- id: FR-051
+  name: Scripted identical statements and hidden links between parties
+  definition: Everyone tells the same story in the same words, or participants who claim to be strangers
+    clearly know each other.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: Scene Indicators for Law Enforcement
+    publisher: NICB
+    url: https://www.NICB.org/sites/files/2019-06/Scene_Indicators_for_Law_Enforcement.pdf
+    locator: Regarding Involved Individuals' Statements
+    quote: All occupants provide the same facts regarding the accident, in many cases using the same exact
+      wording.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - '''Witness/Participant appears familiar with one or more parties to the loss (accident) and may refer
+    to them by first name.'' (NICB)'
+  - Out-of-state phone numbers, PO box or hotel addresses (NICB contact indicators)
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Address
+  - Phone
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family members travelling together naturally agree on facts
+  - Small communities where people know each other
+  version: 1
+- id: FR-052
+  name: Same repair shop, odd ownership or damage that does not fit
+  definition: All vehicles go to the same body shop, ownership or plates do not match, or damage does
+    not fit the story.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: Scene Indicators for Law Enforcement
+    publisher: NICB
+    url: https://www.NICB.org/sites/files/2019-06/Scene_Indicators_for_Law_Enforcement.pdf
+    locator: Regarding Involved Vehicles / Vehicle Damage
+    quote: All vehicles in a reported accident are taken to the same body shop or shops that may be owned
+      by the same person(s).
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  - title: Scene Indicators for Law Enforcement
+    publisher: NICB
+    url: https://www.NICB.org/sites/files/2019-06/Scene_Indicators_for_Law_Enforcement.pdf
+    locator: Regarding Vehicle Damage
+    quote: Damage to vehicles is inconsistent with the accident facts.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - Lack of accident debris at the scene; signs of pre-existing damage (NICB)
+  - Older claimant car vs high-value newer insured car, or a commercial fleet vehicle (NICB)
+  cases: []
+  data_needed:
+  - Vehicle
+  - Company
+  - Ownership
+  - Person
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Vehicle registration records
+  - Company registry for body shops
+  - Insurance claim databases (e.g. NICB ISO, restricted)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Tow company takes all cars to a nearby shop
+  - Borrowed or family vehicles
+  version: 1
+- id: FR-053
+  name: Agent keeps premiums or sells cover without a licence
+  definition: An agent or broker pockets policyholders' premiums instead of passing them to the insurer,
+    or sells insurance while unlicensed.
+  areas:
+  - FR
+  typology: Premium diversion
+  status: verified
+  sources:
+  - title: Insurance Fraud
+    publisher: National Association of Insurance Commissioners (NAIC)
+    url: https://content.naic.org/insurance-topics/insurance-fraud
+    quote: Other types of diversion schemes include selling insurance without a license and collecting
+      premiums without paying claims.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Representation
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - State insurance department licence lookups
+  - NAIC company/producer databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Late remittance due to administrative delay
+  - Licence renewal lag
+  version: 1
+- id: FR-054
+  name: Deliberate loss or inflated claim
+  definition: A policyholder destroys their own property to collect (hard fraud) or exaggerates a real
+    claim or lies on an application (soft fraud).
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: Insurance Fraud
+    publisher: NAIC
+    url: https://content.naic.org/insurance-topics/insurance-fraud
+    quote: Hard fraud occurs when a policyholder deliberately destroys property with the intent of collecting
+      on the insurance policy.
+    quote_verified: true
+    licence: Not stated
+    checked: '2026-10-08'
+  examples:
+  - Soft fraud 'occurs when a policyholder exaggerates an otherwise legitimate claim' (NAIC)
+  cases: []
+  data_needed:
+  - Person
+  - RealEstate
+  - Vehicle
+  - Contract
+  - Document
+  - Payment
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Honest valuation disagreements
+  - Genuine accidental fires or losses
+  version: 1
+- id: FR-055
+  name: Assets hidden from the bankruptcy trustee
+  definition: A debtor hides property, accounts, income or claims from the court, trustee or creditors,
+    or moves them out before filing.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: 18 U.S.C. 152 Concealment of assets; false oaths and claims; bribery
+    publisher: Legal Information Institute, Cornell Law School (US Code)
+    url: https://www.law.cornell.edu/uscode/text/18/152
+    locator: s.152(1)
+    quote: from creditors or the United States Trustee, any property belonging to the estate of a debtor;
+    quote_verified: true
+    licence: 'US Code: public domain'
+    checked: '2026-10-08'
+  - title: US Trustee Program Criminal Referrals FY2014 report
+    publisher: US Department of Justice, US Trustee Program
+    url: https://www.justice.gov/ust/file/criminal_report_fy2014.pdf/dl
+    locator: p. 4, Section I
+    quote: false oath or statement (33.0%), concealment of assets (27.3%), bankruptcy fraud scheme (23.6%),
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - Kimball hid income in a consulting-company account with statements mailed to an attorney's address
+    (DOJ WDMO 2021)
+  cases:
+  - name: United States v. Del Hodges Kimball (W.D. Missouri)
+    year: '2021'
+    jurisdiction: United States (W.D. Missouri)
+    what_happened: Pleaded guilty to bankruptcy fraud for hiding assets, accounts and claims; bankruptcy
+      court had denied discharge for fraudulent concealment; sentenced to one year and a day.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-wdmo/pr/owner-payday-loan-company-sentenced-bankruptcy-fraud
+    source_title: DOJ press release
+  data_needed:
+  - Person
+  - Company
+  - BankAccount
+  - Ownership
+  - Debt
+  - Document
+  - Family
+  checkable: lookups
+  lookup_sources:
+  - Bankruptcy court dockets (PACER)
+  - Property, vehicle and company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (18 U.S.C. 152(1),(7))
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Tax fraud was the most common allegation (38.3%) in US Trustee FY2014 criminal referrals.
+    source_url: https://www.justice.gov/ust/file/criminal_report_fy2014.pdf/dl
+  innocent_explanations:
+  - Asset forgotten or thought worthless
+  - Bad advice from a petition preparer
+  version: 1
+- id: FR-056
+  name: False statements in bankruptcy papers
+  definition: The debtor knowingly makes a false oath, declaration or account in the bankruptcy case,
+    such as undervalued or missing items in the schedules.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: 18 U.S.C. 152
+    publisher: Legal Information Institute (US Code)
+    url: https://www.law.cornell.edu/uscode/text/18/152
+    locator: s.152(2)
+    quote: knowingly and fraudulently makes a false oath or account in or in relation to any case under
+      title 11;
+    quote_verified: true
+    licence: 'US Code: public domain'
+    checked: '2026-10-08'
+  examples:
+  - Kimball undervalued collectibles by $24,000 and did not schedule the $116,280 sale of a business interest
+    (DOJ WDMO 2021)
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Debt
+  - Ownership
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Honest valuation mistakes
+  - Amended schedules filed in good faith
+  version: 1
+- id: FR-057
+  name: 'Bust-out: running up credit, then bankruptcy'
+  definition: Credit is built up and maxed out, often in recruits' names and with bad checks to raise
+    limits, then the debts are wiped out in bankruptcy.
+  areas:
+  - FR
+  - OC
+  typology: Bust-out
+  status: verified
+  sources:
+  - title: FinCEN case example 085 (from SAR Activity Review, Issue 6, Nov 2003)
+    publisher: US Financial Crimes Enforcement Network
+    url: https://www.fincen.gov/sites/default/files/case_example/085.pdf
+    quote: the subject advised the recruit to file for bankruptcy and any outstanding debts to creditors
+      were then discharged.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - '''All credit cards were issued in the recruit''s name, although the subject made most of the charges.''
+    (FinCEN case 085)'
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Debt
+  - Payment
+  - BankAccount
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Bankruptcy dockets (PACER) to find a common preparer/recruiter across filings
+  - Credit/SAR data (restricted)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine financial collapse after heavy borrowing
+  - Debt counsellors legitimately advising many clients to file
+  version: 1
+- id: FR-058
+  name: False identity numbers or serial filing
+  definition: Bankruptcy filings use stolen or multiple Social Security numbers, or the same person files
+    again and again.
+  areas:
+  - FR
+  status: verified
+  sources:
+  - title: US Trustee Program Criminal Referrals FY2014 report
+    publisher: US DOJ, US Trustee Program
+    url: https://www.justice.gov/ust/file/criminal_report_fy2014.pdf/dl
+    locator: p. 4, Section I
+    quote: and identity theft or use of false/multiple Social Security numbers (17.3%).
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-08'
+  examples:
+  - '''Serial Filer'' is a referral category in Table 1 (p. 5) (16 referrals)'
+  cases: []
+  data_needed:
+  - Person
+  - Identification
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Bankruptcy dockets (PACER)
+  - Identity verification sources
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Re-filing after a dismissed case for procedural reasons
+  - Typographical errors in SSNs
+  version: 1
+not_reached:
+- investor.gov /pyramid-scheme (singular URL) failed; used /pyramid-schemes and 2013 alert instead
+- 'justice.gov/ust/bankruptcy-fraud and /ust/criminal-enforcement: fetch errors; used FY2014 USTP criminal
+  referral report and 18 USC 152 instead'
+- 'FBI health care fraud page (fbi.gov/how-we-can-help-you/.../health-care-fraud): server error'
+- 'IRS abusive trust tax evasion schemes main page: content not returned (only navigation)'
+- 'OECD Money Laundering and Terrorist Financing Awareness Handbook for Tax Examiners (2019): located,
+  not opened'
+- 'FATF tax crimes / ML reports: not opened; FIAU Malta factsheet used instead'
+- 'Coalition Against Insurance Fraud $308.6bn study: only cited via NAIC page, original not opened'
+- Theranos/Elizabeth Holmes primary DOJ release not found; only secondary report (Jurist) opened, case
+  not attached to an indicator
+- Paul Manafort primary DOJ/court record not opened; ABA Journal used
+- 'Cum-ex/Hanno Berger: only press (Euronews), no German court text'
+- 'Madoff mechanics: SDNY and FBI releases describe plea/sentence only; SEC Lit. Rel. 20959 against auditor
+  Friehling is a complaint (allegation), not a finding'
+- Operation Gold Rush (FinCEN case study) is charges only, not used as a case outcome

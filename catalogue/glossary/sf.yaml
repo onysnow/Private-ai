@@ -1,0 +1,577 @@
+area: SF
+terms:
+- term: Automatic Identification System (AIS)
+  definition: A required radio system that broadcasts a ship's identity and position so others can track
+    it.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/37751/download
+  cases: []
+  related:
+  - Spoofing
+  - LRIT
+  - SOLAS
+  indicators: []
+  areas:
+  - SF
+- term: AIS spoofing
+  definition: Making a ship's AIS broadcast false information, such as another name, IMO number or position.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/37751/download
+  cases: []
+  related:
+  - AIS
+  indicators: []
+  areas:
+  - SF
+- term: IMO number
+  definition: A permanent seven-digit number that identifies a ship for life, even if its owner or name
+    changes.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/37751/download
+  cases: []
+  related:
+  - MMSI
+  - Ship identity laundering
+  indicators: []
+  areas:
+  - SF
+- term: MMSI (Maritime Mobile Service Identity)
+  definition: A radio identity number that a ship's AIS and radio equipment transmit; it can be changed
+    in spoofing.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/37751/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Ship-to-ship (STS) transfer
+  definition: Moving cargo directly from one ship to another at sea rather than in port.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/37751/download
+  cases: []
+  related:
+  - Lightering
+  indicators: []
+  areas:
+  - SF
+- term: Flag hopping
+  definition: Re-registering a ship with new flag states again and again to avoid detection.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/37751/download
+  cases: []
+  related:
+  - False flag
+  - Flag state
+  indicators: []
+  areas:
+  - SF
+- term: False flag / deregistered flag
+  definition: Flying a country's flag without authorisation or after the ship has been removed from that
+    country's registry.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/37751/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Double-flagging
+  definition: A ship claiming registration in two flag states at once, which the UN Panel found DPRK vessels
+    routinely did.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n19/028/82/pdf/n1902882.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Ship identity laundering
+  definition: Deceiving the IMO into issuing a new identity number to a ship so its past cannot be traced.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n19/028/82/pdf/n1902882.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: ISM management company
+  definition: The company responsible under the International Safety Management Code for a ship's safe
+    operation; frequent changes can hide control.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/37751/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: LRIT (Long-Range Identification and Tracking)
+  definition: A satellite position-reporting system that flag states can access, used to check a ship's
+    true location when AIS is off or manipulated.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/933506/download
+  cases: []
+  related:
+  - AIS
+  indicators: []
+  areas:
+  - SF
+- term: SOLAS
+  definition: The International Convention for the Safety of Life at Sea, which requires certain ships
+    to keep AIS running with few exceptions.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/37751/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Shadow fleet (dark fleet)
+  definition: Older, opaquely owned ships, often poorly insured and flagged, used to carry sanctioned
+    or above-cap oil.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/933506/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Oil price cap
+  definition: A G7, EU, Australia and New Zealand policy that bans their maritime services for Russian
+    oil sold above a set price.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/933506/download
+  cases: []
+  related:
+  - Price Cap Coalition
+  indicators: []
+  areas:
+  - SF
+- term: P&I insurance (Protection and Indemnity)
+  definition: Third-party liability insurance for shipowners covering things like oil spills and crew
+    injury.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/933506/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Classification society / IACS
+  definition: Organisations that survey ships for seaworthiness; IACS is the association of the main ones
+    and classes over 90 percent of ocean-going tonnage.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/933506/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Bill of lading
+  definition: The shipping document that records what cargo was loaded, by whom, on which ship and for
+    where.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/37751/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Transshipment
+  definition: Moving goods through an intermediate country or onto another vehicle on the way to the final
+    destination; can be used to hide where goods really go.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/2022-06/FinCEN%20and%20Bis%20Joint%20Alert%20FINAL.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Freight forwarder
+  definition: A company that arranges or loads transport and receives and forwards goods for others.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/2022-06/FinCEN%20and%20Bis%20Joint%20Alert%20FINAL.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Dual-use items
+  definition: Goods, software or technology with both civilian and military or weapons-proliferation uses.
+  examples:
+  - radio frequency modules
+  - carbon fiber
+  - integrated navigation systems
+  source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Export, reexport and transfer (in-country)
+  definition: An export leaves the US; a reexport goes from one foreign country to another; an in-country
+    transfer changes the end user or end use inside one country.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Export Administration Regulations (EAR)
+  definition: US Commerce Department rules that control exports of dual-use and less sensitive military
+    items.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+  cases: []
+  related:
+  - BIS
+  - Commerce Control List
+  indicators: []
+  areas:
+  - SF
+- term: Commerce Control List (CCL)
+  definition: The EAR list that classifies controlled items by technical parameters and reason for control.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: EAR99
+  definition: Items subject to US export rules but not on the Commerce Control List, generally low-tech
+    consumer goods.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/2022-06/FinCEN%20and%20Bis%20Joint%20Alert%20FINAL.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Entity List
+  definition: A BIS list of foreign persons and organisations that need special licences to receive specified
+    US items.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/2022-06/FinCEN%20and%20Bis%20Joint%20Alert%20FINAL.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: SDN List (Specially Designated Nationals and Blocked Persons)
+  definition: OFAC's main sanctions list; US persons must block the listed persons' property and generally
+    may not deal with them.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Statutorily Debarred Parties List
+  definition: A US State Department list of persons barred from taking part in exports of defence articles.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: OFAC 50 Percent Rule
+  definition: Under US rules, a company owned 50 percent or more in total by blocked persons is itself
+    blocked, even if not listed.
+  examples: []
+  source_url: https://ofac.treasury.gov/faqs/topic/1521
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: HS code (Harmonized System)
+  definition: The six-digit international customs code that classifies goods for trade statistics and
+    duties.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN%20and%20BIS%20Joint%20Alert%20_FINAL_508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: High Priority Items List
+  definition: Nine HS codes of electronic components found in Russian weapons in Ukraine that the US,
+    EU, UK and Japan prioritise for enforcement.
+  examples:
+  - 8542.31 processors and controllers
+  - 8526.91 GNSS modules
+  - 8532.24 multilayer ceramic capacitors
+  source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN%20and%20BIS%20Joint%20Alert%20_FINAL_508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Global Export Control Coalition (GECC)
+  definition: The group of countries that imposed export controls on Russia similar to the US ones, including
+    the EU, UK, Japan, Canada and others.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN%20and%20BIS%20Joint%20Alert%20_FINAL_508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: End-User Statement (Form BIS-711)
+  definition: The 'Statement by Ultimate Consignee and Purchaser' form that names who will receive and
+    use exported items.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/931471/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Third-party intermediary
+  definition: A company or person in the middle of a trade, such as a reseller or forwarder, that can
+    be used to divert goods or hide the real buyer.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/931471/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Red flag (export controls)
+  definition: An abnormal circumstance in a transaction suggesting the export may go to a wrong end use,
+    end user or destination, which triggers a duty to inquire.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-15/subtitle-B/chapter-VII/subchapter-C/part-732
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Self-blinding
+  definition: Deliberately avoiding information about end use or end user; BIS says this does not protect
+    a firm and can aggravate liability.
+  examples: []
+  source_url: https://www.ecfr.gov/current/title-15/subtitle-B/chapter-VII/subchapter-C/part-732
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Letter of credit
+  definition: A bank's promise to pay an exporter once specified documents are presented; used in trade
+    finance.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Terrorist financing
+  definition: Providing money or assets for terrorist acts, terrorists or terrorist organisations.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/pages/fatf-glossary.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Proliferation financing
+  definition: Raising, moving or providing funds or other assets used to make, acquire or deliver weapons
+    of mass destruction, in breach of law or sanctions.
+  examples: []
+  source_url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Targeted financial sanctions
+  definition: Asset freezes plus bans on making funds or assets available to designated persons or entities.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/pages/fatf-glossary.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Without delay (freezing)
+  definition: FATF's standard that assets should be frozen ideally within hours of a UN designation.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/pages/fatf-glossary.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Beneficial owner
+  definition: The real person who ultimately owns or controls a company or customer, as opposed to nominee
+    or legal owners.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/pages/fatf-glossary.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Shell company / front company
+  definition: A company with little or no real business used to hide ownership, money sources or countries
+    involved; a front company presents a false face of legitimate business.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/931471/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Shell bank
+  definition: A bank with no physical presence in the country where it is incorporated and licensed.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/pages/fatf-glossary.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Satellite banks
+  definition: Third-party banks used to route payments so the involvement of sanctioned parties and the
+    main bank is hidden, as in the BNP Paribas case.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/bnp-paribas-agrees-plead-guilty-and-pay-89-billion-illegally-processing-financial
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Wire stripping
+  definition: Removing or omitting the names of sanctioned parties from payment messages so screening
+    does not catch them.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/bnp-paribas-agrees-plead-guilty-and-pay-89-billion-illegally-processing-financial
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: IEEPA (International Emergency Economic Powers Act)
+  definition: The main US law under which most economic sanctions are imposed and criminally enforced.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/justice-department-announces-first-criminal-resolution-involving-illicit-sale-and-transport
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Material support (to a foreign terrorist organization)
+  definition: The US crime of knowingly providing money, goods or services to a designated foreign terrorist
+    organization.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Foreign Terrorist Organization (FTO)
+  definition: A group designated by the US government as a terrorist organization, making support to it
+    a crime.
+  examples: []
+  source_url: https://www.justice.gov/archives/opa/pr/federal-judge-hands-downs-sentences-holy-land-foundation-case
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Non-profit organisation (NPO) abuse
+  definition: Use of a charity or non-profit to raise or move money for terrorism while appearing to do
+    charitable work.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/2023-10/FinCEN_Alert_Terrorist_Financing_FINAL508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Zakat committee
+  definition: A local charitable committee collecting and distributing Islamic alms; in the HLF case prosecutors
+    said Hamas-linked committees received HLF funds.
+  examples: []
+  source_url: https://www.justice.gov/archives/opa/pr/federal-judge-hands-downs-sentences-holy-land-foundation-case
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Money Services Business (MSB)
+  definition: A non-bank business that sends money, exchanges currency or deals in virtual currency for
+    customers.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/2023-10/FinCEN_Alert_Terrorist_Financing_FINAL508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Email money transfer (EMT)
+  definition: A Canadian bank-to-bank transfer sent using an email address or phone number, such as Interac
+    e-Transfer.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: IMVE, RMVE, PMVE
+  definition: 'Canada''s three categories of violent extremism: ideologically, religiously and politically
+    motivated.'
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Canadian Extremist Traveller (CET)
+  definition: A Canadian who travels, or tries to travel, abroad to take part in terrorist activity.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Suspicious Activity Report (SAR) / Suspicious Transaction Report (STR)
+  definition: A report a financial institution must file with its financial intelligence unit when it
+    suspects a transaction is linked to crime, terrorism or sanctions or export evasion.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Civil forfeiture
+  definition: A court action against property (such as a ship or funds) alleged to be linked to crime,
+    separate from charging a person.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/north-korean-cargo-vessel-connected-sanctions-violations-seized-us-government
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Panel of Experts (UN 1718 Committee)
+  definition: An independent UN body that investigated and reported on breaches of UN sanctions on North
+    Korea.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n19/028/82/pdf/n1902882.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF

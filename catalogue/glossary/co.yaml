@@ -1,0 +1,576 @@
+area: CO
+terms:
+- term: Bribery (of a public official)
+  definition: Offering, promising or giving an official an undue advantage so they act or don't act in
+    their official duties, or the official asking for or accepting it.
+  examples:
+  - UNCAC Article 15
+  source_url: https://www.unodc.org/documents/brussels/UN_Convention_Against_Corruption.pdf
+  cases: []
+  related:
+  - Active bribery
+  - Passive bribery
+  - Undue advantage
+  indicators: []
+  areas:
+  - CO
+- term: Active bribery
+  definition: The paying, offering or promising of a bribe.
+  examples: []
+  source_url: https://www.unodc.org/documents/e4j/Secondary/Anti-Corruption_Glossary.pdf
+  cases: []
+  related:
+  - Bribery
+  indicators: []
+  areas:
+  - CO
+- term: Passive bribery
+  definition: 'The official''s side of bribery: receiving or accepting the bribe.'
+  examples: []
+  source_url: https://www.unodc.org/documents/e4j/Secondary/Anti-Corruption_Glossary.pdf
+  cases: []
+  related:
+  - Bribery
+  - Solicitation
+  indicators: []
+  areas:
+  - CO
+- term: Foreign bribery
+  definition: Bribing an official of a foreign government or public international organisation to obtain
+    or keep international business.
+  examples:
+  - UNCAC Article 16
+  source_url: https://www.unodc.org/documents/brussels/UN_Convention_Against_Corruption.pdf
+  cases: []
+  related:
+  - FCPA
+  - Foreign official
+  indicators: []
+  areas:
+  - CO
+- term: Private-sector bribery (commercial bribery)
+  definition: Offering or accepting an undue advantage to make someone working for a private company breach
+    their duties.
+  examples:
+  - UNCAC Article 21
+  source_url: https://www.unodc.org/documents/brussels/UN_Convention_Against_Corruption.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Foreign official (FCPA)
+  definition: Under the US FCPA, any officer or employee of a foreign government or its departments, agencies
+    or instrumentalities, from low-ranking staff to senior officials.
+  examples: []
+  source_url: https://www.justice.gov/criminal-fraud/file/1292051/download
+  cases: []
+  related:
+  - FCPA
+  indicators: []
+  areas:
+  - CO
+- term: FCPA (Foreign Corrupt Practices Act)
+  definition: US law that bans bribing foreign officials and requires listed companies to keep accurate
+    books and adequate internal accounting controls.
+  examples: []
+  source_url: https://www.justice.gov/criminal-fraud/file/1292051/download
+  cases: []
+  related:
+  - Books and records
+  - Internal controls
+  indicators: []
+  areas:
+  - CO
+- term: Books and records / internal controls provisions
+  definition: FCPA rules requiring issuers to keep accurate books and records and maintain adequate internal
+    accounting controls; many corporate bribery cases are charged under them.
+  examples: []
+  source_url: https://www.justice.gov/criminal-fraud/file/1292051/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Willful blindness (conscious disregard)
+  definition: Deliberately avoiding learning about a likely bribe; under the FCPA, being aware of a high
+    probability that it is happening counts as knowledge.
+  examples: []
+  source_url: https://www.justice.gov/criminal-fraud/file/1292051/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Kickback
+  definition: Money or anything of value given to a contractor or its staff to improperly get or reward
+    favourable treatment on a contract.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/41/8701
+  cases: []
+  related:
+  - Bribery
+  indicators: []
+  areas:
+  - CO
+- term: Facilitation (grease) payment
+  definition: A small payment to speed up a routine, non-discretionary government action the payer is
+    already entitled to; many countries treat it as a bribe, and the US exception does not cover decisions
+    to award business.
+  examples: []
+  source_url: https://www.transparency.org/en/corruptionary/facilitation-payments
+  cases: []
+  related:
+  - Routine governmental action
+  indicators: []
+  areas:
+  - CO
+- term: Routine governmental action
+  definition: Under the FCPA, ordinary non-discretionary acts such as processing visas or providing utilities;
+    it never includes deciding to award or continue business.
+  examples: []
+  source_url: https://www.justice.gov/criminal-fraud/file/1292051/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Solicitation
+  definition: Asking, ordering or enticing someone to commit bribery or another crime.
+  examples: []
+  source_url: https://www.transparency.org/en/corruptionary/solicitation
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Extortion
+  definition: Forcing someone to cooperate or pay through intimidation, fear or threats; the degree of
+    coercion distinguishes it from bribery.
+  examples: []
+  source_url: https://www.unodc.org/documents/e4j/Secondary/Anti-Corruption_Glossary.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Trading in influence (influence peddling)
+  definition: Giving or accepting an undue advantage so that someone abuses their real or supposed influence
+    to get an advantage from a public authority.
+  examples:
+  - UNCAC Article 18
+  source_url: https://www.unodc.org/documents/brussels/UN_Convention_Against_Corruption.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Abuse of functions
+  definition: An official doing or failing to do something in breach of the law in their job in order
+    to gain an undue advantage for themselves or others.
+  examples:
+  - UNCAC Article 19
+  source_url: https://www.unodc.org/documents/brussels/UN_Convention_Against_Corruption.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Embezzlement / misappropriation
+  definition: An official taking or diverting public or private property entrusted to them because of
+    their position.
+  examples:
+  - UNCAC Article 17
+  source_url: https://www.unodc.org/documents/brussels/UN_Convention_Against_Corruption.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Illicit enrichment
+  definition: A significant increase in a public official's assets that they cannot reasonably explain
+    from their lawful income.
+  examples:
+  - UNCAC Article 20
+  source_url: https://www.unodc.org/documents/brussels/UN_Convention_Against_Corruption.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Unexplained wealth order (UWO)
+  definition: A UK court order requiring a PEP or person linked to serious crime to explain how they obtained
+    property worth over £50,000 when their known lawful income seems insufficient.
+  examples: []
+  source_url: https://www.legislation.gov.uk/ukpga/2002/29/section/362B
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Off-the-books account
+  definition: An account or transaction kept outside a company's official records, which UNCAC asks states
+    to prohibit when used to commit corruption offences.
+  examples: []
+  source_url: https://www.unodc.org/documents/brussels/UN_Convention_Against_Corruption.pdf
+  cases: []
+  related:
+  - Slush fund
+  indicators: []
+  areas:
+  - CO
+- term: Slush fund / cash desk
+  definition: Hidden pools of money or in-house cash windows used to make untraceable payments; DOJ named
+    both as bribe mechanisms at Siemens.
+  examples: []
+  source_url: https://www.justice.gov/archive/opa/pr/2008/December/08-crm-1105.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Third party / intermediary
+  definition: An agent, consultant, distributor or partner acting between a company and an official; the
+    FCPA Guide lists red flags for using them to pass on bribes.
+  examples: []
+  source_url: https://www.justice.gov/criminal-fraud/file/1292051/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Shell company
+  definition: A company with no physical presence, staff or real business, often only a mailing address,
+    which can be used to hide owners and the source of money.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+  cases: []
+  related:
+  - Beneficial owner
+  indicators: []
+  areas:
+  - CO
+- term: Beneficial owner
+  definition: The real person or people who ultimately own or control a company or customer, as opposed
+    to the names on paper.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/pages/fatf-glossary.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Politically exposed person (PEP)
+  definition: Someone who holds or held a prominent public function (head of state, senior politician,
+    senior official, judge, military officer, senior executive of a state company), domestically, abroad
+    or in an international organisation.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+  cases: []
+  related:
+  - Family members (of a PEP)
+  - Close associates (of a PEP)
+  indicators: []
+  areas:
+  - CO
+- term: Family members (of a PEP)
+  definition: People related to a PEP directly by blood or through marriage, who FATF says should be treated
+    as PEPs.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Close associates (of a PEP)
+  definition: People closely connected to a PEP socially or professionally, such as business partners.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Senior foreign political figure
+  definition: The US regulatory term for a current or former senior foreign official, party official or
+    state-company executive, plus their immediate family and known close associates.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: DNFBP (designated non-financial businesses and professions)
+  definition: Non-bank businesses with anti-money-laundering duties, such as casinos, real estate agents,
+    dealers in precious metals and stones, lawyers, accountants and company formation agents.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/pages/fatf-glossary.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Global Magnitsky sanctions
+  definition: A US Treasury programme that can freeze the assets of people found to engage in serious
+    human rights abuse or corruption, and those who help them.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Conflict of interest
+  definition: A situation where a public official has private interests that could improperly influence
+    how they do their official job.
+  examples: []
+  source_url: https://legalinstruments.oecd.org/public/doc/130/130.en.pdf
+  cases: []
+  related:
+  - Apparent conflict of interest
+  - Potential conflict of interest
+  indicators: []
+  areas:
+  - CO
+- term: Apparent conflict of interest
+  definition: When it looks as if an official's private interests could improperly influence them, but
+    in fact they do not.
+  examples: []
+  source_url: https://legalinstruments.oecd.org/public/doc/130/130.en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Potential conflict of interest
+  definition: When an official's private interests would create a conflict if they became involved in
+    a related decision in future.
+  examples: []
+  source_url: https://legalinstruments.oecd.org/public/doc/130/130.en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Recusal
+  definition: An official stepping aside from a decision in which they have a conflict of interest, under
+    clear rules and procedures.
+  examples: []
+  source_url: https://legalinstruments.oecd.org/public/doc/130/130.en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Revolving door
+  definition: People moving between public office and jobs in the sectors they regulated or dealt with,
+    in either direction, which can be abused without rules.
+  examples: []
+  source_url: https://www.transparency.org/en/corruptionary/revolving-door
+  cases: []
+  related:
+  - Cooling-off period
+  indicators: []
+  areas:
+  - CO
+- term: Cooling-off period
+  definition: A set time after leaving public office during which a former official may not lobby or represent
+    others before their former agency or colleagues.
+  examples:
+  - 'US: 1 or 2 years under 18 U.S.C. § 207'
+  source_url: https://www.law.cornell.edu/uscode/text/18/207
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Lobbying
+  definition: Any activity to influence a government's or institution's policies and decisions for a cause
+    or outcome; lawful and useful, but risky when secret or unequal.
+  examples: []
+  source_url: https://www.transparency.org/en/corruptionary/lobbying
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Agent of a foreign principal (FARA)
+  definition: Someone acting in the US at the direction or control of a foreign government, party or person
+    in political or similar activities, who must register and disclose under FARA.
+  examples: []
+  source_url: https://www.justice.gov/nsd-fara/frequently-asked-questions
+  cases: []
+  related:
+  - Foreign principal
+  indicators: []
+  areas:
+  - CO
+- term: Foreign principal
+  definition: Under FARA, a foreign government, a foreign political party, a person outside the US, or
+    certain foreign entities.
+  examples: []
+  source_url: https://www.justice.gov/nsd-fara/frequently-asked-questions
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Political contribution
+  definition: Any contribution in cash or in kind to support a political cause.
+  examples: []
+  source_url: https://www.transparency.org/en/corruptionary/political-contribution
+  cases: []
+  related:
+  - Pay-to-play
+  indicators: []
+  areas:
+  - CO
+- term: Pay-to-play
+  definition: Making political contributions to officials who can award government business; for US investment
+    advisers, contributions above small limits bar paid work for that government for two years.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/17/275.206(4)-5
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Honest services fraud
+  definition: A US fraud offence covering schemes to deprive others of their intangible right to honest
+    services, used against bribery and kickbacks by officials.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/1346
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: State capture
+  definition: Firms shaping the 'rules of the game' (laws, rules, decrees) through private payments to
+    public officials.
+  examples: []
+  source_url: https://openknowledge.worldbank.org/entities/publication/e7ff924b-ec49-5019-94ce-75431ee93337/full
+  cases: []
+  related:
+  - Influence
+  - Grand corruption
+  indicators: []
+  areas:
+  - CO
+- term: Influence (Hellman et al.)
+  definition: Shaping the rules of the game the same way as state capture but without paying officials.
+  examples: []
+  source_url: https://openknowledge.worldbank.org/entities/publication/e7ff924b-ec49-5019-94ce-75431ee93337/full
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Grand corruption
+  definition: Abuse of high-level power that benefits a few at the expense of many and causes serious,
+    widespread harm.
+  examples: []
+  source_url: https://www.transparency.org/en/corruptionary/grand-corruption
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Nepotism
+  definition: An official using their power to give a job or favour to a relative or friend, even if they
+    are not qualified.
+  examples: []
+  source_url: https://www.unodc.org/documents/e4j/Secondary/Anti-Corruption_Glossary.pdf
+  cases: []
+  related:
+  - Patronage
+  - Clientelism
+  - Cronyism
+  indicators: []
+  areas:
+  - CO
+- term: Patronage
+  definition: Choosing someone for a job or government benefit because of personal ties, regardless of
+    qualifications or entitlement.
+  examples: []
+  source_url: https://www.transparency.org/en/corruptionary/patronage
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Clientelism
+  definition: An unequal exchange of personal favours for political support between a powerful 'patron'
+    and a weaker 'client'.
+  examples: []
+  source_url: https://www.unodc.org/documents/e4j/Secondary/Anti-Corruption_Glossary.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Cronyism (political connections)
+  definition: Favouring friends and political allies in awarding state benefits; research shows firms
+    with board ties to the party in power win more government contracts.
+  examples: []
+  source_url: https://ideas.repec.org/a/oup/revfin/v17y2013i5p1617-1648.html
+  cases: []
+  related:
+  - Patronage
+  - Clientelism
+  indicators: []
+  areas:
+  - CO
+- term: Single bidding
+  definition: A competitive tender that receives only one bid; used by researchers as a proxy for high-level
+    corruption risk in procurement.
+  examples: []
+  source_url: https://www.cambridge.org/core/journals/british-journal-of-political-science/article/uncovering-highlevel-corruption-crossnational-objective-corruption-risk-indicators-using-public-procurement-data/8A1742693965AA92BE4D2BA53EADFDF0
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: ICB / NCB
+  definition: International competitive bidding and national competitive bidding, the two main open tender
+    types in World Bank-financed projects.
+  examples: []
+  source_url: https://openknowledge.worldbank.org/server/api/core/bitstreams/932903d3-dcb1-5daa-9bbf-bd97c6973476/content
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Deferred prosecution agreement (DPA)
+  definition: A deal where prosecutors file charges but postpone prosecution while the company pays penalties,
+    admits facts, cooperates and improves compliance; charges are dropped if it complies.
+  examples:
+  - Airbus (UK, 2020), Ericsson (US, 2019), Goldman Sachs (US, 2020)
+  source_url: https://www.justice.gov/criminal-fraud/file/1292051/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Guilty plea (corporate)
+  definition: A company formally admitting a criminal charge in court, which results in a conviction;
+    recorded here as 'convicted'.
+  examples: []
+  source_url: https://www.justice.gov/criminal-fraud/file/1292051/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Successor liability
+  definition: When a company that acquires or merges with another can be held responsible for the other
+    company's past bribery.
+  examples: []
+  source_url: https://www.justice.gov/criminal-fraud/file/1292051/download
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO

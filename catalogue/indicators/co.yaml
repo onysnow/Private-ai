@@ -1,0 +1,2893 @@
+key: CO
+name: Corruption and influence
+scope: bribery, kickbacks, conflicts of interest, the revolving door, lobbying and undisclosed influence,
+  foreign influence, politically exposed persons, state capture, nepotism and cronyism.
+indicators:
+- id: CO-001
+  name: Excessive commission to an agent or consultant
+  definition: A company pays a third-party agent or consultant a commission that is far above what the
+    work would normally earn, which can leave room to pass part of it on as a bribe.
+  areas:
+  - CO
+  typology: Bribery through intermediaries
+  status: verified
+  sources:
+  - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
+    publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
+    year: '2020'
+    url: https://www.justice.gov/criminal-fraud/file/1292051/download
+    locator: Chapter 2, 'How Are Payments to Third Parties Treated?', p. 23, 'Common red flags associated
+      with third parties'
+    quote: excessive commissions to third-party agents or consultants;
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  - title: SFO enters into €991m Deferred Prosecution Agreement with Airbus as part of a €3.6bn global
+      resolution
+    publisher: UK Serious Fraud Office
+    year: '2020'
+    url: https://sfo-newsroom.prgloo.com/news/sfo-enters-into-991m-deferred-prosecution-agreement-with-airbus-as-part-of-a-3-6bn-global-resolution
+    locator: Press release, 31 January 2020
+    quote: paid bribes through agents around the world to stack the decks in its favour
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A sales agent receives 15-25% of a government contract value for introductions, when comparable agents
+    in the sector receive a few percent.
+  - Commission rates that rise with the size of a state contract without any matching increase in work.
+  cases:
+  - name: Airbus SE Deferred Prosecution Agreement (UK SFO)
+    year: '2020'
+    jurisdiction: United Kingdom
+    what_happened: The SFO said Airbus paid bribes through agents in Sri Lanka, Malaysia, Indonesia, Taiwan
+      and Ghana; Airbus agreed a DPA with €991m in UK fines and costs as part of a €3.6bn global resolution.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://sfo-newsroom.prgloo.com/news/sfo-enters-into-991m-deferred-prosecution-agreement-with-airbus-as-part-of-a-3-6bn-global-resolution
+    source_title: SFO enters into €991m Deferred Prosecution Agreement with Airbus
+  data_needed:
+  - Payment (payer, beneficiary, amount, purpose, contract)
+  - Contract (parties, amount, title)
+  - ContractAward (amount, authority)
+  - Representation (agent, client)
+  - Company
+  - Person
+  checkable: records
+  lookup_sources:
+  - Company's agent and consultancy contracts and ledgers
+  - Procurement portals for the underlying government contract
+  - Industry benchmarks for commission rates
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Commission-only agents in hard markets sometimes carry real costs (offices, staff, long sales cycles)
+    that justify higher rates.
+  - Success fees on very long or risky bids can be legitimately high.
+  - The commission may cover genuine after-sales service, logistics or local compliance work.
+  jurisdictions: Global (FCPA guidance is US; UK SFO case)
+  version: 1
+- id: CO-002
+  name: Unusually large discount to a distributor
+  definition: A company sells to a distributor at a discount much larger than normal, which can create
+    a cash cushion the distributor uses to pay officials.
+  areas:
+  - CO
+  typology: Bribery through intermediaries
+  status: verified
+  sources:
+  - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
+    publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
+    year: '2020'
+    url: https://www.justice.gov/criminal-fraud/file/1292051/download
+    locator: Chapter 2, p. 23, 'Common red flags associated with third parties'
+    quote: unreasonably large discounts to third-party distributors;
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
+    publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
+    year: '2020'
+    url: https://www.justice.gov/criminal-fraud/file/1292051/download
+    locator: Chapter 3, internal controls discussion, p. 40
+    quote: The company also used artificial discounts or rebates on sales contracts to generate the money
+      to pay the bribes.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  examples:
+  - A distributor selling to a state hospital gets a 40% discount while other distributors get 10%.
+  - Rebates are paid to a distributor after a government tender is won.
+  cases: []
+  data_needed:
+  - Contract (parties, amount)
+  - Payment (payer, beneficiary, amount, purpose)
+  - Company
+  - ContractAward
+  checkable: records
+  lookup_sources:
+  - Company sales and pricing records
+  - Procurement portals (end-buyer price)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Volume discounts for very large orders.
+  - Clearing old stock or entering a new market.
+  - The distributor carries warehousing, credit or warranty costs.
+  jurisdictions: Global (US guidance)
+  version: 1
+- id: CO-003
+  name: Vague or sham consulting agreement
+  definition: A consultant or agent is paid under a contract that describes the services only vaguely,
+    or that hides payments behind false invoices for work that was not done.
+  areas:
+  - CO
+  typology: Bribery through intermediaries; false accounting
+  status: verified
+  sources:
+  - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
+    publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
+    year: '2020'
+    url: https://www.justice.gov/criminal-fraud/file/1292051/download
+    locator: Chapter 2, p. 23, 'Common red flags associated with third parties'
+    quote: third-party “consulting agreements” that include only vaguely described services;
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  - title: Glencore Entered Guilty Pleas to Foreign Bribery and Market Manipulation Schemes
+    publisher: U.S. Department of Justice
+    year: '2022'
+    url: https://www.justice.gov/archives/opa/pr/glencore-entered-guilty-pleas-foreign-bribery-and-market-manipulation-schemes
+    locator: Press release, 24 May 2022
+    quote: Glencore concealed the bribe payments by entering into sham consulting agreements
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  - title: Ericsson Agrees to Pay More Than $1 Billion to Resolve Foreign Corrupt Practices Act Case
+    publisher: U.S. Attorney's Office, Southern District of New York
+    year: '2019'
+    url: https://www.justice.gov/usao-sdny/pr/ericsson-agrees-pay-more-1-billion-resolve-foreign-corrupt-practices-act-case
+    locator: Press release, 6 December 2019
+    quote: The agents were often engaged through sham contracts and paid pursuant to false invoices.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  examples:
+  - A 'market advisory' contract with no deliverables, paid in lump sums timed to tender decisions.
+  - Invoices describing 'services rendered' with no reports, emails or work product behind them.
+  cases:
+  - name: Glencore International A.G. and Glencore Ltd. FCPA guilty pleas
+    year: '2022'
+    jurisdiction: United States
+    what_happened: Glencore entities pleaded guilty and agreed to pay over $1.1 billion; DOJ said bribes
+      were concealed through sham consulting agreements and payments to intermediaries tied to Nigeria,
+      Cameroon, Ivory Coast, Equatorial Guinea, the DRC, Venezuela and Brazil.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/glencore-entered-guilty-pleas-foreign-bribery-and-market-manipulation-schemes
+    source_title: Glencore Entered Guilty Pleas to Foreign Bribery and Market Manipulation Schemes
+  - name: Telefonaktiebolaget LM Ericsson FCPA resolution
+    year: '2019'
+    jurisdiction: United States
+    what_happened: Ericsson entered a deferred prosecution agreement and its Egyptian subsidiary pleaded
+      guilty; DOJ said agents in Djibouti, China, Vietnam, Indonesia and Kuwait were engaged through sham
+      contracts and paid on false invoices. Total penalties about $1.06 billion.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/ericsson-agrees-pay-more-1-billion-resolve-foreign-corrupt-practices-act-case
+    source_title: Ericsson Agrees to Pay More Than $1 Billion to Resolve FCPA Case
+  data_needed:
+  - Contract (title, summary, parties, amount)
+  - Payment (payer, beneficiary, amount, purpose, contract)
+  - Document
+  - Company
+  - Person
+  checkable: person
+  lookup_sources:
+  - Company contract files and invoices
+  - Company registry (consultant's age, size, line of business)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some advisory work (relationship management, market intelligence) is hard to describe precisely.
+  - Poor contract drafting by small firms.
+  - Work product may exist but be held outside the reviewed files.
+  jurisdictions: Global
+  version: 1
+- id: CO-004
+  name: Consultant outside its own line of business
+  definition: The third party hired for a deal normally works in an unrelated field, so it is unlikely
+    to have the skills it is supposedly paid for.
+  areas:
+  - CO
+  typology: Bribery through intermediaries
+  status: verified
+  sources:
+  - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
+    publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
+    year: '2020'
+    url: https://www.justice.gov/criminal-fraud/file/1292051/download
+    locator: Chapter 2, p. 23, 'Common red flags associated with third parties'
+    quote: the third-party consultant is in a different line of business than that for which it has been
+      engaged;
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  examples:
+  - A travel agency or car dealer paid as a 'technical consultant' on a power-plant contract.
+  - A newly formed company with a generic name and no staff paid for engineering advice.
+  cases: []
+  data_needed:
+  - Company (sector, classification, incorporationDate)
+  - Contract (title, summary)
+  - Payment
+  - Representation
+  checkable: lookups
+  lookup_sources:
+  - Company registry (registered activity codes, incorporation date)
+  - Web and trade directories
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Diversified local conglomerates often hold registrations unrelated to a specific project.
+  - Registry activity codes are often out of date.
+  - Consultants may subcontract specialist work.
+  jurisdictions: Global
+  version: 1
+- id: CO-005
+  name: Third party linked to the deciding official
+  definition: The agent, consultant or partner on a deal is a relative, friend or close associate of the
+    official who decides the deal.
+  areas:
+  - CO
+  typology: Bribery through intermediaries; conflict of interest
+  status: verified
+  sources:
+  - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
+    publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
+    year: '2020'
+    url: https://www.justice.gov/criminal-fraud/file/1292051/download
+    locator: Chapter 2, p. 23, 'Common red flags associated with third parties'
+    quote: the third party is related to or closely associated with the foreign official;
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  examples:
+  - The local partner on a ministry contract is owned by the minister's brother-in-law.
+  - A consultant shares an address or directors with a company owned by the procurement chief.
+  cases: []
+  data_needed:
+  - Person
+  - Family (person, relative, relationship)
+  - Associate
+  - Ownership
+  - Directorship
+  - Occupancy (holder, post)
+  - Position
+  - Address
+  - Contract
+  - ContractAward
+  checkable: lookups
+  lookup_sources:
+  - Company registry and beneficial ownership register
+  - PEP and relatives databases
+  - Asset and interest declarations
+  - Civil and marriage records, social media
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FATF lists use of family members or close associates as legal owners as a PEP red flag for
+      hiding ownership of illicit wealth.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+  innocent_explanations:
+  - In small markets, qualified local firms are often connected to political families.
+  - Shared surnames or addresses can be coincidental.
+  - The relationship may have been disclosed and the official recused.
+  jurisdictions: Global
+  version: 1
+- id: CO-006
+  name: Third party added at the official's request
+  definition: The official who controls the decision insists that a particular agent, partner or subcontractor
+    be brought into the deal.
+  areas:
+  - CO
+  typology: Bribery through intermediaries; solicitation
+  status: verified
+  sources:
+  - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
+    publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
+    year: '2020'
+    url: https://www.justice.gov/criminal-fraud/file/1292051/download
+    locator: Chapter 2, p. 23, 'Common red flags associated with third parties'
+    quote: the third party became part of the transaction at the express request or insistence of the
+      foreign official;
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  examples:
+  - Emails in which an official names the consultant a bidder 'must' use.
+  - A subcontract created late in negotiations at a ministry's suggestion.
+  cases: []
+  data_needed:
+  - Email
+  - Document
+  - Person
+  - Company
+  - Representation
+  - Contract
+  checkable: person
+  lookup_sources:
+  - Internal emails, meeting notes, interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some governments legally require local-content partners and publish approved lists.
+  - Officials may recommend capable local firms in good faith.
+  jurisdictions: Global
+  version: 1
+- id: CO-007
+  name: Intermediary is an offshore shell company
+  definition: The agent or consultant is a company with no real operations, registered in an offshore
+    jurisdiction.
+  areas:
+  - CO
+  - ML
+  typology: Concealment of beneficial ownership
+  status: verified
+  sources:
+  - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
+    publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
+    year: '2020'
+    url: https://www.justice.gov/criminal-fraud/file/1292051/download
+    locator: Chapter 2, p. 23, 'Common red flags associated with third parties'
+    quote: the third party is merely a shell company incorporated in an offshore jurisdiction; and
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  - title: Advisory on Human Rights Abuses Enabled by Corrupt Senior Foreign Political Figures and their
+      Financial Facilitators (FIN-2018-A003)
+    publisher: FinCEN, U.S. Department of the Treasury
+    year: '2018'
+    url: https://www.fincen.gov/sites/default/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+    locator: p. 4, 'Use of Shell Companies'
+    quote: PEP facilitators commonly use shell companies to obfuscate ownership and mask the true source
+      of the proceeds of corruption.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  examples:
+  - A BVI company with nominee directors invoices for 'consulting' on an African mining licence.
+  - Odebrecht's bribe system paid through shell companies and offshore accounts.
+  cases:
+  - name: Odebrecht S.A. and Braskem S.A. guilty pleas
+    year: '2016'
+    jurisdiction: United States (with Brazil and Switzerland)
+    what_happened: Both companies pleaded guilty to conspiracy to violate the FCPA, with combined penalties
+      of at least $3.5 billion; DOJ described a 'Division of Structured Operations', a hidden business
+      unit that paid about $788 million in bribes through shell companies, off-book transactions and offshore
+      accounts.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/odebrecht-and-braskem-plead-guilty-and-agree-pay-least-35-billion-global-penalties-resolve
+    source_title: Odebrecht and Braskem Plead Guilty and Agree to Pay at Least $3.5 Billion in Global
+      Penalties
+  data_needed:
+  - Company (jurisdiction, incorporationDate, address)
+  - Ownership
+  - Directorship
+  - Address
+  - Payment
+  - BankAccount
+  checkable: lookups
+  lookup_sources:
+  - Offshore company registries
+  - ICIJ Offshore Leaks database
+  - OpenCorporates
+  - Beneficial ownership registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Shell companies are the main tool for hiding who owns corruption proceeds once paid.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+  innocent_explanations:
+  - Holding and treasury companies are often offshore for tax or legal reasons.
+  - FinCEN notes shell companies are often formed for legitimate purposes such as holding assets or facilitating
+    mergers.
+  jurisdictions: Global
+  version: 1
+- id: CO-008
+  name: Payment requested to an offshore bank account
+  definition: The third party asks to be paid into a bank account in a different, often offshore, jurisdiction
+    from where it works or where the service was performed.
+  areas:
+  - CO
+  - ML
+  typology: Bribery through intermediaries
+  status: verified
+  sources:
+  - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
+    publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
+    year: '2020'
+    url: https://www.justice.gov/criminal-fraud/file/1292051/download
+    locator: Chapter 2, p. 23, 'Common red flags associated with third parties'
+    quote: the third party requests payment to offshore bank accounts.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  examples:
+  - A Nigerian agent asks for fees to go to an account in Switzerland held by a different company name.
+  cases: []
+  data_needed:
+  - Payment (payerAccount, beneficiaryAccount)
+  - BankAccount (bankName, country, holder)
+  - Company
+  checkable: records
+  lookup_sources:
+  - Payment records and bank instructions
+  - Company registry for account holder
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Currency controls or unstable local banks make foreign accounts common.
+  - The agent's group treasury may sit in another country.
+  jurisdictions: Global
+  version: 1
+- id: CO-009
+  name: Lavish gifts, travel or hospitality to officials
+  definition: Officials receive expensive gifts, trips, entertainment or cash 'spending money', especially
+    from parties with business before them.
+  areas:
+  - CO
+  typology: Bribery in kind
+  status: verified
+  sources:
+  - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
+    publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
+    year: '2020'
+    url: https://www.justice.gov/criminal-fraud/file/1292051/download
+    locator: Chapter 2, 'Gifts, Travel, Entertainment, and Other Things of Value', p. 15
+    quote: The larger or more extravagant the gift, however, the more likely it was given with an improper
+      purpose.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
+    publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
+    year: '2020'
+    url: https://www.justice.gov/criminal-fraud/file/1292051/download
+    locator: p. 25, safeguards list for travel and expenses
+    quote: Do not advance funds or pay for reimbursements in cash.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  examples:
+  - '''Training trips'' for officials that are mostly sightseeing (the FCPA Guide cites trips costing
+    $25,000-$55,000 each).'
+  - Gold bars and cash found at a senator's home (Menendez trial evidence as reported).
+  cases:
+  - name: Leonard Glenn Francis and Glenn Defense Marine Asia guilty pleas (Navy bribery)
+    year: '2015'
+    jurisdiction: United States
+    what_happened: Francis and his company pleaded guilty to bribery, conspiracy to commit bribery and
+      conspiracy to defraud the US; DOJ said he gave Navy officials cash, travel, luxury lodging and sexual
+      services in exchange for classified and confidential Navy information including ship schedules,
+      and inflated billings.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/defense-contractor-and-its-ceo-plead-guilty-corruption-conspiracy-involving-scores-navy
+    source_title: Defense Contractor and Its CEO Plead Guilty to Corruption Conspiracy Involving Scores
+      of Navy Officials
+  - name: United States v. Robert Menendez, Wael Hana and Fred Daibes
+    year: '2024'
+    jurisdiction: United States
+    what_happened: A jury convicted Senator Menendez and two businessmen on all charges in a bribery and
+      foreign influence scheme; reported trial evidence included about $150,000 in gold and over $480,000
+      in cash found at his home.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/nsd-fara/recent-cases
+    source_title: Recent FARA Cases (DOJ National Security Division)
+  data_needed:
+  - Payment
+  - Trip
+  - Asset
+  - Person
+  - Occupancy
+  - Position
+  - Document
+  checkable: records
+  lookup_sources:
+  - Gift and hospitality registers
+  - Officials' financial disclosure filings
+  - Expense records
+  - Travel and hotel records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The FCPA Guide says items of nominal value such as cab fare, reasonable meals and promotional items
+    are unlikely to improperly influence an official.
+  - Genuine training or product demonstrations can require travel.
+  - Gifts may be culturally customary and properly recorded.
+  jurisdictions: Global
+  version: 1
+- id: CO-010
+  name: Benefits or jobs given to an official's relatives
+  definition: A company pays bills, gives tickets, or hires and promotes the children or relatives of
+    officials whose decisions it wants, as an indirect bribe.
+  areas:
+  - CO
+  typology: Indirect bribery; 'referral hiring'
+  status: verified
+  sources:
+  - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
+    publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
+    year: '2020'
+    url: https://www.justice.gov/criminal-fraud/file/1292051/download
+    locator: Chapter 2, p. 16
+    quote: Companies also may violate the FCPA if they give payments or gifts to third parties, such as
+      an official’s family members, as an indirect way of corruptly influencing a foreign official.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  - title: JPMorgan Chase Paying $264 Million to Settle FCPA Charges (Press Release 2016-241)
+    publisher: U.S. Securities and Exchange Commission
+    year: '2016'
+    url: https://www.sec.gov/news/press-release/2016-241
+    locator: Press release, 17 November 2016
+    quote: JPMorgan hired approximately 100 interns and full-time employees at the request of foreign
+      government officials
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  examples:
+  - Interns hired outside the normal process at the request of state-bank executives.
+  - A contractor pays the tuition of a procurement official's child.
+  cases:
+  - name: JPMorgan Chase referral hiring (SEC, DOJ, Federal Reserve)
+    year: '2016'
+    jurisdiction: United States (conduct in Asia-Pacific)
+    what_happened: The SEC found JPMorgan violated FCPA anti-bribery, books and records and internal controls
+      provisions through a client referral hiring programme; total sanctions over $264 million.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/news/press-release/2016-241
+    source_title: SEC Press Release 2016-241
+  data_needed:
+  - Employment (employer, employee, startDate, role)
+  - Family
+  - Person
+  - Occupancy
+  - Position
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - HR hiring records
+  - PEP and relatives databases
+  - Social media and professional profiles
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Relatives of officials may be fully qualified and hired through the normal process.
+  - Referral programmes are common and lawful when merit-based.
+  jurisdictions: Global
+  version: 1
+- id: CO-011
+  name: Charitable donation linked to a deciding official
+  definition: A company gives to a charity that an official is connected to, at the official's request,
+    or on condition of receiving business.
+  areas:
+  - CO
+  typology: Bribery disguised as charity
+  status: verified
+  sources:
+  - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
+    publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
+    year: '2020'
+    url: https://www.justice.gov/criminal-fraud/file/1292051/download
+    locator: p. 19, 'Five Questions to Consider When Making Charitable Payments in a Foreign Country'
+    quote: Is a foreign official associated with the charity and, if so, can the foreign official make
+      decisions regarding your business in that country?
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  examples:
+  - A donation to a foundation chaired by a minister's spouse shortly before a licence decision.
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, purpose, date)
+  - Organization
+  - Directorship
+  - Family
+  - Occupancy
+  - Position
+  checkable: lookups
+  lookup_sources:
+  - Charity registers and filings
+  - Corporate giving reports
+  - PEP databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Prominent people often sit on charity boards; companies give to well-known local causes.
+  - Long-standing giving programmes that pre-date any business decision.
+  jurisdictions: Global
+  version: 1
+- id: CO-012
+  name: Off-the-books accounts, slush funds or cash desks
+  definition: Money is held or moved outside the official accounts, or large cash is handed out, so payments
+    cannot be traced in the books.
+  areas:
+  - CO
+  - ML
+  typology: False accounting to conceal bribes
+  status: verified
+  sources:
+  - title: United Nations Convention against Corruption
+    publisher: United Nations Office on Drugs and Crime
+    year: '2004'
+    url: https://www.unodc.org/documents/brussels/UN_Convention_Against_Corruption.pdf
+    locator: Article 12(3)(a)-(b)
+    quote: (a) The establishment of off-the-books accounts; (b) The making of off-the-books or inadequately
+      identified transactions;
+    quote_verified: true
+    licence: © United Nations
+    checked: '2026-10-08'
+  - title: Siemens AG and Three Subsidiaries Plead Guilty to Foreign Corrupt Practices Act Violations
+    publisher: U.S. Department of Justice
+    year: '2008'
+    url: https://www.justice.gov/archive/opa/pr/2008/December/08-crm-1105.html
+    locator: Press release, 15 December 2008
+    quote: included cash desks and slush funds
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  examples:
+  - Ledger accounts used to keep credit balances for officials (FCPA Guide p. 40).
+  - Odebrecht's off-book 'Division of Structured Operations'.
+  cases:
+  - name: Siemens AG FCPA guilty pleas
+    year: '2008'
+    jurisdiction: United States (with Germany)
+    what_happened: Siemens AG pleaded guilty to FCPA internal controls and books-and-records violations
+      and three subsidiaries pleaded guilty; DOJ said payment mechanisms included cash desks and slush
+      funds and some bribes ran through purported business consultants. Combined fines, penalties and
+      disgorgement exceeded $1.6 billion.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archive/opa/pr/2008/December/08-crm-1105.html
+    source_title: Siemens AG and Three Subsidiaries Plead Guilty to FCPA Violations
+  data_needed:
+  - BankAccount
+  - Payment
+  - Document
+  - Company
+  - Person
+  checkable: records
+  lookup_sources:
+  - Company accounting records
+  - Audit reports
+  - Bank records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Petty cash and cash wages are normal in some sectors and countries.
+  - Poor bookkeeping in small subsidiaries rather than concealment.
+  jurisdictions: Global
+  version: 1
+- id: CO-013
+  name: Non-existent expenses or false invoices
+  definition: The books record spending for goods or services that were never provided, or use false documents,
+    to create money for bribes or hide them.
+  areas:
+  - CO
+  - FR
+  typology: False accounting to conceal bribes
+  status: verified
+  sources:
+  - title: United Nations Convention against Corruption
+    publisher: United Nations Office on Drugs and Crime
+    year: '2004'
+    url: https://www.unodc.org/documents/brussels/UN_Convention_Against_Corruption.pdf
+    locator: Article 12(3)(c)-(e)
+    quote: (c) The recording of non-existent expenditure; (d) The entry of liabilities with incorrect
+      identification of their objects; (e) The use of false documents;
+    quote_verified: true
+    licence: © United Nations
+    checked: '2026-10-08'
+  - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
+    publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
+    year: '2020'
+    url: https://www.justice.gov/criminal-fraud/file/1292051/download
+    locator: p. 44
+    quote: the company used false invoices and sham consulting contracts to support large bribes that
+      were passed on to foreign officials through an agent
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  examples:
+  - Officials' sightseeing trips booked as 'consulting fees' (FCPA Guide p. 15).
+  - Invoices from a supplier that has no staff, address or delivery records.
+  cases: []
+  data_needed:
+  - Payment
+  - Document
+  - Contract
+  - Company
+  checkable: records
+  lookup_sources:
+  - Accounting and audit records
+  - Company registry for suppliers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Inflated or false billing to a government buyer was part of the Francis Navy bribery scheme.
+    source_url: https://www.justice.gov/opa/pr/defense-contractor-and-its-ceo-plead-guilty-corruption-conspiracy-involving-scores-navy
+  innocent_explanations:
+  - Coding errors and mislabeled expense categories.
+  - Services delivered informally without paperwork.
+  jurisdictions: Global
+  version: 1
+- id: CO-014
+  name: Early destruction of accounting records
+  definition: Bookkeeping documents are destroyed before the law says they may be.
+  areas:
+  - CO
+  typology: Concealment
+  status: verified
+  sources:
+  - title: United Nations Convention against Corruption
+    publisher: United Nations Office on Drugs and Crime
+    year: '2004'
+    url: https://www.unodc.org/documents/brussels/UN_Convention_Against_Corruption.pdf
+    locator: Article 12(3)(f)
+    quote: (f) The intentional destruction of bookkeeping documents earlier than foreseen by the law.
+    quote_verified: true
+    licence: © United Nations
+    checked: '2026-10-08'
+  examples:
+  - Records for a disputed contract year are missing while other years are complete.
+  cases: []
+  data_needed:
+  - Document
+  - Company
+  - Event
+  checkable: person
+  lookup_sources:
+  - National record-retention rules
+  - Auditor letters
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Floods, fires, IT failures or office moves.
+  - Lawful destruction after the retention period ended.
+  jurisdictions: Global
+  version: 1
+- id: CO-015
+  name: '''Facilitating payment'' used for a discretionary decision'
+  definition: A payment labelled as a small 'grease' or facilitating payment was actually made to influence
+    a discretionary decision such as awarding business or ignoring a breach.
+  areas:
+  - CO
+  typology: Facilitation payments
+  status: verified
+  sources:
+  - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
+    publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
+    year: '2020'
+    url: https://www.justice.gov/criminal-fraud/file/1292051/download
+    locator: p. 25, 'What Are Facilitating or Expediting Payments?'
+    quote: Routine government action does not include a decision to award new business or to continue
+      business with a particular party.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
+    publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
+    year: '2020'
+    url: https://www.justice.gov/criminal-fraud/file/1292051/download
+    locator: p. 26
+    quote: Labeling a bribe as a “facilitating payment” in a company’s books and records does not make
+      it one.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  examples:
+  - Payments to customs officials for reduced duties booked in a 'facilitating payment' account.
+  - Paying an inspector to ignore a missing permit.
+  cases: []
+  data_needed:
+  - Payment (purpose, amount)
+  - PublicBody
+  - Person
+  - Document
+  checkable: records
+  lookup_sources:
+  - Company ledgers
+  - Customs and permit records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Official, published expedite fees (e.g. fast-track visa fees) are lawful.
+  - Payments made under threat to personal safety are generally treated differently from bribes.
+  jurisdictions: Global (US exception; many countries, e.g. the UK, allow no such exception)
+  version: 1
+- id: CO-016
+  name: Corporate vehicles hiding a PEP's ownership
+  definition: Companies, trusts or other legal arrangements are used, without a clear business reason,
+    so the politically exposed person's ownership does not appear.
+  areas:
+  - CO
+  - ML
+  typology: PEP shielding identity
+  status: verified
+  sources:
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 4, 'PEPs attempting to shield their identity'
+    quote: Use of corporate vehicles (legal entities and legal arrangements) to obscure the beneficial
+      owner.
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 4
+    quote: Use of corporate vehicles without valid business reason.
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  examples:
+  - A minister's property held through a chain of three companies in different jurisdictions.
+  - Obiang acquired US assets 'through intermediaries and corporate entities' (DOJ).
+  cases: []
+  data_needed:
+  - Ownership
+  - Company
+  - LegalEntity
+  - Person
+  - Occupancy
+  - Position
+  - RealEstate
+  - Asset
+  checkable: lookups
+  lookup_sources:
+  - Beneficial ownership registers
+  - Company registries in several jurisdictions
+  - Property registries
+  - Leak databases (ICIJ Offshore Leaks)
+  - PEP databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FinCEN describes PEP facilitators using shell companies and real estate to hide corruption
+      proceeds.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+  innocent_explanations:
+  - Privacy and security concerns of public figures.
+  - Estate planning and tax structuring.
+  - Blind trusts set up to avoid conflicts of interest.
+  jurisdictions: Global (FATF standard)
+  version: 1
+- id: CO-017
+  name: Relatives or associates used as owners for a PEP
+  definition: A PEP's family members or close associates are recorded as the owners of companies, property
+    or accounts that the PEP actually benefits from.
+  areas:
+  - CO
+  - ML
+  typology: Nominee ownership
+  status: verified
+  sources:
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 4
+    quote: Use of family members or close associates as legal owner.
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 4
+    quote: Use of intermediaries when this does not match with normal business practices…
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  examples:
+  - A governor's driver is listed as the sole shareholder of a road-building company.
+  - A president's child holds stakes in businesses that receive state contracts.
+  cases:
+  - name: 'Luanda Leaks: Isabel dos Santos'
+    year: '2020'
+    jurisdiction: Angola / international
+    what_happened: ICIJ reported, based on more than 715,000 leaked documents, that the daughter of Angola's
+      former president moved public money out of Angola; it reported a $38 million Sonangol payment to
+      a Dubai company controlled by an associate and that her lawyers helped draft a presidential decree
+      benefiting her companies. She denied wrongdoing and called the inquiry political persecution.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.icij.org/investigations/luanda-leaks/how-africas-richest-woman-exploited-family-ties-shell-companies-and-inside-deals-to-build-an-empire/
+    source_title: How Africa's richest woman exploited family ties, shell companies and inside deals to
+      build an empire (ICIJ)
+  data_needed:
+  - Family
+  - Associate
+  - Ownership
+  - Person
+  - Company
+  - Occupancy
+  - Position
+  checkable: lookups
+  lookup_sources:
+  - Company and beneficial ownership registries
+  - PEP databases with relatives and close associates
+  - Asset declarations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Relatives of politicians may run genuine businesses of their own.
+  - Family businesses that pre-date the PEP's office.
+  jurisdictions: Global
+  version: 1
+- id: CO-018
+  name: PEP cannot or will not explain source of wealth
+  definition: A politically exposed person avoids explaining where their wealth or funds came from, or
+    gives information that conflicts with public records.
+  areas:
+  - CO
+  - ML
+  typology: PEP behaviour
+  status: verified
+  sources:
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 5, 'Red flags and indicators relating to the PEP and his behaviour'
+    quote: The PEP seems generally uncomfortable to provide information about source of wealth or source
+      of funds.
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 5
+    quote: The PEP provides inaccurate or incomplete information.
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  examples:
+  - A declared salary that cannot explain a portfolio of foreign properties, and no answer when asked.
+  cases: []
+  data_needed:
+  - Person
+  - Occupancy
+  - Position
+  - Asset
+  - RealEstate
+  - Document
+  checkable: person
+  lookup_sources:
+  - Asset and income declarations
+  - Property registries
+  - Interviews and right-of-reply letters
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Inherited or pre-office wealth, or a spouse's independent income.
+  - Reluctance to share personal financial details with journalists for privacy or safety reasons.
+  jurisdictions: Global
+  version: 1
+- id: CO-019
+  name: Wealth out of proportion to lawful income (illicit enrichment)
+  definition: A public official's assets grow far beyond what their known lawful income could pay for,
+    and they cannot reasonably explain it.
+  areas:
+  - CO
+  - ML
+  typology: Illicit enrichment; unexplained wealth
+  status: verified
+  sources:
+  - title: United Nations Convention against Corruption
+    publisher: United Nations Office on Drugs and Crime
+    year: '2004'
+    url: https://www.unodc.org/documents/brussels/UN_Convention_Against_Corruption.pdf
+    locator: Article 20, 'Illicit enrichment'
+    quote: a significant increase in the assets of a public official that he or she cannot reasonably
+      explain in relation to his or her lawful income.
+    quote_verified: true
+    licence: © United Nations
+    checked: '2026-10-08'
+  - title: 'Proceeds of Crime Act 2002, section 362B (Unexplained wealth orders: requirements)'
+    publisher: UK Parliament (legislation.gov.uk)
+    year: 2017 (inserted by Criminal Finances Act 2017)
+    url: https://www.legislation.gov.uk/ukpga/2002/29/section/362B
+    locator: s. 362B
+    quote: the value of the property is greater than £50,000
+    quote_verified: true
+    licence: Open Government Licence v3.0
+    checked: '2026-10-08'
+  examples:
+  - An official on less than $100,000 a year who amassed over $300 million in assets (DOJ, Obiang).
+  - A mayor's family buys several flats in cash during his term.
+  cases:
+  - name: United States v. assets of Teodoro Nguema Obiang Mangue (civil forfeiture settlement)
+    year: '2014'
+    jurisdiction: United States
+    what_happened: DOJ said Equatorial Guinea's Second Vice President, on an official salary of less than
+      $100,000, amassed more than $300 million in assets through corruption and money laundering; under
+      a settlement he agreed to sell a $30 million Malibu mansion, a Ferrari and memorabilia, with proceeds
+      to benefit the people of Equatorial Guinea.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/second-vice-president-equatorial-guinea-agrees-relinquish-more-30-million-assets-purchased
+    source_title: Second Vice President of Equatorial Guinea Agrees to Relinquish More Than $30 Million
+      of Assets
+  data_needed:
+  - Person
+  - Occupancy (holder, post, declarationDate)
+  - Position
+  - Asset
+  - RealEstate
+  - Ownership
+  - Payment
+  - Vehicle
+  - Airplane
+  checkable: lookups
+  lookup_sources:
+  - Public salary scales and asset declarations
+  - Property, vehicle, aircraft and vessel registries
+  - Company registries
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'UK: property worth more than £50,000 held by a PEP (or person involved in serious crime)
+      where there are reasonable grounds to suspect known lawful income would have been insufficient to
+      obtain it (POCA s.362B). Elsewhere: meets UNCAC Art. 20 definition as worded.'
+    threshold_source: https://www.legislation.gov.uk/ukpga/2002/29/section/362B
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Corruption proceeds were used to buy US real estate and luxury goods through intermediaries
+      and corporate entities.
+    source_url: https://www.justice.gov/opa/pr/second-vice-president-equatorial-guinea-agrees-relinquish-more-30-million-assets-purchased
+  innocent_explanations:
+  - Inheritance, gifts from family, or a spouse's business income.
+  - Wealth earned before entering office.
+  - Investment gains or lottery winnings, which should be documentable.
+  jurisdictions: Global (UNCAC Art. 20 is optional for states; UK UWO thresholds apply in the UK)
+  version: 1
+- id: CO-020
+  name: PEP controls licences, concessions or state assets relevant to the deal
+  definition: The politically exposed person has power over regulatory approvals, licences, concessions,
+    or state funds connected to the business they are involved with.
+  areas:
+  - CO
+  typology: PEP position risk
+  status: verified
+  sources:
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 6, 'The PEP's position or involvement in businesses'
+    quote: The PEP has control over regulatory approvals, including awarding licences and concessions.
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 6
+    quote: The PEP has a substantial authority over or access to state assets and funds, policies and
+      operations.
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  examples:
+  - A mining minister whose relative's company holds a mining licence granted by that ministry.
+  cases: []
+  data_needed:
+  - Person
+  - Occupancy
+  - Position
+  - PublicBody
+  - License
+  - Ownership
+  - Directorship
+  checkable: lookups
+  lookup_sources:
+  - Licence and concession registers (e.g. mining cadastres)
+  - Company registries
+  - Government organisation charts and gazettes
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The PEP may have disclosed the interest and recused from the decision.
+  - Licences granted through open, rules-based processes before the PEP took office.
+  jurisdictions: Global
+  version: 1
+- id: CO-021
+  name: PEP hides or downplays positions held
+  definition: A PEP fails to reveal all their public and ex officio positions, or plays down the importance
+    of their role.
+  areas:
+  - CO
+  typology: PEP behaviour
+  status: verified
+  sources:
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 6
+    quote: The PEP does not reveal all positions (including those that are ex officio).
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  examples:
+  - An official lists himself as 'consultant' on a company filing while chairing a state-owned enterprise's
+    board ex officio.
+  cases: []
+  data_needed:
+  - Person
+  - Occupancy
+  - Position
+  - Directorship
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Government gazettes and state-owned enterprise board lists
+  - Company filings
+  - Asset and interest declarations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ex officio roles are sometimes forgotten or seen as formalities.
+  - Different forms ask for different definitions of 'position'.
+  jurisdictions: Global
+  version: 1
+- id: CO-022
+  name: PEP accounts with cash, round amounts or many accounts
+  definition: A PEP's financial activity uses large cash amounts, repeated round sums, or several accounts
+    with no clear purpose.
+  areas:
+  - CO
+  - ML
+  typology: PEP transaction patterns
+  status: verified
+  sources:
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 8, 'Business relationship / transaction'
+    quote: (Consistent) use of rounded amounts, where this cannot be explained by the expected business.
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 8
+    quote: Use of large amounts of cash in the business relationship.
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 8
+    quote: A PEP uses multiple bank accounts for no apparent commercial or other reason.
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  examples:
+  - Monthly deposits of exactly $50,000 in cash into a deputy minister's account.
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment (amount, date)
+  - Person
+  - Occupancy
+  checkable: records
+  lookup_sources:
+  - Bank records (from leaks, court files or regulators)
+  - Suspicious activity report excerpts in court filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Cash-based economies where salaries and rents are paid in cash.
+  - Round-sum transfers between a person's own accounts or to family for living costs.
+  jurisdictions: Global
+  version: 1
+- id: CO-023
+  name: PEP funds moved through countries with no apparent tie
+  definition: A PEP's money is repeatedly moved to and from countries they have no connection to, and
+    personal and business money are mixed together.
+  areas:
+  - CO
+  - ML
+  typology: PEP transaction patterns
+  status: verified
+  sources:
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 5
+    quote: Funds are repeatedly moved to and from countries to which the PEPs does not seem to have ties
+      with.
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 8
+    quote: Personal and business related money flows are difficult to distinguish from each other.
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  examples:
+  - Funds from a state fund deal pass through accounts in Singapore, Switzerland and the UAE before buying
+    US property (pattern in the 1MDB matters).
+  cases:
+  - name: Goldman Sachs / 1MDB resolution
+    year: '2020'
+    jurisdiction: United States (with Malaysia and others)
+    what_happened: Goldman Sachs entered a deferred prosecution agreement and its Malaysian subsidiary
+      pleaded guilty; DOJ said employees conspired with Low Taek Jho to pay over $1.6 billion in bribes
+      to Malaysian and Abu Dhabi officials. Penalty and disgorgement over $2.9 billion.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/goldman-sachs-charged-foreign-bribery-case-and-agrees-pay-over-29-billion
+    source_title: Goldman Sachs Charged in Foreign Bribery Case and Agrees to Pay Over $2.9 Billion
+  - name: United States v. Roger Ng (1MDB)
+    year: '2022'
+    jurisdiction: United States
+    what_happened: A Brooklyn jury convicted former Goldman Sachs managing director Roger Ng for his part
+      in a bribery and money laundering scheme related to 1MDB.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-edny/pr/statement-united-states-attorney-breon-peace-verdict-us-v-roger-ng
+    source_title: Statement of U.S. Attorney Breon Peace on the Verdict in U.S. v. Roger Ng
+  data_needed:
+  - Payment (payerAccount, beneficiaryAccount)
+  - BankAccount (country)
+  - Person
+  - Company
+  - Address
+  checkable: records
+  lookup_sources:
+  - Bank and wire records
+  - Court filings in asset forfeiture cases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - International investments, foreign study of children, or overseas property for family use.
+  - Business owners in small economies often mix personal and company accounts.
+  jurisdictions: Global
+  version: 1
+- id: CO-024
+  name: Other banks dropped the PEP or were sanctioned over them
+  definition: Other financial institutions or professional firms have ended their relationship with the
+    PEP, or regulators have acted against firms for dealing with them.
+  areas:
+  - CO
+  - ML
+  typology: PEP history
+  status: verified
+  sources:
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 8
+    quote: Other financial institutions and DNFBPs have terminated the business relationship with the
+      PEP.
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 8
+    quote: Other financial institutions and DNFBPs have been subject to regulatory actions over doing
+      business with the PEP.
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  examples:
+  - A regulator fines a bank for failing to check a PEP's funds; the PEP then moves to a smaller bank.
+  cases: []
+  data_needed:
+  - Person
+  - Sanction
+  - BankAccount
+  - Company
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Regulator enforcement notices
+  - Sanctions lists (including Global Magnitsky designations)
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Treasury can designate corrupt actors and their facilitators under the Global Magnitsky programme,
+      freezing their US assets.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+  innocent_explanations:
+  - Banks 'de-risk' whole classes of customers; FinCEN warns most PEPs are dedicated public servants and
+    wholesale de-risking is not intended.
+  - Account closures for commercial reasons unrelated to the PEP.
+  jurisdictions: Global
+  version: 1
+- id: CO-025
+  name: PEP or deal in a high-corruption-risk sector
+  definition: The PEP or the transaction is in a sector FATF names as higher risk, such as arms, construction
+    and infrastructure, mining, procurement-dependent business, privatisation or utilities.
+  areas:
+  - CO
+  typology: Sector risk
+  status: verified
+  sources:
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 7, 'Red flags and indicators relating to the industry/sector'
+    quote: Businesses active in government procurement, i.e., those whose business is selling to government
+      or state agencies.
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  examples:
+  - A PEP-linked company supplying a defence ministry, or holding a mining or extraction licence.
+  cases: []
+  data_needed:
+  - Company (sector, classification)
+  - Person
+  - Occupancy
+  - ContractAward
+  - License
+  checkable: lookups
+  lookup_sources:
+  - Company registries (activity codes)
+  - Procurement portals
+  - Licence registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Sector risk alone says nothing about a particular company; most firms in these sectors are not corrupt.
+  - Many legitimate businesses must sell to government.
+  jurisdictions: Global
+  version: 1
+- id: CO-026
+  name: Payments from unknown or unrelated third parties
+  definition: The PEP or official receives money from people or companies with no visible relationship
+    or business reason to pay them.
+  areas:
+  - CO
+  - ML
+  typology: PEP transaction patterns
+  status: verified
+  sources:
+  - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
+    publisher: Financial Action Task Force
+    year: '2013'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/Guidance-PEP-Rec12-22.pdf
+    locator: Annex 1, para. 9, 'Products, service, transaction or delivery channels'
+    quote: Payments received from unknown or un-associated third parties.
+    quote_verified: true
+    licence: © FATF/OECD
+    checked: '2026-10-08'
+  examples:
+  - A deputy's account receives transfers from a construction company's director shortly after a budget
+    vote.
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - Company
+  - BankAccount
+  - UnknownLink
+  checkable: records
+  lookup_sources:
+  - Bank records
+  - Company registries to identify payers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Loan repayments from friends, sale of personal goods, or rent from tenants.
+  - Payments on behalf of family members.
+  jurisdictions: Global
+  version: 1
+- id: CO-027
+  name: PEP buys high-value real estate through opaque entities
+  definition: A PEP or their facilitator buys expensive property through companies or other structures
+    that hide who the buyer is.
+  areas:
+  - CO
+  - ML
+  typology: Laundering corruption proceeds through real estate
+  status: verified
+  sources:
+  - title: Advisory on Human Rights Abuses Enabled by Corrupt Senior Foreign Political Figures and their
+      Financial Facilitators (FIN-2018-A003)
+    publisher: FinCEN, U.S. Department of the Treasury
+    year: '2018'
+    url: https://www.fincen.gov/sites/default/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+    locator: p. 5, 'Corruption in the Real Estate Sector'
+    quote: drug traffickers, corrupt officials, and other criminals have used real estate to conceal the
+      existence and origins of their illicit funds.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  examples:
+  - A $30 million Malibu mansion acquired for an Equatoguinean minister through corporate entities (DOJ,
+    Obiang).
+  cases: []
+  data_needed:
+  - RealEstate
+  - Ownership
+  - Company
+  - Person
+  - Payment
+  - Occupancy
+  checkable: lookups
+  lookup_sources:
+  - Property registries and deeds
+  - Company registries
+  - Geographic targeting order data where public
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FinCEN describes real estate as a vehicle that 'cleans' large sums in a single transaction.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+  - target_area: HR
+    reason: FinCEN's advisory links corrupt senior foreign political figures and their facilitators to
+      human rights abuses.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+  innocent_explanations:
+  - Buying property through an LLC is common for privacy, liability and estate reasons.
+  - Wealthy foreign buyers legitimately invest in property abroad.
+  jurisdictions: Global (US advisory)
+  version: 1
+- id: CO-028
+  name: Official decides a matter in which they have a private interest
+  definition: A public official takes part in a decision where their own or their family's private interests
+    could improperly influence them.
+  areas:
+  - CO
+  typology: Conflict of interest
+  status: verified
+  sources:
+  - title: Recommendation of the Council on OECD Guidelines for Managing Conflict of Interest in the Public
+      Service (OECD/LEGAL/0316)
+    publisher: OECD
+    year: '2003'
+    url: https://legalinstruments.oecd.org/public/doc/130/130.en.pdf
+    locator: Para. 10
+    quote: A 'conflict of interest' involves a conflict between the public duty and private interests
+      of a public official, in which the public official has private-capacity interests which could improperly
+      influence the performance of their official duties and responsibilities.
+    quote_verified: true
+    licence: © OECD
+    checked: '2026-10-08'
+  - title: United Nations Convention against Corruption
+    publisher: United Nations Office on Drugs and Crime
+    year: '2004'
+    url: https://www.unodc.org/documents/brussels/UN_Convention_Against_Corruption.pdf
+    locator: Article 8(5)
+    quote: declarations to appropriate authorities regarding, inter alia, their outside activities, employment,
+      investments, assets and substantial gifts or benefits from which a conflict of interest may result
+    quote_verified: true
+    licence: © United Nations
+    checked: '2026-10-08'
+  examples:
+  - A councillor votes on rezoning land owned by his wife's company.
+  - A regulator approves a merger involving a firm in which she holds shares.
+  cases:
+  - name: Darleen Druyun and Michael Sears (Air Force tanker procurement)
+    year: '2004'
+    jurisdiction: United States
+    what_happened: Former Air Force procurement official Druyun admitted favouring Boeing in contract
+      negotiations and said she felt indebted to Boeing for jobs given to her, her daughter and her son-in-law;
+      she was sentenced to nine months. Former Boeing CFO Sears pleaded guilty to aiding and abetting
+      illegal employment negotiations with her while she oversaw Boeing contracts.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://govexec.com/defense/2004/11/ex-boeing-cfo-pleads-guilty-in-air-force-procurement-scandal/18035
+    source_title: Ex-Boeing CFO pleads guilty in Air Force procurement scandal (Government Executive)
+  data_needed:
+  - Person
+  - Occupancy
+  - Position
+  - PublicBody
+  - Ownership
+  - Family
+  - Directorship
+  - Event
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Interest and asset declarations
+  - Meeting minutes and voting records
+  - Company and land registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The OECD notes all officials have legitimate private interests; a declared and managed conflict (recusal,
+    divestment) is not misconduct.
+  - The interest may be too small or remote to matter.
+  jurisdictions: Global
+  version: 1
+- id: CO-029
+  name: Officials or their families gain a stake or job in a contractor
+  definition: Government staff, or their relatives, acquire a financial interest in, or employment with,
+    a contractor or subcontractor working for their agency.
+  areas:
+  - CO
+  typology: Conflict of interest in procurement
+  status: verified
+  sources:
+  - title: '''Red Flags of Corruption'' in World Bank Projects: An Analysis of Infrastructure Contracts
+      (Policy Research Working Paper 5243)'
+    publisher: World Bank (Charles Kenny and Maria Musatova)
+    year: '2010'
+    url: https://openknowledge.worldbank.org/server/api/core/bitstreams/932903d3-dcb1-5daa-9bbf-bd97c6973476/content
+    locator: '''Analysis of red flags'', category 1, ''Unobservable red flags'''
+    quote: Government personnel or their families acquiring a financial interest or employment in a contractor
+      or subcontractor.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Recommendation of the Council on OECD Guidelines for Managing Conflict of Interest in the Public
+      Service (OECD/LEGAL/0316)
+    publisher: OECD
+    year: '2003'
+    url: https://legalinstruments.oecd.org/public/doc/130/130.en.pdf
+    locator: Annex, 2.2.2(c) 'Contracts'
+    quote: Consider the circumstances in which the preparation, negotiation, management, or enforcement
+      of a contract involving the public organisation could be compromised by a conflict of interest on
+      the part of a public official within the public organisation.
+    quote_verified: true
+    licence: © OECD
+    checked: '2026-10-08'
+  examples:
+  - The project manager's son joins the winning contractor's payroll a month after award.
+  cases: []
+  data_needed:
+  - Employment
+  - Ownership
+  - Family
+  - Person
+  - Company
+  - ContractAward
+  - Occupancy
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Professional networking profiles
+  - Asset declarations
+  - Procurement portals
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Listed by World Bank researchers as a procurement red flag for World Bank-financed contracts.
+    source_url: https://openknowledge.worldbank.org/server/api/core/bitstreams/932903d3-dcb1-5daa-9bbf-bd97c6973476/content
+  innocent_explanations:
+  - Relatives may have joined the firm long before the contract, on merit.
+  - In small sectors, the same few firms employ most specialists.
+  jurisdictions: Global
+  version: 1
+- id: CO-030
+  name: Official negotiates a future job with a party they oversee
+  definition: While still in office, an official discusses employment with a company whose matters they
+    are handling or supervising.
+  areas:
+  - CO
+  typology: Revolving door (exit side)
+  status: verified
+  sources:
+  - title: Recommendation of the Council on OECD Guidelines for Managing Conflict of Interest in the Public
+      Service (OECD/LEGAL/0316)
+    publisher: OECD
+    year: '2003'
+    url: https://legalinstruments.oecd.org/public/doc/130/130.en.pdf
+    locator: Para. 14
+    quote: the negotiation of future employment by a public official prior to leaving public office is
+      widely regarded as a conflict of interest situation.
+    quote_verified: true
+    licence: © OECD
+    checked: '2026-10-08'
+  examples:
+  - Secret meeting at an airport between an Air Force procurement chief and a Boeing executive about a
+    job (Druyun/Sears).
+  cases:
+  - name: Michael Sears guilty plea (Boeing / Druyun)
+    year: '2004'
+    jurisdiction: United States
+    what_happened: Sears pleaded guilty to aiding and abetting illegal employment negotiations, admitting
+      he met Druyun about a Boeing job while she oversaw Boeing contracts and tried to conceal the meetings.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://govexec.com/defense/2004/11/ex-boeing-cfo-pleads-guilty-in-air-force-procurement-scandal/18035
+    source_title: Ex-Boeing CFO pleads guilty in Air Force procurement scandal (Government Executive)
+  data_needed:
+  - Person
+  - Occupancy
+  - Position
+  - Employment (startDate)
+  - Company
+  - Event
+  - Email
+  checkable: person
+  lookup_sources:
+  - Ethics office recusal letters
+  - Professional profiles (new employer, start date)
+  - Emails and calendars
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Job talks may be lawful if the official disclosed them and stepped back from the matter.
+  - Approaches by recruiters the official declined.
+  jurisdictions: Global
+  version: 1
+- id: CO-031
+  name: Former official lobbies former agency during cooling-off
+  definition: A person who recently left public office contacts or represents others before their former
+    agency or colleagues, within the period the law forbids, or on matters they personally handled.
+  areas:
+  - CO
+  typology: Revolving door (post-employment)
+  status: verified
+  sources:
+  - title: 18 U.S. Code § 207 – Restrictions on former officers, employees, and elected officials
+    publisher: Legal Information Institute, Cornell Law School (US Code)
+    year: current
+    url: https://www.law.cornell.edu/uscode/text/18/207
+    locator: § 207(a)(1), (c), (d), (e)
+    quote: within 1 year after the termination of his or her service
+    quote_verified: true
+    licence: US Code (public domain)
+    checked: '2026-10-08'
+  - title: United Nations Convention against Corruption
+    publisher: United Nations Office on Drugs and Crime
+    year: '2004'
+    url: https://www.unodc.org/documents/brussels/UN_Convention_Against_Corruption.pdf
+    locator: Article 12(2)(e)
+    quote: Preventing conflicts of interest by imposing restrictions, as appropriate and for a reasonable
+      period of time, on the professional activities of former public officials
+    quote_verified: true
+    licence: © United Nations
+    checked: '2026-10-08'
+  - title: 'Corruptionary: Revolving door'
+    publisher: Transparency International
+    url: https://www.transparency.org/en/corruptionary/revolving-door
+    locator: Glossary entry
+    quote: the term 'revolving door' refers to the movement of individuals between positions of public
+      office and jobs
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A former senator registers as a lobbyist and meets former Senate colleagues within two years of leaving.
+  - A former agency head represents a company before the same agency within a year.
+  cases: []
+  data_needed:
+  - Person
+  - Occupancy (periodEnd)
+  - Position
+  - Employment
+  - Representation
+  - Event
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - Lobbying registers (US LDA filings, EU Transparency Register)
+  - Government biographies and leaving dates
+  - UK ACOBA advice letters
+  - Meeting logs and ministerial diaries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'US: contact with former agency within 1 year (senior staff, House Members), 2 years (very
+      senior officials, Senators), 2 years for matters under official responsibility, or ever for matters
+      the person handled personally and substantially (18 U.S.C. § 207). Elsewhere: meets local rule as
+      worded.'
+    threshold_source: https://www.law.cornell.edu/uscode/text/18/207
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many post-office jobs are lawful and approved by ethics bodies.
+  - Behind-the-scenes advice (not contact) may be allowed during the cooling-off period.
+  - Contacts on behalf of governments or certain non-profits can be exempt.
+  jurisdictions: US thresholds given; other countries set their own periods
+  version: 1
+- id: CO-032
+  name: Former senior official represents a foreign entity within a year
+  definition: A former senior US official helps or represents a foreign government or party before US
+    officials within a year of leaving office.
+  areas:
+  - CO
+  typology: Revolving door with foreign principal
+  status: verified
+  sources:
+  - title: 18 U.S. Code § 207 – Restrictions on former officers, employees, and elected officials
+    publisher: Legal Information Institute, Cornell Law School (US Code)
+    year: current
+    url: https://www.law.cornell.edu/uscode/text/18/207
+    locator: § 207(f)
+    quote: represents a foreign entity before any officer or employee of any department or agency of the
+      United States
+    quote_verified: true
+    licence: US Code (public domain)
+    checked: '2026-10-08'
+  examples:
+  - A cabinet official leaves and within months advises an embassy on lobbying Congress.
+  cases: []
+  data_needed:
+  - Person
+  - Occupancy (periodEnd)
+  - Representation (agent, client)
+  - PublicBody
+  - Organization
+  checkable: lookups
+  lookup_sources:
+  - FARA eFile registrations
+  - Lobbying registers
+  - Official biographies
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'US: within 1 year of leaving a position covered by 18 U.S.C. § 207(c), (d) or (e).'
+    threshold_source: https://www.law.cornell.edu/uscode/text/18/207
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Work for a foreign entity that involves no contact with US officials.
+  - Representation of allied governments that was cleared by ethics officials after the period ended.
+  jurisdictions: United States
+  version: 1
+- id: CO-033
+  name: Official sits on the board of an entity dealing with their agency
+  definition: A public official holds an outside board or controlling role in an organisation that has
+    contracts, regulation or sponsorship with their own agency.
+  areas:
+  - CO
+  typology: Outside appointments
+  status: verified
+  sources:
+  - title: Recommendation of the Council on OECD Guidelines for Managing Conflict of Interest in the Public
+      Service (OECD/LEGAL/0316)
+    publisher: OECD
+    year: '2003'
+    url: https://legalinstruments.oecd.org/public/doc/130/130.en.pdf
+    locator: Annex, 2.2.2(f) ''Outside' appointments'
+    quote: a commercial organisation which is involved in a contractual, regulatory, partnership, or sponsorship
+      arrangement with their employing organisation.
+    quote_verified: true
+    licence: © OECD
+    checked: '2026-10-08'
+  examples:
+  - A health ministry director is a board member of a drug distributor that supplies the ministry.
+  cases: []
+  data_needed:
+  - Directorship
+  - Person
+  - Occupancy
+  - Company
+  - Organization
+  - Contract
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - Company registries (directors)
+  - Charity registers
+  - Interest declarations
+  - Procurement portals
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ex officio seats on state-owned enterprise or partner boards are often part of the job.
+  - The appointment may have been authorised with safeguards.
+  jurisdictions: Global
+  version: 1
+- id: CO-034
+  name: Unregistered agent of a foreign principal
+  definition: A person acts in the US for a foreign government, party or person, for example by lobbying
+    officials or influencing public opinion, without registering and disclosing it as required.
+  areas:
+  - CO
+  typology: Undisclosed foreign influence
+  status: verified
+  sources:
+  - title: FARA Frequently Asked Questions
+    publisher: U.S. Department of Justice, National Security Division
+    url: https://www.justice.gov/nsd-fara/frequently-asked-questions
+    locator: '''What does FARA require?'''
+    quote: FARA requires the registration of, and disclosures by, an 'agent of a foreign principal'
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  examples:
+  - A businessman arranges meetings for a foreign government's officials with a senator while being paid
+    by that government's allies.
+  - A lobbyist paid by an overseas political party who has not filed under FARA or the LDA.
+  cases:
+  - name: United States v. Robert Menendez, Wael Hana and Fred Daibes
+    year: '2024'
+    jurisdiction: United States
+    what_happened: Convicted on all charges in a bribery and foreign influence scheme, including a conspiracy
+      for Menendez to act as an agent of Egypt.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/nsd-fara/recent-cases
+    source_title: Recent FARA Cases (DOJ NSD)
+  - name: United States v. Prakazrel 'Pras' Michel
+    year: '2023'
+    jurisdiction: United States
+    what_happened: A federal jury in Washington, D.C. convicted Michel on unregistered-agent and related
+      counts.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/nsd-fara/recent-cases
+    source_title: Recent FARA Cases (DOJ NSD)
+  - name: United States v. Elliott Broidy
+    year: '2020'
+    jurisdiction: United States
+    what_happened: Pleaded guilty to one count of conspiracy to violate FARA.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/nsd-fara/recent-cases
+    source_title: Recent FARA Cases (DOJ NSD)
+  - name: United States v. Thomas Barrack
+    year: '2022'
+    jurisdiction: United States
+    what_happened: Charged with acting as an illegal agent of the UAE; acquitted at trial. Shows the pattern
+      alone is not proof.
+    outcome: acquitted
+    outcome_verified: true
+    source_url: https://www.justice.gov/nsd-fara/recent-cases
+    source_title: Recent FARA Cases (DOJ NSD)
+  data_needed:
+  - Person
+  - Representation (agent, client)
+  - Organization
+  - PublicBody
+  - Payment
+  - Event
+  - Email
+  checkable: lookups
+  lookup_sources:
+  - FARA eFile database
+  - US LDA lobbying disclosures
+  - Court records
+  - Meeting logs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Agents properly registered under the LDA are exempt from FARA unless a foreign government or political
+    party is the principal beneficiary.
+  - Some commercial and academic activities are exempt.
+  - Late but voluntary registration after legal advice.
+  jurisdictions: 'United States (similar schemes: UK Foreign Influence Registration Scheme, Australia
+    FITS)'
+  version: 1
+- id: CO-035
+  name: Foreign-sponsored material without the required label
+  definition: Political or informational material distributed for a foreign principal does not carry the
+    disclosure statement saying who is behind it.
+  areas:
+  - CO
+  typology: Undisclosed foreign influence
+  status: verified
+  sources:
+  - title: FARA Frequently Asked Questions
+    publisher: U.S. Department of Justice, National Security Division
+    url: https://www.justice.gov/nsd-fara/frequently-asked-questions
+    locator: Informational materials labeling
+    quote: This material is distributed by (name of registrant) on behalf of (name of foreign principal).
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  examples:
+  - Op-eds, ads or social posts placed by a registered agent without the statement.
+  cases: []
+  data_needed:
+  - Document
+  - Representation
+  - Person
+  - Organization
+  - Payment
+  checkable: records
+  lookup_sources:
+  - FARA eFile informational materials filings
+  - Ad libraries (Meta, Google)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Material not produced at the foreign principal's direction.
+  - Labels lost when content is reshared by others.
+  jurisdictions: United States
+  version: 1
+- id: CO-036
+  name: Political contributions before or after government business (pay-to-play)
+  definition: A firm, or its executives, makes political donations to officials who can award it government
+    business around the time it seeks or wins that business.
+  areas:
+  - CO
+  typology: Pay-to-play
+  status: verified
+  sources:
+  - title: 17 CFR § 275.206(4)-5 – Political contributions by certain investment advisers
+    publisher: Legal Information Institute, Cornell Law School (Code of Federal Regulations)
+    year: current
+    url: https://www.law.cornell.edu/cfr/text/17/275.206(4)-5
+    locator: Para. (a)(1) and (b)(1)
+    quote: to provide investment advisory services for compensation to a government entity within two
+      years after a contribution
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  - title: 'Corruptionary: Political contribution'
+    publisher: Transparency International
+    url: https://www.transparency.org/en/corruptionary/political-contribution
+    locator: Glossary entry
+    quote: Any contribution, made in cash or in kind, to support a political cause.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An asset manager's partners donate to a state treasurer who then awards the firm a pension mandate.
+  - Construction-firm executives give to a mayor's campaign weeks before a contract award.
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, date, amount)
+  - Person
+  - Company
+  - Employment
+  - Directorship
+  - ContractAward (date, authority)
+  - Occupancy
+  checkable: lookups
+  lookup_sources:
+  - Campaign finance databases (e.g. FEC, state election boards)
+  - Procurement portals
+  - Company registries for executives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'US investment advisers: a contribution by the firm or a covered associate above the de
+      minimis limits ($350 per official per election if able to vote for them, $150 otherwise) followed
+      by paid advisory business with that government entity within two years (SEC Rule 206(4)-5). Elsewhere:
+      meets local rule as worded.'
+    threshold_source: https://www.law.cornell.edu/cfr/text/17/275.206(4)-5
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Executives donate to candidates they genuinely support, often across many races.
+  - Contracts may be awarded by independent boards on objective scores.
+  - Timing can be coincidental in places with frequent elections.
+  jurisdictions: Global concept; numeric threshold is US (investment advisers only)
+  version: 1
+- id: CO-037
+  name: Firm's political connections change its share of contracts
+  definition: A company whose directors are connected to the party in power wins notably more government
+    contracts after that party gains control, and loses them when it loses power.
+  areas:
+  - CO
+  typology: Political connections / cronyism
+  status: verified
+  sources:
+  - title: Politically Connected Boards of Directors and the Allocation of Procurement Contracts (Review
+      of Finance 17(5):1617-1648)
+    publisher: Eitan Goldman, Jörg Rocholl and Jongil So (Oxford University Press)
+    year: '2013'
+    url: https://ideas.repec.org/a/oup/revfin/v17y2013i5p1617-1648.html
+    locator: Abstract
+    quote: companies with boards connected to the winning (losing) party experience a significant and
+      large increase (decrease)
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - After an election, a firm whose chair is a former minister of the winning party sees its contract
+    wins triple.
+  cases: []
+  data_needed:
+  - Company
+  - Directorship
+  - Person
+  - Membership (political party)
+  - Occupancy
+  - ContractAward (date, amount, authority)
+  - Event (election)
+  checkable: lookups
+  lookup_sources:
+  - Procurement portals (award histories)
+  - Company registries (directors)
+  - Political party and candidate records
+  - Election results
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Policy changes after an election can shift spending to sectors where connected firms happen to operate.
+  - Connected directors may be appointed because the firm already expected growth.
+  - The study shows a statistical pattern across firms, not wrongdoing by any one company.
+  jurisdictions: Research based on the United States; pattern used globally
+  version: 1
+- id: CO-038
+  name: Lobbyist gives things of value to officials for official acts
+  definition: A lobbyist or client provides trips, meals, jobs, tickets or donations to an official, who
+    in return takes official action for the lobbyist's clients.
+  areas:
+  - CO
+  typology: Corrupt lobbying; honest services fraud
+  status: verified
+  sources:
+  - title: Former Lobbyist Jack Abramoff Pleads Guilty to Charges Involving Corruption, Fraud Conspiracy
+      and Tax Evasion
+    publisher: U.S. Department of Justice
+    year: '2006'
+    url: https://www.justice.gov/archive/opa/pr/2006/January/06_crm_002.html
+    locator: Press release, 3 January 2006
+    quote: in exchange for these things of value, Scanlon and Abramoff sought and received the Representative's
+      agreement
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  - title: 'Corruptionary: Lobbying'
+    publisher: Transparency International
+    url: https://www.transparency.org/en/corruptionary/lobbying
+    locator: Glossary entry
+    quote: Any activity carried out to influence a government or institution's policies and decisions
+      in favour of a specific cause
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A golf trip for a congressman paid by a lobbying firm, followed by statements in the Congressional
+    Record for its clients.
+  cases:
+  - name: United States v. Jack Abramoff
+    year: '2006'
+    jurisdiction: United States
+    what_happened: Abramoff pleaded guilty to conspiracy, honest-services mail fraud and tax evasion;
+      DOJ said he and Michael Scanlon gave things of value to a Representative in exchange for his agreement
+      to take official actions.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archive/opa/pr/2006/January/06_crm_002.html
+    source_title: Former Lobbyist Jack Abramoff Pleads Guilty
+  data_needed:
+  - Payment
+  - Trip
+  - Person
+  - Occupancy
+  - Representation (agent, client)
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - Lobbying disclosure filings (gifts, contributions sections)
+  - Congressional or parliamentary gift and travel registers
+  - Legislative records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful, disclosed and capped hospitality permitted by ethics rules.
+  - Officials may support the same cause independently of any benefit.
+  jurisdictions: Global (US case)
+  version: 1
+- id: CO-039
+  name: Private interests shape laws or decrees for their own benefit (state capture)
+  definition: Firms or individuals use payments or connections to shape the rules themselves (laws, decrees,
+    regulations, appointments) so that the state works for them.
+  areas:
+  - CO
+  typology: State capture
+  status: verified
+  sources:
+  - title: '''Seize the State, Seize the Day'': State Capture, Corruption, and Influence in Transition
+      (Policy Research Working Paper 2444)'
+    publisher: World Bank (Joel Hellman, Geraint Jones, Daniel Kaufmann)
+    year: '2000'
+    url: https://openknowledge.worldbank.org/entities/publication/e7ff924b-ec49-5019-94ce-75431ee93337/full
+    locator: Abstract
+    quote: shaping, and affecting formulation of the rules of the game through private payments to public
+      officials
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A businessperson's own lawyers draft the decree that authorises a project her companies benefit from
+    (as reported in the Luanda Leaks).
+  - Private associates of a ruling family influence ministerial and state-company appointments (subject
+    of South Africa's State Capture Commission).
+  cases:
+  - name: Judicial Commission of Inquiry into Allegations of State Capture (Zondo Commission), Report
+      Part 1
+    year: '2022'
+    jurisdiction: South Africa
+    what_happened: In Part 1, Vol. 1 (p. 28-31) the Commission recorded testimony that Tony Gupta offered
+      bribes to people who dealt with him, and found that SAA's then acting CEO Mr Kona's version of what
+      happened at a meeting with Tony Gupta 'is the truth'; it also found a steady decline in SAA governance
+      from 2012.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.gov.za/sites/default/files/gcis_speech/Judicial%20Commission%20of%20Inquiry%20into%20State%20Capture%20Report_Part%201.pdf
+    source_title: Judicial Commission of Inquiry into State Capture Report, Part 1
+  - name: 'Luanda Leaks: decree drafted by Isabel dos Santos''s lawyers'
+    year: '2020'
+    jurisdiction: Angola
+    what_happened: ICIJ reported emails showing her Portuguese lawyers helped draft a 2015 presidential
+      decree authorising a Luanda redevelopment project her companies stood to benefit from; she denies
+      wrongdoing.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.icij.org/investigations/luanda-leaks/how-africas-richest-woman-exploited-family-ties-shell-companies-and-inside-deals-to-build-an-empire/
+    source_title: How Africa's richest woman exploited family ties, shell companies and inside deals to
+      build an empire (ICIJ)
+  data_needed:
+  - Document (laws, decrees, drafts)
+  - Email
+  - Person
+  - Company
+  - Associate
+  - Family
+  - Occupancy
+  - Position
+  - PublicBody
+  - Event
+  checkable: person
+  lookup_sources:
+  - Official gazettes and legislative histories
+  - Document metadata and leaked drafts
+  - Commission of inquiry reports
+  - Lobbying registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Industry routinely comments on draft rules through open consultation.
+  - Governments sometimes ask outside lawyers to draft legislation.
+  - Hellman et al. separate 'influence' (the same shaping without payments), which can be lawful lobbying.
+  jurisdictions: Global
+  version: 1
+- id: CO-040
+  name: Official gives jobs or favours to relatives or friends (nepotism)
+  definition: Someone in an official position uses their power to give a job, contract or other favour
+    to a family member or friend, whether or not they are qualified.
+  areas:
+  - CO
+  typology: Nepotism
+  status: verified
+  sources:
+  - title: 'E4J Secondary Education: Anti-Corruption, Teacher''s Guide - Glossary'
+    publisher: United Nations Office on Drugs and Crime
+    url: https://www.unodc.org/documents/e4j/Secondary/Anti-Corruption_Glossary.pdf
+    locator: Glossary, 'Nepotism'
+    quote: someone in an official position exploits his or her power and authority to provide a job or
+      a special favour to a family member or friend, even though he or she may not be qualified or deserving.
+    quote_verified: true
+    licence: © United Nations
+    checked: '2026-10-08'
+  - title: 'Corruptionary: Nepotism'
+    publisher: Transparency International
+    url: https://www.transparency.org/en/corruptionary/nepotism
+    locator: Glossary entry
+    quote: Form of favouritism based on acquaintances and familiar relationships
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A mayor's nephew is hired as head of a municipal department with no relevant experience.
+  - A state company's CEO appoints her spouse's firm as sole supplier.
+  cases: []
+  data_needed:
+  - Family
+  - Associate
+  - Employment
+  - Person
+  - Occupancy
+  - Position
+  - PublicBody
+  - ContractAward
+  checkable: lookups
+  lookup_sources:
+  - Public payroll and appointment records
+  - Civil registries, social media
+  - Company registries
+  - Procurement portals
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The relative may have been chosen by an independent panel on merit.
+  - In small towns, family links between staff are common and unavoidable.
+  jurisdictions: Global
+  version: 1
+- id: CO-041
+  name: Appointment regardless of qualifications (patronage)
+  definition: A person is given a public job or benefit because of personal or political ties rather than
+    qualifications or entitlement.
+  areas:
+  - CO
+  typology: Patronage / clientelism
+  status: verified
+  sources:
+  - title: 'Corruptionary: Patronage'
+    publisher: Transparency International
+    url: https://www.transparency.org/en/corruptionary/patronage
+    locator: Glossary entry
+    quote: Form of favouritism in which a person is selected, regardless of qualifications or entitlement,
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'E4J Secondary Education: Anti-Corruption, Teacher''s Guide - Glossary'
+    publisher: United Nations Office on Drugs and Crime
+    url: https://www.unodc.org/documents/e4j/Secondary/Anti-Corruption_Glossary.pdf
+    locator: Glossary, 'Clientelism'
+    quote: 'Clientelism: the exchange of personal favours for political support.'
+    quote_verified: true
+    licence: © United Nations
+    checked: '2026-10-08'
+  examples:
+  - Party campaign staff appointed to state-company boards right after an election.
+  cases: []
+  data_needed:
+  - Person
+  - Occupancy
+  - Position
+  - Membership
+  - Employment
+  - Event
+  checkable: person
+  lookup_sources:
+  - Government gazettes and appointment notices
+  - CVs and professional profiles
+  - Party records and campaign finance filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many senior posts are legitimately political appointments.
+  - Qualification standards may be unpublished or hard to compare.
+  jurisdictions: Global
+  version: 1
+- id: CO-042
+  name: Too few bidders or a single bidder
+  definition: A competitive tender attracts very few bids, or only one, which can mean the process was
+    steered to a chosen winner.
+  areas:
+  - CO
+  - PP
+  typology: Procurement manipulation
+  status: verified
+  sources:
+  - title: '''Red Flags of Corruption'' in World Bank Projects: An Analysis of Infrastructure Contracts
+      (Policy Research Working Paper 5243)'
+    publisher: World Bank (Charles Kenny and Maria Musatova)
+    year: '2010'
+    url: https://openknowledge.worldbank.org/server/api/core/bitstreams/932903d3-dcb1-5daa-9bbf-bd97c6973476/content
+    locator: Table 3 (red flags and results)
+    quote: Less than four bidders
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Uncovering High-Level Corruption: Cross-National Objective Corruption Risk Indicators Using
+      Public Procurement Data (British Journal of Political Science)'
+    publisher: Mihály Fazekas and Gábor Kocsis (Cambridge University Press)
+    year: '2020'
+    url: https://www.cambridge.org/core/journals/british-journal-of-political-science/article/uncovering-highlevel-corruption-crossnational-objective-corruption-risk-indicators-using-public-procurement-data/8A1742693965AA92BE4D2BA53EADFDF0
+    locator: Abstract
+    quote: two objective proxy measures of high-level corruption in public procurement
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A road contract in a market with dozens of firms receives one bid.
+  cases: []
+  data_needed:
+  - CallForTenders
+  - ContractAward
+  - Contract
+  - Company
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - Procurement portals and open contracting data (OCDS)
+  - Tender documents
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Fewer than four bids received (Kenny & Musatova 2010, Table 3); single bidding in a competitive
+      market is a published proxy (Fazekas & Kocsis).
+    threshold_source: https://openknowledge.worldbank.org/server/api/core/bitstreams/932903d3-dcb1-5daa-9bbf-bd97c6973476/content
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Few bids can also signal bid-rigging among firms (collusion), not only official corruption.
+    source_url: https://openknowledge.worldbank.org/server/api/core/bitstreams/932903d3-dcb1-5daa-9bbf-bd97c6973476/content
+  innocent_explanations:
+  - Specialised or very small markets with few capable suppliers.
+  - Unattractive terms, remote locations or high risk deter bidders.
+  - Busy markets where firms have full order books.
+  jurisdictions: Global (World Bank-financed contracts in the study)
+  version: 1
+- id: CO-043
+  name: Short time to bid
+  definition: The time between advertising a tender and opening bids is very short, which favours a bidder
+    who knew in advance.
+  areas:
+  - CO
+  - PP
+  typology: Procurement manipulation
+  status: verified
+  sources:
+  - title: '''Red Flags of Corruption'' in World Bank Projects: An Analysis of Infrastructure Contracts
+      (Policy Research Working Paper 5243)'
+    publisher: World Bank (Charles Kenny and Maria Musatova)
+    year: '2010'
+    url: https://openknowledge.worldbank.org/server/api/core/bitstreams/932903d3-dcb1-5daa-9bbf-bd97c6973476/content
+    locator: Table 3 (red flag 1)
+    quote: less than 6 weeks for ICB, less than 4 weeks for NCB
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An international tender advertised for 10 days over a holiday period.
+  cases: []
+  data_needed:
+  - CallForTenders (publicationDate, submissionDeadline)
+  - ContractAward
+  - PublicBody
+  checkable: records
+  lookup_sources:
+  - Procurement portals (notice and deadline dates)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Under 6 weeks for international competitive bidding, under 4 weeks for national competitive
+      bidding (Kenny & Musatova 2010, Table 3).
+    threshold_source: https://openknowledge.worldbank.org/server/api/core/bitstreams/932903d3-dcb1-5daa-9bbf-bd97c6973476/content
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine emergencies (disasters, health crises).
+  - Repeat tenders where bidders already know the specification.
+  jurisdictions: World Bank-financed contracts (study); national rules vary
+  version: 1
+- id: CO-044
+  name: Lowest bidder disqualified
+  definition: The cheapest bid is rejected as non-responsive or disqualified, letting a more expensive
+    bidder win.
+  areas:
+  - CO
+  - PP
+  typology: Procurement manipulation
+  status: verified
+  sources:
+  - title: '''Red Flags of Corruption'' in World Bank Projects: An Analysis of Infrastructure Contracts
+      (Policy Research Working Paper 5243)'
+    publisher: World Bank (Charles Kenny and Maria Musatova)
+    year: '2010'
+    url: https://openknowledge.worldbank.org/server/api/core/bitstreams/932903d3-dcb1-5daa-9bbf-bd97c6973476/content
+    locator: Annex, Table A1
+    quote: Improperly disqualifying or discarding the bid or proposal of a contractor (World Bank, 2006).
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The lowest bid is rejected for a missing stamp on one page while the winner's similar error is waived.
+  cases: []
+  data_needed:
+  - CallForTenders
+  - ContractAward
+  - Company
+  - Document
+  checkable: records
+  lookup_sources:
+  - Bid evaluation reports
+  - Procurement complaint and review bodies
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The lowest bid really failed mandatory requirements.
+  - Abnormally low bids can be rejected lawfully as unrealistic.
+  jurisdictions: Global
+  version: 1
+- id: CO-045
+  name: Long delay between award and signing
+  definition: Months pass between the decision to award and signing the contract, which researchers note
+    can reflect side negotiations over kickbacks.
+  areas:
+  - CO
+  - PP
+  typology: Kickback negotiation
+  status: verified
+  sources:
+  - title: '''Red Flags of Corruption'' in World Bank Projects: An Analysis of Infrastructure Contracts
+      (Policy Research Working Paper 5243)'
+    publisher: World Bank (Charles Kenny and Maria Musatova)
+    year: '2010'
+    url: https://openknowledge.worldbank.org/server/api/core/bitstreams/932903d3-dcb1-5daa-9bbf-bd97c6973476/content
+    locator: Contract award discussion (Table 3 commentary)
+    quote: Extended negotiations may arise due to side negotiations centering on kickbacks.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A contract awarded in January is signed in July with changed terms.
+  cases: []
+  data_needed:
+  - ContractAward (date)
+  - Contract (signingDate)
+  - PublicBody
+  - Company
+  checkable: records
+  lookup_sources:
+  - Procurement portals (award and signing dates)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: More than three months from award to signing (Kenny & Musatova 2010, red flag 5).
+    threshold_source: https://openknowledge.worldbank.org/server/api/core/bitstreams/932903d3-dcb1-5daa-9bbf-bd97c6973476/content
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Funding approvals, legal reviews or complaints can delay signing.
+  - Complex contracts need long technical negotiation.
+  jurisdictions: World Bank-financed contracts (study)
+  version: 1
+- id: CO-046
+  name: Final contract value far above award
+  definition: The final amount paid on a contract grows far beyond the awarded price through amendments
+    or extras.
+  areas:
+  - CO
+  - PP
+  typology: Post-award inflation
+  status: verified
+  sources:
+  - title: '''Red Flags of Corruption'' in World Bank Projects: An Analysis of Infrastructure Contracts
+      (Policy Research Working Paper 5243)'
+    publisher: World Bank (Charles Kenny and Maria Musatova)
+    year: '2010'
+    url: https://openknowledge.worldbank.org/server/api/core/bitstreams/932903d3-dcb1-5daa-9bbf-bd97c6973476/content
+    locator: Red flag 12 (Table 2, Table 3 and text)
+    quote: 30 percent or more
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A $10 million bridge contract ends at $16 million after repeated variation orders.
+  cases: []
+  data_needed:
+  - ContractAward (amount)
+  - Contract (amount)
+  - Payment
+  - Document (amendments)
+  checkable: records
+  lookup_sources:
+  - Procurement portals (amendments)
+  - Audit office reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Final contract amount 30% or more above the award amount (Kenny & Musatova 2010, red flag
+      12). Note: the paper''s tables and text differ slightly on some thresholds.'
+    threshold_source: https://openknowledge.worldbank.org/server/api/core/bitstreams/932903d3-dcb1-5daa-9bbf-bd97c6973476/content
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Inflated billings to the US Navy were part of the Francis bribery scheme.
+    source_url: https://www.justice.gov/opa/pr/defense-contractor-and-its-ceo-plead-guilty-corruption-conspiracy-involving-scores-navy
+  innocent_explanations:
+  - Unforeseen ground conditions, design changes or inflation.
+  - Scope added by the buyer for good reasons.
+  jurisdictions: World Bank-financed contracts (study)
+  version: 1
+- id: CO-047
+  name: Pressure on bid evaluation committee
+  definition: Members of a tender evaluation committee are pressured by officials, politicians or bidders
+    to favour a particular bidder.
+  areas:
+  - CO
+  - PP
+  typology: Undue influence in procurement
+  status: verified
+  sources:
+  - title: '''Red Flags of Corruption'' in World Bank Projects: An Analysis of Infrastructure Contracts
+      (Policy Research Working Paper 5243)'
+    publisher: World Bank (Charles Kenny and Maria Musatova)
+    year: '2010'
+    url: https://openknowledge.worldbank.org/server/api/core/bitstreams/932903d3-dcb1-5daa-9bbf-bd97c6973476/content
+    locator: '''Unobservable red flags'''
+    quote: Identification of pressures on Bid Evaluation Committee members.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Committee members report calls from a minister's office before scoring.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Email
+  - Document
+  - CallForTenders
+  checkable: person
+  lookup_sources:
+  - Interviews with committee members
+  - Internal complaints and whistleblower reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate supervision or requests to speed up evaluation.
+  - Disgruntled losing bidders may allege pressure without basis.
+  jurisdictions: Global
+  version: 1
+- id: CO-048
+  name: Kickback within a contracting chain
+  definition: A subcontractor or supplier gives money or something of value to a prime contractor or its
+    staff to win or reward favourable treatment on a government contract.
+  areas:
+  - CO
+  - PP
+  typology: Kickbacks
+  status: verified
+  sources:
+  - title: 41 U.S. Code § 8701 – Definitions (Anti-Kickback)
+    publisher: Legal Information Institute, Cornell Law School (US Code)
+    year: current
+    url: https://www.law.cornell.edu/uscode/text/41/8701
+    locator: § 8701(2)
+    quote: to improperly obtain or reward favorable treatment in connection with a prime contract
+    quote_verified: true
+    licence: US Code (public domain)
+    checked: '2026-10-08'
+  examples:
+  - A subcontractor pays the prime contractor's project manager 5% of each invoice.
+  cases: []
+  data_needed:
+  - Payment
+  - Contract
+  - Company
+  - Person
+  - Employment
+  checkable: records
+  lookup_sources:
+  - Contractor and subcontractor payment records
+  - Federal procurement data (e.g. USAspending subawards)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Volume rebates and loyalty discounts paid openly to the company (not individuals) and passed to the
+    buyer.
+  - Legitimate referral fees disclosed in the contract.
+  jurisdictions: United States (definition); concept global
+  version: 1
+- id: CO-049
+  name: Request or demand for a bribe (solicitation)
+  definition: An official asks for, orders or encourages a payment or favour in exchange for doing or
+    not doing their job.
+  areas:
+  - CO
+  typology: Passive bribery / solicitation
+  status: verified
+  sources:
+  - title: United Nations Convention against Corruption
+    publisher: United Nations Office on Drugs and Crime
+    year: '2004'
+    url: https://www.unodc.org/documents/brussels/UN_Convention_Against_Corruption.pdf
+    locator: Article 15(b)
+    quote: The solicitation or acceptance by a public official, directly or indirectly, of an undue advantage
+    quote_verified: true
+    licence: © United Nations
+    checked: '2026-10-08'
+  - title: 'Corruptionary: Solicitation'
+    publisher: Transparency International
+    url: https://www.transparency.org/en/corruptionary/solicitation
+    locator: Glossary entry
+    quote: The act of a person asking, ordering or enticing someone else to commit bribery or another
+      crime.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A permit officer tells an applicant the file will move faster after a 'fee' paid in cash.
+  cases: []
+  data_needed:
+  - Person
+  - Occupancy
+  - Email
+  - Document
+  - Event
+  checkable: person
+  lookup_sources:
+  - Whistleblower and complainant accounts
+  - Recordings and messages
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Official, published fees for expedited service.
+  - Misunderstood requests or translations; claims by people with grudges.
+  jurisdictions: Global
+  version: 1
+- id: CO-050
+  name: Influence peddling (trading in influence)
+  definition: Someone is paid to use their real or claimed influence with officials to get an advantage
+    from the state for the payer.
+  areas:
+  - CO
+  typology: Trading in influence
+  status: verified
+  sources:
+  - title: United Nations Convention against Corruption
+    publisher: United Nations Office on Drugs and Crime
+    year: '2004'
+    url: https://www.unodc.org/documents/brussels/UN_Convention_Against_Corruption.pdf
+    locator: Article 18, 'Trading in influence'
+    quote: abuse his or her real or supposed influence with a view to obtaining from an administration
+      or public authority of the State Party an undue advantage
+    quote_verified: true
+    licence: © United Nations
+    checked: '2026-10-08'
+  examples:
+  - A former minister's associate is paid a 'success fee' to get a licence approved, with no registered
+    lobbying.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Representation
+  - Associate
+  - Occupancy
+  - PublicBody
+  - License
+  checkable: person
+  lookup_sources:
+  - Lobbying registers
+  - Payment and contract records
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Registered, transparent lobbying and advocacy are lawful in most countries.
+  - Success fees for legal or technical work on applications.
+  jurisdictions: Global (UNCAC Art. 18 optional; criminalised in e.g. France and Spain)
+  version: 1
+not_reached:
+- 'FinCEN Advisory FIN-2018-A003 red-flag list: the bullets sit in an image box on p. 5 and could not
+  be extracted as text (the rest of the advisory was read).'
+- 'OECD Bribery and Corruption Awareness Handbook for Tax Examiners and Tax Auditors (2013): full PDF
+  blocked by robots.txt; OECD iLibrary chapter pages showed only introductions, not the indicator lists.'
+- 'OECD Foreign Bribery Report (2014): PDF not reachable (404/403); only secondary summaries found, so
+  its statistics (e.g. share of cases using intermediaries) were not used.'
+- 'OECD Recommendation on Transparency and Integrity in Lobbying (OECD-LEGAL-0379): legalinstruments.oecd.org
+  page needs JavaScript; text not read.'
+- 'Transparency International Corruptionary entries for ''state capture'' and ''kickback'': fetch errors;
+  other sources used instead.'
+- Zondo (State Capture) Commission Parts 2-6 (Transnet, Eskom, Denel etc.) and the Part 1 sections on
+  The New Age newspaper were not read; only Part 1 Vol. 1 text was reached.
+- 'World Bank ''Warning Signs of Fraud and Corruption in Procurement'' brochure and World Bank INT ''Fraud
+  and Corruption Awareness Handbook'': PDFs not located/opened.'
+- 'Fazekas & Kocsis full article and appendix (paywalled): only the abstract was read, so their specific
+  red-flag list and thresholds are not included.'
+- 'SFO and CPS DPA guidance pages: robots/fetch errors; DPA defined from the FCPA Resource Guide instead.'
+- 'US DOJ press releases for the Menendez verdict (SDNY) and Manafort plea: fetch errors / not found;
+  Menendez outcome taken from DOJ NSD ''Recent FARA Cases'' page; Manafort not included.'
+- 'Wolfsberg Group PEP guidance and FATF 2011/2012 corruption typology reports: not reached.'
+- 'UK ACOBA business appointment rules (two-year period): about page did not state the period, so no UK
+  threshold was used.'

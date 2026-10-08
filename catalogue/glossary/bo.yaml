@@ -1,0 +1,399 @@
+area: BO
+terms:
+- term: Beneficial owner
+  definition: The real person who ultimately owns or controls a company, trust or asset, or on whose behalf
+    a transaction is made, even if someone else's name is on the papers.
+  examples:
+  - FATF/Egmont 2018, footnote 2, p. 11
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  cases: []
+  related:
+  - Person with significant control (PSC)
+  - Nominee
+  indicators: []
+  areas:
+  - BO
+- term: Legal person
+  definition: Any entity other than a human being that can own property or hold a bank account, such as
+    a company, foundation or partnership.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  cases: []
+  related:
+  - Legal arrangement
+  - Corporate vehicle
+  indicators: []
+  areas:
+  - BO
+- term: Legal arrangement
+  definition: An express trust or similar arrangement, where assets are held by one party for others,
+    without being a separate legal person.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  cases: []
+  related:
+  - Express trust
+  - Legal person
+  indicators: []
+  areas:
+  - BO
+- term: Corporate vehicle
+  definition: OECD/World Bank umbrella term for companies, foundations, trusts and similar structures
+    that can hold assets or money.
+  examples: []
+  source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Shell company
+  definition: A registered company with no independent operations, significant assets, ongoing business
+    or employees; often legitimate, but the most common vehicle for hiding owners.
+  examples:
+  - 'FinCEN: typically no physical presence beyond a mailing address and little to no independent economic
+    value (FIN-2018-A003, p. 4)'
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  cases: []
+  related:
+  - Front company
+  - Shelf company
+  indicators: []
+  areas:
+  - BO
+- term: Front company
+  definition: A fully working business with real income that also serves to hide or mix in illicit money.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  cases: []
+  related:
+  - Shell company
+  indicators: []
+  areas:
+  - BO
+- term: Shelf company
+  definition: A company formed in advance with inactive owners and officers and left dormant, then sold
+    ready-made to a buyer.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  cases: []
+  related:
+  - Shell company
+  - Dormant company
+  indicators: []
+  areas:
+  - BO
+- term: Nominee shareholder
+  definition: The person registered as owner of shares who holds them for the benefit of someone else.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  cases: []
+  related:
+  - Nominee director
+  - Beneficial owner
+  indicators: []
+  areas:
+  - BO
+- term: Nominee director
+  definition: A director appointed to represent the interests of whoever appointed them, sometimes in
+    name only.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  cases: []
+  related:
+  - Nominee shareholder
+  - Mass nominee
+  indicators: []
+  areas:
+  - BO
+- term: Formal (professional) nominee
+  definition: A paid nominee, such as a lawyer, accountant, company-service provider or someone who rents
+    out their identity, who acts as director or shareholder for clients.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  cases: []
+  related:
+  - Mass nominee
+  indicators: []
+  areas:
+  - BO
+- term: Mass nominee
+  definition: A formal nominee who is named as agent for a large number of shell companies.
+  examples: []
+  source_url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Informal nominee / straw man / front man
+  definition: A relative, friend, employee or recruited person whose name is used as owner or director,
+    usually without a contract, and who may claim to be the real owner.
+  examples:
+  - 'Puppet Masters, p. 61: a front man ''usually purports to be the beneficial owner'''
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  cases: []
+  related:
+  - Nominee
+  indicators: []
+  areas:
+  - BO
+- term: Trust and company service provider (TCSP)
+  definition: A business that forms companies, supplies directors or secretaries, provides registered
+    office addresses, or acts as trustee or nominee for clients.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  cases: []
+  related:
+  - Formation agent
+  - Registered agent
+  indicators: []
+  areas:
+  - BO
+- term: Formation agent / nominee incorporation service
+  definition: An intermediary that creates and maintains companies for clients, often also offering registered-agent,
+    mail-forwarding and nominee services.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/AdvisoryOnShells_FINAL.pdf
+  cases: []
+  related:
+  - TCSP
+  indicators: []
+  areas:
+  - BO
+- term: Registered agent / registered office
+  definition: The official address and contact where a company receives legal papers; many companies can
+    share one agent's address.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/AdvisoryOnShells_FINAL.pdf
+  cases: []
+  related:
+  - Mass-registration address
+  indicators: []
+  areas:
+  - BO
+- term: Mass-registration address / mailbox service
+  definition: An address used as the registered office of many companies, usually a service provider's
+    office or mail drop.
+  examples: []
+  source_url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+  cases: []
+  related:
+  - Company factory
+  indicators: []
+  areas:
+  - BO
+- term: Company factory
+  definition: Global Witness term for an address with more than 1,000 companies registered there.
+  examples: []
+  source_url: https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Bearer shares
+  definition: Paper share certificates owned by whoever physically holds them, so ownership can change
+    hands without any record.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Express trust
+  definition: A trust deliberately set up, usually in writing, by which a settlor hands assets to a trustee
+    to manage for beneficiaries.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  cases: []
+  related:
+  - Settlor
+  - Trustee
+  - Beneficiary
+  - Protector
+  indicators: []
+  areas:
+  - BO
+- term: Settlor
+  definition: The person who creates a trust and puts assets into it.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Trustee, beneficiary and protector
+  definition: 'Parties to a trust: the trustee holds and manages the assets, beneficiaries benefit from
+    them, and a protector can oversee the trustee; all should be identified as beneficial owners.'
+  examples: []
+  source_url: https://taxjustice.net/2019/09/06/more-beneficial-ownership-loopholes-to-plug-circular-ownership-control-with-little-ownership-and-companies-as-parties-to-the-trust/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Foundation / private foundation
+  definition: A separate legal entity with no owners or shareholders, run by a board; private foundations
+    serve the founder's or members' purposes.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Person with significant control (PSC)
+  definition: UK term for a company's beneficial owner, usually anyone with more than 25% of shares or
+    votes, the power to appoint most directors, or other significant influence.
+  examples: []
+  source_url: https://www.gov.uk/guidance/people-with-significant-control-pscs
+  cases: []
+  related:
+  - Beneficial owner
+  - No-PSC statement
+  indicators: []
+  areas:
+  - BO
+- term: No-PSC statement
+  definition: A UK filing saying a company has no person with significant control; allowed when nobody
+    passes the thresholds, but open to abuse.
+  examples: []
+  source_url: https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Circular ownership
+  definition: A loop of companies owning each other so the group appears to own itself, hiding the person
+    who really controls it.
+  examples: []
+  source_url: https://taxjustice.net/2019/09/06/more-beneficial-ownership-loopholes-to-plug-circular-ownership-control-with-little-ownership-and-companies-as-parties-to-the-trust/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Fragmented ownership
+  definition: Splitting a stake across chains or holders so no single holding passes the disclosure threshold,
+    even though one person controls the company.
+  examples: []
+  source_url: https://taxjustice.net/2019/09/06/more-beneficial-ownership-loopholes-to-plug-circular-ownership-control-with-little-ownership-and-companies-as-parties-to-the-trust/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Layering (ownership layers)
+  definition: Placing intermediary companies or arrangements between the real owner and the asset; each
+    one is a layer.
+  examples: []
+  source_url: https://taxjustice.net/2020/07/06/exploring-uk-companies-legal-ownership-chains-to-detect-red-flags-and-verify-beneficial-ownership-information/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Secrecy jurisdiction
+  definition: A place offering facilities that let people or entities escape or undermine other countries'
+    laws, using secrecy as the main tool (Tax Justice Network definition).
+  examples: []
+  source_url: https://globalwitness.org/en/campaigns/corruption-and-money-laundering/the-companies-we-keep/
+  cases: []
+  related:
+  - Financial Secrecy Index
+  indicators: []
+  areas:
+  - BO
+- term: Politically exposed person (PEP) / senior foreign political figure
+  definition: A current or former senior official in government, the military, courts, a major party or
+    a state-owned company, plus close family and known close associates.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: PEP facilitator
+  definition: Someone who helps a corrupt official move and hide money, for example by setting up shell
+    companies or buying property for them.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Designated person (sanctions)
+  definition: A person or entity placed on a government sanctions list; their assets are frozen and others
+    are barred from dealing with them.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Round-robin / loan-back
+  definition: Sending money out (often as payment of invoices) to a company the sender secretly controls
+    and bringing it back disguised as a loan.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Off-market sale
+  definition: A private sale of property or shares arranged directly between parties rather than through
+    an open market.
+  examples: []
+  source_url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Disqualified director
+  definition: A person barred by a court or authority from acting as a company director, often after misconduct.
+  examples: []
+  source_url: https://egmontgroup.org/wp-content/uploads/2021/10/FATF-Egmont-Concealment-beneficial-ownership-annex-E.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Suspicious activity report (SAR)
+  definition: A report a bank or other institution must file with its financial intelligence unit when
+    it suspects funds come from crime or a transaction has no lawful purpose.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/advisory/2018-06-12/PEP%20Facilitator%20Advisory_FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Financial intelligence unit (FIU)
+  definition: The national agency that receives and analyses suspicious transaction reports; the Egmont
+    Group is their international network.
+  examples: []
+  source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Concealment%20of%20Beneficial%20Ownership.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Civil forfeiture complaint
+  definition: A lawsuit by the state against property it says is linked to crime; its contents are allegations
+    until a court rules.
+  examples: []
+  source_url: https://www.justice.gov/opa/media/1385611/dl
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO

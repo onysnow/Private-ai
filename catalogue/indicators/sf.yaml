@@ -1,0 +1,3265 @@
+key: SF
+name: Terrorist financing, proliferation financing and sanctions evasion
+scope: 'terrorist financing, proliferation financing, sanctions evasion on land and at sea (deceptive
+  shipping practices: AIS manipulation, ship-to-ship transfers, flag hopping, document falsification,
+  the 2020 US maritime advisory and its 2024 or later updates), export control evasion.'
+indicators:
+- id: SF-001
+  name: Vessel AIS switched off or gaps in transmission (going dark)
+  definition: A ship stops broadcasting its Automatic Identification System signal for a period, especially
+    near high-risk areas, so its movements cannot be followed.
+  areas:
+  - SF
+  typology: Deceptive shipping practice
+  status: verified
+  sources:
+  - title: 'Sanctions Advisory for the Maritime Industry, Energy and Metals Sectors, and Related Communities:
+      Guidance to Address Illicit Shipping and Sanctions Evasion Practices'
+    publisher: US Department of State, Treasury OFAC and US Coast Guard
+    year: '2020'
+    url: https://ofac.treasury.gov/media/37751/download
+    locator: p.2, Deceptive Shipping Practices item 1
+    quote: vessels engaged in illicit activities may also intentionally disable their AIS transponders
+      or manipulate the data transmitted in order to mask their movement.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Sanctions Advisory for the Maritime Industry (Annex A, Guidance for Maritime Insurance Companies)
+    publisher: US Department of State, Treasury OFAC and US Coast Guard
+    year: '2020'
+    url: https://ofac.treasury.gov/media/37751/download
+    locator: Annex A, p.9
+    quote: any significant time period with non-transmission that is not consistent with the International
+      Convention for the Safety of Life at Sea (SOLAS)
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Updated Price Cap Coalition Advisory for the Maritime Oil Industry and Related Sectors
+    publisher: Price Cap Coalition (G7, EU, Australia, New Zealand), published by OFAC
+    year: '2024'
+    url: https://ofac.treasury.gov/media/933506/download
+    locator: 'Increased Risks: Reputational, Logistical, and Financial'
+    quote: Shadow fleet tankers have been observed disabling or manipulating Automatic Identification
+      Systems (AIS) to conceal illicit activity or other information about their voyages.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Report of the Panel of Experts established pursuant to resolution 1874 (2009), S/2019/171
+    publisher: United Nations Security Council
+    year: '2019'
+    url: https://documents.un.org/doc/undoc/gen/n19/028/82/pdf/n1902882.pdf
+    locator: Summary, p.4
+    quote: The manipulation of vessel AIS transmis sions remains an overarching feature of illegal transfers
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The DPRK-flagged bulk carrier Wise Honest had not broadcast AIS since 4 August 2017 despite a March
+    2018 coal voyage (DOJ, 2019).
+  - AIS goes silent for several days while a tanker is in an area used for ship-to-ship transfers, then
+    reappears with a full cargo.
+  cases:
+  - name: United States v. M/V Wise Honest (civil forfeiture)
+    year: '2019'
+    jurisdiction: United States (S.D.N.Y.)
+    what_happened: The US seized a North Korean bulk carrier used to export coal; DOJ stated it had not
+      broadcast AIS since August 2017, used false paperwork on nationality and coal origin, and paid over
+      $750,000 through US banks. The 2019 release reports a forfeiture complaint, not a judgment.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/north-korean-cargo-vessel-connected-sanctions-violations-seized-us-government
+    source_title: North Korean Cargo Vessel Connected to Sanctions Violations Seized by U.S. Government
+  data_needed:
+  - Vessel (imoNumber, mmsi, flag, name)
+  - Vessel position history from ship tracking (outside FtM)
+  - Address (ports, areas)
+  - Ownership (owner, asset Vessel)
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - AIS ship tracking services (commercial or open)
+  - LRIT data where accessible to flag registries
+  - Satellite imagery
+  - IMO GISIS ship database
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded: non-transmission inconsistent with SOLAS, or
+      a pattern of turning AIS off inconsistent with SOLAS (2020 advisory Annex A). No hour threshold
+      is published.'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EN
+    reason: The same AIS gaps are used to hide illegal fishing or unsafe oil transfers; the 2024 advisory
+      ties shadow-fleet practices to oil spill and safety risk.
+    source_url: https://ofac.treasury.gov/media/933506/download
+  innocent_explanations:
+  - Legitimate safety disablement, for example piracy risk (the 2020 advisory and 2024 advisory both acknowledge
+    this).
+  - Poor satellite or terrestrial reception coverage in remote waters.
+  - Equipment failure or maintenance.
+  - Data gaps in the tracking provider rather than on the ship.
+  jurisdictions: Global; SOLAS requires AIS on certain classes of ships on international voyages
+  version: 1
+- id: SF-002
+  name: 'AIS spoofing: ship broadcasts a false identity or position'
+  definition: The ship's AIS transmits a different name, IMO number, MMSI or location than its real one,
+    so it looks like another ship or seems to be somewhere else.
+  areas:
+  - SF
+  typology: Deceptive shipping practice
+  status: verified
+  sources:
+  - title: Guidance to Address Illicit Shipping and Sanctions Evasion Practices
+    publisher: US Department of State, Treasury OFAC and US Coast Guard
+    year: '2020'
+    url: https://ofac.treasury.gov/media/37751/download
+    locator: p.2, item 1
+    quote: The practice of manipulating AIS data, referred to as “spoofing,” allows ships to broadcast
+      a different name, International Maritime Organization (IMO) number (a unique, seven-digit vessel
+      identification code), Maritime Mobile Service Identity (MMSI), or other identifying information.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Updated Price Cap Coalition Advisory
+    publisher: Price Cap Coalition
+    year: '2024'
+    url: https://ofac.treasury.gov/media/933506/download
+    locator: Recommendation 3
+    quote: Industry stakeholders should also vigilantly monitor irregular AIS patterns or data that are
+      inconsistent with actual ship locations.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: UN Panel of Experts report S/2019/171
+    publisher: United Nations Security Council
+    year: '2019'
+    url: https://documents.un.org/doc/undoc/gen/n19/028/82/pdf/n1902882.pdf
+    locator: Summary, p.4
+    quote: The disguising of vessels through ship identity theft and false Automatic Identification System
+      (AIS) transmissions is not being taken into account by most global and regional commodity trading
+      companies, banks and insurers
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Two ships broadcast the same IMO number at once in different oceans.
+  - A tanker's AIS shows it anchored offshore while satellite imagery shows it at a sanctioned port.
+  cases:
+  - name: Suez Rajan Limited (Iranian oil)
+    year: '2023'
+    jurisdiction: United States (D.D.C.)
+    what_happened: Suez Rajan Limited pleaded guilty to conspiring to violate IEEPA over Iranian oil;
+      DOJ stated participants tried to disguise the oil's origin using ship-to-ship transfers, false automatic
+      identification system reporting and falsified documents. Fine of nearly $2.5 million and three years'
+      corporate probation.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/justice-department-announces-first-criminal-resolution-involving-illicit-sale-and-transport
+    source_title: Justice Department Announces First Criminal Resolution Involving Illicit Sale and Transport
+      of Iranian Oil in Violation of U.S. Sanctions
+  data_needed:
+  - Vessel (imoNumber, mmsi, callSign, name, flag)
+  - Position history (ship tracking)
+  - Document (bills of lading, port records)
+  checkable: lookups
+  lookup_sources:
+  - AIS tracking history
+  - Satellite imagery (optical or radar)
+  - IMO GISIS
+  - LRIT via flag registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Data entry errors in AIS settings by crew.
+  - GPS jamming or interference in conflict areas that shifts reported positions.
+  - Duplicate MMSI numbers assigned in error.
+  - Tracking-provider merging errors.
+  jurisdictions: Global
+  version: 1
+- id: SF-003
+  name: 'Ship identity altered: painted-over name or IMO number, identity theft or identity laundering'
+  definition: A ship's painted name or IMO number is hidden or changed, it uses another ship's identity,
+    or its owners obtain a new identity number to escape detection.
+  areas:
+  - SF
+  typology: Deceptive shipping practice
+  status: verified
+  sources:
+  - title: Guidance to Address Illicit Shipping and Sanctions Evasion Practices
+    publisher: US Department of State, Treasury OFAC and US Coast Guard
+    year: '2020'
+    url: https://ofac.treasury.gov/media/37751/download
+    locator: p.2, item 2
+    quote: Vessels involved in illicit activities have often painted over vessel names and IMO numbers
+      to obscure their identities and pass themselves off as different vessels.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: UN Panel of Experts report S/2019/171
+    publisher: United Nations Security Council
+    year: '2019'
+    url: https://documents.un.org/doc/undoc/gen/n19/028/82/pdf/n1902882.pdf
+    locator: Summary, p.4
+    quote: The Panel inspected seized vessels engaged in prohibited coal trades, documenting ship identity
+      laundering, whereby the owners had deceived IMO into providing new vessel identity numbers to avoid
+      repeat detection.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Updated Price Cap Coalition Advisory
+    publisher: Price Cap Coalition
+    year: '2024'
+    url: https://ofac.treasury.gov/media/933506/download
+    locator: Recommendation 10
+    quote: owners and operators of sanctioned vessels may attempt to engage in deceptive practices to
+      obfuscate their status, such as renaming, reflagging, obscuring their IMO number, or falsifying
+      documents
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Photographs show a hull name freshly painted over and a different name welded on.
+  - A ship with a newly issued IMO number has the same build year, tonnage and shape as a sanctioned ship
+    that disappeared.
+  cases: []
+  data_needed:
+  - Vessel (imoNumber, name, buildDate, tonnage, pastFlags)
+  - Document (photos, port state control records)
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - IMO GISIS ship database
+  - Port state control inspection databases
+  - Ship photo archives and satellite imagery
+  - Sanctions lists (vessel entries)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded. Note: passenger ships of 100 GT and above and
+      cargo ships of 300 GT and above must display name and IMO number (2020 advisory p.2).'
+    threshold_source: https://ofac.treasury.gov/media/37751/download
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: The Panel found owners deceived the IMO to obtain new identity numbers, which is identity
+      fraud against a registry.
+    source_url: https://documents.un.org/doc/undoc/gen/n19/028/82/pdf/n1902882.pdf
+  innocent_explanations:
+  - Legitimate renaming after a sale (the IMO number should stay the same).
+  - Repainting during dry-dock maintenance.
+  - Rust or damage obscuring markings.
+  jurisdictions: Global (IMO ship identification number scheme)
+  version: 1
+- id: SF-004
+  name: Falsified cargo or vessel documents to disguise origin
+  definition: Bills of lading, certificates of origin, invoices or other shipping papers give a false
+    origin, cargo, ship or destination.
+  areas:
+  - SF
+  typology: Deceptive shipping practice / document fraud
+  status: verified
+  sources:
+  - title: Guidance to Address Illicit Shipping and Sanctions Evasion Practices
+    publisher: US Department of State, Treasury OFAC and US Coast Guard
+    year: '2020'
+    url: https://ofac.treasury.gov/media/37751/download
+    locator: p.2, item 3
+    quote: Authorities have found that sanctions evaders have falsified shipping documentation pertaining
+      to petrochemicals, petroleum, petroleum products, or metals (steel, iron) or sand in order to disguise
+      their origin.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance to Address Illicit Shipping and Sanctions Evasion Practices, Annex A
+    publisher: US Department of State, Treasury OFAC and US Coast Guard
+    year: '2020'
+    url: https://ofac.treasury.gov/media/37751/download
+    locator: Annex A, commodity trading guidance, p.15
+    quote: Any indication of manipulated shipping documentation is a red flag for potential illicit activity
+      and should be investigated fully prior to continuing with the transaction.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A certificate of origin says Malaysia but the cargo's chemical profile and the ship's track point
+    to Iran.
+  - Wise Honest paperwork listed false countries for vessel nationality and coal origin (DOJ 2019, alleged).
+  cases:
+  - name: Suez Rajan Limited
+    year: '2023'
+    jurisdiction: United States (D.D.C.)
+    what_happened: Guilty plea to IEEPA conspiracy; DOJ said falsified documents were among the methods
+      used to disguise the Iranian oil's origin.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/justice-department-announces-first-criminal-resolution-involving-illicit-sale-and-transport
+    source_title: DOJ press release, 8 Sept 2023
+  data_needed:
+  - Document (bill of lading, certificate of origin, invoice, packing list)
+  - Vessel
+  - Company (shipper, consignee)
+  - Address (load port, discharge port)
+  - Payment
+  checkable: person
+  lookup_sources:
+  - Ship tracking to compare claimed load port
+  - Customs and trade data
+  - Port call records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: False origin and value on trade documents is a core trade-based laundering method too.
+    source_url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+  innocent_explanations:
+  - Clerical errors or amended bills of lading after a legitimate cargo resale.
+  - Blending of cargoes from several origins.
+  - Switch bills of lading used legitimately in commodity trading to protect supplier identity.
+  jurisdictions: Global
+  version: 1
+- id: SF-005
+  name: Ship-to-ship transfers at night or in high-risk areas
+  definition: Cargo is moved from one ship to another at sea, particularly at night, outside sheltered
+    waters or in areas known for sanctions evasion, hiding where it came from or where it goes.
+  areas:
+  - SF
+  typology: Deceptive shipping practice
+  status: verified
+  sources:
+  - title: Guidance to Address Illicit Shipping and Sanctions Evasion Practices
+    publisher: US Department of State, Treasury OFAC and US Coast Guard
+    year: '2020'
+    url: https://ofac.treasury.gov/media/37751/download
+    locator: p.3, item 4
+    quote: STS transfers—especially at night or in areas determined to be high-risk for sanctions evasion
+      or other illicit activity—are frequently used to evade sanctions by concealing the origin or destination
+      of surreptitiously transferred petroleum, coal, and other material.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Updated Price Cap Coalition Advisory
+    publisher: Price Cap Coalition
+    year: '2024'
+    url: https://ofac.treasury.gov/media/933506/download
+    locator: Recommendation 4
+    quote: While STS transfers (the transfer of cargo between ships at sea) are often conducted for legitimate
+      purposes, such transfers can also be used to conceal the origin or destination of cargo in circumvention
+      of sanctions or other regulations.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: UN Panel of Experts report S/2019/171
+    publisher: United Nations Security Council
+    year: '2019'
+    url: https://documents.un.org/doc/undoc/gen/n19/028/82/pdf/n1902882.pdf
+    locator: Summary, p.4
+    quote: Other methods of evasion include physical disguise of tankers of the Democratic People’s Republic
+      of Korea, the use of small, unregistered vessels, illegal name-changing and other forms of identity
+      fraud, night transfers and the use of additional vessels for transshipment.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Two tankers sit side by side for 20 hours in open water, one with AIS off.
+  - Oil record book does not match the volumes the ship's draught shows were transferred.
+  cases:
+  - name: Suez Rajan Limited
+    year: '2023'
+    jurisdiction: United States (D.D.C.)
+    what_happened: DOJ stated ship-to-ship transfers were used to disguise the origin of Iranian oil;
+      company pleaded guilty.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/justice-department-announces-first-criminal-resolution-involving-illicit-sale-and-transport
+    source_title: DOJ press release, 8 Sept 2023
+  - name: UN Panel of Experts on DPRK, 2019 final report
+    year: '2019'
+    jurisdiction: United Nations
+    what_happened: The Panel reported that illegal ship-to-ship transfers of petroleum products to the
+      DPRK continued, using AIS manipulation, identity fraud and night transfers.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/doc/undoc/gen/n19/028/82/pdf/n1902882.pdf
+    source_title: S/2019/171
+  data_needed:
+  - Vessel (both ships)
+  - Position history
+  - Document (oil record book, MARPOL Annex I STS notification, bills of lading)
+  - Ownership
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - AIS tracking (encounter detection)
+  - Satellite imagery
+  - Coastal state STS notifications
+  - Sanctions lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EN
+    reason: STS transfers outside safe waters carry heightened spill and safety risk.
+    source_url: https://ofac.treasury.gov/media/933506/download
+  innocent_explanations:
+  - Legitimate lightering where ports are too shallow for large ships.
+  - Bunkering (fuel supply) at sea.
+  - Commercial STS hubs operating with proper notifications and AIS on.
+  jurisdictions: Global; UNSCR 2375 (2017) prohibits STS transfers to or from DPRK-flagged vessels (cited
+    in 2020 advisory Annex A)
+  version: 1
+- id: SF-006
+  name: 'Voyage irregularities: indirect routing, unscheduled detours, transit through third countries'
+  definition: A ship takes routes or stops that do not make commercial sense, often through third countries,
+    to hide the cargo's real origin or destination.
+  areas:
+  - SF
+  typology: Deceptive shipping practice
+  status: verified
+  sources:
+  - title: Guidance to Address Illicit Shipping and Sanctions Evasion Practices
+    publisher: US Department of State, Treasury OFAC and US Coast Guard
+    year: '2020'
+    url: https://ofac.treasury.gov/media/37751/download
+    locator: p.3, item 5
+    quote: Malign actors may attempt to disguise the ultimate destination or origin of cargo or recipients
+      by using indirect routing, unscheduled detours, or transit or transshipment of cargo through third
+      countries.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
+    publisher: FATF
+    year: '2021'
+    url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+    locator: para 31, maritime sector risk indicators, pp.20-21
+    quote: Shipment of goods is made in a circuitous fashion (if information is available), including
+      multiple destinations
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A tanker declares Singapore, detours into the Gulf with AIS off, and returns low in the water.
+  cases: []
+  data_needed:
+  - Vessel
+  - Port calls (Address)
+  - Document (voyage charter, bills of lading)
+  checkable: lookups
+  lookup_sources:
+  - Ship tracking
+  - Port call databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Weather, piracy avoidance or emergencies (the 2020 advisory names unsafe ports, extreme weather, emergencies).
+  - Change of buyer mid-voyage.
+  - Canal closures or congestion forcing reroutes.
+  jurisdictions: Global
+  version: 1
+- id: SF-007
+  name: False flag, flag hopping or fraudulent ship registration
+  definition: A ship flies a flag it has no right to, keeps using a flag after being deregistered, or
+    changes flag state repeatedly in a short time to avoid detection.
+  areas:
+  - SF
+  typology: Deceptive shipping practice
+  status: verified
+  sources:
+  - title: Guidance to Address Illicit Shipping and Sanctions Evasion Practices
+    publisher: US Department of State, Treasury OFAC and US Coast Guard
+    year: '2020'
+    url: https://ofac.treasury.gov/media/37751/download
+    locator: p.3, item 6
+    quote: Bad actors may falsify the flag of their vessels to mask illicit trade. They may also repeatedly
+      register with new flag states (“flag hopping”) to avoid detection.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Updated Price Cap Coalition Advisory
+    publisher: Price Cap Coalition
+    year: '2024'
+    url: https://ofac.treasury.gov/media/933506/download
+    locator: 'Increased Risks: Maritime Safety and Marine Environment'
+    quote: These vessels are often registered with flag states that fail to meet their international obligations.
+      There is also an increased risk of falsified/fraudulent registration.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: UN Panel of Experts report S/2019/171
+    publisher: United Nations Security Council
+    year: '2019'
+    url: https://documents.un.org/doc/undoc/gen/n19/028/82/pdf/n1902882.pdf
+    locator: Summary, p.4
+    quote: routinely engaging in double-flagging and providing safe harbour for hijacked ships
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A tanker changes flag three times in a year, the last to a registry that does not list it.
+  - A ship claims a flag after that registry announced its deregistration.
+  cases:
+  - name: UN Panel of Experts on DPRK, 2019 final report
+    year: '2019'
+    jurisdiction: United Nations
+    what_happened: The Panel found the DPRK fleet routinely engaged in double-flagging.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/doc/undoc/gen/n19/028/82/pdf/n1902882.pdf
+    source_title: S/2019/171
+  data_needed:
+  - Vessel (flag, pastFlags, registrationNumber, registrationDate)
+  - Sanction
+  - Document (registry certificates)
+  checkable: lookups
+  lookup_sources:
+  - Flag registry records
+  - IMO GISIS
+  - Equasis
+  - Sanctions lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded: use of a flag after deregistration, claiming
+      a flag without authorisation, or frequent flag changes in a short period (2020 advisory p.3). No
+      number of changes is published.'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Change of flag after a legitimate sale.
+  - Moving to a cheaper or better-run open registry.
+  - Flag state left a registry scheme or closed it.
+  jurisdictions: Global (UNCLOS; flag state duties)
+  version: 1
+- id: SF-008
+  name: Complex or frequently changing ship ownership and management; single-vessel companies
+  definition: The ship's real owner is hidden behind shell companies, layered ownership, single-ship companies,
+    or repeated changes of owner or ISM manager, including transfers between companies with the same beneficial
+    owner.
+  areas:
+  - BO
+  - SF
+  typology: Deceptive shipping practice / corporate concealment
+  status: verified
+  sources:
+  - title: Guidance to Address Illicit Shipping and Sanctions Evasion Practices
+    publisher: US Department of State, Treasury OFAC and US Coast Guard
+    year: '2020'
+    url: https://ofac.treasury.gov/media/37751/download
+    locator: p.3, item 7
+    quote: Bad actors also may engage in a pattern of changes in the ownership or management of companies
+      or in the International Safety Management Code (ISM) management companies used.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance to Address Illicit Shipping and Sanctions Evasion Practices
+    publisher: US Department of State, Treasury OFAC and US Coast Guard
+    year: '2020'
+    url: https://ofac.treasury.gov/media/37751/download
+    locator: p.5, General Practices item 3
+    quote: industry actors may also consider looking for situations where ownership of a vessel is transferred
+      between companies controlled by the same beneficial owner and where there is no discernable legitimate
+      purpose for the transfer.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Updated Price Cap Coalition Advisory
+    publisher: Price Cap Coalition
+    year: '2024'
+    url: https://ofac.treasury.gov/media/933506/download
+    locator: Increased Risks; Recommendation 6
+    quote: The ownership of shadow fleet tankers may be concealed through complex corporate arrangements,
+      with a recent increase of single vessel fleets.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A tanker is owned by a Marshall Islands company with one ship, managed by a newly formed company in
+    a different country, which changed twice in a year.
+  cases: []
+  data_needed:
+  - Vessel
+  - Company (incorporationDate, jurisdiction)
+  - Ownership (owner, asset, startDate, endDate)
+  - Directorship
+  - Representation (ISM manager, commercial manager)
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - IMO GISIS (registered owner, ISM manager, IMO company number)
+  - Equasis
+  - Company registries
+  - Sanctions lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: BO
+    reason: Layered shell ownership hides the beneficial owner, the same technique used to launder assets.
+    source_url: https://ofac.treasury.gov/media/37751/download
+  innocent_explanations:
+  - Single-ship companies are a long-standing ordinary practice to limit liability.
+  - Refinancing or restructuring moves ships between group companies.
+  - Outsourcing of technical management.
+  jurisdictions: Global
+  version: 1
+- id: SF-009
+  name: Commodity bought at prices significantly below market
+  definition: Oil, petrochemicals or metals are bought far below the going market price, suggesting the
+    seller is sanctioned or the goods are illicit.
+  areas:
+  - SF
+  typology: Pricing anomaly
+  status: verified
+  sources:
+  - title: Guidance to Address Illicit Shipping and Sanctions Evasion Practices, Annex A
+    publisher: US Department of State, Treasury OFAC and US Coast Guard
+    year: '2020'
+    url: https://ofac.treasury.gov/media/37751/download
+    locator: Annex A, Guidance for Regional and Global Commodity Trading, Supplier, and Brokering Companies,
+      p.15
+    quote: Recognizing that purchases of crude and refined petroleum, petrochemicals, and metals at rates
+      significantly below market prices may be red flags indicating illicit behavior.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A trader buys crude at a deep discount to the benchmark with no stated quality reason.
+  cases: []
+  data_needed:
+  - Contract
+  - Payment (amount, date)
+  - Document (invoice)
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - Commodity price benchmarks
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (no percentage published)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Off-spec or distressed cargo.
+  - Long-term contract prices fixed before a price rise.
+  - Market-wide discounts for some grades (for example after sanctions on a producer, which may itself
+    be legal for non-coalition buyers).
+  jurisdictions: US guidance; relevant globally
+  version: 1
+- id: SF-010
+  name: Inflated, bundled or opaque shipping and ancillary costs (price cap evasion)
+  definition: Freight, insurance or other service costs are inflated or lumped together so that oil sold
+    above the Russian price cap looks compliant.
+  areas:
+  - SF
+  typology: Price cap evasion
+  status: verified
+  sources:
+  - title: Updated Price Cap Coalition Advisory
+    publisher: Price Cap Coalition
+    year: '2024'
+    url: https://ofac.treasury.gov/media/933506/download
+    locator: Recommendation 5
+    quote: The billing of commercially unreasonable or opaque shipping and ancillary costs should be viewed
+      as a sign of potential price cap evasion.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An invoice shows oil just under the cap but freight several times the market rate for the route.
+  cases: []
+  data_needed:
+  - Contract
+  - Document (invoice, itemised cost breakdown, attestation)
+  - Payment
+  - Vessel
+  checkable: records
+  lookup_sources:
+  - Freight rate benchmarks
+  - Oil price assessments
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - High war-risk insurance premiums on some routes.
+  - Genuinely high freight rates in tight markets.
+  - Demurrage and delays.
+  jurisdictions: Price Cap Coalition members (G7, EU, Australia, New Zealand)
+  version: 1
+- id: SF-011
+  name: Unproven, fraudulent or non-continuous P&I insurance
+  definition: The ship relies on unknown, untested or fraudulent liability insurance, often from weakly
+    regulated insurers, or lacks cover for parts of a voyage.
+  areas:
+  - SF
+  typology: Shadow fleet risk
+  status: verified
+  sources:
+  - title: Updated Price Cap Coalition Advisory
+    publisher: Price Cap Coalition
+    year: '2024'
+    url: https://ofac.treasury.gov/media/933506/download
+    locator: Recommendation 1
+    quote: The shadow trade involves ships that may rely on unknown, untested, sporadic, or fraudulent
+      insurance.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A tanker's P&I certificate names an insurer with no published capital or reinsurance.
+  cases: []
+  data_needed:
+  - Vessel
+  - Company (insurer)
+  - Document (certificate of insurance, CLC certificate)
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - Insurer regulatory registers
+  - International Group of P&I Clubs membership
+  - Flag state CLC certificate records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: The advisory names fraudulent insurance; fake certificates are document fraud.
+    source_url: https://ofac.treasury.gov/media/933506/download
+  innocent_explanations:
+  - Smaller legitimate insurers outside the International Group.
+  - Gaps from administrative delays at renewal.
+  jurisdictions: Price Cap Coalition members
+  version: 1
+- id: SF-012
+  name: Ship classed by a society outside IACS or removed from it
+  definition: The ship moved away from mainstream classification societies to one that is not, or is no
+    longer, a member of the International Association of Classification Societies.
+  areas:
+  - SF
+  typology: Shadow fleet risk
+  status: verified
+  sources:
+  - title: Updated Price Cap Coalition Advisory
+    publisher: Price Cap Coalition
+    year: '2024'
+    url: https://ofac.treasury.gov/media/933506/download
+    locator: Recommendation 2
+    quote: Some ships involved in the shadow trade have shifted away from industry standard classification
+      societies, and instead use societies that are not a part of, or have been removed from, the International
+      Association of Classification Societies.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A 20-year-old tanker leaves a major class society and joins a little-known one in the same month as
+    an ownership change.
+  cases: []
+  data_needed:
+  - Vessel
+  - Company (classification society)
+  - Document (class certificate)
+  checkable: lookups
+  lookup_sources:
+  - Equasis
+  - IACS member list
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Smaller trades or domestic shipping use non-IACS societies legitimately.
+  - Cost reasons for older ships in local trades.
+  jurisdictions: Price Cap Coalition members; EU requires recognised organisations
+  version: 1
+- id: SF-013
+  name: Ageing tanker sold to opaque buyer, including ships previously set for recycling
+  definition: An old tanker, sometimes one due for scrapping, is bought by a new or opaque company whose
+    owners or source of funds are unclear.
+  areas:
+  - SF
+  typology: Shadow fleet acquisition
+  status: verified
+  sources:
+  - title: Updated Price Cap Coalition Advisory
+    publisher: Price Cap Coalition
+    year: '2024'
+    url: https://ofac.treasury.gov/media/933506/download
+    locator: Recommendation 9
+    quote: Those involved in the sale and brokering of tankers should remain vigilant of potential evasive
+      or illicit purchase structures and end-uses, especially for aging tankers, including tankers previously
+      designated for recycling.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN-BIS Joint Alert FIN-2022-Alert003
+    publisher: FinCEN and BIS
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/2022-06/FinCEN%20and%20Bis%20Joint%20Alert%20FINAL.pdf
+    locator: Transactional and Behavioral Red Flags, p.6
+    quote: A customer acquires new vessels for no apparent economic or business purpose or for use in
+      shipping corridors involving one or more of the identified transshipment countries.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A 22-year-old tanker is sold to a company formed two months earlier in a free zone, paid in full from
+    a third country.
+  cases: []
+  data_needed:
+  - Vessel (buildDate)
+  - Ownership
+  - Company (incorporationDate)
+  - Payment
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - Ship sale reports and broker data
+  - IMO GISIS
+  - Company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (no age threshold published)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New entrants to tanker markets buy older, cheaper ships.
+  - High freight rates make older ships worth trading longer.
+  jurisdictions: Price Cap Coalition members; EU tanker sale notification requirement
+  version: 1
+- id: SF-014
+  name: Dealing with vessels or property that are sanctioned or were recently linked to sanctioned parties
+  definition: A party buys, sells, charters or services a ship or property that is blocked, or whose counterparties
+    recently dealt with sanctioned entities.
+  areas:
+  - SF
+  typology: Direct sanctions exposure
+  status: verified
+  sources:
+  - title: FinCEN-BIS Joint Alert FIN-2022-Alert003
+    publisher: FinCEN and BIS
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/2022-06/FinCEN%20and%20Bis%20Joint%20Alert%20FINAL.pdf
+    locator: p.6
+    quote: A customer purchases or sells vessels or other properties and goods identified as having been
+      involved with or being blocked property under U.S. or partner country sanctions.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Updated Price Cap Coalition Advisory
+    publisher: Price Cap Coalition
+    year: '2024'
+    url: https://ofac.treasury.gov/media/933506/download
+    locator: Recommendation 10
+    quote: Stakeholders should consider not only checking counterparties and vessels against national
+      sanctions lists, but also undertaking proactive investigations to ascertain sanctions exposure,
+      including to understand whether their unsanctioned counterparties may have recently engaged with
+      sanctioned entities.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A port agent services a tanker listed by OFAC under its old name.
+  cases: []
+  data_needed:
+  - Vessel
+  - Sanction (entity, authority, program, listingDate)
+  - Ownership
+  - Contract
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - OFAC SDN list
+  - UK, EU, UN sanctions lists
+  - OpenSanctions
+  - IMO GISIS
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (direct dealing with blocked property without a
+      licence)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Transaction under a licence or exemption (the 2024 advisory notes licences may exist).
+  - Name match with an unrelated ship.
+  - Sale made before the listing date.
+  jurisdictions: US, UK, EU, UN and other sanctions regimes
+  version: 1
+- id: SF-015
+  name: Entity owned 50 percent or more by blocked persons
+  definition: A company that is not itself listed but is owned, in total, half or more by one or more
+    sanctioned persons is treated as blocked under US rules.
+  areas:
+  - BO
+  - SF
+  typology: Indirect sanctioned ownership
+  status: verified
+  sources:
+  - title: 'OFAC FAQs: Entities Owned by Blocked Persons (50% Rule), FAQ 399'
+    publisher: US Treasury OFAC
+    url: https://ofac.treasury.gov/faqs/topic/1521
+    locator: FAQ 399
+    quote: OFAC's 50 Percent Rule applies to entities owned 50 percent or more in the aggregate by one
+      or more blocked persons.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Two sanctioned individuals each hold 25 percent of a trading company; the company is blocked even
+    though it is not on the list.
+  cases: []
+  data_needed:
+  - Ownership (owner, asset, percentage)
+  - Company
+  - Person
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Company registries and beneficial ownership registers
+  - Sanctions lists
+  - OpenSanctions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Aggregate ownership by blocked persons of 50 percent or more (OFAC 50 Percent Rule). Control
+      without that ownership does not trigger the rule automatically (FAQ 398).
+    threshold_source: https://ofac.treasury.gov/faqs/topic/1521
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ownership has dropped below 50 percent or was sold before the listing.
+  - Registry data are out of date.
+  - Other regimes (UK, EU) use different ownership and control tests.
+  jurisdictions: United States (OFAC); UK and EU have their own ownership-and-control tests
+  version: 1
+- id: SF-016
+  name: Name, address or identifiers match or resemble a listed party
+  definition: A customer or counterparty shares a name, address, email, phone, passport number or crypto
+    address with, or is very similar to, a person on a sanctions or restricted-party list.
+  areas:
+  - SF
+  typology: List proximity
+  status: verified
+  sources:
+  - title: FinCEN-BIS Joint Notice FIN-2023-NTC2
+    publisher: FinCEN and BIS
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+    locator: Red Flag Indicators, p.4
+    quote: The customer name or its address is similar to one of the parties on a proscribed parties list,
+      such as the BIS Lists of Parties of Concern (e.g., Entity List, Unverified List, Denied Persons
+      List), Treasury’s List of Specially Designated Nationals and Blocked Persons (SDN List), or State’s
+      Statutorily Debarred Parties List.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN Alert FIN-2023-Alert006 (Hamas)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/2023-10/FinCEN_Alert_Terrorist_Financing_FINAL508.pdf
+    locator: Red flags, p.2
+    quote: A customer or a customer’s counterparty conducts transactions with OFAC-designated entities
+      and individuals, or transactions that contain a nexus to identifiers listed for OFAC-designated
+      entities and individuals, to include email addresses, physical addresses, phone numbers, or passport
+      numbers, or virtual currency addresses.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A new supplier's phone number is the one listed in an SDN entry for a designated front company.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Address
+  - Email
+  - Phone
+  - Passport
+  - CryptoWallet
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - OFAC SDN list
+  - BIS Consolidated Screening List
+  - UN, EU, UK lists
+  - OpenSanctions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Exact match on a listed identifier (meets the published definition as worded)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Common names (false positives).
+  - Shared office buildings or registered-agent addresses.
+  - Reused or recycled phone numbers.
+  jurisdictions: US; relevant globally
+  version: 1
+- id: SF-017
+  name: Co-location or shared owners, managers, addresses, IP addresses or phones with a listed entity
+    or with trading partners
+  definition: Companies share an address, owner, manager, IP address or phone with an Entity List or SDN
+    entity, or with the company on the other side of the trade, suggesting they act together.
+  areas:
+  - SF
+  typology: Network linkage
+  status: verified
+  sources:
+  - title: FinCEN-BIS Joint Notice FIN-2023-NTC2
+    publisher: FinCEN and BIS
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+    locator: p.4
+    quote: Transactions involving companies that are physically co-located, or have shared ownership,
+      with an entity on the Entity List or the SDN List.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
+    publisher: FATF
+    year: '2021'
+    url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+    locator: para 31, account and transaction activity indicators, pp.19-20
+    quote: Demonstrating links between representatives of companies exchanging goods, i.e. same owners
+      or management, same
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A Hong Kong buyer and the Russian end-user list the same director and phone number.
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Ownership
+  - Directorship
+  - Phone
+  - Email
+  - UserAccount (IP data)
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - BIS Entity List
+  - OFAC SDN list
+  - Domain and IP records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Business parks or registered-agent addresses host many unrelated firms.
+  - Group companies legitimately share staff.
+  - Shared corporate service providers.
+  jurisdictions: US and FATF members
+  version: 1
+- id: SF-018
+  name: Shell or front companies used to hide ownership, source of funds or countries involved
+  definition: Legal entities with little real activity are used to hide who owns the business, where money
+    comes from, or which sanctioned countries are involved, often wiring money through banks outside their
+    country of registration.
+  areas:
+  - SF
+  typology: Corporate concealment
+  status: verified
+  sources:
+  - title: 'Tri-Seal Compliance Note: Cracking Down on Third-Party Intermediaries Used to Evade Russia-Related
+      Sanctions and Export Controls'
+    publisher: US Departments of Commerce, Treasury and Justice
+    year: '2023'
+    url: https://ofac.treasury.gov/media/931471/download
+    locator: p.2, red flags
+    quote: Use of corporate vehicles (i.e., legal entities, such as shell companies, and legal arrangements)
+      to obscure (i) ownership, (ii) source of funds, or (iii) countries involved, particularly sanctioned
+      jurisdictions;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Tri-Seal Compliance Note
+    publisher: US Departments of Commerce, Treasury and Justice
+    year: '2023'
+    url: https://ofac.treasury.gov/media/931471/download
+    locator: p.2, red flags
+    quote: Use of shell companies to conduct international wire transfers, often involving financial institutions
+      in jurisdictions distinct from company registration;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
+    publisher: FATF
+    year: '2021'
+    url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+    locator: para 31, account and transaction activity indicators
+    quote: Accounts or transactions involve possible companies with opaque ownership structures, front
+      companies, or shell companies
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN Alert FIN-2023-Alert006 (Hamas)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/2023-10/FinCEN_Alert_Terrorist_Financing_FINAL508.pdf
+    locator: p.3
+    quote: A customer conducts transactions that originate with, are directed to, or otherwise involve
+      entities that are shell corporations, general “trading companies,” or other companies that have
+      a nexus with Iran or other Iran-supported terrorist groups, such as Hizballah and Palestinian Islamic
+      Jihad.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Hong Kong shell companies bought OLED micro-displays from US distributors and received payments that
+    hid Russian origin of funds (US v. Marchenko).
+  cases:
+  - name: United States v. Maxim Marchenko
+    year: '2024'
+    jurisdiction: United States (S.D.N.Y.)
+    what_happened: Marchenko pleaded guilty to money laundering and smuggling charges for using Hong Kong
+      shell companies to buy dual-use OLED micro-displays for end users in Russia; sentenced to three
+      years in prison.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/russian-international-money-launderer-sentenced-three-years-prison-illicitly-procuring
+    source_title: Russian International Money Launderer Sentenced To Three Years In Prison For Illicitly
+      Procuring Large Quantities Of Dual-Use Military Grade Microelectronics For Russia
+  data_needed:
+  - Company (incorporationDate, jurisdiction, address)
+  - Ownership
+  - Directorship
+  - Payment
+  - BankAccount
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Beneficial ownership registers
+  - Leaked-data databases (e.g. ICIJ Offshore Leaks)
+  - Sanctions lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Marchenko was convicted of money laundering for the shell-company payments used in export
+      evasion.
+    source_url: https://www.justice.gov/usao-sdny/pr/russian-international-money-launderer-sentenced-three-years-prison-illicitly-procuring
+  innocent_explanations:
+  - Holding companies and special purpose vehicles are common in trade and finance.
+  - Companies bank abroad for currency or cost reasons.
+  - Newly formed legitimate startups have thin records.
+  jurisdictions: US, FATF members
+  version: 1
+- id: SF-019
+  name: Payment messages stripped of sanctioned-party references or routed via third-party (satellite)
+    banks
+  definition: A bank or customer removes or omits names of sanctioned parties from payment messages, or
+    routes payments through other banks, so screening at the clearing bank does not catch them.
+  areas:
+  - SF
+  typology: Wire stripping
+  status: verified
+  sources:
+  - title: BNP Paribas Agrees to Plead Guilty and to Pay $8.9 Billion for Illegally Processing Financial
+      Transactions for Countries Subject to U.S. Economic Sanctions
+    publisher: US Department of Justice
+    year: '2014'
+    url: https://www.justice.gov/opa/pr/bnp-paribas-agrees-plead-guilty-and-pay-89-billion-illegally-processing-financial
+    locator: press release body
+    quote: removed references to sanctioned entities from payment messages
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - MT103 fields for originator name are blank or generic while the related cover payment names a bank
+    in a sanctioned country.
+  cases:
+  - name: BNP Paribas S.A.
+    year: '2014'
+    jurisdiction: United States
+    what_happened: BNP Paribas agreed to plead guilty to conspiring to violate IEEPA and TWEA for processing
+      transactions for Sudan, Iran and Cuba from 2004 to 2012, using satellite banks and removing references
+      to sanctioned entities; total penalties about $8.9 billion.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/bnp-paribas-agrees-plead-guilty-and-pay-89-billion-illegally-processing-financial
+    source_title: DOJ press release, 30 June 2014
+  data_needed:
+  - Payment (payer, beneficiary, purpose, amount)
+  - BankAccount
+  - Company (banks)
+  - Document (payment messages)
+  checkable: records
+  lookup_sources:
+  - Sanctions lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Message format truncation or legacy systems dropping fields.
+  - Data-privacy rules limiting fields in some corridors.
+  - Use of correspondent banks for ordinary routing reasons.
+  jurisdictions: United States (IEEPA, TWEA) and others
+  version: 1
+- id: SF-020
+  name: IP address or login location inconsistent with stated location; VPN use to defeat geo-blocking
+  definition: The customer logs in from an IP address in a different country from the one they claim,
+    including sanctioned countries, or uses a VPN to get around location controls.
+  areas:
+  - SF
+  typology: Location masking
+  status: verified
+  sources:
+  - title: Tri-Seal Compliance Note
+    publisher: US Departments of Commerce, Treasury and Justice
+    year: '2023'
+    url: https://ofac.treasury.gov/media/931471/download
+    locator: p.2, red flags
+    quote: IP addresses that do not correspond to a customer’s reported location data;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Enforcement Release: OFAC Settles with Binance Holdings, Ltd. for $968,618,825'
+    publisher: US Treasury OFAC
+    year: '2023'
+    url: https://ofac.treasury.gov/media/932351/download
+    locator: Aggravating factors
+    quote: Binance continued to allow trades by users who were logged in from an IP address in a comprehensively
+      sanctioned jurisdiction so long as that user had submitted KYC documents from a non-sanctioned jurisdiction.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An exchange user with Turkish ID documents logs in repeatedly from Iranian IP addresses.
+  cases:
+  - name: Binance Holdings, Ltd. (OFAC settlement)
+    year: '2023'
+    jurisdiction: United States
+    what_happened: OFAC settled 1,667,153 apparent violations for $968,618,825; it found Binance matched
+      trades between US users and users in sanctioned jurisdictions from 2017 to 2022, encouraged VPN
+      use and allowed users logged in from sanctioned-jurisdiction IP addresses to trade.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://ofac.treasury.gov/media/932351/download
+    source_title: OFAC Enforcement Release, 21 Nov 2023
+  data_needed:
+  - UserAccount (IP addresses, login history)
+  - Person
+  - Address
+  - Passport
+  checkable: records
+  lookup_sources:
+  - IP geolocation databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: The Binance case shows sanctions exposure arising inside a virtual asset exchange.
+    source_url: https://ofac.treasury.gov/media/932351/download
+  innocent_explanations:
+  - Travel.
+  - Corporate VPNs or privacy VPNs.
+  - Mobile carrier IP ranges geolocated inaccurately.
+  jurisdictions: US
+  version: 1
+- id: SF-021
+  name: Last-minute change of payment routing or shipping instructions away from a country of concern
+  definition: A payment or shipment that was going to or from a sanctioned or restricted country is suddenly
+    rerouted through a different country or company.
+  areas:
+  - SF
+  typology: Rerouting
+  status: verified
+  sources:
+  - title: FinCEN-BIS Joint Notice FIN-2023-NTC2
+    publisher: FinCEN and BIS
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+    locator: p.4
+    quote: Transactions involve a last-minute change in payment routing that was previously scheduled
+      from a country of concern but now routed through a different country or company.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN-BIS Joint Alert FIN-2022-Alert003
+    publisher: FinCEN and BIS
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/2022-06/FinCEN%20and%20Bis%20Joint%20Alert%20FINAL.pdf
+    locator: p.6
+    quote: Transactions involving a change in shipments or payments that were previously scheduled to
+      go to Russia or Belarus, or a company located in Russia or Belarus, but that are now going to a
+      different country/company.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Tri-Seal Compliance Note
+    publisher: US Departments of Commerce, Treasury and Justice
+    year: '2023'
+    url: https://ofac.treasury.gov/media/931471/download
+    locator: p.2
+    quote: Last-minute changes to shipping instructions that appear contrary to customer history or business
+      practices;
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An order booked for Moscow is re-addressed to a new distributor in a transshipment hub a week before
+    shipment.
+  cases: []
+  data_needed:
+  - Payment
+  - Contract
+  - Document (shipping instructions, amended invoices)
+  - Company
+  - Address
+  checkable: records
+  lookup_sources:
+  - BIS Country Guidance on transshipment
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Customer restructured its regional distribution.
+  - Logistics disruption forcing a different hub.
+  - Buyer changed after a legitimate resale.
+  jurisdictions: US
+  version: 1
+- id: SF-022
+  name: Payment from a third party or third country not part of the trade or not on the end-user statement
+  definition: Money for goods comes from someone other than the buyer or consignee, or from a country
+    uninvolved in the deal, often a known transshipment point.
+  areas:
+  - SF
+  typology: Third-party payment
+  status: verified
+  sources:
+  - title: Tri-Seal Compliance Note
+    publisher: US Departments of Commerce, Treasury and Justice
+    year: '2023'
+    url: https://ofac.treasury.gov/media/931471/download
+    locator: p.2
+    quote: Payment coming from a third-party country or business not listed on the End-User Statement
+      or other applicable end-user form;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN-BIS Joint Alert FIN-2022-Alert003
+    publisher: FinCEN and BIS
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/2022-06/FinCEN%20and%20Bis%20Joint%20Alert%20FINAL.pdf
+    locator: p.6
+    quote: Transactions involving payments being made from entities located in third-party countries not
+      otherwise involved with the transactions and known to be a potential transshipment point for exports
+      to Russia and Belarus.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
+    publisher: FATF
+    year: '2021'
+    url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+    locator: para 31, maritime sector indicators
+    quote: Payment for imported commodities is made by an entity other than the consignee of the commodities
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Goods shipped to a Kazakh importer are paid for by a UAE company with no role in the contract.
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary)
+  - Contract
+  - Document (BIS-711 end-user statement, invoice)
+  - Company
+  - Address
+  checkable: records
+  lookup_sources:
+  - Company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Third-party payments are also a standard trade-based laundering indicator.
+    source_url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+  innocent_explanations:
+  - Group treasury centres pay on behalf of subsidiaries.
+  - Trade finance or factoring companies pay suppliers.
+  - Distributors pay for goods delivered to their customers.
+  jurisdictions: US, FATF members
+  version: 1
+- id: SF-023
+  name: Counterparty with little or no web presence; personal email instead of company email
+  definition: A trading partner has no website or domain email, or uses personal email accounts, which
+    is unusual for a real business of its stated size.
+  areas:
+  - SF
+  typology: Thin business footprint
+  status: verified
+  sources:
+  - title: FinCEN-BIS Joint Notice FIN-2023-NTC2
+    publisher: FinCEN and BIS
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+    locator: p.3
+    quote: Transactions involving entities with little to no web presence, such as a website or a domain-based
+      email account.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Tri-Seal Compliance Note
+    publisher: US Departments of Commerce, Treasury and Justice
+    year: '2023'
+    url: https://ofac.treasury.gov/media/931471/download
+    locator: p.2
+    quote: Use of personal email accounts instead of company email addresses;
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A buyer of high-end oscilloscopes corresponds only from a free webmail address and has no website.
+  cases: []
+  data_needed:
+  - Company (website, email)
+  - Email
+  - Domain records
+  checkable: lookups
+  lookup_sources:
+  - Web search
+  - Domain WHOIS and DNS records
+  - Company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small family businesses often lack websites.
+  - Some regions rely on messaging apps and webmail for business.
+  - Recently formed legitimate firms.
+  jurisdictions: US
+  version: 1
+- id: SF-024
+  name: Phone country code does not match destination country
+  definition: The customer's phone number has a country code different from the country the goods are
+    going to.
+  areas:
+  - SF
+  typology: Location inconsistency
+  status: verified
+  sources:
+  - title: FinCEN-BIS Joint Notice FIN-2023-NTC2
+    publisher: FinCEN and BIS
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+    locator: p.3
+    quote: Transactions involving customers with phone numbers with country codes that do not match the
+      destination country.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Goods consigned to Armenia; buyer's contact number has a +7 (Russia) code.
+  cases: []
+  data_needed:
+  - Phone
+  - Company
+  - Address
+  - Document (purchase order)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Multinational staff using home-country phones.
+  - Regional sales offices in another country.
+  jurisdictions: US
+  version: 1
+- id: SF-025
+  name: Reluctance to give end-use, end-user or ownership information
+  definition: The buyer will not explain what the product is for, who will use it, or who owns the buying
+    company, or refuses to fill in an end-user form.
+  areas:
+  - SF
+  typology: Information refusal
+  status: verified
+  sources:
+  - title: 'EAR Supplement No. 3 to Part 732: BIS''s ''Know Your Customer'' Guidance and Red Flags'
+    publisher: US Department of Commerce BIS (15 CFR Part 732)
+    url: https://www.ecfr.gov/current/title-15/subtitle-B/chapter-VII/subchapter-C/part-732
+    locator: Supplement No. 3, Red Flags item 1
+    quote: The customer or purchasing agent is reluctant to offer information about the end-use of a product.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN-BIS Joint Notice FIN-2023-NTC2
+    publisher: FinCEN and BIS
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+    locator: p.3
+    quote: A customer lacks or refuses to provide details to banks, shippers, or third parties, including
+      details about end-users, intended end-use(s), or company ownership.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Tri-Seal Compliance Note
+    publisher: US Departments of Commerce, Treasury and Justice
+    year: '2023'
+    url: https://ofac.treasury.gov/media/931471/download
+    locator: p.2
+    quote: A customer’s reluctance to share information about the end use of a product, including reluctance
+      to complete an end-user form;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
+    publisher: FATF
+    year: '2021'
+    url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+    locator: para 31, customer profile indicators
+    quote: During on-boarding, a customer provides vague or incomplete information about their proposed
+      trading activities.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A buyer of machine-tool controllers declines to say which factory will use them.
+  cases: []
+  data_needed:
+  - Document (end-user statement, correspondence)
+  - Company
+  - Ownership
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Commercial confidentiality about customers.
+  - Distributors who do not yet know the final buyer.
+  - Language barriers or unfamiliarity with export paperwork.
+  jurisdictions: US (EAR), FATF members
+  version: 1
+- id: SF-026
+  name: Product does not fit the buyer's business or the buyer lacks technical knowledge of it
+  definition: The item's capabilities do not match what the buyer does, or the buyer does not understand
+    the product's performance but still wants it.
+  areas:
+  - SF
+  typology: End-use mismatch
+  status: verified
+  sources:
+  - title: EAR Supplement No. 3 to Part 732
+    publisher: US Department of Commerce BIS
+    url: https://www.ecfr.gov/current/title-15/subtitle-B/chapter-VII/subchapter-C/part-732
+    locator: Red Flags items 2 and 6
+    quote: The product's capabilities do not fit the buyer's line of business; for example, a small bakery
+      places an order for several sophisticated lasers.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN-BIS Joint Notice FIN-2023-NTC2
+    publisher: FinCEN and BIS
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+    locator: p.4
+    quote: The item (commodity, software or technology) does not fit the purchaser’s line of business.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
+    publisher: FATF
+    year: '2021'
+    url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+    locator: para 31, customer profile indicators, p.19
+    quote: The customer is a person dealing with dual-use goods or goods subject to export control
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A furniture importer orders radiation-hardened integrated circuits.
+  cases: []
+  data_needed:
+  - Company (sector, classification)
+  - Contract
+  - Document (purchase order, product classification)
+  checkable: person
+  lookup_sources:
+  - Company registries (activity codes)
+  - Customs data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Business diversification.
+  - Procurement agents buying for several clients.
+  - Hobbyist or research use.
+  jurisdictions: US (EAR), FATF members
+  version: 1
+- id: SF-027
+  name: Product incompatible with the destination country's technical level or configuration
+  definition: The goods would be of little use in the stated destination, for example advanced manufacturing
+    tools sent to a country without that industry, or equipment configured for a different power standard.
+  areas:
+  - SF
+  typology: Destination mismatch
+  status: verified
+  sources:
+  - title: EAR Supplement No. 3 to Part 732
+    publisher: US Department of Commerce BIS
+    url: https://www.ecfr.gov/current/title-15/subtitle-B/chapter-VII/subchapter-C/part-732
+    locator: Red Flags item 3
+    quote: The product ordered is incompatible with the technical level of the country to which the product
+      is being shipped.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
+    publisher: FATF
+    year: '2021'
+    url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+    locator: para 31, maritime sector indicators
+    quote: Shipment of goods incompatible with the technical level of the country to which it is being
+      shipped, e.g.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Semiconductor manufacturing equipment shipped to a country without an electronics industry (BIS example).
+  cases: []
+  data_needed:
+  - Document (commercial invoice, HS codes)
+  - Address (destination)
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - Trade statistics by country and HS code
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New industrial investment in the destination.
+  - Research or university use.
+  - Regional warehousing.
+  jurisdictions: US (EAR), FATF members
+  version: 1
+- id: SF-028
+  name: Freight forwarder, mail centre or logistics company listed as final destination or ultimate consignee
+  definition: The paperwork names a forwarder, mail drop or logistics firm, rather than a company that
+    would actually use the goods, as the final recipient.
+  areas:
+  - SF
+  typology: Consignee concealment
+  status: verified
+  sources:
+  - title: EAR Supplement No. 3 to Part 732
+    publisher: US Department of Commerce BIS
+    url: https://www.ecfr.gov/current/title-15/subtitle-B/chapter-VII/subchapter-C/part-732
+    locator: Red Flags item 9
+    quote: A freight forwarding firm is listed as the product's final destination.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN-BIS Joint Notice FIN-2023-NTC2
+    publisher: FinCEN and BIS
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+    locator: p.4
+    quote: Parties to transactions listed as ultimate consignees or listed in the “consign to” field appear
+      to be mail centers, trading companies, or logistics companies.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN-BIS Joint Alert FIN-2022-Alert003
+    publisher: FinCEN and BIS
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/2022-06/FinCEN%20and%20Bis%20Joint%20Alert%20FINAL.pdf
+    locator: p.6
+    quote: Transactions involving freight-forwarding firms that are also listed as the product’s final
+      end customer, especially items going to traditional Russian transshipment hubs.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
+    publisher: FATF
+    year: '2021'
+    url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+    locator: para 31, maritime sector indicators
+    quote: The person or entity preparing a shipment lists a freight forwarding firm as the product's
+      final destination;
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Marchenko's displays reached Russia via a freight forwarder that served Russia (DOJ 2024).
+  cases: []
+  data_needed:
+  - Company (consignee)
+  - Document (airway bill, bill of lading, BIS-711)
+  - Address
+  checkable: records
+  lookup_sources:
+  - Company registries
+  - Web search on consignee address
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Forwarders sometimes appear as notify party or intermediate consignee in ordinary trade.
+  - Consolidated shipments to a distributor's logistics provider.
+  jurisdictions: US (EAR), FATF members
+  version: 1
+- id: SF-029
+  name: Abnormal shipping route or routing through known transshipment points
+  definition: The route is unusual for the product and destination, or goods or payments pass through
+    countries known as diversion hubs for restricted items.
+  areas:
+  - SF
+  typology: Transshipment / diversion
+  status: verified
+  sources:
+  - title: EAR Supplement No. 3 to Part 732
+    publisher: US Department of Commerce BIS
+    url: https://www.ecfr.gov/current/title-15/subtitle-B/chapter-VII/subchapter-C/part-732
+    locator: Red Flags item 10
+    quote: The shipping route is abnormal for the product and destination.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Tri-Seal Compliance Note
+    publisher: US Departments of Commerce, Treasury and Justice
+    year: '2023'
+    url: https://ofac.treasury.gov/media/931471/download
+    locator: p.3
+    quote: Routing purchases through certain transshipment points commonly used to illegally redirect
+      restricted items to Russia or Belarus.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN-BIS Joint Alert FIN-2022-Alert003
+    publisher: FinCEN and BIS
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/2022-06/FinCEN%20and%20Bis%20Joint%20Alert%20FINAL.pdf
+    locator: p.5, footnote 21
+    quote: 'These points include but are not limited to: Armenia, Brazil, China, Georgia, India, Israel,
+      Kazakhstan, Kyrgyzstan, Mexico, Nicaragua, Serbia, Singapore, South Africa, Taiwan, Tajikistan,
+      Turkey, United Arab Emirates, and Uzbekistan.'
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Microcontrollers ordered by a Kyrgyz firm are flown via the UAE and re-exported overland.
+  cases:
+  - name: United States v. Maxim Marchenko
+    year: '2024'
+    jurisdiction: United States (S.D.N.Y.)
+    what_happened: Displays were routed through pass-through entities, mainly in Hong Kong, before reaching
+      Russia; guilty plea and three-year sentence.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/russian-international-money-launderer-sentenced-three-years-prison-illicitly-procuring
+    source_title: DOJ SDNY press release, 17 July 2024
+  data_needed:
+  - Document (airway bill, bill of lading)
+  - Address (transit points)
+  - Company
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - BIS Country Guidance
+  - Customs and trade data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (the 2022 list is stated to be non-exhaustive)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many listed hubs are major legitimate trading centres.
+  - Controlled US items may be legally exported to these countries as production inputs (2022 alert fn
+    21).
+  - Freight availability drives routing.
+  jurisdictions: US
+  version: 1
+- id: SF-030
+  name: Customer declines routine installation, training or maintenance
+  definition: The buyer turns down installation, testing, training or servicing that normally comes with
+    the product, which may mean the vendor must not see where it ends up.
+  areas:
+  - SF
+  typology: End-use concealment
+  status: verified
+  sources:
+  - title: EAR Supplement No. 3 to Part 732
+    publisher: US Department of Commerce BIS
+    url: https://www.ecfr.gov/current/title-15/subtitle-B/chapter-VII/subchapter-C/part-732
+    locator: Red Flags item 7
+    quote: Routine installation, training or maintenance services are declined by the customer.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Tri-Seal Compliance Note
+    publisher: US Departments of Commerce, Treasury and Justice
+    year: '2023'
+    url: https://ofac.treasury.gov/media/931471/download
+    locator: p.2
+    quote: Declining customary installation, training, or maintenance of the purchased item(s);
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A buyer of a CNC machine refuses the free on-site commissioning visit.
+  cases: []
+  data_needed:
+  - Contract
+  - Document (service agreements, correspondence)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Buyer has in-house engineers.
+  - Cost saving.
+  - Travel restrictions on vendor staff.
+  jurisdictions: US (EAR)
+  version: 1
+- id: SF-031
+  name: Overpaying for goods or paying cash for an expensive item
+  definition: The buyer pays well above known market prices, or offers cash for an expensive item when
+    financing would be normal.
+  areas:
+  - SF
+  typology: Pricing / payment anomaly
+  status: verified
+  sources:
+  - title: FinCEN-BIS Joint Notice FIN-2023-NTC2
+    publisher: FinCEN and BIS
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+    locator: p.4
+    quote: The customer is significantly overpaying for an item based on known market prices.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: EAR Supplement No. 3 to Part 732
+    publisher: US Department of Commerce BIS
+    url: https://www.ecfr.gov/current/title-15/subtitle-B/chapter-VII/subchapter-C/part-732
+    locator: Red Flags item 5
+    quote: The customer is willing to pay cash for a very expensive item when the terms of the sale call
+      for financing.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A distributor pays triple list price for capacitors with immediate prepayment.
+  cases: []
+  data_needed:
+  - Payment (amount)
+  - Contract
+  - Document (invoice)
+  checkable: lookups
+  lookup_sources:
+  - Market price lists and distributor catalogues
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (no percentage published)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Shortages and broker premiums for scarce chips.
+  - Urgent need to avoid production stoppage.
+  - Cash-rich buyer avoiding interest.
+  jurisdictions: US
+  version: 1
+- id: SF-032
+  name: New trading company (incorporated after 24 Feb 2022) in a non-coalition country handling High
+    Priority Items, or sudden spike in such imports
+  definition: A company set up after Russia's full-scale invasion, based outside the Global Export Control
+    Coalition, trades in the battlefield-relevant HS codes, or an existing importer starts receiving or
+    sharply increases them.
+  areas:
+  - SF
+  typology: Russia diversion network
+  status: verified
+  sources:
+  - title: FinCEN-BIS Supplemental Alert FIN-2023-Alert004
+    publisher: FinCEN and BIS
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN%20and%20BIS%20Joint%20Alert%20_FINAL_508C.pdf
+    locator: New Transactional and Behavioral Red Flags, p.9
+    quote: A new customer whose line of business is in trade of products associated with the nine HS codes,
+      is based in a non-GECC country, and was incorporated after February 24, 2022.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN-BIS Supplemental Alert FIN-2023-Alert004
+    publisher: FinCEN and BIS
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN%20and%20BIS%20Joint%20Alert%20_FINAL_508C.pdf
+    locator: p.9
+    quote: An existing customer, based outside the United States, received exports associated with one
+      or more of the nine HS codes prior to February 24, 2022, and requested or received a significant
+      increase in exports with those same codes thereafter.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A Central Asian electronics importer founded in mid-2022 suddenly imports large volumes of HS 8542.31
+    microcontrollers.
+  cases: []
+  data_needed:
+  - Company (incorporationDate, jurisdiction)
+  - Document (invoices with HS codes)
+  - Payment
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Customs and trade data (HS-code level)
+  - BIS High Priority Items List
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Incorporated after 24 February 2022, based in a non-GECC country and trading in one of the
+      nine High Priority HS codes (FinCEN-BIS May 2023). The size of a 'significant increase' is not published.
+    threshold_source: https://www.fincen.gov/sites/default/files/shared/FinCEN%20and%20BIS%20Joint%20Alert%20_FINAL_508C.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate new firms entering electronics distribution.
+  - Regional demand growth.
+  - Supply-chain relocation away from Russia.
+  jurisdictions: US; GECC partners
+  version: 1
+- id: SF-033
+  name: Purported civilian end user at a military address, or military-linked indicators
+  definition: The stated end user claims to be civilian, but its address is a military facility or next
+    to one, or it advertises 'special purpose projects' or a security-service certificate to work on state
+    secrets.
+  areas:
+  - SF
+  typology: Military end use
+  status: verified
+  sources:
+  - title: FinCEN-BIS Joint Notice FIN-2023-NTC2
+    publisher: FinCEN and BIS
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+    locator: p.4
+    quote: Transactions involve a purported civil end-user, but basic research indicates the address is
+      a military facility or co-located with military facilities in a country of concern.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN-BIS Joint Alert FIN-2022-Alert003
+    publisher: FinCEN and BIS
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/2022-06/FinCEN%20and%20Bis%20Joint%20Alert%20FINAL.pdf
+    locator: p.6 and fn 23
+    quote: Transactions involving entities whose website or business registration states the entities
+      work on “special purpose projects.”
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Cadence documents described Central South CAD Center as an alias for China's National University of
+    Defense Technology (DOJ 2025).
+  cases:
+  - name: Cadence Design Systems Inc.
+    year: '2025'
+    jurisdiction: United States (N.D. Cal.)
+    what_happened: Cadence agreed to plead guilty to conspiracy to commit export control violations for
+      exporting EDA tools to NUDT, an Entity-Listed Chinese military university, through the alias Central
+      South CAD Center, 2015 to 2021; combined penalties over $140 million. Plea subject to court approval
+      at time of release.
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/cadence-design-systems-agrees-plead-guilty-and-pay-over-140-million-unlawfully-exporting
+    source_title: Cadence Design Systems Agrees to Plead Guilty and Pay Over $140 Million for Unlawfully
+      Exporting Semiconductor Design Tools to a Restricted PRC Military University
+  data_needed:
+  - Company
+  - Address
+  - Document (website captures, registrations)
+  checkable: lookups
+  lookup_sources:
+  - Mapping and satellite imagery
+  - Company registries
+  - BIS Entity List
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Civilian businesses located in former military buildings or dual-use industrial parks.
+  - Defence suppliers selling legitimately with licences.
+  jurisdictions: US
+  version: 1
+- id: SF-034
+  name: Residential, mass-registration or non-existent business address
+  definition: A trading company operates complex international business from a home address, an address
+    shared with many companies, a post box, or an address that does not exist.
+  areas:
+  - SF
+  typology: Address anomaly
+  status: verified
+  sources:
+  - title: Tri-Seal Compliance Note
+    publisher: US Departments of Commerce, Treasury and Justice
+    year: '2023'
+    url: https://ofac.treasury.gov/media/931471/download
+    locator: p.3
+    quote: Operation of complex and/or international businesses using residential addresses or addresses
+      common to multiple closely-held corporate entities;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN-BIS Joint Alert FIN-2022-Alert003
+    publisher: FinCEN and BIS
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/2022-06/FinCEN%20and%20Bis%20Joint%20Alert%20FINAL.pdf
+    locator: p.6
+    quote: Parties to transactions with addresses that do not appear consistent with the business or are
+      otherwise problematic (e.g., either the physical address does not exist, or it is residential).
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
+    publisher: FATF
+    year: '2021'
+    url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+    locator: para 31, maritime sector indicators
+    quote: A trade entity is registered at an address that is likely to be a mass registration address
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An importer of aircraft parts is registered at a flat in a residential tower with 300 other companies.
+  cases: []
+  data_needed:
+  - Address
+  - Company
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - Company registries (count of companies at an address)
+  - Mapping and street imagery
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: BO
+    reason: Mass-registration addresses are also a standard shell-company indicator.
+    source_url: https://ofac.treasury.gov/media/931471/download
+  innocent_explanations:
+  - Registered-agent or company-formation addresses are common and legal.
+  - Small businesses run from home.
+  - Virtual offices.
+  jurisdictions: US, FATF members
+  version: 1
+- id: SF-035
+  name: Trade documents inconsistent or missing the end user; letter of credit consigned to the issuing
+    bank
+  definition: Contracts, invoices and shipping papers disagree on names, prices, quantities or destination,
+    or a letter of credit is consigned to the bank so the real end user never appears.
+  areas:
+  - SF
+  typology: Trade finance concealment
+  status: verified
+  sources:
+  - title: FinCEN-BIS Joint Notice FIN-2023-NTC2
+    publisher: FinCEN and BIS
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Joint_Notice_US_Export_Controls_FINAL508.pdf
+    locator: p.3
+    quote: Purchases under a letter of credit that are consigned to the issuing bank, not to the actual
+      end-user. In addition, supporting documents, such as a commercial invoice, do not list the actual
+      end-user.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
+    publisher: FATF
+    year: '2021'
+    url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+    locator: para 31, maritime and trade finance indicators, pp.21-22
+    quote: Inconsistencies are identified across contracts, invoices, or other trade documents, e.g. contradictions
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
+    publisher: FATF
+    year: '2021'
+    url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+    locator: para 31, trade finance indicators
+    quote: Transactions include wire instructions or payment details from or due to parties not identified
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The invoice says 500 units at one price, the packing list 800 units at another, and the payer is not
+    named in the letter of credit.
+  cases: []
+  data_needed:
+  - Document (letter of credit, invoice, packing list, bill of lading)
+  - Contract
+  - Payment
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Document inconsistencies on price and quantity are core trade-based laundering signs.
+    source_url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+  innocent_explanations:
+  - Clerical errors and amendments.
+  - Partial shipments.
+  - Bank-consigned shipments are a normal security device in some documentary credits.
+  jurisdictions: US, FATF members
+  version: 1
+- id: SF-036
+  name: Declared value of goods low compared with shipping cost
+  definition: The goods are declared at a value that is small relative to what it costs to ship them,
+    which may hide their true nature or value.
+  areas:
+  - SF
+  typology: Valuation anomaly
+  status: verified
+  sources:
+  - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
+    publisher: FATF
+    year: '2021'
+    url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+    locator: para 31, maritime sector indicators
+    quote: Shipment of goods have a low declared value vis-à-vis the shipping cost;
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An air-freighted crate costing $8,000 to ship is declared as $600 of spare parts.
+  cases: []
+  data_needed:
+  - Document (customs declaration, freight invoice)
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Freight rates
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Urgent replacement parts shipped by air.
+  - Heavy low-value goods.
+  - Samples shipped free of charge.
+  jurisdictions: FATF members
+  version: 1
+- id: SF-037
+  name: Personal account used to buy export-controlled industrial items
+  definition: An individual uses a personal bank account or card to buy controlled industrial goods unrelated
+    to any business activity.
+  areas:
+  - SF
+  typology: Account misuse
+  status: verified
+  sources:
+  - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
+    publisher: FATF
+    year: '2021'
+    url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+    locator: para 31, account and transaction activity indicators, p.20
+    quote: Customer uses a personal account to purchase industrial items that are under export control
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A private individual buys high-precision pressure transducers on a personal credit card for shipment
+    abroad.
+  cases: []
+  data_needed:
+  - Person
+  - BankAccount
+  - Payment
+  - Document (order)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Sole traders mixing personal and business accounts.
+  - Hobbyist or academic use.
+  jurisdictions: FATF members
+  version: 1
+- id: SF-038
+  name: University or research-institute customer trading in dual-use goods
+  definition: A customer affiliated with a university or research institution is involved in buying or
+    trading dual-use or export-controlled goods.
+  areas:
+  - SF
+  typology: Academic procurement
+  status: verified
+  sources:
+  - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
+    publisher: FATF
+    year: '2021'
+    url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+    locator: para 31, customer profile indicators, p.19
+    quote: A customer affiliated with a university or research institution is involved in the trading
+      of dual-use goods
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - NUDT, a military university, received EDA tools through an alias (Cadence, DOJ 2025).
+  cases:
+  - name: Cadence Design Systems Inc.
+    year: '2025'
+    jurisdiction: United States (N.D. Cal.)
+    what_happened: Agreed guilty plea for exports to NUDT, a military university on the Entity List.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/cadence-design-systems-agrees-plead-guilty-and-pay-over-140-million-unlawfully-exporting
+    source_title: DOJ press release, 28 July 2025
+  data_needed:
+  - Organization
+  - Person
+  - Employment
+  - Contract
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - BIS Entity List
+  - Institution websites and publication records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Universities legitimately buy scientific equipment, much of it dual-use.
+  - Licensed academic collaborations.
+  jurisdictions: FATF members
+  version: 1
+- id: SF-039
+  name: Commercial account behaving like a remittance or pass-through account
+  definition: A business account moves high volumes in and out quickly with small end-of-day balances
+    and no clear business reason, sometimes paying many similar dual-use suppliers in small amounts.
+  areas:
+  - SF
+  typology: Pass-through / funnel account
+  status: verified
+  sources:
+  - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
+    publisher: FATF
+    year: '2021'
+    url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+    locator: para 31, customer profile indicators, p.19
+    quote: A customer or counterparty, declared to be a commercial business, conducts transactions that
+      suggest that they
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN-BIS Supplemental Alert FIN-2023-Alert004
+    publisher: FinCEN and BIS
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN%20and%20BIS%20Joint%20Alert%20_FINAL_508C.pdf
+    locator: p.9
+    quote: Transactions involving smaller-volume payments from the same end user’s foreign bank account
+      to multiple, similar suppliers of dual-use products.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A trading company receives wires from three countries and pays out the same day to five electronics
+    distributors.
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment (payer, beneficiary, amount, date)
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Funnel or pass-through account behaviour is a general laundering pattern.
+    source_url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+  innocent_explanations:
+  - Distributors and procurement agents have high turnover with thin margins.
+  - Cash-management sweeps to group accounts.
+  jurisdictions: FATF members, US
+  version: 1
+- id: SF-040
+  name: Ledger arrangements between linked companies instead of international transfers
+  definition: Linked companies keep running accounts of what they owe each other and settle rarely, avoiding
+    international payments that banks would screen.
+  areas:
+  - SF
+  typology: Netting / ledger settlement
+  status: verified
+  sources:
+  - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
+    publisher: FATF
+    year: '2021'
+    url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+    locator: para 31, account and transaction activity indicators, p.20
+    quote: Transactions are made on the basis of "ledger" arrangements that obviate the need for frequent
+      international
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Goods flow monthly between two related firms, but payments occur once a year as a net balance.
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Payment
+  - Document (internal ledgers)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Intra-group netting is a normal treasury practice.
+  - Barter or offset in some trades.
+  jurisdictions: FATF members
+  version: 1
+- id: SF-041
+  name: Link to a country of proliferation or diversion concern
+  definition: The customer, originator or beneficiary is based in, or tied to, a country of proliferation
+    concern (such as the DPRK or Iran) or one with weak sanctions or export-control enforcement.
+  areas:
+  - SF
+  typology: Geographic risk
+  status: verified
+  sources:
+  - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
+    publisher: FATF
+    year: '2021'
+    url: https://isomer-user-content.by.gov.sg/473/b7c26389-d5c0-454a-ba8b-b581c642097d/Guidance-Proliferation-Financing-Risk-Assessment-Mitigation.pdf
+    locator: para 31, customer profile and account indicators, p.19
+    quote: The customer is a person connected with a country of proliferation or diversion concern
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A shipping agent in a third country is owned by nationals of a country under UN proliferation sanctions.
+  cases: []
+  data_needed:
+  - Person (nationality)
+  - Company (jurisdiction)
+  - Address
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Sanctions lists
+  - FATF high-risk jurisdiction lists
+  - National risk assessments
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Diaspora communities and family remittances.
+  - Licensed humanitarian trade.
+  - Nationality alone is not evidence of wrongdoing.
+  jurisdictions: FATF members; UN sanctions on DPRK and Iran
+  version: 1
+- id: SF-042
+  name: Diplomats or designated persons holding accounts in family members' or front companies' names,
+    in several countries
+  definition: Officials or designated persons get around asset freezes and account limits by using accounts
+    in relatives' or front companies' names, or in countries where they are not posted.
+  areas:
+  - SF
+  typology: Nominee accounts
+  status: verified
+  sources:
+  - title: UN Panel of Experts report S/2019/171
+    publisher: United Nations Security Council
+    year: '2019'
+    url: https://documents.un.org/doc/undoc/gen/n19/028/82/pdf/n1902882.pdf
+    locator: Summary, p.4
+    quote: Diplomats and representatives of designated entities of the Democratic People’s Republic of
+      Korea also circumvent the assets freeze and the limit on the number of diplomatic bank accounts
+      by holding accounts in the name of family members and front companies and by establishing accounts
+      in multiple jurisdictions.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An embassy staffer's spouse holds an account receiving regular wires from a trading company.
+  cases:
+  - name: UN Panel of Experts on DPRK, 2019 final report
+    year: '2019'
+    jurisdiction: United Nations
+    what_happened: The Panel found DPRK diplomats controlled accounts in multiple countries, including
+      ones where they were not accredited, and used family-member and front-company accounts.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/doc/undoc/gen/n19/028/82/pdf/n1902882.pdf
+    source_title: S/2019/171
+  data_needed:
+  - Person
+  - Family
+  - BankAccount
+  - Company
+  - Ownership
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Diplomatic lists
+  - Sanctions lists
+  - Company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Use of family and front-company accounts by officials is the same pattern seen in PEP corruption
+      cases.
+    source_url: https://documents.un.org/doc/undoc/gen/n19/028/82/pdf/n1902882.pdf
+  innocent_explanations:
+  - Family members have their own legitimate income and accounts.
+  - Diplomats legitimately hold accounts for personal needs.
+  jurisdictions: UN DPRK sanctions (UNSC 1718 regime)
+  version: 1
+- id: SF-043
+  name: Non-profit solicits donations but provides no visible charitable services, or openly supports
+    a terrorist group
+  definition: A charity raises money, sometimes on social media or in crypto, but shows no real charitable
+    work, or its use of funds does not match its stated purpose.
+  areas:
+  - SF
+  typology: Abuse of non-profit organisations
+  status: verified
+  sources:
+  - title: FinCEN Alert FIN-2023-Alert006 (Hamas)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/2023-10/FinCEN_Alert_Terrorist_Financing_FINAL508.pdf
+    locator: p.3
+    quote: A customer that is a charitable organization or nonprofit organization (NPO) solicits donations
+      but does not appear to provide any charitable services or openly supports Hamas’s terrorist activity
+      or operations.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Operational alert: Terrorist activity financing (FINTRAC-2022-OA001)'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: Indicators in relation to support of international terrorist groups
+    quote: The use of funds by a non-profit organization is not consistent with the purpose for which
+      it was established.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A newly formed relief fund posts crypto addresses on messaging channels and has no published projects.
+  cases:
+  - name: United States v. Holy Land Foundation for Relief and Development et al.
+    year: 2008-2009
+    jurisdiction: United States (N.D. Tex.)
+    what_happened: A jury convicted HLF and five leaders in November 2008 of providing material support
+      to Hamas; DOJ said about $12.4 million went to Hamas-linked zakat committees and charities. Sentences
+      of 15 to 65 years were imposed in May 2009.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/federal-judge-hands-downs-sentences-holy-land-foundation-case
+    source_title: Federal Judge Hands Downs Sentences in Holy Land Foundation Case
+  data_needed:
+  - Organization
+  - Payment
+  - CryptoWallet
+  - Document (annual returns, charity filings)
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Charity regulators' registers
+  - Social media
+  - Blockchain analytics
+  - Sanctions lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Charities that raise money but deliver no services also signal donation fraud.
+    source_url: https://www.fincen.gov/sites/default/files/2023-10/FinCEN_Alert_Terrorist_Financing_FINAL508.pdf
+  innocent_explanations:
+  - New charities may not yet have published results.
+  - Small volunteer groups often report poorly.
+  - Work in conflict zones is hard to document.
+  jurisdictions: US, Canada; FATF Recommendation 8 globally
+  version: 1
+- id: SF-044
+  name: Non-profit receives large donations from unknown sources then wires them on to other non-profits
+  definition: A charity takes in large sums from unknown donors in a short time and quickly passes significant
+    amounts to other charities, possibly to layer funds.
+  areas:
+  - SF
+  typology: Abuse of non-profit organisations
+  status: verified
+  sources:
+  - title: FinCEN Alert FIN-2023-Alert006 (Hamas)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/2023-10/FinCEN_Alert_Terrorist_Financing_FINAL508.pdf
+    locator: p.3
+    quote: A customer that is a charitable organization or NPO receives large donations from an unknown
+      source over a short period of time and then sends significant wire transfers or checks to other
+      charitable organizations or NPOs.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: Indicators in relation to support of international terrorist groups
+    quote: Non-profit or charitable organizations conduct financial transactions (e.g., large cash deposits
+      or wire transfers to location of concern) that does not appear to be in line with stated activity
+      of the organization.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A local charity receives $400,000 in a month from unidentified donors and wires most to two overseas
+    charities.
+  cases: []
+  data_needed:
+  - Organization
+  - Payment (payer, beneficiary, amount, date)
+  - BankAccount
+  - Address
+  checkable: records
+  lookup_sources:
+  - Charity registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Emergency appeals after disasters bring sudden large donations.
+  - Grant-making foundations routinely pass money to partner charities.
+  - Anonymous giving is a religious or cultural norm in some communities.
+  jurisdictions: US, Canada
+  version: 1
+- id: SF-045
+  name: Unofficial fundraising, crowdfunding, fintech or crypto used to finance extremist individuals
+    or groups
+  definition: Money is raised in unregistered ways, or through crowdfunding, online payment platforms,
+    livestream donations or cryptocurrency, for people or groups linked to violent extremism.
+  areas:
+  - SF
+  typology: Fundraising
+  status: verified
+  sources:
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: Indicators in relation to domestic terrorism
+    quote: Use of crowdfunding, FinTech platforms and/or cryptocurrencies to finance individuals or groups
+      associated with violent extremism.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: Indicators in relation to support of international terrorist groups
+    quote: Raising donations in an unofficial or unregistered manner.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN Alert FIN-2023-Alert006 (Hamas)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/2023-10/FinCEN_Alert_Terrorist_Financing_FINAL508.pdf
+    locator: p.3
+    quote: A customer conducts transactions with known or suspected virtual currency addresses tied to
+      terrorism or terrorist financing donation campaigns.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A streamer receives donations through a livestream platform and forwards them to a group's crypto
+    wallet.
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - CryptoWallet
+  - Payment
+  - UserAccount
+  checkable: lookups
+  lookup_sources:
+  - Blockchain analytics
+  - Crowdfunding platform pages
+  - Sanctions and terrorist listings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Crowdfunding and crypto donations are widely used for lawful causes.
+  - Political or activist fundraising that is lawful but controversial.
+  jurisdictions: Canada, US
+  version: 1
+- id: SF-046
+  name: Transaction details reference terrorist campaigns, extremist groups or iconography
+  definition: Payment references, contact names or email addresses contain words, numbers or symbols tied
+    to violent extremist groups or support for terrorist campaigns.
+  areas:
+  - SF
+  typology: Content-based indicator
+  status: verified
+  sources:
+  - title: FinCEN Alert FIN-2023-Alert006 (Hamas)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/2023-10/FinCEN_Alert_Terrorist_Financing_FINAL508.pdf
+    locator: p.2
+    quote: Information included in a transaction between customers indicates support for terrorist campaigns.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: Indicators in relation to domestic terrorism
+    quote: Transaction details (contact name, email address, funds totals, remittance info etc.) makes
+      references to words, phrases and/or numbers linked to violent extremist actors, groups, activity,
+      or iconography.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - E-transfer memos read with a group's slogan and amounts use numbers that are known extremist codes.
+  cases: []
+  data_needed:
+  - Payment (purpose)
+  - Email
+  - Person
+  checkable: person
+  lookup_sources:
+  - Extremist symbol and code references
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Coincidental numbers or words.
+  - Humanitarian fundraising for a region that uses similar words.
+  - Jokes or sarcasm.
+  jurisdictions: US, Canada
+  version: 1
+- id: SF-047
+  name: Transfers to or from conflict zones or high-risk jurisdictions without clear purpose
+  definition: Money moves to or from places in or near armed conflict where terrorist groups operate,
+    or between many people in different countries, with no apparent reason.
+  areas:
+  - SF
+  typology: Geographic risk
+  status: verified
+  sources:
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: Indicators in relation to support of international terrorist groups
+    quote: Transactions involving certain high-risk jurisdictions; such as locations in the midst of or
+      in proximity to, armed conflict where terrorist groups operate or locations which are subject to
+      weaker ML/TF controls.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: same section
+    quote: Individual sends and/or receives wire transfers to/from a number of individuals in different
+      countries without an apparent purpose.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A student receives small transfers from several countries and sends wires to a city near a front line.
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - Address
+  - BankAccount
+  checkable: records
+  lookup_sources:
+  - Conflict-zone mapping
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family remittances to relatives in conflict areas.
+  - Humanitarian aid workers.
+  - Diaspora business ties.
+  jurisdictions: Canada; relevant globally
+  version: 1
+- id: SF-048
+  name: Excessive e-transfers or cash deposits inconsistent with occupation, then wires to high-risk places
+    or cash withdrawals
+  definition: An account receives many electronic transfers or cash deposits beyond what the person's
+    job explains, and the money quickly leaves by wire to a high-risk place or by cash.
+  areas:
+  - SF
+  typology: Funnel account
+  status: verified
+  sources:
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: Indicators in relation to support of international terrorist groups
+    quote: Client receives excessive email money transfers (EMTs) and/or cash deposits, not in line with
+      stated occupation, and are used in part to fund wires to a high-risk jurisdiction and/or cash withdrawals
+      within a short period of time.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: Indicators in relation to domestic terrorism
+    quote: Excessive email money transfers followed by the depletion of funds through third parties or
+      cash withdrawals.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A part-time worker receives 60 e-transfers in two weeks and sends a single wire abroad.
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment
+  - Person
+  - Employment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (FINTRAC gives no number for 'excessive')
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Rapid in-and-out e-transfers are also a money-mule pattern.
+    source_url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+  innocent_explanations:
+  - Informal savings circles or shared household expenses.
+  - Side businesses.
+  - Collecting money for a family event or funeral.
+  jurisdictions: Canada
+  version: 1
+- id: SF-049
+  name: Pre-departure pattern of a would-be foreign fighter (debt financing, selling possessions, tickets
+    near conflict zone)
+  definition: Before travel to a conflict zone a person sells belongings, maxes out credit or takes loans,
+    empties accounts in cash, buys travel to a nearby country, and changes their usual spending.
+  areas:
+  - SF
+  typology: Extremist traveller
+  status: verified
+  sources:
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: Indicators in relation to Canadian Extremist Travellers, Pre-Departure
+    quote: Exploitation of available credit products, including maxing out credit cards (often via cash
+      advances), not making payments and transferring balance to personal debit account.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: Pre-Departure
+    quote: Purchase or airline ticket to country in the vicinity of a conflict zone.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A young man takes a student loan, draws cash advances on two cards, sells his car and buys a one-way
+    ticket to a country bordering a conflict area.
+  cases: []
+  data_needed:
+  - Person
+  - BankAccount
+  - Payment
+  - Document (travel bookings)
+  checkable: records
+  lookup_sources:
+  - Public records and media for travel
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FINTRAC lists use of social assistance and student loans and unpaid credit, which can also
+      be fraud against lenders or the state.
+    source_url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+  innocent_explanations:
+  - Emigration or long travel.
+  - Financial distress.
+  - Visiting family in the region.
+  jurisdictions: Canada
+  version: 1
+- id: SF-050
+  name: 'En-route and in-theatre pattern: card use along a travel corridor, banking access from a conflict
+    border, then dormancy'
+  definition: After departure, card or online-banking activity appears along routes to, or at the border
+    of, a conflict zone, money arrives there, then the account goes quiet; it may revive on return.
+  areas:
+  - SF
+  typology: Extremist traveller
+  status: verified
+  sources:
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: En-Route
+    quote: Client accesses or attempts to access their online banking from inside or along the border
+      of a conflict zone.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: In Theatre; Returning
+    quote: Client accounts go dormant.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Debit card use in a transit city, a login from a border town, then no activity for 18 months.
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment (location)
+  - UserAccount (IP/login history)
+  - Person
+  checkable: records
+  lookup_sources:
+  - Media and court records on travel
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Journalists, aid workers and family visitors travel to such areas.
+  - Dormancy can follow emigration or a switch to another bank.
+  jurisdictions: Canada
+  version: 1
+- id: SF-051
+  name: Purchases of firearms, ammunition, explosives precursors or tactical gear, and payments to extremist
+    media or merchandise sellers
+  definition: A person buys weapons, explosive materials or tactical equipment, or pays extremist propaganda
+    outlets or merchandise sellers, alongside other signs of extremism.
+  areas:
+  - SF
+  typology: Attack preparation / extremist support
+  status: verified
+  sources:
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: Indicators in relation to domestic terrorism
+    quote: Client conducts purchases at vendors who sell firearms, fire-arm making kits, ammunition, explosives,
+      and/or tactical gear.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: Indicators in relation to domestic terrorism
+    quote: Monthly and/or one time payments are made to extremist media outlets and/or propaganda websites.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Card payments to a firearm-kit seller and a monthly subscription to a known extremist forum.
+  cases: []
+  data_needed:
+  - Payment (beneficiary, purpose)
+  - Person
+  - Company (vendor)
+  checkable: records
+  lookup_sources:
+  - Vendor identification
+  - Extremism research databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Purchases of firearm-making kits and ammunition can also point to illegal weapons supply.
+    source_url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+  innocent_explanations:
+  - Lawful hunting, sport shooting and collecting.
+  - Researchers and journalists subscribing to extremist media for work.
+  - Military or security professionals buying gear.
+  jurisdictions: Canada
+  version: 1
+- id: SF-052
+  name: Small recurring payments that look like membership or clubhouse fees
+  definition: Regular low-value transfers with no business purpose, sometimes labelled as membership or
+    clubhouse fees, which may be dues to an extremist group.
+  areas:
+  - SF
+  typology: Self-funding / dues
+  status: verified
+  sources:
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: Indicators in relation to domestic terrorism
+    quote: Transaction details make reference to membership fees or clubhouse fees.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Ten individuals each send $30 a month to the same person with the memo 'dues'.
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - Organization
+  - Associate
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary club, gym, sports or hobby memberships.
+  - Shared rent or utilities.
+  jurisdictions: Canada
+  version: 1
+- id: SF-053
+  name: Use of money services or virtual asset providers in high-risk jurisdictions with lax due diligence
+  definition: Transactions go through remittance businesses or crypto services in jurisdictions linked
+    to a terrorist group's activity that are believed to do weak customer checks or have opaque ownership.
+  areas:
+  - SF
+  typology: Weak-control intermediaries
+  status: verified
+  sources:
+  - title: FinCEN Alert FIN-2023-Alert006 (Hamas)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/2023-10/FinCEN_Alert_Terrorist_Financing_FINAL508.pdf
+    locator: p.2
+    quote: A customer conducts transactions with a Money Services Business (MSB) or other financial institution,
+      including one that offers services in virtual currency, that operates in higher-risk jurisdictions
+      tied to Hamas activity, and is reasonably believed or suspected to have lax customer due diligence
+      (CDD) requirements, opaque ownership, or otherwise fails to comply with anti-money laundering/combatting
+      the financing of terrorism (AML/CFT) best practices.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Repeated transfers via an unlicensed exchange office whose owners are not public.
+  cases: []
+  data_needed:
+  - Company (MSB, VASP)
+  - Ownership
+  - Payment
+  - CryptoWallet
+  checkable: lookups
+  lookup_sources:
+  - MSB and VASP licensing registers
+  - Sanctions lists
+  - Blockchain analytics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - In some regions only small or informal providers are available.
+  - Remittances to family through the only working channel.
+  jurisdictions: US
+  version: 1
+- id: SF-054
+  name: Business payments to armed groups in a conflict zone via intermediaries, disguised with false
+    invoices
+  definition: A company operating where a terrorist group controls territory pays it, directly or via
+    intermediaries, for access, protection, raw materials or per-unit 'taxes', and disguises the payments
+    with false invoices or backdated documents.
+  areas:
+  - SF
+  typology: Extortion / 'taxation' by terrorist groups
+  status: verified
+  sources:
+  - title: Lafarge Pleads Guilty to Conspiring to Provide Material Support to Foreign Terrorist Organizations
+    publisher: US Department of Justice
+    year: '2022'
+    url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+    locator: press release body
+    quote: Lafarge and LCS executives required intermediaries to create business entities with names not
+      obviously linked
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Lafarge press release
+    publisher: US Department of Justice
+    year: '2022'
+    url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+    locator: press release body
+    quote: created invoices with false descriptions of services rendered for an intermediary to submit
+      to LCS.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Financing of the terrorist organisation ISIL
+    publisher: FATF
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Financing-of-terrorist-organisation-isil.html
+    locator: publication page summary
+    quote: ISIL's primary source of income comes from the territory it occupies.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A plant in occupied territory pays monthly 'donations' and a per-ton fee on product sold, booked as
+    consultancy services.
+  cases:
+  - name: Lafarge S.A. and Lafarge Cement Syria S.A.
+    year: '2022'
+    jurisdiction: United States (E.D.N.Y.)
+    what_happened: Both pleaded guilty to conspiring to provide material support to ISIS and al-Nusrah
+      Front; about $5.92 million was paid through intermediaries in 2013-2014 as monthly 'donations',
+      raw-material purchases and per-ton payments; penalties totalled $777.78 million.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+    source_title: Lafarge Pleads Guilty to Conspiring to Provide Material Support to Foreign Terrorist
+      Organizations
+  data_needed:
+  - Company
+  - Payment (purpose)
+  - Representation (intermediary)
+  - Contract
+  - Document (invoices)
+  - Address
+  checkable: person
+  lookup_sources:
+  - Sanctions and terrorist listings
+  - Conflict mapping of territorial control
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Lafarge used intermediaries, front entities and false invoices, the same mechanics as corporate
+      bribery schemes.
+    source_url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+  innocent_explanations:
+  - Payments to local suppliers or security firms in unstable regions.
+  - Duress payments to protect staff (still may be unlawful; legal advice needed).
+  - Licensed humanitarian activity.
+  jurisdictions: US (18 U.S.C. 2339B material support); others
+  version: 1
+- id: SF-055
+  name: Car sales or car-shipping businesses in an area of concern sending funds to similar businesses
+  definition: Businesses that sell or ship cars in a region of concern move money to similar businesses
+    or to individuals, with references to buying cars, a pattern linked to terrorist-group laundering
+    networks.
+  areas:
+  - SF
+  typology: Trade-based terrorist financing
+  status: verified
+  sources:
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: Indicators in relation to support of international terrorist groups
+    quote: Transactions involving businesses involved in auto sales or automobile shipping in an area
+      of concern, sending funds to similar types of companies or to individuals where the purchasing of
+      cars is referenced.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A used-car exporter receives wires from exchange houses in Lebanon and ships vehicles to West Africa.
+  cases:
+  - name: United States v. Lebanese Canadian Bank et al. (civil forfeiture)
+    year: '2013'
+    jurisdiction: United States (S.D.N.Y.)
+    what_happened: LCB agreed to forfeit $102 million. The government alleged at least $329 million was
+      wired to the US to buy used cars shipped to West Africa, with proceeds and drug profits moved through
+      Hizballah-controlled laundering channels; the release does not record an admission.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/manhattan-us-attorney-announces-102-million-settlement-civil-forfeiture-and-money
+    source_title: Manhattan U.S. Attorney Announces $102 Million Settlement Of Civil Forfeiture And Money
+      Laundering Claims Against Lebanese Canadian Bank
+  data_needed:
+  - Company
+  - Payment
+  - Document (export declarations, vehicle titles)
+  - Vehicle
+  checkable: lookups
+  lookup_sources:
+  - Customs export data
+  - Company registries
+  - Sanctions lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: In the LCB case the government alleged used-car trade proceeds were mixed with narcotics profits.
+    source_url: https://www.justice.gov/usao-sdny/pr/manhattan-us-attorney-announces-102-million-settlement-civil-forfeiture-and-money
+  innocent_explanations:
+  - Used-car export to West Africa and the Middle East is a large legitimate trade.
+  jurisdictions: Canada; US case
+  version: 1
+- id: SF-056
+  name: Person or entity linked to terrorism by media, law enforcement or online presence
+  definition: Public information, law enforcement or the person's own online posts tie them to a terrorist
+    or violent extremist group or show intent to commit violence.
+  areas:
+  - SF
+  typology: Adverse information
+  status: verified
+  sources:
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: Indicators in relation to support of international terrorist groups
+    quote: Transactions involve persons or entities identified by media and/or sanctions lists as being
+      linked to a terrorist group or terrorist activities.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Operational alert: Terrorist activity financing'
+    publisher: FINTRAC (Canada)
+    year: '2022'
+    url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
+    locator: Indicators in relation to domestic terrorism
+    quote: Individual’s online presence indicates individual’s intent to engage in violent extremist activity
+      e.g., social media post, tweet, hashtag, and/or manifesto.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A payment recipient's public profile posts a manifesto praising a listed group.
+  cases: []
+  data_needed:
+  - Person
+  - Organization
+  - Sanction
+  - Associate
+  - Document (media reports, posts)
+  checkable: person
+  lookup_sources:
+  - Media archives
+  - Social media
+  - Terrorist listings (UN, national)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Listed on a terrorist or sanctions list (meets the published definition as worded)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Mistaken identity or shared names.
+  - Inaccurate media reporting.
+  - Lawful political speech that is not violent.
+  jurisdictions: Canada; relevant globally
+  version: 1
+not_reached:
+- 'FATF Guidance on Proliferation Financing Risk Assessment and Mitigation (2021) on fatf-gafi.org: direct
+  PDF download was blocked (403); read through a copy hosted by the Singapore government (isomer-user-content.by.gov.sg).
+  Some quotes from it are cut at about 110 characters by the fetch tool and are marked with that locator.'
+- 'FATF Risk of Terrorist Abuse in Non-Profit Organisations (2014) and FATF Emerging Terrorist Financing
+  Risks (2015): not opened.'
+- 'FATF/Egmont reports on foreign terrorist fighters and ISIL financing: only the ISIL publication landing
+  page was opened, not the full report.'
+- 'FATF 2008 Proliferation Financing typologies report (annex of indicators): not opened.'
+- 'OFAC February 2024 Price Cap Coalition Compliance and Enforcement Alert and October 2023 coalition
+  advisory: not opened; only the October 2024 update was read.'
+- 'UK OFSI Maritime Guidance (March 2024) and UK tanker-sales guidance: not opened.'
+- 'IMO Assembly Resolution A.1192(33) on the dark fleet (December 2023): not opened.'
+- 'Any 2025-2026 update to the US maritime advisory: searched but none found in results; not confirmed
+  either way.'
+- 'Egmont Group and AUSTRAC terrorism financing indicator lists: not opened.'
+- 'Court records (dockets) for the cases: DOJ and OFAC releases were used instead; Wise Honest forfeiture
+  judgment status not confirmed.'
+- BIS 'Know Your Customer' red flags were read from the eCFR versioner API (2025-06-02 version of 15 CFR
+  Part 732).

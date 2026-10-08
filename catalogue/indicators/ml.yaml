@@ -1,0 +1,3523 @@
+key: ML
+name: Money laundering
+scope: money laundering in general, trade-based money laundering, real estate, cash-intensive businesses,
+  professional money launderers, crypto-assets used for laundering. Also check whether the coded data
+  behind Akartuna, Johnson & Thornton (2024, Journal of Experimental Criminology, doi 10.1007/s11292-024-09623-y,
+  2,565 indicators from 105 typology reports) is downloadable, and report what you find.
+indicators:
+- id: ML-001
+  name: Complex or illogical ownership structure
+  definition: The company's ownership or the deal's structure is more layered than the business needs,
+    for example chains of shell companies or companies in high-risk places, so it is hard to see who really
+    owns or controls it.
+  areas:
+  - ML
+  typology: Concealment of beneficial ownership
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: 'Structural risk indicators, p.3 (copy of the FATF PDF; FATF landing page: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Trade-based-money-laundering-indicators.html)'
+    quote: The corporate structure of a trade entity appears unusually complex and illogical, such as
+      the involvement of shell companies or companies registered in high-risk jurisdictions.
+    quote_verified: true
+    licence: © 2021 FATF–Egmont Group
+    checked: '2026-10-08'
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Three, Risk categories, transaction risks (para 105)
+    quote: Transactions which evidence complex ownership structures or where the beneficial owner is obfuscated.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'BSA/AML Examination Manual, Appendix F: Money Laundering and Terrorist Financing Red Flags'
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Trade Finance
+    quote: Transaction structure appears unnecessarily complex and designed to obscure the true nature
+      of the transaction.
+    quote_verified: true
+    licence: US government work
+    checked: '2026-10-08'
+  examples:
+  - A trading firm owned by a BVI company, owned in turn by a Seychelles company, with no named natural
+    person
+  - A bank's non-resident customers moving funds through shell companies that hid the true owners (Danske
+    Bank Estonia)
+  cases:
+  - name: Danske Bank A/S
+    year: '2022'
+    jurisdiction: United States (S.D.N.Y.)
+    what_happened: Pleaded guilty to conspiracy to commit bank fraud; DOJ said Danske Bank Estonia's non-resident
+      portfolio moved about $160 billion through US banks, with staff helping clients route money through
+      shell companies that hid who owned the funds; agreed forfeiture of $2.059 billion.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/danske-bank-pleads-guilty-fraud-us-banks-multi-billion-dollar-scheme-access-us-financial
+    source_title: Danske Bank Pleads Guilty to Fraud on U.S. Banks in Multi-Billion Dollar Scheme
+  data_needed:
+  - Company (name, jurisdiction, incorporationDate, registrationNumber)
+  - Ownership (owner, asset, percentage, startDate)
+  - Directorship (director, organization)
+  - Person (name, nationality)
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - company registries
+  - beneficial ownership registers
+  - offshore leaks databases
+  - OpenCorporates
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Layered shell structures were used to move funds allegedly misappropriated from a state fund
+      (1MDB) into luxury property.
+    source_url: https://www.justice.gov/archives/opa/pr/united-states-reaches-settlement-recover-more-700-million-assets-allegedly-traceable
+  innocent_explanations:
+  - Holding structures used for tax planning, financing or limiting liability
+  - Joint ventures and inherited family structures
+  - Investment funds that legitimately pool many owners
+  jurisdictions: Global (FATF, FFIEC US)
+  version: 1
+- id: ML-002
+  name: Entity registered in, or dealing with, a weak-AML jurisdiction
+  definition: The company is registered or has offices where anti-money-laundering rules are weak, or
+    does business with or ships through higher-risk places, without a clear business reason.
+  areas:
+  - ML
+  typology: Geographic risk
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Structural risk indicators, p.3
+    quote: A trade entity is registered or has offices in a jurisdiction with weak AML/CFT compliance.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Trade Finance
+    quote: Customers conducting business in higher-risk jurisdictions.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An importer whose only office is in a jurisdiction on the FATF list of jurisdictions under increased
+    monitoring
+  cases: []
+  data_needed:
+  - Company (jurisdiction, mainCountry)
+  - Address (country)
+  - Payment (payer, beneficiary, payerAccount, beneficiaryAccount)
+  - BankAccount (bankName, country)
+  checkable: lookups
+  lookup_sources:
+  - FATF high-risk and increased-monitoring lists
+  - company registries
+  - national risk assessments
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF VA red flags list transactions and IP addresses linked to sanctioned jurisdictions alongside
+      weak-regulation jurisdictions.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  innocent_explanations:
+  - The firm is local to that country
+  - Trade in goods only produced or sold there
+  - Regional hub offices
+  jurisdictions: Global
+  version: 1
+- id: ML-003
+  name: Mass-registration or unsuitable business address
+  definition: The company's address is one used by many companies (a formation agent or post box) or is
+    a home or building that does not fit the stated business.
+  areas:
+  - ML
+  typology: Shell company indicators
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Structural risk indicators, p.3 and footnote 4
+    quote: A trade entity is registered at an address that is likely to be a mass registration address
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Structural risk indicators, p.3
+    quote: The business activity of a trade entity does not appear to be appropriate for the stated address
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Hundreds of companies registered at one trust and company service provider's office
+  - A wholesale importer registered to a flat with no warehouse
+  cases: []
+  data_needed:
+  - Company (address, registrationNumber)
+  - Address (full, postalCode)
+  - Ownership
+  - Directorship
+  checkable: lookups
+  lookup_sources:
+  - company registries (count companies per address)
+  - OpenCorporates
+  - street-view or property records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small firms legitimately use registered-agent or accountant addresses
+  - Start-ups run from home
+  - Virtual offices for remote businesses
+  jurisdictions: Global
+  version: 1
+- id: ML-004
+  name: Thin, copied or impersonating online presence
+  definition: The company has no website, or a website copied from others that shows no real knowledge
+    of its trade, or a name that imitates a well-known company.
+  areas:
+  - ML
+  typology: Shell company indicators
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Structural risk indicators, p.3
+    quote: A trade entity lacks an online presence or the online presence suggests business activity inconsistent
+      with the stated line of business
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Structural risk indicators, p.3
+    quote: The name of a trade entity appears to be a copy of the name of a well-known corporation or
+      is very similar to it
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A 'Siemens Trading Ltd' unrelated to Siemens
+  - A website with boilerplate text lifted from another firm
+  cases: []
+  data_needed:
+  - Company (name, website, previousName)
+  - LegalEntity (website, email)
+  - Document (archived web pages)
+  checkable: lookups
+  lookup_sources:
+  - web archives (Wayback Machine)
+  - WHOIS/domain records
+  - trademark registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Lookalike names and copied websites are also used in impersonation and invoice fraud; FATF
+      notes the name may be used to appear part of the bigger corporation.
+    source_url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+  innocent_explanations:
+  - Small B2B traders often have no website
+  - Common or descriptive names that happen to resemble big brands
+  jurisdictions: Global
+  version: 1
+- id: ML-005
+  name: Company shows no normal business activity
+  definition: The company's accounts show none of the ordinary costs of running a business (wages, rent,
+    taxes), it has very few staff for its trade volume, or it does not file routine returns.
+  areas:
+  - ML
+  typology: Shell / front company
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Structural risk indicators, p.3
+    quote: A trade entity displays a notable lack of typical business activities, e.g. it lacks regular
+      payroll transactions in line with the number of stated employees, transactions relating to operating
+      costs, tax remittances.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Structural risk indicators, p.3
+    quote: An entity is not compliant with regular business obligations, such as filing VAT returns.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Shell Company Activity
+    quote: Purpose of the shell company is unknown or unclear.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A firm turning over millions with one employee and no rent or tax payments
+  cases: []
+  data_needed:
+  - Company (status, sector)
+  - Payment (payer, beneficiary, purpose, amount, date)
+  - Employment (employee, employer)
+  - Document (annual accounts, tax filings)
+  checkable: records
+  lookup_sources:
+  - company registry filings (accounts, employee counts)
+  - VAT/tax registers where public
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FATF lists failure to file VAT returns among TBML structural indicators, which also points
+      to VAT fraud.
+    source_url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+  innocent_explanations:
+  - Costs paid by a parent or group company
+  - Outsourced staff and services
+  - Brokers and agents who never hold inventory
+  - Late filing by a disorganised small firm
+  jurisdictions: Global
+  version: 1
+- id: ML-006
+  name: Nominee owners or managers
+  definition: 'The people listed as owners or managers look like stand-ins for someone else: they lack
+    business experience, do not know the transactions, or front many companies.'
+  areas:
+  - ML
+  typology: Nominee arrangements
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Structural risk indicators, p.3
+    quote: Owners or senior managers of a trade entity appear to be nominees acting to conceal the actual
+      beneficial owners
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A 22-year-old student listed as director of 40 trading companies
+  cases: []
+  data_needed:
+  - Person (birthDate, nationality)
+  - Directorship (director, organization, startDate)
+  - Ownership
+  - Representation
+  checkable: lookups
+  lookup_sources:
+  - company registries (count of directorships per person)
+  - OpenCorporates officer search
+  - interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Professional directors and company secretaries who legitimately sit on many boards
+  - Family members named as directors for succession or tax reasons
+  jurisdictions: Global
+  version: 1
+- id: ML-007
+  name: Adverse media or known criminal links
+  definition: The company, its owners or managers, or the customer appear in negative news, investigations
+    or convictions related to laundering, fraud, tax evasion or other crime.
+  areas:
+  - CY
+  - ML
+  typology: Customer risk
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Structural risk indicators, p.3
+    quote: A trade entity, or its owners or senior managers, appear in negative news
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Red flags about senders or recipients – Profile, p.13 (copy of FATF report hosted by Saudi
+      GDFI)
+    quote: A customer is known via publicly available information to law enforcement due to previous criminal
+      association.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A director previously convicted of fraud in another country
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Document (press articles, court records)
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - news archives
+  - court records
+  - sanctions and PEP lists (e.g. OpenSanctions)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Name matches with a different person
+  - Old or unproven allegations
+  - Acquittals or dropped cases
+  jurisdictions: Global
+  version: 1
+- id: ML-008
+  name: Dormancy then sudden burst of activity
+  definition: A new or long-dormant company or account suddenly handles large, high-value business, then
+    goes quiet again after a short time.
+  areas:
+  - CY
+  - ML
+  typology: Transaction pattern
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Trade activity risk indicators, p.4
+    quote: A newly formed or recently re-activated trade entity engages in high-volume and high-value
+      trade activity
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Account and transaction activity risk indicators, p.6
+    quote: Transaction activity associated with a trade entity increases in volume quickly and significantly,
+      and then goes dormant after a short period of time.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Structural risk indicators, p.3
+    quote: A trade entity has unexplained periods of dormancy.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A company incorporated last month that imports $20m of electronics, then stops trading
+  cases: []
+  data_needed:
+  - Company (incorporationDate, status, dissolutionDate)
+  - Payment (date, amount)
+  - BankAccount (opening date)
+  checkable: records
+  lookup_sources:
+  - company registry (incorporation and filing history)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Seasonal businesses
+  - Project companies set up for one contract
+  - Start-ups winning a big first order
+  jurisdictions: Global
+  version: 1
+- id: ML-009
+  name: Trade inconsistent with stated line of business
+  definition: A company buys or sells goods that have nothing to do with its declared business, or deals
+    through many unrelated middlemen in other trades.
+  areas:
+  - ML
+  typology: Trade-based money laundering
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Trade activity risk indicators, p.4
+    quote: Trade activity is inconsistent with the stated line of business of the entities involved, e.g.,
+      a car dealer is exporting clothing or a precious metals dealer is importing seafood.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Trade activity risk indicators, p.4
+    quote: A trade entity engages in complex trade deals involving numerous third-party intermediaries
+      in incongruent lines of business.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Activity Inconsistent with the Customer's Business
+    quote: Goods or services purchased by the business do not match the customer’s stated line of business.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A produce company paying a leather goods business and a textile maker in China (FinCEN funnel-account
+    example)
+  - Money exchange houses wiring funds to buy used cars for West Africa (Lebanese Canadian Bank case)
+  cases:
+  - name: Lebanese Canadian Bank SAL
+    year: '2013'
+    jurisdiction: United States (S.D.N.Y.)
+    what_happened: US prosecutors alleged at least $329 million was wired into the US, mainly via two
+      Lebanese exchange houses, to buy used cars shipped to West Africa, with sale proceeds and narcotics
+      proceeds moved to Lebanon through Hizballah-linked channels; LCB agreed to forfeit $102 million
+      to settle civil forfeiture and money laundering claims. The release does not state an admission
+      of liability.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/manhattan-us-attorney-announces-102-million-settlement-civil-forfeiture-and-money
+    source_title: Manhattan U.S. Attorney Announces $102 Million Settlement Of Civil Forfeiture And Money
+      Laundering Claims Against Lebanese Canadian Bank
+  data_needed:
+  - Company (sector)
+  - Payment (payer, beneficiary, purpose)
+  - Contract
+  - Document (invoices, bills of lading)
+  checkable: records
+  lookup_sources:
+  - company registry (stated activity codes)
+  - customs or trade data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: The Lebanese Canadian Bank used-car TBML scheme was alleged to move funds through Hizballah-linked
+      channels.
+    source_url: https://www.justice.gov/usao-sdny/pr/manhattan-us-attorney-announces-102-million-settlement-civil-forfeiture-and-money
+  - target_area: OC
+    reason: The same scheme was alleged to commingle narcotics proceeds with car-sale cash.
+    source_url: https://www.justice.gov/usao-sdny/pr/manhattan-us-attorney-announces-102-million-settlement-civil-forfeiture-and-money
+  innocent_explanations:
+  - Diversified trading houses
+  - Opportunistic one-off deals
+  - Outdated activity codes in the registry
+  jurisdictions: Global
+  version: 1
+- id: ML-010
+  name: Illogical shipping routes or transshipment
+  definition: Goods travel through extra countries, routes or methods that make no commercial sense, often
+    through higher-risk places.
+  areas:
+  - ML
+  typology: Trade-based money laundering
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Trade document and commodity risk indicators, p.5
+    quote: Shipments of commodities are routed through a number of jurisdictions without economic or commercial
+      justification.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Trade activity risk indicators, p.4
+    quote: A trade entity engages in transactions and shipping routes or methods that are inconsistent
+      with standard business practices.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Trade Finance
+    quote: Customers shipping items through higher-risk jurisdictions, including transit through noncooperative
+      countries.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Electronics shipped from Asia to Latin America via three free trade zones
+  cases: []
+  data_needed:
+  - Vessel (imoNumber, flag)
+  - Document (bills of lading, customs declarations)
+  - Address (ports)
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - ship tracking (AIS)
+  - customs and trade databases
+  - bills of lading data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FFIEC tells banks that changes in parties and higher-risk transit should prompt sanctions
+      review.
+    source_url: https://bsaaml.ffiec.gov/manual/Appendices/07
+  innocent_explanations:
+  - Hub-and-spoke shipping via major ports
+  - Consolidation or re-packing in logistics hubs
+  - Route changes for weather, congestion or conflict
+  jurisdictions: Global
+  version: 1
+- id: ML-011
+  name: Overly complex or abnormal trade finance
+  definition: The trade uses letters of credit or other trade finance in odd ways, such as repeated extensions,
+    mixed products, or goods descriptions that do not match the letter of credit.
+  areas:
+  - ML
+  typology: Trade-based money laundering
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Trade activity risk indicators, p.4
+    quote: A trade entity makes unconventional or overly complex use of financial products, e.g. use of
+      letters of credit for unusually long or frequently extended periods without any apparent reason
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Trade Finance
+    quote: Shipment locations or description of goods not consistent with letter of credit.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A letter of credit extended six times with no shipment
+  cases: []
+  data_needed:
+  - Contract (letter of credit terms)
+  - Document (amendments)
+  - Payment
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Production or shipping delays
+  - Disputes over goods quality
+  - Complex but legitimate commodity financing
+  jurisdictions: Global
+  version: 1
+- id: ML-012
+  name: Mispriced goods (over- or under-invoicing)
+  definition: Prices on contracts or invoices do not match market value or past deals, or the company
+    keeps trading at a loss or near-zero margin, which can move value hidden inside the price.
+  areas:
+  - ML
+  typology: Trade-based money laundering
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Trade document and commodity risk indicators, p.5
+    quote: Contracts, invoices, or other trade documents display fees or prices that do not seem to be
+      in line with commercial considerations, are inconsistent with market value, or significantly fluctuate
+      from previous comparable transactions.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Trade activity risk indicators, p.4 and footnote 5
+    quote: A trade entity consistently displays unreasonably low profit margins in its trade transactions
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Trade Finance
+    quote: Obvious over- or under-pricing of goods and services.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Importing wholesale goods at or above retail value
+  - Re-selling goods at or below purchase price (both FATF examples)
+  cases: []
+  data_needed:
+  - Contract (amount)
+  - Payment (amount, currency, purpose)
+  - Document (invoices, customs declarations)
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - commodity price data
+  - UN Comtrade unit values
+  - customs data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Over- and under-invoicing also evades duties and taxes; FATF lists false customs documents
+      among TBML indicators.
+    source_url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+  innocent_explanations:
+  - Clearance sales and damaged stock
+  - Transfer pricing within a group
+  - Goods with no open market price (FATF notes fair price can be hard to estimate)
+  - Volume discounts
+  jurisdictions: Global
+  version: 1
+- id: ML-013
+  name: Purchases beyond the company's means
+  definition: A company buys goods on its own account worth far more than it could afford, funded by sudden
+    cash deposits or third-party transfers.
+  areas:
+  - ML
+  typology: Trade-based money laundering
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Trade activity risk indicators, p.4
+    quote: A trade entity purchases commodities, allegedly on its own account, but the purchases clearly
+      exceed the economic capabilities of the entity
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A firm with $50k capital paying $3m for gold, funded by cash deposits
+  cases: []
+  data_needed:
+  - Company (capital)
+  - Payment (payer, amount)
+  - BankAccount
+  - Document (financial statements)
+  checkable: records
+  lookup_sources:
+  - company registry accounts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Shareholder or group loans
+  - Trade credit and supplier financing
+  - New investment not yet in filed accounts
+  jurisdictions: Global
+  version: 1
+- id: ML-014
+  name: Inconsistent trade documents or misrepresented goods
+  definition: Contracts, invoices and shipping papers contradict each other, for example different names,
+    prices or quantities, or the goods do not match their description.
+  areas:
+  - ML
+  typology: Trade-based money laundering
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Trade document and commodity risk indicators, p.5
+    quote: Inconsistencies across contracts, invoices or other trade documents
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Trade Finance
+    quote: Obvious misrepresentation of quantity or type of goods imported or exported.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Exporter named on the invoice differs from the company receiving payment
+  cases: []
+  data_needed:
+  - Document (contracts, invoices, bills of lading)
+  - Contract
+  - Payment (beneficiary)
+  - Company
+  checkable: records
+  lookup_sources:
+  - customs data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clerical errors
+  - Partial shipments
+  - Use of a group treasury company to receive payment
+  jurisdictions: Global
+  version: 1
+- id: ML-015
+  name: Vague goods descriptions or template contracts
+  definition: Contracts describe the goods only in general terms, or a large or regular trade rests on
+    a simple internet sample contract.
+  areas:
+  - ML
+  typology: Trade-based money laundering
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Trade document and commodity risk indicators, p.5
+    quote: Contracts, invoices, or other trade documents have vague descriptions of the traded commodities
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Trade document and commodity risk indicators, p.5
+    quote: Contracts supporting complex or regular trade transactions appear to be unusually simple, e.g.
+      they follow a “sample contract” structure available on the Internet.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An invoice for 'general merchandise' worth $2m
+  cases: []
+  data_needed:
+  - Contract
+  - Document (invoices)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small firms without legal advice
+  - Mixed consignments
+  jurisdictions: Global
+  version: 1
+- id: ML-016
+  name: Missing, forged or repeatedly amended trade or customs documents
+  definition: Supporting trade or customs papers are absent, fake, false, previously rejected, often changed,
+    or goods imported temporarily are re-exported on falsified papers.
+  areas:
+  - ML
+  typology: Trade-based money laundering
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Trade document and commodity risk indicators, p.5
+    quote: Trade or customs documents supporting the transaction are missing, appear to be counterfeits,
+      include false or misleading information, are a resubmission of previously rejected documents, or
+      are frequently modified or amended.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Trade document and commodity risk indicators, p.5
+    quote: Commodities imported into a country within the framework of temporary importation and inward
+      processing regime are subsequently exported with falsified documents.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The same bill of lading submitted to two banks
+  cases: []
+  data_needed:
+  - Document (version history, issuer)
+  - Contract
+  - Company
+  checkable: person
+  lookup_sources:
+  - customs authorities
+  - shipping line verification
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Falsified documents under temporary importation/inward processing regimes are a customs offence
+      as well as a TBML indicator.
+    source_url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+  innocent_explanations:
+  - Legitimate amendments after renegotiation
+  - Lost originals
+  - Administrative errors
+  jurisdictions: Global
+  version: 1
+- id: ML-017
+  name: Customs values do not match bank payments
+  definition: The value of a company's registered imports or exports is very different from the money
+    it actually sends or receives for them.
+  areas:
+  - ML
+  typology: Trade-based money laundering
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Trade document and commodity risk indicators, p.5
+    quote: The value of registered imports of an entity displays significant mismatches to the entity’s
+      volume of foreign bank transfers for imports.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - $1m of declared imports but $8m of outgoing payments 'for imports'
+  cases: []
+  data_needed:
+  - Payment (amount, purpose)
+  - Document (customs declarations)
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - customs data (usually only via authorities)
+  - trade statistics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Prepayments and timing differences
+  - Payments for services or freight
+  - Netting within a group
+  jurisdictions: Global
+  version: 1
+- id: ML-018
+  name: Late payment changes or payment by unrelated third parties
+  definition: Payment is switched at the last minute to a new party, or the goods are paid for (or proceeds
+    sent) by or to someone other than the buyer or seller without a clear reason.
+  areas:
+  - ML
+  typology: Third-party payments
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Account and transaction activity risk indicators, p.6
+    quote: A trade entity makes very late changes to payment arrangements for the transaction
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Account and transaction activity risk indicators, p.6
+    quote: Payment for imported commodities is made by an entity other than the consignee of the commodities
+      with no clear economic reasons
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Trade Finance
+    quote: Customer requests payment of proceeds to an unrelated third party.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Import paid by a shell company that is not party to the deal
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, payerAccount, beneficiaryAccount, date)
+  - Contract (parties)
+  - Company
+  checkable: records
+  lookup_sources:
+  - company registry (relationship between payer and buyer)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Last-minute redirection of payment to a previously unknown party is also the pattern of business
+      email compromise fraud.
+    source_url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+  innocent_explanations:
+  - Factoring and supply-chain finance
+  - Group treasury paying for subsidiaries
+  - Agents collecting on behalf of principals
+  jurisdictions: Global
+  version: 1
+- id: ML-019
+  name: Account activity out of line with the stated business
+  definition: An account handles far more transactions or value than the customer's declared business
+    would explain, or shows unexplained, repetitive patterns.
+  areas:
+  - ML
+  typology: Transaction pattern
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Account and transaction activity risk indicators, p.6
+    quote: An account displays an unexpectedly high number or value of transactions that are inconsistent
+      with the stated business activity of the client.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Funds Transfers
+    quote: Funds transfer activity is unexplained, repetitive, or shows unusual patterns.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A corner shop account receiving $2m a month in wires
+  cases: []
+  data_needed:
+  - Payment (amount, date, payer, beneficiary)
+  - BankAccount
+  - Company (sector)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Business growth
+  - One-off asset sale or loan
+  - Outdated customer profile
+  jurisdictions: Global
+  version: 1
+- id: ML-020
+  name: Pass-through (transit) account
+  definition: Money moves rapidly in and out of an account in high volumes, leaving a small balance at
+    day's end, for example cash in then wires out to free trade zones or offshore, or incoming wires split
+    to many unrelated accounts.
+  areas:
+  - ML
+  typology: Layering
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Account and transaction activity risk indicators, p.6
+    quote: An account of a trade entity appears to be a “pay-through” or “transit” account with a rapid
+      movement of high-volume transactions and a small end-of-day balance without clear business reasons
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Daily cash deposits forwarded the same day to entities in a free trade zone
+  cases:
+  - name: TD Bank N.A.
+    year: '2024'
+    jurisdiction: United States
+    what_happened: DOJ said a high-risk jewelry business moved nearly $120 million through shell accounts
+      from 2021 to 2023 before the bank reported it; the bank pleaded guilty.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/td-bank-pleads-guilty-bank-secrecy-act-and-money-laundering-conspiracy-violations-18b
+    source_title: TD Bank Pleads Guilty to Bank Secrecy Act and Money Laundering Conspiracy Violations
+      in $1.8B Resolution
+  data_needed:
+  - BankAccount (balance)
+  - Payment (date, amount, payer, beneficiary)
+  - Address (country of beneficiaries)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Payment processors and collection accounts
+  - Treasury sweeping
+  - Payroll accounts
+  jurisdictions: Global
+  version: 1
+- id: ML-021
+  name: Structuring below reporting thresholds
+  definition: Cash or crypto transactions are repeatedly kept just under the amount that triggers a mandatory
+    report, to avoid the report being filed.
+  areas:
+  - CY
+  - ML
+  typology: Structuring / smurfing
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Account and transaction activity risk indicators, p.6
+    quote: Cash deposits or other transactions of a trade entity are consistently just below relevant
+      reporting thresholds.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Other Unusual or Suspicious Customer Activity
+    quote: Currency is deposited or withdrawn in amounts just below identification or reporting thresholds.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Red flags related to transactions – size and frequency, p.5
+    quote: Structuring VA transactions (e.g. exchange or transfer) in small amounts, or in amounts under
+      record-keeping or reporting thresholds, similar to structuring cash transactions.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 31 U.S. Code § 5324 – Structuring transactions to evade reporting requirement prohibited
+    publisher: US Congress (via Cornell LII)
+    url: https://www.law.cornell.edu/uscode/text/31/5324
+    locator: §5324(a)(3)
+    quote: structure or assist in structuring, or attempt to structure or assist in structuring,
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Daily cash deposits of $9,500 across several branches
+  - Cash pushed through bank deposit machines in amounts below the reporting line
+  cases:
+  - name: Commonwealth Bank of Australia
+    year: '2018'
+    jurisdiction: Australia (Federal Court, AUSTRAC proceedings)
+    what_happened: CBA admitted 53,750 contraventions of the AML/CTF Act, including 53,506 late or missing
+      threshold transaction reports for cash of $10,000 or more through Intelligent Deposit Machines,
+      which AUSTRAC said were used to launder proceeds of crime and by customers suspected of structuring;
+      AUSTRAC and CBA agreed a $700 million penalty, subject to court approval.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://austrac.gov.au/news-and-media/media-release/austrac-and-cba-agree-700m-penalty
+    source_title: AUSTRAC and CBA agree $700m penalty
+  data_needed:
+  - Payment (amount, date, payerAccount)
+  - BankAccount
+  - Person (depositor)
+  - Address (branch locations)
+  checkable: records
+  lookup_sources:
+  - national reporting thresholds (e.g. US 31 CFR 1010.311)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'In the US: repeated cash transactions kept just under the $10,000 currency transaction
+      report threshold to evade the report (31 CFR 1010.311; 31 U.S.C. 5324). Other countries: the local
+      threshold.'
+    threshold_source: https://www.law.cornell.edu/cfr/text/31/1010.311
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: FinCEN's 2025 advisory describes structuring as a placement method used by networks laundering
+      cartel drug proceeds.
+    source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+  innocent_explanations:
+  - Businesses with naturally small, regular takings
+  - Customers unaware of thresholds who bank daily
+  - ATM or machine deposit limits
+  jurisdictions: Global; threshold US-specific
+  version: 1
+- id: ML-022
+  name: Large round-amount payments
+  definition: Payments are made in large, round figures in a trade or business where amounts would normally
+    be uneven.
+  areas:
+  - ML
+  typology: Transaction pattern
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Account and transaction activity risk indicators, p.6
+    quote: Payments are sent or received in large round amounts for trade in sectors where this is deemed
+      as unusual.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Funds Transfers
+    quote: Many funds transfers are sent in large, round dollar, hundred dollar, or thousand dollar amounts.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A seafood importer paying suppliers exactly $500,000 each month
+  cases: []
+  data_needed:
+  - Payment (amount, currency, purpose)
+  - Company (sector)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Deposits, advances and instalments
+  - Intra-group funding
+  - Loan repayments
+  jurisdictions: Global
+  version: 1
+- id: ML-023
+  name: Circular payments
+  definition: Money leaves a country or bank, passes through one or more others, and comes back to where
+    it started.
+  areas:
+  - ML
+  typology: Round-tripping
+  status: verified
+  sources:
+  - title: 'Trade-Based Money Laundering: Risk Indicators'
+    publisher: FATF and Egmont Group
+    year: '2021'
+    url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+    locator: Account and transaction activity risk indicators, p.6
+    quote: Payments are routed in a circle – funds are sent out from one country and received back in
+      the same country, after passing through another country or countries.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Other Unusual or Suspicious Customer Activity
+    quote: Suspicious movements of funds occur from one bank to another, and then funds are moved back
+      to the first bank.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Funds from Country A to Hong Kong to Dubai and back to a related company in Country A
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, payerAccount, beneficiaryAccount, date)
+  - BankAccount (bankName, country)
+  - Ownership (links between start and end parties)
+  checkable: records
+  lookup_sources:
+  - company registry to link start and end parties
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Round-tripping returns funds disguised as foreign investment; FATF lists circular routing
+      as a TBML indicator.
+    source_url: https://www.cbr.ru/Content/Document/File/119937/TBLMRI.PDF
+  innocent_explanations:
+  - Group cash pooling
+  - Round-trip foreign investment for tax or regulatory reasons (may itself be problematic but is not
+    necessarily laundering)
+  jurisdictions: Global
+  version: 1
+- id: ML-024
+  name: Funnel account
+  definition: An account receives many cash deposits, often below the reporting limit, at branches far
+    from where the account holder lives or works, and the money is withdrawn or wired out quickly somewhere
+    else.
+  areas:
+  - ML
+  typology: Funnel accounts
+  status: verified
+  sources:
+  - title: 'FinCEN Advisory FIN-2014-A005: Update on U.S. Currency Restrictions in Mexico: Funnel Accounts
+      and TBML'
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2014-a005
+    locator: Red flags table
+    quote: An account opened in one state (typically along the Southwest border) receives multiple cash
+      deposits
+    quote_verified: true
+    licence: US government work
+    checked: '2026-10-08'
+  - title: Professional Money Laundering
+    publisher: FATF
+    year: '2018'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Professional-Money-Laundering.pdf
+    locator: 'MVTS case (Source: Italy)'
+    quote: the agents sometimes deposited cash into their accounts through a branch of the bank located
+      far away from their business.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A Southern California produce company's account receiving small cash deposits at branches in Chicago,
+    Indianapolis and Minneapolis (FinCEN example)
+  - US deposits withdrawn days later from ATMs in Colombia (TD Bank case)
+  cases:
+  - name: TD Bank N.A.
+    year: '2024'
+    jurisdiction: United States
+    what_happened: DOJ said laundering networks deposited funds in the US and withdrew them quickly from
+      ATMs in Colombia, with five bank employees issuing ATM cards supporting about $39 million of laundering;
+      the bank pleaded guilty.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/td-bank-pleads-guilty-bank-secrecy-act-and-money-laundering-conspiracy-violations-18b
+    source_title: TD Bank Pleads Guilty to Bank Secrecy Act and Money Laundering Conspiracy Violations
+      in $1.8B Resolution
+  data_needed:
+  - BankAccount
+  - Payment (amount, date)
+  - Address (branch locations vs holder's address)
+  - Person (depositors)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'FinCEN example: multiple cash deposits of less than $10,000 by unidentified persons at
+      branches outside the account''s region'
+    threshold_source: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2014-a005
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: FinCEN describes funnel accounts plus TBML as a way drug organisations convert US cash proceeds
+      into pesos in Mexico.
+    source_url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2014-a005
+  innocent_explanations:
+  - Family members depositing for a student or relative
+  - Travelling sales staff depositing takings
+  - National businesses with dispersed customers
+  jurisdictions: US (FinCEN); concept global
+  version: 1
+- id: ML-025
+  name: Cash patterns unlike the business or its peers
+  definition: A cash business suddenly changes its deposit pattern, deposits very differently from similar
+    businesses, or regularly swaps small notes for large ones.
+  areas:
+  - ML
+  typology: Commingling through cash-intensive business
+  status: verified
+  sources:
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Activity Inconsistent with the Customer's Business
+    quote: The currency transaction patterns of a business show a sudden change inconsistent with normal
+      activities.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Activity Inconsistent with the Customer's Business
+    quote: A retail business has dramatically different patterns of currency deposits from similar businesses
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Other Unusual or Suspicious Customer Activity
+    quote: Customer frequently exchanges small-dollar denominations for large-dollar denominations.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A nail salon depositing three times the cash of nearby salons
+  - A car wash whose takings double with no new customers
+  cases: []
+  data_needed:
+  - Payment (amount, date, currency)
+  - Company (sector, address)
+  - Employment (staff numbers)
+  checkable: lookups
+  lookup_sources:
+  - industry benchmarks
+  - business licence and footfall data
+  - company accounts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Cash-intensive front businesses can also commingle proceeds of other crimes; the FFIEC lists
+      cash anomalies as general laundering red flags (link to specific trafficking should be checked case
+      by case).
+    source_url: https://bsaaml.ffiec.gov/manual/Appendices/07
+  innocent_explanations:
+  - New owner, renovation or better location
+  - Seasonal peaks and events
+  - Exchanging notes for safe storage or cash transport
+  jurisdictions: US (FFIEC); concept global
+  version: 1
+- id: ML-026
+  name: Bulk cash deposited by couriers into accounts with no business purpose
+  definition: Large volumes of cash or cashier's cheques, often brought by couriers, are paid into personal,
+    nominee or shell-company accounts and then moved on.
+  areas:
+  - ML
+  typology: Professional money laundering – placement
+  status: verified
+  sources:
+  - title: FinCEN Advisory FIN-2025-A003 on Chinese Money Laundering Networks
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+    locator: Red Flags Potentially Indicative of CMLN-Affiliated Money Mules, p.9
+    quote: regularly deposits large volumes of cash or cashier’s checks, or receives multiple wire, ACH,
+      or P2P transfers for no business or apparent lawful purpose.
+    quote_verified: true
+    licence: US government work
+    checked: '2026-10-08'
+  examples:
+  - Couriers collecting drug cash and depositing it into shell company accounts (Fang/Lu/Zhen case)
+  cases:
+  - name: Enhua Fang, Jianfei Lu and Shu Jun Zhen
+    year: '2025'
+    jurisdiction: United States (W.D.N.C.)
+    what_happened: Pleaded guilty to money laundering charges tied to a Chinese money laundering organisation
+      that laundered over $92 million, mostly drug proceeds; DOJ said couriers picked up bulk cash and
+      deposited it into shell company accounts.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/final-three-members-charged-prolific-chinese-money-laundering-scheme-plead-guilty-laundering
+    source_title: Final Three Members Charged in Prolific Chinese Money Laundering Scheme Plead Guilty
+  data_needed:
+  - Payment (amount, date, payerAccount)
+  - Person (depositor)
+  - Company
+  - BankAccount
+  checkable: records
+  lookup_sources:
+  - company registry (for receiving shell companies)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: FinCEN ties this pattern to networks laundering Mexican cartel proceeds.
+    source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+  innocent_explanations:
+  - Cash businesses banking takings
+  - Informal savings returned to the bank
+  jurisdictions: US
+  version: 1
+- id: ML-027
+  name: Attempts to avoid reports or records
+  definition: A customer tries to persuade staff not to file required reports or keep records, or asks
+    to be exempted from them.
+  areas:
+  - ML
+  typology: Evasion of reporting
+  status: verified
+  sources:
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Efforts to Avoid Reporting or Recordkeeping Requirement
+    quote: A customer or group tries to persuade a bank employee not to file required reports or maintain
+      required records.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Efforts to Avoid Reporting or Recordkeeping Requirement
+    quote: A business or customer asks to be exempted from reporting or recordkeeping requirements.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A customer cancels part of a deposit after being told a report will be filed
+  cases: []
+  data_needed:
+  - Person
+  - Document (staff notes, emails)
+  - Payment
+  checkable: person
+  lookup_sources:
+  - staff interviews
+  - internal records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Privacy concerns or misunderstanding of the rules
+  jurisdictions: US (FFIEC); concept global
+  version: 1
+- id: ML-028
+  name: Complicit insider at a bank or service provider
+  definition: An employee helps launderers, for example by overriding holds, coordinating transactions
+    to avoid reports, accepting false documents, or living beyond their salary.
+  areas:
+  - ML
+  typology: Insider complicity
+  status: verified
+  sources:
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Employees
+    quote: Employee overrides a hold placed on an account identified as suspicious so that transactions
+      can occur in the account.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Employees
+    quote: Employee exhibits a lavish lifestyle that cannot be supported by his or her salary.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Professional Money Laundering
+    publisher: FATF
+    year: '2018'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Professional-Money-Laundering.pdf
+    locator: 'Financial institutions: complicit bank employee functions'
+    quote: Co-ordinating financial transactions to avoid STR reporting;
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Bank staff accepting gift cards from a laundering network (TD Bank)
+  cases:
+  - name: TD Bank N.A.
+    year: '2024'
+    jurisdiction: United States
+    what_happened: DOJ said employees received gift cards worth over $57,000 from a network that moved
+      $470 million in cash, and five employees issued ATM cards used by launderers; the bank pleaded guilty.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/td-bank-pleads-guilty-bank-secrecy-act-and-money-laundering-conspiracy-violations-18b
+    source_title: TD Bank Pleads Guilty to Bank Secrecy Act and Money Laundering Conspiracy Violations
+      in $1.8B Resolution
+  data_needed:
+  - Person
+  - Employment (employee, employer)
+  - Payment (to the employee)
+  - Associate
+  checkable: person
+  lookup_sources:
+  - court records
+  - property and asset records for lifestyle checks
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Insiders paid to look away are being bribed; TD Bank employees received gift cards from launderers.
+    source_url: https://www.justice.gov/opa/pr/td-bank-pleads-guilty-bank-secrecy-act-and-money-laundering-conspiracy-violations-18b
+  innocent_explanations:
+  - Family wealth or second income
+  - Override approved for a documented reason
+  jurisdictions: Global
+  version: 1
+- id: ML-029
+  name: Wealth or activity beyond known income
+  definition: A person's transactions, crypto purchases or property buys are far larger than their job,
+    income or financial history would explain.
+  areas:
+  - CY
+  - ML
+  typology: Unexplained wealth
+  status: verified
+  sources:
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Other Unusual or Suspicious Customer Activity
+    quote: Customer makes high-value transactions not commensurate with the customer's known incomes.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Profile of potential money mule or scam victims, p.14
+    quote: Customer purchases large amounts of VA not substantiated by available wealth or consistent
+      with his or her historical financial profile, which may indicate money laundering, a money mule,
+      or a scam victim.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Three, client risk (para 104)
+    quote: The profile of the client does not fit with the transaction with regard to the property value.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN Advisory FIN-2025-A003
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+    locator: Money mule red flags, p.9
+    quote: reports their occupation during customer onboarding as a student, retiree, housewife, or other
+      low-income occupation but has unexplained wealth.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A student buying a $2m house in cash
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Payment
+  - RealEstate
+  - Ownership
+  - CryptoWallet (balance)
+  checkable: lookups
+  lookup_sources:
+  - property registries
+  - company registries
+  - social media
+  - court and divorce records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Unexplained wealth is the trigger for UK Unexplained Wealth Orders, upheld in Hajiyeva v National
+      Crime Agency (2020) over a London property bought via a BVI company.
+    source_url: https://caselaw.nationalarchives.gov.uk/ewca/civ/2020/108
+  - target_area: FR
+    reason: FATF notes the same pattern may indicate a scam victim rather than a launderer.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  innocent_explanations:
+  - Inheritance, gifts or family support
+  - Lottery or investment gains
+  - Under-declared occupation (e.g. retired business owner)
+  jurisdictions: Global. FinCEN's red flags name Chinese nationals; nationality on its own is not an indicator.
+  version: 1
+- id: ML-030
+  name: Refuses or cannot explain identity or source of funds
+  definition: The customer gives incomplete identity information, declines to explain where money came
+    from, or gives evasive answers.
+  areas:
+  - CY
+  - ML
+  typology: Customer due diligence failure
+  status: verified
+  sources:
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Irregularities observed during CDD process, p.12
+    quote: Incomplete or insufficient KYC information, or a customer declines requests for KYC documents
+      or inquiries regarding source of funds.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Three, client risk (para 104)
+    quote: Unexplained or otherwise unusual source of funds that cannot be verified
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Irregularities observed during CDD process, p.12
+    quote: Sender / recipient lacking knowledge or providing inaccurate information about the transaction,
+      the source of funds, or the relationship with the counterparty.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Explaining large inflows only as 'repayment of a loan' (FinCEN example)
+  cases:
+  - name: Binance Holdings Ltd
+    year: '2023'
+    jurisdiction: United States
+    what_happened: Pleaded guilty to Bank Secrecy Act violations, operating an unlicensed money transmitting
+      business and sanctions offences (about $4.3 billion); DOJ said users could trade for years with
+      only an email address and Binance never filed a SAR with FinCEN.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/binance-and-ceo-plead-guilty-federal-charges-4b-resolution
+    source_title: Binance and CEO Plead Guilty to Federal Charges in $4B Resolution
+  data_needed:
+  - Person
+  - Document (KYC file, correspondence)
+  - Payment
+  checkable: person
+  lookup_sources:
+  - interviews
+  - document review
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Privacy concerns
+  - Language barriers
+  - Genuinely informal family loans
+  jurisdictions: Global
+  version: 1
+- id: ML-031
+  name: Forged, edited or inconsistent identity documents
+  definition: The customer uses fake or altered ID, ID that cannot be checked, or documents that contradict
+    each other.
+  areas:
+  - CY
+  - ML
+  typology: Identity fraud in onboarding
+  status: verified
+  sources:
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Irregularities observed during CDD process, p.12
+    quote: Customer has provided forged documents or has edited photographs and/or identification documents
+      as part of the on-boarding process.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN Advisory FIN-2025-A003
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+    locator: Money mule red flags, p.9
+    quote: During the onboarding process, a customer presents a Chinese passport and a visa that contain
+      the same photograph despite being allegedly issued years apart.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Customers Who Provide Insufficient or Suspicious Information
+    quote: A customer uses unusual or suspicious identification documents that cannot be readily verified.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Doctored photos used to pass exchange KYC in a hack-laundering case (FATF case study 12)
+  cases:
+  - name: Enhua Fang, Jianfei Lu and Shu Jun Zhen
+    year: '2025'
+    jurisdiction: United States (W.D.N.C.)
+    what_happened: DOJ said Lu procured fake driver's licences for couriers depositing drug cash; all
+      three pleaded guilty to money laundering charges.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/final-three-members-charged-prolific-chinese-money-laundering-scheme-plead-guilty-laundering
+    source_title: Final Three Members Charged in Prolific Chinese Money Laundering Scheme Plead Guilty
+  data_needed:
+  - Passport (number, issueDate, country)
+  - Identification
+  - Person
+  - Document
+  checkable: person
+  lookup_sources:
+  - document verification services
+  - interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Forged ID is itself an offence and a fraud indicator.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  innocent_explanations:
+  - Reissued documents reusing an old photo
+  - Poor-quality scans
+  jurisdictions: Global
+  version: 1
+- id: ML-032
+  name: Money mule profile
+  definition: 'The person moving the money seems to be a stand-in: they know little about the business,
+    source of cash or the technology, or fit profiles often recruited (students, unemployed, much older
+    users, financially vulnerable people).'
+  areas:
+  - CY
+  - ML
+  typology: Money mules
+  status: verified
+  sources:
+  - title: FinCEN Advisory FIN-2014-A005
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2014-a005
+    locator: Red flags table
+    quote: If questioned, the individuals opening or making deposits to funnel accounts may have no detailed
+      knowledge
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Profile of potential money mule or scam victims, p.14
+    quote: Sender does not appear to be familiar with VA technology or online custodial wallet solutions.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Profile of potential money mule or scam victims, p.14
+    quote: A customer being a financially vulnerable person, who is often used by drug dealers to assist
+      them in their trafficking business.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A young person's new account receiving commercial deposits from companies and sending them to crypto
+    exchanges within two days (FATF Czech case study)
+  cases: []
+  data_needed:
+  - Person (birthDate)
+  - Employment
+  - BankAccount (opening date)
+  - Payment
+  - Associate
+  checkable: person
+  lookup_sources:
+  - interviews
+  - social media recruitment ads
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FATF says mules may be scam victims turned mules, and much older users may be victims of elder
+      financial exploitation.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  - target_area: OC
+    reason: FATF notes financially vulnerable people are often used by drug dealers.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  innocent_explanations:
+  - Inexperienced but legitimate users
+  - Older people investing their own savings
+  - Family members banking for relatives
+  jurisdictions: Global
+  version: 1
+- id: ML-033
+  name: Many accounts or wallets sharing one controller
+  definition: Seemingly unrelated accounts or wallets share an IP address, device, home address or phone,
+    or one person opens several accounts under different names.
+  areas:
+  - CY
+  - ML
+  typology: Smurfing networks
+  status: verified
+  sources:
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Red flags related to anonymity, p.10
+    quote: A large number of seemingly unrelated VA wallets controlled from the same IP-address (or MAC-address),
+      which may involve the use of shell wallets registered to different users to conceal their relation
+      to each other.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Irregularities observed during account creation, p.12
+    quote: Creating separate accounts under different names to circumvent restrictions on trading or withdrawal
+      limits imposed by VASPs.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Other Unusual or Suspicious Customer Activity
+    quote: Customer makes multiple and frequent currency deposits to various accounts that are purportedly
+      unrelated.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - More than 150 people sharing residential addresses and IP addresses buying crypto and sending it abroad
+    (FATF South Africa case study)
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - BankAccount
+  - CryptoWallet (holder)
+  - Email
+  - UnknownLink
+  checkable: records
+  lookup_sources:
+  - IP and device logs (usually only in leaked or court records)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Households and shared offices
+  - Shared Wi-Fi, VPN exit nodes or mobile carrier IPs
+  jurisdictions: Global
+  version: 1
+- id: ML-034
+  name: Personal account used for business
+  definition: Business income and payments run through a personal account, or one person holds many accounts
+    in different names with no business reason.
+  areas:
+  - ML
+  typology: Commingling
+  status: verified
+  sources:
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Other Unusual or Suspicious Customer Activity
+    quote: Customer uses a personal account for business purposes.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A sole trader's personal account receiving hundreds of customer payments
+  cases: []
+  data_needed:
+  - BankAccount
+  - Person
+  - Company
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Keeping business takings in personal accounts can also hide income from tax authorities.
+    source_url: https://bsaaml.ffiec.gov/manual/Appendices/07
+  innocent_explanations:
+  - Sole traders and gig workers
+  - New businesses yet to open a business account
+  jurisdictions: US (FFIEC); concept global
+  version: 1
+- id: ML-035
+  name: Unusual safe deposit box use
+  definition: A customer visits a safe deposit box unusually often, rents boxes far from home or work,
+    or uses them right after large cash withdrawals.
+  areas:
+  - ML
+  typology: Cash storage
+  status: verified
+  sources:
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Other Unusual or Suspicious Customer Activity
+    quote: Customer visits a safe deposit box or uses a safe custody account on an unusually frequent
+      basis.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Several boxes rented to store cash
+  cases: []
+  data_needed:
+  - Person
+  - Document (access logs)
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Storing documents or valuables during a move
+  - Estate administration
+  jurisdictions: US (FFIEC)
+  version: 1
+- id: ML-036
+  name: Payments with missing information or no stated purpose
+  definition: Wire transfers lack the names of the people involved or any reference to goods or services,
+    so there is no visible commercial reason.
+  areas:
+  - ML
+  typology: Layering
+  status: verified
+  sources:
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Funds Transfers
+    quote: Funds transfers contain limited content and lack related party information.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Funds Transfers
+    quote: Payments or receipts with no apparent links to legitimate contracts, goods, or services are
+      received.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Repeated transfers between shell companies labelled only 'payment'
+  cases: []
+  data_needed:
+  - Payment (purpose, payer, beneficiary, transactionNumber)
+  - Contract
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Payment systems that truncate reference fields
+  - Intra-group transfers
+  jurisdictions: Global
+  version: 1
+- id: ML-037
+  name: Property bought through a foreign or shell company
+  definition: Real estate is bought in the name of a foreign company, shell company or intermediary that
+    hides the real buyer, or the escrow receives money from an unrelated foreign shell.
+  areas:
+  - ML
+  typology: Real estate laundering via legal persons
+  status: verified
+  sources:
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Three, client risk (para 104)
+    quote: The use of foreign companies for purchase of real estate.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Three, client risk (para 104)
+    quote: The use of intermediaries or legal persons used to protect a person's identity or hide involvement.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN Advisory FIN-2017-A003
+    publisher: FinCEN
+    year: '2017'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2017-a003
+    locator: Geographic Targeting Orders section
+    quote: over 30 percent of the real estate transactions reported under the GTOs involved a beneficial
+      owner or purchaser representative that had been the subject of unrelated Suspicious Activity Reports.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN Advisory FIN-2025-A003
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+    locator: Money mule red flags, p.10
+    quote: A customer that is a U.S.-based escrow company receives funds from an unaffiliated, foreign-based
+      shell company or entity in a disparate line of business that are used to purchase real estate in
+      the United States.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A London property bought for £11.5m in 2009 by a BVI company (Hajiyeva UWO case)
+  - Beverly Hills, New York and London properties bought with funds allegedly taken from 1MDB
+  cases:
+  - name: Jho Low, family members and FFP (1MDB assets)
+    year: '2019'
+    jurisdiction: United States (C.D. Cal.)
+    what_happened: Agreed to forfeit assets estimated at over $700 million, including high-end properties
+      in Beverly Hills, New York and London, tied to civil forfeiture complaints alleging 1MDB funds were
+      laundered through a web of shell corporations; the release does not state an admission of liability.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/united-states-reaches-settlement-recover-more-700-million-assets-allegedly-traceable
+    source_title: United States Reaches Settlement to Recover More Than $700 Million in Assets Allegedly
+      Traceable to Corruption Involving Malaysian Sovereign Wealth Fund
+  data_needed:
+  - RealEstate (titleNumber, address)
+  - Ownership (owner, asset, startDate)
+  - Company (jurisdiction)
+  - Payment (payer, beneficiary)
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - land/property registries (e.g. HM Land Registry overseas companies data)
+  - company registries
+  - offshore leaks databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: The 1MDB settlement concerned property bought with funds allegedly misappropriated from a
+      sovereign wealth fund.
+    source_url: https://www.justice.gov/archives/opa/pr/united-states-reaches-settlement-recover-more-700-million-assets-allegedly-traceable
+  innocent_explanations:
+  - Privacy and security for well-known buyers
+  - Estate and tax planning
+  - Commercial property held in special-purpose companies
+  jurisdictions: Global; GTO data US
+  version: 1
+- id: ML-038
+  name: Property paid in cash or crypto without good reason
+  definition: A property is paid for wholly or partly in cash, foreign currency or virtual assets with
+    no valid reason, avoiding the checks a mortgage lender would make.
+  areas:
+  - CY
+  - ML
+  typology: Real estate laundering
+  status: verified
+  sources:
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Two, para 52 (typologies)
+    quote: Unexplained cash payments
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Two, para 52 (typologies)
+    quote: Unexplained use of virtual assets
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN Advisory FIN-2017-A003
+    publisher: FinCEN
+    year: '2017'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2017-a003
+    locator: All-cash purchases
+    quote: All-cash transactions account for nearly one in four residential real estate purchases, totaling
+      hundreds of billions of dollars nationwide, and are particularly exposed to abuse.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A $3m home bought 'all cash' (no mortgage) by a newly formed LLC
+  cases: []
+  data_needed:
+  - RealEstate
+  - Payment (amount, currency, payer)
+  - Contract (sale)
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - property registries and deed records (financing/mortgage fields)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Cash buyers selling another home
+  - Investors avoiding interest costs
+  - 'Note: in FinCEN usage ''all-cash'' means no bank financing, not banknotes'
+  jurisdictions: Global
+  version: 1
+- id: ML-039
+  name: Rush, pressure, or price far from market value
+  definition: The buyer or seller pushes to close unusually fast, or asks to buy or sell well over or
+    under value.
+  areas:
+  - ML
+  typology: Real estate laundering
+  status: verified
+  sources:
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Three, client risk (para 104)
+    quote: Undue pressure or abnormal haste from the customer for the transaction to be concluded expeditiously.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Three, transaction risks (para 105)
+    quote: Requests to expedite transactions, possibly over or under value.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A buyer offering 20% above asking price for a closing within a week
+  cases: []
+  data_needed:
+  - RealEstate
+  - Contract (sale price, date)
+  - Payment
+  - Document (valuations)
+  checkable: lookups
+  lookup_sources:
+  - property price data (comparable sales)
+  - property registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Relocation deadlines
+  - Competitive markets
+  - Family sales below value
+  jurisdictions: Global
+  version: 1
+- id: ML-040
+  name: Valuation manipulation, quick resales or unfunded renovation
+  definition: Property values are manipulated, properties are sold and resold in quick succession, or
+    a property is renovated and relisted without a clear source of money for the work.
+  areas:
+  - ML
+  typology: Real estate laundering
+  status: verified
+  sources:
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Two, para 52 (typologies)
+    quote: Manipulation of the appraisal or valuation of a property
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Three, transaction risks (para 105)
+    quote: A previously sold property is re-marketed following renovation without an obvious source of
+      funding.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The same flat sold three times in a year between related companies at rising prices
+  cases: []
+  data_needed:
+  - RealEstate
+  - Ownership (startDate, endDate)
+  - Contract (price)
+  - Company
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - property registries (sale history)
+  - building permits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Inflated valuations and back-to-back sales are also mortgage fraud techniques.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+  innocent_explanations:
+  - Professional property developers ('flippers')
+  - Rising markets
+  - Renovation funded by savings or builder credit
+  jurisdictions: Global
+  version: 1
+- id: ML-041
+  name: Unusual or abruptly changed financing
+  definition: The purchase uses complex or unexplained loans, financing changes suddenly, or loans are
+    taken or repaid for an unrelated third party.
+  areas:
+  - ML
+  typology: Loan-back / complex financing
+  status: verified
+  sources:
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Three, transaction risks (para 105)
+    quote: Unexplained or abrupt changes in financing arrangements.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Lending Activity
+    quote: Loans are made for, or are paid on behalf of, a third party with no reasonable explanation.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A mortgage repaid in full by an offshore company months after purchase (loan-back)
+  cases: []
+  data_needed:
+  - Contract (loan)
+  - Payment (payer, beneficiary)
+  - RealEstate
+  - Company
+  checkable: records
+  lookup_sources:
+  - charges/mortgage registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Refinancing for better rates
+  - Family or employer help with payments
+  jurisdictions: Global
+  version: 1
+- id: ML-042
+  name: Deal makes no economic sense or loses money
+  definition: A deal has no visible business purpose or is done at an obvious loss, for example selling
+    property or crypto at a loss or paying very high fees without reason.
+  areas:
+  - CY
+  - ML
+  typology: Economic irrationality
+  status: verified
+  sources:
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Three, transaction risks (para 105)
+    quote: Transactions which make no obvious economic sense, particularly where there is an obvious loss.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN Advisory FIN-2017-A003
+    publisher: FinCEN
+    year: '2017'
+    url: https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2017-a003
+    locator: Suspicious transaction indicators
+    quote: Lacks economic sense or has no apparent lawful business purpose.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Transactions concerning all users, p.8
+    quote: Conducting VA-fiat currency exchange at a potential loss
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Buying a property and reselling it a month later for 30% less
+  cases: []
+  data_needed:
+  - Contract (price)
+  - Payment (amount)
+  - RealEstate
+  - CryptoWallet
+  checkable: records
+  lookup_sources:
+  - market price data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Forced or distressed sales
+  - Market crashes
+  - Tax-loss selling
+  jurisdictions: Global
+  version: 1
+- id: ML-043
+  name: Groups of similar buyers of new-build or off-plan homes
+  definition: Several buyers with matching profiles buy new or not-yet-built homes in the same development
+    at once.
+  areas:
+  - ML
+  typology: Real estate laundering / mortgage fraud
+  status: verified
+  sources:
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Three, client risk (para 104)
+    quote: A group of buyers with similar profiles buying new builds or off plan property (organised mortgage
+      fraud).
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Ten buyers with the same employer and broker buying units in one tower
+  cases: []
+  data_needed:
+  - Person
+  - RealEstate
+  - Ownership
+  - Representation (agent/broker)
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - property registries
+  - company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FATF labels this pattern organised mortgage fraud.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+  innocent_explanations:
+  - Investor clubs and bulk buy-to-let schemes
+  - Employer housing programmes
+  jurisdictions: Global
+  version: 1
+- id: ML-044
+  name: Property bought under a citizenship-by-investment programme
+  definition: The buyer uses the property purchase to qualify for citizenship or residence through an
+    investment programme.
+  areas:
+  - ML
+  typology: Investment migration
+  status: verified
+  sources:
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Three, client risk (para 104)
+    quote: Whether the buyer is participating in a citizenship by investment program related to real estate
+      purchases.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A buyer purchasing a qualifying villa to obtain a second passport
+  cases: []
+  data_needed:
+  - Person (nationality)
+  - RealEstate
+  - Passport
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - published lists of approved investment-migration projects
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: A second citizenship can be used to obscure identity; FATF treats CBI participation as a client
+      risk factor (link to sanctions should be checked case by case).
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+  innocent_explanations:
+  - Legitimate investment migration for mobility, family or business reasons
+  jurisdictions: Global
+  version: 1
+- id: ML-045
+  name: Politically exposed buyer or owner
+  definition: The client or real owner holds or held a prominent public role, or is close to someone who
+    does.
+  areas:
+  - ML
+  typology: PEP risk
+  status: verified
+  sources:
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Three, client risk (para 104)
+    quote: The client or beneficial owner has political connections and is considered a PEP
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A minister's spouse buying a foreign luxury flat through a company
+  cases: []
+  data_needed:
+  - Person (position)
+  - Family
+  - Associate
+  - Ownership
+  - RealEstate
+  checkable: lookups
+  lookup_sources:
+  - PEP databases (e.g. OpenSanctions, Wikidata)
+  - asset declarations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: PEP status is a risk factor because of exposure to bribery and embezzlement proceeds.
+    source_url: https://www.fatf-gafi.org/en/pages/fatf-glossary.html
+  innocent_explanations:
+  - PEPs with documented legitimate wealth
+  - Family wealth predating office
+  jurisdictions: Global
+  version: 1
+- id: ML-046
+  name: Money parked in a professional's client account then refunded
+  definition: A client asks a real estate business or lawyer to hold a large sum in its client account
+    and then asks for it back, so it returns as a 'clean' payment from the professional.
+  areas:
+  - ML
+  typology: Misuse of gatekeepers
+  status: verified
+  sources:
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Three, transaction risks (para 105)
+    quote: Clients ask a real estate business to hold a large sum in their client account, and request
+      a refund
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance for a Risk-Based Approach for the Real Estate Sector
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/guidance/RBA-Real-Estate-Sector.pdf
+    locator: Part Two, para 52 (typologies)
+    quote: Use of client accounts
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A deposit paid, the purchase 'abandoned', and the deposit refunded to a different account
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, beneficiaryAccount)
+  - BankAccount
+  - Representation (lawyer/agent)
+  - Contract
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Deals that genuinely fall through
+  jurisdictions: Global
+  version: 1
+- id: ML-047
+  name: Crypto moved quickly through several providers or countries
+  definition: Virtual assets are moved immediately to several exchanges, especially abroad where the customer
+    has no ties or where AML rules are weak.
+  areas:
+  - CY
+  - ML
+  typology: Crypto layering
+  status: verified
+  sources:
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Red flags related to transactions, p.6
+    quote: Transferring VAs immediately to multiple VASPs, especially to VASPs registered or operated
+      in another jurisdiction where –
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Red flags related to geographical risks, p.17
+    quote: Customer sends funds to VASPs operating in jurisdictions that have no VA regulation, or have
+      not implemented AML/CFT controls.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Phishing proceeds moved 55 times through 48 accounts at different exchanges before going abroad (FATF
+    Korea case study)
+  cases: []
+  data_needed:
+  - CryptoWallet (managingExchange, holder)
+  - Payment
+  - Company (exchange jurisdiction)
+  checkable: lookups
+  lookup_sources:
+  - blockchain explorers and analytics
+  - VASP registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FATF case studies show phishing and investment-scam proceeds layered this way.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  innocent_explanations:
+  - Arbitrage traders
+  - Using several exchanges for liquidity or fees
+  jurisdictions: Global
+  version: 1
+- id: ML-048
+  name: Exchange used only as a pass-through
+  definition: Crypto is deposited at an exchange and immediately withdrawn or converted into several other
+    coins without trading, paying needless fees.
+  areas:
+  - CY
+  - ML
+  typology: Crypto layering
+  status: verified
+  sources:
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Red flags related to transactions, p.6
+    quote: withdrawing the VAs from a VASP immediately to a private wallet. This effectively turns the
+      exchange/VASP into an ML mixer.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Deposit of BTC, withdrawal of the same BTC to a new private wallet within minutes
+  cases: []
+  data_needed:
+  - CryptoWallet
+  - Payment (date, amount, currency)
+  checkable: lookups
+  lookup_sources:
+  - blockchain explorers and analytics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Moving coins to self-custody for security
+  - Portfolio diversification (FATF notes this as a possible logical explanation)
+  jurisdictions: Global
+  version: 1
+- id: ML-049
+  name: Burst of high-value crypto transactions or large first deposit
+  definition: Several high-value transactions happen in a short time, or a new user deposits a large amount
+    out of line with their profile and trades or withdraws it all at once.
+  areas:
+  - CY
+  - ML
+  typology: Crypto transaction pattern
+  status: verified
+  sources:
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Size and frequency of transactions, p.5
+    quote: in short succession, such as within a 24-hour period;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Transactions concerning new users, p.7
+    quote: Conducting a large initial deposit to open a new relationship with a VASP, while the amount
+      funded is inconsistent with the customer profile.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Transactions concerning new users, p.7
+    quote: A new user attempts to trade the entire balance of VAs, or withdraws the VAs and attempts to
+      send the entire balance off the platform.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Two transfers totalling USD 4.8 million six minutes apart (FATF Cayman case study)
+  cases: []
+  data_needed:
+  - CryptoWallet (creationDate)
+  - Payment (date, amount)
+  - Person
+  checkable: records
+  lookup_sources:
+  - blockchain explorers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Multiple high-value transactions within a 24-hour period, or in a staggered regular pattern
+      followed by a long gap (FATF's worded example; no money threshold given)
+    threshold_source: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: FATF says the staggered pattern followed by inactivity is particularly common in ransomware-related
+      cases.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  innocent_explanations:
+  - Wealthy new investors
+  - Moving holdings from another exchange
+  - Reacting to market moves
+  jurisdictions: Global
+  version: 1
+- id: ML-050
+  name: Many small inflows from unrelated wallets, then consolidation
+  definition: A wallet receives many small payments from unrelated wallets, then sends them on together
+    or cashes them out in full.
+  areas:
+  - CY
+  - ML
+  typology: Aggregation
+  status: verified
+  sources:
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Transactions concerning all users, p.8
+    quote: Incoming transactions from many unrelated wallets in relatively small amounts (accumulation
+      of funds) with subsequent transfer to another wallet or full exchange for fiat currency.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Hundreds of small deposits into one address swept daily to an exchange
+  cases: []
+  data_needed:
+  - CryptoWallet
+  - Payment (payer, beneficiary, amount, date)
+  checkable: lookups
+  lookup_sources:
+  - blockchain explorers and analytics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF notes some indicators, such as fundraising activities, apply to both ML and TF.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  innocent_explanations:
+  - Merchants receiving customer payments
+  - Donation or crowdfunding addresses
+  - Mining pool payouts
+  jurisdictions: Global
+  version: 1
+- id: ML-051
+  name: Switching into privacy coins or many coin types
+  definition: A customer converts into several virtual assets despite extra fees, especially anonymity-enhanced
+    coins, or moves Bitcoin to an exchange and immediately swaps it for a privacy coin.
+  areas:
+  - CY
+  - ML
+  typology: Chain-hopping
+  status: verified
+  sources:
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Red flags related to anonymity, p.9
+    quote: Moving a VA that operates on a public, transparent blockchain, such as Bitcoin, to a centralised
+      exchange and then immediately trading it for an AEC or privacy coin.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - BTC to Monero immediately after deposit
+  cases: []
+  data_needed:
+  - CryptoWallet (currency, blockchain)
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - blockchain analytics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate privacy preferences
+  - Speculation on privacy coins
+  jurisdictions: Global
+  version: 1
+- id: ML-052
+  name: Use of mixers or tumblers
+  definition: Funds pass through, come from, or go to services that blend many users' coins to hide where
+    they came from.
+  areas:
+  - CY
+  - ML
+  typology: Mixing
+  status: verified
+  sources:
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Red flags related to anonymity, p.10
+    quote: Transactions making use of mixing and tumbling services, suggesting an intent to obscure the
+      flow of illicit funds between known wallet addresses and darknet marketplaces.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Red flags in the source of funds or wealth, p.15
+    quote: A customer’s funds which are sourced directly from third-party mixing services or wallet tumblers.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Bitcoin Fog, a mixer that handled over 1.2 million BTC
+  cases:
+  - name: Roman Sterlingov (Bitcoin Fog)
+    year: '2024'
+    jurisdiction: United States (D.D.C.)
+    what_happened: Found guilty by a jury of money laundering conspiracy, money laundering, operating
+      an unlicensed money transmitting business and violating the D.C. Money Transmitters Act for running
+      the Bitcoin Fog mixer, which moved over 1.2 million BTC (about $400 million at the time); sentenced
+      to 150 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-dc/pr/operator-bitcoin-fog-sentenced-more-12-years-prison-running-notorious-darknet
+    source_title: Operator of Bitcoin Fog Sentenced to More Than 12 Years in Prison
+  data_needed:
+  - CryptoWallet
+  - Payment
+  - Company (service operator)
+  checkable: lookups
+  lookup_sources:
+  - blockchain analytics (cluster attribution)
+  - OFAC SDN digital currency addresses
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: FATF describes mixers obscuring flows between wallets and darknet marketplaces; Helix partnered
+      with AlphaBay.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  innocent_explanations:
+  - Privacy-conscious users (FATF says such features alone do not automatically mean an illicit transaction)
+  jurisdictions: Global
+  version: 1
+- id: ML-053
+  name: Exposure to darknet, ransomware, stolen or sanctioned addresses
+  definition: Funds are sent to or received from crypto addresses or cards linked to darknet markets,
+    ransomware, fraud, theft, sanctioned parties or questionable gambling sites.
+  areas:
+  - CY
+  - ML
+  typology: Illicit source exposure
+  status: verified
+  sources:
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Red flags in the source of funds or wealth, p.15
+    quote: Transacting with VA addresses or bank cards that are connected to known fraud, extortion, or
+      ransomware schemes, sanctioned addresses, darknet marketplaces, or other illicit websites.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Red flags related to anonymity, p.10
+    quote: Funds deposited or withdrawn from a VA address or wallet with direct and indirect exposure
+      links to known suspicious sources, including darknet marketplaces, mixing/tumbling services, questionable
+      gambling sites, illegal activities (e.g. ransomware) and/or theft reports.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A wallet two hops from a ransomware payment address
+  cases: []
+  data_needed:
+  - CryptoWallet
+  - Payment
+  - Sanction
+  - Company (marketplace/service)
+  checkable: lookups
+  lookup_sources:
+  - sanctions lists with crypto addresses (OFAC SDN)
+  - blockchain analytics
+  - public ransomware address lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF lists sanctioned addresses among illicit sources.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  - target_area: OC
+    reason: FATF found illicit trafficking in controlled substances the most common VA misuse in its case
+      studies.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  innocent_explanations:
+  - Indirect exposure through large exchanges
+  - Victims paying ransoms
+  - Dusting attacks sending tiny amounts unsolicited
+  jurisdictions: Global
+  version: 1
+- id: ML-054
+  name: Unlicensed peer-to-peer exchanger
+  definition: A customer acts as an unregistered crypto exchange for others on peer-to-peer sites, handling
+    large volumes for higher-than-normal fees, often through bank accounts.
+  areas:
+  - CY
+  - ML
+  typology: Unlicensed money transmission
+  status: verified
+  sources:
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Red flags related to anonymity, p.9
+    quote: Customers that operate as an unregistered/unlicensed VASP on peer-to-peer (P2P) exchange websites,
+      particularly when there are concerns that the customers handle huge amount of VA transfers on its
+      customer’s behalf, and charge higher fees to its customer than transmission services offered by
+      other exchanges.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An individual's bank account receiving dozens of daily payments from strangers matched with crypto
+    sends
+  cases:
+  - name: Binance Holdings Ltd
+    year: '2023'
+    jurisdiction: United States
+    what_happened: Pleaded guilty to operating as an unregistered money transmitter, BSA violations and
+      sanctions offences; about $4.3 billion in penalties.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/binance-and-ceo-plead-guilty-federal-charges-4b-resolution
+    source_title: Binance and CEO Plead Guilty to Federal Charges in $4B Resolution
+  data_needed:
+  - Person
+  - BankAccount
+  - CryptoWallet
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - MSB/VASP registers (e.g. FinCEN MSB search)
+  - P2P marketplace profiles
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Occasional personal trades below licensing thresholds
+  - Jurisdictions without licensing regimes
+  jurisdictions: Global
+  version: 1
+- id: ML-055
+  name: Dealing with weak-KYC or unregistered crypto providers
+  definition: Funds come from or go to exchanges with weak or no customer checks, or exchanges not registered
+    where they or the customer operate.
+  areas:
+  - CY
+  - ML
+  typology: Regulatory arbitrage
+  status: verified
+  sources:
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Red flags related to anonymity, p.10
+    quote: Receiving funds from or sending funds to VASPs whose CDD or know-your-customer (KYC) processes
+      are demonstrably weak or non-existent.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Red flags related to geographical risks, p.17
+    quote: Customer’s funds originate from, or are sent to, an exchange that is not registered in the
+      jurisdiction where either the customer or exchange is located.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Regular flows to an offshore exchange that onboards with only an email address
+  cases:
+  - name: Binance Holdings Ltd
+    year: '2023'
+    jurisdiction: United States
+    what_happened: DOJ said Binance let users trade for years with only an email address and never filed
+      a SAR; it pleaded guilty.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/binance-and-ceo-plead-guilty-federal-charges-4b-resolution
+    source_title: Binance and CEO Plead Guilty to Federal Charges in $4B Resolution
+  data_needed:
+  - CryptoWallet (managingExchange)
+  - Company (exchange, jurisdiction)
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - VASP registers
+  - FATF VA jurisdiction updates
+  - blockchain analytics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Use of popular global exchanges before local registration regimes existed
+  jurisdictions: Global
+  version: 1
+- id: ML-056
+  name: Anonymising or suspicious IP behaviour
+  definition: Logins or transactions come from Tor, VPNs, sanctioned countries or flagged IPs, IPs that
+    do not match the customer, or many IPs in a day.
+  areas:
+  - CY
+  - ML
+  typology: Anonymity
+  status: verified
+  sources:
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Irregularities observed during account creation, p.12
+    quote: Transactions initiated from non-trusted IP addresses, IP addresses from sanctioned jurisdictions,
+      or IP addresses previously flagged as suspicious.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Profile, p.13
+    quote: Discrepancies arise between IP addresses associated with the customer’s profile and the IP
+      addresses from which transactions are being initiated.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A customer registered in Germany always logging in from an Iranian IP
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Document (access logs)
+  - Email
+  checkable: records
+  lookup_sources:
+  - IP geolocation and Tor exit-node lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF lists IP addresses from sanctioned jurisdictions as a red flag.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  innocent_explanations:
+  - Travel
+  - Corporate or privacy VPNs
+  - Mobile networks with shifting IPs
+  - Possible account takeover of an innocent customer (FATF notes this)
+  jurisdictions: Global
+  version: 1
+- id: ML-057
+  name: Cash in or out through crypto ATMs or cards
+  definition: Crypto ATMs or kiosks are used despite high fees, in high-crime areas or for repeated small
+    amounts, or cards linked to crypto wallets are used to pull out large amounts of cash.
+  areas:
+  - CY
+  - ML
+  typology: Crypto cash-out
+  status: verified
+  sources:
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Red flags related to anonymity, p.10
+    quote: A single use of an ATM/kiosk is not enough in and of itself to constitute a red flag, but would
+      if it was coupled with the machine being in a high-risk area, or was used for repeated small transactions
+      (or other additional factors).
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Red flags in the source of funds or wealth, p.15
+    quote: The use of one or multiple credit and/or debit cards that are linked to a VA wallet to withdraw
+      large amounts of fiat currency (crypto-to-plastic), or funds for purchasing VAs are sourced from
+      cash deposits into credit cards.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Pensioners told by scammers to feed cash into a Bitcoin ATM (FATF case study 10)
+  cases: []
+  data_needed:
+  - CryptoWallet
+  - Payment
+  - Address (ATM location)
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - crypto ATM location maps
+  - blockchain analytics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FATF notes crypto ATMs are commonly used by mules or scam victims.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  innocent_explanations:
+  - Unbanked users
+  - Convenience despite fees
+  jurisdictions: Global
+  version: 1
+- id: ML-058
+  name: Illicit wording in payment or message fields
+  definition: Messages attached to crypto transactions use language pointing to illegal goods, such as
+    drugs or stolen card data.
+  areas:
+  - CY
+  - ML
+  typology: Payment narrative
+  status: verified
+  sources:
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Other unusual behaviour, p.15
+    quote: Use of language in VA message fields indicative of the transactions being conducted in support
+      of illicit activity or in the purchase of illicit goods, such as drugs or stolen credit card information.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Memo fields reading slang for drugs
+  cases: []
+  data_needed:
+  - Payment (purpose, description)
+  - CryptoWallet
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: FATF cites drugs as an example of illicit goods named in message fields.
+    source_url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+  innocent_explanations:
+  - Jokes or memes in memo fields
+  jurisdictions: Global
+  version: 1
+- id: ML-059
+  name: Unhosted, hardware or paper wallets used to move value across borders
+  definition: Value is carried across borders in self-held wallets that no exchange controls.
+  areas:
+  - CY
+  - ML
+  typology: Self-custody
+  status: verified
+  sources:
+  - title: Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing
+    publisher: FATF
+    year: '2020'
+    url: https://www.aml.gov.sa/en-us/GuidanceReports/Virtual%20Assets%20Red%20Flag%20Indicators.pdf
+    locator: Red flags related to anonymity, p.10
+    quote: The use of decentralised/unhosted, hardware or paper wallets to transport VAs across borders.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Drug sale proceeds moved through decentralised Bitcoin wallets before exchange (FATF case study 7)
+  cases: []
+  data_needed:
+  - CryptoWallet (custodyType)
+  - Person
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - blockchain analytics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - FATF says hardware or paper wallets may be a legitimate way to secure VAs against theft
+  jurisdictions: Global
+  version: 1
+- id: ML-060
+  name: Business receives sales or export money but never buys stock
+  definition: A business regularly receives payments for exports or online sales, or from countries it
+    has no link to, but shows no purchases of inventory to match.
+  areas:
+  - ML
+  typology: Mirror transactions / TBML
+  status: verified
+  sources:
+  - title: FinCEN Advisory FIN-2025-A003
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+    locator: Red Flags Potentially Indicative of CMLN-Affiliated TBML Schemes, p.10
+    quote: A small U.S.-based business in the electronics or real estate industry receives wires from
+      Mexico, China, Hong Kong, and the United Arab Emirates and has no known nexus to these countries.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: BSA/AML Examination Manual, Appendix F
+    publisher: FFIEC
+    url: https://bsaaml.ffiec.gov/manual/Appendices/07
+    locator: Other Unusual or Suspicious Customer Activity
+    quote: Customer receives large and frequent deposits from online payments systems yet has no apparent
+      online or auction business.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A freight company receiving 'export' wires to Mexico and the UAE with no supplier payments
+  cases: []
+  data_needed:
+  - Company (sector, address)
+  - Payment (payer, beneficiary, purpose)
+  - BankAccount
+  checkable: records
+  lookup_sources:
+  - company registry
+  - customs/export data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: FinCEN ties these TBML red flags to networks laundering cartel proceeds.
+    source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+  innocent_explanations:
+  - Drop-shipping and agency models where suppliers are paid by others
+  - Purchases from a different account
+  jurisdictions: US; FinCEN red flags name Chinese-owned businesses, but ownership nationality alone is
+    not an indicator
+  version: 1
+- id: ML-061
+  name: Paying unrelated people's credit cards or buying luxury goods with third-party money
+  definition: A business or person uses transfers from unknown people to pay off credit cards, or pays
+    many unrelated individuals' cards, linked to bulk buying of electronics or luxury goods.
+  areas:
+  - ML
+  typology: Mirror transactions / professional laundering
+  status: verified
+  sources:
+  - title: FinCEN Advisory FIN-2025-A003
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+    locator: Red Flags Potentially Indicative of CMLN-Affiliated TBML Schemes, p.10
+    quote: A business that sells electronics or other luxury goods makes payments for multiple credit
+      cards associated with various individuals, who are seemingly unrelated to the business.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN Advisory FIN-2025-A003
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+    locator: Red Flags Potentially Indicative of CMLN-Affiliated TBML Schemes, p.10
+    quote: A business that sells electronics or other luxury goods has income that is not commensurate
+      with the size and scale of the business.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An electronics shop paying off 30 strangers' credit cards
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary)
+  - Company
+  - Person
+  - BankAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: FinCEN links these patterns to mirror-transfer laundering of cartel proceeds.
+    source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+  innocent_explanations:
+  - Corporate card programmes for staff
+  - Family members paying each other's cards
+  jurisdictions: US
+  version: 1
+- id: ML-062
+  name: Chains of company formation agents or professional enablers
+  definition: Companies are set up through chains of formation agents in several countries, or professionals
+    take a tick-box approach, forge signatures or falsely notarise documents.
+  areas:
+  - ML
+  typology: Professional money laundering – gatekeepers
+  status: verified
+  sources:
+  - title: Professional Money Laundering
+    publisher: FATF
+    year: '2018'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Professional-Money-Laundering.pdf
+    locator: 'Legal and professional services: TCSP behaviours'
+    quote: utilising chains of formation agents in multiple jurisdictions;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Professional Money Laundering
+    publisher: FATF
+    year: '2018'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Professional-Money-Laundering.pdf
+    locator: 'Legal and professional services: TCSP behaviours'
+    quote: forging signatures and fraudulently notarising documents.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A UK company formed by an agent in Latvia acting for an agent in Belize
+  cases: []
+  data_needed:
+  - Company
+  - Representation (agent, client)
+  - Directorship
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - company registries (filing agent fields)
+  - OpenCorporates
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - International groups using local agents in each country
+  jurisdictions: Global
+  version: 1
+- id: ML-063
+  name: Money transfer agents letting customers split remittances
+  definition: Agents of a money transfer business let customers break up remittances among several people,
+    or share a common customer base with other reported agents.
+  areas:
+  - ML
+  typology: Structuring via MVTS
+  status: verified
+  sources:
+  - title: Professional Money Laundering
+    publisher: FATF
+    year: '2018'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Professional-Money-Laundering.pdf
+    locator: 'MVTS case (Source: Italy)'
+    quote: the MVTS agents allowed their customers to structure transactions by splitting up remittances
+      with several accomplices; and
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Ten senders sending $900 each to the same recipient on the same day
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, amount, date)
+  - Person
+  - Company (MVTS agent)
+  checkable: records
+  lookup_sources:
+  - MSB/MVTS registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family members each sending support to the same relative
+  - Diaspora community collections
+  jurisdictions: Global
+  version: 1
+not_reached:
+- 'FATF PDFs on fatf-gafi.org return HTTP 403 to direct download; the TBML indicators were read from an
+  identical copy hosted by the Bank of Russia (cbr.ru) and the VA red flags from a copy hosted by Saudi
+  Arabia''s GDFI (aml.gov.sa). FATF landing page for TBML indicators: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Trade-based-money-laundering-indicators.html'
+- 'FATF Professional Money Laundering (2018): read through a page-fetch tool only. No formal indicator
+  list was found in the parts read; the report says one aim was to develop PML risk indicators. Only the
+  TCSP, complicit-employee and MVTS case lists were used.'
+- 'FATF RBA Guidance for the Real Estate Sector (2022): text read only up to about para 107. The mortgage-lender
+  section and later parts were not read. Several long indicators were shown cut off and are quoted only
+  as exact fragments.'
+- 'FFIEC Appendix F: some longer red flags were shown cut off by the fetch tool. Only complete sentences
+  or exact fragments are quoted.'
+- 'Cullen Commission (BC) Final Report 2022: only the table of contents was read. Chapters 4, 15 and 19
+  on real estate and scale were not reached, so none of its findings are used.'
+- 'FATF–Egmont Concealment of Beneficial Ownership (2018) indicators: not reached'
+- 'FATF–Egmont Trade-Based Money Laundering: Trends and Developments (2020): not read'
+- 'FATF 2007 Money Laundering through the Real Estate Sector typology: not read'
+- 'FinCEN real estate GTO order text and the 2024 Residential Real Estate rule (and its current legal
+  status): not checked'
+- 'AUSTRAC, UK (NCA/HM Treasury), EU and Egmont indicator lists: not reached'
+- 'CBA case: the final Federal Court penalty order was not checked; the case is recorded from the AUSTRAC
+  release on the agreed penalty'
+- 'Hajiyeva v NCA [2020] EWCA Civ 108: read but not used as a case, because the court upheld an investigative
+  order and made no finding of laundering. It is only cited as a cross-hint and in the glossary.'
+- Springer article page for Akartuna et al. returned a JavaScript client challenge. The full text was
+  read through the Springer PDF link with a page-fetch tool, and the supplements were downloaded from
+  static-content.springer.com.
+- City University of Hong Kong repository PDF of Akartuna et al. returned 403

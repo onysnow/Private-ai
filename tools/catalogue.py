@@ -65,6 +65,9 @@ def area_key(text: str) -> str | None:
     return None
 
 
+WEAK_FIT = re.compile(r"weak fit|only a general example|does not specifically", re.IGNORECASE)
+
+
 def norm(s: str) -> str:
     return re.sub(r"\s+", " ", s.replace("’", "'").replace("‘", "'").replace("“", '"').replace("”", '"')).strip()
 
@@ -104,10 +107,12 @@ def ingest(paths: list[str]) -> None:
                     cv = case_verdicts.get(norm(c["name"]))
                     outcome, ok = c["outcome"], False
                     if cv:
-                        if cv.get("outcome_confirmed"):
-                            ok = True
-                        elif cv.get("correct_outcome") in Outcome.__members__:
+                        if WEAK_FIT.search(cv.get("note") or ""):
+                            continue  # the checker found the case does not show this indicator
+                        if cv.get("correct_outcome") in Outcome.__members__:
                             outcome, ok = cv["correct_outcome"], True
+                        elif cv.get("outcome_confirmed"):
+                            ok = True
                     cases.append({**{k: c.get(k) for k in ("name", "year", "jurisdiction", "what_happened", "source_url", "source_title")},
                                   "outcome": outcome, "outcome_verified": ok})
                 hints = []

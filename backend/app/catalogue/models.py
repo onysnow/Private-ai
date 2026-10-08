@@ -15,7 +15,10 @@ from enum import Enum
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 ID_PATTERN = re.compile(r"^[A-Z]{2}-\d{3}$")
-NUMBER = re.compile(r"\d")
+NUMBER = re.compile(
+    r"\d|\b(?:two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|fifty|hundred|thousand|million|billion|half|percent|per cent)\b",
+    re.IGNORECASE,
+)
 # References to a law, article or report carry digits that are not thresholds
 # ("Article 4(3) of Directive (EU) 2024/1069"); they are removed before looking
 # for a number that needs a source.
@@ -25,10 +28,14 @@ REFERENCE = re.compile(
 )
 
 
+# Years, page numbers and US Code citations ("2020 advisory p.3", "18 U.S.C. 152(1),(7)").
+OTHER_REFERENCES = re.compile(r"\b(?:19|20)\d{2}\b|\bpp?\.\s*\d+|\b\d+\s*U\.S\.C\.?\s*§?\s*[\d()a-z,\s]*", re.IGNORECASE)
+
+
 def has_threshold_number(*texts: str) -> bool:
     """True when the text gives a quantity (a count, a share, an amount) rather
     than only a reference to a law or report."""
-    return any(NUMBER.search(REFERENCE.sub("", text)) for text in texts)
+    return any(NUMBER.search(OTHER_REFERENCES.sub("", REFERENCE.sub("", text))) for text in texts)
 
 
 # Every area the catalogue covers. A cross-hint may point to any of them, even
