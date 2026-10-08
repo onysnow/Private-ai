@@ -1347,7 +1347,11 @@ indicators:
     textbook: Meets the published definition as worded
     threshold_source: none
   threshold_verified: true
-  cross_hints: []
+  cross_hints:
+  - target_area: FR
+    reason: FATF lists a customer much older than the platform's average user as a red flag, and retirement-account
+      drain is a typical pattern for older victims.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
   innocent_explanations:
   - People reallocate savings into crypto or gold by choice
   - Home-equity borrowing has many legitimate uses
@@ -2531,7 +2535,11 @@ indicators:
     textbook: Meets the published definition as worded
     threshold_source: none
   threshold_verified: true
-  cross_hints: []
+  cross_hints:
+  - target_area: FR
+    reason: FATF lists age disparity as a red flag; FinCEN pig-butchering alert notes victims draining
+      retirement accounts.
+    source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
   innocent_explanations:
   - Older people invest in crypto by choice
   jurisdictions: FATF members

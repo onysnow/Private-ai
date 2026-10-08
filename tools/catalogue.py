@@ -43,7 +43,7 @@ AREA_WORDS = [
     ("BO", ["ownership", "shell", "nominee", "front compan"]),
     ("PP", ["procurement", "bid", "non-profit", "nonprofit", "charit", "election", "campaign"]),
     ("CO", ["corruption", "bribery", "influence", "conflict of interest", "lobby", "politically exposed", "state capture", "political figure", "diplomat", "interference", "transnational repression"]),
-    ("FR", ["fraud", "tax", "ponzi", "securities", "insurance", "healthcare"]),
+    ("FR", ["fraud", "elder", "tax", "ponzi", "securities", "insurance", "healthcare"]),
     ("CY", ["cyber", "ransomware", "scam", "crypto", "source reliab", "grading"]),
     ("IN", ["disinformation", "information", "forg", "academic", "media manipulation", "sock"]),
     ("OC", ["organised crime", "organized crime", "drug", "arms", "counterfeit", "match-fixing", "illicit goods"]),
