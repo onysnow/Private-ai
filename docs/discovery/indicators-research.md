@@ -104,3 +104,114 @@ Coverage is very uneven across the four questions. No claims survived verificati
 - <https://www.blockint.nl/intel-analysis/critical-review-of-the-admiralty-code/> (blog; Source reliability grading and investigative training)
 - <https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf> (primary; Source reliability grading and investigative training)
 - <https://gijn.org/academy/> (primary; Source reliability grading and investigative training)
+
+---
+
+# Part 2: grading sources, learning material, danger to journalists (follow-up run, 8 October 2026)
+
+Stats: {"angles": 5, "sourcesFetched": 25, "claimsExtracted": 115, "claimsVerified": 25, "confirmed": 23, "killed": 2, "unverified": 0, "afterSynthesis": 10, "urlDupes": 0, "budgetDropped": 5, "agentCalls": 107}
+
+## Summary
+
+Only part of the question was verified. The 23 claims that survived checking cover the UK College of Policing 3x5x2 intelligence grading, the verification frameworks newsrooms and open-source investigators use (the Verification Handbook, First Draft, the Berkeley Protocol and Bellingcat), and the licences of GIJN, the Verification Handbook and the Berkeley Protocol. 3x5x2 is the current College of Policing standard. It grades the source 1-3 (Reliable, Untested, Not reliable), grades the information A-E by how the source knows it (from first-hand down to suspected false), and adds a P or C handling code. Newsrooms and open-source investigators do not use a letter-number grade like this. They check content against a list of elements: provenance, source, date and location in Wardle's 2014 chapter of the Verification Handbook, with First Draft later adding motivation. First Draft also treated verification as a matter of degree, using a rubric for how 'airtight' a verification is. Of the learning resources, GIJN's Resource Center, Bellingcat's Online Investigations Toolkit and guides, the Verification Handbook and the Berkeley Protocol are all free to read, but none can safely be rewritten into in-app guides without permission. The Verification Handbook is CC BY-NC-ND 4.0, which forbids sharing adapted versions. The Berkeley Protocol is 'All rights reserved' by the United Nations. GIJN says CC BY-NC 4.0 but forbids edits without its approval, and one GIJN page also shows a contradictory CC BY-ND notice. Several parts were not verified at all: the NATO Admiralty Code (A-F / 1-6) under AJP-2.1 or STANAG 2511, the 5x5x5 system beyond its replacement around 2016, the ICIJ, OCCRP and Knight Center courses, and every part of Question C (danger to journalists, SLAPPs, spyware, protecting witnesses, safety templates).
+
+## Findings
+
+**High confidence.** The College of Policing's current standard for grading an intelligence report is 3x5x2: source evaluation (3 grades), information or intelligence assessment (5 grades) and handling codes (2 codes, P or C). It replaced the older 5x5x5 system around 2016, so 5x5x5 should be treated as historical.
+
+Evidence: Primary, current College of Policing guidance (APP page updated 2026-01-13): '3×5×2 ... source evaluation (3), information or intelligence assessment (5), and handling codes (2)'. Unanimous 3-0. The 5x5x5 replacement date comes from a verifier's note, not a separately checked source.
+
+Sources: <https://www.college.police.uk/app/intelligence-management/completing-intelligence-report>
+
+**High confidence.** How 3x5x2 grades the source: 1 = Reliable ('believed to be competent and information received is generally reliable'), 2 = Untested (has not given information to this recipient before; not necessarily unreliable, but treat with caution and corroborate before acting), 3 = Not reliable (reasonable grounds to doubt). A source can be non-human, such as CCTV.
+
+Evidence: Verifiers matched the page wording directly. The CCTV example appears under grade 1 (Reliable).
+
+Sources: <https://www.college.police.uk/app/intelligence-management/completing-intelligence-report>
+
+**High confidence.** How 3x5x2 grades the information: A = known directly to the source (first-hand, e.g. witnessed); B = known indirectly but corroborated by separate, independent intelligence graded A; C = known indirectly (the source was told by someone else); D = not known (no way to assess it, e.g. anonymous sources or Crimestoppers); E = suspected to be false. The app could reuse this as a model, with a source-reliability axis and a separate axis for how the source knows.
+
+Evidence: Matched the primary APP page word for word, including that B needs independent corroboration. 'Hearsay' for C is a paraphrase.
+
+Sources: <https://www.college.police.uk/app/intelligence-management/completing-intelligence-report>
+
+**High confidence.** The original Verification Handbook (European Journalism Centre, ed. Craig Silverman, 2014) checks user-generated content on four elements: provenance (is it the original?), source (who uploaded it?), date and location. Its Chapter 9 checklist gives three steps: identify and verify the original source and content (including location, date and approximate time), triangulate and challenge the source, and get permission from the originator to use the content. The checklist starts by assuming the content is inaccurate or has been taken out of context.
+
+Evidence: Verifiers extracted the PDF text and quotes matched word for word. The four-element framework comes from Claire Wardle's chapter, so it is one chapter's framework rather than the whole handbook's. Later editions (2020, 2024 on DataJournalism.com) cover different ground.
+
+Sources: <https://verificationhandbook.com/downloads/verification.handbook.pdf>
+
+**High confidence.** First Draft's verification framework has five 'pillars': Provenance, Source, Date, Location and Motivation. The same checks apply to eyewitness video, manipulated photos, sockpuppet accounts and memes, and First Draft calls Provenance the most important. It treated verification as collecting corroborating evidence, not a pass/fail result ('hardly ever foolproof'), and published a rubric for visual media that gauges how airtight a verification is. This is the closest thing newsrooms have to a grading scheme.
+
+Evidence: Primary First Draft article (Shaydanay Urbani, 14 Oct 2019), quotes matched. The rubric is published as an image, and its levels were not extracted. First Draft closed in 2022 and its work continues at Brown University's Information Futures Lab, so the app should present this as an archived guide.
+
+Sources: <https://firstdraftnews.org/articles/verifying-online-information-the-absolute-essentials/>
+
+**High confidence.** The Berkeley Protocol on Digital Open Source Investigations was co-published by OHCHR and the Human Rights Center at UC Berkeley School of Law. It launched in December 2020 and the current PDF edition is dated 2022. It sets out minimum professional standards and guidance on methods for finding, collecting, preserving, verifying and analysing digital open-source information in a professional, legal and ethical way, for investigations into international criminal, human rights and humanitarian law. Bellingcat recommends it as a one-stop workflow resource covering ethics, legal issues, security, data collection and analysis.
+
+Evidence: Both publishers' pages and Bellingcat's own article confirm it. It is guidance, not binding law, and it was written for legal and accountability investigations rather than newsroom fact-checking. A more detailed claim about how its verification stage splits into source analysis and content analysis was refuted 0-3, so the app should not repeat that split.
+
+Sources: <https://www.ohchr.org/en/publications/policy-and-methodological-publications/berkeley-protocol-digital-open-source> · <https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf> · <https://www.bellingcat.com/resources/2021/11/09/first-steps-to-getting-started-in-open-source-research/>
+
+**High confidence.** The Berkeley Protocol is not openly licensed. The PDF imprint reads '© 2022 United Nations All rights reserved worldwide' (HR/PUB/20/2), and asks that reproduction requests go to the Copyright Clearance Center and rights queries to Permissions@un.org. The OHCHR landing page shows only a site copyright notice. Adapting it into in-app guides needs UN permission; otherwise the app is limited to short quotation or fair-dealing summaries with citation.
+
+Evidence: Verifiers read the imprint page directly and found no Creative Commons licence. The landing-page footer could not be re-checked because of a Cloudflare block.
+
+Sources: <https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf> · <https://www.ohchr.org/en/publications/policy-and-methodological-publications/berkeley-protocol-digital-open-source>
+
+**High confidence.** The original Verification Handbook is licensed CC BY-NC-ND 4.0. It may be shared unchanged, non-commercially and with credit, but rewritten or adapted in-app guides cannot be distributed without permission.
+
+Evidence: Page 4 of the PDF: 'licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.' This applies to the 2014 edition only; later editions were not checked.
+
+Sources: <https://verificationhandbook.com/downloads/verification.handbook.pdf>
+
+**High confidence.** GIJN's free Resource Center held over a thousand tip sheets, videos and reporting guides in 13 languages as of 2022. GIJN says its articles and guides are 'generally' available under CC BY-NC 4.0 for non-commercial republishing. Republishers must credit GIJN and the author, link to the original, and include the line 'This story was originally published by the Global Investigative Journalism Network.' GIJN does not allow changes without its specific approval, and approved edits must be labelled as edited. Third-party reprints, conference videos and most images are excluded. A per-page notice on at least one guide says CC BY-ND 4.0, which contradicts the BY-NC statement. The app should therefore ask GIJN for permission before adapting any guide.
+
+Evidence: GIJN's own policy pages, checked 2026-10-08. The Resource Center figures are self-reported and dated 2022. A claim that the page is simply CC BY-ND was refuted 1-2 because the page contradicts itself, which shows the licence position is unclear rather than settled.
+
+Sources: <https://gijn.org/use-our-stuff-gijns-republishing-guidelines/> · <https://gijn.org/resource/gijns-reporting-guides-2/>
+
+**High confidence.** Bellingcat's Online Investigations Toolkit (bellingcat.gitbook.io/toolkit, formerly the 'Digital Investigation Toolkit' at bit.ly/bcattools, relaunched in 2024) is a free, regularly updated, categorised directory of tools: satellite imagery and maps, social media, transportation, photo and video verification, archiving and more. Most of the tools listed are free. Entries are designed to include a description, common uses, cost, difficulty, requirements, limitations, ethical considerations and links to guides, so the toolkit works as learning material. It is a tool catalogue, not a verification or grading framework, and inclusion 'does not imply that Bellingcat endorses' a tool. Bellingcat also keeps a free Guides and Resources section of methodology articles.
+
+Evidence: Checked on Bellingcat's live pages (toolkit updated 2026-10-01). Entries are community-contributed, so some lack the full set of fields. The claim about the Guides section passed 2-1; the toolkit claims passed 3-0. The licence of the toolkit and guides was not checked.
+
+Sources: <https://bellingcat.gitbook.io/toolkit> · <https://bellingcat.com/resources/2024/09/24/bellingcat-online-investigations-toolkit> · <https://www.bellingcat.com/resources/2021/11/09/first-steps-to-getting-started-in-open-source-research/>
+
+## Gaps and caveats
+
+Coverage is uneven, and most of the question is unanswered. (1) Not verified at all: the NATO Admiralty Code A-F reliability and 1-6 credibility definitions in current doctrine (AJP-2.1 / STANAG 2511); the 5x5x5 system's details beyond the verifier's note that 3x5x2 replaced it around 2016; the ICIJ, OCCRP and Knight Center courses; and all of Question C, meaning RSF, UNESCO's Observatory of Killed Journalists, CPJ and academic studies on who attacks journalists, CASE coalition and Council of Europe evidence on SLAPPs, Citizen Lab and Amnesty spyware research, UNODC guidance on protecting witnesses, and the CPJ, RSF, IWMF, ACOS Alliance and Rory Peck Trust risk-assessment templates. Nothing in the app should rely on these until they are researched. (2) How current the sources are: the First Draft material dates from 2019 and the organisation closed in 2022. The Verification Handbook findings apply to the 2014 first edition only. The GIJN Resource Center figures are self-reported and from 2022. (3) Licences: GIJN's licence wording contradicts itself (BY-NC policy text versus a BY-ND page notice, plus a no-edits rule), and the licences of Bellingcat's toolkit and guides were never checked. Assume that adapting any of these resources needs permission. (4) Some checks could not be completed. The OHCHR landing page was blocked by Cloudflare, and the Firecrawl search credits ran out, which limited the search for contradicting sources on several claims. (5) Two claims were refuted. The Berkeley Protocol's verification stage splitting into 'source analysis / content analysis' (0-3) should not be used. The claim that the GIJN page is simply CC BY-ND (1-2) was too simple.
+
+## Open questions
+
+- What exact wording do NATO AJP-2.1 and STANAG 2511 give for the Admiralty Code grades (A-F reliability, 1-6 credibility), and is that doctrine publicly available to cite?
+- Which investigation subjects and actors (organised crime, corruption, armed conflict, state actors) are most linked to journalist killings and threats in RSF, UNESCO and CPJ data, and what do the CASE coalition and Council of Europe report on SLAPPs?
+- What licences apply to the free safety risk-assessment templates from CPJ, RSF, IWMF, ACOS Alliance and Rory Peck Trust, and to the training from ICIJ, OCCRP, the Knight Center and Bellingcat, and could any be adapted into in-app guides?
+- Will GIJN, EJC/DataJournalism.com or UN Publications grant permission to adapt their guides, and which licence actually governs GIJN's Resource Center guides, given the conflicting BY-NC and BY-ND notices?
+
+## All sources read
+
+- <https://www.college.police.uk/app/intelligence-management/completing-intelligence-report> (primary; Doctrine: Admiralty Code and UK police grading)
+- <https://en.wikipedia.org/wiki/Admiralty_code> (secondary; Doctrine: Admiralty Code and UK police grading)
+- <https://www.intelligencewithsteve.com/post/the-5-minute-guide-to-the-intelligence-grading-process-and-its-application-in-osint> (unreliable; Doctrine: Admiralty Code and UK police grading)
+- <https://production.copweb.aws.college.police.uk/app/information-management/management-police-information/evaluation/changes> (primary; Doctrine: Admiralty Code and UK police grading)
+- <https://www.sans.org/blog/enhance-your-cyber-threat-intelligence-with-the-admiralty-system> (secondary; Doctrine: Admiralty Code and UK police grading)
+- <https://pangearesearch.substack.com/p/the-admiralty-code-nato-6x6-system> (blog; Doctrine: Admiralty Code and UK police grading)
+- <https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf> (primary; Newsroom and OSINT verification frameworks)
+- <https://www.ohchr.org/en/publications/policy-and-methodological-publications/berkeley-protocol-digital-open-source> (primary; Newsroom and OSINT verification frameworks)
+- <https://verificationhandbook.com/downloads/verification.handbook.pdf> (primary; Newsroom and OSINT verification frameworks)
+- <https://firstdraftnews.org/articles/verifying-online-information-the-absolute-essentials/> (primary; Newsroom and OSINT verification frameworks)
+- <https://bellingcat.gitbook.io/toolkit> (primary; Newsroom and OSINT verification frameworks)
+- <https://www.bellingcat.com/resources/2021/11/09/first-steps-to-getting-started-in-open-source-research/> (primary; Newsroom and OSINT verification frameworks)
+- <https://gijn.org/use-our-stuff-gijns-republishing-guidelines/> (primary; Free training, publishers and licences)
+- <https://gijn.org/resource/gijns-reporting-guides-2/> (primary; Free training, publishers and licences)
+- <https://bellingcat.com/resources/2024/09/24/bellingcat-online-investigations-toolkit> (primary; Free training, publishers and licences)
+- <https://humanrights.berkeley.edu/programs/investigations/berkeley-protocol> (primary; Free training, publishers and licences)
+- <https://www.occrp.org/en/news/over-30-journalists-murdered-by-organized-crime-since-2017-rsf> (secondary; Who and what endangers journalists: killings, SLAPPs and spyware)
+- <https://cpj.org/reports/2016/10/impunity-index-getting-away-with-murder-killed-justice/> (primary; Who and what endangers journalists: killings, SLAPPs and spyware)
+- <https://globalfreedomofexpression.columbia.edu/publications/case-2025-report-on-slapps-in-europe> (secondary; Who and what endangers journalists: killings, SLAPPs and spyware)
+- <https://www.article19.org/resources/europe-increasingly-hostile-environment-for-journalists/> (secondary; Who and what endangers journalists: killings, SLAPPs and spyware)
+- <https://www.occrp.org/en/project/the-pegasus-project/israeli-made-spyware-used-to-monitor-journalists-and-activists-worldwide> (secondary; Who and what endangers journalists: killings, SLAPPs and spyware)
+- <https://www.unodc.org/documents/organized-crime/Witness-protection-manual-Feb08.pdf> (primary; Witness protection and safety risk-assessment templates)
+- <https://cpj.org/2018/09/basic-preparedness-risk-assessment/amp/> (primary; Witness protection and safety risk-assessment templates)
+- <https://www.acosalliance.org/safetychecklist> (primary; Witness protection and safety risk-assessment templates)
+- <https://rorypecktrust.org/get-help/safety/risk-assessment/getting-started-and-security-protocol/> (primary; Witness protection and safety risk-assessment templates)
