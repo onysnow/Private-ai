@@ -1,0 +1,3781 @@
+key: EN
+name: Environmental crime
+scope: wildlife trafficking (TRAFFIC, CITES, FATF 2020 illegal wildlife trade), illegal, unreported and
+  unregulated fishing (Global Fishing Watch, FAO), illegal logging, illegal mining and gold, waste trafficking
+  and pollution crime (FATF 2021 environmental crime report).
+indicators:
+- id: EN-001
+  name: Trading or logistics company in a high-risk wildlife corridor dealing in typical cover goods
+  definition: An import-export, freight, customs-clearing or logistics firm that ships goods often used
+    to hide wildlife (logs, plastic waste, frozen food, fish maws, beans, stone blocks) along routes or
+    ports known for wildlife seizures.
+  areas:
+  - EN
+  - ML
+  typology: Concealment of wildlife in legitimate cargo through import-export front companies
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, A. Client profiles, p.60 and footnote 82
+    quote: raw or squared wooden logs, plastic waste or pellets, frozen food, fish maws, various kinds
+      of beans, stone or quartz blocks.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: para 37, p.18
+    quote: Importantly, criminals incorporate shell and front companies in the both source or destination
+      countries for the illicit wildlife
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A Kenyan 'tea trading' company set up to hide ivory inside tea sacks (FATF 2020 Box 6)
+  - Front companies importing garlic and citric acid and exporting seafood/shells to hide ivory (Mikocheni
+    syndicate, Tanzania)
+  - A frozen fish company used to co-mingle pangolin-scale proceeds (PT. ABC, Indonesia)
+  cases:
+  - name: Tea trading front company used for ivory shipments (Mombasa to Thailand/Singapore)
+    year: '2015'
+    jurisdiction: Kenya / Thailand / Singapore
+    what_happened: Seizures of 6.8 tonnes of ivory exported from Mombasa; an NGO financial investigation
+      traced a syndicate that set up a tea trading front company, diverted trucks to fill tea sacks with
+      ivory and changed destination and consignee en route.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    source_title: 'FATF (2020) Money Laundering and the Illegal Wildlife Trade, Box 6 (source: Liberty
+      Shared)'
+  data_needed:
+  - Company (name, jurisdiction, incorporationDate, sector/classification)
+  - Ownership
+  - Directorship
+  - Document (bills of lading, customs declarations, invoices)
+  - Address (port, warehouse)
+  - Payment (payer, beneficiary, amount, purpose)
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Customs and trade data (shipment manifests, bill-of-lading databases)
+  - Seizure databases and court records
+  - Port/container tracking
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: The same front-company and cover-load method moves value through the trade system, not just
+      goods.
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+  innocent_explanations:
+  - Most companies shipping these commodities on these routes are legitimate traders
+  - Large ports handle huge legitimate volumes, so presence on a high-seizure route alone means little
+  - Freight forwarders and clearing agents serve many unrelated clients
+  jurisdictions: Global; FATF names ports with high seizure volumes incl. Lomé, Dar es Salaam, Manila,
+    Mombasa, Sihanoukville, Apapa (Lagos), Matadi, Haiphong, Danang, Hangzhou (list not exhaustive)
+  version: 1
+- id: EN-002
+  name: Re-used containers, consignees, transporters, clearing agents or exporters from earlier wildlife
+    cases
+  definition: A shipment or payment involves the same container, consignee, transporter, clearing agent
+    or exporter that appeared in other cases believed to involve illegal wildlife trade.
+  areas:
+  - EN
+  typology: Network re-use of logistics intermediaries
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, A. Client profiles, p.60
+    quote: Use of common containers, consignees, transporter, clearing agents, or exporters as seen in
+      other cases believed to involve IWT.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A consignee named in a past ivory seizure appears as buyer on a new timber shipment
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Document (bill of lading, container number, customs entry)
+  - UnknownLink or Associate (links to prior case parties)
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Court records and seizure reports
+  - Customs/bill-of-lading databases
+  - Adverse media and NGO investigation reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Large clearing agents and transporters handle thousands of shipments and may have been unwittingly
+    used once
+  - Container numbers are reused by shipping lines for unrelated cargo
+  jurisdictions: Global
+  version: 1
+- id: EN-003
+  name: Officials with wildlife, forestry, customs or natural-resource duties holding unexplained cash
+    or wealth
+  definition: Government officials who protect or manage wildlife, forests, mines, borders, customs or
+    seized-product stockpiles receive large cash deposits, wire transfers or show wealth their pay cannot
+    explain.
+  areas:
+  - CO
+  - EN
+  typology: Corruption of officials enabling environmental crime
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B. Transactions and client account activity, p.61
+    quote: Large cash deposit by government officials working in wildlife protection agencies, border
+      control or customs and revenue officials.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.61
+    quote: who have specific management or oversight authority of government stockpiles of seized ivory,
+      rhino horn, timber, or other illegal wildlife products.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Customers, p.54
+    quote: Unexplained wealth, cash transfers involving senior officials, politically exposed persons
+      (or family members of) with a position of responsibility related to the management or preservation
+      of natural resources (e.g. forestry or mining officials).
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A CITES Management Authority employee makes repeated cash deposits far above salary
+  - A police officer's brother-in-law's account receives proceeds from armadillo sales (Indonesia, FATF
+    2020 Box 8)
+  cases: []
+  data_needed:
+  - Person (position, employer)
+  - Employment
+  - Family
+  - BankAccount
+  - Payment
+  - Asset/RealEstate/Vehicle
+  checkable: lookups
+  lookup_sources:
+  - Asset declarations of public officials
+  - Land and vehicle registries
+  - PEP databases
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: FATF states environmental crime success is strongly linked to corruption, which provides falsified
+      permits and safe passage.
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  innocent_explanations:
+  - Inheritance, sale of family property or a spouse's business income
+  - Legitimate side business declared to the employer
+  - Cash-based economies where salaries and savings are commonly held in cash
+  jurisdictions: Global
+  version: 1
+- id: EN-004
+  name: Politically exposed person with environmental oversight tied to resource businesses or offshore
+    trips
+  definition: A PEP, wealthy businessperson or public official with oversight of the environment, game,
+    forestry or land rights is involved in wildlife or resource transactions, or travels to offshore centres
+    for undisclosed business.
+  areas:
+  - CO
+  - EN
+  typology: Elite capture of natural-resource rents
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, A. Client profiles, p.60
+    quote: Activity involving PEPs and wealthy businessmen/women, particularly those with environmental,
+      game, or forestry oversight or environmental or wildlife-related businesses
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Customers, p.55
+    quote: PEP or public official with responsibilities for environment management/protection or land/tenure
+      rights travelling to offshore jurisdictions for undisclosed business activities.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A forestry minister's relative holds shares in a logging concessionaire
+  - A mining official makes repeated trips to an offshore financial centre
+  cases: []
+  data_needed:
+  - Person (PEP status, position)
+  - Family
+  - Associate
+  - Ownership
+  - Directorship
+  - Company
+  - Event (travel)
+  checkable: lookups
+  lookup_sources:
+  - PEP lists
+  - Company registries and beneficial ownership registers
+  - Asset declarations
+  - Leaked offshore data (e.g. ICIJ Offshore Leaks)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Natural-resource officials and PEPs controlling licences are a known corruption channel.
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  - target_area: SF
+    reason: Gertler case shows mining corruption can lead to sanctions designations.
+    source_url: https://home.treasury.gov/news/press-releases/sm0417
+  innocent_explanations:
+  - PEPs may own legitimate businesses declared under conflict-of-interest rules
+  - Officials travel abroad for conferences, training or family reasons
+  jurisdictions: Global
+  version: 1
+- id: EN-005
+  name: Legal wildlife business used as a front
+  definition: A licensed zoo, breeder, exotic pet shop, safari company, wildlife-medicine maker, collector
+    or reserve is involved in transactions, giving cover for illegal trade.
+  areas:
+  - EN
+  typology: Laundering illegal specimens through legal wildlife trade
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, A. Client profiles, p.60
+    quote: Involvement of legal wildlife-related entities such as private zoos, breeders, (exotic) pet
+      stores, safari companies, pharmaceutical companies making medicines containing wildlife and wildlife
+      collectors or reserves.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Box 4, p.18
+    quote: Legitimate pet stores and private “zoos”, “farms” or “parks” are often used to facilitate the
+      illicit pet trade
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A private 'tiger zoo' selling cubs and parts using false receipts (FATF 2020 Box 4)
+  - A fish farm used to hold smuggled glass eels before export (German and UK cases)
+  cases: []
+  data_needed:
+  - Company (licence type)
+  - License
+  - Payment
+  - Document (CITES permits, breeding records)
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Wildlife licence registers
+  - CITES Trade Database
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Most licensed zoos, breeders and pet shops trade legally; 97% of CITES-listed species can be traded
+    commercially under permit (FATF 2020 Box 2)
+  jurisdictions: Global; FATF notes Asia and the Americas for the pet trade
+  version: 1
+- id: EN-006
+  name: Pet shop or breeder payments that do not fit the business
+  definition: Licensed pet suppliers or breeders trade with known poachers, receive money from overseas
+    or out of line with their business, or are paid amounts far from the value of the animal ordered.
+  areas:
+  - EN
+  typology: Illicit pet trade
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, pp.61-62
+    quote: Transactions to licenced pet shop suppliers/breeders that originate from overseas, and/or incommensurate
+      with stated business activities.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.62
+    quote: Large transactions to licenced pet shop suppliers/breeders where there is significant discrepancies
+      between the animal/product ordered and the value of the good.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A small reptile breeder receives large overseas wires
+  - A breeder pays an individual previously convicted of poaching
+  cases: []
+  data_needed:
+  - Company
+  - Payment (amount, purpose, origin)
+  - Person (criminal record)
+  - Associate
+  checkable: records
+  lookup_sources:
+  - Court records for poaching convictions
+  - Wildlife licence registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate international trade in captive-bred animals with valid permits
+  - Rare colour morphs or breeding animals can command very high legitimate prices
+  jurisdictions: Global
+  version: 1
+- id: EN-007
+  name: Parties based in wildlife transit or demand countries, or with accounts and addresses spread across
+    countries
+  definition: The person or the beneficial owner of a company sits in a country known as a transit or
+    demand hub for illegal wildlife, or people linked to wildlife networks hold bank accounts and addresses
+    in several countries.
+  areas:
+  - EN
+  typology: Transnational syndicate structure
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, A, p.60
+    quote: Individual or beneficial owner(s) of a corporate domiciled in jurisdiction that is a prominent
+      transit or demand country for illegal wildlife.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.62
+    quote: Individuals or companies suspected of being involved, or linked to, IWT networks using bank
+      accounts and addresses located in different countries.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A Ugandan-resident Liberian national receiving wires from Asian buyers (Kromah case)
+  cases: []
+  data_needed:
+  - Person (nationality, residence)
+  - Company (jurisdiction)
+  - Ownership
+  - BankAccount (country)
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Beneficial ownership registers
+  - US State Department END Wildlife Trafficking Report focus-country list
+  - Company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many legitimate traders and migrants hold accounts in several countries
+  - Transit and demand countries are large economies with huge legitimate trade
+  jurisdictions: Global
+  version: 1
+- id: EN-008
+  name: Suspicious CITES paperwork or false captive-bred / pre-Convention claims
+  definition: Legal-looking wildlife shipments come with CITES certificates that are odd, incomplete or
+    suspicious, or wild-caught animals are declared as captive-bred or as pre-dating the Convention.
+  areas:
+  - EN
+  - FR
+  typology: Laundering wildlife through fraudulent permits
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.61
+    quote: Shipments of legal wildlife (fauna and flora) with anomalous, incomplete, or otherwise suspicious
+      CITES certificates.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Box 2, p.11
+    quote: wild-caught animals falsely declared as captive-bred, wildlife falsely declared as being pre-Convention
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - CITES permit numbers that do not exist in the issuing country's records
+  - Large exports of 'captive-bred' animals of a species that rarely breeds in captivity
+  cases:
+  - name: Dutch exotic bird and monkey smuggling network
+    year: '2017'
+    jurisdiction: Netherlands
+    what_happened: A network moved protected birds, monkeys and big cats through several countries using
+      falsified health, trade and CITES documents and bribed customs officers. Suspect 1 was sentenced
+      to 15 months for nature-protection crimes and forgery of CITES documents; suspect 2 to 8 months;
+      over EUR 70,000 confiscated.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    source_title: 'FATF (2020) Money Laundering and the Illegal Wildlife Trade, Box 35 (source: Netherlands)'
+  data_needed:
+  - 'Document (CITES permit: number, issuer, species, quantity, source code)'
+  - Company
+  - Person
+  - License
+  checkable: lookups
+  lookup_sources:
+  - CITES Trade Database
+  - National CITES Management Authority
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: In the Dutch case the network relied on bribery of customs officers to move animals on forged
+      documents.
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+  innocent_explanations:
+  - Clerical errors on genuine permits
+  - Differences in permit formats between countries
+  - Genuine captive-breeding operations
+  jurisdictions: All 180+ CITES Parties
+  version: 1
+- id: EN-009
+  name: 'Coded payment references: species names, veiled speech or medicine ingredients'
+  definition: Payment references or descriptions use names of protected species, traditional-medicine
+    ingredients that refer to CITES species, or veiled wording.
+  areas:
+  - EN
+  typology: Coded communication in payments
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.61
+    quote: Transaction references using specimen names or veiled speech.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.61
+    quote: Transactions using names of ingredients or products in the traditional medical trade that refer
+      to CITIES species.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Wire memo reading 'horn' or 'scales'
+  - Invoice for traditional medicine ingredient named after pangolin
+  cases: []
+  data_needed:
+  - Payment (purpose/reference text)
+  - Document
+  - Email
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legal trade in permitted traditional medicines or legally farmed species
+  - Brand or product names that happen to include animal names
+  jurisdictions: Global
+  version: 1
+- id: EN-010
+  name: Illogical or zero-interest loans between trading companies or to foreign parties
+  definition: Trading or import-export companies in source or transit countries lend each other money
+    without commercial logic, or companies give zero-interest loans to foreign companies or individuals.
+  areas:
+  - EN
+  - ML
+  typology: Loan-back and value transfer disguised as credit
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.61
+    quote: Illogical or anomalous loans between trading or import/export companies in key IWT source or
+      transit countries.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4 Red flags, Payment behaviour, p.22
+    quote: Granting of loans (with zero interest rates) to foreign companies.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An import company lends money to an unrelated exporter in a wildlife source country with no repayment
+    terms
+  cases: []
+  data_needed:
+  - Contract (loan agreement)
+  - Payment
+  - Company
+  - Ownership
+  checkable: records
+  lookup_sources:
+  - Company financial filings
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Intra-group financing between related companies
+  - Supplier credit to secure supply in thin markets
+  jurisdictions: Global
+  version: 1
+- id: EN-011
+  name: Bills of lading switched, or consignee, destination or owner changed en route
+  definition: Shipping documents are swapped, or the buyer, destination or owner of a cargo changes mid-journey,
+    often in a free trade zone.
+  areas:
+  - EN
+  - ML
+  typology: Trade document fraud to break the paper trail
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.61
+    quote: Switched bills of lading by traders previously implicated in criminal activity involving wildlife
+      trafficking or trade fraud investigations or prosecutions.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Export & transfer pricing, p.56
+    quote: It is common for timber, processed lumber, or gold, to be exported at below market prices,
+      change ownership and Bill of Lading en route, often in a customs free trade zone, and is imported
+      at recipient countries at higher declared values.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - '''Tea'' shipments that changed destination twice and consignee name en route (FATF 2020 Box 6)'
+  cases: []
+  data_needed:
+  - Document (bill of lading versions)
+  - Company (consignee, shipper)
+  - Vessel
+  - Address (ports, free trade zones)
+  - Ownership
+  checkable: records
+  lookup_sources:
+  - Bill-of-lading/shipment databases
+  - Ship tracking
+  - Free trade zone company registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Re-invoicing in a free trade zone moves value between under-priced export and over-priced
+      import.
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  innocent_explanations:
+  - Cargo legitimately sold while at sea (common in commodities)
+  - Switch bills used lawfully to protect supplier identity from the end buyer
+  jurisdictions: Global; FATF notes paperwork switches on Africa-to-Asia container routes
+  version: 1
+- id: EN-012
+  name: Shipping and customs documents do not match the goods
+  definition: The description, quantity, quality, origin or value on invoices, customs and shipping papers
+    or bank trade documents differs from the goods actually shipped or the capacity of the trader.
+  areas:
+  - EN
+  - ML
+  typology: Misdescription and false declaration
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.61
+    quote: Transactions having discrepancies between the description or value, of the commodity in customs
+      and shipping documents and invoice, relative to the actual goods shipped or quoted price or the
+      actual value in payments made.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Export & transfer pricing, p.55
+    quote: False or questionable statements on bank loans, letters of credit, customs and shipping documents
+      associated with the timber trade.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Trade-based behaviour, p.21
+    quote: Misclassification of gold purity, weight, origin and value on customs declaration forms.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Trade-based behaviour, p.21
+    quote: Consignment size or type of commodity being shipped appears inconsistent with the scale or
+      capacity of the exporter or importer’s having regard to their regular business activities
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Mongolian oak from Russia declared as Welsh oak (Lumber Liquidators)
+  - Glass eels declared as 'chilled fish' (UK case)
+  cases:
+  - name: Lumber Liquidators Inc.
+    year: '2015'
+    jurisdiction: United States (E.D. Va.)
+    what_happened: Pleaded guilty to a felony of importing goods through false statements and four Lacey
+      Act misdemeanours over flooring made from timber illegally logged in the Russian Far East; it declared
+      Mongolian oak as Welsh oak and Myanmar merpauh as Indonesian mahogany and ignored its own risk warnings.
+      Total penalties of USD 13.15 million plus civil forfeiture.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/lumber-liquidators-inc-pleads-guilty-environmental-crimes-and-agrees-pay-more-13-million
+    source_title: US DOJ press release, 22 Oct 2015
+  data_needed:
+  - Document (invoice, customs declaration, bill of lading, letter of credit)
+  - Company
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Customs/trade statistics
+  - Bill-of-lading databases
+  - Mirror trade data (UN Comtrade)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FATF links trade fraud in environmental crime to customs duty and tax evasion.
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  innocent_explanations:
+  - Errors in tariff classification
+  - Trade names for timber species differ between countries
+  - Moisture and weight loss in transit
+  jurisdictions: Global
+  version: 1
+- id: EN-013
+  name: Under- or over-priced resource trade between related parties
+  definition: Timber, gold or other resources are exported below market price and re-imported at higher
+    declared values, sold through related businesses with back-to-back invoices, or gold is priced above
+    the local market.
+  areas:
+  - EN
+  - ML
+  typology: Transfer mispricing
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Export & transfer pricing, p.55
+    quote: Co-mingling of funds through related businesses and export/sale of undervalued products, using
+      back-to-back invoicing suggesting ongoing illegal transfer pricing scheme.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Product differentiation, p.21
+    quote: Gold prices higher than those of the local gold market.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Logs exported to an affiliate at half the world price then resold at full price from a tax haven
+  cases: []
+  data_needed:
+  - Payment
+  - Document (invoices)
+  - Company
+  - Ownership
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - Commodity price benchmarks
+  - Mirror trade statistics
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FATF notes tax crime commonly accompanies larger environmental crime through offshore structures
+      and trade.
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  innocent_explanations:
+  - Quality differences
+  - Long-term contract pricing
+  - Lawful transfer pricing within documented arm's-length ranges
+  jurisdictions: Global
+  version: 1
+- id: EN-014
+  name: Trade route that makes no sense for the declared goods
+  definition: Goods are shipped to a place that does not normally import them, or to a country that is
+    itself a major producer of the declared product, suggesting the cargo is a cover.
+  areas:
+  - EN
+  typology: Cover-load shipments
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Box 6, p.20
+    quote: One risk indicator for this case was that the final destination was East Asia that is not a
+      major export market for tea from Africa.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Box 37, p.65
+    quote: One other suspicious element of the case was that the company purported to send the shrimp
+      to Vietnam, although Vietnam is one of the most important suppliers in the world of this commodity.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: What to look for (factsheet)
+    publisher: ROUTES Partnership
+    year: ''
+    url: https://routespartnership.org/industry-resources/factsheets/what-to-look-for-factsheet/@@download/file
+    locator: Cargo handler indicators
+    quote: Cargo origin does not match declared contents
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - African tea shipped to East Asia
+  - French 'shrimp' exports to Vietnam that hid glass eels
+  cases:
+  - name: French glass eel network (seafood front company)
+    year: '2019'
+    jurisdiction: France
+    what_happened: A seafood front company exported 27 tonnes of smuggled glass eels to Asia in 2014-2017
+      under the cover of prawns; false invoices justified payments to shell companies in Eastern Europe.
+      On 7 February 2019 the Nantes Correctional Court convicted four fishermen and three resellers (the
+      resellers also for money laundering).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    source_title: 'FATF (2020) Money Laundering and the Illegal Wildlife Trade, Box 37 (source: France)'
+  data_needed:
+  - Document (bill of lading, customs)
+  - Company
+  - Address (origin and destination)
+  checkable: lookups
+  lookup_sources:
+  - Trade statistics by commodity and country (UN Comtrade)
+  - Bill-of-lading databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Niche or specialty products can have unusual markets
+  - Re-export hubs import goods they also produce
+  jurisdictions: Global
+  version: 1
+- id: EN-015
+  name: Wildlife payments disguised as gold trade
+  definition: A business account shows illogical gold-trading purchases or payments, which may hide payments
+    for wildlife shipments.
+  areas:
+  - EN
+  - ML
+  typology: Commodity cover for value transfer
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.61
+    quote: Payments for wildlife shipping are often masked as payment for gold or to gold trading business.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A freight company with no gold licence pays a gold trader in a wildlife source country
+  cases: []
+  data_needed:
+  - Payment (purpose)
+  - Company (sector, licence)
+  - License
+  checkable: records
+  lookup_sources:
+  - Precious-metals dealer licence registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EN
+    reason: Gold trade is itself a laundering route for illegal mining proceeds.
+    source_url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+  innocent_explanations:
+  - Companies diversifying into gold trading legitimately
+  - Gold used as a savings vehicle by business owners
+  jurisdictions: Global
+  version: 1
+- id: EN-016
+  name: Escrow-type transfers between accounts or companies with the same owner
+  definition: Money moves back and forth between accounts and companies controlled by the same beneficial
+    owner, especially to pay for cross-border shipments.
+  areas:
+  - EN
+  - ML
+  typology: Self-dealing payment loops
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.61
+    quote: Escrow-type transactions from/to accounts and companies with same beneficial owner in particular
+      for payment of cross-border and transcontinental shipments.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Company A in Africa and Company B in Asia, both owned by one person, pass the same sum between them
+    around each shipment
+  cases: []
+  data_needed:
+  - Ownership
+  - Company
+  - BankAccount
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Beneficial ownership registers
+  - Company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Normal treasury management inside a corporate group
+  - Genuine escrow arrangements for trade finance
+  jurisdictions: Global
+  version: 1
+- id: EN-017
+  name: Money to or from known traffickers through third parties, couriers or relatives
+  definition: Known poachers or traffickers receive third-party wires or cash, send money to people who
+    then pay couriers or postage, or send international transfers to relatives labelled as tuition or
+    family support.
+  areas:
+  - EN
+  - ML
+  typology: Third-party and family-account layering
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.61
+    quote: Third-party wire transfers/cash deposits to, or withdrawals by, known wildlife poachers and
+      traffickers.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.62
+    quote: International wire transfers from known wildlife traffickers to a relative’s accounts as tuition,
+      allowance, or family support payments.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.61
+    quote: Transactions from known traffickers to individuals who then pay for couriers or packages via
+      the post.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A Malawi kingpin's transactions with his daughter's and workers' accounts with no clear purpose (FATF
+    2020 Box 16)
+  cases:
+  - name: Malawi kingpin financial investigation
+    year: '2019'
+    jurisdiction: Malawi
+    what_happened: 'Malawi''s FIA opened a financial investigation into an alleged foreign IWT kingpin:
+      unexplained family wealth, transactions with his daughter''s and workers'' accounts without clear
+      purpose, a shell company in the daughter''s name, vehicles registered to locals. The ML investigation
+      was ongoing.'
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    source_title: 'FATF (2020) Money Laundering and the Illegal Wildlife Trade, Box 16 (source: Malawi)'
+  data_needed:
+  - Person (known trafficker status)
+  - Family
+  - Associate
+  - Payment
+  - BankAccount
+  checkable: lookups
+  lookup_sources:
+  - Court records
+  - Sanctions lists
+  - Adverse media
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family support and tuition payments are common and normal
+  - A relative of an offender may have independent legitimate income
+  jurisdictions: Global
+  version: 1
+- id: EN-018
+  name: Travel and logistics paid for syndicate members who are elsewhere
+  definition: Hire cars and lodging are paid by known syndicate members not in that country or region,
+    rental cards book in neighbouring countries close in time, or air tickets on high-risk wildlife routes
+    are paid in cash or by someone else.
+  areas:
+  - EN
+  typology: Courier and poaching-team logistics
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.61
+    quote: Transactions for hired vehicles and domestic accommodation from known members of a trafficking
+      syndicate who are not present in the country or region within a country.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B and C, p.62
+    quote: Airline passengers traveling on high-risk IWT routes on tickets paid for by a third party or
+      in cash.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.62
+    quote: Rental card transactions with two bookings close in time in neighbouring countries.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A trafficker in Asia pays for a car hire near a national park in Africa
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - Event (travel, booking)
+  - Address
+  checkable: records
+  lookup_sources:
+  - Travel and booking records obtained in documents
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: FATF notes the same routes are used to smuggle wildlife, resources and migrants.
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  innocent_explanations:
+  - Employers and relatives commonly book travel for others
+  - Cash ticket purchase is normal in cash-based economies
+  jurisdictions: Global
+  version: 1
+- id: EN-019
+  name: 'Middleman pattern: large money in, many smaller sums out'
+  definition: An account receives large incoming payments and then sends out smaller payments, consistent
+    with a broker distributing funds.
+  areas:
+  - EN
+  - ML
+  typology: Intermediary distribution
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.62
+    quote: Middleman transactions – large incoming payments followed by smaller outgoing payments.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A dealer receives one wire from Asia then pays many local suppliers in small amounts
+  cases: []
+  data_needed:
+  - Payment
+  - BankAccount
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Agricultural aggregators and payroll accounts work exactly this way
+  - Legitimate wholesalers paying many small suppliers
+  jurisdictions: Global
+  version: 1
+- id: EN-020
+  name: Payments between businesses in unrelated lines of trade, including odd sponsorship
+  definition: Money flows between companies whose businesses have nothing in common (for example wildlife
+    farms and coffee, tea, bean or used-clothing traders, or extractive firms and unrelated suppliers),
+    or waste firms invest in or sponsor unrelated entities.
+  areas:
+  - EN
+  - ML
+  typology: Cover-load firms and payment layering
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.62
+    quote: Large dollar wire transfers between wildlife farms and firms operating in inconsistent lines
+      of business.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, B, p.62
+    quote: Payments between entities operating in disparate lines of business.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Transaction and Cash Flows, p.53
+    quote: Frequent payments from companies in the extractive sector to suppliers or beneficiaries unrelated
+      to the legal person’s activity or business.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Economic Activities (waste), p.56
+    quote: Unexplained investment or sponsorship in entities that are not associated with waste.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Italian waste network laundering through simulated sports sponsorship (FATF 2021 Box 3.4)
+  - Brazilian hairdressers receiving funds and passing them to illegal emerald miners (FATF 2021 Box 3.3)
+  cases:
+  - name: Italian metal scrap waste trafficking and false invoicing network
+    year: 2021 (reported)
+    jurisdiction: Italy
+    what_happened: A Guardia di Finanza tax audit of a scrap metal company found irregular waste origin
+      and USD 68 million of false invoices; proceeds were laundered through simulated foreign trade and
+      sports sponsorship. 90 STRs identified 44 companies; 14 arrests and USD 9.5 million of assets seized;
+      case ongoing.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    source_title: 'FATF (2021) Money Laundering from Environmental Crime, Box 3.4 (source: Italy)'
+  - name: Emeralds, hairdressers and mining (Brazil)
+    year: 2021 (reported)
+    jurisdiction: Brazil
+    what_happened: Brazil's FIU received STRs on hairdressers receiving funds beyond their means and passing
+      them to illegal emerald miners; mining companies allegedly exported emeralds to South-East Asia
+      on false invoices and were paid via underground exchange dealers. Estimated USD 120 million; case
+      ongoing.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    source_title: 'FATF (2021) Money Laundering from Environmental Crime, Box 3.3 (source: Brazil)'
+  data_needed:
+  - Company (sector codes)
+  - Payment
+  - Contract
+  - Ownership
+  checkable: records
+  lookup_sources:
+  - Company registry (activity codes)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Italian case combined waste trafficking with false invoicing tax crime.
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  innocent_explanations:
+  - Diversified conglomerates
+  - Genuine marketing sponsorship
+  - Purchases of supplies outside the core trade
+  jurisdictions: Global
+  version: 1
+- id: EN-021
+  name: Payments from wildlife-product industries to known wildlife traders
+  definition: Traditional medicine makers, leather producers, wildlife auctioneers or exotic food sellers
+    pay known wildlife traders or their associates.
+  areas:
+  - EN
+  typology: Demand-side buyers paying suppliers
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, C. Other, p.62
+    quote: Payments from companies/owners from industries using IWT products
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A medicine manufacturer pays an individual named in a pangolin seizure
+  cases: []
+  data_needed:
+  - Company (sector)
+  - Person
+  - Payment
+  - Associate
+  checkable: lookups
+  lookup_sources:
+  - Court records
+  - Adverse media
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - These industries also buy legal, permitted wildlife products
+  jurisdictions: Global
+  version: 1
+- id: EN-022
+  name: Adverse media or NGO reports linking parties to environmental crime or corruption
+  definition: People or companies in the transactions are named in news, NGO investigations or international-organisation
+    reports as involved in wildlife, environmental, bribery or organised crime.
+  areas:
+  - EN
+  typology: Open-source risk
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Annex A, C. Other, p.62
+    quote: Adverse media connected to wildlife or environmental crimes identified in open and available
+      sources on individuals and/or entities involved in reviewed financial transactions.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Customers, p.54
+    quote: Individuals and entities are cited in newspapers, NPO investigative reports or reports by international
+      organizations (public and confidential) as being involved in bribery, corruption, environmental
+      or other organised crimes.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Elemetal kept buying from suppliers linked in open sources to criminally derived gold (US DOJ 2018)
+  cases:
+  - name: Elemetal LLC (NTR Metals)
+    year: '2018'
+    jurisdiction: United States (S.D. Fla.)
+    what_happened: The Dallas refinery pleaded guilty to failing to maintain an adequate anti-money laundering
+      programme; between 2012 and 2016 it accepted gold from third parties with inadequate or no identification,
+      from 'gold collectors' and rotating front companies, and kept buying from suppliers linked in open
+      sources to criminally derived gold. It agreed to recommend a USD 15 million forfeiture.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdfl/pr/us-gold-refinery-pleads-guilty-charge-failure-maintain-adequate-anti-money-laundering
+    source_title: US Attorney S.D. Fla. press release, 16 Mar 2018
+  data_needed:
+  - Document (article, report)
+  - Person
+  - Company
+  - UnknownLink
+  checkable: lookups
+  lookup_sources:
+  - News archives
+  - NGO reports (EIA, Global Witness, TRAFFIC, C4ADS)
+  - UN Panel of Experts reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Media reports can be wrong, outdated or about a person with the same name
+  - Allegations may have been dismissed in court
+  jurisdictions: Global
+  version: 1
+- id: EN-023
+  name: Informal value transfer, prepaid cards or mobile apps used by wildlife networks
+  definition: Wildlife proceeds move through hawala-type brokers (fei chien, hundi), bulk prepaid or gift
+    cards, or mobile payment apps instead of normal bank wires.
+  areas:
+  - EN
+  - ML
+  typology: Informal and alternative payment channels
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: para 39, p.21
+    quote: Countries highlighted that criminals are also using informal MVTS networks
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: para 41, p.23
+    quote: examples of criminals misusing pre-paid cards, mobile apps or social media-based platforms
+      linked to bank accounts, to transfer and launder funds from IWT
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - About USD 1 million of iTunes prepaid cards seized from suspected rhino horn traffickers in South
+    Africa (FATF 2020 Box 10)
+  - RMB delivered in China and matching USD paid out in Uganda through 'fei chen' brokers (Box 9)
+  cases:
+  - name: South Africa iTunes card rhino horn case
+    year: 2020 (reported)
+    jurisdiction: South Africa
+    what_happened: Two suspects were arrested; police seized cash and about USD 1 million of iTunes prepaid
+      cards; one suspect admitted selling over 30 kg of rhino horn a month. Outcome not stated.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    source_title: 'FATF (2020) Money Laundering and the Illegal Wildlife Trade, Box 10 (source: South
+      Africa)'
+  data_needed:
+  - Payment
+  - Person
+  - Organization (MVTS provider)
+  - Asset (prepaid cards)
+  checkable: records
+  lookup_sources:
+  - MVTS licence registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Diaspora communities rely on informal remittance for family support
+  - Mobile money is the main payment tool in much of Africa
+  jurisdictions: Global; cases from Africa and Asia
+  version: 1
+- id: EN-024
+  name: Cash purchases of property, vehicles and luxury goods by people tied to wildlife or resource crime
+  definition: People linked to wildlife or resource crime buy real estate, vehicles, jewellery or art,
+    often in cash or through others' names.
+  areas:
+  - EN
+  - ML
+  typology: Integration through high-value assets
+  status: verified
+  sources:
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: para 38, p.20
+    quote: Countries highlighted that criminals are also purchasing high-value goods, such as real estate
+      and luxury items (e.g., vehicles, jewellery and artwork) to launder proceeds from IWT at the integration
+      stage.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A rhino horn syndicate laundering about USD 1 million through cash purchases of property and luxury
+    vehicles (FATF 2020 Box 7)
+  cases:
+  - name: South African rhino horn syndicate (former police officer leader)
+    year: 2020 (reported)
+    jurisdiction: South Africa
+    what_happened: About 12 people allegedly poached and dehorned rhino, bribed a park official and laundered
+      proceeds through cash purchases of property and luxury vehicles worth about USD 1 million. Charged
+      with rhino offences, corruption, murder, money laundering and racketeering; case ongoing.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    source_title: 'FATF (2020) Money Laundering and the Illegal Wildlife Trade, Box 7 (source: South Africa)'
+  - name: Tiger bones and skin trafficking (Mr. X, Mr. Y, Mr. Z)
+    year: 2013 (raid)
+    jurisdiction: India
+    what_happened: Delhi Police and the Wildlife Crime Control Bureau seized tiger remains and cash; a
+      special court found Mr. X guilty of money laundering (4 years rigorous imprisonment), acquitted
+      Mr. Y, and confiscated Rs 5 million and Rs 270,000; Mr. Z died during trial.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    source_title: 'FATF (2020) Money Laundering and the Illegal Wildlife Trade, Box 39 (source: India)'
+  data_needed:
+  - RealEstate
+  - Vehicle
+  - Ownership
+  - Payment
+  - Person
+  - Family
+  checkable: lookups
+  lookup_sources:
+  - Land registry
+  - Vehicle registry
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Cash property purchases are normal in some markets
+  - Assets may be bought with legitimate savings or loans
+  jurisdictions: Global
+  version: 1
+- id: EN-025
+  name: Offshore or tax-haven companies in the logging, mining or gold trade
+  definition: Logging firms transact often with offshore financial centres, trading companies are registered
+    in tax havens though their business is elsewhere, or shell-company chains span several jurisdictions.
+  areas:
+  - EN
+  - ML
+  typology: Offshore layering of resource proceeds
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Transaction and Cash Flows, p.53
+    quote: Companies operating in the logging sector with frequent transactions to offshore financial
+      centres.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Company behaviour, pp.20-21
+    quote: Registration of a trading company in a tax haven even though its business relates to another
+      jurisdiction.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Company behaviour, p.21
+    quote: Use of a corporate structure of shell companies located across the jurisdictions.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Gertler's Fleurette Properties using offshore companies for DRC mining deals (FATF 2021 Box A C.2)
+  cases: []
+  data_needed:
+  - Company (jurisdiction)
+  - Ownership
+  - Payment
+  - BankAccount
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Offshore leak databases
+  - Beneficial ownership registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FATF notes offshore structures used for tax evasion alongside environmental crime.
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  innocent_explanations:
+  - Holding companies in financial centres are common for tax planning and investor protection
+  - Trade finance often runs through regional financial hubs
+  jurisdictions: Global
+  version: 1
+- id: EN-026
+  name: Large cash withdrawals near extraction areas
+  definition: Large cash withdrawals at rural bank branches close to illegal mining or logging, or heavy
+    cash withdrawals by gold-trade participants.
+  areas:
+  - EN
+  typology: Cash financing of extraction
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Transaction and Cash Flows, p.53
+    quote: Large cash withdrawals from financial institutions operating in rural areas that may be in
+      proximity to illegal mining or logging areas.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Payment behaviour, p.22
+    quote: Significant cash withdrawals from bank accounts by participants within the gold trading industry.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Weekly six-figure withdrawals at a branch near an illegal gold field
+  cases: []
+  data_needed:
+  - Payment (cash, branch location)
+  - BankAccount
+  - Address
+  - Person
+  checkable: records
+  lookup_sources:
+  - Maps of mining/logging hotspots (e.g. satellite deforestation alerts)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Rural economies and legal artisanal mining run on cash
+  - Payroll for legitimate remote operations
+  jurisdictions: Source countries for timber and minerals
+  version: 1
+- id: EN-027
+  name: Sudden unexplained boom in economic activity in a rural or isolated area
+  definition: A remote area, especially in timber or mineral source countries, suddenly shows more transactions,
+    remittances, mobile-money use or cash turnover at local shops without explanation.
+  areas:
+  - EN
+  typology: Geographic financial signal of illegal extraction
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Economic Activities, p.54
+    quote: Sudden and unexplained increases in economic activity (formal and informal) in rural or isolated
+      zones, particularly in source countries for illegal logging and mining.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Mobile money volumes in a forest district triple in a year with no new legal project
+  cases: []
+  data_needed:
+  - Payment (aggregated by location)
+  - Address
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - Satellite imagery and deforestation alerts
+  - Licensed concession maps
+  - Local economic statistics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New legal mine, plantation, road or public project
+  - Harvest seasons and commodity price rises
+  jurisdictions: Source countries for illegal logging and mining
+  version: 1
+- id: EN-028
+  name: Cash-intensive businesses sending large sums to mining or logging areas
+  definition: Petrol stations or other cash-heavy businesses transfer large amounts to people in areas
+    known for gold mining, illegal logging or land clearing.
+  areas:
+  - EN
+  typology: Use of cash businesses to fund and launder extraction
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Transaction and Cash Flows, p.54 and footnote 28
+    quote: Large volume and value of cash transfers from cash-intensive businesses (such as petrol or
+      gas stations) to beneficiaries in areas known as a source of gold mining and illegal logging and
+      illegal land clearing.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A fuel station invoicing an illegal mine for diesel instead of pump payments (FATF footnote 28)
+  cases: []
+  data_needed:
+  - Company (sector)
+  - Payment
+  - Address
+  - Person
+  checkable: records
+  lookup_sources:
+  - Mining hotspot maps
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Fuel suppliers legitimately serve remote legal mines and farms
+  jurisdictions: Source countries
+  version: 1
+- id: EN-029
+  name: Money arriving from many unrelated origins without business reason
+  definition: Accounts receive deposits and wires from many places with no link to the holder's business
+    or location, including foreign nationals paying timber or mining accounts with no clear relationship,
+    followed by cash-out.
+  areas:
+  - EN
+  - ML
+  typology: Funnel accounts
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Transaction and Cash Flows, p.53
+    quote: Receiving deposits and wire transfers from several origins without economic or financial grounds.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Customers, p.55
+    quote: Cash payments or transfers to client/customer accounts operating in the timber/mining industry
+      from foreign nationals (or companies owned by foreign nationals) where there is no clear business
+      relationship.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A timber dealer's account fed by dozens of foreign individuals, then emptied in cash
+  cases: []
+  data_needed:
+  - Payment (origin)
+  - Person (nationality)
+  - Company
+  - BankAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many small legitimate customers
+  - Foreign investors funding a legal concession
+  jurisdictions: Global
+  version: 1
+- id: EN-030
+  name: Funds from smelter or refiner countries cashed out almost at once
+  definition: Money is sent from a country with gold smelters to a gold source country and most of it
+    is withdrawn in cash almost immediately, or large international transfers are withdrawn very quickly.
+  areas:
+  - EN
+  - ML
+  typology: Cash payment of illegal miners
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Transaction and Cash Flows, p.53
+    quote: Transfers from country where the gold smelters are located to source countries for gold, and
+      almost immediate cash withdrawal of majority of the transfer.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Payment behaviour, p.22
+    quote: Large amount of funds transferred internationally and then withdrawn very quickly.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - NTR Metals in Miami paid Chilean smugglers by wire for gold hand-carried to the US (FATF 2021 Box
+    3.5)
+  cases:
+  - name: Operation Diez Condores (NTR Metals Miami)
+    year: 2016-2017
+    jurisdiction: Chile / United States
+    what_happened: A Chilean organisation procured gold from illicit sources with false paperwork, couriers
+      hand-carried it to NTR Metals Miami, which paid by wire back to Chile; USD 80 million of shipments
+      moved through shell companies. Seven subjects convicted and restitution of about USD 16 million
+      (US) and USD 25 million (Chile).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    source_title: 'FATF (2021) Money Laundering from Environmental Crime, Box 3.5 (source: United States)'
+  data_needed:
+  - Payment (origin country, timing, cash withdrawal)
+  - BankAccount
+  - Company
+  - Person
+  checkable: records
+  lookup_sources:
+  - Refinery lists (e.g. LBMA Good Delivery list)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: FATF reports NTR executives knew the gold involved organisations linked to narcotics trafficking.
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  innocent_explanations:
+  - Legal artisanal gold buyers pay miners in cash
+  jurisdictions: Gold source and refining countries
+  version: 1
+- id: EN-031
+  name: Unlicensed parties buying extraction equipment
+  definition: People or companies without mining or logging licences increasingly pay equipment leasing
+    or sales firms, for example for chainsaws, mercury or explosives.
+  areas:
+  - EN
+  typology: Financing inputs of illegal extraction
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Transaction and Cash Flows, p.53 and footnote 27
+    quote: Increase in transactions between entities or individuals not registered in mining/logging sector
+      (i.e., non-license-holding) and equipment leasing companies and equipment sales companies
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An individual with no concession buys excavators and mercury
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - License (absence)
+  - Payment
+  - Contract (lease)
+  checkable: lookups
+  lookup_sources:
+  - Mining cadastre / logging concession registers
+  - Import data for mercury and explosives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Construction, farming and road works use the same equipment
+  - Contractors working for licence holders
+  jurisdictions: Global
+  version: 1
+- id: EN-032
+  name: New, renamed or reactivated companies with large short-lived resource exports
+  definition: Recently created companies register big gold exports over a short period, dormant companies
+    are revived to extract resources with income that does not fit, or gold dealers keep changing business
+    names.
+  areas:
+  - EN
+  typology: Disposable trading vehicles
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Economic Activities, p.54
+    quote: Recently created companies that register gold exports for significant amounts and noticeably
+      brief period of operations.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Customers, p.55
+    quote: Client is a recently activated dormant companies which undertakes resource extraction with
+      income inconsistent with the activity being undertaken, where the primary customer or beneficiary
+      is a related corporate entity.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Company behaviour, p.20
+    quote: Changes to business name of entities registered to deal in gold.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A company formed six months ago exports tonnes of gold then stops filing
+  cases: []
+  data_needed:
+  - Company (incorporationDate, dissolutionDate, previousName, status)
+  - Document (export records)
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Export statistics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Special purpose vehicles for new legitimate projects
+  - Rebranding after mergers
+  jurisdictions: Global
+  version: 1
+- id: EN-033
+  name: Output or revenue that does not fit capacity
+  definition: A resource-sector company shows sudden unexplained changes in cash flow or revenue, or its
+    output is lower than its official capacity, its peers or its workforce would suggest, or a licensed
+    mine's production drops without explanation.
+  areas:
+  - EN
+  typology: Front company co-mingling
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Economic Activities, p.54
+    quote: Aberrations/anomalous bank activity (i.e., sudden, or unexplained changes to cash flows) or
+      corporate revenues of company operating in natural resource supply chains (e.g. processing, harvesting).
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Section 3.2, p.28
+    quote: Other indicators of potential criminality include output that is at lower levels than suggested
+      by the official production capacity, the production capacity of similar companies in their sector,
+      or the number of employees.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Gold mining behaviour, p.23
+    quote: Licensed mines where the production has decreased with no apparent explanation.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A sawmill with 10 staff reports sales typical of a 200-staff mill
+  cases:
+  - name: Rosewood proceeds laundered through the vanilla trade
+    year: 2009-2020
+    jurisdiction: Madagascar
+    what_happened: Madagascar authorities reported 76 rosewood cases referred to court involving about
+      USD 160 million; in 2014 individuals bulk-bought vanilla to drive up prices and present illegal-logging
+      proceeds as vanilla earnings, a pattern that stopped after the 2019 rosewood export ban was enforced.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    source_title: 'FATF (2021) Money Laundering from Environmental Crime, Box 3.1 (source: Madagascar)'
+  data_needed:
+  - Company (revenue, employees)
+  - Document (production reports)
+  - Payment
+  - License
+  checkable: lookups
+  lookup_sources:
+  - Company financial filings
+  - Mining production statistics
+  - EITI reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Equipment breakdowns, depleted ore, weather or price shocks
+  - Outsourced labour not on the payroll
+  jurisdictions: Global
+  version: 1
+- id: EN-034
+  name: Mining licences or gold supply in or near conflict-affected or high-risk areas
+  definition: A customer holds mining licences in or around active conflict zones, or gold comes from
+    or passes through a conflict-affected or high-risk area, or suppliers operate there or have shareholdings
+    in suppliers there.
+  areas:
+  - EN
+  - SF
+  typology: Conflict-linked mineral supply chains
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Customers, p.54
+    quote: Customers with mining licenses operating in or around active conflict zones.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected
+      and High-Risk Areas, 3rd ed.
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Supplement on Gold, Step 2.B, Red flag locations, p.86
+    quote: The gold originates from or has been transported through a conflict-affected or high-risk area.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected
+      and High-Risk Areas, 3rd ed.
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Supplement on Gold, Step 2.B, Supplier red flags, p.87
+    quote: Suppliers or other known upstream companies operate in one of the above-mentioned red flag
+      locations of gold origin and transit, or have shareholder or other interests in suppliers of gold
+      from one of the above-mentioned red flag locations of gold origin and transit.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A gold exporter sourcing from eastern DRC mining sites
+  cases: []
+  data_needed:
+  - License (area)
+  - Company
+  - Ownership
+  - Address
+  - Document (certificates of origin)
+  checkable: lookups
+  lookup_sources:
+  - Mining cadastres
+  - EU CAHRA indicative list
+  - UN Panel of Experts reports
+  - Conflict event data (ACLED)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF observes mining is a profitable tool for insurgent and terrorist groups in unstable resource-rich
+      areas.
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  innocent_explanations:
+  - Many legal mines operate in fragile regions and conduct due diligence
+  - The OECD guidance expects continued responsible sourcing from such areas, not withdrawal
+  jurisdictions: Conflict-affected and high-risk areas (OECD definition)
+  version: 1
+- id: EN-035
+  name: One person behind many extraction companies, or proxies fronting companies
+  definition: One individual manages or directs several extraction companies, or many small firms set
+    up by apparently unrelated people are controlled by the same group, sometimes with false addresses.
+  areas:
+  - EN
+  - ML
+  typology: Nominee and multi-company structures
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Customers, p.54
+    quote: Individual identified as a manager or director of several companies linked to environmental
+      extraction.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Company behaviour, p.21
+    quote: Numerous sole proprietorship businesses/private limited companies set up by seemingly unrelated
+      people (proxies) but controlled by the same group of people.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Company behaviour, p.21
+    quote: Significant number of companies registered to one natural person.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The same director listed on six gold-trading firms registered at different addresses
+  cases: []
+  data_needed:
+  - Person
+  - Directorship
+  - Ownership
+  - Company
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - OpenCorporates
+  - Beneficial ownership registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Groups set up one company per concession for legal and financing reasons
+  - Professional directors serve many clients
+  jurisdictions: Global
+  version: 1
+- id: EN-036
+  name: Frequent share trading in companies holding agricultural or logging permits
+  definition: Shares in permit-holding companies are bought and sold often, especially by shareholders
+    in third countries.
+  areas:
+  - EN
+  typology: Permit flipping and ownership obfuscation
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Customers, p.54
+    quote: Frequent buying and selling of shares in companies holding agricultural or logging permits,
+      especially transactions involving shareholders in third party jurisdictions.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A plantation permit holder changes owners three times in two years through foreign holding companies
+  cases: []
+  data_needed:
+  - Ownership (startDate, endDate, shareholder jurisdiction)
+  - Company
+  - License
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Company registry filing history
+  - Concession registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Normal M&A and investor turnover
+  - Restructuring before listing or refinancing
+  jurisdictions: Global
+  version: 1
+- id: EN-037
+  name: Refineries or timber processors paying staff only in cash or on commission
+  definition: Refineries or sawmills pay employees exclusively in cash and/or by commission, giving staff
+    an incentive to bring in material regardless of origin.
+  areas:
+  - EN
+  typology: Incentive structures at supply-chain choke points
+  status: pending
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Customers, p.54
+    quote: Companies such as refineries or timber processing facilities that pay their employees exclusively
+      in cash and/or on a commission basis, creating the potential of a direct incentive for investment
+      into illicit activities.
+    quote_verified: false
+  examples:
+  - NTR Metals applied a commission model encouraging staff to import as much gold as quickly as possible
+    (FATF 2021 Box 3.5)
+  cases: []
+  data_needed:
+  - Company
+  - Employment
+  - Payment (payroll)
+  checkable: person
+  lookup_sources:
+  - Employee interviews
+  - Labour inspection records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Sales commissions are common in trading
+  - Cash wages are normal where workers lack bank accounts
+  jurisdictions: Global
+  version: 1
+- id: EN-038
+  name: Sales below market to a related company, then bankruptcy after extraction
+  definition: A company earns little or less than expected, sells below market price to a related company
+    such as its parent, and sometimes goes bankrupt once extraction is finished.
+  areas:
+  - EN
+  - FR
+  typology: Profit shifting and phoenix extraction
+  status: pending
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Customers, p.54
+    quote: Companies generating minimal income (or it is below what would be expected for its stated activity)
+      with sales below market prices to a company where there is a direct relationship, such as a parent.
+    quote_verified: false
+  examples:
+  - A local logging subsidiary declares losses for years then is liquidated when the concession is exhausted
+  cases: []
+  data_needed:
+  - Company (status, dissolutionDate)
+  - Ownership
+  - Payment
+  - Contract
+  - Document (financial statements)
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Insolvency records
+  - Tax filings where public
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Below-market related-party sales shift profit and tax out of the source country.
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  innocent_explanations:
+  - Genuine losses from low prices
+  - Lawful cost-plus intra-group pricing
+  jurisdictions: Global
+  version: 1
+- id: EN-039
+  name: Illegal extractor also holds unrelated government contracts
+  definition: A company doing illegal mining or forestry also has government contracts for unrelated services,
+    suggesting corruption around licences.
+  areas:
+  - CO
+  - EN
+  - PP
+  typology: Corrupt state relationships
+  status: pending
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Customers, p.55
+    quote: Companies operating illegal mining or forestry holds contracts with provision of another un-related
+      government service or activity (corruption risks for licenses).
+    quote_verified: false
+  examples:
+  - A logging firm accused of illegal harvest also wins road-maintenance tenders
+  cases: []
+  data_needed:
+  - Company
+  - ContractAward
+  - Contract
+  - PublicBody
+  - License
+  checkable: lookups
+  lookup_sources:
+  - Public procurement portals
+  - Open contracting data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Contract awards to firms linked to illegal extraction may signal corrupt exchange.
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+  innocent_explanations:
+  - Diversified local firms win tenders on merit in small markets
+  jurisdictions: Global
+  version: 1
+- id: EN-040
+  name: No proof of permits, or resources claimed from places with no licence or no mines
+  definition: The client cannot show environmental, export or land permits, or gold is sold as coming
+    from a place with no extraction licence or no gold mines, or gold is produced and sold without a licence.
+  areas:
+  - EN
+  typology: Unlicensed extraction
+  status: pending
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Customers, p.55
+    quote: Clients that are unable to provide evidence of compliance with local environmental requirements
+      (e.g., proof of permit for environmental activity, export, land purchase/lease agreements, etc.)
+    quote_verified: false
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Payment behaviour, p.22
+    quote: Natural person or business sells gold saying that it comes from a place with no extraction
+      license or from places with no gold mines.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Gold mining behaviour, p.22
+    quote: Production and commercialisation of gold by a person or business without a license.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Lumber Liquidators imported from suppliers 'unable to provide documentation of legal harvest' (US
+    DOJ 2015)
+  cases:
+  - name: South African illegal gold mining racketeering case (21 accused)
+    year: 2021 (reported)
+    jurisdiction: South Africa
+    what_happened: A group mined gold-bearing material in a disused mine level and sold unwrought gold;
+      16 illegal processing plants found. All accused were convicted on charges including racketeering,
+      money laundering and Precious Metals Act offences, with up to 15 years for money laundering.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    source_title: 'FATF (2021) Money Laundering from Environmental Crime, Box 2.1 (source: South Africa)'
+  - name: Ms. C (illegal mining money laundering)
+    year: '2021'
+    jurisdiction: China
+    what_happened: Mr. L and his brothers ran illegal mining from 2006; his wife Ms. C hid the proceeds
+      through multiple accounts, wires and mis-invoiced lawyer fees and insurance. She was convicted of
+      money laundering on 18 February 2021 and sentenced to 5 years 6 months; Mr. L and 30 others had
+      been convicted in 2019.
+    outcome: convicted
+    outcome_verified: false
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    source_title: 'FATF (2021) Money Laundering from Environmental Crime, Box A C.5 (source: China)'
+  data_needed:
+  - License
+  - Document (permits, land agreements)
+  - Company
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Mining cadastres
+  - Forestry concession registers
+  - Environmental permit registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Permits pending renewal
+  - Informal but tolerated artisanal mining in transition to formalisation
+  jurisdictions: Global
+  version: 1
+- id: EN-041
+  name: Exports larger than the source region or country can produce
+  definition: A client's exports of timber, minerals or gold exceed what is available in the region, or
+    gold is said to come from a country whose known reserves or production cannot explain the volume.
+  areas:
+  - EN
+  typology: Origin laundering
+  status: pending
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Customers, p.55
+    quote: Clients stated business is to export environmental materials but the volume/value is in excess
+      of what is available in the region.
+    quote_verified: false
+  - title: OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected
+      and High-Risk Areas, 3rd ed.
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Supplement on Gold, Step 2.B, Red flag locations, p.87
+    quote: The gold is claimed to originate from a country that has limited known reserves or stocks,
+      likely resources or expected production levels of gold
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A country with almost no mines reporting large gold exports
+  cases: []
+  data_needed:
+  - Document (export declarations, certificates of origin)
+  - Company
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - National production statistics
+  - Mirror trade statistics (UN Comtrade)
+  - USGS mineral yearbooks
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Re-export of recycled or stockpiled material
+  - Poor official statistics underestimating legal production
+  jurisdictions: Global
+  version: 1
+- id: EN-042
+  name: Co-mingling at sawmills, refineries and aggregators
+  definition: Processing points such as sawmills and refineries mix income or material from many sources
+    linked to mining or logging, or national precious-metals aggregators present themselves as refiners.
+  areas:
+  - EN
+  typology: Supply-chain choke points
+  status: pending
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Supply Chain Choke Points, p.55
+    quote: 'Red flags could include: apparent co-mingling of income from diverse sources with links to
+      mining or logging sectors.'
+    quote_verified: false
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Supply Chain Choke Points, p.55
+    quote: National precious metals aggregators sometimes portraying themselves as refiners.
+    quote_verified: false
+  examples:
+  - A gold exporter calling itself a refinery without refining equipment
+  cases: []
+  data_needed:
+  - Company (sector, licences, equipment)
+  - Payment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Refiner accreditation lists (LBMA, RMI)
+  - Import records for refining equipment
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate processors buy from many suppliers by design
+  jurisdictions: Global; FATF flags the aggregator trend in Africa
+  version: 1
+- id: EN-043
+  name: Resource trade routed through high-risk or transit jurisdictions
+  definition: Trade finance or shipments for extractive business involve jurisdictions with proven corruption,
+    conflict or illegal extraction risk; gold is transhipped through high-risk jurisdictions for no reason;
+    or gold is claimed to come from a known transit country.
+  areas:
+  - EN
+  - ML
+  typology: Transit laundering
+  status: pending
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Export & transfer pricing, p.55
+    quote: Trade transactions to finance extractive business involving high-risk jurisdictions – e.g.
+      that have a proven risk of corruption, conflict and/or illegal resource extraction.
+    quote_verified: false
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Trade-based behaviour, p.21
+    quote: Gold is transhipped through one or more such high risk / sensitive jurisdictions for no apparent
+      economic reason.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected
+      and High-Risk Areas, 3rd ed.
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Supplement on Gold, Step 2.B, p.87
+    quote: The gold is claimed to originate from a country through which gold from conflict-affected and
+      high-risk areas is known or reasonably suspected to transit.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Gold from a land-locked conflict country declared as originating in its neighbour
+  cases: []
+  data_needed:
+  - Document
+  - Company
+  - Address
+  - Payment
+  - Contract (trade finance)
+  checkable: lookups
+  lookup_sources:
+  - FATF high-risk jurisdiction lists
+  - Corruption indices
+  - Trade statistics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Transit hubs have legitimate logistics and refining advantages
+  jurisdictions: Global
+  version: 1
+- id: EN-044
+  name: Trade in goods under a ban or moratorium
+  definition: Transactions involve environmentally sensitive goods such as round logs while a national
+    moratorium or ban is in force.
+  areas:
+  - EN
+  typology: Export-ban evasion
+  status: pending
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Export & transfer pricing, p.55
+    quote: Trade transactions linked to environmentally sensitive goods (e.g., round logs) when there
+      is a moratorium, or this has been banned by national authorities.
+    quote_verified: false
+  examples:
+  - Rosewood shipments after Madagascar's export ban
+  cases: []
+  data_needed:
+  - Document (export permits)
+  - Company
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - National export ban lists
+  - CITES Appendices and trade suspensions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Pre-ban stock with valid permits
+  - Exemptions for specific concessions
+  jurisdictions: Countries with log export bans or moratoria (e.g. Madagascar rosewood ban)
+  version: 1
+- id: EN-045
+  name: Shipped timber volume differs from permit or concession volume
+  definition: Import or export papers show a large gap between the timber volume allowed in the concession
+    or permit and the volume shipped.
+  areas:
+  - EN
+  typology: Permit overrun and laundering through permits
+  status: pending
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Export & transfer pricing, p.56
+    quote: Export/import documents show significant inconsistency in amount of timber permitted in the
+      concession/permit document and the amount shipped.
+    quote_verified: false
+  examples:
+  - A concession permitted to cut 5,000 m3 exporting 20,000 m3
+  cases: []
+  data_needed:
+  - License (volume)
+  - Document (export declarations)
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - Concession registers
+  - Export statistics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Exporter legally buys from several concessions
+  - Measurement differences between roundwood and sawn volumes
+  jurisdictions: Global
+  version: 1
+- id: EN-046
+  name: 'Mining that does not fit the licence: wrong equipment or prohibited areas'
+  definition: Mining uses machinery beyond what a small or artisanal licence allows, breaks administrative,
+    social or environmental rules, or takes place in prohibited areas.
+  areas:
+  - EN
+  typology: Licence abuse
+  status: verified
+  sources:
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Gold mining behaviour, p.23
+    quote: The development of mining activities using machinery and equipment that is not in accordance
+      with the characteristics of the licensed small or artisanal mining.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Gold mining behaviour, p.23
+    quote: The development of mining activities in prohibited areas.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Dredges and excavators on an artisanal permit
+  - Mining inside a national park
+  cases: []
+  data_needed:
+  - License (type, area)
+  - Address
+  - Company
+  - Document (satellite images, inspection reports)
+  checkable: lookups
+  lookup_sources:
+  - Mining cadastre
+  - Protected area maps (WDPA)
+  - Satellite imagery
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Licence boundaries mapped inaccurately
+  - Equipment leased for permitted reclamation work
+  jurisdictions: Global
+  version: 1
+- id: EN-047
+  name: Gold claimed as recycled or scrap and refined in a transit country
+  definition: Gold is said to come from recycled, scrap or mixed sources and was refined in a country
+    through which conflict or high-risk gold is known or suspected to pass.
+  areas:
+  - EN
+  typology: Recycled-gold origin laundering
+  status: verified
+  sources:
+  - title: OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected
+      and High-Risk Areas, 3rd ed.
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Supplement on Gold, Step 2.B, p.87
+    quote: The gold is claimed to originate from recyclable/scrap or mixed sources and has been refined
+      in a country where gold from conflict-affected and high-risk areas is known or reasonably suspected
+      to transit.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - '''Scrap jewellery'' exports from a hub that also receives artisanal gold from conflict areas'
+  cases: []
+  data_needed:
+  - Document (origin declarations)
+  - Company
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Trade statistics
+  - Refiner audit reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Large legitimate jewellery recycling markets exist in such hubs
+  jurisdictions: Global
+  version: 1
+- id: EN-048
+  name: Supplier sourced from a red-flag gold location within the last 12 months
+  definition: A supplier or known upstream company is known to have bought gold from a conflict-affected,
+    high-risk or transit red-flag location in the past 12 months.
+  areas:
+  - EN
+  typology: Supplier due diligence
+  status: verified
+  sources:
+  - title: OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected
+      and High-Risk Areas, 3rd ed.
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Supplement on Gold, Step 2.B, Supplier red flags, p.87
+    quote: Suppliers or other known upstream companies are known to have sourced gold from a red flag
+      location of gold origin and transit in the last 12 months.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A trader's purchase records show gold bought in a conflict zone eight months ago
+  cases: []
+  data_needed:
+  - Company
+  - Payment (date)
+  - Document (purchase records, origin)
+  - Address
+  checkable: records
+  lookup_sources:
+  - Refiner and trader due diligence reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Supplier known to have sourced gold from a red-flag location of origin or transit within
+      the last 12 months
+    threshold_source: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Supplier may have done the OECD-required enhanced due diligence on that sourcing
+  jurisdictions: Global
+  version: 1
+- id: EN-049
+  name: Gold buyer taking gold from unidentified 'collectors' or rotating front companies
+  definition: A refiner or dealer accepts gold from third parties with little or no identification, from
+    vaguely described 'gold collectors', or from customers who keep switching front companies.
+  areas:
+  - EN
+  - ML
+  typology: Complicit or negligent refiner
+  status: verified
+  sources:
+  - title: U.S. Gold Refinery Pleads Guilty to Charge of Failure to Maintain Adequate Anti-Money Laundering
+      Program
+    publisher: US Attorney's Office, Southern District of Florida
+    year: '2018'
+    url: https://www.justice.gov/usao-sdfl/pr/us-gold-refinery-pleads-guilty-charge-failure-maintain-adequate-anti-money-laundering
+    locator: Press release body
+    quote: Criminals frequently trade illegal gold through illicit shell companies using false or incomplete
+      documents.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Elemetal/NTR buying from 'gold collectors' and rotating front companies (2012-2016)
+  cases:
+  - name: Samer H. Barrage, Renato J. Rodriguez, Juan P. Granda (NTR Metals)
+    year: 2017-2018
+    jurisdiction: United States (S.D. Fla.)
+    what_happened: Named as co-conspirators in a scheme to buy billions of dollars of criminally derived
+      gold from Latin America through Elemetal; the US Attorney states they pled guilty to conspiracy
+      to commit money laundering in a related case.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdfl/pr/four-peruvian-members-multi-billion-dollar-international-gold-money-laundering-scheme
+    source_title: US Attorney S.D. Fla. press release, 9 Jan 2018
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Document (KYC files)
+  - Email (supplier chats)
+  checkable: records
+  lookup_sources:
+  - Company registry
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: DOJ says the gold was tied to illegal mining, foreign bribery, smuggling and narcotics trafficking.
+    source_url: https://www.justice.gov/usao-sdfl/pr/four-peruvian-members-multi-billion-dollar-international-gold-money-laundering-scheme
+  innocent_explanations:
+  - Small legitimate suppliers may lack full documentation
+  - Aggregators collect from many artisanal miners lawfully
+  jurisdictions: United States case; applicable globally
+  version: 1
+- id: EN-050
+  name: Cash or structured purchases of gold bullion with unknown source of funds
+  definition: Bullion is bought in cash, in many purchases over a short time or with structured cash deposits,
+    and the original source of the money cannot be established.
+  areas:
+  - EN
+  - ML
+  typology: Placement through gold
+  status: verified
+  sources:
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Payment behaviour, p.22
+    quote: The use of cash to purchase bullion, especially when there are multiple purchases in a short
+      timeframe, or when large amounts are purchased at once, or when there are structured cash deposits
+      into an account to finance a single gold bullion purchase.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
+    publisher: FATF / APG
+    year: '2015'
+    url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+    locator: Section 4, Payment behaviour, p.22
+    quote: Original source of funds to buy gold bullion cannot be established.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Several cash deposits just under the reporting limit followed by one bullion purchase
+  cases: []
+  data_needed:
+  - Payment (cash, amount, date)
+  - Person
+  - BankAccount
+  - Asset
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: This is a general gold-sector laundering indicator, not specific to environmental crime.
+    source_url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Ml-tf-risks-and-vulnerabilities-gold.html
+  innocent_explanations:
+  - Cultural preference for gold savings and cash
+  - Buying gold during currency crises
+  jurisdictions: Global
+  version: 1
+- id: EN-051
+  name: Inexperienced buyers acquire a waste company cheaply
+  definition: People with no knowledge of the highly regulated waste sector buy waste companies, sometimes
+    at prices below book or market value.
+  areas:
+  - EN
+  - OC
+  typology: Criminal infiltration of the waste sector
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Lack of experience/background in a complex sector, p.56
+    quote: Purchases of companies by persons lacking adequate knowledge and experience in the waste sector
+      to manage entities operating in a highly regulated sector.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Metals and Waste Sector, p.56
+    quote: Has shares sold at lower than book value, and
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - New shareholders bought an Italian metals and waste firm far below market value and had limited skills
+    to run it (FATF 2021 Box 3.2)
+  cases:
+  - name: Italian metals and waste front company (STR case)
+    year: 2021 (reported)
+    jurisdiction: Italy
+    what_happened: An STR on a waste-disposal company without real structure showed new shareholders bought
+      it below market value; transfers were justified as advance invoice payments from firms previously
+      investigated for tax crimes, illegal waste disposal and Mafia laundering; shipping documents described
+      waste as goods. About USD 14.2 million involved. Outcome not stated.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    source_title: 'FATF (2021) Money Laundering from Environmental Crime, Box 3.2 (source: Italy)'
+  data_needed:
+  - Ownership (price, date)
+  - Person (background)
+  - Company
+  - License (waste permits)
+  checkable: lookups
+  lookup_sources:
+  - Company registry share transfers
+  - Waste permit registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: INTERPOL finds organised crime enters the waste sector through legitimate businesses used
+      as cover.
+    source_url: https://www.interpol.int/en/content/download/15587/file/INTERPOL%20Report%20_criminal%20trends-plastic%20waste.pdf
+  innocent_explanations:
+  - Distressed sale of a failing firm
+  - Investors hiring experienced managers after purchase
+  jurisdictions: Global; Italian cases
+  version: 1
+- id: EN-052
+  name: Heavy cash use by waste companies
+  definition: Waste management companies deposit and withdraw large volumes of cash.
+  areas:
+  - EN
+  typology: Cash extraction from waste businesses
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Lack of experience/background, p.56
+    quote: High volume/value of cash deposits and withdrawals by waste management sector companies.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A waste hauler withdrawing most incoming payments in cash
+  cases: []
+  data_needed:
+  - Payment (cash)
+  - BankAccount
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Scrap metal and small-waste businesses often pay suppliers in cash where legal
+  jurisdictions: Global
+  version: 1
+- id: EN-053
+  name: Waste companies moving money with known waste-trafficking source or destination countries
+  definition: Local waste firms send or receive large international transfers with countries known as
+    sources of, or destinations for, trafficked waste.
+  areas:
+  - EN
+  typology: Cross-border waste trafficking finance
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Metals and Waste Sector, p.56
+    quote: Large international funds transfer between local waste management sector companies and known
+      source countries for waste trafficking.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A UK recycler paid by buyers in Indonesia and India for mixed household waste (Biffa)
+  cases: []
+  data_needed:
+  - Payment (country)
+  - Company
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - Basel Convention national reports
+  - INTERPOL waste crime reports
+  - Trade data on waste HS codes
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legal recyclable exports with proper notification and consent
+  jurisdictions: Global; INTERPOL notes re-routing to South and South-East Asia and Eastern Europe since
+    2018
+  version: 1
+- id: EN-054
+  name: Waste or metals company with no real structure or address
+  definition: A metals or waste company lacks an adequate organisation, uses an address with no economic
+    activity, or shows heavy cash withdrawals.
+  areas:
+  - EN
+  typology: Shell and front companies in waste
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Metals and Waste Sector, p.56
+    quote: Lacks an adequate organizational structure,
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Metals and Waste Sector, p.56
+    quote: Holds an address that is not linked to any economic activity,
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A licensed waste processor registered at a residential flat with no site
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Employment
+  - License
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Waste permit registers
+  - Street view / site visit
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Brokers legitimately operate without physical sites
+  - Registered office services
+  jurisdictions: Global
+  version: 1
+- id: EN-055
+  name: Invoices for waste types the company is not allowed to handle
+  definition: A waste company pays or invoices for waste types that do not match those it is authorised
+    to process.
+  areas:
+  - EN
+  typology: Permit mismatch
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Metals and Waste Sector, p.56
+    quote: Waste management sector companies with payments or trade invoices for types of waste unaligned
+      with those they are authorised to process.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A plastics recycler invoicing for hazardous industrial sludge
+  cases: []
+  data_needed:
+  - Document (invoices)
+  - License (permitted waste codes)
+  - Company
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Environmental permit registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Broker invoices for waste sent on to properly permitted facilities
+  jurisdictions: Global
+  version: 1
+- id: EN-056
+  name: Unexplained investment in waste facilities by owners who cannot be identified
+  definition: Waste facilities receive sudden investment from entities whose beneficial owners are unclear.
+  areas:
+  - EN
+  - OC
+  typology: Opaque ownership in waste
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Economic Activities (waste), p.56
+    quote: Sudden and unexplained investment in waste facilities from entities with unclear beneficial
+      ownership information.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An offshore trust funds a new landfill operator
+  cases: []
+  data_needed:
+  - Ownership
+  - Company
+  - Payment
+  - LegalEntity
+  checkable: lookups
+  lookup_sources:
+  - Beneficial ownership registers
+  - Company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Private equity funds with layered but lawful structures
+  jurisdictions: Global
+  version: 1
+- id: EN-057
+  name: Waste disposal priced below what it costs to do legally
+  definition: A waste company's costs or prices are lower than industry standards would allow for lawful
+    treatment.
+  areas:
+  - EN
+  typology: Illegal disposal undercutting legal cost
+  status: verified
+  sources:
+  - title: Money Laundering from Environmental Crime
+    publisher: FATF
+    year: '2021'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
+    locator: Annex A, Economic Activities (waste), p.56
+    quote: Costs are lower than expected industry standards.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A contractor quoting half the market rate for hazardous waste disposal
+  cases: []
+  data_needed:
+  - Contract
+  - Payment
+  - Company
+  - ContractAward
+  checkable: lookups
+  lookup_sources:
+  - Industry price benchmarks
+  - Public procurement records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Efficiency, scale or new technology
+  - Loss-leader pricing to win contracts
+  jurisdictions: Global
+  version: 1
+- id: EN-058
+  name: Waste misdeclared as clean, recoverable or raw material
+  definition: Shipments are declared as waste for recovery, as raw material or as non-hazardous when they
+    are contaminated or mixed, or contaminated waste is hidden behind clean bales; under the Basel Convention,
+    a shipment that does not materially match its documents is illegal traffic.
+  areas:
+  - EN
+  - FR
+  typology: Misdeclaration and concealment
+  status: verified
+  sources:
+  - title: 'Strategic Analysis Report: Emerging criminal trends in the global plastic waste market since
+      January 2018'
+    publisher: INTERPOL
+    year: '2020'
+    url: https://www.interpol.int/en/content/download/15587/file/INTERPOL%20Report%20_criminal%20trends-plastic%20waste.pdf
+    locator: Key findings, p.6
+    quote: Plastic waste shipments are falsely declared as destined for recovery, or misdeclared as raw
+      material.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Strategic Analysis Report: Emerging criminal trends in the global plastic waste market since
+      January 2018'
+    publisher: INTERPOL
+    year: '2020'
+    url: https://www.interpol.int/en/content/download/15587/file/INTERPOL%20Report%20_criminal%20trends-plastic%20waste.pdf
+    locator: Key findings, p.6
+    quote: Illegal shipped contaminated plastic waste is concealed in the container by being placed behind
+      the “clean” plastic waste that is declared on shipping documents;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Basel Convention on the Control of Transboundary Movements of Hazardous Wastes and their Disposal
+      (text revised 2025)
+    publisher: UNEP / Secretariat of the Basel Convention
+    year: '2025'
+    url: https://www.basel.int/Portals/4/download.aspx?e=UNEP-CHW-IMPL-CONVTEXT-2025.English.pdf
+    locator: Article 9(1)(d), p.15
+    quote: that does not conform in a material way with the documents; or
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Biffa containers declared as paper but full of mixed household waste (2021)
+  cases:
+  - name: Biffa Waste Services Ltd
+    year: '2021'
+    jurisdiction: United Kingdom (Wood Green Crown Court)
+    what_happened: Convicted by a jury of four breaches of regulation 23 of the Transfrontier Shipment
+      of Waste Regulations 2007 for exporting poorly sorted household waste described as paper to India
+      and Indonesia (2018-2019); fined GBP 1.5 million plus costs and a proceeds of crime order.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://gov.uk/government/news/biffa-fined-15-million-for-reckless-export-breach
+    source_title: UK Environment Agency press release, 30 Jul 2021
+  data_needed:
+  - Document (shipping and notification documents)
+  - Company
+  - Vessel
+  - Address
+  - License
+  checkable: lookups
+  lookup_sources:
+  - Customs inspection records
+  - Basel/EU waste shipment notifications
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Shipment that does not conform in a material way with its documents (Basel Convention Art.
+      9(1)(d))
+    threshold_source: https://www.basel.int/Portals/4/download.aspx?e=UNEP-CHW-IMPL-CONVTEXT-2025.English.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: INTERPOL notes misdeclaration of waste supporting tax evasion.
+    source_url: https://www.interpol.int/en/content/download/15587/file/INTERPOL%20Report%20_criminal%20trends-plastic%20waste.pdf
+  innocent_explanations:
+  - Contamination levels in recyclables vary and can exceed limits without intent
+  - Classification disputes over mixed plastics codes
+  jurisdictions: Basel Convention Parties; INTERPOL data global
+  version: 1
+- id: EN-059
+  name: Waste routed through a transit country or free trade zone
+  definition: Waste shipments pass through a transit country, often a free trade zone, with the final
+    destination misdeclared to hide origin or destination.
+  areas:
+  - EN
+  typology: Transit re-routing
+  status: verified
+  sources:
+  - title: 'Strategic Analysis Report: Emerging criminal trends in the global plastic waste market since
+      January 2018'
+    publisher: INTERPOL
+    year: '2020'
+    url: https://www.interpol.int/en/content/download/15587/file/INTERPOL%20Report%20_criminal%20trends-plastic%20waste.pdf
+    locator: Key findings, p.5
+    quote: The use of transit countries to disguise the origin of the waste shipment has been commonly
+      observed modus operandi for such illegal shipments.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Strategic Analysis Report: Emerging criminal trends in the global plastic waste market since
+      January 2018'
+    publisher: INTERPOL
+    year: '2020'
+    url: https://www.interpol.int/en/content/download/15587/file/INTERPOL%20Report%20_criminal%20trends-plastic%20waste.pdf
+    locator: Key findings, p.6
+    quote: Misdeclaration of the final destination of plastic waste shipments, using a transit country
+      in a free trade zone.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Plastic waste booked to one Asian port then re-exported to a neighbour
+  cases: []
+  data_needed:
+  - Document (bills of lading)
+  - Vessel
+  - Address (ports, FTZ)
+  - Company (broker)
+  checkable: lookups
+  lookup_sources:
+  - Bill-of-lading databases
+  - Ship tracking
+  - Trade data on waste HS codes
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Transshipment hubs are normal in container shipping
+  jurisdictions: Global; re-routing to South and South-East Asia since China's 2018 import restrictions
+  version: 1
+- id: EN-060
+  name: Fires at waste storage or recycling sites
+  definition: Accidental or deliberate fires at legal or illegal waste sites, which INTERPOL links partly
+    to cheap illegal disposal.
+  areas:
+  - EN
+  - FR
+  typology: Illegal disposal by burning
+  status: verified
+  sources:
+  - title: 'Strategic Analysis Report: Emerging criminal trends in the global plastic waste market since
+      January 2018'
+    publisher: INTERPOL
+    year: '2020'
+    url: https://www.interpol.int/en/content/download/15587/file/INTERPOL%20Report%20_criminal%20trends-plastic%20waste.pdf
+    locator: Key findings, p.6
+    quote: There has been an increase in accidental and deliberate waste fires, almost certain in export
+      countries, and probable in European and South-East Asian import countries as well.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - About 80 waste fires in Poland in early 2018 (INTERPOL report)
+  cases: []
+  data_needed:
+  - Event (fire)
+  - Address
+  - Company
+  - License
+  checkable: lookups
+  lookup_sources:
+  - Fire service records
+  - Local news
+  - Satellite fire detection
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: INTERPOL notes Dutch insurers stopped covering outdoor storage fires and fires dropped, suggesting
+      many were deliberate.
+    source_url: https://www.interpol.int/en/content/download/15587/file/INTERPOL%20Report%20_criminal%20trends-plastic%20waste.pdf
+  innocent_explanations:
+  - Spontaneous combustion, battery fires and lightning are common at waste sites
+  jurisdictions: Export countries (almost certain) and European and South-East Asian import countries
+    (probable), per INTERPOL
+  version: 1
+- id: EN-061
+  name: Fishing without a valid licence, in closed areas or seasons, on banned stocks or with prohibited
+    gear
+  definition: A vessel fishes without a licence, in a closed area or season, beyond quota, on a stock
+    under moratorium, or with prohibited gear; EU law presumes such vessels are engaged in IUU fishing.
+  areas:
+  - EN
+  typology: Illegal fishing
+  status: verified
+  sources:
+  - title: Council Regulation (EC) No 1005/2008 establishing a Community system to prevent, deter and
+      eliminate IUU fishing
+    publisher: Council of the European Union (EUR-Lex)
+    year: '2008'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008R1005
+    locator: Article 3(1)(a)
+    quote: fished without a valid licence, authorisation or permit issued by the flag State or the relevant
+      coastal State; or
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Council Regulation (EC) No 1005/2008
+    publisher: Council of the European Union (EUR-Lex)
+    year: '2008'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008R1005
+    locator: Article 3(1)(c)
+    quote: fished in a closed area, during a closed season, without or after attainment of a quota or
+      beyond a closed depth; or
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Council Regulation (EC) No 1005/2008
+    publisher: Council of the European Union (EUR-Lex)
+    year: '2008'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008R1005
+    locator: Article 3(1)(e)
+    quote: used prohibited or non-compliant fishing gear; or
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Vessel tracks showing fishing patterns inside a marine protected area
+  cases: []
+  data_needed:
+  - Vessel (imoNumber, mmsi, flag, owner)
+  - License (fishing authorisation)
+  - Ownership
+  - Address (fishing area)
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Ship tracking (Global Fishing Watch)
+  - RFMO authorised vessel lists
+  - FAO Global Record of Fishing Vessels
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (EU Reg. 1005/2008 Art. 3(1))
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Licence exists but is not published
+  - Transit through an area without fishing
+  - Errors in AIS-derived fishing classification
+  jurisdictions: EU (Regulation 1005/2008) and coastal states; FAO IPOA-IUU globally
+  version: 1
+- id: EN-062
+  name: Catch not recorded, under-reported, or not matching buyers' purchases
+  definition: A vessel fails to record or report catch, or misreports it; or a buyer's purchases do not
+    match the fishing records of its suppliers.
+  areas:
+  - EN
+  typology: Unreported fishing and catch laundering
+  status: pending
+  sources:
+  - title: Council Regulation (EC) No 1005/2008
+    publisher: Council of the European Union (EUR-Lex)
+    year: '2008'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008R1005
+    locator: Article 3(1)(b)
+    quote: not fulfilled its obligations to record and report catch or catch-related data
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and the Illegal Wildlife Trade
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+    locator: Box 37, p.65
+    quote: noted discrepancies between the fishing records of fishermen who supplied two fish trading
+      companies and their purchases.
+    quote_verified: false
+    checked: '2026-10-08'
+  examples:
+  - Hout Bay Fishing under-reported rock lobster catches to South African authorities (Bengis case)
+  cases:
+  - name: Arnold Maurice Bengis, David Bengis, Jeffrey Noll (Hout Bay Fishing Industries)
+    year: 2004 (pleas); 2013 (restitution)
+    jurisdiction: United States (S.D.N.Y.) / South Africa
+    what_happened: From 1987 to 2001 they harvested South African rock lobster far beyond quota, under-reported
+      catch, bribed fisheries inspectors and filed false export documents for US imports. They pleaded
+      guilty to Lacey Act and smuggling conspiracy counts; in 2013 the court ordered about USD 22.5 million
+      restitution to South Africa.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/officers-fishing-and-seafood-corporations-ordered-pay-nearly-225-million-south-africa
+    source_title: US Attorney SDNY press release, 14 Jun 2013
+  data_needed:
+  - Vessel
+  - Document (logbooks, landing records, catch certificates)
+  - Company (buyer)
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Landing and catch certificate records
+  - Fisheries authority data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: The Bengis scheme relied on bribing fisheries inspectors.
+    source_url: https://www.justice.gov/usao-sdny/pr/officers-fishing-and-seafood-corporations-ordered-pay-nearly-225-million-south-africa
+  innocent_explanations:
+  - Weight conversion differences between whole and processed fish
+  - Reporting delays
+  jurisdictions: Global
+  version: 1
+- id: EN-063
+  name: Vessel markings, identity or registration falsified or hidden
+  definition: A fishing vessel falsifies or conceals its markings, name, identity numbers or registration.
+  areas:
+  - EN
+  - SF
+  typology: Vessel identity fraud
+  status: verified
+  sources:
+  - title: Council Regulation (EC) No 1005/2008
+    publisher: Council of the European Union (EUR-Lex)
+    year: '2008'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008R1005
+    locator: Article 3(1)(f)
+    quote: falsified or concealed its markings, identity or registration; or
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Two vessels broadcasting the same MMSI number
+  - Hull name painted over
+  cases: []
+  data_needed:
+  - Vessel (name, pastNames, imoNumber, mmsi, callSign)
+  - Document (registration)
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - Ship tracking (AIS)
+  - IMO GISIS
+  - RFMO IUU vessel lists
+  - Combined IUU Vessel List
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Identity manipulation of vessels is a shared technique with sanctions evasion shipping.
+    source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008R1005
+  innocent_explanations:
+  - AIS transponders misconfigured
+  - Legitimate name changes after sale
+  jurisdictions: Global
+  version: 1
+- id: EN-064
+  name: Frequent flag changes (flag hopping) or stateless vessel
+  definition: A vessel changes flag often, or has no nationality; FAO says a pattern of flag hopping may
+    mean the vessel was used for IUU fishing, and EU law treats a stateless vessel as presumed IUU.
+  areas:
+  - EN
+  typology: Flags of convenience / non-compliance
+  status: verified
+  sources:
+  - title: Stopping illegal, unreported and unregulated fishing (FAO document y3554e), section Responsibilities
+      of Flag Countries
+    publisher: FAO
+    year: '2002'
+    url: https://www.fao.org/4/y3554e/y3554e01.htm
+    locator: Responsibilities of Flag Countries – Fishing Vessel Registration
+    quote: Should a pattern of possible flag hopping (that is, frequent changes of flag) emerge, it is
+      possible that the vessel has been used for IUU fishing.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Council Regulation (EC) No 1005/2008
+    publisher: Council of the European Union (EUR-Lex)
+    year: '2008'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008R1005
+    locator: Article 3(1)(l)
+    quote: no nationality and is therefore a stateless vessel, in accordance with international law.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A longliner registered under four flags in five years
+  cases: []
+  data_needed:
+  - Vessel (flag, pastFlags)
+  - Ownership
+  - Document (registration certificates)
+  checkable: lookups
+  lookup_sources:
+  - IMO GISIS
+  - Ship registries
+  - Global Fishing Watch vessel identity
+  - RFMO lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Vessel sold to new owners in different countries
+  - Reflagging for lawful access to fishing agreements
+  jurisdictions: Global
+  version: 1
+- id: EN-065
+  name: AIS tracking switched off at sea
+  definition: A fishing vessel's AIS transponder goes dark far offshore, which can hide illegal activity;
+    Global Fishing Watch only counts events more than 50 nautical miles from shore.
+  areas:
+  - EN
+  typology: Going dark
+  status: verified
+  sources:
+  - title: Hotspots of Unseen Fishing Vessels Illuminate Areas of Concern for IUU Fishing (Q&A)
+    publisher: Global Fishing Watch
+    year: '2022'
+    url: https://globalfishingwatch.org/article/hotspots-of-unseen-fishing-vessels-qa/
+    locator: Q&A on methods
+    quote: more than 50 nautical miles from shore
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Hot spots of unseen fishing vessels (Welch et al., Science Advances)
+    publisher: NOAA Institutional Repository
+    year: '2022'
+    url: https://repository.library.noaa.gov/view/noaa/63172
+    locator: Abstract
+    quote: obscures up to 6% (>4.9 M hours) of vessel activity
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A vessel's track stops near a contested EEZ border and resumes days later
+  cases: []
+  data_needed:
+  - Vessel (mmsi)
+  - Event (AIS gap start/end, position)
+  - Address (EEZ, MPA)
+  checkable: lookups
+  lookup_sources:
+  - Global Fishing Watch AIS gap data
+  - Commercial AIS providers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Poor satellite reception or equipment faults
+  - Hiding productive fishing spots from competitors
+  - Rules allow switching off AIS in piracy areas for security
+  jurisdictions: Global; hotspots include the North Pacific and West Africa per GFW
+  version: 1
+- id: EN-066
+  name: Meetings or loitering at sea suggesting transshipment, especially with IUU-listed vessels
+  definition: A fishing vessel and a carrier vessel stay close together at low speed for hours far from
+    port (an 'encounter'), or a carrier loiters at sea; transshipping with or supplying IUU-listed vessels
+    is itself presumed IUU under EU law.
+  areas:
+  - EN
+  - HT
+  typology: At-sea transshipment
+  status: verified
+  sources:
+  - title: Identifying Global Patterns of Transshipment Behavior (Miller et al.)
+    publisher: Frontiers in Marine Science
+    year: '2018'
+    url: https://www.frontiersin.org/articles/10.3389/fmars.2018.00240/full
+    locator: Materials and methods, Two-vessel encounter
+    quote: locations where a fishing vessel and a transshipment vessel were continuously within 500 m
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Identifying Global Patterns of Transshipment Behavior (Miller et al.)
+    publisher: Frontiers in Marine Science
+    year: '2018'
+    url: https://www.frontiersin.org/articles/10.3389/fmars.2018.00240/full
+    locator: Materials and methods, Single-vessel loitering
+    quote: locations where a transshipment vessel traveled at speeds of < 2 knots for at least 8 h
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Council Regulation (EC) No 1005/2008
+    publisher: Council of the European Union (EUR-Lex)
+    year: '2008'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008R1005
+    locator: Article 3(1)(j)
+    quote: transhipped or participated in joint fishing operations with, supported or re-supplied other
+      fishing vessels
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A reefer carrier meeting several longliners on the high seas
+  cases: []
+  data_needed:
+  - Vessel (both vessels)
+  - 'Event (encounter: time, duration, position)'
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - Global Fishing Watch encounter and loitering events
+  - RFMO IUU vessel lists
+  - RFMO transshipment authorisations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Encounter: within 500 m for at least 2 h at < 2 knots, at least 10 km from a coastal anchorage;
+      loitering: carrier at < 2 knots for at least 8 h, at least 20 nautical miles from shore (Miller
+      et al. 2018 detection definitions)'
+    threshold_source: https://www.frontiersin.org/articles/10.3389/fmars.2018.00240/full
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: FinCEN notes illegal fishing is often associated with human trafficking; transshipment keeps
+      crews at sea for long periods.
+    source_url: https://www.fincen.gov/sites/default/files/2021-11/FinCEN%20Environmental%20Crimes%20Notice%20508%20FINAL.pdf
+  innocent_explanations:
+  - Authorised transshipment is legal and efficient, keeping vessels on fishing grounds
+  - Carriers loiter while waiting for their next job
+  - Remote fleets such as in the Russian Far East use it as standard practice
+  jurisdictions: Global
+  version: 1
+- id: EN-067
+  name: Fishing vessel seen by satellite but not publicly tracked
+  definition: Satellite radar detects an industrial vessel with no matching public AIS signal (a 'dark'
+    vessel); a 2024 study found most industrial fishing vessels are not publicly tracked.
+  areas:
+  - EN
+  typology: Dark fleet activity
+  status: verified
+  sources:
+  - title: Satellite mapping reveals extensive industrial activity at sea (Paolo et al.)
+    publisher: Nature
+    year: '2024'
+    url: https://www.nature.com/articles/s41586-023-06825-8
+    locator: Abstract
+    quote: We find that 72–76% of the world's industrial fishing vessels are not publicly tracked
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Sentinel-1 radar detections of vessels in an EEZ with no AIS match
+  cases: []
+  data_needed:
+  - Vessel
+  - 'Event (detection: date, position)'
+  - Address (EEZ)
+  checkable: lookups
+  lookup_sources:
+  - Global Fishing Watch SAR vessel detections
+  - National VMS data where available
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many vessels are not legally required to carry AIS
+  - Vessels may report via national VMS that is not public
+  jurisdictions: Global
+  version: 1
+- id: EN-068
+  name: Obstructing inspectors or observers, tampering with evidence, or bribing inspectors
+  definition: A vessel or operator obstructs officials or observers, conceals or disposes of evidence,
+    or bribes fisheries inspectors.
+  areas:
+  - CO
+  - EN
+  typology: Enforcement evasion
+  status: verified
+  sources:
+  - title: Council Regulation (EC) No 1005/2008
+    publisher: Council of the European Union (EUR-Lex)
+    year: '2008'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32008R1005
+    locator: Article 3(1)(g)
+    quote: concealed, tampered with or disposed of evidence relating to an investigation; or
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Bengis defendants bribed South African fisheries inspectors (US DOJ 2013)
+  cases: []
+  data_needed:
+  - Vessel
+  - Person
+  - Event (inspection)
+  - Payment
+  - Document (observer reports)
+  checkable: person
+  lookup_sources:
+  - Observer programme reports
+  - Court records
+  - Crew interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Bribery of inspectors was central to the Bengis rock lobster scheme.
+    source_url: https://www.justice.gov/usao-sdny/pr/officers-fishing-and-seafood-corporations-ordered-pay-nearly-225-million-south-africa
+  innocent_explanations:
+  - Disputes over inspection procedure or safety
+  - Observer reports can be contested
+  jurisdictions: Global
+  version: 1
+not_reached:
+- FATF website PDFs (fatf-gafi.org /content/dam/fatf-gafi/reports/...) blocked automated download (robots/bot
+  check). The FATF 2020 IWT report was read from the OJK Indonesia mirror, the FATF 2021 environmental
+  crime report from the Bank of Russia (cbr.ru) mirror, and the FATF/APG 2015 gold report from a Singapore
+  government mirror; page numbers are the printed FATF page numbers.
+- Full text of Welch et al. 2022 'Hot spots of unseen fishing vessels' (Science Advances) could not be
+  fetched (science.org error, SEAFDEC mirror connection reset); the AIS gap duration threshold used in
+  that paper was not verified, so no duration threshold is given for EN-065.
+- TRAFFIC's own published indicator lists were not opened; the ROUTES Partnership factsheet does not name
+  TRAFFIC as publisher.
+- United for Wildlife Financial Taskforce red-flag lists (member-only).
+- ECOFEL 'Financial Investigations into Wildlife Crime' (Egmont, 2021).
+- FATF 'Following the money' IWT guide for LEAs/FIUs and the full FATF private-sector IWT brochure text
+  (only a WebFetch summary was read).
+- FAO Port State Measures Agreement text and the official IPOA-IUU paragraph-numbered text.
+- INTERPOL restricted version of the plastic waste report and INTERPOL fisheries crime reports.
+- UNODC 'Rotten Fish' fisheries corruption guide; ILO forced-labour-at-sea indicators.
+- APG/UNODC 2017 and ESAAMLG 2016 wildlife typology reports cited by FATF.
+- Court records for Steinmetz appeal outcome (FATF reported it as under appeal in 2021).
+- A plain-language official definition of 'bill of lading' and of PEP from the FATF Glossary (not opened;
+  PEP definition given from context).
+- FinCEN/US Treasury designations for Xaysavang wildlife network and other IWT sanctions cases.

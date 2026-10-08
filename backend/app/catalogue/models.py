@@ -23,7 +23,7 @@ NUMBER = re.compile(
 # ("Article 4(3) of Directive (EU) 2024/1069"); they are removed before looking
 # for a number that needs a source.
 REFERENCE = re.compile(
-    r"\b(?:Article|Art\.|Directive|Regulation|Recommendation|Rec|Section|s\.|paragraph|para\.|Annex|Rule|indicator|indication|point|item|principle|chapter|§)\s*(?:\(EU\)\s*)?[\w()./-]*\d[\w()./-]*",
+    r"\b(?:Article|Art\.|Directive|Regulation|Reg\.|Recommendation|Rec|Section|s\.|paragraph|para\.|Annex|Rule|indicator|indication|point|item|principle|chapter|§)\s*(?:\(EU\)\s*)?[\w()./-]*\d[\w()./-]*",
     re.IGNORECASE,
 )
 

@@ -65,7 +65,7 @@ def area_key(text: str) -> str | None:
     return None
 
 
-WEAK_FIT = re.compile(r"weak fit|only a general example|does not specifically|loosely relevant|only loosely|loose fit", re.IGNORECASE)
+WEAK_FIT = re.compile(r"weak fit|only a general example|does not specifically|loosely relevant|only loosely|loose fit|fit caveat|narrow the case|true only for", re.IGNORECASE)
 
 
 def norm(s: str) -> str:
