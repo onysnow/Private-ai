@@ -1,0 +1,492 @@
+area: IN
+terms:
+- term: Coordinated inauthentic behaviour (CIB)
+  definition: Meta's term for organised efforts to sway public debate where the people involved hide who
+    they are, usually using fake accounts.
+  examples: []
+  source_url: https://transparency.meta.com/sr/Q4-2024-Adversarial-threat-report
+  cases: []
+  related:
+  - Platform manipulation
+  - Influence operation
+  indicators: []
+  areas:
+  - IN
+- term: Platform manipulation
+  definition: X's term for any activity that tries to game the platform, including fake accounts, coordinated
+    inauthentic activity and engagement manipulation.
+  examples: []
+  source_url: https://help.x.com/en/rules-and-policies/platform-manipulation
+  cases: []
+  related:
+  - Coordinated inauthentic behaviour (CIB)
+  - Engagement manipulation
+  indicators: []
+  areas:
+  - IN
+- term: Engagement manipulation
+  definition: Using likes, reposts or follows inauthentically, for example by trading them, to boost traffic
+    artificially.
+  examples: []
+  source_url: https://help.x.com/en/rules-and-policies/platform-manipulation
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: DISARM framework
+  definition: An open framework, modelled on MITRE ATT&CK, for describing disinformation incidents by
+    the tactics and techniques used (Red) and the countermeasures (Blue).
+  examples: []
+  source_url: https://github.com/DISARMFoundation/DISARMframeworks
+  cases: []
+  related:
+  - TTP
+  indicators: []
+  areas:
+  - IN
+- term: TTP (tactics, techniques and procedures)
+  definition: The methods an attacker or disinformation operator uses, grouped by stage; DISARM lists
+    them for disinformation creators.
+  examples: []
+  source_url: https://github.com/DISARMFoundation/DISARMframeworks
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Fake online persona
+  definition: An invented identity run on social media to look like a real, independent person, for example
+    a supposed U.S. citizen run by a foreign agency.
+  examples: []
+  source_url: https://www.justice.gov/usao-edny/pr/34-officers-peoples-republic-china-national-police-charged-perpetrating-transnational
+  cases: []
+  related:
+  - Sock puppet
+  indicators: []
+  areas:
+  - IN
+- term: Bot (automated account)
+  definition: A social media account run wholly or partly by software; DFRLab lists signs such as very
+    high activity, anonymity and amplification.
+  examples: []
+  source_url: https://medium.com/dfrlab/botspot-twelve-ways-to-spot-a-bot-aedc7d9c110c
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Burner account
+  definition: An account created for one use and then abandoned, sometimes within an hour.
+  examples: []
+  source_url: https://secondaryinfektion.org/downloads/secondary-infektion-report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Cybersquatting
+  definition: Registering a web address made to look like another person's or company's site.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/justice-department-disrupts-covert-russian-government-sponsored-foreign-malign-influence
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Doppelganger
+  definition: A Russia-origin influence operation known for websites that imitate real news outlets.
+  examples:
+  - 32 domains seized by the U.S. DOJ in September 2024.
+  source_url: https://transparency.meta.com/sr/Q4-2024-Adversarial-threat-report
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Social Design Agency (SDA)
+  definition: A Russian company that the U.S. DOJ named, with Structura and ANO Dialog, as behind the
+    Doppelganger domains (allegation).
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/justice-department-disrupts-covert-russian-government-sponsored-foreign-malign-influence
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Internet Research Agency (IRA)
+  definition: A Russian organisation the Special Counsel found ran social media accounts using fictitious
+    U.S. personas to interfere in the 2016 election.
+  examples: []
+  source_url: https://www.justice.gov/archives/sco/file/1373816/dl
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Secondary Infektion
+  definition: A long-running Russia-attributed operation, documented by Graphika, known for forged documents
+    and single-use accounts.
+  examples: []
+  source_url: https://secondaryinfektion.org/downloads/secondary-infektion-report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Ghostwriter
+  definition: A campaign documented by Mandiant that used hacked websites or spoofed emails to plant false
+    articles, quotes and documents in Eastern Europe.
+  examples: []
+  source_url: https://cloud.google.com/blog/topics/threat-intelligence/ghostwriter-influence-campaign/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Portal Kombat
+  definition: A network of at least 193 pro-Russian 'news' sites identified by France's VIGINUM that produce
+    no original content.
+  examples: []
+  source_url: https://www.sgdsn.gouv.fr/publications/portal-kombat-un-reseau-structure-et-coordonne-de-propagande-prorusse
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: VIGINUM
+  definition: The French government service, within SGDSN, that detects foreign digital interference and
+    published the Portal Kombat findings.
+  examples: []
+  source_url: https://www.sgdsn.gouv.fr/publications/portal-kombat-un-reseau-structure-et-coordonne-de-propagande-prorusse
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Breakout Scale
+  definition: Ben Nimmo's six-level scale for how far an influence operation spreads, from one community
+    on one platform (1) to triggering a policy response or call for violence (6).
+  examples: []
+  source_url: https://www.brookings.edu/articles/the-breakout-scale-measuring-the-impact-of-influence-operations/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Copypasta
+  definition: The same block of text copied and pasted by many accounts; listed by DISARM as technique
+    T0084.001.
+  examples: []
+  source_url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Astroturfing (fictitious grassroots group)
+  definition: Creating what looks like a citizens' movement that is actually run by a hidden sponsor;
+    the IRA created accounts for fictitious U.S. grassroots groups.
+  examples: []
+  source_url: https://www.justice.gov/archives/sco/file/1373816/dl
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Deepfake
+  definition: Media fully created or partly edited with machine learning so it looks real.
+  examples: []
+  source_url: https://media.defense.gov/2023/Sep/12/2003298925/-1/-1/0/CSI-DEEPFAKE-THREATS.PDF
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Cheap fake (shallow fake)
+  definition: Media manipulated without AI, for example by editing, slowing or mis-captioning.
+  examples: []
+  source_url: https://media.defense.gov/2023/Sep/12/2003298925/-1/-1/0/CSI-DEEPFAKE-THREATS.PDF
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Passive detection vs active authentication
+  definition: Passive detection examines media after the fact for signs of tampering; active authentication
+    embeds proof of origin when the media is captured or edited.
+  examples: []
+  source_url: https://media.defense.gov/2023/Sep/12/2003298925/-1/-1/0/CSI-DEEPFAKE-THREATS.PDF
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Voice cloning and caller ID spoofing
+  definition: Using AI to imitate a person's voice, and faking the number shown to the call recipient;
+    both were used in the 2024 Biden robocall.
+  examples: []
+  source_url: https://cyberscoop.com/fcc-fine-joe-biden-deepfake-new-hampshire-robocall-steve-kramer/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: C2PA / Content Credentials
+  definition: An open technical standard for recording where digital content came from and how it was
+    edited, shown to users as 'Content Credentials'.
+  examples: []
+  source_url: https://c2pa.org/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: EXIF metadata
+  definition: Data stored inside an image file, such as camera, date and settings, which can be read with
+    an EXIF viewer.
+  examples: []
+  source_url: https://ijnet.org/en/story/journalists-guide-verifying-images
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Reverse image search
+  definition: Searching with an image to find where else it appears online and when it first appeared,
+    for example with TinEye.
+  examples: []
+  source_url: https://ijnet.org/en/story/journalists-guide-verifying-images
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: GAN-generated image
+  definition: A picture, often a face, made by a generative adversarial network; such faces of non-existent
+    people are used for fake profiles.
+  examples: []
+  source_url: https://www.mprnews.org/story/2022/03/27/npr-fake-linkedin-profiles
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Forensic document examiner
+  definition: A specialist who tests whether a document is genuine; the Killian panel faulted CBS for
+    not getting clear authentication from one.
+  examples: []
+  source_url: https://tvtechnology.com/miscellaneous/cbs-news-violated-its-own-principles-in-bush-guard-service-story-says-panel
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Joint Investigation Team (JIT), Pakistan
+  definition: The team appointed in the Panama Papers case that concluded the Sharif trust deed was falsified
+    because of its Calibri font.
+  examples: []
+  source_url: https://www.aljazeera.com/news/2017/7/13/fontgate-maryam-nawaz-accused-of-document-forgery
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Fake reviews and testimonials
+  definition: Reviews from people who do not exist or have no real experience, including AI-generated
+    ones, banned in the U.S. by the FTC's 2024 rule.
+  examples: []
+  source_url: https://www.ftc.gov/news-events/news/press-releases/2024/08/federal-trade-commission-announces-final-rule-banning-fake-reviews-testimonials
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Research misconduct
+  definition: Fabrication, falsification or plagiarism in proposing, doing, reviewing or reporting research.
+  examples: []
+  source_url: https://ori.hhs.gov/definition-research-misconduct
+  cases: []
+  related:
+  - Fabrication
+  - Falsification
+  - Plagiarism
+  indicators: []
+  areas:
+  - IN
+- term: Fabrication
+  definition: Making up data or results and recording or reporting them.
+  examples: []
+  source_url: https://ori.hhs.gov/definition-research-misconduct
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Falsification
+  definition: Manipulating research materials, equipment or processes, or changing or leaving out data,
+    so the research is misrepresented.
+  examples: []
+  source_url: https://ori.hhs.gov/definition-research-misconduct
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Plagiarism
+  definition: Using another person's ideas, processes, results or words without giving proper credit.
+  examples: []
+  source_url: https://ori.hhs.gov/definition-research-misconduct
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Paper mill
+  definition: A business that produces fake manuscripts or sells authorship slots to researchers under
+    pressure to publish.
+  examples: []
+  source_url: https://publicationethics.org/resources/research/paper-mills-research
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Tortured phrases
+  definition: Strange substitutes for standard technical terms, a sign of paraphrasing tools used to disguise
+    copied text.
+  examples:
+  - '''counterfeit consciousness'' for ''artificial intelligence'''
+  source_url: https://arxiv.org/abs/2107.06751
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: SCIgen
+  definition: A program that randomly combines words to produce fake computer-science papers.
+  examples: []
+  source_url: https://www.nsf.no/sites/default/files/attachments/2020-11/publishers-withdraw-more-than-120-gibberish-papers.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Problematic Paper Screener
+  definition: A tool run by Cabanac and colleagues that flags papers with tortured phrases, SCIgen/Mathgen
+    text, or citations to retracted works.
+  examples: []
+  source_url: https://dbrech.irit.fr/pls/apex/f?p=9999:1
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Image duplication (Categories I–III)
+  definition: 'Bik et al.''s classes of reused images in papers: simple duplication, duplication with
+    repositioning, and duplication with alteration.'
+  examples: []
+  source_url: https://journals.asm.org/doi/10.1128/mbio.00809-16
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Peer review manipulation
+  definition: Interfering with a journal's review, for example by suggesting reviewers with email addresses
+    the author controls.
+  examples: []
+  source_url: https://publicationethics.org/guidance/flowchart/systematic-manipulation-publication-process
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Special issue / guest editor
+  definition: A themed journal issue managed by a visiting editor; COPE says such issues are particularly
+    vulnerable to manipulation.
+  examples: []
+  source_url: https://publicationethics.org/sites/default/files/addressing-batch-article-manipulation.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Batch (of manipulated articles)
+  definition: COPE's term for groups of articles that share content, style, figures, references, authors
+    or manipulation patterns.
+  examples: []
+  source_url: https://publicationethics.org/sites/default/files/addressing-batch-article-manipulation.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Retraction
+  definition: Formal withdrawal of a published paper to correct the record, not to punish authors.
+  examples: []
+  source_url: https://publicationethics.org/guidance/guideline/retraction-guidelines
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Expression of concern
+  definition: A notice an editor publishes when a paper's reliability is in doubt but a decision on retraction
+    is pending or uncertain.
+  examples: []
+  source_url: https://publicationethics.org/guidance/guideline/retraction-guidelines
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Predatory journal / publisher
+  definition: A journal or publisher that puts its own gain ahead of scholarship, marked by false information,
+    poor practice, lack of transparency or aggressive solicitation.
+  examples: []
+  source_url: https://media.nature.com/original/magazine-assets/d41586-019-03759-y/d41586-019-03759-y.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Hijacked (cloned) journal
+  definition: A fake journal website that copies a real journal to collect fees from authors.
+  examples: []
+  source_url: https://julkaisufoorumi.fi/en/news/hijacked-journals-nuisance-scientific-community
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Journal self-citation
+  definition: A journal citing its own articles; excessive levels can inflate its impact factor and lead
+    Clarivate to suppress it.
+  examples: []
+  source_url: https://clarivate.com/webofsciencegroup/wp-content/uploads/sites/2/2020/06/JCR-suppression-policy-2020.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Citation stacking
+  definition: One journal citing another heavily in the years that count toward its impact factor, distorting
+    the citation network.
+  examples: []
+  source_url: https://clarivate.com/webofsciencegroup/wp-content/uploads/sites/2/2020/06/JCR-suppression-policy-2020.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Impact factor suppression
+  definition: Clarivate withholding a journal's impact factor because its citation behaviour is an outlier;
+    Clarivate says this does not presume wrongdoing.
+  examples: []
+  source_url: https://retractionwatch.com/2024/06/27/seventeen-journals-lose-impact-factors-for-suspected-citation-manipulation
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN

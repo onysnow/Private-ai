@@ -1,0 +1,2702 @@
+key: IN
+name: Information integrity
+scope: disinformation and influence operations (DISARM framework, platform takedown reports), fake identities
+  and sock-puppet accounts, coordinated inauthentic behaviour, forged or manipulated documents and media
+  (document forensics, image verification), scientific and academic fraud (retractions, paper mills, predatory
+  journals, tortured phrases).
+indicators:
+- id: IN-001
+  name: Coordinated inauthentic behaviour network
+  definition: A group of accounts, Pages or sites that work together to mislead people about who is behind
+    them and what they want, usually with fake accounts at the centre.
+  areas:
+  - IN
+  typology: Coordinated inauthentic behaviour (CIB) / platform manipulation
+  status: verified
+  sources:
+  - title: Q4 2024 Adversarial Threat Report
+    publisher: Meta
+    year: '2025'
+    url: https://transparency.meta.com/sr/Q4-2024-Adversarial-threat-report
+    locator: Introduction / CIB definition
+    quote: coordinated efforts to manipulate public debate for a strategic goal
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Platform manipulation and spam policy
+    publisher: X Corp.
+    url: https://help.x.com/en/rules-and-policies/platform-manipulation
+    locator: Coordinated activity
+    quote: We prohibit coordinated inauthentic activity that artificially influences conversations or
+      disrupts
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Meta removed networks from Benin, Ghana and China in Q4 2024 and kept tracking the Russia-origin Doppelganger
+    operation (Meta Q4 2024 report).
+  - Facebook identified 470 IRA-controlled accounts (Mueller report Vol. I, p.15).
+  cases:
+  - name: Internet Research Agency social media campaign
+    year: '2019'
+    jurisdiction: United States
+    what_happened: The Special Counsel's report found IRA employees ran social media accounts and group
+      pages using fictitious U.S. personas; Facebook identified 470 IRA-controlled accounts and Twitter
+      3,814 IRA-associated accounts.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/sco/file/1373816/dl
+    source_title: Report on the Investigation into Russian Interference in the 2016 Presidential Election,
+      Vol. I
+  - name: Meta Q4 2024 takedowns (Benin, Ghana, China networks)
+    year: '2025'
+    jurisdiction: Benin; Ghana; China (platform enforcement)
+    what_happened: Meta reported removing small networks of Facebook and Instagram accounts, Pages and
+      Groups that it judged to be coordinated inauthentic behaviour.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://transparency.meta.com/sr/Q4-2024-Adversarial-threat-report
+    source_title: Q4 2024 Adversarial Threat Report
+  data_needed:
+  - UserAccount (username, service, owner, createdAt, email, phone, ipAddress)
+  - Person
+  - Organization
+  - LegalEntity (website)
+  - UnknownLink (between accounts)
+  - Associate
+  - Article
+  - Document (sourceUrl, publishedAt)
+  checkable: lookups
+  lookup_sources:
+  - Platform takedown reports (Meta Adversarial Threat Reports, OpenAI threat reports)
+  - Platform transparency archives
+  - Social media monitoring tools
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: CIB networks often target elections; the IRA staged U.S. political activity.
+    source_url: https://www.justice.gov/archives/sco/file/1373816/dl
+  innocent_explanations:
+  - Real activist groups and campaigns often coordinate posting times and messages openly.
+  - Fan communities and marketing teams legitimately run several brand accounts.
+  - Volunteers sharing a template message can look coordinated.
+  jurisdictions: Global (platform policy, not law)
+  version: 1
+- id: IN-002
+  name: Fictitious persona posing as a local or national of the target country
+  definition: An account presents itself as an ordinary local person or citizen of the audience's country,
+    but is run by an outside actor.
+  areas:
+  - IN
+  typology: Fake identities / sock puppets
+  status: verified
+  sources:
+  - title: Report on the Investigation into Russian Interference in the 2016 Presidential Election, Vol.
+      I
+    publisher: U.S. Department of Justice, Special Counsel's Office
+    year: '2019'
+    url: https://www.justice.gov/archives/sco/file/1373816/dl
+    locator: p.14
+    quote: Using fictitious U.S. personas, IRA employees operated social media accounts and group pages
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 34 Officers of the People's Republic of China National Police Charged
+    publisher: U.S. Attorney's Office, EDNY
+    year: '2023'
+    url: https://www.justice.gov/usao-edny/pr/34-officers-peoples-republic-china-national-police-charged-perpetrating-transnational
+    locator: Press release body
+    quote: created thousands of fake online personas on social media sites, including Twitter
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA16 Establish Legitimacy
+    quote: T0097.101 Local Persona
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Personas that 'purport to be U.S. persons' (EDNY 2023 complaint, alleged).
+  - Doppelganger profiles 'posing as U.S. (or other non-Russian) citizens' (DOJ 2024).
+  cases:
+  - name: MPS '912 Special Project Working Group'
+    year: '2023'
+    jurisdiction: United States (EDNY)
+    what_happened: A criminal complaint charged 34 PRC national police officers with running thousands
+      of fake online personas, some posing as U.S. persons. The DOJ states these are allegations and defendants
+      are presumed innocent.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-edny/pr/34-officers-peoples-republic-china-national-police-charged-perpetrating-transnational
+    source_title: 34 Officers of the PRC National Police Charged
+  - name: Internet Research Agency
+    year: '2019'
+    jurisdiction: United States
+    what_happened: Special Counsel found IRA employees operated accounts using fictitious U.S. personas.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/sco/file/1373816/dl
+    source_title: Mueller Report Vol. I
+  data_needed:
+  - UserAccount (username, country, createdAt, ipAddress, phone, email)
+  - Person (nationality, country)
+  - Address
+  - UnknownLink
+  - Associate
+  checkable: lookups
+  lookup_sources:
+  - Platform takedown reports
+  - Reverse image search
+  - Account-creation and IP metadata (only via platforms or court records)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: The 912 group personas were allegedly used to harass Chinese dissidents abroad.
+    source_url: https://www.justice.gov/usao-edny/pr/34-officers-peoples-republic-china-national-police-charged-perpetrating-transnational
+  innocent_explanations:
+  - Diaspora members and expatriates genuinely post about their home country from abroad.
+  - People use pseudonyms for safety, especially activists and abuse survivors.
+  - VPN use makes a real local user appear to be elsewhere.
+  jurisdictions: Global
+  version: 1
+- id: IN-003
+  name: AI-generated (GAN) profile photo
+  definition: An account's profile picture is a computer-generated face of a person who does not exist.
+  areas:
+  - IN
+  typology: Fake identities
+  status: verified
+  sources:
+  - title: Q4 2024 Adversarial Threat Report
+    publisher: Meta
+    year: '2025'
+    url: https://transparency.meta.com/sr/Q4-2024-Adversarial-threat-report
+    locator: Benin network
+    quote: profile photos likely generated using AI
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: That smiling LinkedIn profile face might be a computer-generated fake (NPR)
+    publisher: NPR / MPR News
+    year: '2022'
+    url: https://www.mprnews.org/story/2022/03/27/npr-fake-linkedin-profiles
+    locator: Body
+    quote: Her eyes were aligned right in the middle of the image.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA15 Establish Assets
+    quote: T0145.002 AI-Generated Account Imagery
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Eyes centred in the same spot, a single earring, hair that disappears and reappears, vague background
+    (NPR on Stanford Internet Observatory research).
+  cases:
+  - name: GAN-faced LinkedIn sales profiles
+    year: '2022'
+    jurisdiction: Global (LinkedIn)
+    what_happened: Researchers Renée DiResta and Josh Goldstein reported finding more than a thousand
+      accounts that appeared to be fake with GAN-generated images; LinkedIn removed profiles that broke
+      its rules.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.mprnews.org/story/2022/03/27/npr-fake-linkedin-profiles
+    source_title: 'NPR: That smiling LinkedIn profile face might be a computer-generated fake'
+  data_needed:
+  - UserAccount
+  - Image (contentHash)
+  - Person
+  checkable: person
+  lookup_sources:
+  - Reverse image search
+  - GAN-face detection tools
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: DISARM lists 'Romantic Suitor Persona' and 'Scam' among goals; fake faces support such personas.
+    source_url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+  innocent_explanations:
+  - Some people use avatars or AI portraits openly for privacy or style.
+  - Heavily filtered or retouched real photos can show similar artefacts.
+  - Professional headshots are often centred.
+  jurisdictions: Global
+  version: 1
+- id: IN-004
+  name: Stolen, shared or stock profile photo
+  definition: The profile picture also appears elsewhere online under another identity or as a stock image.
+  areas:
+  - IN
+  typology: Fake identities
+  status: verified
+  sources:
+  - title: '#BotSpot: Twelve Ways to Spot a Bot'
+    publisher: DFRLab (Atlantic Council)
+    year: '2017'
+    url: https://medium.com/dfrlab/botspot-twelve-ways-to-spot-a-bot-aedc7d9c110c
+    locator: 'Indicator 7: Stolen or shared photo'
+    quote: reverse search its avatar picture
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA15
+    quote: T0145.001 Copy Account Imagery
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Same avatar used by several accounts with different names (DFRLab).
+  - Default silhouette avatars on accounts that retweet in bulk (DFRLab indicator 6).
+  cases: []
+  data_needed:
+  - UserAccount
+  - Image (contentHash, sourceUrl)
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Reverse image search (TinEye, Google, Yandex)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - People use cartoons, celebrities, pets or landscapes as avatars.
+  - A real person's photo may have been stolen by someone else, making the original account look suspicious.
+  - Default avatars are common for new or inactive users.
+  jurisdictions: Global
+  version: 1
+- id: IN-005
+  name: Abnormally high posting volume
+  definition: An account posts far more often than a person plausibly could, suggesting automation.
+  areas:
+  - IN
+  typology: Bots / automation
+  status: verified
+  sources:
+  - title: '#BotSpot: Twelve Ways to Spot a Bot'
+    publisher: DFRLab (Atlantic Council)
+    year: '2017'
+    url: https://medium.com/dfrlab/botspot-twelve-ways-to-spot-a-bot-aedc7d9c110c
+    locator: 'Indicator 1: Activity'
+    quote: The most obvious indicator that an account is automated is its activity.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - DFRLab treats 72 tweets per day as suspicious and over 144 as highly suspicious; the Oxford Internet
+    Institute uses more than 50 a day.
+  cases: []
+  data_needed:
+  - UserAccount (createdAt, messagesSent)
+  - Mention
+  - Article
+  checkable: records
+  lookup_sources:
+  - Platform APIs or archives for post counts
+  levels:
+    faint: More than 50 posts a day (Oxford Internet Institute benchmark cited by DFRLab)
+    strong: 72 posts per day averaged over the account's life (DFRLab 'suspicious')
+    textbook: Over 144 posts per day (DFRLab 'highly suspicious')
+    threshold_source: https://medium.com/dfrlab/botspot-twelve-ways-to-spot-a-bot-aedc7d9c110c
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - News outlets, emergency services and weather services post automatically by design.
+  - Very active real users during breaking events.
+  - Declared bots used for scheduling or service alerts.
+  jurisdictions: Global
+  version: 1
+- id: IN-006
+  name: Anonymous account with no personal information
+  definition: The account gives little or no real detail about who runs it.
+  areas:
+  - IN
+  typology: Bots / fake identities
+  status: verified
+  sources:
+  - title: '#BotSpot: Twelve Ways to Spot a Bot'
+    publisher: DFRLab
+    year: '2017'
+    url: https://medium.com/dfrlab/botspot-twelve-ways-to-spot-a-bot-aedc7d9c110c
+    locator: 'Indicator 2: Anonymity'
+    quote: the less personal information it gives, the more likely it is to be a bot.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - No bio, generic or political-slogan bio, no location, default avatar.
+  cases: []
+  data_needed:
+  - UserAccount (name, summary, country)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many real users value privacy and post nothing personal.
+  - Whistleblowers, journalists' sources and people at risk deliberately stay anonymous.
+  jurisdictions: Global
+  version: 1
+- id: IN-007
+  name: Algorithmic handle or name mismatch
+  definition: The username is a random-looking string of letters and numbers, or does not match the display
+    name.
+  areas:
+  - IN
+  typology: Bots / fake identities
+  status: verified
+  sources:
+  - title: '#BotSpot: Twelve Ways to Spot a Bot'
+    publisher: DFRLab
+    year: '2017'
+    url: https://medium.com/dfrlab/botspot-twelve-ways-to-spot-a-bot-aedc7d9c110c
+    locator: 'Indicator 8: Bot''s in a name?'
+    quote: alphanumeric scrambles generated by an algorithm
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Display name 'Sarah Miller' with handle '@kq83hd7201'.
+  cases: []
+  data_needed:
+  - UserAccount (username, name, alias, previousName)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Platforms auto-suggest numbered handles when a name is taken.
+  - People rename display names but keep old handles.
+  jurisdictions: Global
+  version: 1
+- id: IN-008
+  name: Identical or near-identical content posted by many accounts at the same time
+  definition: Several accounts publish the same text, image or link within a short window, often copied
+    word for word.
+  areas:
+  - IN
+  typology: Coordinated inauthentic behaviour / copypasta
+  status: verified
+  sources:
+  - title: '#BotSpot: Twelve Ways to Spot a Bot'
+    publisher: DFRLab
+    year: '2017'
+    url: https://medium.com/dfrlab/botspot-twelve-ways-to-spot-a-bot-aedc7d9c110c
+    locator: 'Indicator 5: Common content'
+    quote: the same content, or type of content, at the same time.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Platform manipulation and spam policy
+    publisher: X Corp.
+    url: https://help.x.com/en/rules-and-policies/platform-manipulation
+    locator: Multiple accounts
+    quote: Operating multiple accounts that interact with the same or substantially similar content
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA06 Develop Content
+    quote: T0084.001 Use Copypasta
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Dozens of accounts posting the same sentence with the same typo within minutes.
+  cases: []
+  data_needed:
+  - UserAccount
+  - Article / Mention (publishedAt, bodyText)
+  - UnknownLink
+  checkable: records
+  lookup_sources:
+  - Platform search / social listening tools
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Campaigns and unions openly ask supporters to share a template message.
+  - Share buttons on news sites generate identical text.
+  - Memes and quotes spread organically in identical form.
+  jurisdictions: Global
+  version: 1
+- id: IN-009
+  name: Artificial amplification (high engagement from otherwise inactive accounts)
+  definition: A post gets a burst of likes or reposts mostly from accounts that rarely post anything of
+    their own, or retweet and like counts are almost the same.
+  areas:
+  - IN
+  typology: Engagement manipulation
+  status: verified
+  sources:
+  - title: '#BotSpot: Twelve Ways to Spot a Bot'
+    publisher: DFRLab
+    year: '2017'
+    url: https://medium.com/dfrlab/botspot-twelve-ways-to-spot-a-bot-aedc7d9c110c
+    locator: 'Indicator 12: Retweets and likes'
+    quote: the number of retweets and likes will be almost identical.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Platform manipulation and spam policy
+    publisher: X Corp.
+    url: https://help.x.com/en/rules-and-policies/platform-manipulation
+    locator: Engagement manipulation
+    quote: We prohibit inauthentic use of >x< engagement features to artificially impact traffic
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA17 Maximise Exposure
+    quote: T0049.003 Bots Amplify via Automated Forwarding and Reposting
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A post from a new account receives thousands of reposts from accounts with no original posts (DFRLab
+    'low posts / high results').
+  cases: []
+  data_needed:
+  - UserAccount
+  - Mention
+  - UnknownLink
+  checkable: records
+  lookup_sources:
+  - Platform engagement data / social listening tools
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: US FTC rule bars buying or selling fake indicators of social media influence for commercial
+      purposes.
+    source_url: https://www.ftc.gov/news-events/news/press-releases/2024/08/federal-trade-commission-announces-final-rule-banning-fake-reviews-testimonials
+  innocent_explanations:
+  - Lurkers who only like and share are a normal part of every platform.
+  - A celebrity share can bring a sudden surge of real engagement.
+  - Paid advertising legitimately boosts reach.
+  jurisdictions: Global
+  version: 1
+- id: IN-010
+  name: Single-use burner accounts
+  definition: An account is created, used to post one item, and abandoned almost at once.
+  areas:
+  - IN
+  typology: Fake identities / operational security of influence operations
+  status: verified
+  sources:
+  - title: Secondary Infektion (report)
+    publisher: Graphika
+    year: '2020'
+    url: https://secondaryinfektion.org/downloads/secondary-infektion-report.pdf
+    locator: Executive Summary
+    quote: it typically created, used and abandoned each account in less than an hour
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A blog or forum account that posts one 'leaked' document and never posts again.
+  cases:
+  - name: Secondary Infektion
+    year: '2020'
+    jurisdiction: Global (targeting Europe, U.S., Ukraine)
+    what_happened: Graphika reported a Russia-attributed operation that posted at least 2,500 pieces of
+      content across over 300 platforms, mostly through single-use burner accounts, active from 2014 to
+      early 2020.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://secondaryinfektion.org/downloads/secondary-infektion-report.pdf
+    source_title: Secondary Infektion report
+  data_needed:
+  - UserAccount (createdAt, modifiedAt, messagesSent)
+  - Document
+  - Article
+  checkable: records
+  lookup_sources:
+  - Web archives (Wayback Machine)
+  - Platform account histories
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Account created, used and abandoned in under an hour (pattern described by Graphika)
+    threshold_source: https://secondaryinfektion.org/downloads/secondary-infektion-report.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine whistleblowers often use throwaway accounts to protect themselves.
+  - People sign up to ask one question on a forum and never return.
+  jurisdictions: Global
+  version: 1
+- id: IN-011
+  name: Language errors inconsistent with the claimed identity
+  definition: A persona claiming to be a native speaker writes with errors typical of a non-native speaker
+    or machine translation.
+  areas:
+  - IN
+  typology: Fake identities
+  status: verified
+  sources:
+  - title: Secondary Infektion (report)
+    publisher: Graphika
+    year: '2020'
+    url: https://secondaryinfektion.org/downloads/secondary-infektion-report.pdf
+    locator: The Techniques, Range of Languages
+    quote: In all except Russian, the writing was marked by errors not characteristic of a native speaker
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA06
+    quote: T0085.008 Machine Translated Text
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A 'German pensioner' account posting German with Russian-style grammar errors.
+  cases: []
+  data_needed:
+  - UserAccount (country)
+  - Article (language, bodyText)
+  - Person (nationality)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Immigrants and second-language speakers are real people who make such errors.
+  - Dyslexia, haste or autocorrect cause errors.
+  - DFRLab notes many languages in one account can also reflect multilingual users.
+  jurisdictions: Global
+  version: 1
+- id: IN-012
+  name: Spoofed or cybersquatted news website impersonating a real outlet
+  definition: A website copies the name, design or web address of a genuine news outlet to publish content
+    the outlet never produced.
+  areas:
+  - IN
+  typology: Impersonation / Doppelganger technique
+  status: verified
+  sources:
+  - title: Justice Department Disrupts Covert Russian Government-Sponsored Foreign Malign Influence Operation
+    publisher: U.S. Department of Justice
+    year: '2024'
+    url: https://www.justice.gov/opa/pr/justice-department-disrupts-covert-russian-government-sponsored-foreign-malign-influence
+    locator: Press release body
+    quote: a method of registering a domain intended to mimic another person or company's website
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Q4 2024 Adversarial Threat Report
+    publisher: Meta
+    year: '2025'
+    url: https://transparency.meta.com/sr/Q4-2024-Adversarial-threat-report
+    locator: Doppelganger section
+    quote: websites spoofing legitimate news outlets
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA16
+    quote: T0097.202 News Outlet Persona
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Look-alike domains of major Western newspapers carrying pro-Kremlin articles (Doppelganger).
+  cases:
+  - name: Doppelganger domain seizures
+    year: '2024'
+    jurisdiction: United States
+    what_happened: DOJ announced the seizure of 32 internet domains it said were used by Russian companies
+      Social Design Agency, Structura and ANO Dialog to publish Russian government messaging falsely presented
+      as content from legitimate news media.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/justice-department-disrupts-covert-russian-government-sponsored-foreign-malign-influence
+    source_title: DOJ press release, 4 Sept 2024
+  data_needed:
+  - LegalEntity (website)
+  - Company
+  - Organization
+  - Article (publisher, sourceUrl)
+  - Ownership
+  - UnknownLink
+  checkable: lookups
+  lookup_sources:
+  - WHOIS / domain registration history
+  - Web archives
+  - DNS and hosting records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: The DOJ release names Russian companies (Social Design Agency, Structura) behind the domains;
+      check against sanctions lists.
+    source_url: https://www.justice.gov/opa/pr/justice-department-disrupts-covert-russian-government-sponsored-foreign-malign-influence
+  innocent_explanations:
+  - Satire sites openly mimic news brands.
+  - Typo domains may be parked by unrelated domain speculators.
+  - Outlets run regional or language editions on different domains.
+  jurisdictions: Global; U.S. seizure under federal law
+  version: 1
+- id: IN-013
+  name: Network of 'news' sites with no original content and automated republishing
+  definition: Many websites look like separate news outlets but only copy content from the same few sources,
+    often automatically and in bulk.
+  areas:
+  - IN
+  typology: Inauthentic news site network / content farm
+  status: verified
+  sources:
+  - title: 'Portal Kombat : un réseau structuré et coordonné de propagande prorusse'
+    publisher: SGDSN / VIGINUM (France)
+    year: '2024'
+    url: https://www.sgdsn.gouv.fr/publications/portal-kombat-un-reseau-structure-et-coordonne-de-propagande-prorusse
+    locator: Publication summary
+    quote: ne produisent aucun contenu original
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA17
+    quote: T0049.007 Inauthentic Sites Amplify News and Narratives
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - At least 193 sites relaying Russian and pro-Russian content (VIGINUM).
+  cases:
+  - name: Portal Kombat
+    year: '2024'
+    jurisdiction: France
+    what_happened: France's VIGINUM agency reported a network of at least 193 sites that produce no original
+      content, relay Russian and pro-Russian sources, and use massive automation and search-engine optimisation.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.sgdsn.gouv.fr/publications/portal-kombat-un-reseau-structure-et-coordonne-de-propagande-prorusse
+    source_title: VIGINUM, Portal Kombat
+  data_needed:
+  - LegalEntity (website)
+  - Article (publisher, sourceUrl, publishedAt)
+  - Ownership
+  - UnknownLink
+  checkable: lookups
+  lookup_sources:
+  - WHOIS / hosting and shared analytics IDs
+  - Web archives
+  - Text-similarity search
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate news aggregators republish with attribution.
+  - Wire-service copy (AP, Reuters, AFP) appears word for word on many real outlets.
+  - Local news chains share content across mastheads.
+  jurisdictions: Global
+  version: 1
+- id: IN-014
+  name: Forged or altered document leaked online
+  definition: A 'leaked' letter, memo or petition is fabricated or tampered with and released to support
+    a narrative.
+  areas:
+  - IN
+  typology: Forged documents
+  status: verified
+  sources:
+  - title: Secondary Infektion (report)
+    publisher: Graphika
+    year: '2020'
+    url: https://secondaryinfektion.org/downloads/secondary-infektion-report.pdf
+    locator: Executive Summary
+    quote: Graphika has identified more than 250 suspected forgeries, from letters to petitions, that
+      the operation launched online.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA06
+    quote: T0089.003 Alter Authentic Documents
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Fake letters attributed to officials posted by burner accounts (Secondary Infektion).
+  - DISARM T0085.004 'Develop Document'.
+  cases:
+  - name: Secondary Infektion forgeries
+    year: '2020'
+    jurisdiction: Global
+    what_happened: Graphika identified more than 250 suspected forgeries launched online by the operation.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://secondaryinfektion.org/downloads/secondary-infektion-report.pdf
+    source_title: Secondary Infektion report
+  data_needed:
+  - Document (author, authoredAt, generator, modifiedAt, fileName, contentHash, sourceUrl)
+  - Person
+  - Organization
+  checkable: person
+  lookup_sources:
+  - Forensic document examiner
+  - Comparison with authentic documents from the claimed issuer
+  - Web archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Document forgery also underpins asset-ownership disputes; the Calibri trust-deed case concerned
+      London property ownership.
+    source_url: https://www.aljazeera.com/news/2017/7/13/fontgate-maryam-nawaz-accused-of-document-forgery
+  innocent_explanations:
+  - Real leaks often look odd because they are drafts, scans or photos.
+  - Templates and letterheads change over time, so a genuine document may differ from others.
+  - Authentic documents may be reformatted when retyped by a source.
+  jurisdictions: Global
+  version: 1
+- id: IN-015
+  name: Compromised website or spoofed email used to plant fabricated content
+  definition: Attackers break into a real website or fake an official email address to publish false articles,
+    quotes or letters that appear genuine.
+  areas:
+  - IN
+  typology: Hack-and-plant / hybrid cyber-influence operation
+  status: verified
+  sources:
+  - title: '''Ghostwriter'' Influence Campaign'
+    publisher: Mandiant (Google Cloud)
+    year: '2020'
+    url: https://cloud.google.com/blog/topics/threat-intelligence/ghostwriter-influence-campaign/
+    locator: Overview
+    quote: appear to have leveraged website compromises or spoofed email accounts to disseminate fabricated
+      content
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA18
+    quote: T0123 Control Information Environment through Offensive Cyberspace Operations
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Fabricated quotes from military officials posted on hacked news sites (Ghostwriter).
+  cases:
+  - name: Ghostwriter
+    year: '2020'
+    jurisdiction: Lithuania, Latvia, Poland (targets)
+    what_happened: Mandiant reported a campaign using website compromises or spoofed emails to spread
+      falsified news articles, quotes and documents, cited by at least 14 inauthentic personas.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://cloud.google.com/blog/topics/threat-intelligence/ghostwriter-influence-campaign/
+    source_title: 'Mandiant: Ghostwriter Influence Campaign'
+  data_needed:
+  - Article (publisher, sourceUrl, publishedAt, modifiedAt)
+  - Email (sender, headers)
+  - Organization
+  - LegalEntity (website)
+  checkable: lookups
+  lookup_sources:
+  - Web archives (compare versions)
+  - Outlet's own correction notices
+  - Email header analysis
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: The technique depends on unauthorised access to websites or email.
+    source_url: https://cloud.google.com/blog/topics/threat-intelligence/ghostwriter-influence-campaign/
+  innocent_explanations:
+  - Outlets update or correct articles after publication.
+  - Content management errors can publish drafts.
+  - Email display names are routinely set by legitimate mailing services.
+  jurisdictions: Global
+  version: 1
+- id: IN-016
+  name: Fictitious grassroots group or organisation (astroturfing)
+  definition: A group presents itself as an independent citizens' movement but was created and run by
+    a hidden actor.
+  areas:
+  - IN
+  typology: Astroturfing / fake organisations
+  status: verified
+  sources:
+  - title: Mueller Report Vol. I
+    publisher: U.S. Department of Justice, Special Counsel's Office
+    year: '2019'
+    url: https://www.justice.gov/archives/sco/file/1373816/dl
+    locator: p.22
+    quote: the IRA created accounts in the names of fictitious U.S. organizations and grassroots groups
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA15
+    quote: T0092.001 Create Organisations
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Meta reported the Ghana network promoted a fictitious youth movement, 'Empowering Ghana' (Q4 2024).
+  cases:
+  - name: IRA-organised U.S. rallies
+    year: '2019'
+    jurisdiction: United States
+    what_happened: The Special Counsel found the IRA organised and promoted political rallies in the U.S.
+      while posing as U.S. grassroots activists.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/sco/file/1373816/dl
+    source_title: Mueller Report Vol. I, p.29
+  data_needed:
+  - Organization (incorporationDate, website)
+  - UserAccount
+  - Person
+  - Membership
+  - Payment
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Company / charity registry
+  - Domain registration
+  - Event listings and permit records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Hidden sponsorship of political activity can breach campaign finance and foreign agent rules.
+    source_url: https://www.justice.gov/archives/sco/file/1373816/dl
+  innocent_explanations:
+  - Many real movements are informal and unregistered.
+  - New groups often have thin online histories.
+  - Professional organisers legitimately help grassroots groups.
+  jurisdictions: Global
+  version: 1
+- id: IN-017
+  name: Commercial firm running a covert influence operation
+  definition: A marketing, PR or political consulting company is behind fake accounts or content pushed
+    on someone's behalf.
+  areas:
+  - IN
+  typology: Influence-for-hire
+  status: verified
+  sources:
+  - title: 'AI and Covert Influence Operations: Latest Trends'
+    publisher: OpenAI
+    year: '2024'
+    url: https://www.rivista.ai/wp-content/uploads/2024/06/Threat_Intel_Report.pdf
+    locator: Zero Zeno case study
+    quote: The network was operated by STOIC, a political campaign management firm in Israel.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA15
+    quote: T0096.002 Outsource Content Creation to External Organisations
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Doppelganger attributed by DOJ to Russian companies Social Design Agency and Structura.
+  cases:
+  - name: Zero Zeno / STOIC
+    year: '2024'
+    jurisdiction: Israel (operator); multiple target countries
+    what_happened: OpenAI reported that STOIC used its models to generate content for an influence operation
+      across X, Facebook, Instagram, websites and YouTube.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.rivista.ai/wp-content/uploads/2024/06/Threat_Intel_Report.pdf
+    source_title: OpenAI, AI and Covert Influence Operations (May 2024)
+  data_needed:
+  - Company
+  - Organization
+  - Employment
+  - Representation
+  - Payment
+  - Contract
+  - UserAccount
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Lobbying / foreign-agent registers
+  - Platform takedown reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Paid influence for a foreign client may require registration as a foreign agent or lobbyist.
+    source_url: https://www.justice.gov/opa/pr/justice-department-disrupts-covert-russian-government-sponsored-foreign-malign-influence
+  innocent_explanations:
+  - PR and campaign firms legitimately run disclosed advertising and branded accounts.
+  - Agencies manage clients' official accounts openly.
+  jurisdictions: Global
+  version: 1
+- id: IN-018
+  name: Concealed sponsorship, shell organisations or obscured payments behind content
+  definition: The real funder of a campaign is hidden through front organisations, cryptocurrency or obscured
+    payments.
+  areas:
+  - IN
+  typology: Concealed infrastructure
+  status: verified
+  sources:
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA11 Persist in the Information Environment
+    quote: T0130.003 Use Shell Organisations
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA11
+    quote: T0130.005 Obfuscate Payment
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - DISARM also lists T0130.001 Conceal Sponsorship and T0130.004 Use Cryptocurrency.
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Directorship
+  - Payment
+  - LegalEntity
+  - CryptoWallet
+  - UnknownLink
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Beneficial ownership register
+  - Ad libraries (Meta Ad Library, Google Ads Transparency)
+  - Blockchain explorers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Shell organisations and obscured payments are core money-laundering techniques as well as
+      influence-operation tactics (DISARM T0130).
+    source_url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+  innocent_explanations:
+  - Donors to causes may legitimately ask for anonymity where law allows.
+  - Small businesses use agencies to place ads.
+  - Cryptocurrency is used for ordinary payments.
+  jurisdictions: Global
+  version: 1
+- id: IN-019
+  name: Tell-tale artefacts of AI-generated text
+  definition: Posts or articles contain leftovers from an AI tool, such as refusal messages, leaked prompts,
+    or accounts replying to themselves with generated comments.
+  areas:
+  - IN
+  typology: AI-generated content
+  status: verified
+  sources:
+  - title: 'AI and Covert Influence Operations: Latest Trends'
+    publisher: OpenAI
+    year: '2024'
+    url: https://www.rivista.ai/wp-content/uploads/2024/06/Threat_Intel_Report.pdf
+    locator: Bad Grammar case study
+    quote: posted content that included refusal messages from our model
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA06
+    quote: T0085.001 Develop AI-Generated Text
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - IUVM website tags included a model message exposing them as AI-generated; Zero Zeno generated replies
+    to its own posts (OpenAI 2024).
+  - 'Meta: Ghana network comments ''created using GenAI'' (Q4 2024).'
+  cases:
+  - name: Bad Grammar (Telegram comment-spamming)
+    year: '2024'
+    jurisdiction: Russia (attributed); Ukraine, Moldova, Baltics, U.S. (targets)
+    what_happened: OpenAI reported a Russian actor used its models and Telegram accounts to set up a comment-spamming
+      pipeline, with some posts containing model refusal messages.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.rivista.ai/wp-content/uploads/2024/06/Threat_Intel_Report.pdf
+    source_title: OpenAI threat report, May 2024
+  data_needed:
+  - Article / Mention (bodyText)
+  - UserAccount
+  - Document (generator)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real people openly use AI to draft or translate posts.
+  - Copy-paste mistakes by genuine users.
+  - Some sites disclose AI assistance.
+  jurisdictions: Global
+  version: 1
+- id: IN-020
+  name: Synthetic (deepfake) audio or video impersonating a real person
+  definition: Audio or video made or edited with AI makes a real person appear to say or do something
+    they did not.
+  areas:
+  - IN
+  typology: Deepfakes / synthetic media
+  status: verified
+  sources:
+  - title: Contextualizing Deepfake Threats to Organizations
+    publisher: NSA, FBI, CISA
+    year: '2023'
+    url: https://media.defense.gov/2023/Sep/12/2003298925/-1/-1/0/CSI-DEEPFAKE-THREATS.PDF
+    locator: p.4
+    quote: Multimedia that have either been created (fully synthetic) or edited (partially synthetic)
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA06
+    quote: T0088.001 Develop AI-Generated Audio (Deepfakes)
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - AI voice clone of President Biden urging New Hampshire voters to 'stay away from the polls', sent
+    with spoofed caller ID (2024).
+  cases:
+  - name: FCC v. Steve Kramer (Biden voice-clone robocall)
+    year: '2024'
+    jurisdiction: United States (FCC)
+    what_happened: The FCC finalised a $6 million fine against the political consultant behind AI voice-cloned
+      robocalls using caller ID spoofing before the New Hampshire primary.
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://cyberscoop.com/fcc-fine-joe-biden-deepfake-new-hampshire-robocall-steve-kramer/
+    source_title: CyberScoop, 26 Sept 2024
+  - name: FCC – Lingo Telecom
+    year: '2024'
+    jurisdiction: United States (FCC)
+    what_happened: The FCC reached a $1 million settlement with Lingo Telecom, the provider that carried
+      the calls.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://cyberscoop.com/fcc-fine-joe-biden-deepfake-new-hampshire-robocall-steve-kramer/
+    source_title: CyberScoop, 26 Sept 2024
+  - name: State of New Hampshire v. Steven Kramer
+    year: '2025'
+    jurisdiction: New Hampshire, United States
+    what_happened: A jury acquitted Steven Kramer of 11 felony voter suppression charges and 11 candidate
+      impersonation charges, though he admitted orchestrating the message.
+    outcome: acquitted
+    outcome_verified: true
+    source_url: https://www.cbsnews.com/amp/boston/news/new-hampshire-jury-acquits-consultant-ai-robocalls-biden
+    source_title: CBS News Boston, 13 June 2025
+  data_needed:
+  - Audio / Video (contentHash, generator, authoredAt)
+  - Person
+  - Call (caller, receiver)
+  - Company
+  - Payment
+  checkable: person
+  lookup_sources:
+  - Media forensics tools / experts
+  - Telecom carrier records
+  - Content Credentials (C2PA) check
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: The Biden voice clone targeted a primary election.
+    source_url: https://cyberscoop.com/fcc-fine-joe-biden-deepfake-new-hampshire-robocall-steve-kramer/
+  - target_area: FR
+    reason: NSA/FBI/CISA warn deepfakes threaten organisations through impersonation; liveness testing
+      is advised for real-time identity verification.
+    source_url: https://media.defense.gov/2023/Sep/12/2003298925/-1/-1/0/CSI-DEEPFAKE-THREATS.PDF
+  innocent_explanations:
+  - Satire, parody and clearly labelled art.
+  - Lossy compression and poor connections create artefacts that look synthetic (NSA/FBI/CISA note compression
+    destroys forensic artefacts).
+  - Authorised synthetic voices (e.g., accessibility, dubbing).
+  jurisdictions: Global; U.S. FCC rules on robocalls
+  version: 1
+- id: IN-021
+  name: 'Cheap fake: deceptively edited or recontextualised media'
+  definition: Real photos, video or audio are cut, slowed, cropped or given a false caption so they mislead,
+    without needing AI.
+  areas:
+  - IN
+  typology: Manipulated media
+  status: verified
+  sources:
+  - title: Contextualizing Deepfake Threats to Organizations
+    publisher: NSA, FBI, CISA
+    year: '2023'
+    url: https://media.defense.gov/2023/Sep/12/2003298925/-1/-1/0/CSI-DEEPFAKE-THREATS.PDF
+    locator: p.3
+    quote: Multimedia that has been manipulated using techniques that do not involve machine/deep learning
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA06
+    quote: T0023.001 Reframe Context
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Old disaster photo recirculated as a new event; DISARM T0086.003 'Deceptively Edit Images (Cheap Fakes)'.
+  cases: []
+  data_needed:
+  - Image / Video / Audio (authoredAt, sourceUrl, contentHash)
+  - Event
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Reverse image / keyframe search
+  - Web archives
+  - Geolocation via maps and street imagery
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Honest captioning mistakes by people who reshared without checking.
+  - Routine editing for length or clarity.
+  - Archive footage used openly as illustration.
+  jurisdictions: Global
+  version: 1
+- id: IN-022
+  name: Missing, stripped or inconsistent metadata or provenance
+  definition: A file's embedded data (camera, date, software, Content Credentials) is absent, partly removed,
+    or contradicts the claimed origin.
+  areas:
+  - IN
+  typology: Media / document forensics
+  status: verified
+  sources:
+  - title: Contextualizing Deepfake Threats to Organizations
+    publisher: NSA, FBI, CISA
+    year: '2023'
+    url: https://media.defense.gov/2023/Sep/12/2003298925/-1/-1/0/CSI-DEEPFAKE-THREATS.PDF
+    locator: p.12
+    quote: Some metadata stripped indicates the media was potentially manipulated, but further investigation
+      is required.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: A journalist's guide to verifying images
+    publisher: IJNet (International Center for Journalists)
+    year: '2018'
+    url: https://ijnet.org/en/story/journalists-guide-verifying-images
+    locator: Steps list
+    quote: See what info is attached to the image in an exif (exchangeable image file format) viewer
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: C2PA home page
+    publisher: Coalition for Content Provenance and Authenticity
+    url: https://c2pa.org/
+    locator: Home page
+    quote: an open technical standard for publishers, creators and consumers to establish the origin and
+      edits of digital content
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - EXIF shows editing software and a date after the claimed event.
+  - 'NSA/FBI/CISA: ''All metadata intact is an indication of authenticity.'''
+  cases: []
+  data_needed:
+  - Document / Image (authoredAt, modifiedAt, generator, mimeType, contentHash)
+  checkable: records
+  lookup_sources:
+  - EXIF viewers
+  - Content Credentials verifier
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Social media platforms and messaging apps strip metadata on upload.
+  - Wrong camera clock settings.
+  - Sources remove metadata to protect their safety.
+  - Most genuine media carries no Content Credentials at all.
+  jurisdictions: Global
+  version: 1
+- id: IN-023
+  name: Image or video provenance mismatch (earlier copies, wrong weather, shadows or place)
+  definition: The image existed online before the claimed event, or its visible conditions do not match
+    the claimed time and place.
+  areas:
+  - IN
+  typology: Image verification
+  status: verified
+  sources:
+  - title: A journalist's guide to verifying images
+    publisher: IJNet
+    year: '2018'
+    url: https://ijnet.org/en/story/journalists-guide-verifying-images
+    locator: Steps list
+    quote: Review the uploader's history and location to see if he or she has shared credible content
+      in the past or may be 'scraping' content from others.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: A journalist's guide to verifying images
+    publisher: IJNet
+    year: '2018'
+    url: https://ijnet.org/en/story/journalists-guide-verifying-images
+    locator: Steps list
+    quote: Review the uploader's history and location to see if he or she has shared credible content
+      in the past or may be 'scraping' content from others.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Reverse image search (TinEye) finds the same photo from years earlier.
+  cases: []
+  data_needed:
+  - Image / Video (sourceUrl, authoredAt, publishedAt)
+  - UserAccount (uploader)
+  - Address
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Reverse image search
+  - Historical weather data
+  - Satellite / street-level imagery
+  - Sun-position calculators
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Local weather varies within a city.
+  - Uploaders who repost others' content may not be the originator but may still be honest.
+  - Similar-looking places and recurring events.
+  jurisdictions: Global
+  version: 1
+- id: IN-024
+  name: Physically impossible or tell-tale visual artefacts in media
+  definition: The image or video shows things that cannot happen physically, or generator glitches, such
+    as floating feet, mismatched earrings or hair that vanishes.
+  areas:
+  - IN
+  typology: Media forensics
+  status: verified
+  sources:
+  - title: Contextualizing Deepfake Threats to Organizations
+    publisher: NSA, FBI, CISA
+    year: '2023'
+    url: https://media.defense.gov/2023/Sep/12/2003298925/-1/-1/0/CSI-DEEPFAKE-THREATS.PDF
+    locator: p.12
+    quote: physical properties that would not be possible, such as feet not touching the ground
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: That smiling LinkedIn profile face might be a computer-generated fake (NPR)
+    publisher: NPR / MPR News
+    year: '2022'
+    url: https://www.mprnews.org/story/2022/03/27/npr-fake-linkedin-profiles
+    locator: Body
+    quote: Bits of her hair disappeared and then reappeared.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - NSA/FBI/CISA also list audio filters such as added noise used for obfuscation.
+  cases: []
+  data_needed:
+  - Image / Video / Audio (contentHash)
+  checkable: person
+  lookup_sources:
+  - Media forensics experts or tools
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lens distortion, motion blur and compression produce odd shapes.
+  - Beauty filters and phone 'enhancement' features alter faces.
+  jurisdictions: Global
+  version: 1
+- id: IN-025
+  name: Anachronism in a document (font, software or format not available at the claimed date)
+  definition: A document uses a typeface, technology or layout that did not exist, or was not commonly
+    available, when the document says it was made.
+  areas:
+  - IN
+  typology: Document forensics
+  status: verified
+  sources:
+  - title: '#Fontgate: Maryam Nawaz accused of document forgery'
+    publisher: Al Jazeera
+    year: '2017'
+    url: https://www.aljazeera.com/news/2017/7/13/fontgate-maryam-nawaz-accused-of-document-forgery
+    locator: Body
+    quote: were dated February 2006 and the font in which they were typed in was not released until 2007
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Avenfield reference hearing report
+    publisher: Dawn
+    year: '2018'
+    url: https://www.dawn.com/news/amp/1391118
+    locator: Body
+    quote: the trust deed was prepared in February 2006 hence it was fabricated
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Calibri font on a trust deed dated 2006 (Pakistan JIT, based on Radley Forensic Document Laboratory).
+  - Bloggers questioned a superscript 'th' and Times Roman font in the 2004 Killian memos (as reported).
+  cases:
+  - name: Panama Papers JIT – Sharif family trust deed ('Fontgate')
+    year: '2017'
+    jurisdiction: Pakistan
+    what_happened: A Supreme Court-appointed Joint Investigation Team concluded, relying on Radley Forensic
+      Document Laboratory, that trust papers naming Maryam Nawaz as trustee were falsified because they
+      used Calibri; under cross-examination in 2018 the expert conceded Calibri existed in a 2005 Windows
+      Vista beta.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.aljazeera.com/news/2017/7/13/fontgate-maryam-nawaz-accused-of-document-forgery
+    source_title: Al Jazeera 2017; Dawn 2018
+  - name: Maryam Nawaz – Avenfield reference appeal
+    year: '2022'
+    jurisdiction: Pakistan
+    what_happened: A Pakistani court quashed Maryam Nawaz's conviction in the Avenfield case.
+    outcome: acquitted
+    outcome_verified: true
+    source_url: https://www.occrp.org/en/daily/16855-pakistan-court-acquits-maryam-nawaz-of-corruption
+    source_title: 'OCCRP: Pakistan Court Acquits Maryam Nawaz of Corruption'
+  data_needed:
+  - Document (authoredAt, generator, modifiedAt, fileName)
+  - Person
+  - Ownership
+  - RealEstate
+  checkable: person
+  lookup_sources:
+  - Forensic document examiner
+  - Font and software release histories
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: The Calibri case was about ownership of London flats in a corruption reference.
+    source_url: https://www.dawn.com/news/amp/1391118
+  innocent_explanations:
+  - Pre-release, beta or bundled versions of fonts and software existed before public launch (as conceded
+    in the Calibri case).
+  - Genuine documents are often retyped or reissued later as certified copies.
+  - Older typewriters and printers had more features than commonly assumed.
+  jurisdictions: Global
+  version: 1
+- id: IN-026
+  name: Document relied on without independent authentication or chain of custody
+  definition: A key document is published or used though no qualified examiner has authenticated it and
+    its origin cannot be traced.
+  areas:
+  - IN
+  typology: Document forensics / editorial verification
+  status: verified
+  sources:
+  - title: CBS News violated its own principles in Bush guard service story, says panel
+    publisher: TV Technology
+    year: '2005'
+    url: https://tvtechnology.com/miscellaneous/cbs-news-violated-its-own-principles-in-bush-guard-service-story-says-panel
+    locator: Panel findings
+    quote: The failure to obtain clear authentication of any of the Killian documents from any document
+      examiner
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Claim that 'an expert had authenticated' documents when none had (Killian panel).
+  cases:
+  - name: CBS 'Killian documents' (Thornburgh–Boccardi panel)
+    year: '2005'
+    jurisdiction: United States
+    what_happened: An independent panel led by Dick Thornburgh and Louis Boccardi found CBS failed to
+      obtain clear authentication of the Killian documents from any document examiner; it did not decide
+      whether the documents were genuine or fake.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://tvtechnology.com/miscellaneous/cbs-news-violated-its-own-principles-in-bush-guard-service-story-says-panel
+    source_title: TV Technology report on the panel
+  data_needed:
+  - Document (author, authoredAt, sourceUrl)
+  - Person (source)
+  - Representation
+  checkable: person
+  lookup_sources:
+  - Forensic document examiner
+  - Original issuing body's archive
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Photocopies and faxes often cannot be authenticated even when genuine.
+  - Sources protecting themselves may not reveal the chain of custody.
+  jurisdictions: Global
+  version: 1
+- id: IN-027
+  name: Fake experts or journalist personas used as sources
+  definition: Invented 'analysts', 'experts' or 'journalists' write or are quoted to give false content
+    credibility.
+  areas:
+  - IN
+  typology: Narrative laundering
+  status: verified
+  sources:
+  - title: '''Ghostwriter'' Influence Campaign'
+    publisher: Mandiant (Google Cloud)
+    year: '2020'
+    url: https://cloud.google.com/blog/topics/threat-intelligence/ghostwriter-influence-campaign/
+    locator: Overview
+    quote: at least 14 inauthentic personas posing as locals, journalists and analysts within those countries
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA08 Conduct Pump Priming
+    quote: T0045 Use Fake Experts
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'Meta: Ghana network used fictitious journalists and activists (Q4 2024).'
+  cases: []
+  data_needed:
+  - Person
+  - UserAccount
+  - Article (author, publisher)
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - Press association and employer directories
+  - Byline search
+  - Reverse image search of author photos
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Freelancers and new writers have thin bylines.
+  - Writers use pen names, sometimes for safety.
+  jurisdictions: Global
+  version: 1
+- id: IN-028
+  name: Fake reviews or purchased social-proof indicators
+  definition: Reviews, testimonials, followers or views are invented, bought, or written by insiders without
+    disclosure.
+  areas:
+  - IN
+  typology: Fake reviews / engagement fraud
+  status: verified
+  sources:
+  - title: FTC Announces Final Rule Banning Fake Reviews and Testimonials
+    publisher: U.S. Federal Trade Commission
+    year: '2024'
+    url: https://www.ftc.gov/news-events/news/press-releases/2024/08/federal-trade-commission-announces-final-rule-banning-fake-reviews-testimonials
+    locator: Rule summary
+    quote: selling or buying fake indicators of social media influence
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: DISARM Red Framework
+    publisher: DISARM Foundation
+    url: https://github.com/DISARMFoundation/DISARMframeworks/blob/main/generated_pages/disarm_red_framework.md
+    locator: TA07
+    quote: T0109 Consumer Review Networks
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - AI-generated reviews from people who do not exist; insider reviews without disclosure; company-controlled
+    'independent' review sites (FTC).
+  cases: []
+  data_needed:
+  - UserAccount
+  - Person
+  - Company
+  - Payment
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - Review platform histories
+  - Company registry (to link review sites to sellers)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: The FTC treats fake reviews as an unfair or deceptive practice.
+    source_url: https://www.ftc.gov/news-events/news/press-releases/2024/08/federal-trade-commission-announces-final-rule-banning-fake-reviews-testimonials
+  innocent_explanations:
+  - Genuine bursts of reviews after a launch or promotion.
+  - Disclosed incentivised reviews are allowed.
+  - Employees may review products if they disclose the connection.
+  jurisdictions: United States (FTC rule, effective after Aug 2024); platform policies globally
+  version: 1
+- id: IN-029
+  name: Tortured phrases in a scientific paper
+  definition: Established technical terms are replaced by odd synonyms, a sign that text was run through
+    a paraphrasing tool to hide copying.
+  areas:
+  - FR
+  - IN
+  typology: Paper mills / plagiarism disguise
+  status: verified
+  sources:
+  - title: 'Tortured phrases: A dubious writing style emerging in science'
+    publisher: arXiv (Cabanac, Labbé, Magazinov)
+    year: '2021'
+    url: https://arxiv.org/abs/2107.06751
+    locator: Abstract
+    quote: unexpected weird phrases in lieu of established ones
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Problematic Paper Screener
+    publisher: IRIT / Cabanac et al.
+    url: https://dbrech.irit.fr/pls/apex/f?p=9999:1
+    locator: Detectors list
+    quote: weirdly paraphrased versions of scientific terms
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - '''counterfeit consciousness'' for ''artificial intelligence'' (Cabanac et al. 2021).'
+  cases: []
+  data_needed:
+  - Document (title, author, publisher, publishedAt, bodyText)
+  - Person (author)
+  - Organization (journal)
+  checkable: records
+  lookup_sources:
+  - Problematic Paper Screener
+  - PubPeer
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Non-native authors may choose unusual synonyms honestly.
+  - Translation tools produce odd phrasing.
+  - Some fields use rare but legitimate variants of terms.
+  jurisdictions: Global
+  version: 1
+- id: IN-030
+  name: Computer-generated nonsense paper (SCIgen, Mathgen)
+  definition: A paper was produced by software that strings together scientific-sounding words with no
+    real content.
+  areas:
+  - FR
+  - IN
+  typology: Fake papers
+  status: verified
+  sources:
+  - title: Publishers withdraw more than 120 gibberish papers
+    publisher: Nature (Richard Van Noorden)
+    year: '2014'
+    url: https://www.nsf.no/sites/default/files/attachments/2020-11/publishers-withdraw-more-than-120-gibberish-papers.pdf
+    locator: News article
+    quote: which randomly combines strings of words to produce fake computer-science papers
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Labbé's method 'involves searching for characteristic vocabulary generated by SCIgen'.
+  cases:
+  - name: Springer and IEEE SCIgen withdrawals
+    year: '2014'
+    jurisdiction: Global
+    what_happened: Springer (16 papers) and IEEE (more than 100) removed more than 120 conference papers
+      identified by Cyril Labbé as computer-generated.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.nsf.no/sites/default/files/attachments/2020-11/publishers-withdraw-more-than-120-gibberish-papers.pdf
+    source_title: Nature, 24 Feb 2014
+  data_needed:
+  - Document
+  - Person (author)
+  - Organization (publisher, conference)
+  checkable: records
+  lookup_sources:
+  - Problematic Paper Screener (SCIgen/Mathgen detectors)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Deliberate hoax papers submitted to test journals' review (sting operations).
+  - Author names may be used without consent.
+  jurisdictions: Global
+  version: 1
+- id: IN-031
+  name: Inappropriate image duplication in a research paper
+  definition: The same image or part of an image appears more than once to represent different experiments,
+    sometimes shifted, rotated or altered.
+  areas:
+  - FR
+  - IN
+  typology: Image manipulation / falsification
+  status: verified
+  sources:
+  - title: The Prevalence of Inappropriate Image Duplication in Biomedical Research Publications
+    publisher: mBio (Bik, Casadevall, Fang)
+    year: '2016'
+    url: https://journals.asm.org/doi/10.1128/mbio.00809-16
+    locator: Results
+    quote: Overall, 3.8% of published papers contained problematic figures
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: JCB editorial policies (image integrity)
+    publisher: Journal of Cell Biology / Rockefeller University Press
+    url: https://rupress.org/jcb/pages/editorial-policies
+    locator: Image screening
+    quote: any reuse of images, including control data, across multiple figures should be explicitly stated
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Category I simple duplication (29.4%), Category II duplication with repositioning (45.5%), Category
+    III duplication with alteration (25.1%) of 782 problematic papers (Bik et al. 2016).
+  cases:
+  - name: Marc Tessier-Lavigne (Stanford Board scientific panel)
+    year: '2023'
+    jurisdiction: United States
+    what_happened: A panel found repeated instances of manipulation of research data and/or subpar practices
+      in papers from his labs, but no evidence he personally manipulated data; he was expected to retract
+      or correct at least five papers.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://stanforddaily.com/2023/07/19/stanford-president-resigns-over-manipulated-research-will-retract-at-least-3-papers/
+    source_title: Stanford Daily, 19 July 2023
+  - name: Hwang Woo-suk (Seoul National University panel)
+    year: not stated in source (before 2009 trial)
+    jurisdiction: South Korea
+    what_happened: SNU's investigating panel concluded that the data and images in both of Hwang's Science
+      papers had been fabricated; Science retracted both.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.the-scientist.com/hwang-convictions-upheld-37889
+    source_title: 'The Scientist: Hwang Convictions Upheld'
+  - name: Hwang Woo-suk criminal case
+    year: 2009 (trial); upheld by Supreme Court
+    jurisdiction: South Korea
+    what_happened: Hwang was convicted of embezzlement and bioethics violations; he was acquitted of fraud,
+      and the Supreme Court upheld both outcomes.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.the-scientist.com/hwang-convictions-upheld-37889
+    source_title: 'The Scientist: Hwang Convictions Upheld'
+  data_needed:
+  - Document (contentHash of figures)
+  - Image
+  - Person (author)
+  - Organization (institution)
+  checkable: person
+  lookup_sources:
+  - PubPeer
+  - Image-duplication detection tools
+  - Retraction Watch Database
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Honest figure-assembly mistakes (Bik et al. treat Category I as possibly error).
+  - Reuse of the same control image disclosed in the legend is acceptable.
+  - Similar-looking cells or blots that are actually different.
+  jurisdictions: Global
+  version: 1
+- id: IN-032
+  name: Selective or undisclosed image editing in research figures
+  definition: A specific feature in a research image was enhanced, hidden, moved, removed or added, or
+    parts of different images were joined without marking.
+  areas:
+  - FR
+  - IN
+  typology: Falsification
+  status: verified
+  sources:
+  - title: JCB editorial policies (image integrity)
+    publisher: Journal of Cell Biology
+    url: https://rupress.org/jcb/pages/editorial-policies
+    locator: Image screening
+    quote: whether any specific feature within an image has been enhanced, obscured, moved, removed, or
+      introduced
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Definition of Research Misconduct
+    publisher: U.S. Office of Research Integrity (HHS)
+    url: https://ori.hhs.gov/definition-research-misconduct
+    locator: Falsification
+    quote: Falsification is manipulating research materials, equipment, or processes, or changing or omitting
+      data or results
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Unmarked splice lines between lanes from different parts of a gel; contrast applied to only part of
+    an image (JCB).
+  cases: []
+  data_needed:
+  - Document
+  - Image (contentHash, generator, modifiedAt)
+  - Person
+  checkable: person
+  lookup_sources:
+  - Raw image files from authors
+  - Image forensics tools
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Whole-image brightness or contrast adjustments are acceptable under JCB rules.
+  - Lack of training in figure preparation.
+  - Journal production staff can introduce artefacts.
+  jurisdictions: Global; U.S. federally funded research under 42 CFR Part 93
+  version: 1
+- id: IN-033
+  name: 'Paper mill red flags: non-institutional email, no international co-author, hospital affiliation'
+  definition: A biomedical paper's corresponding author uses a private email, has no international co-authors,
+    and/or a hospital affiliation, a combination linked to fake papers.
+  areas:
+  - FR
+  - IN
+  typology: Paper mills
+  status: verified
+  sources:
+  - title: 'Fake Publications in Biomedical Science: Red-flagging Method Indicates Mass Production'
+    publisher: medRxiv (Sabel, Knaack, Gigerenzer, Bilc)
+    year: '2023'
+    url: https://medrxiv.org/content/10.1101/2023.05.06.23289563v2
+    locator: Abstract
+    quote: non-institutional email AND no international authors
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Fake Publications in Biomedical Science (v2)
+    publisher: medRxiv
+    year: '2023'
+    url: https://medrxiv.org/content/10.1101/2023.05.06.23289563v2
+    locator: Abstract
+    quote: sensitivity of RFP identification was 86%
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The authors estimated a red-flagged-publication rate of 11.0% in 2020 (about 150,000 papers).
+  cases: []
+  data_needed:
+  - Document
+  - Person (author)
+  - Email
+  - Organization (affiliation)
+  - Employment
+  - Address (country)
+  checkable: records
+  lookup_sources:
+  - PubMed / bibliographic databases
+  - Institutional email domain checks
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the red-flag rule as worded; the authors report 86% sensitivity and a 44% false-alarm
+      rate, so this is a screening flag, not proof
+    threshold_source: https://medrxiv.org/content/10.1101/2023.05.06.23289563v2
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many genuine clinicians use private email because hospital systems are unreliable.
+  - Most honest research has no international co-author.
+  - Preprint, not peer reviewed; a 44% false-alarm rate means many flagged papers are genuine.
+  jurisdictions: Global
+  version: 1
+- id: IN-034
+  name: Batch similarity across supposedly unrelated papers
+  definition: Papers from different author groups share the same style, layout, figures, references or
+    data labelling, suggesting one producer.
+  areas:
+  - FR
+  - IN
+  typology: Paper mills / systematic manipulation
+  status: verified
+  sources:
+  - title: 'COPE Supplemental guidance: Addressing concerns about systematic manipulation of the publication
+      process'
+    publisher: Committee on Publication Ethics
+    year: '2023'
+    url: https://publicationethics.org/sites/default/files/addressing-batch-article-manipulation.pdf
+    locator: Definition of 'batch'
+    quote: articles with similar content, such as the same language style, formatting, illustrations,
+      references, or authors
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Physics publisher retracting nearly 500 likely paper mill papers
+    publisher: Retraction Watch
+    year: '2022'
+    url: https://retractionwatch.com/2022/09/09/physics-publisher-retracting-nearly-500-likely-paper-mill-papers/
+    locator: Body
+    quote: a network of content being created by one source, despite multiple different authors being
+      listed on the papers
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'COPE: data files from different authors ''may look very similar in terms of labelling, formatting,
+    or content''.'
+  cases:
+  - name: IOP Publishing mass retraction
+    year: '2022'
+    jurisdiction: United Kingdom (publisher)
+    what_happened: IOP Publishing retracted 494 papers after a whistleblower noticed similarities and
+      its investigation found content created by one source despite different author lists.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://retractionwatch.com/2022/09/09/physics-publisher-retracting-nearly-500-likely-paper-mill-papers/
+    source_title: Retraction Watch, 9 Sept 2022
+  data_needed:
+  - Document (contentHash, generator, author)
+  - Person
+  - Organization
+  - UnknownLink
+  checkable: records
+  lookup_sources:
+  - Text and image similarity tools
+  - STM Integrity Hub (publisher-only)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Journal templates force similar formatting.
+  - Research groups reuse their own methods text and figure styles.
+  - Commercial editing services legitimately polish many papers.
+  jurisdictions: Global
+  version: 1
+- id: IN-035
+  name: Manipulated peer review (fake reviewer accounts, unusually fast reviews)
+  definition: Authors suggest reviewers whose email addresses they control, or reviews come back suspiciously
+    fast and alike.
+  areas:
+  - FR
+  - IN
+  typology: Peer review manipulation
+  status: verified
+  sources:
+  - title: Systematic manipulation of the publication process (flowchart)
+    publisher: Committee on Publication Ethics
+    url: https://publicationethics.org/guidance/flowchart/systematic-manipulation-publication-process
+    locator: Peer review
+    quote: rapid reviews or similar reports
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Korean plant compound researcher faked email addresses so he could review his own studies
+    publisher: Retraction Watch
+    year: '2012'
+    url: https://retractionwatch.com/2012/08/24/korean-plant-compound-researcher-faked-email-addresses-so-he-could-review-his-own-studies/
+    locator: Body
+    quote: almost all of the peer review comments were coming back in less than 24 hours
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Hindawi flagged 'plagiarized peer-review reports, and suspect peer review turn-around times' (Retraction
+    Watch 2023).
+  cases:
+  - name: Hyung-In Moon fake peer reviews
+    year: '2012'
+    jurisdiction: South Korea (author); international journals
+    what_happened: The editor of Enzyme Inhibition and Medicinal Chemistry noticed reviews returning in
+      under 24 hours; per the publisher, Moon suggested reviewers who were himself or colleagues under
+      bogus identities, and he admitted it; papers were retracted.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://retractionwatch.com/2012/08/24/korean-plant-compound-researcher-faked-email-addresses-so-he-could-review-his-own-studies/
+    source_title: Retraction Watch, 24 Aug 2012
+  data_needed:
+  - Person (author, reviewer)
+  - Email
+  - UserAccount
+  - Document (review reports, timestamps)
+  checkable: records
+  lookup_sources:
+  - Journal submission-system records
+  - Institutional email directories
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some reviewers are genuinely fast.
+  - Reviewers often use personal email addresses.
+  - Short reviews of strong papers can look similar.
+  jurisdictions: Global
+  version: 1
+- id: IN-036
+  name: Special issue or guest-editor content outside the journal's scope
+  definition: A themed or guest-edited issue contains papers unrelated to the journal's field or to the
+    issue topic.
+  areas:
+  - FR
+  - IN
+  typology: Paper mills / special-issue manipulation
+  status: verified
+  sources:
+  - title: Hindawi reveals process for retracting more than 8,000 paper mill articles
+    publisher: Retraction Watch (quoting Hindawi whitepaper)
+    year: '2023'
+    url: https://retractionwatch.com/2023/12/19/hindawi-reveals-process-for-retracting-more-than-8000-paper-mill-articles
+    locator: Indicators list
+    quote: Discrepancies in scope.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: COPE Supplemental guidance (2023)
+    publisher: Committee on Publication Ethics
+    year: '2023'
+    url: https://publicationethics.org/sites/default/files/addressing-batch-article-manipulation.pdf
+    locator: Higher-risk contexts
+    quote: themed or special issues that are managed by a guest editor are particularly vulnerable
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Hindawi banned several hundred guest editors after its investigation.
+  cases:
+  - name: Hindawi / Wiley special-issue retractions
+    year: '2023'
+    jurisdiction: Global (publisher)
+    what_happened: Hindawi retracted over 8,000 articles in 2023 using indicators including scope discrepancies,
+      inappropriate citations and compromised peer review, and banned several hundred guest editors.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://retractionwatch.com/2023/12/19/hindawi-reveals-process-for-retracting-more-than-8000-paper-mill-articles
+    source_title: Retraction Watch, 19 Dec 2023
+  data_needed:
+  - Document
+  - Person (guest editor, author)
+  - Organization (journal)
+  - Membership
+  checkable: records
+  lookup_sources:
+  - Journal special-issue listings
+  - Retraction Watch Database
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Interdisciplinary issues legitimately span fields.
+  - Journal scope statements are often broad or out of date.
+  jurisdictions: Global
+  version: 1
+- id: IN-037
+  name: Inappropriate or irrelevant citations (citation manipulation)
+  definition: A paper cites works that are unrelated to its topic, often to boost particular authors or
+    journals.
+  areas:
+  - FR
+  - IN
+  typology: Citation manipulation
+  status: verified
+  sources:
+  - title: Hindawi reveals process for retracting more than 8,000 paper mill articles
+    publisher: Retraction Watch (quoting Hindawi whitepaper)
+    year: '2023'
+    url: https://retractionwatch.com/2023/12/19/hindawi-reveals-process-for-retracting-more-than-8000-paper-mill-articles
+    locator: Indicators list
+    quote: Inappropriate citations.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Fake Publications in Biomedical Science (v2)
+    publisher: medRxiv
+    year: '2023'
+    url: https://medrxiv.org/content/10.1101/2023.05.06.23289563v2
+    locator: Abstract
+    quote: email+hospital+RFP-citations
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'Hijacked journals: articles with an exceptionally large number of citations to the same journal (Julkaisufoorumi).'
+  cases: []
+  data_needed:
+  - Document (references)
+  - Person
+  - Organization (journal)
+  - UnknownLink
+  checkable: records
+  lookup_sources:
+  - Citation databases (Crossref, OpenAlex, Web of Science)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Reviewers sometimes legitimately ask authors to cite relevant work.
+  - Small fields cite the same few groups heavily.
+  jurisdictions: Global
+  version: 1
+- id: IN-038
+  name: Journal self-citation or citation stacking anomaly
+  definition: A journal's impact factor is propped up by unusually high self-citation or by another journal
+    citing it heavily in the counting years.
+  areas:
+  - FR
+  - IN
+  typology: Citation manipulation
+  status: verified
+  sources:
+  - title: JCR suppression policy 2020
+    publisher: Clarivate
+    year: '2020'
+    url: https://clarivate.com/webofsciencegroup/wp-content/uploads/sites/2/2020/06/JCR-suppression-policy-2020.pdf
+    locator: Policy text
+    quote: Journal self-citation and citation stacking have the potential to distort the citation network
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: JCR suppression policy 2020
+    publisher: Clarivate
+    year: '2020'
+    url: https://clarivate.com/webofsciencegroup/wp-content/uploads/sites/2/2020/06/JCR-suppression-policy-2020.pdf
+    locator: Criteria
+    quote: Suppressed journals represent outliers in citation behavior and exceed normal ranges within
+      their category.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'Clarivate data points: donor as % of recipient''s JIF numerator citations; % self-citations in-bound
+    and out-bound.'
+  cases:
+  - name: Clarivate 2024 impact-factor suppressions
+    year: '2024'
+    jurisdiction: Global
+    what_happened: Clarivate suppressed impact factors for 17 journals for anomalous citation behaviour,
+      while stating it does not presume motive or accuse the journals of wrongdoing.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://retractionwatch.com/2024/06/27/seventeen-journals-lose-impact-factors-for-suspected-citation-manipulation
+    source_title: Retraction Watch, 27 June 2024
+  data_needed:
+  - Organization (journal)
+  - Document (references)
+  - UnknownLink
+  checkable: lookups
+  lookup_sources:
+  - Journal Citation Reports
+  - Citation databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Journal suppressed by Clarivate as an outlier exceeding normal ranges in its category (no
+      numeric cut-off published)
+    threshold_source: https://clarivate.com/webofsciencegroup/wp-content/uploads/sites/2/2020/06/JCR-suppression-policy-2020.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clarivate excludes new journals because their citations naturally concentrate in recent years.
+  - Niche journals are naturally the main venue citing themselves.
+  - Clarivate itself says it does not presume motive.
+  jurisdictions: Global
+  version: 1
+- id: IN-039
+  name: Authorship changes or manuscript substitution after acceptance
+  definition: Authors are added, removed or swapped late, or a different weaker manuscript replaces the
+    accepted one, a sign of sold authorship slots.
+  areas:
+  - FR
+  - IN
+  typology: Paper mills / authorship for sale
+  status: verified
+  sources:
+  - title: Systematic manipulation of the publication process (flowchart)
+    publisher: Committee on Publication Ethics
+    url: https://publicationethics.org/guidance/flowchart/systematic-manipulation-publication-process
+    locator: Manipulation methods
+    quote: replacing the name during revision or after editorial acceptance
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Paper mills research
+    publisher: COPE & STM
+    year: '2022'
+    url: https://publicationethics.org/resources/research/paper-mills-research
+    locator: Key points
+    quote: Paper mills produce fake manuscripts for researchers to easily publish or buy authorship
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'COPE: ''a similar, but poorer quality manuscript (the authors'' own manuscript) is substituted after
+    editorial acceptance.'''
+  cases: []
+  data_needed:
+  - Document (versions, modifiedAt)
+  - Person (author)
+  - Payment
+  - Email
+  checkable: records
+  lookup_sources:
+  - Journal submission-system history
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Authorship sold for money is a commercial fraud; COPE/STM describe researchers buying authorship.
+    source_url: https://publicationethics.org/resources/research/paper-mills-research
+  innocent_explanations:
+  - Legitimate authorship corrections after contributions are re-assessed.
+  - Researchers change institutions and update affiliations.
+  jurisdictions: Global
+  version: 1
+- id: IN-040
+  name: Falsified email addresses or fabricated affiliations on submissions
+  definition: The contact emails or institutional affiliations given with a paper are fake or not controlled
+    by the named people.
+  areas:
+  - FR
+  - IN
+  typology: Paper mills / fake identities
+  status: verified
+  sources:
+  - title: COPE Supplemental guidance (2023)
+    publisher: Committee on Publication Ethics
+    year: '2023'
+    url: https://publicationethics.org/sites/default/files/addressing-batch-article-manipulation.pdf
+    locator: Email and affiliations
+    quote: Email addresses provided with submissions may be falsified or registered to users
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: COPE Supplemental guidance (2023)
+    publisher: Committee on Publication Ethics
+    year: '2023'
+    url: https://publicationethics.org/sites/default/files/addressing-batch-article-manipulation.pdf
+    locator: Email and affiliations
+    quote: Affiliations may also be fabricated
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'COPE flowchart: ''multiple submissions or unusual emails''.'
+  cases: []
+  data_needed:
+  - Email
+  - Person
+  - Organization
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - Institutional staff directories
+  - ORCID
+  - Email domain checks
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Researchers move institutions and keep old affiliations on papers.
+  - Private email is common where institutional email is poor.
+  jurisdictions: Global
+  version: 1
+- id: IN-041
+  name: Data availability does not match the research described
+  definition: A paper claims data or methods that are not available, or the data supplied could not have
+    produced the reported results.
+  areas:
+  - FR
+  - IN
+  typology: Fabrication / paper mills
+  status: verified
+  sources:
+  - title: Hindawi reveals process for retracting more than 8,000 paper mill articles
+    publisher: Retraction Watch (quoting Hindawi whitepaper)
+    year: '2023'
+    url: https://retractionwatch.com/2023/12/19/hindawi-reveals-process-for-retracting-more-than-8000-paper-mill-articles
+    locator: Indicators list
+    quote: Discrepancies between the availability of data and the research described.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Definition of Research Misconduct
+    publisher: U.S. Office of Research Integrity
+    url: https://ori.hhs.gov/definition-research-misconduct
+    locator: Fabrication
+    quote: Fabrication is making up data or results and recording or reporting them.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Hindawi also listed 'Incoherent, meaningless, and/or irrelevant content included in the article.'
+  cases:
+  - name: Diederik Stapel (Levelt, Noort and Drenth committees)
+    year: '2012'
+    jurisdiction: Netherlands
+    what_happened: The three committees' joint final report found Stapel committed fraud with certainty
+      in 55 publications, with indications of fraud in eleven older ones, and ten PhD theses affected.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.rug.nl/news/2012/11/171-stapel
+    source_title: University of Groningen news, 28 Nov 2012
+  data_needed:
+  - Document
+  - Person
+  - Organization (institution, funder)
+  checkable: person
+  lookup_sources:
+  - Data repositories
+  - Trial registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Privacy or consent rules can stop data sharing.
+  - Data lost through staff moves or old storage.
+  - '''Data available on request'' is a common, if weak, practice.'
+  jurisdictions: Global
+  version: 1
+- id: IN-042
+  name: 'Predatory journal: false or misleading claims'
+  definition: A journal or publisher misstates its peer review, impact factor, indexing or editorial board
+    to attract paying authors.
+  areas:
+  - FR
+  - IN
+  typology: Predatory publishing
+  status: verified
+  sources:
+  - title: 'Predatory journals: no definition, no defence'
+    publisher: Nature (Grudniewicz, Moher, Cobey et al.)
+    year: '2019'
+    url: https://media.nature.com/original/magazine-assets/d41586-019-03759-y/d41586-019-03759-y.pdf
+    locator: Consensus definition
+    quote: Predatory journals and publishers are entities that prioritize self-interest at the expense
+      of scholarship
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FTC v. OMICS Group Inc.
+    publisher: U.S. Federal Trade Commission
+    url: https://www.ftc.gov/enforcement/cases-proceedings/152-3113/federal-trade-commission-v-omics-group-inc
+    locator: Case summary
+    quote: deceptively claimed the journals provided authors with rigorous peer review
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Fake impact factors, false indexing claims, misleading peer-review claims (Grudniewicz et al.).
+  cases:
+  - name: FTC v. OMICS Group (Srinubabu Gedela)
+    year: '2019'
+    jurisdiction: United States (D. Nev.)
+    what_happened: In an FTC case alleging false claims of peer review and prominent editorial boards
+      and hidden fees, the court granted summary judgment on 3 April 2019 and ordered Gedela and his companies
+      to pay more than $50.1 million.
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.ftc.gov/enforcement/cases-proceedings/152-3113/federal-trade-commission-v-omics-group-inc
+    source_title: 'FTC case page: FTC v. OMICS Group Inc.'
+  data_needed:
+  - Organization (journal, publisher)
+  - Company
+  - Person (editors)
+  - Membership
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Journal Citation Reports (check impact factor)
+  - DOAJ and indexing databases
+  - Editors' own institutional pages
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: The FTC pursued OMICS as deceptive practices against paying authors.
+    source_url: https://www.ftc.gov/enforcement/cases-proceedings/152-3113/federal-trade-commission-v-omics-group-inc
+  innocent_explanations:
+  - New legitimate journals cannot yet have impact factors or indexing.
+  - Small society journals may have outdated websites.
+  - Editorial board pages lag behind changes.
+  jurisdictions: Global; U.S. FTC Act
+  version: 1
+- id: IN-043
+  name: 'Predatory journal: lack of transparency (hidden fees, contacts, editorial board)'
+  definition: The journal hides its fees, contact details or who its editors are.
+  areas:
+  - FR
+  - IN
+  typology: Predatory publishing
+  status: verified
+  sources:
+  - title: 'Predatory journals: no definition, no defence'
+    publisher: Nature (Grudniewicz et al.)
+    year: '2019'
+    url: https://media.nature.com/original/magazine-assets/d41586-019-03759-y/d41586-019-03759-y.pdf
+    locator: Consensus definition
+    quote: a lack of transparency, and/or the use of aggressive and indiscriminate solicitation practices.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FTC v. OMICS Group Inc.
+    publisher: U.S. Federal Trade Commission
+    url: https://www.ftc.gov/enforcement/cases-proceedings/152-3113/federal-trade-commission-v-omics-group-inc
+    locator: Case summary
+    quote: hid steep publication fees
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Article processing charges disclosed only after acceptance; no verifiable editorial board members.
+  cases: []
+  data_needed:
+  - Organization
+  - Address
+  - Person
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Journal website
+  - Company registry
+  - Editors' institutional pages
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Poorly maintained websites of small legitimate journals.
+  - Fee waivers make fee pages complex.
+  jurisdictions: Global
+  version: 1
+- id: IN-044
+  name: 'Predatory journal: aggressive and indiscriminate solicitation'
+  definition: Repeated flattering emails invite researchers to submit or join boards, often outside their
+    field.
+  areas:
+  - FR
+  - IN
+  typology: Predatory publishing
+  status: verified
+  sources:
+  - title: 'Predatory journals: no definition, no defence'
+    publisher: Nature (Grudniewicz et al.)
+    year: '2019'
+    url: https://media.nature.com/original/magazine-assets/d41586-019-03759-y/d41586-019-03759-y.pdf
+    locator: Consensus definition
+    quote: a lack of transparency, and/or the use of aggressive and indiscriminate solicitation practices.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Invitations to a cardiologist to submit to an engineering journal.
+  cases: []
+  data_needed:
+  - Email
+  - Organization
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate journals and conferences also send calls for papers.
+  - Special issues are advertised widely.
+  jurisdictions: Global
+  version: 1
+- id: IN-045
+  name: Hijacked (cloned) journal website
+  definition: A fake website copies a real journal's name and look to take submission fees.
+  areas:
+  - FR
+  - IN
+  typology: Hijacked journals
+  status: verified
+  sources:
+  - title: Hijacked journals as a nuisance to the scientific community
+    publisher: Publication Forum (Julkaisufoorumi), Finland
+    url: https://julkaisufoorumi.fi/en/news/hijacked-journals-nuisance-scientific-community
+    locator: Definition and features
+    quote: publication channels whose operation is based on copying a website of an existing journal
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Hijacked journals as a nuisance to the scientific community
+    publisher: Publication Forum (Julkaisufoorumi)
+    url: https://julkaisufoorumi.fi/en/news/hijacked-journals-nuisance-scientific-community
+    locator: Features list
+    quote: Journal articles do not correspond to the original journal's discipline.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Editorial board affiliations missing; contact only by web form or email; many citations to the same
+    journal.
+  cases: []
+  data_needed:
+  - Organization (journal)
+  - LegalEntity (website)
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Retraction Watch Hijacked Journal Checker
+  - ISSN Portal
+  - WHOIS
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Journals legitimately move to new publishers and domains.
+  - Several unrelated journals can share similar names.
+  jurisdictions: Global
+  version: 1
+- id: IN-046
+  name: Paper cites retracted or flagged references
+  definition: A paper's bibliography relies on works that have been retracted, carry an expression of
+    concern, or were flagged as problematic.
+  areas:
+  - FR
+  - IN
+  typology: Literature contamination
+  status: verified
+  sources:
+  - title: Problematic Paper Screener
+    publisher: IRIT / Cabanac et al.
+    url: https://dbrech.irit.fr/pls/apex/f?p=9999:1
+    locator: Annulled / Concerning detectors
+    quote: References marked with expressions of concern
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Retraction guidelines
+    publisher: Committee on Publication Ethics
+    url: https://publicationethics.org/guidance/guideline/retraction-guidelines
+    locator: Purpose
+    quote: The purpose of retraction is to correct the literature and ensure its integrity, not to punish
+      the authors.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - PPS 'Annulled' detector covers bibliographies citing retracted references.
+  cases: []
+  data_needed:
+  - Document (references)
+  - Organization (journal)
+  checkable: lookups
+  lookup_sources:
+  - Retraction Watch Database (via Crossref)
+  - Problematic Paper Screener
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The cited paper was retracted after the citing paper was written.
+  - Papers cite retracted work in order to critique it.
+  jurisdictions: Global
+  version: 1
+- id: IN-047
+  name: Author or lab with a record of retractions or misconduct findings
+  definition: A researcher, lab or institution has prior retractions, corrections or formal misconduct
+    findings.
+  areas:
+  - FR
+  - IN
+  typology: Research misconduct history
+  status: verified
+  sources:
+  - title: Retraction guidelines
+    publisher: Committee on Publication Ethics
+    url: https://publicationethics.org/guidance/guideline/retraction-guidelines
+    locator: When to retract
+    quote: any form of misrepresentation (eg, fraud, identity theft or fictitious authorship)
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Definition of Research Misconduct
+    publisher: U.S. Office of Research Integrity
+    url: https://ori.hhs.gov/definition-research-misconduct
+    locator: Definition
+    quote: Research misconduct means fabrication, falsification, or plagiarism in proposing, performing,
+      or reviewing research
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'Stapel: fraud found in 55 publications (2012).'
+  - 'Tessier-Lavigne: at least five papers to be retracted or corrected (2023).'
+  cases:
+  - name: Diederik Stapel
+    year: '2012'
+    jurisdiction: Netherlands
+    what_happened: Joint committees found fraud with certainty in 55 publications.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.rug.nl/news/2012/11/171-stapel
+    source_title: University of Groningen news
+  data_needed:
+  - Person
+  - Document
+  - Organization
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - Retraction Watch Database
+  - ORI case summaries
+  - PubPeer
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Honest-error retractions are a sign of good practice, not misconduct.
+  - Co-authors of a misconduct case are often not responsible (the Stanford panel found no evidence Tessier-Lavigne
+    himself manipulated data).
+  - Same-name confusion between different researchers.
+  jurisdictions: Global
+  version: 1
+not_reached:
+- Meta Transparency Center Community Standards page on Inauthentic Behavior (page renders only metadata
+  via fetch); policy wording on fake accounts, Foreign or Government Interference not quoted
+- Meta Q2 2023 Adversarial Threat Report (Spamouflage) and Meta Q1 2024 report (STOIC) - body not retrievable;
+  NBC article blocked by robots
+- EEAS 3rd Report on FIMI Threats (2025) PDF - FIMI definition and TTP list not reached
+- COPE & STM 'Paper Mills' 2022 full report PDF and COPE infographics listing all indicators
+- Hindawi/Wiley whitepaper on the 8,000 retractions (used only via Retraction Watch quotes)
+- Thornburgh-Boccardi panel report primary text (used via TV Technology article)
+- Stanford Board scientific panel report primary text (used via Stanford Daily)
+- Seoul National University investigation report on Hwang Woo-suk (used via The Scientist)
+- Pakistan Supreme Court JIT report primary text (used via Al Jazeera, Dawn)
+- FTC v. OMICS court order PDF text
+- Levelt/Noort/Drenth 'Flawed Science' report English PDF (used University of Groningen Dutch news)
+- Wikipedia 'Sock puppetry' and 'Signs of sockpuppetry' pages (fetch errors) - no sourced sock-puppet
+  definition beyond DOJ 'fake online personas'
+- C2PA technical explainer (fetch error); only home page reached
+- Rossner & Yamada 2004 JCB article 'What's in a picture?' (fetch errors); JCB editorial policy page used
+  instead
+- Science.org article on fake paper prevalence (fetch error)
+- Retraction Watch Hijacked Journal Checker and Retraction Watch Database pages
+- DISARM framework red framework page beyond first 100,000 characters (TA03/TA04 not shown); DISARM Blue
+  countermeasures not reviewed
+- X/Twitter information operations archive, Stanford Internet Observatory primary reports, Graphika Spamouflage
+  reports, EU DisinfoLab Doppelganger reports, Google TAG bulletins
+- Beall's list criteria and Think.Check.Submit checklist
+- ORI 42 CFR Part 93 eCFR section with definitions (renumbered; used ori.hhs.gov definition page)
