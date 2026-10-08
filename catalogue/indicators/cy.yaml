@@ -1,0 +1,2604 @@
+key: CY
+name: Cybercrime and judging sources
+scope: ransomware, online fraud networks, scam compounds (which link to trafficking), business email compromise,
+  crypto fraud and mixers. Separately, collect the published systems for grading source reliability and
+  information credibility (the Admiralty Code / NATO system and similar) as glossary entries, not as indicators
+  about people.
+indicators:
+- id: CY-001
+  name: Network activity linked to known ransomware indicators or actors
+  definition: The organisation's own IT logs, network traffic or files show activity that matches published
+    ransomware technical indicators or known ransomware groups.
+  areas:
+  - CY
+  typology: Ransomware
+  status: verified
+  sources:
+  - title: Advisory on Ransomware and the Use of the Financial System to Facilitate Ransom Payments (FIN-2021-A004)
+    publisher: FinCEN, US Treasury
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Financial Red Flag Indicators, item 1
+    quote: A financial institution or its customer detects IT enterprise activity that is connected to
+      ransomware cyber indicators or known cyber threat actors.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-08'
+  examples:
+  - Incident-response logs from a hospital show a beacon to a server listed in a government ransomware
+    alert.
+  cases: []
+  data_needed:
+  - Document (log files, incident reports)
+  - Company
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - 'Government cyber advisories (CISA/FBI #StopRansomware)'
+  - Threat-intelligence indicator feeds
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Indicator lists contain shared hosting IPs or common tools also used legitimately
+  - Security testing (red-team exercises) can trigger the same indicators
+  - Scanning traffic from the internet hits almost every network
+  jurisdictions: US (FinCEN guidance; widely used internationally)
+  version: 1
+- id: CY-002
+  name: Payer says a payment is a ransom
+  definition: A customer or organisation states, when opening an account or arranging a payment, that
+    the money is to pay a ransomware demand.
+  areas:
+  - CY
+  typology: Ransomware
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 2
+    quote: When opening a new account or during other interactions with the financial institution, a customer
+      provides information that a payment is in response to a ransomware incident.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Colonial Pipeline paid a ransom of about 75 bitcoin in May 2021 (DOJ).
+  cases:
+  - name: Colonial Pipeline ransom and DarkSide seizure
+    year: '2021'
+    jurisdiction: US (N.D. California seizure warrant)
+    what_happened: Colonial Pipeline paid about 75 bitcoin after a ransomware attack; DOJ traced the payment
+      on the public Bitcoin ledger and seized 63.7 bitcoin (about $2.3 million). This was a seizure, not
+      a conviction.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/department-justice-seizes-23-million-cryptocurrency-paid-ransomware-extortionists-darkside
+    source_title: Department of Justice Seizes $2.3 Million in Cryptocurrency Paid to the Ransomware Extortionists
+      Darkside
+  data_needed:
+  - Payment (payer, beneficiary, amount, purpose)
+  - CryptoWallet
+  - Company
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Paying or facilitating a ransom to a sanctioned person or group may breach US sanctions on
+      a strict-liability basis.
+    source_url: https://ofac.treasury.gov/media/912981/download?inline=
+  innocent_explanations:
+  - The victim is the payer and may be acting lawfully; paying a ransom is not itself a crime in most
+    places
+  - The statement may describe a payment for decryption tools or negotiation services rather than the
+    ransom itself
+  jurisdictions: US
+  version: 1
+- id: CY-003
+  name: Wallet or address linked to ransomware, fraud or extortion
+  definition: An account, bank card or crypto address used by the subject, or by its counterparties, has
+    been publicly or commercially linked to ransomware, fraud or extortion.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Proceeds of cybercrime
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 3
+    quote: A customer’s CVC address, or an address with which a customer conducts transactions is connected
+      to ransomware variants, payments, or related activity.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Virtual Assets: Red Flag Indicators of Money Laundering and Terrorist Financing'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 15 (source of funds or wealth)
+    quote: Transacting with VA addresses or bank cards that are connected to known fraud, extortion, or
+      ransomware schemes
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A wallet receives funds from an address that blockchain-analytics firms label as a ransomware cash-out.
+  cases: []
+  data_needed:
+  - CryptoWallet (publicKey, holder)
+  - Payment
+  - BankAccount
+  - Sanction
+  - Document (analytics report)
+  checkable: lookups
+  lookup_sources:
+  - Blockchain analytics / block explorers
+  - OFAC SDN list (includes digital currency addresses)
+  - Government advisories listing addresses
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Exchanges and payment hubs touch huge numbers of addresses, so indirect links are common
+  - Analytics attributions can be wrong or out of date
+  - A victim's own wallet will show links to the ransom address
+  jurisdictions: US; FATF members (international)
+  version: 1
+- id: CY-004
+  name: Unusual payment from a high-risk-sector organisation to an incident-response or cyber-insurance
+    firm
+  definition: An organisation in a sector often hit by ransomware makes an irregular payment to a digital
+    forensics/incident response (DFIR) firm or cyber insurer, especially one known to pay ransoms on clients'
+    behalf.
+  areas:
+  - CY
+  typology: Ransomware payment facilitation
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 4
+    quote: An irregular transaction occurs between an organization, especially an organization from a
+      sector at high risk for targeting by ransomware (e.g., government, financial, educational, healthcare)
+      and a DFIR or CIC, especially one known to facilitate ransomware payments.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A school district wires an unbudgeted sum to an incident-response firm days after a system outage.
+  cases: []
+  data_needed:
+  - Payment
+  - Company
+  - Contract
+  - Document (invoices, board minutes)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: OFAC names DFIR firms, cyber insurers and financial institutions as facilitators who may face
+      strict-liability penalties if a ransom reaches a sanctioned person.
+    source_url: https://ofac.treasury.gov/media/912981/download?inline=
+  innocent_explanations:
+  - Organisations routinely hire DFIR firms for audits and breaches that involve no ransom
+  - Insurance premiums and claims payments are ordinary
+  jurisdictions: US
+  version: 1
+- id: CY-005
+  name: 'Pass-through: incident-response or insurer receives funds then quickly sends the same amount
+    to a crypto exchange'
+  definition: A DFIR firm or cyber insurer receives money from a client and soon after sends an equal
+    amount to a crypto exchange, consistent with buying crypto to pay a ransom.
+  areas:
+  - CY
+  typology: Ransomware payment facilitation
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 5
+    quote: A DFIR or CIC customer receives funds from a counterparty and shortly after receipt of funds
+      sends equivalent amounts to a CVC exchange.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A $400,000 inbound wire from a hospital is followed within a day by a $400,000 wire to a crypto exchange.
+  cases: []
+  data_needed:
+  - Payment (amount, date, payer, beneficiary)
+  - BankAccount
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some firms legitimately buy crypto for clients for lawful purposes
+  - Matching amounts may be coincidental pass-through billing
+  jurisdictions: US
+  version: 1
+- id: CY-006
+  name: Person new to crypto suddenly buys or sends large amounts, often under time pressure
+  definition: Someone with little or no crypto experience urgently converts large sums into crypto or
+    sends large transfers to a crypto platform, which can mean they are a ransomware or scam victim.
+  areas:
+  - CY
+  - FR
+  typology: Victim-side signal
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 6
+    quote: A customer shows limited knowledge of CVC during onboarding or via other interactions with
+      the financial institution, yet inquires about or purchases CVC (particularly if in a large amount
+      or rush requests), which may indicate the customer is a victim of ransomware.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN Alert on Prevalent Virtual Currency Investment Scam Commonly Known as 'Pig Butchering'
+      (FIN-2023-Alert005)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Behavioral red flags, p.6
+    quote: A customer with no history or background of using, exchanging, or otherwise interacting with
+      virtual currency…
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2023-Alert005
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Behavioral red flags, p.6
+    quote: A customer appears distressed or anxious to access funds to meet demands or the timeline…
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A retiree who has never owned crypto asks the bank to wire $150,000 to a crypto exchange the same
+    day.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - BankAccount
+  - CryptoWallet
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: FinCEN says pig-butchering scams are largely run by Southeast Asian criminal groups using
+      trafficked workers, so victim-side signals can point back to scam compounds.
+    source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+  innocent_explanations:
+  - People do start investing in crypto for their own reasons
+  - A large first purchase may follow an inheritance or bonus
+  jurisdictions: US
+  version: 1
+- id: CY-007
+  name: Business with little crypto history makes a large crypto transfer
+  definition: A company with no or limited crypto activity sends a large crypto transaction outside its
+    normal business, which can indicate a ransom payment.
+  areas:
+  - CY
+  typology: Ransomware
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 7
+    quote: A customer that has no or limited history of CVC transactions sends a large CVC transaction,
+      particularly when outside a company’s normal business practices.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A manufacturer with no crypto holdings sends 75 BTC in a single transfer.
+  cases: []
+  data_needed:
+  - Company
+  - Payment
+  - CryptoWallet
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Treasury diversification into crypto
+  - Paying a supplier who invoices in crypto
+  jurisdictions: US
+  version: 1
+- id: CY-008
+  name: Unregistered broker using an exchange's liquidity for many offsetting trades
+  definition: A customer who has not identified itself as a money transmitter makes large numbers of offsetting
+    trades through an exchange, suggesting it is acting as an unlicensed over-the-counter (OTC) or peer-to-peer
+    broker.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Unlicensed money transmission / nested services
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 8
+    quote: A customer that has not identified itself to the CVC exchanger, or registered with FinCEN as
+      a money transmitter, appears to be using the liquidity provided by the exchange to execute large
+      numbers of offsetting transactions between various CVCs, which may indicate that the customer is
+      acting as an unregistered MSB.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN Alert on Scam Centers (FIN-2026-Alert005)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Laundering Techniques, p.12
+    quote: A customer of a digital asset exchange appears to be using liquidity provided by the digital
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An account trades back and forth between USDT, BTC and ETH thousands of times a month with balanced
+    inflows and outflows.
+  cases:
+  - name: Samourai Wallet (Keonne Rodriguez and William Lonergan Hill)
+    year: '2025'
+    jurisdiction: US (S.D.N.Y.)
+    what_happened: Founders of the Samourai Wallet mixing service were sentenced to five and four years
+      for conspiracy to operate a money transmitting business; DOJ says over $237 million in criminal
+      proceeds passed through it.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/founders-samourai-wallet-cryptocurrency-mixing-service-sentenced-five-and-four-years
+    source_title: Founders Of Samourai Wallet Cryptocurrency Mixing Service Sentenced
+  data_needed:
+  - Company
+  - UserAccount
+  - Payment
+  - CryptoWallet
+  - Document (MSB registration)
+  checkable: lookups
+  lookup_sources:
+  - FinCEN MSB registration search
+  - Exchange account records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - High-frequency or arbitrage traders make many offsetting trades for their own account
+  - A registered broker may not have told the exchange of its status
+  jurisdictions: US
+  version: 1
+- id: CY-009
+  name: Use of exchanges in jurisdictions with weak or no crypto regulation
+  definition: Funds come from or go to crypto exchanges that are unregistered where they operate or are
+    based in places with no or weak anti-money-laundering rules for crypto.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: High-risk jurisdiction
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 9
+    quote: A customer uses a foreign-located CVC exchanger in a high-risk jurisdiction lacking, or known
+      to have inadequate, AML/CFT regulations for CVC entities.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 16 (geographical risks)
+    quote: Customer sends funds to VASPs operating in jurisdictions that have no VA regulation
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Withdrawals routed to an offshore exchange that advertises no identity checks.
+  cases:
+  - name: Garantex
+    year: '2022'
+    jurisdiction: US (OFAC)
+    what_happened: OFAC designated the Russia-linked exchange Garantex, stating over $100 million of its
+      transactions were associated with illicit actors and darknet markets, including nearly $6 million
+      from the Conti ransomware gang.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://home.treasury.gov/news/press-releases/jy0701
+    source_title: Treasury press release jy0701
+  data_needed:
+  - Company (jurisdiction)
+  - Payment
+  - CryptoWallet
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - FATF grey/black lists and mutual evaluations
+  - National VASP registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Residents of those countries legitimately use local exchanges
+  - Regulation is changing quickly and lists go out of date
+  jurisdictions: US; FATF members
+  version: 1
+- id: CY-010
+  name: Rapid swaps across coins or blockchains with no clear purpose (chain-hopping)
+  definition: Funds arrive and are quickly swapped between several cryptocurrencies or blockchains, often
+    into privacy coins or lower-fee chains, then moved off the platform, breaking the trail.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Layering via chain-hopping
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 10
+    quote: This may be indicative of attempts to break the chain of custody on the respective blockchains
+      or further obfuscate the transaction.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Technical red flags, p.7
+    quote: A customer receives a large amount of virtual currency such as ether at an exchange, subsequently
+      converts…
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: p.9
+    quote: swapping USDT tokens originating from scams from the Ethereum blockchain to the Tron blockchain
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - ETH received, converted to TRX and withdrawn within minutes (FinCEN pig-butchering alert).
+  cases: []
+  data_needed:
+  - CryptoWallet
+  - Payment (date, amount, currency)
+  - UserAccount
+  checkable: lookups
+  lookup_sources:
+  - Blockchain explorers / analytics
+  - Exchange trade records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Traders move to cheaper chains to save fees
+  - Arbitrage and portfolio rebalancing involve fast swaps
+  jurisdictions: US
+  version: 1
+- id: CY-011
+  name: Use of a crypto mixing or tumbling service
+  definition: Funds are sent to or come from a mixer, which pools and reshuffles coins to hide where they
+    came from.
+  areas:
+  - CY
+  - ML
+  typology: Obfuscation
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 11
+    quote: A customer initiates a transfer of funds involving a mixing service.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 13 (anonymity)
+    quote: Transactions making use of mixing and tumbling services
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Withdrawals from an exchange go straight into a CoinJoin coordinator such as Samourai's Whirlpool.
+  cases:
+  - name: Bitcoin Fog (Roman Sterlingov)
+    year: '2024'
+    jurisdiction: US (D.D.C.)
+    what_happened: A jury convicted the operator of money laundering conspiracy, money laundering and
+      unlicensed money transmission; the mixer processed over 1.2 million bitcoin (about $400 million).
+      Sentenced to 12 years 6 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/bitcoin-fog-operator-sentenced-money-laundering-conspiracy
+    source_title: Bitcoin Fog Operator Sentenced for Money Laundering Conspiracy
+  - name: Helix (Larry Dean Harmon)
+    year: '2024'
+    jurisdiction: US (D.D.C.)
+    what_happened: Harmon pleaded guilty in 2021 to money laundering conspiracy for running Helix, which
+      laundered about 354,468 bitcoin; sentenced to three years; FinCEN separately assessed a $60 million
+      civil penalty.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/operator-helix-darknet-cryptocurrency-mixer-sentenced-money-laundering-conspiracy-and
+    source_title: Operator of Helix Darknet Cryptocurrency Mixer Sentenced
+  - name: Tornado Cash (Roman Storm)
+    year: '2025'
+    jurisdiction: US (S.D.N.Y.)
+    what_happened: Storm was convicted of one count of conspiracy to operate an unlicensed money transmitting
+      business; DOJ says Tornado Cash moved over $1 billion in illegal transactions, including Ronin hack
+      proceeds the FBI attributed to North Korea's Lazarus Group. Other charges did not result in a conviction
+      (per trial reporting).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/founder-tornado-cash-crypto-mixing-service-convicted-knowingly-transmitting-criminal
+    source_title: Founder Of Tornado Cash Crypto Mixing Service Convicted
+  data_needed:
+  - CryptoWallet
+  - Payment
+  - Company (mixer operator)
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Blockchain analytics
+  - OFAC SDN list
+  - Court records of mixer prosecutions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Mixers have laundered proceeds of North Korean state hacking (Ronin hack via Tornado Cash).
+    source_url: https://www.justice.gov/usao-sdny/pr/founder-tornado-cash-crypto-mixing-service-convicted-knowingly-transmitting-criminal
+  innocent_explanations:
+  - Privacy-minded users mix funds to avoid surveillance or theft
+  - Some wallets include coin-mixing features by default
+  jurisdictions: US; FATF members
+  version: 1
+- id: CY-012
+  name: Communicating with the payee over Tor or an unidentified web portal
+  definition: The payer talks to the recipient of a crypto payment through an anonymising network or an
+    unknown web portal, as ransomware negotiators typically require.
+  areas:
+  - CY
+  typology: Ransomware
+  status: verified
+  sources:
+  - title: FIN-2021-A004 Ransomware Advisory
+    publisher: FinCEN
+    year: '2021'
+    url: https://www.fincen.gov/sites/default/files/advisory/2021-11-08/FinCEN%20Ransomware%20Advisory_FINAL_508_.pdf
+    locator: Red flag item 12
+    quote: A customer uses an encrypted network (e.g., the onion router) or an unidentified web portal
+      to communicate with the recipient of the CVC transaction.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Payment instructions arrive via a .onion chat page linked from a ransom note.
+  cases: []
+  data_needed:
+  - Message
+  - Document (ransom note)
+  - CryptoWallet
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Journalists, activists and privacy users use Tor for lawful reasons
+  jurisdictions: US
+  version: 1
+- id: CY-013
+  name: Counterparty is an exchange with a high share of illicit business or under sanctions
+  definition: Funds pass through a crypto exchange that government analysis shows serves mainly criminals
+    or that has been sanctioned for doing so.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Complicit exchange
+  status: verified
+  sources:
+  - title: Treasury Takes Robust Actions to Counter Ransomware (jy0364)
+    publisher: US Treasury
+    year: '2021'
+    url: https://home.treasury.gov/news/press-releases/jy0364
+    locator: SUEX section
+    quote: Analysis of known SUEX transactions shows that over 40% of SUEX’s known transaction history
+      is associated with illicit actors.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Treasury sanctions ransomware operators and virtual currency exchange (jy0471)
+    publisher: US Treasury
+    year: '2021'
+    url: https://home.treasury.gov/news/press-releases/jy0471
+    locator: Chatex section
+    quote: over half are directly traced to illicit or high-risk activities
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Ransom proceeds from several ransomware variants cashed out through SUEX (Treasury).
+  cases:
+  - name: SUEX OTC
+    year: '2021'
+    jurisdiction: US (OFAC)
+    what_happened: First OFAC designation of a crypto exchange; Treasury said SUEX facilitated proceeds
+      from at least eight ransomware variants.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://home.treasury.gov/news/press-releases/jy0364
+    source_title: Treasury press release jy0364
+  - name: Chatex and associates; Yaroslav Vasinskyi; Yevgeniy Polyanin
+    year: '2021'
+    jurisdiction: US (OFAC)
+    what_happened: OFAC designated Chatex and its support companies, and ransomware operators including
+      Vasinskyi, said to be responsible for the July 2021 Kaseya attack.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://home.treasury.gov/news/press-releases/jy0471
+    source_title: Treasury press release jy0471
+  data_needed:
+  - Company
+  - Sanction
+  - CryptoWallet
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - OFAC SDN list
+  - UK and EU sanctions lists
+  - Blockchain analytics exposure reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: The exchange is on a sanctions list, or official analysis attributes a large share of its
+      business to illicit actors as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary users of a since-sanctioned exchange may have traded before the designation
+  - Indirect exposure through multiple hops is common
+  jurisdictions: US (OFAC)
+  version: 1
+- id: CY-014
+  name: Ransomware group operating as a service with affiliates, data theft and leak-site threats
+  definition: 'An attack follows the affiliate model: affiliates break in, encrypt and steal data, and
+    threaten to publish it on the group''s leak site if the victim does not pay, with the developer taking
+    a cut.'
+  areas:
+  - CY
+  typology: Ransomware-as-a-service / double extortion
+  status: verified
+  sources:
+  - title: Two Foreign Nationals Plead Guilty to Participating in LockBit Ransomware Group
+    publisher: US Department of Justice
+    year: '2024'
+    url: https://www.justice.gov/archives/opa/pr/two-foreign-nationals-plead-guilty-participating-lockbit-ransomware-group
+    locator: Press release body
+    quote: LockBit's members extorted at least approximately $500 million in ransom payments from their
+      victims.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Victim name appears on a ransomware group's leak site with a countdown timer.
+  cases:
+  - name: LockBit affiliates Ruslan Astamirov and Mikhail Vasiliev
+    year: '2024'
+    jurisdiction: US (D.N.J.)
+    what_happened: Both pleaded guilty to charges including conspiracy to commit computer fraud and wire
+      fraud for deploying LockBit; DOJ says LockBit hit over 2,500 victims in at least 120 countries.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/two-foreign-nationals-plead-guilty-participating-lockbit-ransomware-group
+    source_title: Two Foreign Nationals Plead Guilty to Participating in LockBit Ransomware Group
+  data_needed:
+  - Organization (ransomware group)
+  - Person (affiliates, administrator)
+  - Membership
+  - Document (leak-site captures)
+  - Payment
+  - CryptoWallet
+  checkable: lookups
+  lookup_sources:
+  - Leak-site monitoring services
+  - Court indictments and sanctions designations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Leak-site listings are sometimes false or recycled from older breaches
+  - A named company may be a supplier rather than the actual victim
+  jurisdictions: US; international
+  version: 1
+- id: CY-015
+  name: Emailed payment instructions differ from the customer's usual language, timing or amounts
+  definition: An email asking for a payment looks genuine but its wording, timing or amounts do not match
+    the sender's normal pattern.
+  areas:
+  - CY
+  typology: Business email compromise
+  status: verified
+  sources:
+  - title: Advisory to Financial Institutions on E-Mail Fraud Against Businesses (FIN-2016-A003)
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: BEC and EAC fraud red flags, item 1, p.5
+    quote: A customer’s seemingly legitimate e-mailed transaction instructions contain different language,
+      timing, and amounts...
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Updated Advisory on Email Compromise Fraud Schemes (FIN-2019-A005)
+    publisher: FinCEN
+    year: '2019'
+    url: https://www.fincen.gov/sites/default/files/advisory/2019-07-16/Updated%20BEC%20Advisory%20FINAL%20508.pdf
+    locator: Red flags section
+    quote: The red flags from the 2016 BEC Advisory remain relevant.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A CFO's usual monthly supplier run arrives on a Saturday for an unusual round amount.
+  cases:
+  - name: Ramon Olorunwa Abbas ('Ray Hushpuppi')
+    year: '2022'
+    jurisdiction: US (C.D. California)
+    what_happened: Pleaded guilty to conspiracy to engage in money laundering tied to BEC and other online
+      scams, including a scheme against a New York law firm; sentenced to 135 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-cdca/pr/nigerian-man-sentenced-over-11-years-federal-prison-conspiring-launder-tens-millions
+    source_title: Nigerian Man Sentenced to Over 11 Years in Federal Prison
+  data_needed:
+  - Email
+  - Payment
+  - Person
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New staff, new systems or one-off purchases change patterns
+  - Year-end or travel can shift timing
+  jurisdictions: US
+  version: 1
+- id: CY-016
+  name: Instructions sent from a look-alike email address or look-alike company
+  definition: Payment instructions come from an email account that closely resembles a known customer's
+    or supplier's account, or from a company set up with the same name as a real supplier.
+  areas:
+  - CY
+  typology: Business email compromise / impersonation
+  status: verified
+  sources:
+  - title: FIN-2016-A003
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: Red flag item 2, p.5
+    quote: Transaction instructions originate from an e-mail account closely resembling a known customer’s
+      e-mail account...
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Email from accounts@acme-supp1y.com instead of acme-supply.com.
+  cases:
+  - name: Evaldas Rimasauskas
+    year: '2019'
+    jurisdiction: US (S.D.N.Y.)
+    what_happened: Registered a Latvian company with the same name as an Asian hardware maker, sent phishing
+      emails and forged invoices, and induced two US internet companies to wire over $120 million; sentenced
+      to 60 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/lithuanian-man-sentenced-5-years-prison-theft-over-120-million-fraudulent-business
+    source_title: Lithuanian Man Sentenced To 5 Years In Prison For Theft Of Over $120 Million
+  data_needed:
+  - Email (sender, headers)
+  - Company (name, jurisdiction, incorporationDate)
+  - LegalEntity:website
+  - BankAccount
+  checkable: lookups
+  lookup_sources:
+  - Domain registration (WHOIS) records
+  - Company registries in the beneficiary's country
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Companies do change domains or use regional subsidiaries with similar names
+  - Personal email used while travelling
+  jurisdictions: US
+  version: 1
+- id: CY-017
+  name: Known payee, but new bank details
+  definition: An email directs payment to a familiar supplier or beneficiary but to a different account
+    from the one used before.
+  areas:
+  - CY
+  typology: Business email compromise
+  status: verified
+  sources:
+  - title: FIN-2016-A003
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: Red flag item 3, p.5
+    quote: E-mailed transaction instructions direct payment to a known beneficiary...
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - '''Please note our bank has changed'' email from a long-standing vendor.'
+  cases: []
+  data_needed:
+  - Payment
+  - BankAccount (accountNumber, bank, holder)
+  - Company
+  - Email
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Suppliers genuinely change banks after mergers or bank closures
+  - Factoring arrangements redirect payments
+  jurisdictions: US
+  version: 1
+- id: CY-018
+  name: Payment to a foreign account already linked to fraud complaints
+  definition: An email directs a wire to an overseas account that earlier customer complaints have tied
+    to fraud.
+  areas:
+  - CY
+  typology: Business email compromise
+  status: verified
+  sources:
+  - title: FIN-2016-A003
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: Red flag item 4, p.5
+    quote: E-mailed transaction instructions direct wire transfers to a foreign bank account that has
+      been documented...
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Beneficiary account in another country flagged in earlier complaints to the bank.
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment
+  - Document (complaints)
+  checkable: lookups
+  lookup_sources:
+  - Bank fraud complaint records
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Complaints may be unfounded or relate to a previous account holder
+  jurisdictions: US
+  version: 1
+- id: CY-019
+  name: Payment to a new beneficiary with no history
+  definition: Emailed instructions send money to a payee the customer has never paid before.
+  areas:
+  - CY
+  typology: Business email compromise
+  status: verified
+  sources:
+  - title: FIN-2016-A003
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: Red flag item 5, p.5
+    quote: E-mailed transaction instructions direct payment to a beneficiary with which the customer has
+      no payment history...
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - First-ever wire to an individual's personal account for a 'consulting fee'.
+  cases: []
+  data_needed:
+  - Payment
+  - BankAccount
+  - Person
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Businesses take on new suppliers all the time
+  jurisdictions: US
+  version: 1
+- id: CY-020
+  name: Urgent, secret or confidential payment request with little time to verify
+  definition: Instructions are marked urgent, secret or confidential, or arrive in a way that leaves little
+    time to confirm they are real.
+  areas:
+  - CY
+  typology: Business email compromise / CEO fraud
+  status: verified
+  sources:
+  - title: FIN-2016-A003
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: Red flag items 6 and 7, p.5
+    quote: E-mailed transaction instructions include markings, assertions, or language designating the
+      transaction request...
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - '''Confidential acquisition, wire today, do not discuss with anyone'' from the ''CEO''.'
+  cases: []
+  data_needed:
+  - Email
+  - Payment
+  - Person (purported sender)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real deals (acquisitions, property closings) can be confidential and time-critical
+  jurisdictions: US
+  version: 1
+- id: CY-021
+  name: Instructions from a newly authorised or unverifiable person
+  definition: Payment instructions come from an employee newly added to the account, or the employee says
+    they could not confirm the request with the executives or lawyers who supposedly ordered it.
+  areas:
+  - CY
+  typology: Business email compromise
+  status: verified
+  sources:
+  - title: FIN-2016-A003
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: Red flag items 8 and 9, p.5
+    quote: E-mailed transaction instructions originate from a customer’s employee who is a newly authorized
+      person on the account...
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A newly authorised clerk sends a large wire request while the CEO is 'travelling'.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Representation (authority on account)
+  - Email
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Staff turnover means new signatories
+  - Executives are often hard to reach
+  jurisdictions: US
+  version: 1
+- id: CY-022
+  name: Follow-up payment request immediately after a successful one
+  definition: Right after a payment goes through, the same email channel asks for further payments.
+  areas:
+  - CY
+  typology: Business email compromise
+  status: verified
+  sources:
+  - title: FIN-2016-A003
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: Red flag item 10, p.5
+    quote: A customer e-mails transaction requests for additional payments immediately following a successful
+      payment...
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - In the Hushpuppi case, a victim paid about $330,000 and was then asked for $575,000 in fake taxes
+    (DOJ).
+  cases: []
+  data_needed:
+  - Email
+  - Payment (date, amount)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Instalment payments are normal for some contracts
+  jurisdictions: US
+  version: 1
+- id: CY-023
+  name: Named beneficiary does not match the account holder
+  definition: An incoming wire names a beneficiary who is not the holder of the receiving account.
+  areas:
+  - CY
+  typology: Business email compromise / mule account
+  status: verified
+  sources:
+  - title: FIN-2016-A003
+    publisher: FinCEN
+    year: '2016'
+    url: https://www.fincen.gov/sites/default/files/advisory/2016-09-09/FIN-2016-A003.pdf
+    locator: Red flag item 11, p.5
+    quote: A wire transfer is received for credit into an account, however, the wire transfer names a
+      beneficiary...
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Wire addressed to 'ABC Steel Ltd' credited to a personal account in another name.
+  cases: []
+  data_needed:
+  - Payment (beneficiary)
+  - BankAccount (holder)
+  - Person
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Trading names, recent name changes and agent/escrow accounts cause mismatches
+  jurisdictions: US
+  version: 1
+- id: CY-024
+  name: 'Signs of mailbox tampering: auto-forwarding or hidden inbox rules'
+  definition: The victim's email account has auto-forwarding or sweep/sorting rules set up that hide or
+    copy messages, a technical trace of account takeover that FinCEN asks institutions to report.
+  areas:
+  - CY
+  typology: Email account compromise
+  status: verified
+  sources:
+  - title: FIN-2019-A005 Updated BEC Advisory
+    publisher: FinCEN
+    year: '2019'
+    url: https://www.fincen.gov/sites/default/files/advisory/2019-07-16/Updated%20BEC%20Advisory%20FINAL%20508.pdf
+    locator: SAR filing information (cyber-related information)
+    quote: Inbox sweep rules or sorting rules set up in victim email accounts.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A rule forwards every email containing 'invoice' to an outside Gmail address.
+  cases: []
+  data_needed:
+  - Email
+  - UserAccount
+  - Document (mail server logs)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Staff set up forwarding to personal devices or assistants
+  - IT filtering rules
+  jurisdictions: US
+  version: 1
+- id: CY-025
+  name: Unsolicited contact pitching a high-return crypto investment
+  definition: Someone who recently reached out uninvited by text, social media or a dating app introduces
+    a crypto investment with large returns.
+  areas:
+  - CY
+  - FR
+  typology: Pig butchering (relationship investment scam)
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Behavioral red flags, p.6
+    quote: A customer mentions or expresses interest in an investment opportunity leveraging virtual currency
+      with significant returns…
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A 'wrong number' text grows into a friendship, then an offer to join a 'trading platform'.
+  cases: []
+  data_needed:
+  - Person
+  - UserAccount
+  - Message
+  - CryptoWallet
+  - Payment
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: FinCEN states these scams are largely run from Southeast Asia using victims of labour trafficking
+      to contact targets.
+    source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+  innocent_explanations:
+  - Friends do share investment tips
+  - Legitimate brokers do cold-call within regulation
+  jurisdictions: US
+  version: 1
+- id: CY-026
+  name: Told by a new contact to buy crypto at a kiosk or deposit cash and send it to a given wallet
+  definition: A person says someone who recently contacted them told them to change cash into crypto (often
+    at a crypto ATM) and send it to an address the contact supplied.
+  areas:
+  - CY
+  - FR
+  typology: Pig butchering / money mule
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Behavioral red flags, p.6
+    quote: A customer mentions that they were instructed by an individual who recently contacted them
+      to exchange fiat currency…
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Mules
+    publisher: FBI
+    url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-scams-and-crimes/money-mules
+    locator: 'Warning signs: cryptocurrency kiosks'
+    quote: You are directed to deposit cash into one or more cryptocurrency kiosks.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Victim feeds cash into a bitcoin ATM while on the phone with the 'adviser'.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - CryptoWallet
+  - Message
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some people buy crypto at kiosks for their own use
+  jurisdictions: US
+  version: 1
+- id: CY-027
+  name: Savings, retirement or home equity drained to buy crypto or gold for a third party
+  definition: A person cashes out savings early, borrows against their home, or withdraws retirement money
+    to buy crypto or gold, sometimes handing gold to a courier.
+  areas:
+  - CY
+  - FR
+  typology: Pig butchering / impersonation scams
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Financial red flags, p.6
+    quote: A customer takes out a HELOC, home equity loan, or second mortgage and uses the proceeds to
+      purchase virtual currency…
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Victim Payments, p.10
+    quote: A customer withdraws funds from an investment or retirement account to purchase gold from a
+      precious metals dealer
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - CD broken before maturity; proceeds wired to a crypto exchange next day.
+  cases: []
+  data_needed:
+  - Person
+  - BankAccount
+  - Payment
+  - Contract (loan)
+  - CryptoWallet
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - People reallocate savings into crypto or gold by choice
+  - Home-equity borrowing has many legitimate uses
+  jurisdictions: US
+  version: 1
+- id: CY-028
+  name: Small crypto 'return' that mirrors an outflow, followed by much larger outflows
+  definition: A person receives a crypto deposit roughly equal to what they just sent, then sends much
+    larger amounts, a sign of a fake 'profit' used to build trust.
+  areas:
+  - CY
+  - FR
+  typology: Pig butchering
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Financial red flags, p.6
+    quote: A customer receives what appears to be a deposit of virtual currency from a virtual currency
+      address…
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - $1,000 out, $1,050 'withdrawal' back, then $40,000 out.
+  cases: []
+  data_needed:
+  - Payment
+  - CryptoWallet
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine trading gains followed by larger investment
+  jurisdictions: US
+  version: 1
+- id: CY-029
+  name: Dormant account suddenly sends large sums to crypto platforms
+  definition: An account with a large balance and little activity starts making frequent, large or unusual
+    withdrawals to crypto platforms.
+  areas:
+  - CY
+  - FR
+  typology: Pig butchering
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Financial red flags, p.7
+    quote: Accounts with large balances that are inactive or have limited activity begin to show constant,
+      uncharacteristic, sudden…
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Ten-year-old savings account begins weekly wires to a VASP.
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Life events (retirement, inheritance) change account use
+  jurisdictions: US
+  version: 1
+- id: CY-030
+  name: Payments labelled as taxes, fees or penalties to release funds
+  definition: Transfers to a crypto platform are described as taxes, fees or penalties needed to withdraw
+    supposed profits.
+  areas:
+  - CY
+  - FR
+  typology: Pig butchering / advance-fee
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Financial red flags, p.7
+    quote: A customer sends multiple electronic funds transfers (EFTs) or wire transfers to a VASP…
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - '''Release fee'' of 20% demanded before a withdrawal is processed.'
+  cases: []
+  data_needed:
+  - Payment (purpose)
+  - Message
+  - CryptoWallet
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real platforms charge withdrawal fees, though not usually as separate up-front 'taxes'
+  jurisdictions: US
+  version: 1
+- id: CY-031
+  name: Small test transfers followed by large wires to unfamiliar parties
+  definition: After several small transfers to a crypto platform, the person switches to multiple large
+    wires to unfamiliar companies or individuals.
+  areas:
+  - CY
+  - FR
+  typology: Pig butchering
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Financial red flags, p.7
+    quote: A customer with a short history of conducting several small-value EFTs to a VASP abruptly stops
+      sending EFTs…
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Three $200 transfers to an exchange, then $60,000 wires to a 'trading company' in Hong Kong.
+  cases: []
+  data_needed:
+  - Payment
+  - Company
+  - Person
+  - BankAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Testing a new platform with small amounts is sensible behaviour
+  jurisdictions: US
+  version: 1
+- id: CY-032
+  name: Account accessed from unusual devices, IPs or places that do not match the holder
+  definition: Logins come from IP addresses, devices or locations unlike the account's normal pattern,
+    or the location/device data does not match the identity documents.
+  areas:
+  - CY
+  typology: Account takeover / remote control by scammer
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Technical red flags, p.7
+    quote: System monitoring and logs show that a customer's account is accessed repeatedly by unique
+      IP addresses, device IDs…
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN Alert on Fraud Schemes Involving Deepfake Media (FIN-2024-Alert004)
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-DeepFakes-Alert508FINAL.pdf
+    locator: Financial red flag indicators, p.6
+    quote: A customer's geographic or device data is inconsistent
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 13
+    quote: A large number of seemingly unrelated VA wallets controlled from the same IP-address
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Many unrelated accounts all log in from one IP in Cambodia.
+  cases: []
+  data_needed:
+  - UserAccount
+  - Address
+  - Document (access logs)
+  - Identification
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - VPN use, travel, shared office or mobile carrier IPs
+  - Family members using one device
+  jurisdictions: US
+  version: 1
+- id: CY-033
+  name: Investment site or app that imitates a real platform or shows amateur warning signs
+  definition: The person uses a trading site or app with poor spelling, fake testimonials, a newly registered
+    or misspelled domain, no physical address, chat-only contact, or an app installed from outside official
+    app stores.
+  areas:
+  - CY
+  - FR
+  typology: Fake trading platform
+  status: verified
+  sources:
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Technical red flags, p.7
+    quote: A customer mentions visiting a website or application that is purported to be associated with
+      a legitimate VASP…
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2023-Alert005 (Pig Butchering)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN_Alert_Pig_Butchering_FINAL_508c.pdf
+    locator: Technical red flags, p.7
+    quote: A customer mentions that they downloaded an application on their phone directly from a third-party
+      website…
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Domain registered three weeks ago, copying a known exchange's logo.
+  cases: []
+  data_needed:
+  - LegalEntity:website
+  - Company
+  - Document (screenshots)
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Domain registration (WHOIS) and certificate logs
+  - Regulator warning lists of unauthorised firms
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small genuine start-ups can have rough websites and new domains
+  jurisdictions: US
+  version: 1
+- id: CY-034
+  name: Payment to a 'recovery' service to get back money lost to fraud
+  definition: A victim pays a law firm or other outfit that promises to recover scam losses, without documents
+    showing it is legitimate.
+  areas:
+  - CY
+  - FR
+  typology: Recovery scam (re-victimisation)
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Victim Payments, p.10
+    quote: A customer states that a payment is intended to retain a law firm or other entity to recover
+      funds lost to fraud
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - After losing $80,000, the victim is contacted by a 'blockchain recovery attorney' demanding an upfront
+    fee.
+  cases: []
+  data_needed:
+  - Payment
+  - Company
+  - Person
+  - Representation
+  checkable: lookups
+  lookup_sources:
+  - Bar association / lawyer registers
+  - Company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real lawyers and licensed investigators do help fraud victims
+  jurisdictions: US
+  version: 1
+- id: CY-035
+  name: Payment directed by someone posing as police or a government agency
+  definition: A person says a supposed law enforcement or government official told them to pay in crypto,
+    by international wire, in gold or gift cards.
+  areas:
+  - CY
+  typology: Government impersonation scam
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Victim Payments, p.10
+    quote: A customer states that they were directed by a purported representative of law enforcement
+      or a government agency
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - '''FBI agent'' tells the victim to move savings into a ''safe'' crypto wallet.'
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Message
+  - CryptoWallet
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real agencies do collect fines, but not in crypto, gift cards or gold via couriers
+  jurisdictions: US
+  version: 1
+- id: CY-036
+  name: Money business claims to be 'approved by FinCEN' or exchange advertises no ID checks
+  definition: A money services business receiving funds falsely claims government approval, or an exchange
+    advertises that it runs without know-your-customer checks.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Complicit or fake financial service
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Victim Payments, p.10
+    quote: Open-source information shows that a digital asset exchange receiving customer funds is advertising
+      services
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Website banner reads 'FinCEN approved' (FinCEN registration is not approval).
+  cases: []
+  data_needed:
+  - Company
+  - LegalEntity:website
+  - Document (advertising)
+  checkable: lookups
+  lookup_sources:
+  - FinCEN MSB registration search
+  - Archived web pages
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Firms sometimes loosely (but wrongly) describe registration as approval
+  jurisdictions: US
+  version: 1
+- id: CY-037
+  name: Dealings with a guarantee marketplace or its tokens and addresses
+  definition: A person or business transacts with tokens or wallet addresses tied to Telegram-based 'guarantee'
+    marketplaces that sell laundering and scam services, with no clear lawful purpose or documented source
+    of funds.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Guarantee marketplace laundering
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Guarantee Marketplaces, p.10
+    quote: A customer conducts transactions involving a digital asset token issued by or associated with
+      a guarantee marketplace
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Guarantee Marketplaces, p.10
+    quote: Blockchain analysis indicates that a customer has transacted directly or indirectly with a
+      digital asset address
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Repeated USDT transfers to addresses attributed to Haowang Guarantee (Huione's marketplace).
+  cases:
+  - name: Huione Group
+    year: '2025'
+    jurisdiction: US (FinCEN Section 311)
+    what_happened: FinCEN found Huione laundered at least $4 billion of illicit proceeds between August
+      2021 and January 2025, including DPRK cyber-heist funds and investment-scam proceeds, and in October
+      2025 issued a final rule cutting it off from the US financial system.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.fincen.gov/news/news-releases/fincen-issues-final-rule-severing-huione-group-us-financial-system
+    source_title: FinCEN Issues Final Rule Severing Huione Group from the U.S. Financial System
+  data_needed:
+  - CryptoWallet
+  - Payment
+  - Company
+  - UserAccount (Telegram)
+  checkable: lookups
+  lookup_sources:
+  - Blockchain analytics attributions
+  - FinCEN/OFAC actions
+  - Telegram channel archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FinCEN found Huione laundered DPRK cyber-heist proceeds.
+    source_url: https://www.fincen.gov/news/news-releases/fincen-finds-cambodia-based-huione-group-be-primary-money-laundering-concern
+  innocent_explanations:
+  - Marketplaces also host ordinary trade, so some counterparties may be unaware
+  - Indirect exposure through exchanges
+  jurisdictions: US; Southeast Asia
+  version: 1
+- id: CY-038
+  name: Payment provider rebrands after enforcement or bad press
+  definition: A payment service tied to a guarantee marketplace changes its name, branding or website
+    in an apparent attempt to hide the link to a marketplace that faced enforcement or negative news.
+  areas:
+  - CY
+  - ML
+  typology: Phoenixing / rebranding
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Guarantee Marketplaces, p.10; and p.6
+    quote: Huione Group transitioned operations from Huione Pay PLC to H-Pay
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Huione Pay PLC operations moved to 'H-Pay' (FinCEN).
+  cases: []
+  data_needed:
+  - Company (name, previousName, incorporationDate)
+  - Ownership
+  - Directorship
+  - LegalEntity:website
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Archived websites
+  - Regulator notices
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Companies rebrand for marketing, mergers or licensing reasons
+  jurisdictions: US; Southeast Asia
+  version: 1
+- id: CY-039
+  name: Payment provider in Burma, Cambodia or Laos that hides its location or structure
+  definition: A payment or exchange service appears to operate in Burma, Cambodia or Laos and seems to
+    obscure where it is or who owns it.
+  areas:
+  - CY
+  - ML
+  typology: Scam-centre financial infrastructure
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Guarantee Marketplaces, p.10
+    quote: A payment service provider that offers digital asset exchange services appears to operate in
+      Burma, Cambodia, or Laos
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Exchange lists a Seychelles address but its support staff and IPs are in Sihanoukville.
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Address
+  - LegalEntity:website
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Sanctions lists
+  - Web infrastructure lookups
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many lawful fintechs operate in the region
+  - Offshore incorporation is common for tax reasons
+  jurisdictions: Burma (Myanmar), Cambodia, Laos
+  version: 1
+- id: CY-040
+  name: Wallet address advertised in chat groups next to laundering terms
+  definition: Public sources show a wallet the subject uses was posted on a messaging platform near Chinese-language
+    terms related to money laundering.
+  areas:
+  - CY
+  - ML
+  typology: Chinese money laundering networks
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Laundering Techniques, p.12
+    quote: Open-source information indicates that a digital asset address used by a customer was posted
+      on
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A TRON address appears in a Telegram post offering 'clean USDT' exchange.
+  cases: []
+  data_needed:
+  - CryptoWallet
+  - Message
+  - UserAccount
+  - Document (screenshots)
+  checkable: lookups
+  lookup_sources:
+  - Telegram/messaging channel archives
+  - Open-source search
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Addresses can be posted by third parties without the owner's knowledge
+  - Exchange deposit addresses are shared widely
+  jurisdictions: US; Southeast Asia; China
+  version: 1
+- id: CY-041
+  name: Heavy use of a stablecoin that advertises it will not cooperate with law enforcement
+  definition: Large transactions use a stablecoin whose issuer markets it as unfreezable or says it does
+    not cooperate with law enforcement.
+  areas:
+  - CY
+  - ML
+  typology: Seizure-resistant value transfer
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Laundering Techniques, p.12
+    quote: A customer conducts substantial transactions using a stablecoin whose issuer advertises that
+      it does not cooperate
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Treasury flows shift into a token marketed as 'cannot be frozen'.
+  cases: []
+  data_needed:
+  - CryptoWallet
+  - Payment
+  - Company (issuer)
+  checkable: lookups
+  lookup_sources:
+  - Issuer marketing material
+  - Blockchain analytics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Users in unstable countries may seek censorship-resistant savings
+  jurisdictions: US
+  version: 1
+- id: CY-042
+  name: Scam-proceeds aggregation wallets and DeFi services without AML controls used to swap and cash
+    out
+  definition: Deposits arrive from a wallet that pools suspected scam proceeds, or from a DeFi service
+    with no AML controls, and are swapped to another asset or chain or converted to cash and withdrawn.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Layering and cash-out
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Laundering Techniques, p.12
+    quote: A customer of a DeFi service receives deposits from a wallet that aggregates suspected scam
+      proceeds
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Laundering Techniques, p.12
+    quote: A customer receives stablecoin deposits from a DeFi service that lacks AML/CFT controls
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 12
+    quote: Incoming transactions from many unrelated wallets in relatively small amounts
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Hundreds of victim deposits consolidate into one wallet, which swaps into USDT on Tron and cashes
+    out.
+  cases: []
+  data_needed:
+  - CryptoWallet
+  - Payment
+  - BankAccount
+  checkable: lookups
+  lookup_sources:
+  - Blockchain analytics
+  - Exchange records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Merchants and payment processors legitimately receive many small payments
+  - DeFi swaps are ordinary for traders
+  jurisdictions: US
+  version: 1
+- id: CY-043
+  name: Stablecoins arriving from mainstream exchanges with on-chain laundering patterns
+  definition: An exchange customer receives stablecoin transfers that originate at US-operating centralised
+    exchanges and show patterns associated with on-chain laundering.
+  areas:
+  - CY
+  - ML
+  typology: Victim funds in transit
+  status: verified
+  sources:
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: Red Flags Related to Laundering Techniques, p.12
+    quote: A customer of a digital asset exchange receives stablecoin transactions that originate from
+      centralized
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - USDT withdrawn by many US retail users lands, via several hops, in one overseas account.
+  cases: []
+  data_needed:
+  - CryptoWallet
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Blockchain analytics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Popular exchanges are the source of most retail stablecoin flows
+  jurisdictions: US
+  version: 1
+- id: CY-044
+  name: Overseas job offer with vague details and unusually high pay
+  definition: A job advert, often for work abroad in Southeast Asia, offers unusually high pay and perks
+    but gives vague details about the company or job, a known recruitment route into scam compounds.
+  areas:
+  - CY
+  - HT
+  typology: Trafficking for forced criminality
+  status: verified
+  sources:
+  - title: The FBI Warns of False Job Advertisements Linked to Labor Trafficking at Scam Compounds (I-052223-PSA)
+    publisher: FBI / IC3
+    year: '2023'
+    url: https://www.ic3.gov/PSA/2023/PSA230522
+    locator: Tips
+    quote: Beware of job advertisements with unusually high salaries and many perks.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Crime Trend Update: Human Trafficking-Fuelled Scam Centres'
+    publisher: INTERPOL
+    year: '2025'
+    url: https://www.interpol.int/ar/content/download/23175/file/INTERPOL%20Crime%20Trend%20Update%20-%20Human%20trafficking-fueled%20scam%20centres.pdf
+    locator: Introduction
+    quote: typically through false job ads
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Social-media ad for 'customer service, $3,000/month, flights paid' in Bangkok, with onward travel
+    to Myawaddy.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Company
+  - Document (job advert)
+  - Address
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: OHCHR estimated at least 120,000 people in Myanmar and around 100,000 in Cambodia may be held
+      and forced to carry out online scams.
+    source_url: https://www.ohchr.org/en/press-releases/2023/08/hundreds-thousands-trafficked-work-online-scammers-se-asia-says-un-report
+  innocent_explanations:
+  - Real overseas jobs (e.g. call centres) recruit online with relocation packages
+  jurisdictions: Southeast Asia (Cambodia, Myanmar, Laos); victims worldwide
+  version: 1
+- id: CY-045
+  name: Workers held by passport seizure, invented debts, violence or resale between compounds
+  definition: People in a scam operation have passports taken, are charged 'debts' for travel and board,
+    are threatened or beaten, held for ransom, or sold on to other compounds.
+  areas:
+  - CY
+  - HT
+  typology: Trafficking for forced criminality / debt bondage
+  status: verified
+  sources:
+  - title: FBI PSA I-052223-PSA
+    publisher: FBI / IC3
+    year: '2023'
+    url: https://www.ic3.gov/PSA/2023/PSA230522
+    locator: Body
+    quote: Criminal actors assign debts to victims under the guise of travel fees and room and board.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2026-Alert005 (Scam Centers)
+    publisher: FinCEN
+    year: '2026'
+    url: https://www.fincen.gov/system/files/2026-08/FinCEN-Alert-Scam-Centers.pdf
+    locator: p.3
+    quote: victims may have their passports taken to prevent them from leaving
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Hundreds of thousands trafficked to work as online scammers in SE Asia, says UN report
+    publisher: OHCHR
+    year: '2023'
+    url: https://www.ohchr.org/en/press-releases/2023/08/hundreds-thousands-trafficked-work-online-scammers-se-asia-says-un-report
+    locator: Press release
+    quote: at least 120,000 people across Myanmar may be held in situations where they are forced to carry
+      out online scams
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Escaped worker says family paid a ransom to release them (FinCEN p.3).
+  cases:
+  - name: OHCHR report on online scam operations in Southeast Asia
+    year: '2023'
+    jurisdiction: UN (Southeast Asia)
+    what_happened: UN Human Rights Office reported victims forced into online scams facing torture, arbitrary
+      detention, sexual violence and forced labour, with at least 120,000 in Myanmar and around 100,000
+      in Cambodia.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.ohchr.org/en/press-releases/2023/08/hundreds-thousands-trafficked-work-online-scammers-se-asia-says-un-report
+    source_title: Hundreds of thousands trafficked to work as online scammers in SE Asia, says UN report
+  data_needed:
+  - Person
+  - Passport
+  - Employment
+  - Address
+  - Payment (ransom)
+  - Document (testimony)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: These are direct trafficking/forced-labour indicators documented by FBI, FinCEN and OHCHR.
+    source_url: https://www.ic3.gov/PSA/2023/PSA230522
+  innocent_explanations:
+  - Some employers unlawfully hold passports without other coercion; this is still abuse but not necessarily
+    trafficking
+  - Workers may be voluntary participants in some operations
+  jurisdictions: Southeast Asia
+  version: 1
+- id: CY-046
+  name: '''Job'' that consists of receiving money and passing it on for a cut'
+  definition: A person is recruited, usually by an unsolicited message, to open accounts, receive funds
+    and forward them by wire, ACH or money transfer, keeping a portion, with no real job description.
+  areas:
+  - CY
+  typology: Money mule recruitment
+  status: verified
+  sources:
+  - title: Money Mules
+    publisher: FBI
+    url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-scams-and-crimes/money-mules
+    locator: 'Warning signs: work-from-home job opportunities'
+    quote: You are asked to open a bank account in your own name or in the name of a company you form
+      to receive and transfer money.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Mules
+    publisher: FBI
+    url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-scams-and-crimes/money-mules
+    locator: Warning signs
+    quote: You are allowed to keep a portion of the money you transfer.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - '''Payment processing agent'' role advertised via social media, employer uses a Gmail address.'
+  cases: []
+  data_needed:
+  - Person
+  - BankAccount
+  - Company
+  - Payment
+  - Employment
+  - Email
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine payment agents and remittance workers do move money for others under licence
+  jurisdictions: US
+  version: 1
+- id: CY-047
+  name: Online companion asks you to receive and forward money
+  definition: Someone met only online asks a person to receive money and send it on to people they do
+    not know.
+  areas:
+  - CY
+  typology: Romance-scam money mule
+  status: verified
+  sources:
+  - title: Money Mules
+    publisher: FBI
+    url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-scams-and-crimes/money-mules
+    locator: 'Warning signs: dating and social media sites'
+    quote: An online contact or companion, whom you have never met in person, asks you to receive money
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Partner met on a dating app asks the victim to accept a wire and buy gift cards with it.
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Payment
+  - Message
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Long-distance partners genuinely help each other with money
+  jurisdictions: US
+  version: 1
+- id: CY-048
+  name: Structuring or rapid bursts of crypto transactions
+  definition: Crypto transfers are split into small amounts to stay under reporting limits, or several
+    high-value transfers are made in quick succession, such as within 24 hours.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Structuring
+  status: verified
+  sources:
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 11 (size and frequency)
+    quote: Structuring VA transactions (e.g. exchange or transfer) in small amounts
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 11
+    quote: in short succession, such as within a 24-hour period
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Nine transfers of just under the local reporting threshold in one day.
+  cases: []
+  data_needed:
+  - Payment (amount, date)
+  - CryptoWallet
+  - UserAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Several high-value transfers within a 24-hour period, or deliberate splitting under a reporting
+      limit, as worded
+    threshold_source: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Daily withdrawal limits force splitting
+  - Active traders make many transfers a day
+  jurisdictions: FATF members
+  version: 1
+- id: CY-049
+  name: Forged or altered ID, AI-generated photos, or multiple accounts under different names
+  definition: Identity documents or photos look edited, contradict each other or match AI-generated faces,
+    or one person opens several accounts under different names.
+  areas:
+  - CY
+  - FR
+  typology: Identity fraud / deepfake onboarding
+  status: verified
+  sources:
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 14 (senders or recipients)
+    quote: Customer has provided forged documents or has edited photographs and/or identification documents
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2024-Alert004 (Deepfake Media)
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-DeepFakes-Alert508FINAL.pdf
+    locator: Financial red flag indicators, p.5
+    quote: A customer's photo is internally inconsistent
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2024-Alert004 (Deepfake Media)
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-DeepFakes-Alert508FINAL.pdf
+    locator: p.6
+    quote: A reverse-image lookup or open-source search
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Reverse-image search matches the ID photo to a gallery of AI-generated faces.
+  cases: []
+  data_needed:
+  - Person
+  - Passport
+  - Identification
+  - Document
+  - UserAccount
+  checkable: lookups
+  lookup_sources:
+  - Reverse-image search
+  - Deepfake detection tools
+  - ID document verification services
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Old photos, name changes and poor scans cause mismatches
+  - Detection tools give false positives
+  jurisdictions: US; FATF members
+  version: 1
+- id: CY-050
+  name: 'Evasive remote verification: third-party webcam plugins or refusing multi-factor authentication'
+  definition: During live identity checks the person uses an outside webcam add-on, switches channels
+    after 'technical problems', or declines multi-factor authentication.
+  areas:
+  - CY
+  typology: Deepfake onboarding
+  status: verified
+  sources:
+  - title: FIN-2024-Alert004 (Deepfake Media)
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-DeepFakes-Alert508FINAL.pdf
+    locator: Financial red flag indicators, p.6
+    quote: A customer uses a third-party webcam plugin
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2024-Alert004 (Deepfake Media)
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-DeepFakes-Alert508FINAL.pdf
+    locator: p.6
+    quote: A customer declines to use multifactor authentication
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Video KYC call drops whenever the agent asks the customer to turn their head.
+  cases: []
+  data_needed:
+  - Person
+  - UserAccount
+  - Document (verification logs)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real connection problems and older devices
+  - Some people distrust MFA or lack a phone
+  jurisdictions: US
+  version: 1
+- id: CY-051
+  name: New account with rapid, high-risk payment activity or many chargebacks
+  definition: A new or barely used account quickly makes large payments to higher-risk destinations such
+    as gambling sites or crypto exchanges, or has many chargebacks or rejected payments.
+  areas:
+  - CY
+  - FR
+  typology: Mule / fraudulent account
+  status: verified
+  sources:
+  - title: FIN-2024-Alert004 (Deepfake Media)
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Alert-DeepFakes-Alert508FINAL.pdf
+    locator: Financial red flag indicators, p.6
+    quote: A newly opened account or an account with little prior
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 15
+    quote: VA transactions originating from or destined to online gambling services
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 12
+    quote: Conducting a large initial deposit to open a new relationship with a VASP
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Account opened Monday, $90,000 through it to an offshore casino by Friday.
+  cases: []
+  data_needed:
+  - UserAccount
+  - BankAccount
+  - Payment
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Gamblers and traders open new accounts and move money quickly
+  - Chargebacks follow genuine merchant disputes
+  jurisdictions: US; FATF members
+  version: 1
+- id: CY-052
+  name: Crypto platform customer much older than the typical user
+  definition: A customer far older than the platform's average user opens an account, which FATF lists
+    because older people are often scam victims or recruited mules.
+  areas:
+  - CY
+  - FR
+  typology: Victim-side signal
+  status: verified
+  sources:
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 14
+    quote: A customer significantly older than the average age of platform users opens an account
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An 82-year-old opens an exchange account and deposits life savings.
+  cases: []
+  data_needed:
+  - Person (birthDate)
+  - UserAccount
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Older people invest in crypto by choice
+  jurisdictions: FATF members
+  version: 1
+- id: CY-053
+  name: Crypto converted to cash at a loss or whole balance traded at once
+  definition: A user exchanges crypto for regular money at an obvious loss, or a new user immediately
+    tries to trade the entire balance, showing more interest in moving value than in returns.
+  areas:
+  - CY
+  - FR
+  - ML
+  typology: Layering
+  status: verified
+  sources:
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 12
+    quote: Conducting VA-fiat currency exchange at a potential loss
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Virtual Assets: Red Flag Indicators'
+    publisher: FATF
+    year: '2020'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Virtual-Assets-Red-Flag-Indicators.pdf
+    locator: Para 12
+    quote: A new user attempts to trade the entire balance of VAs
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Selling BTC 8% below market price for quick fiat.
+  cases: []
+  data_needed:
+  - Payment
+  - CryptoWallet
+  - UserAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Panic selling in a falling market
+  - Urgent need for cash
+  jurisdictions: FATF members
+  version: 1
+not_reached:
+- 'FATF ''Countering Ransomware Financing'' (March 2023) report and its risk-indicator annex: fatf-gafi.org
+  blocked automated fetching (robots / HTML returned instead of PDF)'
+- 'FATF ''Illicit Financial Flows from Cyber-Enabled Fraud'' (November 2023): same fetch block'
+- 'OHCHR full report ''Online Scam Operations and Trafficking into Forced Criminality in Southeast Asia''
+  (2023) PDF: fetch error; only the OHCHR press release was used'
+- 'US Army FM 2-22.3 Appendix B (source and information reliability matrix, with full A–F/1–6 descriptions):
+  FAS copy empty, marines.mil copy truncated before the appendix; NATO AJP-2.1 Edition B ratification
+  draft (labels only) was used instead'
+- 'UNODC 2024/2025 reports on scam centres and casinos in Southeast Asia: not opened'
+- 'Europol IOCTA and Europol/Eurojust ransomware reports: not opened'
+- 'NCA Operation Cronos (LockBit) press release: not opened from primary site'
+- 'DOJ indictment of Chen Zhi (E.D.N.Y.) and civil forfeiture complaint for ~127,271 BTC: not opened;
+  only the Treasury press release mentioning the unsealed indictment'
+- 'FinCEN 2025 advisory on Chinese money laundering networks (FIN-2025 CMLN): not opened in detail'
+- 'FinCEN Bitzlato Section 9714 order (2023) and OFAC Blender.io / Tornado Cash designations: not opened'
+- 'UK PHIA Probability Yardstick and Berkeley Protocol on Digital Open Source Investigations: not opened
+  (would add glossary entries on judging sources)'
