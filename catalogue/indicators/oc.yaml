@@ -1,0 +1,2595 @@
+key: OC
+name: Organised crime and illicit goods
+scope: organised crime group structures, drug trafficking, arms trafficking, counterfeit goods, match-fixing
+  and sports corruption, front businesses.
+indicators:
+- id: OC-001
+  name: Group meets the legal definition of an organised criminal group
+  definition: Three or more people work together over time to commit serious crimes for money or other
+    material gain.
+  areas:
+  - OC
+  typology: Organised crime group structure
+  status: verified
+  sources:
+  - title: United Nations Convention against Transnational Organized Crime, Article 2
+    publisher: United Nations (text hosted by University of Oslo Faculty of Law library)
+    year: '2000'
+    url: https://jus.uio.no/english/services/library/treaties/04/4-05/un-transnational-organized.html
+    locator: Article 2(a), 2(b), 2(c)
+    quote: '"Organized criminal group" shall mean a structured group of three or more persons, existing
+      for a period of time and acting in concert with the aim of committing one or more serious crimes
+      or offences'
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A cartel leader convicted of running a continuing criminal enterprise covering 26 drug violations
+    (Guzmán, 2019).
+  cases:
+  - name: United States v. Joaquín Guzmán Loera
+    year: '2019'
+    jurisdiction: United States (E.D.N.Y.)
+    what_happened: Jury convicted Guzmán on all 10 counts including a continuing criminal enterprise covering
+      26 drug-related violations and a murder conspiracy; sentenced to life plus 30 years and $12.6 billion
+      forfeiture.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/joaquin-el-chapo-guzman-sinaloa-cartel-leader-sentenced-life-prison-plus-30-years
+    source_title: Joaquin 'El Chapo' Guzman, Sinaloa Cartel Leader, Sentenced to Life in Prison Plus 30
+      Years
+  - name: United States v. Viktor Bout
+    year: '2011'
+    jurisdiction: United States (S.D.N.Y.)
+    what_happened: Arms dealer convicted on four conspiracy counts, including providing material support
+      to a designated foreign terrorist organisation; sentenced to 25 years on 5 April 2012.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archive/usao/nys/pressreleases/April12/boutviktorsentencing.html
+    source_title: Viktor Bout sentencing press release, U.S. Attorney S.D.N.Y.
+  data_needed:
+  - Person
+  - Associate
+  - Family
+  - UnknownLink
+  - Employment
+  - Directorship
+  - Payment
+  - Document (court records, indictments)
+  checkable: person
+  lookup_sources:
+  - Court records and indictments
+  - Sanctions lists (OFAC SDN, UN, EU)
+  - Police and prosecutor press releases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Three or more persons, existing for a period of time, acting together to commit offences
+      punishable by at least four years' imprisonment, for financial or other material benefit (UNTOC
+      Art. 2(a)-(b)).
+    threshold_source: https://jus.uio.no/english/services/library/treaties/04/4-05/un-transnational-organized.html
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Arms-trafficking networks may supply designated terrorist organisations; Bout was convicted
+      of conspiring to provide material support to one.
+    source_url: https://www.justice.gov/archive/usao/nys/pressreleases/April12/boutviktorsentencing.html
+  innocent_explanations:
+  - Ordinary businesses, families and social groups also have three or more members working together over
+    time; the definition only applies when the shared aim is serious crime.
+  - People can be linked to a group by family, employment or neighbourhood without taking part in its
+    crimes.
+  jurisdictions: International (189+ States Parties to UNTOC); national definitions vary.
+  version: 1
+- id: OC-002
+  name: Criminal network uses or owns legal businesses
+  definition: A criminal network runs, owns or uses ordinary companies to commit crimes, hide them, or
+    launder the money.
+  areas:
+  - ML
+  - OC
+  typology: Front businesses / abuse of legal business structures
+  status: verified
+  sources:
+  - title: Council conclusions on mapping the most threatening criminal networks (summarising Europol,
+      Decoding the EU's most threatening criminal networks, April 2024)
+    publisher: Council of the European Union
+    year: '2024'
+    url: https://data.consilium.europa.eu/doc/document/ST-11153-2024-INIT/en/pdf
+    locator: p. 4, point m
+    quote: 86 % of the most threatening criminal networks make use of legal business structures (LBS)
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Abuse of Legal Business Structures through Criminal Networks (on Europol, Leveraging legitimacy,
+      18 Dec 2024)
+    publisher: eucrim / Europol
+    year: '2024'
+    url: https://eucrim.eu/news/abuse-of-legal-business-structures-through-criminal-networks/
+    locator: news summary
+    quote: high-level infiltration or criminal ownership of legal business structures
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: Europol and EUIPO
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+      crime threat assessment 2022_2.pdf
+    locator: p. 35
+    quote: Legal business structures are an essential component of IP crime.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A cartel leader laundered money through insurance companies, debit cards and shell companies alongside
+    bulk cash smuggling.
+  cases:
+  - name: United States v. Joaquín Guzmán Loera
+    year: '2019'
+    jurisdiction: United States (E.D.N.Y.)
+    what_happened: DOJ states he laundered billions through bulk cash smuggling and other methods including
+      insurance companies, debit cards and shell companies.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/joaquin-el-chapo-guzman-sinaloa-cartel-leader-sentenced-life-prison-plus-30-years
+    source_title: DOJ press release on sentencing
+  data_needed:
+  - Company
+  - Ownership
+  - Directorship
+  - Person
+  - Payment
+  - BankAccount
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Beneficial ownership registers
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Europol states legal business structures are integral to laundering criminal proceeds.
+    source_url: https://eucrim.eu/news/abuse-of-legal-business-structures-through-criminal-networks/
+  innocent_explanations:
+  - Most people with a criminal record who own businesses run them lawfully.
+  - Legitimate firms can be used unknowingly; Europol notes a range from criminal-owned firms to legitimate
+    firms that unwittingly facilitate crime.
+  jurisdictions: EU findings; pattern seen worldwide
+  version: 1
+- id: OC-003
+  name: Front companies used to move illicit cargo through ports
+  definition: Companies are set up so that drugs or other illicit goods travel inside normal commercial
+    shipments.
+  areas:
+  - OC
+  typology: Drug trafficking via maritime containers
+  status: verified
+  sources:
+  - title: 'Criminal networks in EU ports: Risks and challenges for law enforcement'
+    publisher: Europol and EMPACT (joint report)
+    year: '2023'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Europol_Joint-report_Criminal
+      networks in EU ports_Public_version.pdf
+    locator: p. 9
+    quote: setting-up of front companies, and sending illicit cargo within the legitimate stream of commerce
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A newly formed importer receiving container loads of low-value goods from a cocaine-source country.
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Directorship
+  - Address
+  - Vessel
+  - Document (bills of lading, customs declarations)
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Customs and trade data (bills of lading)
+  - Ship tracking
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New import businesses are created all the time and may have thin histories.
+  - Small importers often use freight forwarders and have few staff or assets.
+  jurisdictions: EU ports; general
+  version: 1
+- id: OC-004
+  name: Corrupted insiders in ports, logistics or customs
+  definition: Port, logistics or customs staff are bribed to let illicit shipments through or help retrieve
+    them.
+  areas:
+  - CO
+  - OC
+  typology: Drug trafficking via maritime containers
+  status: verified
+  sources:
+  - title: 'Criminal networks in EU ports: Risks and challenges for law enforcement'
+    publisher: Europol and EMPACT
+    year: '2023'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Europol_Joint-report_Criminal
+      networks in EU ports_Public_version.pdf
+    locator: p. 13; p. 19
+    quote: The insiders include corrupted port personnel but also extraction teams brought into the port
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A terminal worker with unexplained income who repeatedly accesses records of containers they do not
+    handle.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Payment
+  - BankAccount
+  - Associate
+  - Company
+  checkable: person
+  lookup_sources:
+  - Court records
+  - Employment records (person)
+  - Asset and property records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Europol describes criminal networks infiltrating ports by corrupting port, logistics and customs
+      personnel.
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Europol_Joint-report_Criminal
+      networks in EU ports_Public_version.pdf
+  innocent_explanations:
+  - Port workers legitimately access many shipment records as part of their jobs.
+  - Extra income can come from overtime, second jobs or family.
+  jurisdictions: EU ports; general
+  version: 1
+- id: OC-005
+  name: Container release codes misused or containers going missing
+  definition: Release codes for containers are leaked or misused so criminals can collect a container
+    while pretending to be the real client.
+  areas:
+  - OC
+  typology: Drug trafficking via maritime containers (PIN code fraud)
+  status: verified
+  sources:
+  - title: 'Criminal networks in EU ports: Risks and challenges for law enforcement'
+    publisher: Europol and EMPACT
+    year: '2023'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Europol_Joint-report_Criminal
+      networks in EU ports_Public_version.pdf
+    locator: p. 6; p. 15; p. 17
+    quote: the criminals retrieve the drugs container from the port terminal pretending to be the legitimate
+      client
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A container reported as collected by a haulier the consignee never hired; containers delivered to
+    wrong addresses or found in unexpected places (p. 15).
+  cases: []
+  data_needed:
+  - Company
+  - Vessel
+  - Address
+  - Person
+  - Employment
+  - Document (terminal release logs, delivery records)
+  checkable: records
+  lookup_sources:
+  - Terminal operator records
+  - Ship tracking
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: Europol notes codes may also be obtained through hacking or phishing.
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Europol_Joint-report_Criminal
+      networks in EU ports_Public_version.pdf
+  innocent_explanations:
+  - Containers are sometimes misrouted or delivered to wrong addresses through clerical error.
+  - Codes are shared among many legitimate staff and hauliers for operational reasons.
+  jurisdictions: EU ports; general
+  version: 1
+- id: OC-006
+  name: Shipments routed through low-inspection channels with corrupted contacts
+  definition: Criminals pick shipments and logistics firms that are unlikely to be inspected and where
+    they have bribed contacts.
+  areas:
+  - OC
+  typology: Drug trafficking via maritime containers ('green lines')
+  status: verified
+  sources:
+  - title: 'Criminal networks in EU ports: Risks and challenges for law enforcement'
+    publisher: Europol and EMPACT
+    year: '2023'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Europol_Joint-report_Criminal
+      networks in EU ports_Public_version.pdf
+    locator: p. 10
+    quote: less likely to be inspected
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Repeated use of the same small forwarder for perishable goods from a source country.
+  cases: []
+  data_needed:
+  - Company
+  - Vessel
+  - Document (customs declarations)
+  - Associate
+  checkable: lookups
+  lookup_sources:
+  - Customs and trade data
+  - Ship tracking
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many legitimate shippers use trusted-trader or fast-lane schemes and stick with one forwarder.
+  jurisdictions: EU ports; general
+  version: 1
+- id: OC-007
+  name: 'Funnel account: cash in one region, withdrawn in another'
+  definition: An account receives many cash deposits, often below the reporting threshold, in one place
+    and the money is quickly taken out somewhere else.
+  areas:
+  - ML
+  - OC
+  typology: Drug proceeds laundering
+  status: verified
+  sources:
+  - title: 'Update on U.S. Currency Restrictions in Mexico: Funnel Accounts and TBML (FIN-2014-A005)'
+    publisher: FinCEN (U.S. Treasury)
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A005.pdf
+    locator: Funnel account definition and red flags
+    quote: An individual or business account in one geographic area that receives multiple cash deposits,
+      often in amounts below the cash reporting threshold, and from which the funds are withdrawn in a
+      different geographic area with little time elapsing between the deposits and withdrawals.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An account opened near the US southwest border receives cash deposits under $10,000 from unidentified
+    people at branches in other states.
+  cases:
+  - name: TD Bank, N.A. guilty plea
+    year: '2024'
+    jurisdiction: United States (D.N.J.)
+    what_happened: TD Bank pleaded guilty to conspiring to fail to maintain an AML program and agreed
+      to pay over $1.8 billion; DOJ said networks moved hundreds of millions including for international
+      drug traffickers, one through cash deposits into nominee accounts.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/td-bank-pleads-guilty-bank-secrecy-act-and-money-laundering-conspiracy-violations-18b
+    source_title: TD Bank Pleads Guilty to Bank Secrecy Act and Money Laundering Conspiracy Violations
+  data_needed:
+  - BankAccount
+  - Payment
+  - Person
+  - Company
+  - Address
+  checkable: records
+  lookup_sources:
+  - Bank records (records)
+  - Suspicious activity reporting (not public)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Multiple cash deposits below the $10,000 reporting threshold in one area, withdrawn quickly
+      in another (FinCEN FIN-2014-A005).
+    threshold_source: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A005.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Funnel accounts are a placement and layering method for drug cash.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A005.pdf
+  innocent_explanations:
+  - Families and businesses with staff in several regions deposit cash in one place for use in another.
+  - Students or workers away from home may be supported by relatives depositing cash.
+  jurisdictions: United States / Mexico corridor
+  version: 1
+- id: OC-008
+  name: Structuring cash to avoid reporting thresholds
+  definition: Someone splits cash into amounts just under the reporting limit, or changes a transaction
+    when told it will be reported.
+  areas:
+  - ML
+  - OC
+  typology: Drug proceeds laundering
+  status: verified
+  sources:
+  - title: Supplemental Advisory on the Procurement of Precursor Chemicals and Manufacturing Equipment
+      Used for the Synthesis of Illicit Fentanyl (FIN-2024-A002)
+    publisher: FinCEN
+    year: '2024'
+    url: https://fincen.gov/sites/default/files/advisory/2024-06-20/FinCEN-Supplemental-Advisory-on-Fentanyl-508C.pdf
+    locator: Transactional red flag 12
+    quote: A customer engages in behavior that suggests efforts to evade the Currency Transaction Report
+      (CTR) filing requirement
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
+    publisher: FINTRAC (Canada)
+    year: '2025'
+    url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+    locator: General money laundering indicators
+    quote: Client has funds deposited into his or her personal account in amounts below the reporting
+      threshold from what
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Several cash deposits of $9,500 on consecutive days.
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment
+  - Person
+  checkable: records
+  lookup_sources:
+  - Bank records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Multiple cash transactions under $10,000, or altering/cancelling a transaction when told
+      a CTR would be filed (FinCEN FIN-2024-A002, red flag 12).
+    threshold_source: https://fincen.gov/sites/default/files/advisory/2024-06-20/FinCEN-Supplemental-Advisory-on-Fentanyl-508C.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Structuring is itself a reporting offence and a placement technique.
+    source_url: https://fincen.gov/sites/default/files/advisory/2024-06-20/FinCEN-Supplemental-Advisory-on-Fentanyl-508C.pdf
+  innocent_explanations:
+  - Cash businesses bank daily takings that naturally fall below the limit.
+  - Some people avoid paperwork out of privacy concerns, without a criminal source.
+  jurisdictions: US ($10,000 CTR); Canada (C$10,000 large cash reporting)
+  version: 1
+- id: OC-009
+  name: Bulk cash moved by armoured car and rapidly sent abroad
+  definition: Large amounts of cash are delivered to a bank or money transmitter, often by armoured car,
+    for a cross-border business and then quickly moved to Mexico or other businesses.
+  areas:
+  - ML
+  - OC
+  typology: Bulk cash smuggling and repatriation
+  status: verified
+  sources:
+  - title: FinCEN Alert on Bulk Cash Smuggling and Repatriation by Mexico-Based Transnational Criminal
+      Organizations (FIN-2025-Alert001)
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/shared/BCS-Alert-FINAL-508C.pdf
+    locator: Red flags for depository institutions, 1-2
+    quote: Large volumes of cash are transported by an ACS or passenger vehicles to an U.S.-based MSB
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
+    publisher: FINTRAC
+    year: '2025'
+    url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+    locator: General money laundering indicators
+    quote: Client makes use of armored car services that are not in line with expectations.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A Mexico-based business ships cash by armoured car to several US cities before it reaches a bank,
+    then wires it to Mexico.
+  cases:
+  - name: United States v. Joaquín Guzmán Loera
+    year: '2019'
+    jurisdiction: United States (E.D.N.Y.)
+    what_happened: DOJ states he laundered billions of dollars through bulk cash smuggling from the US
+      to Mexico.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/joaquin-el-chapo-guzman-sinaloa-cartel-leader-sentenced-life-prison-plus-30-years
+    source_title: DOJ press release on sentencing
+  data_needed:
+  - Company
+  - BankAccount
+  - Payment
+  - Address
+  - Ownership
+  checkable: records
+  lookup_sources:
+  - Bank and MSB records
+  - CMIR filings (not public)
+  - Company registry (Mexico/US)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Cash over $10,000 moved across the US border must be reported on FinCEN Form 105 (CMIR);
+      unexplained or unreported movements meet the alert's pattern.
+    threshold_source: https://www.fincen.gov/system/files/shared/BCS-Alert-FINAL-508C.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Repatriating drug cash is the placement stage of laundering.
+    source_url: https://www.fincen.gov/system/files/shared/BCS-Alert-FINAL-508C.pdf
+  innocent_explanations:
+  - Cross-border retailers, currency exchangers and border businesses legitimately handle large US dollar
+    cash volumes.
+  - Armoured car services are a normal way to move business cash safely.
+  jurisdictions: United States / Mexico / Canada
+  version: 1
+- id: OC-010
+  name: Cash or income out of line with business size or profile
+  definition: A business handles far more cash or income than its size, sector or history would explain.
+  areas:
+  - ML
+  - OC
+  typology: Front businesses / commingling
+  status: verified
+  sources:
+  - title: FinCEN Alert on Bulk Cash Smuggling and Repatriation by Mexico-Based TCOs (FIN-2025-Alert001)
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/shared/BCS-Alert-FINAL-508C.pdf
+    locator: Red flags for armored car services, 8
+    quote: that are not commensurate with the size of the business or the business profile.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
+    publisher: FINTRAC
+    year: '2025'
+    url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+    locator: General money laundering indicators
+    quote: Client sales/purchases/expenses are not in line with their business profile as a cash-heavy
+      industry (laundry
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN Advisory on Chinese Money Laundering Networks (FIN-2025-A003)
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+    locator: TBML red flag 6
+    quote: A business that sells electronics or other luxury goods has income that is not commensurate
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A small laundromat deposits more cash than its machines could take in.
+  cases: []
+  data_needed:
+  - Company
+  - BankAccount
+  - Payment
+  - Address
+  - Document (tax filings, accounts)
+  checkable: lookups
+  lookup_sources:
+  - Company registry and filed accounts
+  - Bank records
+  - Sector benchmarks
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FINTRAC lists absent payroll or sales tax transactions alongside cash-heavy profiles.
+    source_url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+  innocent_explanations:
+  - Seasonal peaks, a new contract or a successful promotion.
+  - Owners injecting personal savings or loans into the business.
+  jurisdictions: US, Canada; general
+  version: 1
+- id: OC-011
+  name: Unclear origin or destination of cross-border cash
+  definition: Whoever is sending cash across a border will not, or cannot, say clearly where it came from
+    or where it is going.
+  areas:
+  - ML
+  - OC
+  typology: Bulk cash smuggling
+  status: verified
+  sources:
+  - title: FinCEN Alert on Bulk Cash Smuggling and Repatriation by Mexico-Based TCOs (FIN-2025-Alert001)
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/shared/BCS-Alert-FINAL-508C.pdf
+    locator: Red flags 7, 9, 10
+    quote: but does not provide a clear explanation of the source of the funds.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A cash shipment arrives from a Mexico- or Canada-based armoured carrier without instructions or purpose.
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Document (CMIR, shipping instructions)
+  checkable: records
+  lookup_sources:
+  - CMIR filings (not public)
+  - Bank records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Cash over $10,000 crossing the US border with missing or inconsistent originator or destination
+      on CMIR Part II.
+    threshold_source: https://www.fincen.gov/system/files/shared/BCS-Alert-FINAL-508C.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Paperwork errors or language barriers.
+  - Businesses guarding commercial confidentiality.
+  jurisdictions: United States / Mexico / Canada
+  version: 1
+- id: OC-012
+  name: Chemical or pharmaceutical supplier with shell-company features
+  definition: A chemical or drug-ingredient company, often in China or Hong Kong, shares an address with
+    similar firms, uses a home address, or has no real premises.
+  areas:
+  - OC
+  typology: Synthetic drug precursor procurement
+  status: verified
+  sources:
+  - title: Supplemental Advisory on the Procurement of Precursor Chemicals and Manufacturing Equipment
+      (FIN-2024-A002)
+    publisher: FinCEN
+    year: '2024'
+    url: https://fincen.gov/sites/default/files/advisory/2024-06-20/FinCEN-Supplemental-Advisory-on-Fentanyl-508C.pdf
+    locator: Customer and counterparty profile red flag 2
+    quote: with a residential address or a business address shared with other similar businesses or that
+      has no physical presence
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Five chemical exporters registered at one apartment in a single city.
+  cases:
+  - name: Eight indictments against China-based chemical manufacturing companies and employees
+    year: '2023'
+    jurisdiction: United States
+    what_happened: DOJ announced indictments (3 Oct 2023) against China-based chemical companies and employees
+      for fentanyl precursor trafficking; cited in FinCEN FIN-2024-A002.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://fincen.gov/sites/default/files/advisory/2024-06-20/FinCEN-Supplemental-Advisory-on-Fentanyl-508C.pdf
+    source_title: FinCEN FIN-2024-A002 footnotes 16, 38, 40
+  data_needed:
+  - Company
+  - Address
+  - Ownership
+  - Directorship
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Company registries (PRC, Hong Kong)
+  - Sanctions lists (OFAC SDN)
+  - Business address databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FinCEN lists payments to parties named in DOJ indictments and OFAC designations as a red flag.
+    source_url: https://fincen.gov/sites/default/files/advisory/2024-06-20/FinCEN-Supplemental-Advisory-on-Fentanyl-508C.pdf
+  innocent_explanations:
+  - Small trading firms often use registered-agent or shared office addresses.
+  - Many legitimate chemical distributors do not manufacture and have no plant.
+  jurisdictions: PRC, Hong Kong, Mexico, US
+  version: 1
+- id: OC-013
+  name: Unrelated importers share contacts and the same overseas chemical supplier
+  definition: Several importing companies that claim to be unrelated share phone numbers, emails or addresses
+    and buy from the same Chinese chemical suppliers.
+  areas:
+  - OC
+  typology: Synthetic drug precursor procurement
+  status: verified
+  sources:
+  - title: Supplemental Advisory on the Procurement of Precursor Chemicals and Manufacturing Equipment
+      (FIN-2024-A002)
+    publisher: FinCEN
+    year: '2024'
+    url: https://fincen.gov/sites/default/files/advisory/2024-06-20/FinCEN-Supplemental-Advisory-on-Fentanyl-508C.pdf
+    locator: Customer and counterparty profile red flag 7
+    quote: Multiple, seemingly unrelated Mexican importing companies share phone numbers, email addresses,
+      or physical addresses
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Three Mexican importers list the same email domain and pay the same PRC supplier.
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Email
+  - Phone
+  - Payment
+  - UnknownLink
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Trade data
+  - Domain and phone lookups
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Customs brokers or accountants often register many clients with their own contact details.
+  - Related family businesses may share offices.
+  jurisdictions: Mexico, PRC, US
+  version: 1
+- id: OC-014
+  name: Payments to overseas chemical firms with no business reason
+  definition: A person or company outside the chemical trade sends money, often small amounts or crypto,
+    to chemical or pharmaceutical firms in China, India or Eastern Europe.
+  areas:
+  - OC
+  typology: Synthetic drug precursor procurement
+  status: verified
+  sources:
+  - title: Supplemental Advisory on the Procurement of Precursor Chemicals and Manufacturing Equipment
+      (FIN-2024-A002)
+    publisher: FinCEN
+    year: '2024'
+    url: https://fincen.gov/sites/default/files/advisory/2024-06-20/FinCEN-Supplemental-Advisory-on-Fentanyl-508C.pdf
+    locator: Transactional red flags 9-11, 14
+    quote: A Mexico-based entity from an unrelated industry transacts with a PRC-based chemical or pharmaceutical
+      company.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
+    publisher: FINTRAC
+    year: '2025'
+    url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+    locator: Indicators of synthetic opioid production
+    quote: Client makes virtual currency or wire transfers to chemical companies located in China, Eastern
+      Europe, or India.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A Mexican clothing retailer wires money to a Hong Kong pharmaceutical intermediate supplier.
+  cases:
+  - name: Charges against China-based chemical companies and arrests of executives
+    year: '2023'
+    jurisdiction: United States
+    what_happened: DOJ announced charges (23 June 2023) against China-based chemical manufacturing companies
+      and arrests of executives in fentanyl manufacturing; cited in FIN-2024-A002.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://fincen.gov/sites/default/files/advisory/2024-06-20/FinCEN-Supplemental-Advisory-on-Fentanyl-508C.pdf
+    source_title: FinCEN FIN-2024-A002 footnotes
+  data_needed:
+  - Payment
+  - Company
+  - Person
+  - CryptoWallet
+  - BankAccount
+  checkable: records
+  lookup_sources:
+  - Bank and crypto records
+  - Company registries
+  - Blockchain analytics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Businesses diversify into new product lines.
+  - Hobbyists and researchers buy lab supplies abroad.
+  jurisdictions: Mexico, Canada, US, PRC, India
+  version: 1
+- id: OC-015
+  name: Importer lacks licences or real presence but buys controlled chemicals
+  definition: A company imports precursor chemicals or lab equipment without the required licences, or
+    has almost no online presence or real chemical business.
+  areas:
+  - OC
+  typology: Synthetic drug precursor procurement
+  status: verified
+  sources:
+  - title: Supplemental Advisory on the Procurement of Precursor Chemicals and Manufacturing Equipment
+      (FIN-2024-A002)
+    publisher: FinCEN
+    year: '2024'
+    url: https://fincen.gov/sites/default/files/advisory/2024-06-20/FinCEN-Supplemental-Advisory-on-Fentanyl-508C.pdf
+    locator: Customer and counterparty profile red flags 5-6
+    quote: shipments of fentanyl precursor chemicals and manufacturing equipment without appropriate importing
+      licenses
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An importer with no website or permits receiving 4-ANPP shipments.
+  cases: []
+  data_needed:
+  - Company
+  - Document (import licences, customs records)
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Chemical import licence registers
+  - Company registry
+  - Trade data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Licence applications may be pending.
+  - Many small B2B firms have little online presence.
+  jurisdictions: Mexico; general
+  version: 1
+- id: OC-016
+  name: Transactions with darknet markets or crypto mixers
+  definition: Money or crypto goes to or from darknet marketplaces, mixing services or addresses known
+    to be linked to illicit activity.
+  areas:
+  - ML
+  - OC
+  typology: Online drug trafficking
+  status: verified
+  sources:
+  - title: Advisory on Illicit Financial Schemes and Methods Related to the Trafficking of Fentanyl and
+      Other Synthetic Opioids (FIN-2019-A006)
+    publisher: FinCEN
+    year: '2019'
+    url: https://www.fincen.gov/sites/default/files/advisory/2019-08-21/Fentanyl%20Advisory%20FINAL%20508.pdf
+    locator: Clearnet and Darknet Marketplace red flags
+    quote: Direct or indirect transactions with Darknet marketplaces or CVC mixing services.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
+    publisher: FINTRAC
+    year: '2025'
+    url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+    locator: General virtual currency indicators
+    quote: Client sends or receives virtual currency to/from mixing or tumbling services that is unusual
+      for their profile.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A wallet receiving funds traced by blockchain analytics to a darknet market vendor address.
+  cases:
+  - name: Three Darknet Fentanyl Vendors Sentenced to Over 20 Years in Prison
+    year: '2023'
+    jurisdiction: United States
+    what_happened: Three darknet fentanyl vendors were sentenced to over 20 years (14 July 2023); cited
+      in FIN-2024-A002.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://fincen.gov/sites/default/files/advisory/2024-06-20/FinCEN-Supplemental-Advisory-on-Fentanyl-508C.pdf
+    source_title: FinCEN FIN-2024-A002 footnote 20
+  data_needed:
+  - CryptoWallet
+  - Payment
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Blockchain analytics
+  - Exchange records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: Darknet markets and mixers are shared infrastructure for many online crimes.
+    source_url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+  innocent_explanations:
+  - Privacy-minded users use mixers for lawful reasons.
+  - Indirect exposure can arise several hops away without the user's knowledge.
+  jurisdictions: Global
+  version: 1
+- id: OC-017
+  name: Drug names or slang in payment notes
+  definition: Payment memos or notes mention drugs, drug slang or weights.
+  areas:
+  - OC
+  typology: Drug distribution
+  status: verified
+  sources:
+  - title: Advisory on Illicit Financial Schemes and Methods Related to the Trafficking of Fentanyl (FIN-2019-A006)
+    publisher: FinCEN
+    year: '2019'
+    url: https://www.fincen.gov/sites/default/files/advisory/2019-08-21/Fentanyl%20Advisory%20FINAL%20508.pdf
+    locator: Clearnet and Darknet Marketplace red flags
+    quote: Customers discussing drug purchases in the transaction notes field available on the exchange,
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
+    publisher: FINTRAC
+    year: '2025'
+    url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+    locator: Indicators of synthetic opioid distribution
+    quote: Client receives email money transfers with references to common street-names for drugs in memo
+      section
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A transfer note reading '1 gram fent'.
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - BankAccount
+  checkable: records
+  lookup_sources:
+  - Bank and payment app records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Jokes or slang between friends.
+  - Words that are also nicknames or brand names.
+  jurisdictions: US, Canada
+  version: 1
+- id: OC-018
+  name: Buying pill presses or industrial lab equipment with no business need
+  definition: Someone buys pill presses, die molds, pumps or other lab gear that their stated business
+    does not need.
+  areas:
+  - OC
+  typology: Synthetic drug production
+  status: verified
+  sources:
+  - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
+    publisher: FINTRAC
+    year: '2025'
+    url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+    locator: Indicators of synthetic opioid production
+    quote: Client purchases industrial lab equipment with no obvious business need, for example pill presses
+      and industrial pumps.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Supplemental Advisory (FIN-2024-A002)
+    publisher: FinCEN
+    year: '2024'
+    url: https://fincen.gov/sites/default/files/advisory/2024-06-20/FinCEN-Supplemental-Advisory-on-Fentanyl-508C.pdf
+    locator: footnote 9
+    quote: Pill presses and die molds are components used to manufacture fentanyl and other synthetic
+      opioids in pill form.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A person with a landscaping business buys a tablet press and punch dies online.
+  cases: []
+  data_needed:
+  - Payment
+  - Company
+  - Person
+  - Document (invoices, shipping records)
+  checkable: records
+  lookup_sources:
+  - Bank records
+  - Import/customs data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Supplement, confectionery and cosmetics makers use pill presses legitimately.
+  jurisdictions: Canada, US
+  version: 1
+- id: OC-019
+  name: Rural rentals, storage lockers or warehouses out of line with profile
+  definition: Someone rents several rural properties, storage lockers or warehouses that do not fit their
+    stated work.
+  areas:
+  - OC
+  typology: Synthetic drug production
+  status: verified
+  sources:
+  - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
+    publisher: FINTRAC
+    year: '2025'
+    url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+    locator: Indicators of synthetic opioid production
+    quote: Client makes payment for a rental storage locker not commensurate with their overall client
+      profile.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Rent paid on three remote farm properties by an office worker.
+  cases: []
+  data_needed:
+  - Payment
+  - Address
+  - Person
+  - Company
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - Land and property registries
+  - Bank records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Holiday homes, family property or moving house.
+  - Small businesses need storage.
+  jurisdictions: Canada; general
+  version: 1
+- id: OC-020
+  name: Mailing patterns typical of drug distribution
+  definition: Frequent bulk buying of mailing supplies, many small parcels under 1 kg, vague or disguised
+    contents descriptions, and use of PO boxes or drop addresses.
+  areas:
+  - OC
+  typology: Drug distribution by post and courier
+  status: verified
+  sources:
+  - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
+    publisher: FINTRAC
+    year: '2025'
+    url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+    locator: Indicators of synthetic opioid distribution
+    quote: Client ships packages under the 1 kg weight.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Dozens of parcels labelled 'action figure' sent to the US and Mexico.
+  cases: []
+  data_needed:
+  - Payment
+  - Address
+  - Person
+  - Document (shipping records)
+  checkable: records
+  lookup_sources:
+  - Courier and postal records
+  - Bank records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Packages under 1 kg combined with disguised descriptions or bulk mailing purchases, as listed
+      by FINTRAC.
+    threshold_source: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Europol reports counterfeit items increasingly enter the EU in small parcels too.
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+      crime threat assessment 2022_2.pdf
+  innocent_explanations:
+  - Online sellers of small goods ship many light parcels.
+  - PO boxes are common for privacy and rural residents.
+  jurisdictions: Canada; general
+  version: 1
+- id: OC-021
+  name: Transport or logistics worker with cash beyond their means
+  definition: A trucking, shipping or logistics worker deposits cash or buys crypto or prepaid cards well
+    beyond what their job pays.
+  areas:
+  - OC
+  typology: Drug distribution
+  status: verified
+  sources:
+  - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
+    publisher: FINTRAC
+    year: '2025'
+    url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+    locator: Indicators of synthetic opioid distribution
+    quote: Client employed in trucking/shipping/logistics frequently makes cash deposits beyond the financial
+      means associated
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A long-haul driver making weekly cash deposits to reloadable prepaid cards.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Payment
+  - BankAccount
+  checkable: records
+  lookup_sources:
+  - Bank records
+  - Employment records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Drivers are often paid cash expenses or tips.
+  - Side businesses or family support.
+  jurisdictions: Canada; general
+  version: 1
+- id: OC-022
+  name: Unexplained wealth for a student, retiree or low-income person (possible money mule)
+  definition: Someone with a low stated income regularly receives and passes on money that their job cannot
+    explain.
+  areas:
+  - ML
+  - OC
+  typology: Chinese money laundering networks / money mules
+  status: verified
+  sources:
+  - title: FinCEN Advisory on the Use of Chinese Money Laundering Networks by Mexico-Based TCOs (FIN-2025-A003)
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+    locator: Money mule red flags 1, 3, 4
+    quote: as a student, retiree, housewife, or other low-income occupation
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
+    publisher: FINTRAC
+    year: '2025'
+    url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+    locator: General money laundering indicators
+    quote: Client lives beyond his or her apparent means, as evidenced by large credit card or other bills,
+      or expenses
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A student account receives 'tuition' wires far above fees and then pays unrelated people.
+  cases:
+  - name: Queens, NY Chinese money laundering conspiracy (DOJ, 22 Feb 2022)
+    year: '2022'
+    jurisdiction: United States
+    what_happened: A defendant admitted orchestrating a $653 million laundering conspiracy, operating
+      an unlicensed money transmitting business and bribing bank employees (as summarised in FIN-2025-A003).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+    source_title: FinCEN FIN-2025-A003
+  - name: United States v. Chen (D. Mass., 1:25-cr-10284)
+    year: '2025'
+    jurisdiction: United States
+    what_happened: Seven Chinese nationals charged in a laundering, alien smuggling and drug trafficking
+      enterprise; ongoing.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+    source_title: FinCEN FIN-2025-A003
+  data_needed:
+  - Person
+  - BankAccount
+  - Payment
+  - Employment
+  - Passport
+  checkable: records
+  lookup_sources:
+  - Bank records
+  - Property registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: The Chen case combined money laundering with alien smuggling charges.
+    source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+  innocent_explanations:
+  - Family wealth or support from abroad.
+  - Inheritance or savings.
+  - FinCEN's wording singles out Chinese nationals; nationality alone is not evidence and must not be
+    used as a proxy.
+  jurisdictions: United States; general
+  version: 1
+- id: OC-023
+  name: Unexplained funds used to buy property via cashier's checks or foreign shell companies
+  definition: Someone with unexplained wealth, or a foreign shell company, pays for property through escrow,
+    wires or cashier's checks.
+  areas:
+  - ML
+  - OC
+  typology: Chinese money laundering networks / real estate
+  status: verified
+  sources:
+  - title: FinCEN Advisory on CMLNs (FIN-2025-A003)
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+    locator: Money mule red flags 5, 10
+    quote: shell company or entity in a disparate line of business
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An escrow company receives funds for a house purchase from a Hong Kong trading company unrelated to
+    the buyer.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Ownership
+  - Payment
+  - Address
+  - Document (deeds, escrow records)
+  checkable: lookups
+  lookup_sources:
+  - Property registries
+  - Company registries (Hong Kong)
+  - Beneficial ownership registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FinCEN lists real estate purchases as a CMLN laundering outlet for drug proceeds.
+    source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+  innocent_explanations:
+  - Foreign buyers often fund purchases from abroad through family or company accounts.
+  - Cashier's checks are a standard real estate payment method.
+  jurisdictions: United States
+  version: 1
+- id: OC-024
+  name: Trader receives export payments but never buys stock
+  definition: A business receives payments for exports or online sales but shows no purchases to build
+    inventory.
+  areas:
+  - ML
+  - OC
+  typology: Trade-based money laundering
+  status: verified
+  sources:
+  - title: FinCEN Advisory on CMLNs (FIN-2025-A003)
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+    locator: TBML red flags 1-3
+    quote: but rarely, or never, engages in transactions that indicate the purchase of goods
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: Europol and EUIPO
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+      crime threat assessment 2022_2.pdf
+    locator: p. 36
+    quote: Criminals use trade-based money laundering schemes to hide illicit funds
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A small US electronics shop receiving wires from Mexico, Hong Kong and the UAE with no link to those
+    countries.
+  cases:
+  - name: Operation Fortune Runner / United States v. Martinez-Reyes (C.D. Cal.)
+    year: '2024'
+    jurisdiction: United States
+    what_happened: Superseding indictment (June 2024) alleges a Sinaloa Cartel-linked laundering network
+      worked with Chinese underground banking groups; ongoing.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+    source_title: FinCEN FIN-2025-A003
+  data_needed:
+  - Company
+  - Payment
+  - BankAccount
+  - Document (invoices, customs records)
+  checkable: records
+  lookup_sources:
+  - Trade data
+  - Company registry
+  - Bank records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: TBML relies on misinvoiced or fictitious trade.
+    source_url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+  innocent_explanations:
+  - Drop-shipping models where suppliers ship directly.
+  - Purchases paid from another account or entity.
+  jurisdictions: United States; general
+  version: 1
+- id: OC-025
+  name: Credit cards paid by strangers to buy luxury goods or electronics
+  definition: Someone receives transfers from unknown people, uses them to pay off credit cards, and buys
+    large volumes of electronics or luxury goods; or a shop pays many unrelated people's cards.
+  areas:
+  - ML
+  - OC
+  typology: Daigou-based trade laundering (CMLN)
+  status: verified
+  sources:
+  - title: FinCEN Advisory on CMLNs (FIN-2025-A003)
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+    locator: TBML red flags 4, 5, 7
+    quote: makes payments for multiple credit cards associated with various individuals, who are seemingly
+      unrelated to the business.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - P2P transfers from many unknown senders followed by a large credit card payment.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - BankAccount
+  - Company
+  checkable: records
+  lookup_sources:
+  - Bank and card records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Personal shoppers and resellers legitimately buy goods for others.
+  - Friends splitting group purchases.
+  jurisdictions: United States
+  version: 1
+- id: OC-026
+  name: Hong Kong trading companies with shell features sending money with no purpose
+  definition: Hong Kong-registered trading firms that look like shells send money to individuals, escrow
+    or title firms abroad without a business reason.
+  areas:
+  - ML
+  - OC
+  typology: Chinese money laundering networks
+  status: verified
+  sources:
+  - title: FinCEN Advisory on CMLNs (FIN-2025-A003)
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+    locator: TBML red flag 8
+    quote: Hong Kong registered trading companies with shell-like characteristics send funds to Chinese
+      nationals
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A Hong Kong trading company with a secretarial address wiring funds to a US title insurer.
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Directorship
+  - Address
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Hong Kong Companies Registry
+  - Bank records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Hong Kong is a major trade hub and many real trading firms use company secretaries.
+  jurisdictions: Hong Kong, United States
+  version: 1
+- id: OC-027
+  name: Unclear beneficial owner or many business accounts with no reason
+  definition: It is not clear who really owns a business, or someone opens accounts for several businesses
+    without an economic reason.
+  areas:
+  - ML
+  - OC
+  typology: Front businesses / nominees
+  status: verified
+  sources:
+  - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
+    publisher: FINTRAC
+    year: '2025'
+    url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+    locator: General money laundering indicators
+    quote: Client opens bank accounts for several businesses for no apparent economic reason.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A partner or relative listed as owner (nominee) while another person controls the money; FINTRAC notes
+    nominees were often family members or romantic partners.
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Directorship
+  - Person
+  - Family
+  - BankAccount
+  - Representation
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Beneficial ownership registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: In the TD Bank case, bank employees were given gift cards to keep processing transactions.
+    source_url: https://www.justice.gov/opa/pr/td-bank-pleads-guilty-bank-secrecy-act-and-money-laundering-conspiracy-violations-18b
+  innocent_explanations:
+  - Holding structures and family businesses for tax or succession planning.
+  - Entrepreneurs running several ventures.
+  jurisdictions: Canada; general
+  version: 1
+- id: OC-028
+  name: Forged or mismatched identity documents
+  definition: Identity documents look forged or do not match the person, for example a passport and visa
+    with the same photo despite being issued years apart.
+  areas:
+  - OC
+  typology: Identity fraud supporting trafficking and laundering
+  status: verified
+  sources:
+  - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
+    publisher: FINTRAC
+    year: '2025'
+    url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+    locator: General money laundering indicators
+    quote: Client's identification documents have been forged and/or do not match the client's identity.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FinCEN Advisory on CMLNs (FIN-2025-A003)
+    publisher: FinCEN
+    year: '2025'
+    url: https://www.fincen.gov/system/files/2025-08/FinCEN-Advisory-CMLN-508.pdf
+    locator: Money mule red flag 2
+    quote: that contain the same photograph despite being allegedly issued years apart.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Betting accounts opened with misused identities (Europol on match-fixing).
+  cases: []
+  data_needed:
+  - Passport
+  - Identification
+  - Person
+  - Document
+  checkable: person
+  lookup_sources:
+  - Document verification services
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Identity misuse is also used to open betting accounts and e-wallets for match-fixing.
+    source_url: https://eucrim.eu/news/report-sports-corruption/
+  innocent_explanations:
+  - People reuse the same photo across applications.
+  - Name transliteration differences.
+  jurisdictions: General
+  version: 1
+- id: OC-029
+  name: Heavy spending on online gambling platforms
+  definition: A person makes many or large payments from a personal account to online gambling sites.
+  areas:
+  - ML
+  - OC
+  typology: Drug proceeds laundering through gambling
+  status: verified
+  sources:
+  - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
+    publisher: FINTRAC
+    year: '2025'
+    url: https://fintrac-canafe.canada.ca/intel/operation/iso-osi-eng
+    locator: General money laundering indicators
+    quote: Client makes high volume and/or frequent purchases from his or her personal account to online
+      gambling platforms
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Cash deposited and then moved to several offshore betting sites.
+  cases: []
+  data_needed:
+  - Payment
+  - BankAccount
+  - Person
+  - Company
+  checkable: records
+  lookup_sources:
+  - Bank records
+  - Gambling operator records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: UNODC notes betting-related match-fixing is linked to money laundering and organised crime.
+    source_url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+  innocent_explanations:
+  - Recreational or problem gambling with legitimate money.
+  jurisdictions: Canada; general
+  version: 1
+- id: OC-030
+  name: Short time-to-crime for a recovered firearm
+  definition: A gun is recovered in a crime only a short time after its first retail sale.
+  areas:
+  - OC
+  typology: Firearms trafficking
+  status: verified
+  sources:
+  - title: Indicators of Firearms Trafficking
+    publisher: INTERPOL Firearms Programme
+    year: '2019'
+    url: https://www.interpol.int/content/download/8141/file/Indicators%20of%20firearms%20trafficking_2019_EN_LR.pdf
+    locator: p. 2
+    quote: The recovery of a crime gun within 2 to 3 years after its initial purchase is considered a
+      short time-to-crime
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Justice Department Announces Publication of Second Volume of National Firearms Commerce and
+      Trafficking Assessment
+    publisher: U.S. Department of Justice / ATF
+    year: '2023'
+    url: https://www.justice.gov/opa/pr/justice-department-announces-publication-second-volume-national-firearms-commerce-and
+    locator: press release
+    quote: nearly 25% of traced crime guns – more than 366,000 guns – had a time-to-crime of less than
+      one-year
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A handgun bought in one state and recovered at a shooting elsewhere eight months later.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Address
+  - Document (trace reports, sales records)
+  checkable: lookups
+  lookup_sources:
+  - Firearm trace records (ATF eTrace, INTERPOL iARMS) - law enforcement only
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: Under one year (ATF reports nearly 25% of traced crime guns fall here, 2017-2021).
+    textbook: Recovered within 2 to 3 years of initial purchase (INTERPOL).
+    threshold_source: https://www.interpol.int/content/download/8141/file/Indicators%20of%20firearms%20trafficking_2019_EN_LR.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Guns stolen from a lawful owner soon after purchase.
+  - A lawful owner who later commits a crime with their own gun.
+  jurisdictions: Global (INTERPOL); US data (ATF)
+  version: 1
+- id: OC-031
+  name: Recovered firearm traced to another region or country
+  definition: A gun recovered in a crime was sold or reported stolen far away, in another region or country.
+  areas:
+  - OC
+  typology: Firearms trafficking
+  status: verified
+  sources:
+  - title: Indicators of Firearms Trafficking
+    publisher: INTERPOL
+    year: '2019'
+    url: https://www.interpol.int/content/download/8141/file/Indicators%20of%20firearms%20trafficking_2019_EN_LR.pdf
+    locator: p. 2
+    quote: Recovered firearm originated (reported stolen from or traced to) from a different region of
+      the country or another country
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - US-sold rifles recovered in Mexico.
+  cases: []
+  data_needed:
+  - Address
+  - Document (trace reports)
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Firearm trace records
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Owners move house and take guns with them.
+  - Lawful private sales across regions where permitted.
+  jurisdictions: Global
+  version: 1
+- id: OC-032
+  name: Recovered firearm was part of a multiple purchase
+  definition: The gun was one of several bought by the same person.
+  areas:
+  - OC
+  typology: Firearms trafficking / straw purchasing
+  status: verified
+  sources:
+  - title: Indicators of Firearms Trafficking
+    publisher: INTERPOL
+    year: '2019'
+    url: https://www.interpol.int/content/download/8141/file/Indicators%20of%20firearms%20trafficking_2019_EN_LR.pdf
+    locator: p. 2
+    quote: Recovered firearm was part of multiple firearms purchased by the same person
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - One buyer purchases five identical pistols in a week.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Document (sales records)
+  checkable: lookups
+  lookup_sources:
+  - Firearm sales and trace records (law enforcement)
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Collectors, sport shooters or security firms buy several at once.
+  jurisdictions: Global
+  version: 1
+- id: OC-033
+  name: Recovered firearm was part of a multiple theft
+  definition: The gun was one of several stolen at or around the same time or place.
+  areas:
+  - OC
+  typology: Firearms trafficking
+  status: verified
+  sources:
+  - title: Indicators of Firearms Trafficking
+    publisher: INTERPOL
+    year: '2019'
+    url: https://www.interpol.int/content/download/8141/file/Indicators%20of%20firearms%20trafficking_2019_EN_LR.pdf
+    locator: p. 2
+    quote: Recovered firearm was part of multiple firearms stolen at or around the same time or vicinity
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Guns from one gun-shop burglary turning up in several cities.
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - Document (theft reports)
+  checkable: lookups
+  lookup_sources:
+  - Police theft reports
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Opportunistic burglaries without organised resale.
+  jurisdictions: Global
+  version: 1
+- id: OC-034
+  name: Altered or obliterated serial number
+  definition: The gun's serial number has been changed or removed.
+  areas:
+  - OC
+  typology: Firearms trafficking
+  status: verified
+  sources:
+  - title: Indicators of Firearms Trafficking
+    publisher: INTERPOL
+    year: '2019'
+    url: https://www.interpol.int/content/download/8141/file/Indicators%20of%20firearms%20trafficking_2019_EN_LR.pdf
+    locator: p. 2
+    quote: Altered or obliterated serial number
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A pistol with a ground-off serial recovered in a raid.
+  cases: []
+  data_needed:
+  - Document (forensic reports)
+  checkable: records
+  lookup_sources:
+  - Court and forensic records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Wear or damage on very old firearms; antique guns made without serial numbers.
+  jurisdictions: Global
+  version: 1
+- id: OC-035
+  name: Firearm said to come from an unlicensed seller
+  definition: The suspect says they got the gun from someone without a dealer licence.
+  areas:
+  - OC
+  typology: Firearms trafficking
+  status: verified
+  sources:
+  - title: Indicators of Firearms Trafficking
+    publisher: INTERPOL
+    year: '2019'
+    url: https://www.interpol.int/content/download/8141/file/Indicators%20of%20firearms%20trafficking_2019_EN_LR.pdf
+    locator: p. 2
+    quote: Suspect claims to have obtained firearm from a non-licensed individual
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Interview statement naming an acquaintance who 'sells guns'.
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Document (interview records)
+  checkable: person
+  lookup_sources:
+  - Court records
+  - Interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful private transfers in jurisdictions that allow them.
+  jurisdictions: Global
+  version: 1
+- id: OC-036
+  name: Cluster of recovered firearms from the same source location
+  definition: Guns recovered from different people or places all trace back to the same area or source.
+  areas:
+  - OC
+  typology: Firearms trafficking
+  status: verified
+  sources:
+  - title: Indicators of Firearms Trafficking
+    publisher: INTERPOL
+    year: '2019'
+    url: https://www.interpol.int/content/download/8141/file/Indicators%20of%20firearms%20trafficking_2019_EN_LR.pdf
+    locator: p. 2
+    quote: Pattern of recovered firearms (from different individuals or from different locations)
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Many crime guns traced to one dealer or one town.
+  cases: []
+  data_needed:
+  - Address
+  - Company
+  - Document (trace reports)
+  checkable: lookups
+  lookup_sources:
+  - Firearm trace statistics (ATF publishes state-level data)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Large dealers sell many guns, so more of their sales will appear in traces.
+  jurisdictions: Global
+  version: 1
+- id: OC-037
+  name: Counterfeits imported in small parcels or split shipments
+  definition: Fake goods arrive in many small parcels, or parts, packaging and labels are shipped separately
+    and put together later.
+  areas:
+  - OC
+  typology: Counterfeit goods
+  status: verified
+  sources:
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: Europol and EUIPO
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+      crime threat assessment 2022_2.pdf
+    locator: p. 8; p. 11; p. 31
+    quote: Packaging materials, logos and labels are usually shipped separately from the counterfeit goods
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Unbranded trainers in one shipment and branded logos in another, joined in an EU workshop (p. 32).
+  cases:
+  - name: Operation LUDUS
+    year: '2022'
+    jurisdiction: European Union
+    what_happened: Close to 5 million toys seized worth over EUR 16 million and 11 people arrested, per
+      Europol/EUIPO.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+      crime threat assessment 2022_2.pdf
+    source_title: Intellectual Property Crime Threat Assessment 2022, p. 30
+  data_needed:
+  - Company
+  - Address
+  - Document (customs declarations)
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Customs and trade data
+  - Courier records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Europol reports splitting containers and changing shipment weights to evade detection.
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+      crime threat assessment 2022_2.pdf
+  innocent_explanations:
+  - E-commerce sends many legitimate small parcels.
+  - Legitimate brands also ship packaging and goods separately.
+  jurisdictions: EU; general
+  version: 1
+- id: OC-038
+  name: Counterfeits sold through online marketplaces, social media and sponsored ads
+  definition: Fake goods are sold mainly online, through marketplaces, social media, messaging apps and
+    paid ads.
+  areas:
+  - OC
+  typology: Counterfeit goods
+  status: verified
+  sources:
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: Europol and EUIPO
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+      crime threat assessment 2022_2.pdf
+    locator: p. 12; p. 17
+    quote: Online marketplaces remain the chief distribution channels for counterfeit goods in the EU
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Sponsored social media ads for luxury-brand bags at a fraction of retail price.
+  cases:
+  - name: Operation In Our Sites
+    year: '2022'
+    jurisdiction: International
+    what_happened: Europol/EUIPO report 494,516 websites taken down and 12 suspects arrested.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+      crime threat assessment 2022_2.pdf
+    source_title: Intellectual Property Crime Threat Assessment 2022, p. 25
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Document (web pages, ads)
+  checkable: lookups
+  lookup_sources:
+  - Domain WHOIS
+  - Brand-owner takedown records
+  - Web archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Resale of genuine second-hand goods.
+  - Grey-market parallel imports of genuine products.
+  jurisdictions: EU; general
+  version: 1
+- id: OC-039
+  name: Goods routed through free trade zones
+  definition: Shipments pass through free trade zones, where rules and customs checks are lighter.
+  areas:
+  - OC
+  typology: Counterfeit goods and illicit tobacco
+  status: verified
+  sources:
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: Europol and EUIPO
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+      crime threat assessment 2022_2.pdf
+    locator: p. 21; p. 27
+    quote: Free trade zones are also misused in the trade in counterfeit products
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Cigarettes trans-shipped through a free economic zone before entering the EU.
+  cases:
+  - name: Belgian customs record cigarette seizure
+    year: '2022'
+    jurisdiction: Belgium
+    what_happened: Belgian customs confiscated 126 million counterfeit cigarettes, per Europol/EUIPO.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+      crime threat assessment 2022_2.pdf
+    source_title: Intellectual Property Crime Threat Assessment 2022, p. 28
+  data_needed:
+  - Vessel
+  - Company
+  - Address
+  - Document (bills of lading)
+  checkable: lookups
+  lookup_sources:
+  - Ship tracking
+  - Trade data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Free trade zones are major legitimate logistics hubs used by most global shippers.
+  jurisdictions: Global
+  version: 1
+- id: OC-040
+  name: False origin, transit or import documents
+  definition: Shipping, origin or customs papers are forged, incomplete or misleading.
+  areas:
+  - OC
+  typology: Counterfeit goods, food fraud, illegal pesticides
+  status: verified
+  sources:
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: Europol and EUIPO
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+      crime threat assessment 2022_2.pdf
+    locator: p. 19; p. 14; p. 18
+    quote: Criminals rely on fraudulent documents to import and transport illegal goods.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Pesticide shipping documents lacking country of origin (p. 18).
+  cases:
+  - name: Oro Giallo
+    year: '2022'
+    jurisdiction: Italy and Germany
+    what_happened: Authorities arrested 20 people and seized 150,000 litres of fake olive oil worth up
+      to EUR 8 million, per Europol/EUIPO.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+      crime threat assessment 2022_2.pdf
+    source_title: Intellectual Property Crime Threat Assessment 2022, p. 14
+  data_needed:
+  - Document
+  - Company
+  - Vessel
+  - Address
+  checkable: records
+  lookup_sources:
+  - Customs records
+  - Trade data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Food fraud typically involves falsified origin, transit and administrative documents.
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+      crime threat assessment 2022_2.pdf
+  innocent_explanations:
+  - Clerical errors and incomplete paperwork from small exporters.
+  jurisdictions: EU; general
+  version: 1
+- id: OC-041
+  name: Counterfeit medicines sold online, sometimes laced with fentanyl
+  definition: Fake medicines are advertised and sold online, often made in illegal labs, and some contain
+    fentanyl.
+  areas:
+  - OC
+  typology: Counterfeit pharmaceuticals
+  status: verified
+  sources:
+  - title: Intellectual Property Crime Threat Assessment 2022
+    publisher: Europol and EUIPO
+    year: '2022'
+    url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+      crime threat assessment 2022_2.pdf
+    locator: p. 21; p. 22
+    quote: Counterfeit pharmaceuticals are widely advertised and offered for sale on social media platforms.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Pills sold as prescription painkillers via social media that test positive for fentanyl.
+  cases:
+  - name: Operation Shield
+    year: '2022'
+    jurisdiction: European Union
+    what_happened: Disrupted 25 criminal networks with nearly 700 arrests, per Europol/EUIPO.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+      crime threat assessment 2022_2.pdf
+    source_title: Intellectual Property Crime Threat Assessment 2022, p. 22
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - CryptoWallet
+  - Document (web pages)
+  checkable: lookups
+  lookup_sources:
+  - Medicines regulator pharmacy registers
+  - Domain WHOIS
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Europol reports deaths by overdose when counterfeit medicines are laced with fentanyl.
+    source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/Report. Intellectual property
+      crime threat assessment 2022_2.pdf
+  innocent_explanations:
+  - Licensed online pharmacies exist; check against regulator registers.
+  jurisdictions: EU; general
+  version: 1
+- id: OC-042
+  name: Irregular betting patterns on a match
+  definition: Betting on a match does not fit normal market patterns, such as odds moving in ways experts
+    cannot explain.
+  areas:
+  - OC
+  typology: Match-fixing / betting fraud
+  status: verified
+  sources:
+  - title: Council of Europe Convention on the Manipulation of Sports Competitions (Macolin Convention,
+      CETS 215)
+    publisher: Council of Europe
+    year: '2014'
+    url: https://rm.coe.int/16801cdd7e
+    locator: Article 3(5)(b)
+    quote: any sports betting activity inconsistent with usual or anticipated patterns of the market
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Resource Guide on Good Practices in the Investigation of Match-Fixing
+    publisher: UNODC and ICSS
+    year: '2016'
+    url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+    locator: p. 62
+    quote: to identify dis-crepancies between actual and expected odds that can indicate potentially irregular
+      and suspicious betting
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A betting monitoring firm flags heavy late money on a second-tier match.
+  cases:
+  - name: Southern Stars football team (Victoria, Australia)
+    year: '2013'
+    jurisdiction: Australia
+    what_happened: Monitoring firm detected irregular betting on at least five matches; police charged
+      the coach, four players and a Malaysian national linked to a Hungary/Malaysia betting syndicate
+      (UNODC guide reports charges).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+    source_title: UNODC Resource Guide, p. 17
+  data_needed:
+  - Event
+  - Payment
+  - Person
+  - Company
+  - Document (betting monitoring alerts)
+  checkable: lookups
+  lookup_sources:
+  - Betting monitoring services (e.g. sports federation early-warning systems)
+  - Gambling regulator reports
+  levels:
+    faint: To be set by Ony
+    strong: 'Suspicious sports betting: reliable and consistent evidence links the betting to manipulation
+      (Macolin Art. 3(5)(c)).'
+    textbook: Irregular sports betting as defined in Macolin Art. 3(5)(b).
+    threshold_source: https://rm.coe.int/16801cdd7e
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: UNODC states betting-related match-fixing is linked to money laundering and raises capital
+      for organised crime.
+    source_url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+  innocent_explanations:
+  - Public team news (injuries, line-ups) moves odds sharply.
+  - Large professional bettors' models can move thin markets.
+  jurisdictions: Council of Europe parties; general
+  version: 1
+- id: OC-043
+  name: Unusually poor play that matches suspicious betting
+  definition: Players or officials perform oddly badly in a match that also drew irregular betting.
+  areas:
+  - OC
+  typology: Match-fixing
+  status: verified
+  sources:
+  - title: Resource Guide on Good Practices in the Investigation of Match-Fixing
+    publisher: UNODC and ICSS
+    year: '2016'
+    url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+    locator: p. 17
+    quote: These matches were characterized by unusually poor play by some of the players.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A referee awarding handball penalties when the ball went nowhere near players' hands (Perumal-linked
+    friendlies, p. 20).
+  cases:
+  - name: R v Amir and Butt (Pakistan spot-fixing, Lord's Test 2010)
+    year: '2011'
+    jurisdiction: England and Wales
+    what_happened: Three no-balls were bowled to order for agent Mazhar Majeed; Amir pleaded guilty and
+      Butt was convicted by a jury of conspiracy to accept corrupt payments and conspiracy to cheat.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://caselaw.nationalarchives.gov.uk/ewca/crim/2011/2914
+    source_title: Amir & Anor, R v [2011] EWCA Crim 2914
+  data_needed:
+  - Event
+  - Person
+  - Employment
+  - Document (match footage, referee reports)
+  checkable: person
+  lookup_sources:
+  - Match footage
+  - Sports federation disciplinary records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Injury, fatigue, illness or simple bad form.
+  - Honest refereeing mistakes.
+  jurisdictions: General
+  version: 1
+- id: OC-044
+  name: Players or officials paid little, late or not at all
+  definition: Athletes or referees who are underpaid or unpaid are more likely to be targeted by fixers.
+  areas:
+  - OC
+  typology: Match-fixing (vulnerability)
+  status: verified
+  sources:
+  - title: Resource Guide on Good Practices in the Investigation of Match-Fixing
+    publisher: UNODC and ICSS
+    year: '2016'
+    url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+    locator: p. 66
+    quote: it has been proven that where participants are paid a low wage, paid late or not paid at all,
+      they are more likely to be targeted by fixers.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Šapina's network targeted leagues where players were modestly paid (p. 20).
+  cases:
+  - name: Ante Šapina (Bochum trial)
+    year: '2011'
+    jurisdiction: Germany
+    what_happened: Jailed in Bochum after confessing to fixing 20 matches in 2008-2009; network bought
+      players, officials and clubs and organised ghost friendlies.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+    source_title: UNODC Resource Guide, pp. 19-20
+  data_needed:
+  - Person
+  - Employment
+  - Company
+  - Payment
+  checkable: person
+  lookup_sources:
+  - Players' union reports
+  - Club accounts
+  - Interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many lower-league and semi-professional players are poorly paid and never approached; this is a vulnerability,
+    not evidence of fixing.
+  jurisdictions: General
+  version: 1
+- id: OC-045
+  name: Opaque investors buying financially distressed clubs
+  definition: Investors with unclear backgrounds buy or fund struggling clubs, which can then be used
+    to fix matches or launder money.
+  areas:
+  - ML
+  - OC
+  typology: Match-fixing / club infiltration
+  status: verified
+  sources:
+  - title: Resource Guide on Good Practices in the Investigation of Match-Fixing
+    publisher: UNODC and ICSS
+    year: '2016'
+    url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+    locator: p. 67
+    quote: A lack of transparency in this regard has made clubs vulnerable to acquisition and investment
+      by organized crime, with clubs used as a vehicle for match-fixing activities.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - One foreign businessman investing in eight financially troubled Belgian clubs.
+  cases:
+  - name: Belgian football investment and match-fixing case
+    year: '2015'
+    jurisdiction: Belgium
+    what_happened: After investments in eight financially troubled clubs, players were allegedly offered
+      money to fix games; in 2015, 31 people were sentenced for crimes including corruption, money laundering
+      and tax fraud, with appeals pending at the time of the guide.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+    source_title: UNODC Resource Guide, p. 67
+  data_needed:
+  - Company
+  - Ownership
+  - Person
+  - Payment
+  - Directorship
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - League ownership registers
+  - Beneficial ownership registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: The Belgian case produced money laundering and tax fraud convictions.
+    source_url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+  innocent_explanations:
+  - Struggling clubs often depend on new owners and outside investment for survival.
+  jurisdictions: General
+  version: 1
+- id: OC-046
+  name: Athlete lifestyle beyond their pay, visible on social media
+  definition: Athletes post photos of spending they could not afford on their wages.
+  areas:
+  - OC
+  typology: Match-fixing
+  status: verified
+  sources:
+  - title: Resource Guide on Good Practices in the Investigation of Match-Fixing
+    publisher: UNODC and ICSS
+    year: '2016'
+    url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+    locator: p. 42
+    quote: they had posted photos on social media that showed them partying on islands that players on
+      the salaries earned in a semi-professional football environment could not normally afford to visit.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Semi-professional players posting luxury island holidays.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Document (social media posts)
+  - Associate
+  checkable: person
+  lookup_sources:
+  - Social media archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Gifts, sponsorship, family money or trips paid by others.
+  jurisdictions: General
+  version: 1
+- id: OC-047
+  name: Bets placed through proxy, multiple or fake accounts
+  definition: Fixers hide behind other people's accounts, many accounts on many sites, or stolen identities
+    to bet.
+  areas:
+  - ML
+  - OC
+  typology: Match-fixing / betting fraud
+  status: verified
+  sources:
+  - title: Resource Guide on Good Practices in the Investigation of Match-Fixing
+    publisher: UNODC and ICSS
+    year: '2016'
+    url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+    locator: p. 13
+    quote: Those engaged in a match-fixing, including organized criminals, can avoid detection in the
+      global betting markets by using proxy accounts, or by opening multiple betting accounts on multiple
+      platforms.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Report on Sports Corruption (summary of Europol report)
+    publisher: eucrim
+    year: '2020'
+    url: https://eucrim.eu/news/report-sports-corruption/
+    locator: news summary
+    quote: OCGs misuse identities to create betting accounts and e-wallets that are used to bet on prearranged
+      matches.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Many new accounts placing similar bets on one obscure match.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Identification
+  - Event
+  - CryptoWallet
+  checkable: records
+  lookup_sources:
+  - Betting operator records
+  - Gambling regulator data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Identity misuse to open betting accounts and e-wallets.
+    source_url: https://eucrim.eu/news/report-sports-corruption/
+  innocent_explanations:
+  - Bettors legitimately hold accounts with several operators to get the best odds.
+  jurisdictions: General
+  version: 1
+- id: OC-048
+  name: Ghost or fake matches
+  definition: Bets are taken on a match that never happened or was staged, such as invented friendlies.
+  areas:
+  - OC
+  typology: Match-fixing / betting fraud
+  status: verified
+  sources:
+  - title: Resource Guide on Good Practices in the Investigation of Match-Fixing
+    publisher: UNODC and ICSS
+    year: '2016'
+    url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+    locator: pp. 4-5; p. 20
+    quote: One European bookmaker paid out on the result after receiving confirmation that the match had
+      taken place. Only subsequent investigations revealed that it had not been played.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A friendly listed by data feeds with no venue booking or local reports.
+  cases: []
+  data_needed:
+  - Event
+  - Company
+  - Person
+  - Document (fixture lists, venue records)
+  checkable: lookups
+  lookup_sources:
+  - Fixture databases
+  - Venue and federation records
+  - Local news
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Low-profile friendlies are often poorly documented.
+  jurisdictions: General
+  version: 1
+- id: OC-049
+  name: Misuse of inside information for betting
+  definition: Someone uses non-public information they have because of their role in a sport to bet or
+    tip others.
+  areas:
+  - OC
+  typology: Betting fraud
+  status: verified
+  sources:
+  - title: Council of Europe Convention on the Manipulation of Sports Competitions
+    publisher: Council of Europe
+    year: '2014'
+    url: https://rm.coe.int/16801cdd7e
+    locator: Article 3(7)
+    quote: information relating to any competition that a person possesses by virtue of his or her position
+      in relation to a sport or competition
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Resource Guide on Good Practices in the Investigation of Match-Fixing
+    publisher: UNODC and ICSS
+    year: '2016'
+    url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+    locator: p. 4
+    quote: it is a way of defrauding betting operators by using specific information about a sporting
+      event that is not in the public domain.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A team staff member's relative betting on a line-up change before it is announced.
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Associate
+  - Employment
+  - Payment
+  - Event
+  checkable: person
+  lookup_sources:
+  - Betting operator records
+  - Federation disciplinary records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Information may already be public or easy to find, which the Convention excludes.
+  jurisdictions: Council of Europe parties; general
+  version: 1
+- id: OC-050
+  name: Spot-fixing of specific in-match events
+  definition: A participant makes a specific event happen at a set moment (for example a no-ball) for
+    people betting on it.
+  areas:
+  - OC
+  typology: Match-fixing (spot-fixing)
+  status: pending
+  sources:
+  - title: Amir & Anor, R v [2011] EWCA Crim 2914
+    publisher: Court of Appeal (Criminal Division), England and Wales
+    year: '2011'
+    url: https://caselaw.nationalarchives.gov.uk/ewca/crim/2011/2914
+    locator: para 3
+    quote: As agreed, three "no balls" were bowled, two by Amir and one by Asif, in effect to order.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Resource Guide on Good Practices in the Investigation of Match-Fixing
+    publisher: UNODC and ICSS
+    year: '2016'
+    url: https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+    locator: p. 66
+    quote: Spot betting can potentially involve the influencing of one individual or a team.
+    quote_verified: false
+    checked: '2026-10-08'
+  examples:
+  - A bowler's front foot well over the line at exactly the pre-agreed delivery.
+  cases:
+  - name: R v Amir and Butt
+    year: '2011'
+    jurisdiction: England and Wales
+    what_happened: Amir pleaded guilty and Butt was convicted by a jury of conspiracy to accept corrupt
+      payments and conspiracy to cheat.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://caselaw.nationalarchives.gov.uk/ewca/crim/2011/2914
+    source_title: Amir & Anor, R v [2011] EWCA Crim 2914
+  data_needed:
+  - Event
+  - Person
+  - Associate
+  - Payment
+  - Representation
+  checkable: person
+  lookup_sources:
+  - Match footage
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Manipulation of sports competitions as defined in Macolin Art. 3(4).
+    threshold_source: https://rm.coe.int/16801cdd7e
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Spot-fixing convictions were for conspiracy to accept corrupt payments.
+    source_url: https://caselaw.nationalarchives.gov.uk/ewca/crim/2011/2914
+  innocent_explanations:
+  - Such events (no-balls, cards, throw-ins) happen naturally many times in a match.
+  jurisdictions: General
+  version: 1
+not_reached:
+- 'FATF, Money Laundering through the Football Sector (2009): fatf-gafi.org blocks automated fetching
+  (robots disallowed), so its football and betting indicators are not included.'
+- 'Europol, Decoding the EU''s most threatening criminal networks (2024) and Leveraging legitimacy (Dec
+  2024): the Europol pages need JavaScript or returned errors. Used the Council of the EU summary and
+  the eucrim summary instead.'
+- 'Europol, The involvement of organised crime groups in sports corruption (2020): page needs JavaScript.
+  Used the eucrim summary only.'
+- 'UNODC Global Report on Corruption in Sport (2021): the site and the mirrored PDF did not return content.'
+- 'UNTOC text on unodc.org and ohchr.org: fetch errors. Used the University of Oslo hosted text.'
+- 'FinCEN FIN-2019-A006 fentanyl advisory: the MSB, structuring/funnel and shell-company red flags are
+  in graphics that did not extract. Only the darknet red flags are quoted.'
+- FINTRAC operational alert indicators are quoted from the start of each indicator only, because the fetch
+  tool cut text at 125 characters. Full wording is on the source page.
+- 'Arms trafficking financial red flags: no FATF, FinCEN or FINTRAC financial-indicator list for firearms
+  trafficking was found or reached. The arms indicators come only from INTERPOL''s trace-based list and
+  the ATF/DOJ time-to-crime figures.'
+- 'ATF NFCTA Volumes II and III full reports: not opened. Only the DOJ press release was used.'
+- 'OECD/EUIPO counterfeit trade reports (Mapping global trade in fakes): not reached.'
+- 'Primary court documents for the Šapina (Bochum), Belgian club and Southern Stars cases: not reached.
+  Outcomes are as stated in the UNODC Resource Guide (2016).'

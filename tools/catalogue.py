@@ -46,7 +46,7 @@ AREA_WORDS = [
     ("FR", ["fraud", "elder", "tax", "ponzi", "securities", "insurance", "healthcare"]),
     ("CY", ["cyber", "ransomware", "scam", "crypto", "source reliab", "grading"]),
     ("IN", ["disinformation", "information", "forg", "academic", "media manipulation", "sock"]),
-    ("OC", ["organised crime", "organized crime", "drug", "arms", "counterfeit", "match-fixing", "illicit goods"]),
+    ("OC", ["organised crime", "organized crime", "drug", "arms", "counterfeit", "match-fixing", "illicit goods", "gambling", "sport"]),
     ("ML", ["laundering"]),
 ]
 
@@ -65,7 +65,7 @@ def area_key(text: str) -> str | None:
     return None
 
 
-WEAK_FIT = re.compile(r"weak fit|only a general example|does not specifically", re.IGNORECASE)
+WEAK_FIT = re.compile(r"weak fit|only a general example|does not specifically|loosely relevant|only loosely|loose fit", re.IGNORECASE)
 
 
 def norm(s: str) -> str:

@@ -2234,15 +2234,7 @@ indicators:
     checked: '2026-10-08'
   examples:
   - NUDT, a military university, received EDA tools through an alias (Cadence, DOJ 2025).
-  cases:
-  - name: Cadence Design Systems Inc.
-    year: '2025'
-    jurisdiction: United States (N.D. Cal.)
-    what_happened: Agreed guilty plea for exports to NUDT, a military university on the Entity List.
-    outcome: convicted
-    outcome_verified: true
-    source_url: https://www.justice.gov/opa/pr/cadence-design-systems-agrees-plead-guilty-and-pay-over-140-million-unlawfully-exporting
-    source_title: DOJ press release, 28 July 2025
+  cases: []
   data_needed:
   - Organization
   - Person

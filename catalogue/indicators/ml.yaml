@@ -3017,16 +3017,7 @@ indicators:
   examples:
   - An individual's bank account receiving dozens of daily payments from strangers matched with crypto
     sends
-  cases:
-  - name: Binance Holdings Ltd
-    year: '2023'
-    jurisdiction: United States
-    what_happened: Pleaded guilty to operating as an unregistered money transmitter, BSA violations and
-      sanctions offences; about $4.3 billion in penalties.
-    outcome: convicted
-    outcome_verified: true
-    source_url: https://www.justice.gov/opa/pr/binance-and-ceo-plead-guilty-federal-charges-4b-resolution
-    source_title: Binance and CEO Plead Guilty to Federal Charges in $4B Resolution
+  cases: []
   data_needed:
   - Person
   - BankAccount
