@@ -117,7 +117,7 @@ Status: proposed, 5 October 2026. Nothing here is built. It extends `chart-build
 3. Style changes go through the existing presets/options (`/visuals/restyle`).
 4. The spec, not the drawing, is what the design stores.
 
-**Save a picture.** Diagram mode is captured in the browser (React Flow's documented image-export approach, using `html-to-image`, which would need an ADR) or drawn on the server. Chart mode goes through the existing render service. Either way the picture carries the key, a source line and the advice that was overridden (§6). This route is a trade-off; see §9, T3.
+**Save a picture.** Decided 8 Oct 2026 (Ony: "whatever is the best solution for the long term"): **drawn on the server.** The design file already holds every position and style, so the render service (which already draws ECharts as SVG and maps as PNG for decks and briefs) draws the diagram as SVG from it. The node and link drawing is one shared module, used by the React Flow canvas and by the render service, so the picture matches the screen. Reasons: one export path for decks, PowerPoint, briefs and OpenAleph; pictures can be made with no browser open (scheduled briefs, the AI assistant); no new package. The picture carries the key, a source line and any advice that was overridden (§6).
 
 **Send to OpenAleph** (F11). The existing `diagram_layout` is extended to take positions from the design instead of the spring layout:
 - party nodes → `vertices` (position converted to grid units, colour, radius from size);
@@ -400,5 +400,5 @@ Live co-editing would need a CRDT such as Yjs, plus a WebSocket server: two new 
 5. Should hand-drawn connections be allowed in a picture for a story? (§6)
 6. For undo: the plain history stack, or zundo (new package, ADR)? (§3.3)
 7. Should the unused `chart_design.saved` event be kept or left out? (§3.6)
-8. For the diagram picture: made in the browser (`html-to-image`, ADR) or drawn on the server? (T3)
+8. ~~For the diagram picture: browser or server?~~ Decided: drawn on the server (§2.3).
 9. Is one editor at a time enough, or is live co-editing needed? (A1)
