@@ -29,7 +29,7 @@ REFERENCE = re.compile(
 
 
 # Years, page numbers and US Code citations ("2020 advisory p.3", "18 U.S.C. 152(1),(7)").
-OTHER_REFERENCES = re.compile(r"\b(?:19|20)\d{2}\b|\bpp?\.\s*\d+|\b\d+\s*U\.S\.C\.?\s*§?\s*[\d()a-z,\s]*", re.IGNORECASE)
+OTHER_REFERENCES = re.compile(r"\b(?:fn|footnote|note)\.?\s*\d+|\b(?:19|20)\d{2}\b|\bpp?\.\s*\d+|\b\d+\s*U\.S\.C\.?\s*§?\s*[\d()a-z,\s]*", re.IGNORECASE)
 
 
 def has_threshold_number(*texts: str) -> bool:

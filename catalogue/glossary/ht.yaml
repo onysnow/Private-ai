@@ -1,0 +1,538 @@
+area: HT
+terms:
+- term: Trafficking in persons (human trafficking)
+  definition: Recruiting, moving, harbouring or receiving people by force, coercion, deception, abuse
+    of vulnerability or payments, in order to exploit them.
+  examples:
+  - Sexual exploitation, forced labour, servitude, organ removal
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-prevent-suppress-and-punish-trafficking-persons
+  cases: []
+  related:
+  - Exploitation
+  - Consent (irrelevance)
+  - Migrant smuggling
+  indicators: []
+  areas:
+  - HT
+- term: Exploitation (Palermo Protocol)
+  definition: 'At minimum: exploiting others'' prostitution or other sexual exploitation, forced labour
+    or services, slavery or similar practices, servitude, or removal of organs.'
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-prevent-suppress-and-punish-trafficking-persons
+  cases: []
+  related:
+  - Trafficking in persons
+  indicators: []
+  areas:
+  - HT
+- term: Consent (irrelevance in trafficking)
+  definition: A victim's agreement to the exploitation does not count if force, deception or another listed
+    means was used.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-prevent-suppress-and-punish-trafficking-persons
+  cases: []
+  related:
+  - Trafficking in persons
+  indicators: []
+  areas:
+  - HT
+- term: Child
+  definition: Any person under 18 years of age (Palermo Protocol and ILO Convention 182).
+  examples: []
+  source_url: https://hrlibrary.law.umn.edu/links/ilo182.html
+  cases: []
+  related:
+  - Worst forms of child labour
+  indicators: []
+  areas:
+  - HT
+- term: Forced labour
+  definition: All work or service taken from a person under threat of a penalty and which the person did
+    not offer voluntarily (ILO Convention No. 29).
+  examples: []
+  source_url: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@declaration/documents/publication/wcms_203832.pdf
+  cases: []
+  related:
+  - ILO indicators of forced labour
+  - Debt bondage
+  indicators: []
+  areas:
+  - HT
+- term: ILO indicators of forced labour
+  definition: 'The ILO''s 11 warning signs: abuse of vulnerability, deception, restriction of movement,
+    isolation, violence, threats, retained ID documents, withheld wages, debt bondage, abusive conditions
+    and excessive overtime; one may be enough or several may be needed.'
+  examples: []
+  source_url: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@declaration/documents/publication/wcms_203832.pdf
+  cases: []
+  related:
+  - Forced labour
+  indicators: []
+  areas:
+  - HT
+- term: Debt bondage (bonded labour)
+  definition: Working off a pledged debt where the work's value is not fairly counted against the debt,
+    or the length and nature of the work are not limited.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/supplementary-convention-abolition-slavery-slave-trade-and
+  cases: []
+  related:
+  - Recruitment fees
+  - Forced labour
+  indicators: []
+  areas:
+  - HT
+- term: Smuggling of migrants
+  definition: Arranging someone's illegal entry into a country where they are not a national or permanent
+    resident, for money or other material benefit.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-against-smuggling-migrants-land-sea-and-air
+  cases: []
+  related:
+  - Illegal entry
+  - Trafficking in persons
+  indicators: []
+  areas:
+  - HT
+- term: Illegal entry
+  definition: Crossing a border without meeting the requirements for legal entry into the receiving country.
+  examples: []
+  source_url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-against-smuggling-migrants-land-sea-and-air
+  cases: []
+  related:
+  - Smuggling of migrants
+  indicators: []
+  areas:
+  - HT
+- term: Difference between smuggling and trafficking
+  definition: Smuggling involves people choosing to migrate illegally and always a border crossing; trafficking
+    involves force or coercion and exploitation and needs no border crossing.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+  cases: []
+  related:
+  - Smuggling of migrants
+  - Trafficking in persons
+  indicators: []
+  areas:
+  - HT
+- term: Worst forms of child labour
+  definition: Slavery-like practices including child trafficking and debt bondage, using children for
+    prostitution or pornography, for illicit activities like drug trafficking, and hazardous work likely
+    to harm them.
+  examples: []
+  source_url: https://hrlibrary.law.umn.edu/links/ilo182.html
+  cases: []
+  related:
+  - Hazardous child labour
+  - Child
+  indicators: []
+  areas:
+  - HT
+- term: Hazardous child labour
+  definition: Work that by its nature or conditions is likely to harm a child's health, safety or morals
+    (ILO C182 Article 3(d)).
+  examples:
+  - Overnight cleaning of meat-plant saws by 13-17 year olds (PSSI case)
+  source_url: https://hrlibrary.law.umn.edu/links/ilo182.html
+  cases: []
+  related:
+  - Worst forms of child labour
+  indicators: []
+  areas:
+  - HT
+- term: Domestic servitude
+  definition: Trafficking for work in a private household, where the worker lives with the family under
+    controlling, isolating conditions.
+  examples: []
+  source_url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+  cases: []
+  related:
+  - Forced labour
+  indicators: []
+  areas:
+  - HT
+- term: Recruitment fees
+  definition: Charges for getting a job; the ILO principle says workers and jobseekers should not be charged
+    or bear them.
+  examples: []
+  source_url: https://www.ilo.org/resource/ilos-2016-general-principles-and-operational-guidelines-fair-recruitment
+  cases: []
+  related:
+  - Debt bondage
+  - Contract switching
+  indicators: []
+  areas:
+  - HT
+- term: Contract switching
+  definition: Replacing the job terms a worker agreed to with worse ones after recruitment; FinCEN lists
+    it among labour recruiters' deceptive practices.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+  cases: []
+  related:
+  - Deception
+  indicators: []
+  areas:
+  - HT
+- term: Front company
+  definition: A business that looks legitimate and mixes criminal money with real business income to hide
+    the crime and its owners.
+  examples:
+  - Massage businesses, escort services, bars, restaurants, cantinas
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+  cases: []
+  related:
+  - Illicit storefront business
+  indicators: []
+  areas:
+  - HT
+- term: Illicit storefront business offering sexual services
+  definition: A shop-front business such as a spa, massage or body-rub centre or private club used to
+    sell sexual services.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  cases: []
+  related:
+  - Front company
+  indicators: []
+  areas:
+  - HT
+- term: Short-stay locations
+  definition: Places such as hotels where FINTRAC found most sexual exploitation in its trafficking disclosures
+    took place.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  cases: []
+  related:
+  - Hotel booking anomalies
+  indicators: []
+  areas:
+  - HT
+- term: Funnel account
+  definition: An account in one area that receives many cash deposits, often under reporting limits, from
+    which money is quickly withdrawn in another area.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+  cases: []
+  related:
+  - Structuring
+  indicators: []
+  areas:
+  - HT
+- term: Nominee
+  definition: A person who holds accounts or assets or moves money for someone else to hide who really
+    controls it; in FINTRAC's sample often victims or traffickers' family.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  cases: []
+  related:
+  - Money mule
+  - Beneficial ownership
+  indicators: []
+  areas:
+  - HT
+- term: Money mule
+  definition: A person who transfers money on behalf of others, used by smuggling networks to pass remittances
+    through third parties.
+  examples: []
+  source_url: https://www.cbr.ru/Content/Document/File/135353/Mig_Sm.pdf
+  cases: []
+  related:
+  - Nominee
+  indicators: []
+  areas:
+  - HT
+- term: Hawala / Hundi
+  definition: Informal money transfer systems that FATF lists among migrant smuggling laundering methods.
+  examples: []
+  source_url: https://www.cbr.ru/Content/Document/File/135353/Mig_Sm.pdf
+  cases: []
+  related:
+  - Money remittance company (MVTS)
+  indicators: []
+  areas:
+  - HT
+- term: MVTS (money or value transfer service) agent
+  definition: A local agent of a money transfer business; FATF flags MVTS agents involved in prepaid card
+    recharge networks as a risk.
+  examples: []
+  source_url: https://www.cbr.ru/Content/Document/File/135353/Mig_Sm.pdf
+  cases: []
+  related:
+  - Hawala / Hundi
+  indicators: []
+  areas:
+  - HT
+- term: Prepaid access card
+  definition: A reloadable card holding money that is not a standard bank account; FinCEN and FINTRAC
+    flag frequent use in trafficking.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+  cases: []
+  related:
+  - Gift cards
+  indicators: []
+  areas:
+  - HT
+- term: White-label ATM
+  definition: A cash machine not owned by a bank, often in convenience stores, gas stations, casinos or
+    hotels.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Third-party payment processor
+  definition: A company that processes payments for other merchants, which can hide who actually paid
+    or was paid.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Email money transfer
+  definition: A bank transfer sent to an email address or phone (e.g. Interac e-Transfer in Canada); FINTRAC
+    found these and cash deposits were the main trafficking-related transactions.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Structuring
+  definition: Keeping cash deposits or transfers under reporting limits (in the US $3,000 record-keeping
+    and $10,000 CTR) to avoid reports.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+  cases: []
+  related:
+  - Currency Transaction Report (CTR)
+  indicators: []
+  areas:
+  - HT
+- term: Currency Transaction Report (CTR)
+  definition: A US report banks file for cash transactions over $10,000.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+  cases: []
+  related:
+  - Structuring
+  - Suspicious Activity Report (SAR)
+  indicators: []
+  areas:
+  - HT
+- term: Suspicious Activity Report (SAR)
+  definition: A report a US financial institution files with FinCEN when it suspects a transaction has
+    no lawful purpose; FinCEN asks for keywords 'ADVISORY HUMAN TRAFFICKING' or 'ADVISORY HUMAN SMUGGLING',
+    and says victims should not be named as the subject.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+  cases: []
+  related:
+  - Suspicious Transaction Report (STR)
+  indicators: []
+  areas:
+  - HT
+- term: Suspicious Transaction Report (STR)
+  definition: 'Canada''s equivalent report to FINTRAC, filed when an entity has reasonable grounds to
+    suspect laundering; FINTRAC asks for the tag #PROTECT for trafficking.'
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  cases: []
+  related:
+  - Reasonable grounds to suspect
+  - Project Protect
+  indicators: []
+  areas:
+  - HT
+- term: Reasonable grounds to suspect
+  definition: 'Canada''s reporting standard: more than a hunch, based on facts, context and indicators
+    taken together, though proof is not required.'
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  cases: []
+  related:
+  - Suspicious Transaction Report (STR)
+  indicators: []
+  areas:
+  - HT
+- term: Project Protect
+  definition: A Canadian public-private partnership on financial intelligence about human trafficking
+    for sexual exploitation; reporters tag STRs '#PROTECT'.
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Section 314(b)
+  definition: A US voluntary scheme that lets financial institutions share information with each other
+    about possible laundering, with legal safe harbour.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: FIU (financial intelligence unit)
+  definition: A national body that receives and analyses suspicious transaction reports, such as FinCEN
+    (US), FINTRAC (Canada) or AUSTRAC (Australia).
+  examples: []
+  source_url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  cases: []
+  related:
+  - SAR
+  - STR
+  indicators: []
+  areas:
+  - HT
+- term: Withhold Release Order (WRO)
+  definition: A CBP order to hold imports at the border when information reasonably but not conclusively
+    indicates they were made with forced labour.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/19/12.42
+  cases: []
+  related:
+  - CBP Finding
+  - 19 U.S.C. 1307
+  indicators: []
+  areas:
+  - HT
+- term: CBP Finding (forced labour)
+  definition: A determination by CBP, published in the Federal Register, that goods are subject to the
+    forced labour import ban, allowing seizure.
+  examples:
+  - Top Glove, 2021
+  source_url: https://www.law.cornell.edu/cfr/text/19/12.42
+  cases: []
+  related:
+  - Withhold Release Order (WRO)
+  indicators: []
+  areas:
+  - HT
+- term: 19 U.S.C. 1307
+  definition: The US law banning imports of goods made wholly or partly by forced labour.
+  examples: []
+  source_url: https://www.cbp.gov/trade/forced-labor/UFLPA
+  cases: []
+  related:
+  - UFLPA
+  indicators: []
+  areas:
+  - HT
+- term: UFLPA rebuttable presumption
+  definition: Since 21 June 2022, US customs presumes goods made wholly or partly in Xinjiang, or by companies
+    on the UFLPA Entity List, are made with forced labour unless the importer proves otherwise.
+  examples: []
+  source_url: https://www.cbp.gov/trade/forced-labor/UFLPA
+  cases: []
+  related:
+  - UFLPA Entity List
+  - 19 U.S.C. 1307
+  indicators: []
+  areas:
+  - HT
+- term: UFLPA Entity List
+  definition: A US government list of companies whose goods are presumed to be made with forced labour
+    under the UFLPA.
+  examples: []
+  source_url: https://www.cbp.gov/trade/forced-labor/UFLPA
+  cases: []
+  related:
+  - UFLPA rebuttable presumption
+  indicators: []
+  areas:
+  - HT
+- term: List of Goods Produced by Child Labor or Forced Labor
+  definition: 'A US Department of Labor list of goods and source countries it has reason to believe are
+    made with child or forced labour (2024: 204 goods, 82 countries and areas).'
+  examples: []
+  source_url: https://www.dol.gov/agencies/ilab/reports/child-labor/list-of-goods
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: H-2B guest worker program
+  definition: A US visa scheme for temporary non-farm workers; Signal International recruited Indian workers
+    through it.
+  examples: []
+  source_url: https://www.eeoc.gov/newsroom/signal-international-llc-pay-5-million-settle-eeoc-race-national-origin-lawsuit
+  cases: []
+  related:
+  - Recruitment fees
+  indicators: []
+  areas:
+  - HT
+- term: Facilitator (child sexual exploitation)
+  definition: A person, often linked to the victim's family, who arranges and is paid for the abuse of
+    a child, for example by live stream, and has no obvious link to the paying offender.
+  examples: []
+  source_url: https://www.austrac.gov.au/sites/default/files/2022-12/2022%20AUSTRAC%20Child%20Sexual%20Exploitation%20Financial%20Crime%20Guide.pdf
+  cases: []
+  related:
+  - Live online child sexual abuse
+  indicators: []
+  areas:
+  - HT
+- term: Live online child sexual abuse
+  definition: Abuse of a child broadcast live to paying offenders; AUSTRAC says facilitators may receive
+    payments from several offenders at once during broadcasts.
+  examples: []
+  source_url: https://www.austrac.gov.au/sites/default/files/2022-12/2022%20AUSTRAC%20Child%20Sexual%20Exploitation%20Financial%20Crime%20Guide.pdf
+  cases: []
+  related:
+  - Facilitator (child sexual exploitation)
+  indicators: []
+  areas:
+  - HT
+- term: Transit country
+  definition: A country an offender or victim passes through on the way to the destination, sometimes
+    to hide the final destination (AUSTRAC names Singapore, Hong Kong, Malaysia, Thailand).
+  examples: []
+  source_url: https://www.austrac.gov.au/sites/default/files/2022-12/2022%20AUSTRAC%20Child%20Sexual%20Exploitation%20Financial%20Crime%20Guide.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Stages of trafficking (recruitment, transportation, exploitation)
+  definition: FinCEN's three stages at which traffickers touch the financial system; exploitation can
+    produce ongoing proceeds, unlike one-off smuggling fees.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+  cases: []
+  related:
+  - Smuggling payment stages
+  indicators: []
+  areas:
+  - HT
+- term: Travel Act (US)
+  definition: A US federal law used in the Backpage case alongside money laundering charges; Spear and
+    Brunst were convicted of conspiring to violate it.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/three-owners-notorious-prostitution-website-backpagecom-sentenced
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: Concealment money laundering
+  definition: Moving criminal proceeds in a way designed to hide their nature, source, ownership or control;
+    Michael Lacey was convicted of one count of international concealment money laundering.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/three-owners-notorious-prostitution-website-backpagecom-sentenced
+  cases: []
+  related:
+  - Front company
+  indicators: []
+  areas:
+  - HT

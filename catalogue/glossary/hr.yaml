@@ -1,0 +1,489 @@
+area: HR
+terms:
+- term: Antiquity
+  definition: An old object, often from archaeological digs; UNESCO's list covers antiquities more than
+    100 years old.
+  examples: []
+  source_url: https://www.unesco.org/en/legal-affairs/convention-means-prohibiting-and-preventing-illicit-import-export-and-transfer-ownership-cultural
+  cases: []
+  related:
+  - Cultural property
+  indicators: []
+  areas:
+  - HR
+- term: Cultural property
+  definition: Property a state designates as important for archaeology, history, art, science and similar
+    fields, in the categories of the 1970 UNESCO Convention, Art. 1.
+  examples: []
+  source_url: https://www.unesco.org/en/legal-affairs/convention-means-prohibiting-and-preventing-illicit-import-export-and-transfer-ownership-cultural
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Illicit import, export or transfer (cultural property)
+  definition: Moving or transferring cultural property in breach of the rules states adopt under the 1970
+    UNESCO Convention (Art. 3).
+  examples: []
+  source_url: https://www.unesco.org/en/legal-affairs/convention-means-prohibiting-and-preventing-illicit-import-export-and-transfer-ownership-cultural
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Provenance (objects)
+  definition: The full ownership history of an item from discovery or creation to today, which supports
+    authenticity and ownership.
+  examples: []
+  source_url: https://icom.museum/wp-content/uploads/2018/07/ICOM-code-En-web.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Valid title
+  definition: An undisputed right to own property, backed by full provenance since discovery or production.
+  examples: []
+  source_url: https://icom.museum/wp-content/uploads/2018/07/ICOM-code-En-web.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Due diligence
+  definition: Making every effort to establish the facts, especially the source and history of an item,
+    before acting or acquiring it.
+  examples: []
+  source_url: https://icom.museum/wp-content/uploads/2018/07/ICOM-code-En-web.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Looting
+  definition: Unauthorised removal of cultural artefacts or human remains, typically from archaeological
+    sites.
+  examples: []
+  source_url: https://www.regjeringen.no/contentassets/570f17301cdd4df4bb3e19a70c640e90/rapport-money-laundering-and-terrorist-financing-in-the-art-and-antiquities-market-feb-2023.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Free trade zone / freeport
+  definition: Areas set up within a jurisdiction to promote trade, where goods can be stored with lighter
+    customs controls; FATF flags them as a risk for art.
+  examples: []
+  source_url: https://www.regjeringen.no/contentassets/570f17301cdd4df4bb3e19a70c640e90/rapport-money-laundering-and-terrorist-financing-in-the-art-and-antiquities-market-feb-2023.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: ICOM Red List
+  definition: Lists of categories of cultural objects at risk of illicit trade, used to check whether
+    an object type needs extra scrutiny.
+  examples: []
+  source_url: https://kernochan.law.columbia.edu/sites/default/files/content/Symposium%20March%201/Anquities%20Supplement%20to%20Due%20Diligence%20Toolkit%20(4873-9119-0428.1)_VF.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Import licence / importer statement (EU)
+  definition: Under EU Regulation 2019/880, high-risk archaeological goods over 250 years old need a licence,
+    and other listed goods over 200 years and EUR 18,000 need a signed importer statement.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32019R0880
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Suspicious Activity Report (SAR)
+  definition: A report US financial institutions file with FinCEN on possibly illicit transactions; FinCEN
+    asks filers to tag antiquities/art cases 'FIN-2021-NTC2'.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/2021-03/FinCEN%20Notice%20on%20Antiquities%20and%20Art_508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Crimes relating to antiquities and art
+  definition: FinCEN lists looting, theft, illicit excavation, smuggling, sale of stolen or fake objects,
+    money laundering and sanctions violations.
+  examples: []
+  source_url: https://fincen.gov/sites/default/files/2021-03/FinCEN%20Notice%20on%20Antiquities%20and%20Art_508C.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Conflict-affected and high-risk area (CAHRA)
+  definition: An area with armed conflict, widespread violence or other risks of harm to people, often
+    with widespread human rights abuses.
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Red flag location of mineral origin and transit
+  definition: 'OECD''s term for an origin or transit point that triggers enhanced due diligence: a CAHRA,
+    a country whose declared output exceeds its reserves, or a known transit country.'
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: 3T / 3TG
+  definition: 'Tin (cassiterite), tantalum (tantalite/coltan), tungsten (wolframite), plus gold: the minerals
+    covered by the OECD supplements.'
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Upstream / known upstream companies
+  definition: Actors from the mine to the smelter or refiner, including immediate suppliers and any known
+    actors further up the chain.
+  examples: []
+  source_url: https://www.lme.com/-/media/Files/Company/Responsibility/Responsible-sourcing/LME-responsible-sourcing-supplier-red-flags-guidance-February-2021.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Direct or indirect support to non-state armed groups
+  definition: Buying minerals from, paying, or giving logistics or equipment to armed groups or their
+    affiliates who control or tax the mineral trade.
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Affiliates (of armed groups)
+  definition: Négociants, consolidators, intermediaries and others who work directly with armed groups
+    to help extract or trade minerals.
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Extort (OECD)
+  definition: Demanding money or minerals under threat of violence or penalty, often for access to mines,
+    routes or trade.
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Forced or compulsory labour
+  definition: Work taken from a person under threat of penalty that they did not volunteer for.
+  examples: []
+  source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Conflict diamonds
+  definition: Rough diamonds used by rebel movements or their allies to finance conflict against legitimate
+    governments, as described by UN resolutions.
+  examples: []
+  source_url: https://www.kimberleyprocess.com/en/what-kp
+  cases: []
+  related:
+  - Kimberley Process certificate
+  indicators: []
+  areas:
+  - HR
+- term: Kimberley Process certificate
+  definition: The certificate that must travel with every rough diamond export of a KP participant, stating
+    the diamonds are conflict-free.
+  examples: []
+  source_url: https://www.kimberleyprocess.com/en/what-kp
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Crony companies
+  definition: Private businesses with strong and lasting business and family ties to a military, as described
+    for Myanmar by the UN Fact-Finding Mission.
+  examples: []
+  source_url: https://www.un.org/sexualviolenceinconflict/wp-content/uploads/2019/08/report/the-economic-interests-of-the-myanmar-military/A_HRC_42_CRP_3.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: War crimes
+  definition: Serious violations of the laws of war, such as grave breaches of the Geneva Conventions,
+    listed in Rome Statute Art. 8.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Crime against humanity
+  definition: Listed acts such as murder or torture committed as part of a widespread or systematic attack
+    on civilians, with knowledge of the attack.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Genocide
+  definition: Listed acts committed with intent to destroy, in whole or in part, a national, ethnic, racial
+    or religious group.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Persecution
+  definition: Intentional, severe deprivation of fundamental rights because of a group's identity, contrary
+    to international law.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Enslavement
+  definition: Exercising powers of ownership over a person, including in the course of trafficking in
+    persons.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Deportation or forcible transfer
+  definition: Forcing people out of an area where they are lawfully present by expulsion or coercion without
+    lawful grounds.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Enforced disappearance
+  definition: Arrest or abduction by or with state or political organisation support, followed by refusal
+    to acknowledge it or reveal the person's fate.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Pillage
+  definition: Taking property for private use in war without the owner's consent; a war crime under Rome
+    Statute Art. 8(2)(b)(xvi).
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Aiding and abetting
+  definition: Helping, encouraging or supporting the commission of a crime by others; the mode of liability
+    in the Charles Taylor conviction.
+  examples: []
+  source_url: https://www.jurist.org/news/2013/09/charles-taylors-50-year-sentence-upheld-on-appeal/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Material support (terrorism)
+  definition: Providing money, goods or services to a designated terrorist organisation, a US federal
+    crime; basis of the Lafarge plea.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Civil forfeiture
+  definition: A legal action against property itself, claiming it is linked to a crime; claims in a complaint
+    are allegations until decided or settled.
+  examples: []
+  source_url: https://www.justice.gov/usao-dc/pr/united-states-files-complaint-seeking-forfeiture-antiquities-associated-islamic-state
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Open source information
+  definition: Information any member of the public can observe, buy or request without special legal status
+    or unauthorised access.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Digital open source investigation
+  definition: An investigation based on publicly available digital information such as social media posts,
+    videos, satellite images and government data.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Chain of custody
+  definition: A dated record of everyone who held, moved or analysed a piece of evidence and what they
+    did with it.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Hash value
+  definition: A fixed-length string calculated from a file that stays the same as long as the file is
+    unchanged, used to show it was not altered.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Metadata
+  definition: Data about a file, such as its creator, dates, size and location, that can help establish
+    authenticity.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Verification
+  definition: Establishing the accuracy of online information by examining the source, the file and the
+    content together.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Source analysis
+  definition: Assessing a source's credibility and reliability, including attribution, posting history
+    and independence.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Technical analysis
+  definition: Examining a digital file itself (metadata, source code, identifiers) to test whether it
+    was altered.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Content analysis
+  definition: Assessing what an image, video or document shows for authenticity and truth, including visual
+    clues and consistency.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Geolocation
+  definition: Identifying where an image or video was taken, for example by matching landmarks to a map.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Chronolocation
+  definition: Confirming the date and time of events shown, for example from shadow length.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Provenance (online content)
+  definition: The earliest known appearance of an item online; investigators speak of the 'first copy
+    found online'.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Circular reporting
+  definition: Sources repeating each other so one claim appears independently confirmed; the Berkeley
+    Protocol lists it as a validity issue.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: WHOIS
+  definition: A record of who registered a domain name, used in source analysis.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Caesar files
+  definition: About 27,000 photographs of bodies of Syrian detainees taken by a military photographer
+    and smuggled out; used as evidence in the Koblenz trial.
+  examples: []
+  source_url: https://iiim.un.org/wp-content/uploads/2025/07/1StE9_19-Judgment_Unofficial-IIIM-Translation_ENG.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR

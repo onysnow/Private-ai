@@ -1,0 +1,3217 @@
+key: HT
+name: Human trafficking and forced labour
+scope: human trafficking, forced labour (the ILO 11 indicators), forced labour in supply chains, migrant
+  smuggling, labour exploitation, child labour, and child exploitation only at the level official bodies
+  (UNODC, ILO, FATF, national FIUs) publish. Include the financial indicators FIUs publish for trafficking,
+  since those link to financial cases.
+indicators:
+- id: HT-001
+  name: Abuse of vulnerability
+  definition: The employer or recruiter takes advantage of a worker's weak position (for example irregular
+    migration status, poverty, not speaking the language, or dependence on the employer) to impose conditions
+    the worker would not otherwise accept.
+  areas:
+  - HT
+  typology: ILO forced labour indicator 1 of 11
+  status: verified
+  sources:
+  - title: ILO Indicators of Forced Labour
+    publisher: International Labour Organization (Special Action Programme to Combat Forced Labour)
+    year: not printed in the text read
+    url: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@declaration/documents/publication/wcms_203832.pdf
+    locator: Indicator 1, Abuse of vulnerability
+    quote: Anyone can be a victim of forced labour.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 1, General indicators
+    quote: Be in a situation of dependence
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Workers whose visa is tied to one employer told they will be deported if they complain
+  - Workers recruited from an area of economic hardship who cannot speak the local language and rely on
+    the employer for housing and transport
+  cases:
+  - name: Operation Fort (R v Ignacy Brzezinski and others)
+    year: '2019'
+    jurisdiction: England and Wales (Birmingham Crown Court)
+    what_happened: An organised crime group lured largely vulnerable Polish nationals to the UK with offers
+      of work, accommodation, food and travel, then exploited them; defendants were sentenced for human
+      trafficking, forced labour and money laundering.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.gov.uk/government/news/solicitor-general-welcomes-modern-slavery-conviction
+    source_title: Solicitor General welcomes modern slavery conviction (GOV.UK press release)
+  data_needed:
+  - Person (nationality, birthDate)
+  - Employment (employer, employee, startDate, role)
+  - Passport / Identification (holder, country, type)
+  - Address (shared housing provided by employer)
+  - Document (visa or work permit, contract)
+  checkable: person
+  lookup_sources:
+  - Immigration or visa sponsorship records where public
+  - Labour inspectorate findings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many migrant workers depend on an employer for a visa or housing under lawful, fair schemes
+  - Vulnerability alone shows risk, not exploitation; the ILO says some indicators need others alongside
+    them
+  jurisdictions: International (ILO standard); used by national labour inspectorates and customs authorities
+  version: 1
+- id: HT-002
+  name: Deception about the job
+  definition: The worker was promised one job, wage, or set of conditions (verbally or in writing) and
+    got something worse on arrival, including contract switching.
+  areas:
+  - HT
+  typology: ILO forced labour indicator 2 of 11
+  status: verified
+  sources:
+  - title: ILO Indicators of Forced Labour
+    publisher: International Labour Organization
+    year: not printed in the text read
+    url: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@declaration/documents/publication/wcms_203832.pdf
+    locator: Indicator 2, Deception
+    quote: Deception relates to the failure to deliver what has been promised to the worker, either verbally
+      or in writing.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 1, General indicators
+    quote: Have acted on the basis of false promises
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Supplemental Advisory on Identifying and Reporting Human Trafficking and Related Activity (FIN-2020-A008)
+    publisher: FinCEN, US Treasury
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section I.2, Exploitative Employment Practices
+    quote: Some labor recruiters also mislead workers about the conditions and nature of a job, engage
+      in contract switching, and confiscate or destroy workers' identity documents.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Job advert abroad promises factory work at a set wage; worker is placed in a different job at lower
+    pay
+  - Contract signed in home country differs from the one presented on arrival
+  cases:
+  - name: Operation Fort (R v Ignacy Brzezinski and others)
+    year: '2019'
+    jurisdiction: England and Wales
+    what_happened: Victims were lured with offers of work and free or subsidised accommodation, food and
+      travel, then housed in very poor accommodation and paid as little as £10 a week.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.gov.uk/government/news/solicitor-general-welcomes-modern-slavery-conviction
+    source_title: Solicitor General welcomes modern slavery conviction
+  data_needed:
+  - Document (job advertisement, recruitment contract, employment contract)
+  - Employment (employer, employee, salary, role)
+  - Company (recruitment agency)
+  - Representation (agency acting for employer)
+  checkable: person
+  lookup_sources:
+  - Online job advertisements and archives
+  - Company registry for the recruitment agency
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Deceptive recruitment and visa fraud are named by FinCEN as exploitative employment schemes
+      used to profit from trafficking.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+  innocent_explanations:
+  - Lawful contract changes agreed by both sides
+  - Misunderstanding caused by translation
+  - An employer that failed financially and could not deliver what it promised
+  jurisdictions: International
+  version: 1
+- id: HT-003
+  name: Restriction of movement
+  definition: Workers are locked in, guarded, or otherwise kept from leaving the workplace or living quarters,
+    or can only go out escorted.
+  areas:
+  - HT
+  typology: ILO forced labour indicator 3 of 11
+  status: verified
+  sources:
+  - title: ILO Indicators of Forced Labour
+    publisher: International Labour Organization
+    year: not printed in the text read
+    url: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@declaration/documents/publication/wcms_203832.pdf
+    locator: Indicator 3, Restriction of movement
+    quote: Forced labourers may be locked up and guarded to prevent them from escaping, at work or while
+      being transported.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 1, General indicators
+    quote: Be unable to leave their work environment
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Guarded worker camps
+  - Workers escorted to and from work and never seen alone
+  cases:
+  - name: EEOC v. Signal International, LLC
+    year: '2015'
+    jurisdiction: United States (E.D. Louisiana; Delaware bankruptcy court)
+    what_happened: EEOC alleged that Indian H-2B guest workers were made to pay $1,050 a month to live
+      in overcrowded, unsanitary, guarded camps; Signal agreed to pay an estimated $5 million to 476 workers
+      to settle the race and national origin discrimination suit.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.eeoc.gov/newsroom/signal-international-llc-pay-5-million-settle-eeoc-race-national-origin-lawsuit
+    source_title: Signal International, LLC to Pay $5 Million to Settle EEOC Race, National Origin Lawsuit
+  data_needed:
+  - Address (workplace and housing, same or linked)
+  - Employment
+  - Person (worker, supervisor)
+  - Document (witness statements, photos)
+  checkable: person
+  lookup_sources:
+  - Satellite or street imagery of sites
+  - Planning or property records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Site security rules on dangerous or remote sites (mines, ships, oil rigs)
+  - Employer-provided transport offered for convenience
+  - Pandemic or public-health movement limits
+  jurisdictions: International
+  version: 1
+- id: HT-004
+  name: Isolation
+  definition: Workers are kept in remote places or cut off from family, friends, phones, or anyone who
+    could help.
+  areas:
+  - HT
+  typology: ILO forced labour indicator 4 of 11
+  status: verified
+  sources:
+  - title: ILO Indicators of Forced Labour
+    publisher: International Labour Organization
+    year: not printed in the text read
+    url: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@declaration/documents/publication/wcms_203832.pdf
+    locator: Indicator 4, Isolation
+    quote: Victims of forced labour are often isolated in remote locations, denied contact with the outside
+      world.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 1, General indicators
+    quote: Have limited contact with their families or with people outside of their immediate environment
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Fishing crews kept at sea for long periods
+  - Workers' phones taken away
+  cases: []
+  data_needed:
+  - Address (remote worksite)
+  - Vessel (for at-sea labour)
+  - Person
+  - Employment
+  checkable: person
+  lookup_sources:
+  - Ship tracking (AIS) for time at sea
+  - Satellite imagery
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Remote work by nature (fishing, mining, farming) with lawful rotation and communication
+  - Poor connectivity rather than deliberate restriction
+  jurisdictions: International
+  version: 1
+- id: HT-005
+  name: Physical and sexual violence
+  definition: Workers, or their families, are beaten, assaulted, sexually abused, or given injuries consistent
+    with control measures.
+  areas:
+  - HT
+  typology: ILO forced labour indicator 5 of 11
+  status: verified
+  sources:
+  - title: ILO Indicators of Forced Labour
+    publisher: International Labour Organization
+    year: not printed in the text read
+    url: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@declaration/documents/publication/wcms_203832.pdf
+    locator: Indicator 5, Physical and sexual violence
+    quote: Forced labourers, their family members and close associates may be subjected to actual physical
+      or sexual violence.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 1, General indicators
+    quote: Suffer injuries that appear to be the result of an assault
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section II, Behavioral indicators
+    quote: A third party commits acts of physical aggression or intimidation toward the customer.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Bank staff see a companion strike or threaten a customer
+  - Medical records of repeated unexplained injuries
+  cases: []
+  data_needed:
+  - Person
+  - Document (medical records, police reports, statements)
+  - Associate (victim and controller)
+  checkable: person
+  lookup_sources:
+  - Court and police records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Workplace accidents
+  - Injuries from unrelated domestic or personal causes
+  jurisdictions: International
+  version: 1
+- id: HT-006
+  name: Intimidation and threats
+  definition: Workers are threatened (with violence, denunciation to immigration, harm to family, or loss
+    of pay) when they complain or try to leave.
+  areas:
+  - HT
+  typology: ILO forced labour indicator 6 of 11
+  status: verified
+  sources:
+  - title: ILO Indicators of Forced Labour
+    publisher: International Labour Organization
+    year: not printed in the text read
+    url: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@declaration/documents/publication/wcms_203832.pdf
+    locator: Indicator 6, Intimidation and threats
+    quote: Victims of forced labour may suffer intimidation and threats when they complain about their
+      conditions
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 1, General indicators
+    quote: Be threatened with being handed over to the authorities
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Messages threatening to report a worker to immigration
+  - Threats against family in home country
+  cases:
+  - name: Operation Fort (R v Ignacy Brzezinski and others)
+    year: '2019'
+    jurisdiction: England and Wales
+    what_happened: The group threatened or assaulted victims who suggested leaving.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.gov.uk/government/news/solicitor-general-welcomes-modern-slavery-conviction
+    source_title: Solicitor General welcomes modern slavery conviction
+  data_needed:
+  - Person
+  - Document (messages, recordings, statements)
+  - Email
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary, lawful disciplinary warnings
+  - Workplace disputes without coercion
+  jurisdictions: International
+  version: 1
+- id: HT-007
+  name: Retention of identity documents
+  definition: The employer, recruiter or a companion holds the worker's passport, ID card or other valuables,
+    so the worker cannot leave or prove who they are.
+  areas:
+  - HT
+  - ML
+  typology: ILO forced labour indicator 7 of 11
+  status: verified
+  sources:
+  - title: ILO Indicators of Forced Labour
+    publisher: International Labour Organization
+    year: not printed in the text read
+    url: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@declaration/documents/publication/wcms_203832.pdf
+    locator: Indicator 7, Retention of identity documents
+    quote: The retention by the employer of identity documents or other valuable personal possessions
+      is an element of forced labour
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 1, General indicators
+    quote: Not be in possession of their passports or other travel or identity documents, as those documents
+      are being held by someone else
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Guidance on Recognizing Activity that May be Associated with Human Smuggling and Human Trafficking
+      (FIN-2014-A008)
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix B, Customer Interaction Red Flags
+    quote: Correspondingly, the third party escorting the customer may always have possession of the customer's
+      ID.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section II, Behavioral indicators
+    quote: A third party maintains possession and/or control of all documents or money.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Companion hands the customer's passport to the bank teller
+  - Employer keeps workers' passports 'for safekeeping'
+  cases:
+  - name: Operation Fort (R v Ignacy Brzezinski and others)
+    year: '2019'
+    jurisdiction: England and Wales
+    what_happened: The group kept victims' bank cards and Polish identity cards, or copies of them, to
+      prevent them from leaving.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.gov.uk/government/news/solicitor-general-welcomes-modern-slavery-conviction
+    source_title: Solicitor General welcomes modern slavery conviction
+  - name: CBP forced labor finding on Top Glove Corporation Bhd.
+    year: '2021'
+    jurisdiction: United States (import enforcement; Malaysia production)
+    what_happened: CBP issued a forced labor finding on 29 March (2021) citing indicators including retention
+      of identity documents in Top Glove's production; a shipment of 3.97 million gloves was later seized
+      in Cleveland.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://cbp.gov/newsroom/local-media-release/cbp-cleveland-seizes-top-glove-products-under-forced-labor-finding
+    source_title: CBP Cleveland seizes Top Glove products under forced labor finding
+  data_needed:
+  - Passport / Identification (holder)
+  - Person (holder and person in possession)
+  - Associate or UnknownLink (companion to customer)
+  - Employment
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Control of a victim's ID lets traffickers open and run accounts in the victim's name; FinCEN
+      lists third-party control of documents as a bank-branch red flag.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+  innocent_explanations:
+  - Short, consented retention for a visa or permit application
+  - A parent or guardian holding a child's documents
+  - Safe-deposit arrangement the worker can end at any time
+  jurisdictions: International
+  version: 1
+- id: HT-008
+  name: Withholding of wages
+  definition: Wages are systematically held back, delayed or not paid, so the worker stays to try to get
+    what they are owed.
+  areas:
+  - HT
+  typology: ILO forced labour indicator 8 of 11
+  status: verified
+  sources:
+  - title: ILO Indicators of Forced Labour
+    publisher: International Labour Organization
+    year: not printed in the text read
+    url: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@declaration/documents/publication/wcms_203832.pdf
+    locator: Indicator 8, Withholding of wages
+    quote: The fact of irregular or delayed payment of wages does not automatically imply a forced labour
+      situation.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 1, General indicators
+    quote: Have no access to their earnings
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Wages paid months late or held until the end of a contract
+  - Workers receive tiny cash sums while records show larger pay
+  cases:
+  - name: Operation Fort (R v Ignacy Brzezinski and others)
+    year: '2019'
+    jurisdiction: England and Wales
+    what_happened: Victims were forced to work for as little as £10 a week and their benefits were siphoned
+      by the group.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.gov.uk/government/news/solicitor-general-welcomes-modern-slavery-conviction
+    source_title: Solicitor General welcomes modern slavery conviction
+  data_needed:
+  - Employment (salary)
+  - Payment (payer = employer, beneficiary = worker, amount, date)
+  - BankAccount (worker account)
+  - Document (payslips, contracts)
+  checkable: records
+  lookup_sources:
+  - Labour inspectorate or wage-claim records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FinCEN notes a business that shows no normal payroll costs (wages, payroll taxes) for its
+      size as a trafficking red flag, which also signals payroll tax evasion.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+  innocent_explanations:
+  - Employer cash-flow trouble or insolvency (the ILO itself says late pay alone is not forced labour)
+  - Agreed end-of-season lump-sum payments
+  - Payroll errors
+  jurisdictions: International
+  version: 1
+- id: HT-009
+  name: Debt bondage
+  definition: The worker owes a debt (often recruitment fees, travel or advances) that is used to keep
+    them working, where the work does not fairly pay the debt down or has no clear limit.
+  areas:
+  - HT
+  typology: ILO forced labour indicator 9 of 11
+  status: verified
+  sources:
+  - title: ILO Indicators of Forced Labour
+    publisher: International Labour Organization
+    year: not printed in the text read
+    url: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@declaration/documents/publication/wcms_203832.pdf
+    locator: Indicator 9, Debt bondage
+    quote: Debt bondage – or bonded labour – reflects an imbalance in power between the worker-debtor
+      and the employer-creditor.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Supplementary Convention on the Abolition of Slavery, the Slave Trade, and Institutions and
+      Practices Similar to Slavery
+    publisher: United Nations (OHCHR)
+    year: '1956'
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/supplementary-convention-abolition-slavery-slave-trade-and
+    locator: Article 1, item (a) debt bondage
+    quote: if the value of those services as reasonably assessed is not applied towards the liquidation
+      of the debt
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 1, General indicators
+    quote: Be under the perception that they are bonded by debt
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Workers paid large recruitment fees and must repay them from wages for years
+  - Debt grows through charges for housing and food
+  cases:
+  - name: CBP forced labor finding on Top Glove Corporation Bhd.
+    year: '2021'
+    jurisdiction: United States (import enforcement; Malaysia production)
+    what_happened: CBP cited debt bondage, excessive overtime, abusive working and living conditions and
+      retention of identity documents as forced labor indicators in Top Glove's production.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://cbp.gov/newsroom/local-media-release/cbp-cleveland-seizes-top-glove-products-under-forced-labor-finding
+    source_title: CBP Cleveland seizes Top Glove products under forced labor finding
+  data_needed:
+  - Debt (debtor, creditor, amount, date)
+  - Payment (recruitment fee payments)
+  - Employment
+  - Company (recruitment agency)
+  checkable: person
+  lookup_sources:
+  - Recruitment agency licensing registers
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Debt bondage in a factory can lead to import bans on its goods, as in the CBP Top Glove finding.
+    source_url: https://cbp.gov/newsroom/local-media-release/cbp-cleveland-seizes-top-glove-products-under-forced-labor-finding
+  innocent_explanations:
+  - Ordinary salary advances or loans repaid on clear, fair terms
+  - Lawful employer-funded training repayment agreements
+  jurisdictions: International (1956 UN Supplementary Convention; ILO)
+  version: 1
+- id: HT-010
+  name: Abusive working and living conditions
+  definition: Workers endure degrading, dangerous, overcrowded or unsanitary work or housing that no one
+    would freely accept, often in serious breach of labour law.
+  areas:
+  - HT
+  typology: ILO forced labour indicator 10 of 11
+  status: verified
+  sources:
+  - title: ILO Indicators of Forced Labour
+    publisher: International Labour Organization
+    year: not printed in the text read
+    url: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@declaration/documents/publication/wcms_203832.pdf
+    locator: Indicator 10, Abusive working and living conditions
+    quote: Forced labour victims are likely to endure living and working conditions that workers would
+      never freely accept.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 2, Labour exploitation
+    quote: Live in degraded, unsuitable places, such as in agricultural or industrial buildings
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Dozens of workers sleeping in a container or a farm building
+  - No protective equipment for dangerous work
+  cases:
+  - name: EEOC v. Signal International, LLC
+    year: '2015'
+    jurisdiction: United States
+    what_happened: EEOC alleged that as many as 24 men were forced to live in containers the size of a
+      double-wide trailer; the case settled for an estimated $5 million.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.eeoc.gov/newsroom/signal-international-llc-pay-5-million-settle-eeoc-race-national-origin-lawsuit
+    source_title: Signal International, LLC to Pay $5 Million to Settle EEOC Race, National Origin Lawsuit
+  - name: Operation Fort (R v Ignacy Brzezinski and others)
+    year: '2019'
+    jurisdiction: England and Wales
+    what_happened: Victims were housed in very poor accommodation and given little, sometimes expired,
+      food.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.gov.uk/government/news/solicitor-general-welcomes-modern-slavery-conviction
+    source_title: Solicitor General welcomes modern slavery conviction
+  data_needed:
+  - Address (housing linked to employer)
+  - RealEstate (owner of worker housing)
+  - Employment
+  - Document (inspection reports, photos)
+  checkable: person
+  lookup_sources:
+  - Land and property registry
+  - Housing or health-and-safety inspection records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Poor but lawful seasonal housing
+  - Single safety breaches that are ordinary labour-law matters, not coercion
+  jurisdictions: International
+  version: 1
+- id: HT-011
+  name: Excessive overtime
+  definition: Workers are made to work hours or days beyond legal limits, with no breaks or rest days,
+    under some threat or penalty.
+  areas:
+  - HT
+  typology: ILO forced labour indicator 11 of 11
+  status: verified
+  sources:
+  - title: ILO Indicators of Forced Labour
+    publisher: International Labour Organization
+    year: not printed in the text read
+    url: https://www.ilo.org/sites/default/files/wcmsp5/groups/public/@ed_norm/@declaration/documents/publication/wcms_203832.pdf
+    locator: Indicator 11, Excessive overtime
+    quote: Forced labourers may be obliged to work excessive hours or days beyond the limits prescribed
+      by national law
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 1, General indicators
+    quote: Work excessively long hours over long periods
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Time records showing 7-day weeks for months
+  - Audits finding hours far above legal limits
+  cases:
+  - name: CBP forced labor finding on Top Glove Corporation Bhd.
+    year: '2021'
+    jurisdiction: United States / Malaysia
+    what_happened: Excessive overtime was one of the forced labor indicators CBP cited.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://cbp.gov/newsroom/local-media-release/cbp-cleveland-seizes-top-glove-products-under-forced-labor-finding
+    source_title: CBP Cleveland seizes Top Glove products under forced labor finding
+  data_needed:
+  - Employment
+  - Document (time sheets, audit reports)
+  checkable: records
+  lookup_sources:
+  - Social audit reports
+  - Labour inspection data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Voluntary paid overtime in peak season
+  - Legal shift systems with compensating rest
+  jurisdictions: International
+  version: 1
+- id: HT-012
+  name: Third party controls the customer at the bank
+  definition: A companion speaks for the customer, insists on being present, fills in forms for them,
+    or holds their documents or money, sometimes claiming to be an interpreter or relative.
+  areas:
+  - HT
+  - ML
+  typology: Behavioural red flag (financial institutions)
+  status: verified
+  sources:
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section II, Behavioral indicators
+    quote: A third party speaks on behalf of the customer (a third party may insist on being present and/or
+      translating).
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix B, Customer Interaction Red Flags
+    quote: A customer establishes an account or visits a branch to conduct transactions while always escorted
+      by a third party (e.g., under the pretext of requiring an interpreter).
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Updated Indicators: Laundering of proceeds from human trafficking for sexual exploitation
+      (FINTRAC-2021-OA001)'
+    publisher: FINTRAC (Canada)
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: Appendix, Contextual indicators (2016 list)
+    quote: Client makes deposits accompanied or watched by a third party who may, on separate occasions,
+      accompany or watch clients who are making deposits.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 1, General indicators
+    quote: Allow others to speak for them when addressed directly
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The same man accompanies several different women to open accounts at one branch
+  - A 'cousin' cannot give the customer's date of birth
+  cases: []
+  data_needed:
+  - Person (customer and companion)
+  - UnknownLink or Associate (companion to several customers)
+  - BankAccount (accounts opened in presence of same companion)
+  - Document (branch visit logs, CCTV notes)
+  checkable: person
+  lookup_sources:
+  - Bank or branch records (usually only via SARs, leaks or court files)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine interpreters or family carers
+  - Customers with disabilities who need support
+  - Elderly or newly arrived customers helped by relatives
+  jurisdictions: United States, Canada
+  version: 1
+- id: HT-013
+  name: Customer shows signs of abuse or confusion
+  definition: The customer shows poor hygiene, malnourishment, fatigue or injuries, or cannot say where
+    they live and gives scripted or inconsistent answers.
+  areas:
+  - HT
+  typology: Behavioural red flag (financial institutions)
+  status: verified
+  sources:
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section II, Behavioral indicators
+    quote: A customer shows lack of knowledge of their whereabouts, cannot clarify where they live or
+      where they are staying, or provides scripted, confusing, or inconsistent stories in response to
+      inquiry.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 1, General indicators
+    quote: Not know their home or work address
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Customer cannot name the city they are staying in
+  cases: []
+  data_needed:
+  - Person
+  - Address (stated vs. actual)
+  - Document (interview notes)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Illness, disability or homelessness
+  - Recent arrival or language barrier
+  - Travelling workers who move often
+  jurisdictions: United States; international
+  version: 1
+- id: HT-014
+  name: Someone else's ID, aliases, or an account for an unqualified minor
+  definition: Accounts are opened with another person's identification, under aliases across several banks,
+    or for a minor who does not qualify.
+  areas:
+  - HT
+  - ML
+  typology: Know-your-customer red flag
+  status: verified
+  sources:
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section II, Behavioral indicators
+    quote: A third party attempts to open an account for an unqualified minor.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: Appendix, Know your client (2016 list)
+    quote: Use of aliases for the purpose of opening multiple accounts in different banks, or in different
+      branches of the same bank; and,
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Adult opens an account for a 16-year-old who is not their child
+  cases: []
+  data_needed:
+  - Person (birthDate, alias names)
+  - Identification / Passport
+  - BankAccount
+  - Representation (person acting for account holder)
+  checkable: records
+  lookup_sources:
+  - Identity document verification
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Use of someone else's identification is also a general identity-fraud signal.
+    source_url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  innocent_explanations:
+  - Parents or legal guardians opening youth accounts
+  - Name variations from transliteration or marriage
+  jurisdictions: United States, Canada
+  version: 1
+- id: HT-015
+  name: Contact details linked to escort advertising
+  definition: A customer's phone, email, social handle or address matches those in escort or commercial
+    sex adverts, or the same advert phone number moves between cities.
+  areas:
+  - HT
+  - ML
+  typology: Sex trafficking; open-source link
+  status: verified
+  sources:
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section II, Financial indicators
+    quote: A customer's account shares common identifiers, such as a telephone number, email, and social
+      media handle, or address, associated with escort agency websites and commercial sex advertisements.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: Appendix, Contextual indicators (2016 list)
+    quote: Phone number provided on online advertising and promotional services is used in different cities
+      and provinces in a short period of time;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: 'Indicators: out of private residences'
+    quote: Escort services business/escort agency is associated to a residential address.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The phone number on a bank file appears in escort ads in three cities in one week
+  cases: []
+  data_needed:
+  - Person (phone, email)
+  - Email
+  - Address
+  - Document (archived adverts)
+  - UnknownLink (person to advert)
+  checkable: lookups
+  lookup_sources:
+  - Archived online classified and escort advert data
+  - Reverse phone and email lookups
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful independent adult sex work where it is legal
+  - Recycled phone numbers
+  - Shared addresses in large apartment buildings
+  jurisdictions: United States, Canada
+  version: 1
+- id: HT-016
+  name: Frequent payments for online escort or classified adverts
+  definition: Repeated small payments (and sometimes premium fees) to online classified, escort-advertising
+    or web-hosting services, inconsistent with the customer's profile.
+  areas:
+  - HT
+  - ML
+  typology: Sex trafficking running costs
+  status: verified
+  sources:
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix B, Transactional Red Flags
+    quote: Frequent payments to online escort services for advertising, including small posting fees to
+      companies of online classifieds as well as more expensive, higher-end advertising and website hosting
+      companies.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: Appendix, Types of financial transactions (2016 list), Online advertising
+    quote: frequent payments in multiples of small amounts (e.g., $3, $12, $24) in relatively short timelines
+      and inconsistent with expected activity;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section II, Financial indicators
+    quote: Frequent transactions with online classified sites that are based in foreign jurisdictions.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Card statement shows many CAD 3, 12 and 24 charges to an adult classifieds site
+  cases:
+  - name: United States v. Lacey, Spear and Brunst (Backpage.com)
+    year: '2023'
+    jurisdiction: United States (District of Arizona)
+    what_happened: A federal jury convicted Backpage principals in November 2023; Lacey was convicted
+      of one count of international concealment money laundering, and Spear and Brunst of Travel Act and
+      money laundering counts; DOJ says they laundered revenue through shell companies in multiple foreign
+      countries.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/three-owners-notorious-prostitution-website-backpagecom-sentenced
+    source_title: Three owners of notorious prostitution website Backpage.com sentenced (DOJ)
+  data_needed:
+  - Payment (payer, beneficiary = advertising platform, amount, date)
+  - Company (advertising platform)
+  - BankAccount
+  checkable: records
+  lookup_sources:
+  - Company registry for the payee merchant
+  - Open-source checks of the merchant's business
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Repeated payments in small multiples such as $3, $12, $24 to escort or online advertising
+      services in short timelines, inconsistent with expected activity (FINTRAC example amounts).
+    threshold_source: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Advertising platform revenue from commercial sex ads was laundered through foreign shell companies
+      in the Backpage case.
+    source_url: https://www.justice.gov/usao-az/pr/backpage-principals-convicted-500m-prostitution-enterprises-promotion-scheme
+  innocent_explanations:
+  - Small businesses advertising lawful services online
+  - Lawful independent adult services where legal
+  jurisdictions: United States, Canada
+  version: 1
+- id: HT-017
+  name: Paying other people's living costs
+  definition: An account pays for hotels, short-term rentals, transport, fast food, pharmacies, clothing
+    or beauty items in a way that looks like covering the needs of several people rather than the holder's
+    own life.
+  areas:
+  - HT
+  - ML
+  typology: Trafficking running costs
+  status: verified
+  sources:
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section II, Financial indicators
+    quote: Transactions are inconsistent with a customer's expected activity and/or line of business in
+      an apparent effort to cover trafficking victims' living costs
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix B, Transactional Red Flags
+    quote: Frequent transactions, inconsistent with expected activity and/or line of business, carried
+      out by a business customer in apparent efforts to provide sustenance to individuals
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: General contextual and ML indicators
+    quote: Frequent purchases for food delivery services, often on the same day.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Several hotel rooms and multiple fast-food orders on the same day from one card
+  - A construction firm paying for workers' groceries and housing in bulk with no payroll
+  cases: []
+  data_needed:
+  - 'Payment (beneficiary merchants: hotels, transport, food)'
+  - BankAccount
+  - Person (account holder)
+  checkable: records
+  lookup_sources:
+  - Merchant category data in bank records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Families, team travel or event organisers
+  - Employers lawfully providing room and board
+  - Shared household spending
+  jurisdictions: United States, Canada
+  version: 1
+- id: HT-018
+  name: Transactions across many cities in a short time
+  definition: Purchases, deposits and hotel stays move quickly between cities or provinces, sometimes
+    deposits in one city followed by withdrawals in another the same or next day.
+  areas:
+  - HT
+  - ML
+  typology: Circuit movement of victims
+  status: verified
+  sources:
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section II, Financial indicators
+    quote: Customers frequently appear to move through, and transact from, different geographic locations
+      in the United States.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: General contextual and ML indicators
+    quote: Location(s) of accommodation bookings correspond to location(s) of cash deposits, particularly
+      when multiple cities are observed in transactions.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: Appendix, Patterns (2016 list)
+    quote: Deposits (e.g., via ABM, in-branch) conducted in one city followed by same day or next day
+      withdrawal and/or purchase conducted in another city;
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Hotel stays in four cities in ten days with cash deposits near each hotel
+  cases: []
+  data_needed:
+  - Payment (date, location via merchant Address)
+  - Address
+  - BankAccount
+  checkable: records
+  lookup_sources:
+  - ATM and merchant location data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Deposits in one city followed by same day or next day withdrawal or purchase in another
+      city (FINTRAC wording).
+    threshold_source: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Truck drivers, sales reps, touring performers, travelling nurses
+  - Holidays
+  jurisdictions: United States, Canada
+  version: 1
+- id: HT-019
+  name: Night-time and after-hours activity
+  definition: Cash activity or card sales happen mostly late at night, or a day-time business takes most
+    of its money after its normal hours.
+  areas:
+  - HT
+  - ML
+  typology: Sex trafficking; illicit storefront businesses
+  status: verified
+  sources:
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: Appendix, Patterns of financial transactions (2016 list)
+    quote: Cash deposits/withdrawals between the hours of 10 p.m. and 6 a.m.;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: 'Indicators: illicit storefront businesses'
+    quote: Merchant point-of-sale transactions occur after the establishment's normal business hours.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section II, Financial indicators
+    quote: Transactional activity largely occurs outside of normal business operating hours (e.g., an
+      establishment that operates during the day has a large number of transactions at night)
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A massage spa listed as open 10am to 7pm takes card payments at 1am
+  cases: []
+  data_needed:
+  - Payment (date and time)
+  - Company (stated opening hours)
+  - BankAccount
+  checkable: records
+  lookup_sources:
+  - Business listings for opening hours
+  - Licensing records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Cash deposits or withdrawals between 10 p.m. and 6 a.m. (FINTRAC), or a day-time business
+      with most transactions at night (FinCEN).
+    threshold_source: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Night-shift workers, bars, restaurants and hospitality
+  - Delayed card settlement timestamps
+  jurisdictions: United States, Canada
+  version: 1
+- id: HT-020
+  name: Funnel account
+  definition: An account receives many cash deposits in places where the holder does not live or do business,
+    and the money is quickly withdrawn somewhere else.
+  areas:
+  - HT
+  - ML
+  typology: Funnel account
+  status: verified
+  sources:
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix A and Appendix B
+    quote: A customer's account appears to function as a funnel account, where cash deposits occur in
+      cities/states where the customer does not reside or conduct business.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section I.3, Funnel Accounts
+    quote: Traffickers maintain control of the victims' bank accounts through coercion, and direct victims
+      to deposit money into their accounts and other accounts that the traffickers can access.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: Appendix, Patterns (2016 list)
+    quote: Account appears to function as a funnel account; deposits occur in locations where the client
+      does not reside or conduct business;
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Cash deposited into one account at branches in five states, withdrawn the same day in a sixth
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment (deposit location, withdrawal location, date)
+  - Address (holder's residence)
+  checkable: records
+  lookup_sources:
+  - Bank branch and ATM location data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Cash deposits in places where the customer does not live or work, often below the $10,000
+      reporting threshold, with funds frequently withdrawn the same day (FinCEN).
+    threshold_source: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: FinCEN first described funnel accounts in a Mexico currency-restrictions advisory (FIN-2014-A005),
+      a pattern also used by drug and smuggling networks.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+  innocent_explanations:
+  - Family members depositing support for a student or relative
+  - Businesses with staff in several regions
+  jurisdictions: United States, Canada
+  version: 1
+- id: HT-021
+  name: Many unrelated senders paying one person
+  definition: Several people with no visible link send money (wires or e-transfers) to the same beneficiary,
+    sometimes with shared addresses or phone numbers, or with escort-related references or nicknames.
+  areas:
+  - HT
+  - ML
+  typology: Collection of proceeds
+  status: verified
+  sources:
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix B, Transactional Red Flags
+    quote: Multiple, apparently unrelated, customers sending wire transfers to the same beneficiary.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: Appendix, Patterns (2016 list)
+    quote: Email money transfers to third parties with alternate names provided in brackets [e.g., jane@example.com
+      (Bambi)];
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: General contextual and ML indicators
+    quote: Individual or entity received multiple email money transfers referencing the name or partial
+      name of an escort agency/escort services business.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Twenty men each send small e-transfers to one woman's account with notes like 'session'
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, purpose/memo)
+  - Person
+  - Address and phone shared across senders
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Crowdfunding or group gifts
+  - Small sellers paid by many customers
+  - Landlords collecting rent
+  jurisdictions: United States, Canada
+  version: 1
+- id: HT-022
+  name: Prepaid cards and gift cards
+  definition: Heavy buying or loading of prepaid credit cards and gift cards, card-to-card transfers,
+    or a woman's prepaid card funded only by one man's card.
+  areas:
+  - HT
+  - ML
+  typology: Alternative payment methods
+  status: verified
+  sources:
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section II, Financial indicators
+    quote: An individual frequently purchases and uses prepaid access cards.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: General contextual and ML indicators
+    quote: Female's reloadable prepaid credit card is funded by reloads or transfers from a male, usually
+      the same male.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: General contextual and ML indicators
+    quote: Rounded sum purchases at grocery stores and/or other retailers that sell gift cards and/or
+      prepaid credit cards.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Round-sum purchases of $500 at a supermarket that sells gift cards, several times a week
+  cases: []
+  data_needed:
+  - Payment (merchant, amount)
+  - BankAccount (prepaid card as account)
+  - Person
+  checkable: records
+  lookup_sources:
+  - Prepaid card issuer records (via legal process)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Gift and prepaid cards are common in scams; FINTRAC notes the ML methods seen were not specific
+      to trafficking.
+    source_url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  innocent_explanations:
+  - Budgeting, gifts, people without bank accounts
+  - Parents loading teenagers' cards
+  jurisdictions: United States, Canada
+  version: 1
+- id: HT-023
+  name: Virtual currency and darknet links
+  definition: Money moves to or from crypto exchanges, people exchanging crypto for others, or darknet
+    markets and services linked to illicit content or advertising.
+  areas:
+  - HT
+  - ML
+  typology: Virtual assets
+  status: verified
+  sources:
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section II, Financial indicators
+    quote: A customer frequently sends or receives funds via cryptocurrency to or from darknet markets
+      or services known to be associated with illicit activity.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: General contextual and ML indicators
+    quote: Transfers to individuals or entities that advertise their virtual currency services on escort
+      websites.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: General contextual and ML indicators
+    quote: Frequent transfers to virtual currency exchangers, particularly if these funds were sourced
+      from incoming email money transfers from multiple individuals.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - E-transfers from many men followed at once by a transfer to a crypto exchange
+  cases: []
+  data_needed:
+  - CryptoWallet
+  - Payment
+  - Company (exchange)
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Blockchain explorers and attribution data
+  - Exchange registration lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary crypto investing
+  - Peer-to-peer trading for legitimate reasons
+  jurisdictions: United States, Canada
+  version: 1
+- id: HT-024
+  name: Payment processors that hide who paid
+  definition: Frequent transactions through third-party payment processors that conceal originators or
+    beneficiaries, especially processors linked to escort sites, adult entertainment or online gambling.
+  areas:
+  - HT
+  - ML
+  typology: Third-party payment processors
+  status: verified
+  sources:
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section II, Financial indicators
+    quote: Frequent transactions using third-party payment processors that conceal the originators and/
+      or beneficiaries of the transactions.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: 'Indicators: illicit storefront businesses'
+    quote: Storefront business or its owner(s) received multiple funds transfers from payment processors,
+      particularly from payment processors associated to escort services or adult entertainment.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A spa receives most income through a processor used by escort sites
+  cases: []
+  data_needed:
+  - Payment (payer = processor)
+  - Company (processor, merchant)
+  - BankAccount
+  checkable: records
+  lookup_sources:
+  - Company registry for processor
+  - Open-source review of the processor's client base
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many legitimate online sellers are paid through processors
+  jurisdictions: United States, Canada
+  version: 1
+- id: HT-025
+  name: Cash-heavy inflows that don't fit the business
+  definition: Money comes in mostly as cash, with no normal electronic (ACH) payments, or cash receipts
+    far above what the business type or size would explain.
+  areas:
+  - HT
+  - ML
+  typology: Cash-intensive proceeds
+  status: verified
+  sources:
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section II, Financial indicators
+    quote: A customer frequently makes cash deposits with no Automated Clearing House (ACH) payments.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix A and Appendix B
+    quote: Inflows are largely received in cash where substantial cash receipts are inconsistent with
+      the customer's line of business.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: Appendix, Patterns (2016 list)
+    quote: Account funded primarily via third party cash transactions;
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Personal account with only cash deposits, no salary or benefit payments
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment (cash deposits)
+  - Company (line of business)
+  checkable: records
+  lookup_sources:
+  - Company registry (stated activity)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Unexplained cash income inconsistent with a business is also a tax-evasion signal.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+  innocent_explanations:
+  - Cash-based trades (market stalls, tips, small restaurants)
+  - Unbanked or informal workers
+  jurisdictions: United States
+  version: 1
+- id: HT-026
+  name: Keeping cash below reporting thresholds
+  definition: Cash deposits or wires kept just below record-keeping or reporting limits, or avoiding transactions
+    that need ID.
+  areas:
+  - HT
+  - ML
+  typology: Structuring
+  status: verified
+  sources:
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix B, Transactional Red Flags
+    quote: Cash deposits or wire transfers are kept below $3,000 or $10,000 in apparent efforts to avoid
+      record keeping requirements or the filing of Currency Transaction Reports (CTRs), respectively.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section II, Financial indicators
+    quote: A customer avoids transactions that require identification documents or that trigger reporting
+      requirements.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Repeated $9,500 cash deposits
+  cases: []
+  data_needed:
+  - Payment (amount, date)
+  - BankAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Cash or wires kept below $3,000 (record-keeping) or $10,000 (CTR) in apparent effort to
+      avoid reporting (US thresholds, FinCEN).
+    threshold_source: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Structuring is a general money laundering offence pattern in US law, not specific to trafficking.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+  innocent_explanations:
+  - Amounts that naturally fall under limits (rent, wages)
+  - Customers unaware of the thresholds
+  jurisdictions: United States
+  version: 1
+- id: HT-027
+  name: Lifestyle out of line with income
+  definition: Spending on luxury cars, high-end clothing, jewellery, nightclubs or cosmetic surgery, or
+    profits well above peers, with no matching legitimate income.
+  areas:
+  - HT
+  - ML
+  typology: Unexplained wealth
+  status: verified
+  sources:
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix A and Appendix B
+    quote: Unexplained/unjustified lifestyle incommensurate with employment or business line.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: General contextual and ML indicators
+    quote: Purchases and/or payments at luxury vehicle dealerships or for limousine services.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Unemployed man buys a luxury car and pays for cosmetic surgery for others
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Vehicle
+  - RealEstate
+  - Employment (declared income)
+  checkable: lookups
+  lookup_sources:
+  - Vehicle and land registries
+  - Social media
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FINTRAC notes traffickers were often also involved in drugs and fraud, so lifestyle spending
+      may reflect several crimes.
+    source_url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  innocent_explanations:
+  - Inheritance, gifts, lawful side income
+  - Debt-funded spending
+  jurisdictions: United States, Canada
+  version: 1
+- id: HT-028
+  name: Business with no normal payroll
+  definition: A business shows little or no wages, payroll taxes or social security payments for the size
+    of its workforce or operations.
+  areas:
+  - HT
+  typology: Labour trafficking
+  status: verified
+  sources:
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix B, Transactional Red Flags
+    quote: A business customer does not exhibit normal payroll expenditures (e.g., wages, payroll taxes,
+      social security contributions).
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A farm or restaurant with dozens of workers but almost no payroll outflows
+  cases: []
+  data_needed:
+  - Company
+  - Payment (payroll, tax)
+  - Employment (headcount)
+  - BankAccount
+  checkable: records
+  lookup_sources:
+  - Company filings and accounts
+  - Public contract or licence records showing workforce size
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Missing payroll taxes for an active workforce also signals payroll tax evasion and undeclared
+      work.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+  innocent_explanations:
+  - Payroll run from another group account or outsourced to a payroll firm
+  - Family-run business with unpaid family help
+  - Seasonal gaps
+  jurisdictions: United States
+  version: 1
+- id: HT-029
+  name: 'Wages taken back: big deductions, payroll returned to employer, or many salaries into one account'
+  definition: Employers deduct large charges (housing, food, tools, fees) leaving workers a fraction,
+    payroll cheques are cashed and the money returns to the employer, or several workers' pay lands in
+    one account.
+  areas:
+  - HT
+  typology: Exploitative employment practices
+  status: verified
+  sources:
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix B, Transactional Red Flags
+    quote: Cashing of payroll checks where the majority of the funds are kept by the employer or are deposited
+      back into the employer's account.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section I.2, Exploitative Employment Practices
+    quote: Financial institutions may see multiple employees receiving their salaries in the same account,
+      or payment for employment may be followed by immediate withdrawal or transfer into another account.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 2, Labour exploitation
+    quote: There is evidence that workers must pay for tools, food or accommodation or that those costs
+      are being deducted from their wages.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Financial Flows from Human Trafficking
+    publisher: FATF and APG
+    year: '2018'
+    url: https://www.fatf-gafi.org/media/fatf/content/images/Human-Trafficking-2018.pdf
+    locator: Paragraph 64 (case example)
+    quote: forced to provide a portion of their wages to Mr A to pay back their debt
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Payslips show wages paid, but bank records show the same sums moving back to the employer the same
+    day
+  cases: []
+  data_needed:
+  - Payment (payer employer, beneficiary worker, then onward transfer)
+  - BankAccount (holder vs controller)
+  - Employment
+  - Document (payslips)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful, capped deductions for employer housing
+  - Workers choosing to pool money for remittance
+  jurisdictions: United States; international
+  version: 1
+- id: HT-030
+  name: Employer, agency or trafficker controls workers' bank accounts
+  definition: The employer or agency is custodian of foreign workers' accounts, holds their bank cards
+    and passwords, or the trafficker has joint access to victims' accounts.
+  areas:
+  - HT
+  - ML
+  typology: Nominee or victim accounts
+  status: verified
+  sources:
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix B, Customer Interaction Red Flags
+    quote: Accounts of foreign workers or students where the employer or employment agency serves as a
+      custodian.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Financial Flows from Human Trafficking
+    publisher: FATF and APG
+    year: '2018'
+    url: https://www.fatf-gafi.org/media/fatf/content/images/Human-Trafficking-2018.pdf
+    locator: Paragraph 65 (case example)
+    quote: seized their bank cards to control these accounts
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: Overview of FINTRAC's analysis
+    quote: Some traffickers also had access to their victims' accounts or held joint accounts with victims.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: General contextual and ML indicators
+    quote: Multiple phone numbers attempting to access a female's bank account.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Online banking for 30 workers' accounts accessed from the employer's IP address
+  cases:
+  - name: Operation Fort (R v Ignacy Brzezinski and others)
+    year: '2019'
+    jurisdiction: England and Wales
+    what_happened: The group kept victims' bank cards; victims were made to claim benefits that the group
+      siphoned; money laundering was among the charges.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.gov.uk/government/news/solicitor-general-welcomes-modern-slavery-conviction
+    source_title: Solicitor General welcomes modern slavery conviction
+  data_needed:
+  - BankAccount
+  - Ownership or Representation (who controls vs who holds)
+  - Person
+  - Company (employer or agency)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: In Operation Fort victims were made to claim benefits that were diverted by the group.
+    source_url: https://www.gov.uk/government/news/solicitor-general-welcomes-modern-slavery-conviction
+  innocent_explanations:
+  - Legitimate payroll-card programmes
+  - Spouses or family with shared access
+  jurisdictions: United States, Canada; international
+  version: 1
+- id: HT-031
+  name: Recruitment fees charged to workers or paid to unlicensed agencies
+  definition: Workers pay fees to get a job, or payments go to recruitment agencies that are unlicensed
+    or have labour violations.
+  areas:
+  - HT
+  typology: Recruitment-fee debt
+  status: verified
+  sources:
+  - title: ILO's 2016 General Principles and Operational Guidelines for Fair Recruitment
+    publisher: International Labour Organization
+    year: '2016'
+    url: https://www.ilo.org/resource/ilos-2016-general-principles-and-operational-guidelines-fair-recruitment
+    locator: General principles
+    quote: No recruitment fees or related costs should be charged to, or otherwise borne by, workers or
+      jobseekers.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix B, Transactional Red Flags
+    quote: Payments to employment or student recruitment agencies that are not licensed/registered or
+      that have labor violations.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section I.2, Exploitative Employment Practices
+    quote: Recruitment fees can range from hundreds of dollars to tens of thousands of dollars, and take
+      years to repay.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Workers' families wire thousands of dollars to a recruiter before departure
+  cases:
+  - name: EEOC v. Signal International, LLC
+    year: '2015'
+    jurisdiction: United States
+    what_happened: Indian H-2B workers recruited after hurricanes Katrina and Rita; EEOC's district director
+      said many paid thousands of dollars to come to the US. The discrimination suit settled for an estimated
+      $5 million.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.eeoc.gov/newsroom/signal-international-llc-pay-5-million-settle-eeoc-race-national-origin-lawsuit
+    source_title: Signal International, LLC to Pay $5 Million to Settle EEOC Race, National Origin Lawsuit
+  data_needed:
+  - Payment (worker to agency)
+  - Company (recruitment agency, licence status)
+  - Debt
+  - Representation (agency for employer)
+  checkable: lookups
+  lookup_sources:
+  - Recruitment agency licence registers
+  - Company registry
+  - Labour violation databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful fees in countries that allow some worker-paid costs
+  - Employer reimbursement made later
+  jurisdictions: International (ILO principle); United States (FinCEN)
+  version: 1
+- id: HT-032
+  name: Workers' wages sent abroad under escort, or wires to high-risk countries
+  definition: Frequent outbound wires with no clear purpose to countries at higher risk of trafficking,
+    or escorted individuals sending what look like their salaries abroad.
+  areas:
+  - HT
+  - ML
+  typology: Cross-border proceeds
+  status: verified
+  sources:
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix B, Transactional Red Flags
+    quote: Transactions conducted by individuals, escorted by a third party (e.g., under the pretext of
+      requiring an interpreter), to transfer funds (that may seem to be their salaries) to other countries.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix B, Transactional Red Flags
+    quote: Frequent outbound wire transfers, with no business or apparent lawful purpose, directed to
+      countries at higher risk for human trafficking
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Each payday, a supervisor brings five workers to a money transmitter to send most of their pay to
+    one recipient abroad
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, country)
+  - Person
+  - Associate (escort to customers)
+  checkable: records
+  lookup_sources:
+  - US State Department Trafficking in Persons Report country tiers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary migrant remittances to family, which are very common
+  jurisdictions: United States, Canada
+  version: 1
+- id: HT-033
+  name: Front company in a high-risk sector
+  definition: A business that mixes illicit and legitimate money and operates in a sector often used as
+    a venue (massage, spas, escort services, bars, restaurants, motels, nail and hair salons, property
+    rentals).
+  areas:
+  - HT
+  - ML
+  typology: Front companies
+  status: verified
+  sources:
+  - title: FIN-2020-A008
+    publisher: FinCEN
+    year: '2020'
+    url: https://www.fincen.gov/sites/default/files/advisory/2020-10-15/Advisory%20Human%20Trafficking%20508%20FINAL_0.pdf
+    locator: Section I.1, Front Companies
+    quote: Examples of front companies used by human traffickers for labor or sex trafficking include
+      massage businesses, escort services, bars, restaurants, and cantinas.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: Overview of FINTRAC's analysis
+    quote: Front companies co-mingled legitimate with illicit funds and/or had limited business-related
+      transactions.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: General contextual and ML indicators
+    quote: Incoming funds (cash deposits and incoming email money transfers) are immediately transferred
+      to a business account and from the business account, funds are depleted by outgoing email money
+      transfers and cash withdrawals.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Owner of three massage spas moves funds between them and a restaurant he also owns
+  cases: []
+  data_needed:
+  - Company (sector, address)
+  - Ownership
+  - Directorship
+  - Payment (between related companies)
+  - BankAccount
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Business licensing records
+  - Online reviews and adverts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Front companies are a general laundering method; FINTRAC found trafficking front companies
+      in music, farming, IT, transport and construction too.
+    source_url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  innocent_explanations:
+  - The great majority of businesses in these sectors are legitimate
+  - Group companies lawfully moving cash between units
+  jurisdictions: United States, Canada
+  version: 1
+- id: HT-034
+  name: Paying for many residences
+  definition: One person or business pays rent to several landlords, property taxes to several municipalities,
+    or utilities for areas where it has no address.
+  areas:
+  - HT
+  - ML
+  typology: Trafficking out of private residences
+  status: verified
+  sources:
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: 'Indicators: out of private residences'
+    quote: Payments, usually monthly, to multiple individuals or entities involved in residential rentals
+      (e.g., landlords, property management, real estate agencies) or that reference rent or specific
+      addresses.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: 'Indicators: out of private residences'
+    quote: Payments of property taxes to different municipalities.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: Appendix, Types of financial transactions (2016 list)
+    quote: 'Rent payments: for addresses where prostitution is reported to occur by media, law enforcement,
+      or classified ads; and,'
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Individual pays rent on five apartments in one month
+  cases: []
+  data_needed:
+  - Payment (beneficiary = landlords)
+  - Address
+  - RealEstate
+  - Occupancy or Ownership
+  checkable: lookups
+  lookup_sources:
+  - Land registry
+  - Property tax rolls
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FINTRAC lists purchases of multiple real estate properties as a trafficking-linked indicator.
+    source_url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  innocent_explanations:
+  - Landlords, property managers, or parents paying children's student rent
+  - Companies housing staff lawfully
+  jurisdictions: Canada
+  version: 1
+- id: HT-035
+  name: Collector or nominee accounts
+  definition: An individual collects escort-related e-transfers from many payers and passes them on to
+    others, with few other transactions; nominees (often victims or family) hold assets or move proceeds.
+  areas:
+  - HT
+  - ML
+  typology: Nominees and money mules
+  status: verified
+  sources:
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: Overview of FINTRAC's analysis
+    quote: Traffickers frequently used nominees to funnel proceeds of crime, pay for human trafficking
+      running costs, launder funds, or conceal beneficial ownership.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: General contextual and ML indicators
+    quote: (The individual may be a financial intermediary/nominee in a human trafficking network and
+      may be a collector of human trafficking-related funds.)
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A trafficker's mother holds a car and accounts funded by escort income
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Ownership (nominee holding assets)
+  - Payment
+  - BankAccount
+  checkable: records
+  lookup_sources:
+  - Vehicle and land registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Nominees concealing beneficial ownership are a general laundering pattern.
+    source_url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  innocent_explanations:
+  - Family members legitimately helping each other
+  - Treasurers of informal savings groups
+  jurisdictions: Canada
+  version: 1
+- id: HT-036
+  name: Casino, online gambling and investment accounts used as pass-through
+  definition: Money is deposited to and withdrawn from casino or investment accounts with little or no
+    gambling or investing, or online gambling is funded by many incoming e-transfers.
+  areas:
+  - HT
+  - ML
+  typology: Layering through gaming and investment accounts
+  status: verified
+  sources:
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: General contextual and ML indicators
+    quote: Funds deposited to or withdrawn from a casino player's gaming account with limited or no gambling
+      involved.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: General contextual and ML indicators
+    quote: Funds deposited to or withdrawn from an investment account with limited or no purchases of
+      investments.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Cash buys casino chips, little play, cheque cashed out
+  cases: []
+  data_needed:
+  - BankAccount (gaming or investment)
+  - Payment
+  - Company (casino, broker)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Casino and investment pass-through is a general laundering method, not trafficking-specific
+      (FINTRAC).
+    source_url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+  innocent_explanations:
+  - Gamblers who change their minds
+  - Investors parking cash
+  jurisdictions: Canada
+  version: 1
+- id: HT-037
+  name: Hotel booking anomalies
+  definition: Rounded-sum hotel payments, two rooms booked by one person for the same dates, payments
+    refunded in full, or rooms pre-authorised by card but paid in cash.
+  areas:
+  - HT
+  - ML
+  typology: Trafficking out of short-stay locations
+  status: verified
+  sources:
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: Appendix, Patterns (2016 list)
+    quote: Hotel transactions by the same individual for two separate rooms for the same dates;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: Appendix, Patterns (2016 list)
+    quote: Pre-authorized hotel by credit card, but accommodations are actually paid for using cash.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Card authorises a hotel, then a full refund appears, suggesting cash payment
+  cases: []
+  data_needed:
+  - Payment (merchant = hotel, refunds)
+  - Address (hotel)
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Families booking two rooms
+  - Cancelled bookings
+  - Customers preferring to settle in cash
+  jurisdictions: Canada
+  version: 1
+- id: HT-038
+  name: Shared signers and details across unrelated accounts
+  definition: The same signer, custodian, address, phone or employer details appear on many apparently
+    unrelated accounts, or unusual numbers of joint holders or authorised users are added.
+  areas:
+  - HT
+  - ML
+  typology: Account control network
+  status: verified
+  sources:
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix B, Customer Interaction Red Flags
+    quote: Common signer(s)/custodian(s) in apparently unrelated business and/or personal accounts.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: Appendix, Know your client (2016 list)
+    quote: Addition of an unusual number of individuals as joint account holders, or authorized users
+      to products such as credit cards.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Ten workers' accounts list the same phone number and the same address
+  cases: []
+  data_needed:
+  - BankAccount
+  - Person (phone, email, address)
+  - Address
+  - Representation
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Staff housing at one address
+  - Accountants or carers acting for several clients
+  - Families
+  jurisdictions: United States, Canada
+  version: 1
+- id: HT-039
+  name: Links to foreign recruitment or escort adverts and travel for others
+  definition: A person or business is tied to job or escort adverts posted in another country, foreign
+    storefront sex businesses, or buys flights for others to or from victim source countries.
+  areas:
+  - HT
+  typology: Trafficking foreign nationals
+  status: verified
+  sources:
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: 'Contextual indicators: trafficking foreign nationals'
+    quote: Individual or entity is associated to advertisements recruiting escorts from foreign countries.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FINTRAC-2021-OA001
+    publisher: FINTRAC
+    year: '2021'
+    url: https://fintrac-canafe.canada.ca/intel/operation/oai-hts-2021-eng
+    locator: 'Contextual indicators: trafficking foreign nationals'
+    quote: Individual or entity is associated to job recruitment advertisements posted in another country.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 2, Sexual exploitation
+    quote: Advertisements are placed for brothels or similar places offering the services of women of
+      a particular ethnicity or nationality.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Owner of a spa pays for airfares for several young women from one country
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment (airline tickets for others)
+  - Document (adverts)
+  - Address (foreign)
+  checkable: lookups
+  lookup_sources:
+  - Foreign classified and job sites
+  - Company registries abroad
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful international hiring
+  - Families paying relatives' travel
+  jurisdictions: Canada
+  version: 1
+- id: HT-040
+  name: Smuggling fee wires to border beneficiaries
+  definition: Many wires, often below $3,000, from different places to one beneficiary in a border city,
+    or from high-migration countries to border beneficiaries who are not nationals of those countries.
+  areas:
+  - HT
+  - ML
+  typology: Smuggling fee payments
+  status: verified
+  sources:
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix A, Human Smuggling Red Flags
+    quote: Multiple wire transfers, generally kept below the $3,000 reporting threshold, sent from various
+      locations across the United States to a common beneficiary located in a U.S or Mexican city along
+      the Southwest Border.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix A, Human Smuggling Red Flags
+    quote: Beneficiaries receiving wire transfers from countries with high migrant populations (e.g.,
+      Mexico, Guatemala, El Salvador, Honduras) who are not nationals of those countries.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Fifteen senders in different states wire $2,800 each to one person in a border town in a week
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, amount, location)
+  - Person (nationality)
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Multiple wires generally below $3,000 from various US locations to a common Southwest Border
+      beneficiary (FinCEN).
+    threshold_source: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: FinCEN notes smuggling can turn into trafficking; both share financial red flags such as funnel
+      accounts.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+  innocent_explanations:
+  - Family remittances
+  - Payments to border-town businesses
+  jurisdictions: United States / Mexico border
+  version: 1
+- id: HT-041
+  name: 'Smuggling payment stages: paid before, part-paid, or paid by relatives on arrival'
+  definition: Smuggling fees are paid in advance, in part before departure and the rest on arrival, or
+    in full by relatives once the migrant arrives.
+  areas:
+  - HT
+  typology: Smuggling fee payment models
+  status: verified
+  sources:
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: How Human Smuggling Works, Payment
+    quote: 'Partial Payment: A portion of the smuggling fees is paid prior to departure, with the remaining
+      due upon arrival; final payment is often made by relatives of the migrant in the United States.'
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Relatives in the destination country send a lump sum within days of a migrant's arrival
+  cases:
+  - name: Essex lorry deaths (R v Eamonn Harrison, Gheorghe Nica and others)
+    year: '2020'
+    jurisdiction: England and Wales (Old Bailey)
+    what_happened: Four men were found guilty over a people-smuggling ring that contributed to the deaths
+      of 39 Vietnamese people found in a lorry trailer in Grays in October 2019; Harrison and Nica were
+      convicted of 39 counts of manslaughter and conspiracy to assist unlawful immigration. The source
+      does not describe the payment trail.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://essex.pfcc.police.uk/news/two-guilty-for-the-manslaughter-of-39-vietnamese-men-women-and-children
+    source_title: Two guilty for the manslaughter of 39 Vietnamese men, women and children (Essex Police,
+      Fire and Crime Commissioner)
+  data_needed:
+  - Payment
+  - Person
+  - Family
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Relatives supporting a newly arrived family member
+  - Lawful travel agency payments
+  jurisdictions: United States; international
+  version: 1
+- id: HT-042
+  name: Remittance patterns typical of smuggling networks
+  definition: Many remitters used without reason, shared IP or device IDs across migrants' transactions,
+    money mules, hawala, quick liquidation, and payments to accommodation along smuggling routes.
+  areas:
+  - HT
+  - ML
+  typology: FATF migrant smuggling ML indicators
+  status: verified
+  sources:
+  - title: Money Laundering and Terrorist Financing Risks Arising from Migrant Smuggling
+    publisher: FATF (copy hosted by Bank of Russia; FATF site could not be fetched directly)
+    year: '2022'
+    url: https://www.cbr.ru/Content/Document/File/135353/Mig_Sm.pdf
+    locator: Annex B, Money Laundering, p. 67
+    quote: Foreign/Migrants using the same IP or machine ID to perform transactions.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and Terrorist Financing Risks Arising from Migrant Smuggling
+    publisher: FATF
+    year: '2022'
+    url: https://www.cbr.ru/Content/Document/File/135353/Mig_Sm.pdf
+    locator: Annex B, Money Laundering, p. 67
+    quote: Numerous transactions with money remittance companies and online payment services companies.
+      Sometimes there is no logical reason to use a range of remitters.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and Terrorist Financing Risks Arising from Migrant Smuggling
+    publisher: FATF
+    year: '2022'
+    url: https://www.cbr.ru/Content/Document/File/135353/Mig_Sm.pdf
+    locator: Annex B, Money Laundering, p. 67
+    quote: Abnormal payments to hotels, apartments and other accommodation services that are located on
+      or close to migrant smuggling routes.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Twelve migrants' remittances sent from one phone
+  - Use of hawala to settle smuggling fees
+  cases: []
+  data_needed:
+  - Payment
+  - Person
+  - Company (money remitter)
+  - Address (accommodation on routes)
+  - Note (IP/device identifiers)
+  checkable: records
+  lookup_sources:
+  - Money service business registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF's annex also lists terrorist financing indicators linked to migrant smuggling, such as
+      prepaid card recharges by MVTS agents near reception centres.
+    source_url: https://www.cbr.ru/Content/Document/File/135353/Mig_Sm.pdf
+  innocent_explanations:
+  - Migrants sharing a phone or internet café
+  - Hawala used lawfully where regulated
+  - Travellers on common routes
+  jurisdictions: International (FATF)
+  version: 1
+- id: HT-043
+  name: Prepaid card recharges near reception centres or borders
+  definition: Prepaid cards held by foreign nationals are recharged between each other near reception
+    centres or border crossings, or used far from the holders' homes.
+  areas:
+  - HT
+  - ML
+  typology: FATF migrant smuggling ML indicators
+  status: verified
+  sources:
+  - title: Money Laundering and Terrorist Financing Risks Arising from Migrant Smuggling
+    publisher: FATF
+    year: '2022'
+    url: https://www.cbr.ru/Content/Document/File/135353/Mig_Sm.pdf
+    locator: Annex B, Money Laundering, p. 67
+    quote: Recharging transactions between prepaid cards held by foreign nationals, living or operating
+      in places close to reception centers for immigrants or to border crossing points.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Card-to-card reloads among holders living near a border reception centre
+  cases: []
+  data_needed:
+  - BankAccount (prepaid card)
+  - Payment
+  - Address
+  - Person (nationality)
+  checkable: records
+  lookup_sources:
+  - Locations of reception centres and border crossings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Asylum seekers receiving aid on prepaid cards
+  - Friends sharing money
+  jurisdictions: International (FATF)
+  version: 1
+- id: HT-044
+  name: Swapping small notes for large ones (bulk cash preparation)
+  definition: A customer outside cash-intensive trades often exchanges small-denomination notes for large
+    ones, consistent with readying cash for bulk shipment.
+  areas:
+  - HT
+  - ML
+  typology: Bulk cash smuggling
+  status: verified
+  sources:
+  - title: FIN-2014-A008
+    publisher: FinCEN
+    year: '2014'
+    url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+    locator: Appendix A, Human Smuggling Red Flags
+    quote: Frequent exchange of small-denomination for larger denomination bills by a customer who is
+      not in a cash intensive industry.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Weekly exchange of $20 bills for $100 bills by a salaried person
+  cases: []
+  data_needed:
+  - Payment
+  - Person (occupation)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: FinCEN ties this to bulk cash repatriation to Mexico, a pattern also used by drug networks
+      (FIN-2006-A003 referenced).
+    source_url: https://www.fincen.gov/sites/default/files/advisory/FIN-2014-A008.pdf
+  innocent_explanations:
+  - Saving cash at home
+  - Preparing travel money
+  jurisdictions: United States
+  version: 1
+- id: HT-045
+  name: Signs a child has been trafficked
+  definition: A child has no access to parents, travels unaccompanied or with non-relatives, does work
+    unsuitable for children, has no schooling or play, or an adult claims to have 'found' the child.
+  areas:
+  - HT
+  typology: Child trafficking
+  status: verified
+  sources:
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 1, Children
+    quote: Travel in groups with persons who are not relatives
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 1, Children
+    quote: The claim made by an adult that he or she has "found" an unaccompanied child
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Protocol to Prevent, Suppress and Punish Trafficking in Persons, Especially Women and Children
+    publisher: United Nations (OHCHR)
+    year: '2000'
+    url: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-prevent-suppress-and-punish-trafficking-persons
+    locator: Article 3(c)
+    quote: shall be considered "trafficking in persons" even if this does not involve any of the means
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Child-sized work clothes or children's beds found in a factory or brothel
+  cases: []
+  data_needed:
+  - Person (birthDate)
+  - Family (absence of parental link)
+  - Address
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (for children, no coercive means needs to be shown
+      under Palermo Protocol Article 3(c))
+    threshold_source: https://www.ohchr.org/en/instruments-mechanisms/instruments/protocol-prevent-suppress-and-punish-trafficking-persons
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Children travelling with aunts, coaches or school groups
+  - Informal fostering within extended families
+  jurisdictions: International (UNODC)
+  version: 1
+- id: HT-046
+  name: Children in hazardous work
+  definition: People under 18 do work that by its nature or conditions is likely to harm their health,
+    safety or morals (for example night shifts with dangerous chemicals or machinery).
+  areas:
+  - HT
+  typology: Worst forms of child labour
+  status: verified
+  sources:
+  - title: Worst Forms of Child Labour Convention, 1999 (No. 182)
+    publisher: International Labour Organization (text via University of Minnesota Human Rights Library)
+    year: '1999'
+    url: https://hrlibrary.law.umn.edu/links/ilo182.html
+    locator: Article 3(d)
+    quote: work which, by its nature or the circumstances in which it is carried out, is likely to harm
+      the health, safety or morals of children.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 2, Labour exploitation
+    quote: Equipment is designed or has been modified so that it can be operated by children.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Teenagers on overnight sanitation shifts in meat plants
+  cases:
+  - name: Packers Sanitation Services Inc. (PSSI) child labor investigation
+    year: '2023'
+    jurisdiction: United States (US Department of Labor, Wage and Hour Division)
+    what_happened: WHD found the company employed at least 102 children aged 13 to 17 in hazardous occupations
+      on overnight cleaning shifts at meat processing plants in eight states; the company paid $1.5 million
+      in civil money penalties.
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.dol.gov/newsroom/releases/whd/whd20230217-1
+    source_title: US Department of Labor news release WHD 2023-02-17
+  data_needed:
+  - Person (birthDate)
+  - Employment (role, shift)
+  - Company (employer, contractor)
+  - Contract (contractor to site owner)
+  checkable: lookups
+  lookup_sources:
+  - Labour department enforcement databases
+  - US DOL ILAB List of Goods Produced by Child Labor or Forced Labor
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (child = under 18, ILO C182 Article 2)
+    threshold_source: https://hrlibrary.law.umn.edu/links/ilo182.html
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: PSSI was a contractor at meat processors, showing child labour can sit in a supplier or subcontractor
+      layer.
+    source_url: https://www.dol.gov/newsroom/releases/whd/whd20230217-1
+  innocent_explanations:
+  - Lawful light work by older teenagers within national rules
+  - Apprenticeships with safeguards
+  jurisdictions: International (ILO C182); national child labour laws
+  version: 1
+- id: HT-047
+  name: Low-value payments to child sexual exploitation facilitators
+  definition: Small, frequent payments (often with narrations like 'school fees' or 'family support')
+    from offenders to unrelated people, typically women in high-risk countries, sometimes from several
+    payers at once, before live-streamed abuse.
+  areas:
+  - HT
+  - ML
+  typology: Live online child sexual abuse for financial gain
+  status: verified
+  sources:
+  - title: 'Financial Crime Guide: Combating the Sexual Exploitation of Children for Financial Gain'
+    publisher: AUSTRAC (Australia)
+    year: '2022'
+    url: https://www.austrac.gov.au/sites/default/files/2022-12/2022%20AUSTRAC%20Child%20Sexual%20Exploitation%20Financial%20Crime%20Guide.pdf
+    locator: p. 18, facilitator indicators
+    quote: approximate ranges between $13 and $50
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Financial Crime Guide: Combating the Sexual Exploitation of Children for Financial Gain'
+    publisher: AUSTRAC
+    year: '2022'
+    url: https://www.austrac.gov.au/sites/default/files/2022-12/2022%20AUSTRAC%20Child%20Sexual%20Exploitation%20Financial%20Crime%20Guide.pdf
+    locator: p. 14
+    quote: The facilitator will have no obvious links to the offenders sending funds.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Combating the sexual exploitation of children for financial gain (web page)
+    publisher: AUSTRAC
+    year: '2023'
+    url: https://www.austrac.gov.au/business/how-comply-guidance-and-resources/guidance-resources/combating-sexual-exploitation-children-financial-gain
+    locator: Web page (last updated 5 Apr 2023)
+    quote: No single financial indicator will reveal if an account is being used for child sexual exploitation
+      purposes.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An Australian man sends AUD 20-40 several times a week to different women in the Philippines with
+    notes 'gift' or 'school fees'
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, amount, purpose/narration, country)
+  - Person
+  - UnknownLink (no family link between payer and payee)
+  - Company (remitter, payment processor)
+  checkable: records
+  lookup_sources:
+  - Remittance provider records (via legal process)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Payments to facilitators in the approximate range $13 to $50, generally under $500 per transaction,
+      from payers with no obvious link (AUSTRAC).
+    threshold_source: https://www.austrac.gov.au/sites/default/files/2022-12/2022%20AUSTRAC%20Child%20Sexual%20Exploitation%20Financial%20Crime%20Guide.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine remittances to family, partners or sponsored children
+  - Charitable giving
+  jurisdictions: Australia (AUSTRAC); international
+  version: 1
+- id: HT-048
+  name: Offender travel and spending in high-risk or transit countries
+  definition: Payments to a high-risk jurisdiction escalate, followed by spending in transit hubs and
+    then accommodation or phones bought in the high-risk country.
+  areas:
+  - HT
+  typology: Travelling child sex offenders
+  status: verified
+  sources:
+  - title: 'Financial Crime Guide: Combating the Sexual Exploitation of Children for Financial Gain'
+    publisher: AUSTRAC
+    year: '2022'
+    url: https://www.austrac.gov.au/sites/default/files/2022-12/2022%20AUSTRAC%20Child%20Sexual%20Exploitation%20Financial%20Crime%20Guide.pdf
+    locator: p. 21, offender indicators
+    quote: escalation in payments to a high-risk jurisdiction for child sexual exploitation
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Financial Crime Guide: Combating the Sexual Exploitation of Children for Financial Gain'
+    publisher: AUSTRAC
+    year: '2022'
+    url: https://www.austrac.gov.au/sites/default/files/2022-12/2022%20AUSTRAC%20Child%20Sexual%20Exploitation%20Financial%20Crime%20Guide.pdf
+    locator: p. 12
+    quote: Offenders may transit through different countries to hide their final destination.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Card used in Singapore, then hotel and phone purchases in the Philippines after months of small remittances
+    there
+  cases: []
+  data_needed:
+  - Payment (merchant country)
+  - Person
+  - Address
+  checkable: records
+  lookup_sources:
+  - Travel records (via legal process)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Tourism, business travel, visiting family or partners
+  jurisdictions: Australia (AUSTRAC); South-East Asia
+  version: 1
+- id: HT-049
+  name: Employer cannot show records for workers
+  definition: The employer cannot show wage records, documents needed to employ foreign workers, or contracts;
+    health and safety notices or equipment are missing; labour law is clearly breached.
+  areas:
+  - HT
+  typology: Labour exploitation (workplace)
+  status: verified
+  sources:
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 2, Labour exploitation
+    quote: The employer or manager is unable to show records of wages paid to workers.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 2, Labour exploitation
+    quote: Have no labour contract
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Inspection finds no payroll records for 40 foreign workers
+  cases: []
+  data_needed:
+  - Company
+  - Employment
+  - Document (contracts, wage records, work permits)
+  checkable: person
+  lookup_sources:
+  - Labour inspection reports
+  - Work permit registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Missing wage records also indicate undeclared work and tax non-compliance.
+    source_url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+  innocent_explanations:
+  - Poor record-keeping by small businesses
+  - Records held by an outsourced payroll provider
+  jurisdictions: International (UNODC)
+  version: 1
+- id: HT-050
+  name: Signs of sexual exploitation
+  definition: People moved between brothels or locations, escorted everywhere, marked with 'ownership'
+    tattoos, sleeping where they work, with no cash or ID of their own.
+  areas:
+  - HT
+  typology: Trafficking for sexual exploitation
+  status: verified
+  sources:
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 2, Sexual exploitation
+    quote: Have tattoos or other marks indicating "ownership" by their exploiters
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 2, Sexual exploitation
+    quote: Move from one brothel to the next or work in various locations
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Same women advertised in different cities each week
+  cases: []
+  data_needed:
+  - Person
+  - Address (venues)
+  - Document (adverts)
+  - Associate
+  checkable: person
+  lookup_sources:
+  - Escort advert archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Independent adult sex workers who travel by choice where lawful
+  - Tattoos with personal meaning
+  jurisdictions: International (UNODC)
+  version: 1
+- id: HT-051
+  name: Signs of domestic servitude
+  definition: A domestic worker lives with a family but eats apart, has no private space, rarely leaves
+    the house or only with the employer, and may be reported missing while still there.
+  areas:
+  - HT
+  typology: Domestic servitude
+  status: verified
+  sources:
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 1, Domestic servitude
+    quote: Be reported missing by their employer even though they are still living in their employer's
+      house
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 1, Domestic servitude
+    quote: Never leave the house without their employer
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Nanny sleeping in a kitchen, never seen outside alone
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Address
+  - Family (employer household)
+  checkable: person
+  lookup_sources:
+  - Domestic worker visa records where public
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Not sourced here; flag only as a research lead. No source opened.
+    source_url: none
+  innocent_explanations:
+  - Live-in carers with fair terms who choose to stay in
+  - Cultural household practices
+  jurisdictions: International (UNODC)
+  version: 1
+- id: HT-052
+  name: Signs of forced begging and petty crime
+  definition: Children, elderly or disabled migrants begging in groups under one adult, moving daily over
+    long distances, punished if they do not collect or steal enough.
+  areas:
+  - HT
+  typology: Trafficking for forced begging and criminality
+  status: verified
+  sources:
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 2, Begging and petty crime
+    quote: Be punished if they do not collect or steal enough
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Human Trafficking Indicators
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+    locator: Page 2, Begging and petty crime
+    quote: Be part of large groups of children who have the same adult guardian
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Groups of children dropped off and collected by the same van each day
+  cases: []
+  data_needed:
+  - Person
+  - Vehicle
+  - Associate
+  - Address
+  checkable: person
+  lookup_sources:
+  - Police records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: UNODC notes these victims may participate in the activities of organised criminal gangs.
+    source_url: https://www.unodc.org/pdf/HT_indicators_E_LOWRES.pdf
+  innocent_explanations:
+  - Families begging together out of poverty
+  jurisdictions: International (UNODC)
+  version: 1
+- id: HT-053
+  name: Goods from an origin or company under a forced labour import ban
+  definition: Goods made wholly or partly in Xinjiang, by a UFLPA Entity List company, or by a producer
+    subject to a CBP Withhold Release Order or Finding.
+  areas:
+  - HT
+  typology: Forced labour in supply chains
+  status: verified
+  sources:
+  - title: Uyghur Forced Labor Prevention Act
+    publisher: US Customs and Border Protection
+    year: '2022'
+    url: https://www.cbp.gov/trade/forced-labor/UFLPA
+    locator: UFLPA page, introduction
+    quote: Effective June 21, 2022, CBP enforces the rebuttable presumption that goods mined, produced,
+      or manufactured wholly or in part in the XUAR, or by an entity on the UFLPA Entity List,
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 19 CFR 12.42 - Findings of Commissioner of CBP
+    publisher: Legal Information Institute (Cornell) reproducing US Code of Federal Regulations
+    year: current
+    url: https://www.law.cornell.edu/cfr/text/19/12.42
+    locator: 19 CFR 12.42(e)
+    quote: information available reasonably but not conclusively indicates
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Imports of polysilicon traced to a Xinjiang producer
+  - Gloves made by a company under a CBP finding
+  cases:
+  - name: CBP forced labor finding on Top Glove Corporation Bhd.
+    year: '2021'
+    jurisdiction: United States / Malaysia
+    what_happened: After the finding, CBP Cleveland seized a shipment of 3.97 million nitrile disposable
+      gloves valued at $518,000 made by a Top Glove subsidiary.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://cbp.gov/newsroom/local-media-release/cbp-cleveland-seizes-top-glove-products-under-forced-labor-finding
+    source_title: CBP Cleveland seizes Top Glove products under forced labor finding
+  data_needed:
+  - Company (producer, exporter, importer)
+  - Ownership
+  - Address (production site)
+  - Sanction (Entity List, WRO or Finding as listing)
+  - Document (bills of lading)
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - UFLPA Entity List
+  - CBP WRO and Findings list
+  - Customs and shipping manifests
+  - Company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Goods from the XUAR or an Entity List company (UFLPA presumption), or from a producer named
+      in a CBP WRO or Finding.
+    threshold_source: https://www.cbp.gov/trade/forced-labor/UFLPA
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Entity lists and import bans work like sanctions lists and need the same entity-matching checks.
+    source_url: https://www.cbp.gov/trade/forced-labor/UFLPA
+  innocent_explanations:
+  - Importer has rebutted the presumption or obtained release
+  - Same company name but different entity
+  - Goods made at a different, unaffected site
+  jurisdictions: United States (19 U.S.C. 1307; UFLPA)
+  version: 1
+- id: HT-054
+  name: Good and country on the US list of goods made with child or forced labour
+  definition: A product category and source country appear on the US Department of Labor's list of goods
+    it has reason to believe are produced by child labour or forced labour.
+  areas:
+  - HT
+  typology: Sector and country risk
+  status: verified
+  sources:
+  - title: List of Goods Produced by Child Labor or Forced Labor
+    publisher: US Department of Labor, Bureau of International Labor Affairs
+    year: '2024'
+    url: https://www.dol.gov/agencies/ilab/reports/child-labor/list-of-goods
+    locator: 'List of Goods page, introduction (2024 edition: 204 goods from 82 countries and areas)'
+    quote: which it has reason to believe are produced by child labor or forced labor in violation of
+      international standards
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Cocoa from a listed country in a chocolate maker's supply chain
+  cases: []
+  data_needed:
+  - Company (supplier)
+  - Address (country of origin)
+  - Contract
+  - Document (supply chain records)
+  checkable: lookups
+  lookup_sources:
+  - US DOL ILAB List of Goods
+  - Trade data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Listing is about a sector in a country, not a specific company; many producers are clean
+  - Certified or audited supply chains
+  jurisdictions: International (US DOL list)
+  version: 1
+not_reached:
+- 'FATF/APG ''Financial Flows from Human Trafficking'' (July 2018) Annex B indicator list: fatf-gafi.org
+  blocks direct download (robots and bot page) and the WebFetch text stopped before Annex B. Only paragraphs
+  64-65 were quoted, via the fetch tool''s summary.'
+- 'FATF ''ML/TF Risks Arising from Migrant Smuggling'' (2022): fatf-gafi.org not fetchable; used a copy
+  hosted by the Bank of Russia (cbr.ru). Check against the FATF original.'
+- 'ILO Indicators of Forced Labour: the year is not printed in the text read (ILO catalogues it as 2012).
+  Quotes came through the fetch tool, not a local text dump.'
+- 'US DOL news release on Packers Sanitation Services (whd20230217-1): curl was blocked, so the quote
+  came through the fetch tool.'
+- 'CBP national press release on the Top Glove finding: fetch failed. Used the CBP Cleveland local release,
+  which gives 29 March but no year. 2021 comes from search-result URLs, not the CBP page.'
+- CBP Withhold Release Orders and Findings page has no definitions. WRO and Finding definitions are taken
+  from 19 CFR 12.42 via Cornell LII.
+- 'ILO 2019 definition of recruitment fees and related costs: not opened.'
+- 'ILO normlex pages for C29 and C182: blocked. C182 text came from the University of Minnesota Human
+  Rights Library mirror.'
+- 'FinCEN FIN-2014-A005 (funnel accounts advisory): not opened; funnel account described from FIN-2014-A008
+  and FIN-2020-A008.'
+- 'Europol ''Trafficking in Human Beings Financial Business Model'', OSCE ''Following the Money'', AHTI
+  red flags, Polaris typology: not opened.'
+- 'FINTRAC 2025 online child sexual exploitation indicators and the May 2026 major-events trafficking
+  indicators (seen in search results): not opened.'
+- 'EU Forced Labour Regulation (2024/3015), UK Modern Slavery Act statutory guidance and GLAA indicators,
+  Australian Modern Slavery Act: not opened.'
+- 'AP ''Seafood from Slaves'' (Benjina) reporting: not opened, so not used as a case.'
+- 'FinCEN FIN-2020-A008 case studies (Thai sex trafficking funnel accounts): names were not extracted,
+  so not used as a case.'

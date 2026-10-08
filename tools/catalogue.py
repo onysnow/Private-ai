@@ -36,13 +36,13 @@ AREA_NAMES = AREAS
 # Words in a free-text area name that decide which area it means; checked in order.
 AREA_WORDS = [
     ("SA", ["safety", "investigator", "journalist", "witness protection"]),
-    ("HT", ["trafficking in persons", "human trafficking", "forced labour", "forced labor", "labour exploitation", "migrant smuggling", "child"]),
+    ("HT", ["trafficking in persons", "human trafficking", "forced labour", "forced labor", "labour exploitation", "migrant smuggling", "child", "supply chain"]),
     ("EN", ["environment", "wildlife", "fishing", "logging", "mining", "waste", "pollution"]),
     ("HR", ["human rights", "war crime", "atrocity", "cultural property", "antiquit", "state abuse"]),
     ("SF", ["sanction", "terror", "prolifera", "export control", "maritime"]),
     ("BO", ["ownership", "shell", "nominee", "front compan"]),
     ("PP", ["procurement", "bid", "non-profit", "nonprofit", "charit", "election", "campaign"]),
-    ("CO", ["corruption", "bribery", "influence", "conflict of interest", "lobby", "politically exposed", "state capture"]),
+    ("CO", ["corruption", "bribery", "influence", "conflict of interest", "lobby", "politically exposed", "state capture", "political figure", "diplomat"]),
     ("FR", ["fraud", "tax", "ponzi", "securities", "insurance", "healthcare"]),
     ("CY", ["cyber", "ransomware", "scam", "crypto", "source reliab", "grading"]),
     ("IN", ["disinformation", "information", "forg", "academic", "media manipulation", "sock"]),
@@ -75,6 +75,7 @@ def norm(s: str) -> str:
 def ingest(paths: list[str]) -> None:
     today = date.today()
     unresolved: list[str] = []
+    refused: list[str] = []
     for path in paths:
         data = json.loads(Path(path).read_text(encoding="utf-8"))
         data = data.get("result", data)
@@ -131,7 +132,11 @@ def ingest(paths: list[str]) -> None:
                     "cross_hints": hints, "innocent_explanations": raw.get("innocent_explanations") or ["None recorded yet."],
                     "jurisdictions": raw.get("jurisdictions"),
                 }
-                draft = Indicator.model_validate(ind)
+                try:
+                    draft = Indicator.model_validate(ind)
+                except ValueError as exc:
+                    refused.append(f"{raw['id']}: {exc.errors()[0]['msg'] if hasattr(exc, 'errors') else exc} | {raw['levels']}")
+                    continue
                 ok_all = all(s.quote_verified for s in draft.sources) and all(c.outcome_verified for c in draft.cases) and (
                     draft.threshold_verified or not has_threshold_number(draft.levels.faint, draft.levels.strong, draft.levels.textbook))
                 ind["status"] = "verified" if ok_all and v is not None else "pending"
@@ -142,6 +147,8 @@ def ingest(paths: list[str]) -> None:
                       "related": t.get("related", []), "areas": [area["key"]]} for t in research.get("glossary", [])]
             dump(CAT / "glossary" / f"{area['key'].lower()}.yaml", Glossary(area=area["key"], terms=terms).model_dump(mode="json", exclude_none=True))
             print(f"{area['key']}: {len(indicators)} indicators ({sum(i.status.value == 'verified' for i in indicators)} verified), {len(terms)} glossary terms")
+    if refused:
+        print("Refused (fix by hand, then ingest again):", *refused, sep="\n  ", file=sys.stderr)
     if unresolved:
         print("Cross-hints to an area no file covers (dropped):", *unresolved, sep="\n  ", file=sys.stderr)
 

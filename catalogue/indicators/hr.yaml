@@ -1,0 +1,2661 @@
+key: HR
+name: Human rights abuses, war crimes and cultural property
+scope: documentation of human rights abuses and war crimes (Berkeley Protocol on Digital Open Source Investigations
+  and similar), atrocity financing, conflict resources, trafficking of cultural property and antiquities.
+indicators:
+- id: HR-001
+  name: Mineral or metal originates from, or passed through, a conflict-affected or high-risk area
+  definition: The declared or traced origin or transit route of tin, tantalum, tungsten or gold runs through
+    an area of armed conflict, widespread violence or other serious risk of harm to people.
+  areas:
+  - HR
+  typology: Conflict minerals
+  status: verified
+  sources:
+  - title: OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected
+      and High-Risk Areas (3rd ed.)
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Supplement on Tin, Tantalum and Tungsten, 'Red flags triggering the application of this supplement',
+      p. 33; Supplement on Gold, Step 2(B), p. 87
+    quote: The minerals originate from or have been transported via a conflict-affected or high-risk area.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - UN Group of Experts (S/2024/432) found Rubaya minerals in DRC were moved via Mushaki under M23 control
+    and became ineligible for trade.
+  cases: []
+  data_needed:
+  - Address (country, region) for mine site, trader and exporter
+  - Contract or Payment between supplier and buyer (date, amount, purpose)
+  - Document (certificate of origin, export permit)
+  - Ownership linking upstream companies to mines
+  - Vessel/Vehicle or route data where available
+  checkable: lookups
+  lookup_sources:
+  - UN Security Council sanctions committee and Group/Panel of Experts reports
+  - EU indicative list of conflict-affected and high-risk areas
+  - Customs/trade statistics (e.g. UN Comtrade)
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded: origin or transit in an area meeting the OECD
+      CAHRA definition.'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Armed groups taxing the trade may be UN-sanctioned (e.g. William Amuri Yakutumba, CDi.043,
+      controlling gold in Fizi).
+    source_url: https://www.ecoi.net/en/file/local/2112471/n2411880.pdf
+  innocent_explanations:
+  - Many legitimate, certified mines and traders operate inside high-risk areas; origin alone is a trigger
+    for due diligence, not proof of conflict financing.
+  - Transit through a neighbouring country can be the only practical export route.
+  jurisdictions: Global (OECD Recommendation); EU Regulation 2017/821 and US Dodd-Frank s.1502 build on
+    it
+  version: 1
+- id: HR-002
+  name: Declared origin out of keeping with the country's known reserves or production
+  definition: A country is declared as the origin of more mineral or gold than its known reserves, stocks
+    or expected production could supply, suggesting relabelled origin.
+  areas:
+  - HR
+  typology: Conflict minerals; origin laundering
+  status: verified
+  sources:
+  - title: OECD Due Diligence Guidance for Responsible Supply Chains of Minerals (3rd ed.)
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: 3T Supplement p. 33; Gold Supplement p. 88
+    quote: The minerals are claimed to originate from a country that has limited known reserves, likely
+      resources or expected production levels of the mineral in question (i.e. the declared volumes of
+      mineral from that country are out of keeping with its known reserves or expected production levels).
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - UN Group of Experts reported circulation of fraudulently imported DRC gold to Kigali and Kampala as
+    transit routes (S/2024/432, paras 208-209).
+  cases: []
+  data_needed:
+  - Document (export declarations, certificates of origin) with country and quantity
+  - Company (exporter, refiner) jurisdiction
+  - Payment/Contract volumes over time
+  checkable: lookups
+  lookup_sources:
+  - National geological surveys and production statistics
+  - UN Comtrade / national export statistics
+  - UN Group of Experts reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded: declared volumes out of keeping with known reserves
+      or expected production.'
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Misdeclared origin is a form of trade misrepresentation used to launder proceeds.
+    source_url: https://www.ecoi.net/en/file/local/2112471/n2411880.pdf
+  innocent_explanations:
+  - Production statistics may lag or under-count artisanal output.
+  - Re-export of legitimately imported material can be recorded under the wrong origin by clerical error.
+  - New discoveries may not yet appear in reserve estimates.
+  jurisdictions: Global
+  version: 1
+- id: HR-003
+  name: Origin claimed in a known transit country for conflict minerals or gold
+  definition: The declared origin is a country through which minerals or gold from conflict areas are
+    known or reasonably suspected to pass.
+  areas:
+  - HR
+  typology: Conflict minerals; transit laundering
+  status: verified
+  sources:
+  - title: OECD Due Diligence Guidance for Responsible Supply Chains of Minerals (3rd ed.)
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Gold Supplement, Step 2(B), p. 88
+    quote: The gold is claimed to originate from a country through which gold from conflict-affected and
+      high-risk areas is known or reasonably suspected to transit.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Final report of the Group of Experts on the Democratic Republic of the Congo (S/2024/432)
+    publisher: United Nations Security Council
+    year: '2024'
+    url: https://www.ecoi.net/en/file/local/2112471/n2411880.pdf
+    locator: para. 209
+    quote: Several sources reported that Kampala remained a transit route for gold illegally imported
+      from the Democratic Republic of the Congo
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Kampala and Kigali named as transit routes for DRC gold (S/2024/432).
+  cases: []
+  data_needed:
+  - Document (certificate of origin, airway bill)
+  - Company (exporter, refiner) with Address
+  - Payment (buyer, seller, amount)
+  checkable: lookups
+  lookup_sources:
+  - UN Group/Panel of Experts reports
+  - Trade statistics
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Transit countries also have genuine domestic production.
+  - Regional hubs legitimately refine and re-export material from many sources.
+  jurisdictions: Global
+  version: 1
+- id: HR-004
+  name: Recycled, scrap or mixed gold refined in a known transit country
+  definition: Gold is described as recycled, scrap or of mixed origin and was refined in a country where
+    conflict gold is known or suspected to pass, a way to hide mined origin.
+  areas:
+  - HR
+  typology: Conflict gold
+  status: verified
+  sources:
+  - title: OECD Due Diligence Guidance for Responsible Supply Chains of Minerals (3rd ed.)
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Gold Supplement, Step 2(B), p. 88
+    quote: The gold is claimed to originate from recyclable/scrap or mixed sources and has been refined
+      in a country where gold from conflict-affected and high-risk areas is known or reasonably suspected
+      to transit.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Document (refinery intake records, assay reports)
+  - Company (refiner) with Address
+  - Payment/Contract for scrap purchases
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Recasting gold as scrap is a known way to disguise origin of illicit gold proceeds.
+    source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  innocent_explanations:
+  - Genuine jewellery and industrial scrap is refined in large volumes in regional hubs.
+  - Mixed lots are common in small refineries for cost reasons.
+  jurisdictions: Global
+  version: 1
+- id: HR-005
+  name: Supplier has sourced from a red-flag location in the last 12 months
+  definition: A supplier or another known upstream company is known to have bought minerals or gold from
+    a red-flag origin or transit location within the past year.
+  areas:
+  - HR
+  typology: Conflict minerals
+  status: verified
+  sources:
+  - title: OECD Due Diligence Guidance for Responsible Supply Chains of Minerals (3rd ed.)
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Gold Supplement, 'Supplier red flags', p. 88; 3T Supplement p. 34
+    quote: Suppliers or other known upstream companies are known to have sourced gold from a red flag
+      location of gold origin and transit in the last 12 months.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Company (supplier)
+  - Contract/Payment with date and counterparty
+  - Address of counterparties
+  checkable: lookups
+  lookup_sources:
+  - Customs records
+  - UN expert panel reports
+  - Responsible Minerals Initiative / LBMA refiner lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: A known purchase from a red-flag location dated within the last 12 months (OECD).
+    threshold_source: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The supplier may have sourced from a certified, audited site in that location.
+  - Older relationships may have ended.
+  jurisdictions: Global
+  version: 1
+- id: HR-006
+  name: Supplier or upstream company owns interests in, or operates in, a red-flag location
+  definition: A supplier or upstream company has shareholdings or other interests in companies operating
+    in, or supplying from, a red-flag location.
+  areas:
+  - HR
+  typology: Conflict minerals
+  status: verified
+  sources:
+  - title: OECD Due Diligence Guidance for Responsible Supply Chains of Minerals (3rd ed.)
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Gold Supplement, 'Supplier red flags', p. 88; 3T Supplement p. 34
+    quote: Suppliers or other known upstream companies operate in one of the above-mentioned red flag
+      locations of gold origin and transit, or have shareholder or other interests in suppliers of gold
+      from one of the above-mentioned red flag locations of gold origin and transit.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Ownership (owner, asset, percentage)
+  - Directorship
+  - Company (jurisdiction, address)
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Beneficial ownership registers
+  - OpenCorporates / OpenSanctions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Diversified mining groups often hold legitimate licensed assets in high-risk countries.
+  jurisdictions: Global
+  version: 1
+- id: HR-007
+  name: Weak AML, customs and oversight with heavy cash use along the route
+  definition: The origin or transit environment has weakly enforced anti-money-laundering, anti-corruption
+    and customs laws, informal banking and extensive cash use, which raises location risk.
+  areas:
+  - HR
+  typology: Conflict minerals
+  status: verified
+  sources:
+  - title: OECD Due Diligence Guidance for Responsible Supply Chains of Minerals (3rd ed.)
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Gold Supplement, p. 88
+    quote: In each of these location-based red flag considerations, the risk is increased when anti-money
+      laundering laws, anti-corruption laws, customs controls and other relevant governmental oversight
+      laws are weakly enforced; informal banking systems operate, and cash is extensively used.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment (method, currency, cash)
+  - Address (country)
+  checkable: lookups
+  lookup_sources:
+  - FATF mutual evaluations and grey/black lists
+  - Basel AML Index
+  - Transparency International CPI
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Same conditions are FATF-recognised money-laundering risk factors.
+    source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  innocent_explanations:
+  - Cash is the normal means of payment for artisanal miners in many regions with few banks.
+  jurisdictions: Global
+  version: 1
+- id: HR-008
+  name: Anomalies giving reasonable suspicion that minerals fund conflict or abuse
+  definition: Information gathered on a supply chain shows unusual circumstances that reasonably suggest
+    the gold or minerals may contribute to conflict or serious abuses.
+  areas:
+  - HR
+  typology: Conflict minerals
+  status: verified
+  sources:
+  - title: OECD Due Diligence Guidance for Responsible Supply Chains of Minerals (3rd ed.)
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Gold Supplement, 'Red flag circumstances', pp. 79 and 88
+    quote: Anomalies or unusual circumstances are identified through the information collected in Step
+      1 which give rise to a reasonable suspicion that the gold may contribute to conflict or serious
+      abuses associated with the extraction, transport or trade of gold.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Document (KYC files)
+  - Payment
+  - Contract
+  - Company
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many anomalies are explained by poor record-keeping rather than misconduct.
+  jurisdictions: Global
+  version: 1
+- id: HR-009
+  name: Non-state armed group controls mine sites, routes or trading points
+  definition: An armed group (or its affiliates) oversees extraction, grants access to mines, controls
+    transport routes or trading points, or holds ownership or director roles in upstream companies.
+  areas:
+  - HR
+  typology: Conflict financing through natural resources
+  status: verified
+  sources:
+  - title: OECD Due Diligence Guidance - Annex II Model Supply Chain Policy
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Annex II, para. 3(i) and footnote 5, p. 21
+    quote: illegally control mine sites or otherwise control transportation routes, points where minerals
+      are traded and upstream actors in the supply chain
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Final report of the Group of Experts on the DRC (S/2024/432)
+    publisher: United Nations Security Council
+    year: '2024'
+    url: https://www.ecoi.net/en/file/local/2112471/n2411880.pdf
+    locator: para. 138
+    quote: Mining sites in the Rubaya area remained under the control of the armed group Coalition des
+      patriotes résistants congolais-Force de frappe (PARECO-FF)
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Rubaya (DRC) coltan sites under PARECO-FF, with M23 controlling the smuggling route (S/2024/432).
+  - Mai-Mai Yakutumba controlling gold mining in Fizi territory (S/2024/432, para 189).
+  cases: []
+  data_needed:
+  - Organization (armed group)
+  - Ownership / Directorship (armed group members in upstream companies)
+  - Address (mine site)
+  - Event (control, clashes)
+  - Sanction (listing of group or leader)
+  checkable: lookups
+  lookup_sources:
+  - UN Group/Panel of Experts reports
+  - UN sanctions lists
+  - IPIS mine-site maps
+  - ACLED conflict event data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (OECD Annex II para. 3 and fn. 5).
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Leaders of such groups are often on UN sanctions lists (e.g. CDi.043).
+    source_url: https://www.ecoi.net/en/file/local/2112471/n2411880.pdf
+  innocent_explanations:
+  - Local community defence groups or state forces may be present without controlling extraction.
+  - Control can change quickly; old reports may be out of date.
+  jurisdictions: Global
+  version: 1
+- id: HR-010
+  name: Illegal taxation or extortion by armed actors along the supply chain
+  definition: Armed groups or security forces demand money or minerals, under threat, for access to mines,
+    roads, trading points, or from traders and exporters.
+  areas:
+  - HR
+  typology: Conflict financing; extortion
+  status: verified
+  sources:
+  - title: OECD Due Diligence Guidance - Annex II Model Supply Chain Policy
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Annex II, para. 3(ii)-(iii), para. 5, p. 21-22
+    quote: illegally tax or extort money or minerals at point of access to mine sites, along transportation
+      routes or at points where minerals are traded
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Final report of the Group of Experts on the DRC (S/2024/432)
+    publisher: United Nations Security Council
+    year: '2024'
+    url: https://www.ecoi.net/en/file/local/2112471/n2411880.pdf
+    locator: para. 190
+    quote: All armed groups in Fizi territory maintained an illegal taxation system on various economic
+      activities, in particular gold mining
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Fizi territory gold taxation by armed groups (S/2024/432).
+  - Lafarge Cement Syria paid ISIS 750 Syrian pounds per ton of cement sold, which executives likened
+    to taxes (DOJ, 2022).
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, purpose, amount, date)
+  - Document (receipts, roadblock tickets)
+  - Organization (armed group)
+  - Address (checkpoint location)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (OECD Annex II).
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: The same pattern was the basis of Lafarge's US guilty plea for material support to ISIS and
+      ANF.
+    source_url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+  innocent_explanations:
+  - Lawful taxes, fees and royalties paid to government are expressly excluded from 'direct or indirect
+    support' (OECD Annex II fn. 7).
+  - Payments made under duress to protect staff may be extorted rather than voluntary, which matters for
+    liability but not for the indicator.
+  jurisdictions: Global
+  version: 1
+- id: HR-011
+  name: Payments to armed groups for checkpoint passage or 'protection'
+  definition: A business makes regular 'donations' or fees to armed groups so staff, customers or suppliers
+    can pass checkpoints.
+  areas:
+  - HR
+  - SF
+  typology: Corporate complicity in conflict financing
+  status: verified
+  sources:
+  - title: Lafarge Pleads Guilty to Conspiring to Provide Material Support to Foreign Terrorist Organizations
+    publisher: US Department of Justice
+    year: '2022'
+    url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+    quote: the equivalent of approximately $5.92 million
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'Lafarge and Lafarge Cement Syria: monthly payments to armed groups for checkpoint passage around
+    the Jalabiya plant, 2013-2014.'
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, purpose, amount, date)
+  - Representation / Associate (intermediary acting for company)
+  - Organization (armed group)
+  - Email
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Payments to designated groups are material support under terrorism laws.
+    source_url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+  innocent_explanations:
+  - Humanitarian organisations may pay negotiated access fees under licences or exemptions.
+  - Payments to recognised state authorities at official checkpoints may be lawful fees.
+  jurisdictions: US (18 U.S.C. 2339B); France (separate proceedings)
+  version: 1
+- id: HR-012
+  name: Purchase of inputs from suppliers controlled by an armed or terrorist group
+  definition: A business buys raw materials or goods from suppliers located in, or controlled by, an armed
+    or terrorist group.
+  areas:
+  - HR
+  - SF
+  typology: Corporate complicity in conflict financing
+  status: verified
+  sources:
+  - title: Lafarge Pleads Guilty to Conspiring to Provide Material Support to Foreign Terrorist Organizations
+    publisher: US Department of Justice
+    year: '2022'
+    url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+    quote: conspiring to provide material support and resources in Northern Syria from 2013 to 2014
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: OECD Due Diligence Guidance - Annex II
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Annex II, para. 3
+    quote: procuring minerals from, making payments to or otherwise providing logistical assistance or
+      equipment to, non-state armed groups or their affiliates
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Lafarge Cement Syria bought raw materials from ISIS-controlled suppliers (DOJ, 2022).
+  cases: []
+  data_needed:
+  - Contract / Payment (supplier, goods, amount)
+  - Company (supplier) with Address
+  - Organization (controlling group)
+  - UnknownLink between supplier and group
+  checkable: lookups
+  lookup_sources:
+  - Sanctions lists
+  - Conflict control maps (e.g. ACLED, ISW)
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (OECD Annex II para. 3).
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Suppliers in contested areas may change control without the buyer's knowledge.
+  - Small traders may have no alternative supply.
+  jurisdictions: Global
+  version: 1
+- id: HR-013
+  name: Intermediaries and newly named companies used to hide dealings with armed groups
+  definition: Payments to or deals with armed groups are routed through intermediaries or companies with
+    names unrelated to the business, with false invoice descriptions.
+  areas:
+  - HR
+  - ML
+  - SF
+  typology: Concealment of conflict payments
+  status: verified
+  sources:
+  - title: Lafarge Pleads Guilty to Conspiring to Provide Material Support to Foreign Terrorist Organizations
+    publisher: US Department of Justice
+    year: '2022'
+    url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+    quote: false descriptions of services rendered
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Lafarge executives had intermediaries form companies with names not obviously tied to them; intermediaries
+    received about $1.11 million (DOJ, 2022).
+  cases: []
+  data_needed:
+  - Company (incorporationDate, jurisdiction)
+  - Representation (intermediary acting for principal)
+  - Payment (purpose text vs. actual service)
+  - Document (invoices)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: False invoicing through front companies is a standard laundering method.
+    source_url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+  innocent_explanations:
+  - Local agents and logistics firms are ordinary in conflict-area business; generic invoice wording is
+    common.
+  jurisdictions: Global
+  version: 1
+- id: HR-014
+  name: Records backdated or moved to personal email around sanctions events
+  definition: Agreements are backdated to just after a sanctions resolution, or executives use personal
+    email and keep the company name off documents with armed groups.
+  areas:
+  - HR
+  - SF
+  typology: Concealment
+  status: verified
+  sources:
+  - title: Lafarge Pleads Guilty to Conspiring to Provide Material Support to Foreign Terrorist Organizations
+    publisher: US Department of Justice
+    year: '2022'
+    url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+    quote: backdated
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A termination agreement with an intermediary was backdated to 18 August 2014, shortly after a UN Security
+    Council resolution on ISIS and ANF (DOJ, 2022).
+  cases: []
+  data_needed:
+  - Document (dates of creation vs. stated date)
+  - Email (sender domains)
+  - Sanction (date of listing/resolution)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Contracts are sometimes signed after the effective date to formalise earlier oral agreements.
+  - Personal email is used when corporate systems fail in conflict zones.
+  jurisdictions: Global
+  version: 1
+- id: HR-015
+  name: Public or private security forces illegally controlling or taxing mine sites
+  definition: State or private security forces control mines or routes, or illegally tax or extort miners,
+    traders or exporters.
+  areas:
+  - HR
+  typology: Conflict minerals
+  status: verified
+  sources:
+  - title: OECD Due Diligence Guidance - Annex II
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Annex II, para. 5, p. 22
+    quote: direct or indirect support to public or private security forces who illegally control mine
+      sites, transportation routes and upstream actors in the supply chain
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'UN Group of Experts annex 110: illegal taxation by FARDC in Misisi (S/2024/432).'
+  cases: []
+  data_needed:
+  - Organization (security unit)
+  - Payment
+  - Address (mine site)
+  - Employment (security contractors)
+  checkable: lookups
+  lookup_sources:
+  - UN expert reports
+  - NGO field reports
+  - Voluntary Principles reporting
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Illegal levies by state forces are a form of extortion and bribery.
+    source_url: https://www.ecoi.net/en/file/local/2112471/n2411880.pdf
+  innocent_explanations:
+  - Security forces may lawfully protect mines under the Voluntary Principles on Security and Human Rights.
+  jurisdictions: Global
+  version: 1
+- id: HR-016
+  name: Bribes to conceal mineral origin or misstate taxes and royalties
+  definition: Bribes are offered or demanded to disguise where minerals came from or to misrepresent taxes,
+    fees and royalties paid.
+  areas:
+  - CO
+  - HR
+  typology: Origin fraud
+  status: verified
+  sources:
+  - title: OECD Due Diligence Guidance - Annex II
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Annex II, para. 11, p. 22
+    quote: We will not offer, promise, give or demand any bribes, and will resist the solicitation of
+      bribes to conceal or disguise the origin of minerals
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment (to officials)
+  - Person (public official, role)
+  - Document (export certificates)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Bribery of customs and mining officials is a corruption offence in itself.
+    source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  innocent_explanations:
+  - Facilitation fees may be official (but undocumented) charges; check against published fee schedules.
+  jurisdictions: Global
+  version: 1
+- id: HR-017
+  name: Forced labour or worst forms of child labour at extraction sites
+  definition: Work at mines or along the supply chain is exacted under threat of penalty, or children
+    are used in hazardous work.
+  areas:
+  - HR
+  - HT
+  typology: Serious abuses in mineral supply chains
+  status: verified
+  sources:
+  - title: OECD Due Diligence Guidance - Annex II
+    publisher: OECD
+    year: '2016'
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+    locator: Annex II, para. 1(ii)-(iii), pp. 20-21
+    quote: any forms of forced or compulsory labour, which means work or service which is exacted from
+      any person under the menace of penalty and for which said person has not offered himself voluntarily
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: The economic interests of the Myanmar military (A/HRC/42/CRP.3)
+    publisher: UN Independent International Fact-Finding Mission on Myanmar
+    year: '2019'
+    url: https://www.un.org/sexualviolenceinconflict/wp-content/uploads/2019/08/report/the-economic-interests-of-the-myanmar-military/A_HRC_42_CRP_3.pdf
+    locator: Summary, finding (b)
+    quote: Human rights and international humanitarian law violations, including forced labour and sexual
+      violence, have been perpetrated by the Tatmadaw in mining areas, particularly in Kachin State, in
+      connection with their business activities.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Tatmadaw jade and ruby mining areas in Kachin (UN FFM 2019).
+  cases: []
+  data_needed:
+  - Person (workers, ages)
+  - Employment
+  - Organization (operator)
+  - Address (site)
+  - Document (interviews, NGO reports)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (OECD Annex II / ILO conventions).
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Forced labour in mining is also a trafficking offence; the Rome Statute's enslavement definition
+      includes trafficking.
+    source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  innocent_explanations:
+  - Family-based artisanal mining may involve older teenagers in non-hazardous tasks that are lawful under
+    national law.
+  jurisdictions: Global
+  version: 1
+- id: HR-018
+  name: Refiner has no procedure to trace the exact origin of gold
+  definition: A refinery accepts gold without an established process to trace where it was mined, in a
+    region where smuggled conflict gold circulates.
+  areas:
+  - HR
+  typology: Conflict gold
+  status: verified
+  sources:
+  - title: Final report of the Group of Experts on the DRC (S/2024/432)
+    publisher: United Nations Security Council
+    year: '2024'
+    url: https://www.ecoi.net/en/file/local/2112471/n2411880.pdf
+    locator: para. 208
+    quote: Gasabo Gold Refinery managers reported the absence of an established procedure for tracing
+      the exact origin of gold delivered by customers to the refinery.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'Gasabo Gold Refinery, Kigali (S/2024/432): Group concluded due diligence policy revealed shortcomings.'
+  cases: []
+  data_needed:
+  - Company (refiner)
+  - Document (due diligence policy, audit reports)
+  - Payment / Contract (intake)
+  checkable: lookups
+  lookup_sources:
+  - LBMA Good Delivery list and audit reports
+  - Responsible Minerals Assurance Process lists
+  - UN expert reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New refineries may still be building their systems.
+  - Small refiners handling only domestic scrap may have simpler procedures.
+  jurisdictions: Great Lakes region; global principle
+  version: 1
+- id: HR-019
+  name: Rough diamonds traded without a valid Kimberley Process certificate
+  definition: Rough diamonds cross borders without a valid KP certificate stating they are conflict-free.
+  areas:
+  - HR
+  typology: Conflict diamonds
+  status: verified
+  sources:
+  - title: What is the Kimberley Process?
+    publisher: Kimberley Process
+    url: https://www.kimberleyprocess.com/en/what-kp
+    quote: must be accompanied by a valid KP certificate, certifying that the diamonds are conflict-free
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Charles Taylor convicted (SCSL) for aiding and abetting RUF crimes in exchange for diamonds.
+  cases: []
+  data_needed:
+  - Document (KP certificate number, issuing authority)
+  - Company (exporter/importer)
+  - Address (country)
+  checkable: lookups
+  lookup_sources:
+  - Kimberley Process statistics and participant list
+  - Customs records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Export or import of rough diamonds with no valid KP certificate (meets the published definition).
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Conflict diamonds are defined by reference to UN Security Council resolutions.
+    source_url: https://www.kimberleyprocess.com/en/what-kp
+  innocent_explanations:
+  - Polished diamonds and jewellery are outside the KP certificate scheme.
+  - Clerical errors on certificates.
+  jurisdictions: KP participants
+  version: 1
+- id: HR-020
+  name: Natural resources traded with, or for, an armed party in exchange for support
+  definition: An armed party or leader receives diamonds, timber or other resources in return for arms,
+    logistics or support to forces committing crimes.
+  areas:
+  - HR
+  - OC
+  typology: Resources for arms
+  status: verified
+  sources:
+  - title: Charles Taylor's 50-year sentence upheld on appeal
+    publisher: JURIST
+    year: '2013'
+    url: https://www.jurist.org/news/2013/09/charles-taylors-50-year-sentence-upheld-on-appeal/
+    quote: planning as well as aiding and abetting crimes committed by rebel forces in exchange for diamonds
+      during the civil war
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: The Public Prosecutor v. Guus Kouwenhoven
+    publisher: International Crimes Database (T.M.C. Asser Instituut)
+    year: '2017'
+    url: https://www.internationalcrimesdatabase.org/Case/3309/The-Public-Prosecutor-v-Guus-Kouwenhoven/
+    quote: guilty for illegal trafficking of weapons and ammunitions and complicity in war crimes
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Charles Taylor (Liberia) and RUF diamonds.
+  - Guus Kouwenhoven's logging companies used to import, store and distribute weapons for Taylor's regime.
+  cases: []
+  data_needed:
+  - Company (logging/mining company)
+  - Ownership / Directorship
+  - Contract (concessions)
+  - Vessel / Airplane (arms deliveries)
+  - Sanction (arms embargo)
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - UN Panel of Experts reports
+  - Court judgments
+  - Ship tracking and port records
+  - Sanctions lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Kouwenhoven was convicted of illegal arms trafficking in breach of the UN embargo context.
+    source_url: https://www.internationalcrimesdatabase.org/Case/3309/The-Public-Prosecutor-v-Guus-Kouwenhoven/
+  innocent_explanations:
+  - Governments legitimately grant concessions and buy arms; the indicator depends on the recipient committing
+    crimes or an embargo being in force.
+  jurisdictions: International and domestic courts
+  version: 1
+- id: HR-021
+  name: Business owned or controlled by military leaders responsible for grave violations
+  definition: Companies or conglomerates are owned or influenced by senior military officers credibly
+    linked to atrocities, so revenue supports the perpetrating force.
+  areas:
+  - HR
+  - SF
+  typology: Military-owned economy
+  status: verified
+  sources:
+  - title: The economic interests of the Myanmar military (A/HRC/42/CRP.3)
+    publisher: UN Independent International Fact-Finding Mission on Myanmar
+    year: '2019'
+    url: https://www.un.org/sexualviolenceinconflict/wp-content/uploads/2019/08/report/the-economic-interests-of-the-myanmar-military/A_HRC_42_CRP_3.pdf
+    locator: Summary, finding (a)
+    quote: The revenue that these military businesses generate strengthens the Tatmadaw's autonomy from
+      elected civilian oversight and provides financial support for the Tatmadaw's operations with their
+      wide array of international human rights and humanitarian law violations.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'MEHL and MEC: 120 owned businesses and 27 closely affiliated (UN FFM 2019).'
+  cases: []
+  data_needed:
+  - Ownership (owner, asset, percentage)
+  - Directorship
+  - Company
+  - Person (military rank, role)
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Company registry (e.g. Myanmar DICA)
+  - Sanctions lists (OFAC, EU, UK)
+  - UN fact-finding reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: The Mission recommended targeted financial sanctions against all Tatmadaw-owned companies.
+    source_url: https://www.un.org/sexualviolenceinconflict/wp-content/uploads/2019/08/report/the-economic-interests-of-the-myanmar-military/A_HRC_42_CRP_3.pdf
+  innocent_explanations:
+  - Military pension funds and state enterprises exist in many lawful systems.
+  - Ownership may have been divested since the report.
+  jurisdictions: Myanmar; principle applies globally
+  version: 1
+- id: HR-022
+  name: Joint ventures or commercial ties with perpetrator-owned businesses
+  definition: Foreign or domestic companies hold joint ventures or other commercial ties with businesses
+    owned by a force accused of grave violations.
+  areas:
+  - HR
+  typology: Business linkage to atrocities
+  status: verified
+  sources:
+  - title: The economic interests of the Myanmar military (A/HRC/42/CRP.3)
+    publisher: UN Independent International Fact-Finding Mission on Myanmar
+    year: '2019'
+    url: https://www.un.org/sexualviolenceinconflict/wp-content/uploads/2019/08/report/the-economic-interests-of-the-myanmar-military/A_HRC_42_CRP_3.pdf
+    locator: Summary, finding (d)
+    quote: 15 foreign companies have joint ventures and at least 44 foreign companies have other forms
+      of commercial ties with Tatmadaw businesses.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Foreign joint ventures with MEHL/MEC (UN FFM 2019).
+  cases: []
+  data_needed:
+  - Ownership (joint venture shareholders)
+  - Contract
+  - Company (jurisdiction)
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Annual reports
+  - UN FFM annexes
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ventures may predate the violations or be in the process of exit.
+  jurisdictions: Global
+  version: 1
+- id: HR-023
+  name: Company donations solicited by armed forces during an atrocity operation
+  definition: Businesses give money to military leaders' appeals made while an operation accused of mass
+    crimes is under way.
+  areas:
+  - HR
+  typology: Atrocity financing
+  status: verified
+  sources:
+  - title: The economic interests of the Myanmar military (A/HRC/42/CRP.3)
+    publisher: UN Independent International Fact-Finding Mission on Myanmar
+    year: '2019'
+    url: https://www.un.org/sexualviolenceinconflict/wp-content/uploads/2019/08/report/the-economic-interests-of-the-myanmar-military/A_HRC_42_CRP_3.pdf
+    locator: Summary, finding (c)
+    quote: At least 45 companies and organizations provided the Tatmadaw with USD 10.2 million in financial
+      donations that were solicited in September 2017 by senior Tatmadaw leadership in support of the
+      "clearance operations" that began in August 2017 against the Rohingya in northern Rakhine.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Donations to the Tatmadaw, September 2017 (UN FFM 2019, Annex IV).
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, amount, date, purpose)
+  - Event (operation dates)
+  - Company
+  - Organization
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Donations may be framed as disaster relief or community welfare, and some donors may have been pressured.
+  jurisdictions: Myanmar; principle applies globally
+  version: 1
+- id: HR-024
+  name: Development projects on land of a displaced or persecuted group
+  definition: Companies linked to the perpetrating force build on land from which a group was expelled,
+    which can consolidate the effects of crimes and block return.
+  areas:
+  - HR
+  typology: Forcible transfer; business complicity
+  status: verified
+  sources:
+  - title: The economic interests of the Myanmar military (A/HRC/42/CRP.3)
+    publisher: UN Independent International Fact-Finding Mission on Myanmar
+    year: '2019'
+    url: https://www.un.org/sexualviolenceinconflict/wp-content/uploads/2019/08/report/the-economic-interests-of-the-myanmar-military/A_HRC_42_CRP_3.pdf
+    locator: Summary, finding (c)
+    quote: private companies with enduring links to the Tatmadaw are financing development projects in
+      northern Rakhine in furtherance of the Tatmadaw's objective of re-engineering the region in a way
+      that erases evidence of Rohingya belonging in Myanmar
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - UEHRD projects in northern Rakhine (UN FFM 2019).
+  cases: []
+  data_needed:
+  - Contract / ContractAward (authority, supplier)
+  - Company
+  - Address / RealEstate
+  - Event (displacement)
+  - Image (satellite)
+  checkable: lookups
+  lookup_sources:
+  - Satellite imagery archives
+  - Public procurement records
+  - UN reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Reconstruction after conflict can be genuine and consented to by returning communities.
+  jurisdictions: Global
+  version: 1
+- id: HR-025
+  name: Arms or dual-use technology supplied to a force with a known record of violations
+  definition: Companies or states sell weapons or surveillance and dual-use goods to forces whose abuses
+    are publicly known.
+  areas:
+  - HR
+  - OC
+  typology: Arms supply to perpetrators
+  status: verified
+  sources:
+  - title: The economic interests of the Myanmar military (A/HRC/42/CRP.3)
+    publisher: UN Independent International Fact-Finding Mission on Myanmar
+    year: '2019'
+    url: https://www.un.org/sexualviolenceinconflict/wp-content/uploads/2019/08/report/the-economic-interests-of-the-myanmar-military/A_HRC_42_CRP_3.pdf
+    locator: Summary, finding (e)
+    quote: At least 14 foreign companies from seven States have provided arms and related equipment to
+      the Tatmadaw since 2016, after the Tatmadaw's dismal human rights record was widely and publicly
+      known.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Arms suppliers to the Tatmadaw (UN FFM 2019, Annex VI).
+  cases: []
+  data_needed:
+  - Contract
+  - Payment
+  - Company
+  - Vessel / Airplane (deliveries)
+  - Sanction (arms embargoes)
+  checkable: lookups
+  lookup_sources:
+  - SIPRI Arms Transfers Database
+  - UN Register of Conventional Arms
+  - Export licence data
+  - Ship tracking
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Transfers may breach arms embargoes; the Mission called for a comprehensive arms embargo.
+    source_url: https://www.un.org/sexualviolenceinconflict/wp-content/uploads/2019/08/report/the-economic-interests-of-the-myanmar-military/A_HRC_42_CRP_3.pdf
+  innocent_explanations:
+  - Transfers may be lawful under national export controls if no embargo applies.
+  - Dual-use goods often have civilian uses.
+  jurisdictions: Global
+  version: 1
+- id: HR-026
+  name: Children recruited or used by armed forces or groups
+  definition: Children under 15 are enlisted or used to take part in hostilities; under the Rome Statute
+    this is a war crime.
+  areas:
+  - HR
+  typology: War crime
+  status: verified
+  sources:
+  - title: Rome Statute of the International Criminal Court
+    publisher: International Criminal Court
+    url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+    locator: Art. 8(2)(b)(xxvi)
+    quote: Conscripting or enlisting children under the age of fifteen years into the national armed forces
+      or using them to participate actively in hostilities
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Final report of the Group of Experts on the DRC (S/2024/432)
+    publisher: United Nations Security Council
+    year: '2024'
+    url: https://www.ecoi.net/en/file/local/2112471/n2411880.pdf
+    locator: Summary
+    quote: All armed actors recruited and used children in hostilities on an unprecedented scale.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Thomas Lubanga Dyilo convicted by the ICC (2012).
+  cases: []
+  data_needed:
+  - Person (age, birthDate)
+  - Membership / Employment in armed group
+  - Image / Video
+  - Document (testimony)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Recruitment or use of a child under 15 years (Rome Statute Art. 8).
+    threshold_source: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Child recruitment is also listed among worst forms of child labour (ILO C182, referenced by
+      OECD Annex II).
+    source_url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/04/oecd-due-diligence-guidance-for-responsible-supply-chains-of-minerals-from-conflict-affected-and-high-risk-areas_g1g65996/9789264252479-en.pdf
+  innocent_explanations:
+  - Age is hard to judge from images; young-looking adults may be misidentified.
+  - Children in imagery may be civilians near fighters.
+  jurisdictions: ICC States Parties; customary IHL
+  version: 1
+- id: HR-027
+  name: Deliberate destruction of religious, historic or cultural buildings
+  definition: Attacks intentionally target buildings dedicated to religion, education, art, science, charity
+    or historic monuments that are not military objectives.
+  areas:
+  - HR
+  typology: War crime against cultural property
+  status: verified
+  sources:
+  - title: Rome Statute of the International Criminal Court
+    publisher: International Criminal Court
+    url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+    locator: Art. 8(2)(b)(ix) and 8(2)(e)(iv)
+    quote: Intentionally directing attacks against buildings dedicated to religion, education, art, science
+      or charitable purposes, historic monuments, hospitals and places where the sick and wounded are
+      collected, provided they are not military objectives
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: UN Security Council Resolution 2199 (2015)
+    publisher: United Nations Security Council
+    year: '2015'
+    url: https://documents.un.org/api/symbol/access?s=S/RES/2199(2015)&l=en&t=pdf
+    locator: para. 15
+    quote: Condemns the destruction of cultural heritage in Iraq and Syria particularly by ISIL and ANF,
+      whether such destruction is incidental or deliberate, including targeted destruction of religious
+      sites and objects
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'Ahmad Al Faqi Al Mahdi: destruction of historical and religious monuments in Timbuktu, 2012 (ICC,
+    convicted).'
+  cases: []
+  data_needed:
+  - Event (date, location, involved)
+  - Image / Video (before/after, satellite)
+  - Address (site)
+  - Organization (unit or group)
+  checkable: lookups
+  lookup_sources:
+  - Satellite imagery
+  - UNESCO World Heritage in Danger list
+  - Open-source video archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (Rome Statute Art. 8).
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HR
+    reason: Destruction and looting of sites often go together; UNSC 2199 links both to ISIL income.
+    source_url: https://documents.un.org/api/symbol/access?s=S/RES/2199(2015)&l=en&t=pdf
+  innocent_explanations:
+  - Sites may be damaged incidentally in fighting or used for military purposes, which can make them military
+    objectives.
+  - Neglect, earthquakes or authorised demolition.
+  jurisdictions: ICC; domestic war crimes law
+  version: 1
+- id: HR-028
+  name: Pillage of towns or resources during conflict
+  definition: Property, including natural resources or antiquities, is seized for private or group gain
+    in conflict without the owner's consent.
+  areas:
+  - HR
+  typology: War crime
+  status: verified
+  sources:
+  - title: Rome Statute of the International Criminal Court
+    publisher: International Criminal Court
+    url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+    locator: Art. 8(2)(b)(xvi) and 8(2)(e)(v)
+    quote: Pillaging a town or place, even when taken by assault
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Wazalendo groups 'looting, extorting, kidnapping and murdering civilians' (S/2024/432 summary).
+  cases: []
+  data_needed:
+  - Event
+  - Asset / Payment (proceeds)
+  - Organization
+  - Address
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Pillaged resources are laundered through trade.
+    source_url: https://www.ecoi.net/en/file/local/2112471/n2411880.pdf
+  innocent_explanations:
+  - Lawful requisition or seizure under IHL rules (e.g. military necessity with compensation).
+  jurisdictions: ICC; domestic
+  version: 1
+- id: HR-029
+  name: Widespread or systematic attack on civilians
+  definition: Acts such as murder, torture or deportation are committed as part of a widespread or systematic
+    attack on a civilian population, with knowledge of it.
+  areas:
+  - HR
+  typology: Crime against humanity
+  status: verified
+  sources:
+  - title: Rome Statute of the International Criminal Court
+    publisher: International Criminal Court
+    url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+    locator: Art. 7(1)
+    quote: For the purpose of this Statute, "crime against humanity" means any of the following acts when
+      committed as part of a widespread or systematic attack directed against any civilian population,
+      with knowledge of the attack
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'Anwar R., Koblenz Higher Regional Court, 2022: crimes against humanity at al-Khatib Branch 251.'
+  cases: []
+  data_needed:
+  - Event (date, location, victims)
+  - Person (victims, perpetrators)
+  - Organization (unit)
+  - Image / Video
+  - Document (testimony)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Isolated incidents or lawful combat operations do not meet the definition.
+  jurisdictions: ICC; universal jurisdiction courts
+  version: 1
+- id: HR-030
+  name: Systematic custodial deaths shown in official photographic records
+  definition: Numbered photographs of detainee bodies showing emaciation or torture injuries indicate
+    systematic killing in custody.
+  areas:
+  - HR
+  typology: Torture; crimes against humanity
+  status: verified
+  sources:
+  - title: Judgment 1 StE 9/19 (Anwar R.), unofficial IIIM translation
+    publisher: Higher Regional Court Koblenz / IIIM
+    year: '2022'
+    url: https://iiim.un.org/wp-content/uploads/2025/07/1StE9_19-Judgment_Unofficial-IIIM-Translation_ENG.pdf
+    locator: p. 132
+    quote: The documentation of the dead by a Syrian military photographer ('Caesar') as ordered from
+      late spring 2011 on provides key evidence of the systematic and extensive killing of those arrested
+      in the intelligence services' prisons.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'Caesar files: 26,938 image files depicting 6,821 people (Koblenz judgment).'
+  cases: []
+  data_needed:
+  - Image (contentHash, date)
+  - Person (victim)
+  - Organization (detention branch)
+  - Document (metadata, chain of custody)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Deaths in custody can result from illness; forensic review is needed before attribution.
+  jurisdictions: Germany (universal jurisdiction); applicable elsewhere
+  version: 1
+- id: HR-031
+  name: Detentions followed by refusal to acknowledge or disclose fate
+  definition: People are arrested or abducted by or with state or political organisation support, and
+    authorities refuse to acknowledge the detention or say where they are.
+  areas:
+  - HR
+  typology: Crime against humanity
+  status: verified
+  sources:
+  - title: Rome Statute of the International Criminal Court
+    publisher: International Criminal Court
+    url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+    locator: Art. 7(2)(i)
+    quote: '"Enforced disappearance of persons" means the arrest, detention or abduction of persons by,
+      or with the authorization, support or acquiescence of, a State or a political organization, followed
+      by a refusal to acknowledge that deprivation of freedom or to give information on the fate or whereabouts
+      of those persons'
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Person (missing)
+  - Event (arrest)
+  - Organization (detaining authority)
+  - Document (requests and responses)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful incommunicado periods are short and regulated; families may not have asked the right authority.
+  jurisdictions: ICC; International Convention for the Protection of All Persons from Enforced Disappearance
+  version: 1
+- id: HR-032
+  name: Forced displacement of a population
+  definition: People are expelled or coerced to leave an area where they are lawfully present, without
+    grounds allowed in international law.
+  areas:
+  - HR
+  typology: Crime against humanity
+  status: verified
+  sources:
+  - title: Rome Statute of the International Criminal Court
+    publisher: International Criminal Court
+    url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+    locator: Art. 7(2)(d)
+    quote: '"Deportation or forcible transfer of population" means forced displacement of the persons
+      concerned by expulsion or other coercive acts from the area in which they are lawfully present,
+      without grounds permitted under international law'
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Rohingya 'clearance operations' from August 2017 (UN FFM 2019).
+  cases: []
+  data_needed:
+  - Event
+  - Address
+  - 'Image (satellite: burned villages)'
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Satellite imagery
+  - UNHCR / IOM displacement data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful evacuation for civilians' security or imperative military reasons is permitted under IHL.
+  jurisdictions: ICC; domestic
+  version: 1
+- id: HR-033
+  name: Starvation of civilians or blocking relief supplies
+  definition: Civilians are deprived of objects essential to survival, including by wilfully blocking
+    relief, as a method of warfare.
+  areas:
+  - HR
+  typology: War crime
+  status: verified
+  sources:
+  - title: Rome Statute of the International Criminal Court
+    publisher: International Criminal Court
+    url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+    locator: Art. 8(2)(b)(xxv)
+    quote: Intentionally using starvation of civilians as a method of warfare by depriving them of objects
+      indispensable to their survival, including wilfully impeding relief supplies as provided for under
+      the Geneva Conventions
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Event
+  - Vehicle (convoys)
+  - Address (checkpoints)
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Security inspections and genuine logistical failure can delay aid.
+  jurisdictions: ICC
+  version: 1
+- id: HR-034
+  name: Open-source item is recycled, decontextualised or circularly reported
+  definition: An image, video or claim is reused from another event, stripped of context, or repeated
+    by sources citing each other, so it appears better corroborated than it is.
+  areas:
+  - HR
+  typology: Evidence reliability
+  status: verified
+  sources:
+  - title: Berkeley Protocol on Digital Open Source Investigations
+    publisher: UN OHCHR and UC Berkeley Human Rights Center
+    year: '2022'
+    url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+    locator: Chapter VI, para. 187 (Content analysis)
+    quote: These include circular reporting, decontextualization of information and misinterpretation.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Image / Video (contentHash, sourceUrl, publishedAt)
+  - Document (reverse-image search results)
+  - Article
+  checkable: lookups
+  lookup_sources:
+  - Reverse image search
+  - Web archives (Wayback)
+  - Platform search
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Similar scenes recur in long conflicts; an earlier match must be the same item, not a similar one.
+  jurisdictions: Global (methodology)
+  version: 1
+- id: HR-035
+  name: Metadata missing, stripped or inconsistent with claimed time and place
+  definition: A file's metadata is absent or conflicts with the claimed date, device or location, which
+    weakens or questions authenticity.
+  areas:
+  - HR
+  typology: Evidence reliability
+  status: verified
+  sources:
+  - title: Berkeley Protocol on Digital Open Source Investigations
+    publisher: UN OHCHR and UC Berkeley Human Rights Center
+    year: '2022'
+    url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+    locator: Chapter VI, para. 184
+    quote: Where metadata have been stripped, open source researchers should seek other ways to verify
+      an item.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Image / Video / Document (contentHash, date, author, generator)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Social media platforms routinely strip or rewrite metadata on upload (Berkeley Protocol para. 184).
+  jurisdictions: Global
+  version: 1
+- id: HR-036
+  name: No documented chain of custody for a digital item
+  definition: There is no chronological record of who collected, held, transferred or analysed the item,
+    and no hash recorded at collection.
+  areas:
+  - HR
+  typology: Evidence reliability
+  status: verified
+  sources:
+  - title: Berkeley Protocol on Digital Open Source Investigations
+    publisher: UN OHCHR and UC Berkeley Human Rights Center
+    year: '2022'
+    url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+    locator: Chapter VI, para. 167
+    quote: Chain of custody refers to the chronological documentation of the sequence of custodians of
+      a piece of information or evidence, and documentation of the control, date and time, transfer, analysis
+      and disposition of any such evidence.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Document (collection log)
+  - Image / Video (contentHash, retrievedAt)
+  - Person (custodian)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Early first-responder captures are often made without formal logging; the item may still be authenticated
+    by other means.
+  jurisdictions: Global
+  version: 1
+- id: HR-037
+  name: Source is tied to a party to the conflict
+  definition: The uploader or source has affiliations, funding or relationships with a party to the events,
+    which affects independence and impartiality.
+  areas:
+  - HR
+  typology: Evidence reliability
+  status: verified
+  sources:
+  - title: Berkeley Protocol on Digital Open Source Investigations
+    publisher: UN OHCHR and UC Berkeley Human Rights Center
+    year: '2022'
+    url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+    locator: Chapter VI, para. 180
+    quote: In considering the independence of sources, examine whether they may be associated with relevant
+      entities (e.g. parties to a conflict).
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Person / Organization (source)
+  - Associate / Membership
+  - Payment (funding)
+  - UserAccount
+  checkable: lookups
+  lookup_sources:
+  - Social media account history
+  - WHOIS / domain records
+  - Organisation funding disclosures
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Affiliated sources often have unique access and can still be accurate; affiliation calls for corroboration,
+    not dismissal.
+  jurisdictions: Global
+  version: 1
+- id: HR-038
+  name: Content cannot be geolocated, chronolocated or externally corroborated
+  definition: The place and time shown cannot be confirmed from features, shadows or other independent
+    information, or the item contradicts itself.
+  areas:
+  - HR
+  typology: Evidence reliability
+  status: verified
+  sources:
+  - title: Berkeley Protocol on Digital Open Source Investigations
+    publisher: UN OHCHR and UC Berkeley Human Rights Center
+    year: '2022'
+    url: https://www.ohchr.org/sites/default/files/2024-01/OHCHR_BerkeleyProtocol.pdf
+    locator: Chapter VI, paras 190-194
+    quote: External corroboration is provided by information that lies outside a digital item itself but
+      that coincides with and thus supports the veracity of the item's content.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - MH17 judgment relied on photographs and videos of a Buk TELAR, intercepted calls, mast data and satellite
+    images together (District Court of The Hague, 2022).
+  cases: []
+  data_needed:
+  - Image / Video
+  - Address (geocoded)
+  - Event (date/time)
+  - Document (satellite imagery)
+  checkable: lookups
+  lookup_sources:
+  - Satellite imagery
+  - Street-level imagery and maps
+  - Sun-position calculators
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many authentic items lack distinctive features; failure to verify is not proof of falsity.
+  jurisdictions: Global
+  version: 1
+- id: HR-039
+  name: Antiquity offered with little or no provenance
+  definition: An archaeological or cultural object is offered with very limited or no ownership history
+    or documentation.
+  areas:
+  - HR
+  typology: Antiquities trafficking
+  status: verified
+  sources:
+  - title: Antiquities Transaction Due Diligence Toolkit (Annex)
+    publisher: Responsible Art Market Initiative
+    url: https://kernochan.law.columbia.edu/sites/default/files/content/Symposium%20March%201/Anquities%20Supplement%20to%20Due%20Diligence%20Toolkit%20(4873-9119-0428.1)_VF.pdf
+    locator: s. 2.8, p. 3
+    quote: The antiquity is presented with very limited or no documentation or provenance.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: UN Security Council Resolution 2347 (2017)
+    publisher: United Nations Security Council
+    year: '2017'
+    url: https://documents.un.org/api/symbol/access?s=S/RES/2347(2017)&l=en&t=pdf
+    locator: para. 8
+    quote: which lack clearly documented and certified provenance
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: ICOM Code of Ethics for Museums
+    publisher: International Council of Museums
+    url: https://icom.museum/wp-content/uploads/2018/07/ICOM-code-En-web.pdf
+    locator: s. 2.3
+    quote: Due diligence in this regard should establish the full history of the item since discovery
+      or production.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'Michael Steinhardt reportedly said: "There''s no provenance for it. If I see a piece and I like it,
+    then I buy it." (OCCRP on Manhattan DA case, 2021).'
+  cases: []
+  data_needed:
+  - Asset (object) with description
+  - Document (provenance records, export licences, invoices)
+  - Ownership (chain of owners with dates)
+  - Person / Company (seller)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: UNSC 2347 targets undocumented items from conflict zones because of terrorist group income.
+    source_url: https://documents.un.org/api/symbol/access?s=S/RES/2347(2017)&l=en&t=pdf
+  innocent_explanations:
+  - Many legitimately owned old collections were never documented; family heirlooms rarely have paperwork.
+  jurisdictions: Global
+  version: 1
+- id: HR-040
+  name: Vague provenance such as 'private collection' or unverifiable exhibition history
+  definition: Provenance entries lack specifics, or exhibition and publication history is used to give
+    an undocumented object legitimacy.
+  areas:
+  - HR
+  typology: Provenance laundering
+  status: verified
+  sources:
+  - title: Antiquities Transaction Due Diligence Toolkit (Annex)
+    publisher: Responsible Art Market Initiative
+    url: https://kernochan.law.columbia.edu/sites/default/files/content/Symposium%20March%201/Anquities%20Supplement%20to%20Due%20Diligence%20Toolkit%20(4873-9119-0428.1)_VF.pdf
+    locator: s. 2.4, p. 2
+    quote: Of particular concern are references that lack specificity, like "private collection."
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Document (catalogues, exhibition records)
+  - Ownership
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Private owners often ask for anonymity for privacy or security reasons.
+  jurisdictions: Global
+  version: 1
+- id: HR-041
+  name: Contradictory information about the same object
+  definition: Different documents or statements about an object give conflicting histories, dates, findspots
+    or owners.
+  areas:
+  - HR
+  typology: Provenance fraud
+  status: verified
+  sources:
+  - title: Antiquities Transaction Due Diligence Toolkit (Annex)
+    publisher: Responsible Art Market Initiative
+    url: https://kernochan.law.columbia.edu/sites/default/files/content/Symposium%20March%201/Anquities%20Supplement%20to%20Due%20Diligence%20Toolkit%20(4873-9119-0428.1)_VF.pdf
+    locator: s. 2.8, p. 3
+    quote: Contradictory or inconsistent information about the same object.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Document (multiple)
+  - Asset
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Scholarly attributions change; old catalogues contain errors.
+  jurisdictions: Global
+  version: 1
+- id: HR-042
+  name: Provenance, export licence or permit appears false
+  definition: Documentation such as export licences, authorisations or provenance papers seems forged
+    or fabricated.
+  areas:
+  - FR
+  - HR
+  typology: Provenance fraud
+  status: verified
+  sources:
+  - title: Antiquities Transaction Due Diligence Toolkit (Annex)
+    publisher: Responsible Art Market Initiative
+    url: https://kernochan.law.columbia.edu/sites/default/files/content/Symposium%20March%201/Anquities%20Supplement%20to%20Due%20Diligence%20Toolkit%20(4873-9119-0428.1)_VF.pdf
+    locator: s. 2.8, p. 3
+    quote: Documentation for the object (e.g. authorisation, export licenses, provenance documents) appears
+      to be false.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: U.S. Attorney Announces $12 Million Settlement Of Civil Forfeiture Action Against Estate Of
+      Antiquities Trafficker
+    publisher: US Attorney's Office, SDNY
+    year: '2023'
+    url: https://www.justice.gov/usao-sdny/pr/us-attorney-announces-12-million-settlement-civil-forfeiture-action-against-estate
+    quote: primarily by creating false provenance documents and falsifying invoices and shipping documents
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Douglas Latchford (alleged; indictment dismissed on his death; estate settled for $12 million in 2023).
+  cases: []
+  data_needed:
+  - Document (licence numbers, stamps, issuing authority)
+  - Asset
+  - Person / Company (seller)
+  checkable: lookups
+  lookup_sources:
+  - Issuing ministry or customs authority confirmation
+  - Expert examination
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: False provenance is also a wire fraud offence (Latchford indictment).
+    source_url: https://www.justice.gov/usao-sdny/pr/us-attorney-announces-12-million-settlement-civil-forfeiture-action-against-estate
+  innocent_explanations:
+  - Old genuine documents may look irregular by today's standards; translations can introduce errors.
+  jurisdictions: Global
+  version: 1
+- id: HR-043
+  name: Object recently present in an active conflict zone
+  definition: The object's recent history places it in an active conflict zone where lawful excavation
+    or export permission is unlikely.
+  areas:
+  - HR
+  typology: Conflict antiquities
+  status: verified
+  sources:
+  - title: Antiquities Transaction Due Diligence Toolkit (Annex)
+    publisher: Responsible Art Market Initiative
+    url: https://kernochan.law.columbia.edu/sites/default/files/content/Symposium%20March%201/Anquities%20Supplement%20to%20Due%20Diligence%20Toolkit%20(4873-9119-0428.1)_VF.pdf
+    locator: s. 2.8, p. 3; s. 2.5
+    quote: Indication of recent presence in an active conflict zone where excavation or export permission
+      would have bene unlikely under the circumstances.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'Steinhardt case: a bull''s-head statue traced to Lebanon, taken during the civil war (OCCRP, 2021).'
+  cases: []
+  data_needed:
+  - Asset
+  - Address (findspot, transit)
+  - Event (conflict period)
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - UNESCO List of World Heritage in Danger
+  - ICOM Red Lists
+  - Conflict event data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: UNSC 2199 found ISIL and ANF generating income from looting and smuggling cultural heritage.
+    source_url: https://documents.un.org/api/symbol/access?s=S/RES/2199(2015)&l=en&t=pdf
+  innocent_explanations:
+  - Objects may have left the region long before the conflict and be documented accordingly.
+  jurisdictions: Global
+  version: 1
+- id: HR-044
+  name: Iraqi or Syrian cultural property removed after the UN cut-off dates
+  definition: An item of Iraqi or Syrian cultural, archaeological or religious importance left Iraq after
+    6 August 1990 or Syria after 15 March 2011.
+  areas:
+  - HR
+  - SF
+  typology: Conflict antiquities
+  status: verified
+  sources:
+  - title: UN Security Council Resolution 2199 (2015)
+    publisher: United Nations Security Council
+    year: '2015'
+    url: https://documents.un.org/api/symbol/access?s=S/RES/2199(2015)&l=en&t=pdf
+    locator: para. 17
+    quote: illegally removed from Iraq since 6 August 1990 and from Syria since 15 March 2011, including
+      by prohibiting cross-border trade in such items
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'Hobby Lobby: about 5,500 artifacts (cuneiform tablets, cylinder seals, bullae) of Iraqi origin; settled
+    2017.'
+  cases: []
+  data_needed:
+  - Asset (object, origin)
+  - Document (export date evidence)
+  - Address (country of origin)
+  checkable: lookups
+  lookup_sources:
+  - ICOM Red List for Iraq and Syria
+  - INTERPOL Stolen Works of Art database
+  - Customs records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Documented removal from Iraq after 6 August 1990 or from Syria after 15 March 2011 (UNSC
+      2199 para. 17).
+    threshold_source: https://documents.un.org/api/symbol/access?s=S/RES/2199(2015)&l=en&t=pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: The resolution is a counter-terrorist-financing measure against ISIL and ANF.
+    source_url: https://documents.un.org/api/symbol/access?s=S/RES/2199(2015)&l=en&t=pdf
+  innocent_explanations:
+  - Objects lawfully exported before the cut-off dates with documentation.
+  jurisdictions: All UN Member States
+  version: 1
+- id: HR-045
+  name: Cultural objects mislabelled or with false country of origin on customs papers
+  definition: Shipments of antiquities are described as ordinary goods (e.g. tile samples) or declared
+    with a false country of origin, or not declared at all.
+  areas:
+  - FR
+  - HR
+  typology: Smuggling
+  status: verified
+  sources:
+  - title: United States Files Civil Action To Forfeit Thousands Of Ancient Iraqi Artifacts Imported By
+      Hobby Lobby
+    publisher: US Attorney's Office, EDNY
+    year: '2017'
+    url: https://www.justice.gov/usao-edny/pr/united-states-files-civil-action-forfeit-thousands-ancient-iraqi-artifacts-imported
+    quote: falsely declared that the Artifacts' country of origin was Turkey
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and Terrorist Financing in the Art and Antiquities Market
+    publisher: FATF
+    year: '2023'
+    url: https://www.regjeringen.no/contentassets/570f17301cdd4df4bb3e19a70c640e90/rapport-money-laundering-and-terrorist-financing-in-the-art-and-antiquities-market-feb-2023.pdf
+    locator: Annex A, p. 45
+    quote: Imported or exported items not declared to the relevant customs administration(s).
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Hobby Lobby packages labelled 'clay tiles (sample)' and declared from Turkey and Israel (EDNY, 2017).
+  cases: []
+  data_needed:
+  - Document (customs declarations, shipping labels)
+  - Asset
+  - Company (shipper, consignee)
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Misdescription of goods is a core trade-based laundering technique.
+    source_url: https://www.regjeringen.no/contentassets/570f17301cdd4df4bb3e19a70c640e90/rapport-money-laundering-and-terrorist-financing-in-the-art-and-antiquities-market-feb-2023.pdf
+  innocent_explanations:
+  - Country of origin on customs forms is sometimes entered as the country of export by mistake.
+  jurisdictions: Global
+  version: 1
+- id: HR-046
+  name: Payment to accounts or jurisdictions unconnected to the deal
+  definition: The seller asks for payment in a currency or jurisdiction unrelated to the transaction,
+    or to multiple third-party personal accounts.
+  areas:
+  - HR
+  - ML
+  typology: Antiquities trafficking; laundering
+  status: verified
+  sources:
+  - title: Antiquities Transaction Due Diligence Toolkit (Annex)
+    publisher: Responsible Art Market Initiative
+    url: https://kernochan.law.columbia.edu/sites/default/files/content/Symposium%20March%201/Anquities%20Supplement%20to%20Due%20Diligence%20Toolkit%20(4873-9119-0428.1)_VF.pdf
+    locator: s. 2.8, p. 3
+    quote: Payment requests in currency or jurisdictions with no apparent connection to the transaction.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: United States Files Civil Action To Forfeit Thousands Of Ancient Iraqi Artifacts Imported By
+      Hobby Lobby
+    publisher: US Attorney's Office, EDNY
+    year: '2017'
+    url: https://www.justice.gov/usao-edny/pr/united-states-files-civil-action-forfeit-thousands-ancient-iraqi-artifacts-imported
+    quote: wired payment for the Artifacts to seven personal bank accounts held in the names of other
+      individuals
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Hobby Lobby payments to seven personal accounts (EDNY, 2017).
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, beneficiary account, currency)
+  - BankAccount
+  - Person / Company (seller)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Third-party payments obscure beneficial recipients.
+    source_url: https://www.justice.gov/usao-edny/pr/united-states-files-civil-action-forfeit-thousands-ancient-iraqi-artifacts-imported
+  innocent_explanations:
+  - Dealers may use agents or escrow in other countries for tax or banking reasons.
+  jurisdictions: Global
+  version: 1
+- id: HR-047
+  name: Seller or intermediary previously linked to trafficking in cultural objects
+  definition: A party has been reported, investigated or known to be involved in illicit excavation or
+    trafficking of cultural property.
+  areas:
+  - HR
+  typology: Antiquities trafficking
+  status: verified
+  sources:
+  - title: Money Laundering and Terrorist Financing in the Art and Antiquities Market
+    publisher: FATF
+    year: '2023'
+    url: https://www.regjeringen.no/contentassets/570f17301cdd4df4bb3e19a70c640e90/rapport-money-laundering-and-terrorist-financing-in-the-art-and-antiquities-market-feb-2023.pdf
+    locator: Annex A, p. 45
+    quote: Presence of natural or legal persons known to be involved in, or suspected of, trafficking
+      in cultural objects.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Antiquities Transaction Due Diligence Toolkit (Annex)
+    publisher: Responsible Art Market Initiative
+    url: https://kernochan.law.columbia.edu/sites/default/files/content/Symposium%20March%201/Anquities%20Supplement%20to%20Due%20Diligence%20Toolkit%20(4873-9119-0428.1)_VF.pdf
+    locator: s. 2.8, p. 3
+    quote: A seller or intermediary who has been reported frequently in connection with unauthorized excavation
+      or cultural property sales.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Subhash Kapoor convicted (Kumbakonam, 2022); 235 of 307 artifacts repatriated to India by the Manhattan
+    DA related to his dealings (Hyperallergic).
+  cases: []
+  data_needed:
+  - Person / Company
+  - Sanction / court records
+  - Associate
+  checkable: lookups
+  lookup_sources:
+  - Court records and press releases (DOJ, Manhattan DA)
+  - Repatriation announcements
+  - Media archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Allegations are not findings; RAM notes allegations 'should not be considered automatically disqualifying'.
+  jurisdictions: Global
+  version: 1
+- id: HR-048
+  name: Price suspiciously low, out of line, or margins unusually high
+  definition: An antiquity is priced far below its market segment, or resale shows unusual profit margins
+    or prices far above expected value.
+  areas:
+  - HR
+  - ML
+  typology: Art and antiquities laundering
+  status: verified
+  sources:
+  - title: Antiquities Transaction Due Diligence Toolkit (Annex)
+    publisher: Responsible Art Market Initiative
+    url: https://kernochan.law.columbia.edu/sites/default/files/content/Symposium%20March%201/Anquities%20Supplement%20to%20Due%20Diligence%20Toolkit%20(4873-9119-0428.1)_VF.pdf
+    locator: s. 2.8, p. 3
+    quote: Suspiciously low price, or price out of line with the market segment.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and Terrorist Financing in the Art and Antiquities Market
+    publisher: FATF
+    year: '2023'
+    url: https://www.regjeringen.no/contentassets/570f17301cdd4df4bb3e19a70c640e90/rapport-money-laundering-and-terrorist-financing-in-the-art-and-antiquities-market-feb-2023.pdf
+    locator: Annex A, p. 45
+    quote: Unusually high profit margins on the sale of an item of art, antiquity or other cultural objects.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment (amounts over successive sales)
+  - Asset (valuation)
+  - Document (auction records)
+  checkable: lookups
+  lookup_sources:
+  - Auction price databases
+  - Expert valuation
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FATF lists the same price anomalies as laundering indicators.
+    source_url: https://www.regjeringen.no/contentassets/570f17301cdd4df4bb3e19a70c640e90/rapport-money-laundering-and-terrorist-financing-in-the-art-and-antiquities-market-feb-2023.pdf
+  innocent_explanations:
+  - Reattribution, cleaning or research can legitimately raise value; estate sales can be cheap.
+  jurisdictions: Global
+  version: 1
+- id: HR-049
+  name: Buyer or seller indifferent to provenance, price or loss
+  definition: A buyer shows no interest in provenance, style or artist, or pays far above notional value;
+    a seller is unconcerned about recouping cost.
+  areas:
+  - HR
+  - ML
+  typology: Art and antiquities laundering
+  status: verified
+  sources:
+  - title: Money Laundering and Terrorist Financing in the Art and Antiquities Market
+    publisher: FATF
+    year: '2023'
+    url: https://www.regjeringen.no/contentassets/570f17301cdd4df4bb3e19a70c640e90/rapport-money-laundering-and-terrorist-financing-in-the-art-and-antiquities-market-feb-2023.pdf
+    locator: Annex A, p. 45
+    quote: Sales or purchases of art where a client is not familiar with, or interested in, the provenance,
+      history, style, genre, or artist of an object.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Document (correspondence)
+  - Payment
+  - Person
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Decorators and new collectors often buy for appearance alone.
+  jurisdictions: Global
+  version: 1
+- id: HR-050
+  name: Shell companies, trusts or intermediaries used to buy, hold or sell cultural objects
+  definition: Ownership or purchase of cultural objects is routed through shell companies, trusts or third
+    parties such as advisers or brokers, hiding the real owner.
+  areas:
+  - HR
+  - ML
+  - SF
+  typology: Art and antiquities laundering
+  status: verified
+  sources:
+  - title: Money Laundering and Terrorist Financing in the Art and Antiquities Market
+    publisher: FATF
+    year: '2023'
+    url: https://www.regjeringen.no/contentassets/570f17301cdd4df4bb3e19a70c640e90/rapport-money-laundering-and-terrorist-financing-in-the-art-and-antiquities-market-feb-2023.pdf
+    locator: Annex A, p. 45
+    quote: Use of shell companies, trusts, or third-party intermediaries, including art dealers, brokers,
+      advisers, or interior designers, to purchase, hold, or sell cultural objects.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Company (jurisdiction, incorporationDate)
+  - Ownership
+  - Representation
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Beneficial ownership registers
+  - Offshore leaks databases
+  - Sanctions lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FinCEN notes art crimes may include sanctions violations; FATF Box 4 describes OFAC-designated
+      persons using art.
+    source_url: https://fincen.gov/sites/default/files/2021-03/FinCEN%20Notice%20on%20Antiquities%20and%20Art_508C.pdf
+  innocent_explanations:
+  - Collectors use companies and trusts for estate planning, privacy and insurance.
+  jurisdictions: Global
+  version: 1
+- id: HR-051
+  name: Large cash payments for cultural objects
+  definition: Cultural objects are paid for with large amounts of cash or high-denomination banknotes.
+  areas:
+  - HR
+  - ML
+  typology: Art and antiquities laundering
+  status: verified
+  sources:
+  - title: Money Laundering and Terrorist Financing in the Art and Antiquities Market
+    publisher: FATF
+    year: '2023'
+    url: https://www.regjeringen.no/contentassets/570f17301cdd4df4bb3e19a70c640e90/rapport-money-laundering-and-terrorist-financing-in-the-art-and-antiquities-market-feb-2023.pdf
+    locator: Annex A, p. 45
+    quote: Cash transactions, in particular using large bulks of cash.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment (method, amount, currency)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Cash is customary in some local antiques markets and flea markets.
+  jurisdictions: Global
+  version: 1
+- id: HR-052
+  name: Art-backed loan with refusal of identification or early cash repayment
+  definition: A customer will not identify themselves for an art-collateralised loan, or repays early
+    or in cash.
+  areas:
+  - HR
+  - ML
+  typology: Art and antiquities laundering
+  status: verified
+  sources:
+  - title: Money Laundering and Terrorist Financing in the Art and Antiquities Market
+    publisher: FATF
+    year: '2023'
+    url: https://www.regjeringen.no/contentassets/570f17301cdd4df4bb3e19a70c640e90/rapport-money-laundering-and-terrorist-financing-in-the-art-and-antiquities-market-feb-2023.pdf
+    locator: Annex A, p. 45
+    quote: Unwillingness of a customer to provide identification information to receive an art-collateralized
+      loan, or early repayment or use of cash to pay such a loan.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Payment
+  - Contract (loan)
+  - Person / Company (borrower)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Early repayment after a sale is ordinary.
+  jurisdictions: Global
+  version: 1
+- id: HR-053
+  name: Insurance bought or ended on art in a way that contradicts its known value
+  definition: High-value insurance is bought or terminated for art that other information suggests is
+    of low value.
+  areas:
+  - FR
+  - HR
+  - ML
+  typology: Insurance fraud
+  status: verified
+  sources:
+  - title: Money Laundering and Terrorist Financing in the Art and Antiquities Market
+    publisher: FATF
+    year: '2023'
+    url: https://www.regjeringen.no/contentassets/570f17301cdd4df4bb3e19a70c640e90/rapport-money-laundering-and-terrorist-financing-in-the-art-and-antiquities-market-feb-2023.pdf
+    locator: Annex A, p. 45
+    quote: Purchase or termination of insurance policies to protect the market value or provide cash payments
+      for the loss, theft, or destruction of privately held or donated high-value art in circumstances
+      where other information has suggested the art has a low value.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Contract (insurance)
+  - Asset (valuation)
+  - Payment (claims)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Valuations differ honestly between experts.
+  jurisdictions: Global
+  version: 1
+- id: HR-054
+  name: Antiquities advertised in online groups, with conflict-zone locations
+  definition: Objects are offered in social media groups, often with locations in or bordering conflict
+    zones and sometimes before they are dug up.
+  areas:
+  - HR
+  - SF
+  typology: Online antiquities trafficking
+  status: verified
+  sources:
+  - title: Facebook's black market in antiquities
+    publisher: ATHAR Project
+    year: '2019'
+    url: https://atharproject.org/reportsAndPublications/facebooks-black-market-in-antiquities
+    quote: 36% of posts offering artifacts have identifiable locations in conflict zones.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Money Laundering and Terrorist Financing in the Art and Antiquities Market
+    publisher: FATF
+    year: '2023'
+    url: https://www.regjeringen.no/contentassets/570f17301cdd4df4bb3e19a70c640e90/rapport-money-laundering-and-terrorist-financing-in-the-art-and-antiquities-market-feb-2023.pdf
+    locator: Annex A, p. 45 (indicator text was cut off in the copy reached)
+    quote: Use of social media or financial intermediaries to advertise cultural objects
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - 'ATHAR: 95 Arabic Facebook groups with 1,947,195 members; participants included individuals associated
+    with Hay''at Tahrir al-Sham (alleged in reporting).'
+  cases: []
+  data_needed:
+  - UserAccount
+  - Image (posts)
+  - Address (location tags)
+  - Person / Organization
+  checkable: lookups
+  lookup_sources:
+  - Social media platforms and archives
+  - ATHAR research datasets
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: ATHAR reported extremist-linked participants selling artifacts.
+    source_url: https://atharproject.org/reportsAndPublications/facebooks-black-market-in-antiquities
+  innocent_explanations:
+  - Many posts offer fakes or replicas; collectors' groups also discuss legal items.
+  jurisdictions: Global
+  version: 1
+- id: HR-055
+  name: Physical signs of recent excavation or damage
+  definition: Condition analysis shows soil, damage or other clues consistent with recent, unrecorded
+    digging.
+  areas:
+  - HR
+  typology: Looting
+  status: verified
+  sources:
+  - title: Antiquities Transaction Due Diligence Toolkit (Annex)
+    publisher: Responsible Art Market Initiative
+    url: https://kernochan.law.columbia.edu/sites/default/files/content/Symposium%20March%201/Anquities%20Supplement%20to%20Due%20Diligence%20Toolkit%20(4873-9119-0428.1)_VF.pdf
+    locator: s. 2.7, p. 2
+    quote: analysis of materials and condition can yield important information that rules out authenticity
+      or give clues to other concerns related to excavation. (e.g., damage, or soil).
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: ICOM Code of Ethics for Museums
+    publisher: International Council of Museums
+    url: https://icom.museum/wp-content/uploads/2018/07/ICOM-code-En-web.pdf
+    locator: s. 2.4
+    quote: Museums should not acquire objects where there is reasonable cause to believe their recovery
+      involved unauthorised or unscientific fieldwork, or intentional destruction or damage of monuments,
+      archaeological or geological sites
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Asset
+  - Image
+  - Document (condition reports)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Old excavation residue can remain on long-documented objects; deliberate 'aging' of fakes also adds
+    soil.
+  jurisdictions: Global
+  version: 1
+- id: HR-056
+  name: Object matches stolen-art databases or Red List categories
+  definition: The object appears in stolen-art databases or belongs to a category on an ICOM Red List
+    of at-risk cultural objects.
+  areas:
+  - HR
+  typology: Stolen cultural property
+  status: verified
+  sources:
+  - title: Antiquities Transaction Due Diligence Toolkit (Annex)
+    publisher: Responsible Art Market Initiative
+    url: https://kernochan.law.columbia.edu/sites/default/files/content/Symposium%20March%201/Anquities%20Supplement%20to%20Due%20Diligence%20Toolkit%20(4873-9119-0428.1)_VF.pdf
+    locator: s. 2.4, p. 2
+    quote: Databases of lost and stolen art should be checked
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Asset (description, images)
+  - Image (contentHash)
+  checkable: lookups
+  lookup_sources:
+  - INTERPOL Stolen Works of Art database / ID-Art
+  - Art Loss Register
+  - ICOM Red Lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: A positive match to a stolen-object record (meets the published definition).
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Red List category match means 'at risk', not stolen; many listed object types circulate legally with
+    documentation.
+  jurisdictions: Global
+  version: 1
+- id: HR-057
+  name: Archaeological goods imported into the EU without a licence or importer statement
+  definition: Archaeological finds or dismembered monument parts over 250 years old enter the EU without
+    an import licence, or other listed goods over 200 years and EUR 18,000 without an importer statement.
+  areas:
+  - FR
+  - HR
+  typology: Illicit import
+  status: verified
+  sources:
+  - title: Regulation (EU) 2019/880 on the introduction and the import of cultural goods
+    publisher: European Parliament and Council
+    year: '2019'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32019R0880
+    locator: Arts 4(1), 5(1) and Annex Parts B-C
+    quote: The import of the cultural goods listed in Part C of the Annex shall require an importer statement.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples: []
+  cases: []
+  data_needed:
+  - Document (import licence, importer statement)
+  - Asset (age, value, category)
+  - Company (importer)
+  checkable: lookups
+  lookup_sources:
+  - EU ICG electronic system / customs records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Part B goods 'More than 250 years old', 'Whatever the value' without licence; or Part C
+      goods 'More than 200 years old' and 'EUR 18 000 or more per item' without importer statement (Reg.
+      2019/880 Annex).
+    threshold_source: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32019R0880
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Licence and statement obligations applied from June 2025; earlier imports were not subject to them.
+  - Temporary admission for exhibitions or research is exempt.
+  jurisdictions: European Union
+  version: 1
+- id: HR-058
+  name: Armed or terrorist group administering excavation permits or taxing antiquities
+  definition: Documents show an armed group issuing excavation permits or receipts and depositing antiquities
+    proceeds into its treasury.
+  areas:
+  - HR
+  - SF
+  typology: Conflict antiquities
+  status: verified
+  sources:
+  - title: United States Files Complaint Seeking Forfeiture of Antiquities Associated with the Islamic
+      State
+    publisher: US Attorney's Office, District of Columbia
+    year: '2016'
+    url: https://www.justice.gov/usao-dc/pr/united-states-files-complaint-seeking-forfeiture-antiquities-associated-islamic-state
+    quote: excavation permits and receipts of collections written on ISIL letterhead
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: UN Security Council Resolution 2199 (2015)
+    publisher: United Nations Security Council
+    year: '2015'
+    url: https://documents.un.org/api/symbol/access?s=S/RES/2199(2015)&l=en&t=pdf
+    locator: para. 16
+    quote: are generating income from engaging directly or indirectly in the looting and smuggling of
+      cultural heritage items from archaeological sites, museums, libraries, archives, and other sites
+      in Iraq and Syria
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Abu Sayyaf raid records (May 2015), forfeiture complaint (alleged, 2016).
+  cases: []
+  data_needed:
+  - Document (permits, receipts)
+  - Organization
+  - Payment
+  - Asset
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Proceeds went to ISIL's treasury per the complaint (allegation).
+    source_url: https://www.justice.gov/usao-dc/pr/united-states-files-complaint-seeking-forfeiture-antiquities-associated-islamic-state
+  innocent_explanations:
+  - Lawful state antiquities authorities also issue permits; the question is who issued them.
+  jurisdictions: Global
+  version: 1
+- id: HR-059
+  name: Expert warnings about looting ignored before purchase
+  definition: A buyer is told by an adviser that objects may have been looted but proceeds, often without
+    meeting the purported owner.
+  areas:
+  - HR
+  typology: Wilful blindness
+  status: verified
+  sources:
+  - title: United States Files Civil Action To Forfeit Thousands Of Ancient Iraqi Artifacts Imported By
+      Hobby Lobby
+    publisher: US Attorney's Office, EDNY
+    year: '2017'
+    url: https://www.justice.gov/usao-edny/pr/united-states-files-civil-action-forfeit-thousands-ancient-iraqi-artifacts-imported
+    quote: carries a risk that such objects may have been looted from archaeological sites in Iraq
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Hobby Lobby received this warning in October 2010 (EDNY, 2017).
+  cases: []
+  data_needed:
+  - Document (memos, emails)
+  - Email
+  - Person (expert, buyer)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded.
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Warnings may be followed by due diligence that resolves the concern.
+  jurisdictions: Global
+  version: 1
+not_reached:
+- 'FATF ''Money Laundering and Terrorist Financing in the Art and Antiquities Market'' (2023): the official
+  fatf-gafi.org PDF is behind Cloudflare; read via the regjeringen.no copy, but the WebFetch text stopped
+  partway through Annex A (p. 45), so the indicators after ''Use of social media or financial intermediaries
+  to advertise cultural objects that...'' (including any conflict-zone or terrorist-financing indicators)
+  were not reached.'
+- 'FATF ''Financing of the Terrorist Organisation ISIL'' (2015) and FATF ''Emerging Terrorist Financing
+  Risks'' (2015): not opened (Cloudflare on fatf-gafi.org).'
+- 'OFAC ''Advisory and Guidance on Potential Sanctions Risks Arising from Dealings in High-Value Artwork''
+  (30 Oct 2020): fetch failed.'
+- 'US Senate PSI report ''The Art Industry and U.S. Policies that Undermine Sanctions'' (2020): not opened.'
+- 'UNODC Practical Assistance Tool and International Guidelines on trafficking in cultural property: download
+  blocked (returned HTML stub).'
+- 'EU Regulation 2017/821 (conflict minerals) full text: EUR-Lex returned an empty page; definitions came
+  from the OECD Guidance instead.'
+- 'LBMA Responsible Gold Guidance v9: download returned an XML error.'
+- 'Kimberley Process Core Document PDF: download returned HTML; used kimberleyprocess.com ''What is the
+  KP'' page.'
+- 'MH17 court judgment full text: only the court''s summary page was read.'
+- 'UN Fact-Finding Mission on Myanmar press release (OHCHR): fetch failed; the full A/HRC/42/CRP.3 report
+  was read instead.'
+- 'ICC Al Mahdi reparations amount and judgment date: the case page did not state them.'
+- 'Manhattan DA press releases (Steinhardt, Kapoor): manhattan.da.ny.gov blocks robots; facts taken from
+  OCCRP and Hyperallergic reports on them.'
+- 'Interpol cultural property pages, UNESCO 1954 Hague Convention and UNIDROIT 1995 text: not opened.'
