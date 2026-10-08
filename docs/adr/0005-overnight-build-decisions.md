@@ -76,12 +76,7 @@ reversed; the code built on it says which ADR line it rests on.
 
 ### Visual editor and chart styles
 
-7. **Konva with react-konva is the editor base.** Reason: MIT, free, built for
-   React 19, never contacts an outside server; its own Canvas Editor guide
-   (<https://konvajs.org/docs/sandbox/Canvas_Editor.html>) builds selection,
-   moving, resizing, undo and PNG export. tldraw needs a paid licence with an
-   unpublished price. Not built in the overnight build; slices 2–6 of the
-   editor design wait on this line being accepted.
+7. **React Flow is the editor base** (amended 2026-10-08; Ony: "What's best? Do that."). It was "Konva with react-konva", never built. Reason for the change: React Flow (`@xyflow/react`, MIT) is already in the app and used by the network and ownership views, so no new package; nodes are React components, so the icons, cards and hover cards reuse the app's own; handles, connecting by drag, selection, snap, zoom, pan and groups are built in; nodes are DOM elements, so keyboard and screen readers reach them, which a canvas library would need a second layer for. Konva stays the fallback if canvases grow past about 1,000 items (chart-builder-system-design.md §8.1). tldraw still needs a paid licence.
 8. **The four starter themes stay** (Dark Academia, Newsprint, Ledger, High
    contrast). They are built (commit 5d146ac).
 9. **Anyone who can write to an investigation can change its theme.** Reason:

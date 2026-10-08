@@ -232,6 +232,31 @@ Decided by Ony, 7 October 2026: a few main features get reporters' names; everyt
 - **The Drop**: where documents are added and read, and their proposals reviewed (today's "Document ingestion" and bulk import), chosen by Ony the same day.
 - **Chain of Custody**: following one fact back to its document (today's "Provenance trace"), kept apart from Paper Trail, which covers every source at once.
 
+## Ony's answers, 8 October 2026
+
+Decided:
+
+- **Build order** as listed below; each step ends with tests, the full check and screenshots.
+- **The app is the Workbench.** Everything in it is a tool or feature of the Workbench; there is no separate "workbench page".
+- **Paper Trail holds every source.** There is no OpenAleph-only panel; every possible source is available there.
+- **The chart builder sits inside Data visualization.**
+- **Type of investigation:** the app fills it in from the records; the reporter can change it at any time.
+- **Research automation has three settings:** identify and research without approval; identify and ask for approval before researching; off.
+- **Several people on one investigation** is not built and is needed: it must be planned (accounts, roles, who changed what, shared settings and lookups).
+- **The mass-officer flag is a graded scale:** caution when a pattern appears, danger when it looks serious, confirmed at the Global Witness level (more than 100 appointments). The caution and danger levels are still to be set.
+- **Every link waits for a person.** No automatic linking at any score; the match confidence is always shown.
+- **AI is an investigative journalist's assistant:** it may manage the investigation, report findings, ask for guidance and clarification, and do other relevant tasks. Everything it does goes into the research trail. (This replaces assumption A3 in research-design.md and question 6 in system-design.md; the design for it is still to be written.)
+- **Chart builder canvas:** React Flow (ADR-0005 line 7 amended).
+- **Design files:** import and export only; no shared gallery for now.
+- **Settings like the research switch are chosen in a first-run tutorial** that asks the reporter how they want each one.
+- **A connection the reporter draws records intent, not fact:** the reporter believes the two are connected. As the investigation goes on, evidence either fills it in or it stays empty.
+- **The "design saved" event is kept.**
+- **Diagram pictures:** whichever is best long term (see chart-builder-system-design.md, T3).
+- **No live co-editing for now.**
+- **Device sync:** delete permission for the git lock files, and running npm install and pip install on Ony's computer, are approved.
+
+Still open: the chart rules question (Ony asked where the rules come from), undo (plain history or zundo), and the research-run question (Ony asked what it meant).
+
 ## Build order
 
 1. **Page structure and colour roles across every page.** Search redesign.
