@@ -162,20 +162,50 @@ def schema() -> None:
         (CAT / "schema" / f"{name}.schema.json").write_text(json.dumps(model.model_json_schema(), indent=2) + "\n", encoding="utf-8")
 
 
-def coverage() -> None:
+def coverage(gaps: str | None = None) -> None:
+    """Print the coverage report as Markdown: counts per area, what is still
+    pending and why, sources the research could not reach, and (when given a
+    file) the gaps the coverage critics found."""
     cat = load()
-    print("| Area | Indicators | Verified | From records | After lookups | Person only | Sources not reached |")
-    print("|---|---|---|---|---|---|---|")
-    for a in cat.areas:
+    out = ["# Indicator catalogue: coverage report", "", f"Made {date.today():%d %B %Y} from the files in catalogue/.", ""]
+    total = sum(len(a.indicators) for a in cat.areas)
+    ver = sum(i.status.value == "verified" for a in cat.areas for i in a.indicators)
+    terms = sum(len(g.terms) for g in cat.glossaries)
+    out += [f"**{total} indicators in {len(cat.areas)} areas; {ver} verified, {total - ver} pending. {terms} glossary terms.**", "",
+            "| Area | Indicators | Verified | From records | After lookups | Person only | Cases | Cross-hints | Sources not reached |",
+            "|---|---|---|---|---|---|---|---|---|"]
+    for a in sorted(cat.areas, key=lambda a: a.key):
         n = len(a.indicators)
         by = {k: sum(i.checkable.value == k for i in a.indicators) for k in ("records", "lookups", "person")}
-        ver = sum(i.status.value == "verified" for i in a.indicators)
-        print(f"| {a.name} | {n} | {ver} | {by['records']} | {by['lookups']} | {by['person']} | {len(a.not_reached)} |")
+        v = sum(i.status.value == "verified" for i in a.indicators)
+        cases = sum(len(i.cases) for i in a.indicators)
+        hints = sum(len(i.cross_hints) for i in a.indicators)
+        out.append(f"| {a.key} {a.name} | {n} | {v} | {by['records']} | {by['lookups']} | {by['person']} | {cases} | {hints} | {len(a.not_reached)} |")
+    no_cases = [a for a in cat.areas if not any(i.cases for i in a.indicators)]
+    if no_cases:
+        out += ["", "Areas with no documented cases yet: " + ", ".join(f"{a.key} {a.name}" for a in no_cases) + ". The research for them returned none; a case round is needed."]
+    pending = [(a, i) for a in cat.areas for i in a.indicators if i.status.value != "verified"]
+    out += ["", "## Pending indicators", "", "Kept out of Red Flags and the PDF until what is listed is checked.", ""]
+    for a, i in pending:
+        why = [f"quote not confirmed at {s.url}" for s in i.sources if not s.quote_verified]
+        why += [f"case outcome not confirmed: {c.name}" for c in i.cases if not c.outcome_verified]
+        if not i.threshold_verified:
+            why.append("threshold number not confirmed")
+        out.append(f"- **{i.id}** {i.name}: {'; '.join(why)}")
+    out += ["", "## Sources the research could not reach", ""]
+    for a in sorted(cat.areas, key=lambda a: a.key):
+        if a.not_reached:
+            out.append(f"**{a.key} {a.name}**")
+            out += [f"- {x}" for x in a.not_reached]
+            out.append("")
     issues = problems(cat)
     if issues:
-        print("\nProblems:", *issues, sep="\n- ")
+        out += ["## Problems", ""] + [f"- {p}" for p in issues]
+    if gaps:
+        out += ["", Path(gaps).read_text(encoding="utf-8")]
+    print("\n".join(out))
 
 
 if __name__ == "__main__":
     cmd, *rest = sys.argv[1:] or ["help"]
-    {"ingest": lambda: ingest(rest), "schema": schema, "coverage": coverage}.get(cmd, lambda: print(__doc__))()
+    {"ingest": lambda: ingest(rest), "schema": schema, "coverage": lambda: coverage(rest[0] if rest else None)}.get(cmd, lambda: print(__doc__))()

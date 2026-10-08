@@ -84,7 +84,8 @@ class Book:
     def __init__(self, mission_draft: bool) -> None:
         self.cat = load()
         self.mission_draft = mission_draft
-        self.areas = [a for a in self.cat.areas if any(i.status is Status.verified for i in a.indicators)]
+        order = list(AREAS)
+        self.areas = sorted((a for a in self.cat.areas if any(i.status is Status.verified for i in a.indicators)), key=lambda a: order.index(a.key) if a.key in order else 99)
         self.sources: dict[str, dict] = {}
         for a in self.areas:
             for i in self.verified(a.indicators):
@@ -268,7 +269,8 @@ def render(parts: list[str], out: Path | None) -> tuple[dict[str, int], int]:
 
 
 def main() -> None:
-    out = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "catalogue" / "indicator-catalogue.pdf"
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    out = Path(args[0]) if args else Path("indicator-catalogue.pdf")
     book = Book(mission_draft="--mission-draft" in sys.argv)
     pages, _ = render(book.parts({}), None)
     pages, _ = render(book.parts(pages), None)  # the contents may change length once page numbers are in
