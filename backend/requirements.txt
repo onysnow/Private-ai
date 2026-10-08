@@ -13,6 +13,9 @@ openpyxl==3.1.5
 # because the Workbench imports it), which computes with numpy (BSD-3).
 networkx==3.6.1
 numpy==2.4.6
+# The indicator catalogue's YAML files (app/catalogue/; ADR-0007; MIT). Already
+# installed with followthemoney; pinned because the Workbench imports it.
+PyYAML==6.0.3
 
 python-multipart==0.0.32
 python-docx==1.2.0
