@@ -257,6 +257,11 @@ Decided:
 
 Still open: the chart rules question (Ony asked where the rules come from), undo (plain history or zundo), and the research-run question (Ony asked what it meant).
 
+## Safety indicators and learning guides (Ony, 8 October 2026)
+
+- **Danger to the investigator.** Alongside indicators of wrongdoing, the catalogue holds indicators that the people doing or helping an investigation (reporter, sources, witnesses) may be in danger because of what is being uncovered. Example from Ony: several journalists who looked into the same person have died in suspicious circumstances. The seriousness of the crimes uncovered, and the kind of actors involved, also raise the danger. These form their own area (SA) in the catalogue and are shown apart from Red Flags about the subject.
+- **Guides, later.** How to be an investigator, how to be a journalist, and how to be an investigative journalist, inside the app, so people who download it can teach themselves. Not started; to be planned after the catalogue.
+
 ## Build order
 
 1. **Page structure and colour roles across every page.** Search redesign.
