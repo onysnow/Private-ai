@@ -1,0 +1,2044 @@
+key: SA
+name: Safety of investigators, sources and witnesses
+scope: 'warning signs that the people doing or helping an investigation (journalists, researchers, sources,
+  whistleblowers, witnesses) may be in danger because of what is being uncovered. Include: subjects or
+  networks linked to killings, disappearances, attacks, threats, imprisonment or suspicious deaths of
+  journalists, activists or witnesses who looked into them (use the Committee to Protect Journalists database,
+  Reporters Without Borders, UNESCO Observatory of Killed Journalists, IFJ, Forbidden Stories, Mapping
+  Media Freedom); kinds of crime and actors that raise the danger (organised crime, cartels, armed groups,
+  state security services, trafficking networks, extractive industries; cite the studies that show this);
+  legal harassment and SLAPPs (CASE coalition, Council of Europe Safety of Journalists Platform); surveillance
+  and spyware (Citizen Lab, Amnesty Security Lab, Pegasus Project); online harassment and doxxing; threats
+  to witnesses and sources (UNODC Good practices for the protection of witnesses in criminal proceedings
+  involving organized crime). Use safety guides from CPJ, GIJN, Rory Peck Trust, Freedom of the Press
+  Foundation, IWMF and OCCRP for what each sign means. These indicators are about danger to the investigator
+  or witness, not about wrongdoing by the subject; innocent explanations still apply (a death may be unrelated).
+  Cases: documented attacks with sources, outcome stated exactly (convicted, found_by_official_inquiry,
+  alleged_in_reporting and so on).'
+indicators:
+- id: SA-001
+  name: Subject or network already linked to the killing of a journalist who reported on them
+  definition: A person, company or group at the centre of the investigation has been charged, convicted,
+    or credibly reported as connected to the murder of a journalist or media worker who was looking into
+    them.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Data methodology
+    publisher: Committee to Protect Journalists
+    year: current
+    url: https://cpj.org/data-methodology/
+    locator: Definition of 'Murder'
+    quote: a targeted killing, whether premeditated or spontaneous, in direct reprisal for the journalist’s
+      work.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Ján Kuciak (database entry)
+    publisher: Committee to Protect Journalists
+    url: https://cpj.org/data/people/jan-kuciak/
+    locator: Case summary
+    quote: reported on government corruption and investigated tax fraud
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Businessman accused of masterminding Caruana Galizia assassination stands trial in Malta
+    publisher: ICIJ
+    year: '2026'
+    url: https://www.icij.org/news/2026/07/businessman-accused-of-masterminding-caruana-galizia-assassination-stands-trial-in-malta/
+    locator: On Alfred and George Degiorgio
+    quote: are serving 40-year prison sentences
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The subject's associates were convicted of killing a reporter who wrote about the subject's business
+    deals.
+  - A company director is named in court as having commissioned surveillance of a journalist who was later
+    murdered.
+  cases:
+  - name: Murder of Daphne Caruana Galizia (Malta)
+    year: '2017'
+    jurisdiction: Malta
+    what_happened: Journalist killed by car bomb while investigating a power-station deal involving businessman
+      Yorgen Fenech and Panama Papers follow-ups. Alfred and George Degiorgio are serving 40 years, Vincent
+      Muscat 15 years, and Robert Agius and Jamie Vella got life sentences for supplying the bomb. Fenech
+      was acquitted by a jury on 2 September 2026.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.icij.org/news/2026/07/businessman-accused-of-masterminding-caruana-galizia-assassination-stands-trial-in-malta/
+    source_title: 'ICIJ: Businessman accused of masterminding Caruana Galizia assassination stands trial
+      in Malta'
+  - name: Yorgen Fenech (alleged commissioner, Caruana Galizia murder)
+    year: '2026'
+    jurisdiction: Malta
+    what_happened: A jury acquitted the businessman accused of commissioning the murder.
+    outcome: acquitted
+    outcome_verified: true
+    source_url: https://forbiddenstories.org/actualites_posts/yorgen-fenech-acquitted-in-maltese-journalist-daphne-caruana-galizia-murder-case/
+    source_title: 'Forbidden Stories: Yorgen Fenech acquitted'
+  - name: Murder of Ján Kuciak and Martina Kušnírová (Slovakia)
+    year: '2018'
+    jurisdiction: Slovakia
+    what_happened: Kuciak investigated tax fraud, corruption and the 'Ndrangheta in Slovakia. Shooter
+      Tomáš Szabó (25 years), Miroslav Marček (25 years) and Zoltán Andruskó (15 years) were convicted.
+      Marián Kočner was acquitted twice; the Supreme Court cancelled the acquittal in May 2025 and a retrial
+      began in January 2026.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://cpj.org/data/people/jan-kuciak/
+    source_title: 'CPJ: Ján Kuciak'
+  - name: Murder of Javier Valdez Cárdenas (Mexico)
+    year: '2017'
+    jurisdiction: Mexico
+    what_happened: Co-founder of Riodoce, which covered organised crime and corruption in Sinaloa, was
+      shot at least 12 times in Culiacán. Heriberto Picos Barraza got 14 years 8 months (2020) and Juan
+      Francisco Picos Barrueta 32 years (2021).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://cpj.org/data/people/javier-valdez-cardenas/
+    source_title: 'CPJ: Javier Valdez Cárdenas'
+  data_needed:
+  - Person (the journalist and the subject)
+  - Event (the killing, with date and place)
+  - CourtCase and CourtCaseParty (charges, verdicts)
+  - Associate / UnknownLink (subject to people charged)
+  - Article and Mention (what the journalist published about the subject)
+  checkable: lookups
+  lookup_sources:
+  - CPJ database of killed journalists
+  - UNESCO Observatory of Killed Journalists
+  - RSF Barometer
+  - IFJ list of killed journalists
+  - Court records in the relevant country
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Murdered journalists in this group were often investigating public-procurement and political
+      corruption by the same subjects.
+    source_url: https://cpj.org/2016/10/protecting-journalists-who-cover-corruption-is-goo/
+  innocent_explanations:
+  - The subject was named in reporting but never charged, and may have no connection to the killing.
+  - The killing may have been unrelated to the journalist's work (CPJ separates 'confirmed' from 'suspected'
+    work-related deaths).
+  - An acquittal (for example Yorgen Fenech in 2026, Marián Kočner in 2020 and 2023) means the link was
+    not proven in court.
+  jurisdictions: Global
+  version: 1
+- id: SA-002
+  name: Cluster of deaths, disappearances or attacks among people who looked into or testified against
+    the same subject
+  definition: Several journalists, lawyers, witnesses or relatives connected to the same subject or case
+    have been killed, gone missing or been attacked, which suggests a pattern of reprisals rather than
+    a one-off.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: 'Netherlands: RSF and FPU welcome convictions for the killing of journalist Peter R. de Vries'
+    publisher: Reporters Without Borders
+    year: '2024'
+    url: https://rsf.org/en/netherlands-rsf-and-fpu-welcome-convictions-killing-journalist-peter-r-de-vries
+    locator: Background paragraph (as summarised by fetch tool; RSF wording close to this)
+    quote: From 2019 onwards, he became a trust person and advisor to crown witness Nabil B. in the turbulent
+      "Marengo-trial".
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Marked for Death
+    publisher: Committee to Protect Journalists
+    year: '2005'
+    url: https://cpj.org/reports/2005/05/murderous-05.php
+    locator: Philippines section
+    quote: All had reported on government and police corruption, drug dealing, and the activities of crime
+      syndicates.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A cooperating witness's brother, then his lawyer, then his adviser are each killed over three years.
+  - Three local reporters who covered the same mayor's links to traffickers are shot within two years.
+  cases:
+  - name: Killings around crown witness Nabil B. (Marengo trial)
+    year: 2018-2021
+    jurisdiction: Netherlands
+    what_happened: Nabil B.'s brother was murdered in 2018, his lawyer Derk Wiersum in 2019, and his adviser,
+      crime reporter Peter R. de Vries, in 2021. Two men got 30 years each for Wiersum's murder (11 October
+      2021). For de Vries, two men got 28 years and a middleman 26 years (2024); the court found the alleged
+      Marengo motive could not be proven.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://rsf.org/en/netherlands-rsf-and-fpu-welcome-convictions-killing-journalist-peter-r-de-vries
+    source_title: 'RSF: convictions for the killing of Peter R. de Vries'
+  - name: Derk Wiersum murder
+    year: '2021'
+    jurisdiction: Netherlands
+    what_happened: Amsterdam District Court jailed Giërmo B. and Moreno B. for 30 years each for killing
+      the lawyer of state witness Nabil B.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.euronews.com/2021/10/11/two-men-found-guilty-of-murdering-dutch-lawyer-linked-to-organised-crime-trial
+    source_title: 'Euronews: Two men found guilty of murdering Dutch lawyer'
+  - name: Gauri Lankesh murder (India)
+    year: '2017'
+    jurisdiction: India (Karnataka)
+    what_happened: A police Special Investigation Team charged 18 people, 16 allegedly part of Sanatan
+      Sanstha, and invoked the organised-crime law KCOCA; one accused was also suspected in the murder
+      of rationalist Narendra Dabholkar. The trial has not produced a verdict in the sources read.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://thenewsminute.com/article/gauri-lankesh-murder-sit-files-first-additional-chargesheet-names-18-accused-92108
+    source_title: 'The News Minute: SIT files chargesheet naming 18 accused'
+  data_needed:
+  - Person (each victim)
+  - Event (each attack, date, place)
+  - Associate / Family / Representation (how each victim relates to the case)
+  - CourtCase (the case they were connected to)
+  - UnknownLink (victim to subject)
+  checkable: lookups
+  lookup_sources:
+  - CPJ database
+  - UNESCO Observatory
+  - RSF Barometer
+  - Court records
+  - Local press archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Reprisal killings of witnesses, lawyers and reporters around one prosecution are a hallmark
+      of organised criminal groups.
+    source_url: https://rsf.org/en/netherlands-rsf-and-fpu-welcome-convictions-killing-journalist-peter-r-de-vries
+  innocent_explanations:
+  - In high-violence places, many people die violently for unrelated reasons; clusters can be coincidence.
+  - Courts sometimes cannot prove the motive (the de Vries court found the Marengo motive unproven).
+  - Deaths may be accidents, illness or suicide that look suspicious only in hindsight.
+  jurisdictions: Global
+  version: 1
+- id: SA-003
+  name: Earlier attacks on journalists in the same place or story went unpunished
+  definition: Killings or attacks on journalists in the country, region or story have not led to convictions,
+    so attackers have little reason to fear consequences.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Haiti, Israel most likely to let journalists’ murders go unpunished, CPJ 2024 impunity index
+      shows
+    publisher: Committee to Protect Journalists
+    year: '2024'
+    url: https://cpj.org/special-reports/haiti-israel-most-likely-to-let-journalists-murders-go-unpunished-cpj-2024-impunity-index-shows/
+    locator: Key findings / methodology
+    quote: the vast majority – 77% – of journalists' murderers have escaped with full impunity.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 85 per cent of journalist killings go unpunished
+    publisher: UN Geneva
+    year: '2024'
+    url: https://www.ungeneva.org/en/news-media/news/2024/11/99850/85-cent-journalist-killings-go-unpunished
+    locator: News article on UNESCO report
+    quote: around 85 percent of the cases did not make it to court
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The country is on CPJ's Global Impunity Index.
+  - Two earlier murders of reporters covering the same port have no convictions.
+  cases: []
+  data_needed:
+  - Event (prior attacks)
+  - CourtCase (status of each)
+  - Address / jurisdiction of the investigation
+  checkable: lookups
+  lookup_sources:
+  - CPJ Global Impunity Index
+  - UNESCO Director-General report on safety of journalists and the danger of impunity
+  - Council of Europe Safety of Journalists Platform (impunity alerts)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Country appears on CPJ's Global Impunity Index, which includes only countries with five
+      or more unsolved journalist murders in the ten-year window
+    threshold_source: https://cpj.org/special-reports/haiti-israel-most-likely-to-let-journalists-murders-go-unpunished-cpj-2024-impunity-index-shows/
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Weak courts or slow investigations affect all crimes, not only those against journalists.
+  - Some cases have partial convictions (CPJ calls this 'partial impunity' and does not count them).
+  jurisdictions: Global
+  version: 1
+- id: SA-004
+  name: A journalist, source or companion connected to the story has gone missing
+  definition: Someone working on or helping with the story has disappeared and it is unclear whether they
+    were killed or abducted.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: RSF’s 2024 Round-up
+    publisher: Reporters Without Borders
+    year: '2024'
+    url: https://rsf.org/en/rsf-s-2024-round-journalism-suffers-exorbitant-human-cost-due-conflicts-and-repressive-regimes
+    locator: Key figures
+    quote: 95 missing journalists
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Dom Phillips (database entry)
+    publisher: Committee to Protect Journalists
+    url: https://cpj.org/data/people/dom-phillips/
+    locator: Case summary
+    quote: interviewing local residents and people defending Indigenous territory from illegal fishing
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A fixer stops answering after meeting a source linked to an illegal mine.
+  cases:
+  - name: Dom Phillips and Bruno Pereira (Brazil)
+    year: '2022'
+    jurisdiction: Brazil
+    what_happened: The journalist and the Indigenous-affairs expert disappeared in the Javari Valley on
+      5 June 2022 while reporting on illegal fishing; their remains were found with gunshot wounds. Several
+      men were charged; CPJ reports no convictions as of late 2025.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://cpj.org/data/people/dom-phillips/
+    source_title: 'CPJ: Dom Phillips'
+  data_needed:
+  - Person
+  - Event (last known contact, place)
+  - Associate (relationship to the investigation)
+  - Address
+  checkable: person
+  lookup_sources:
+  - RSF Barometer (missing)
+  - CPJ missing journalists list
+  - Local police records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets RSF's published definition of 'missing' as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EN
+    reason: The disappearance happened during reporting on illegal fishing in Indigenous territory.
+    source_url: https://cpj.org/data/people/dom-phillips/
+  innocent_explanations:
+  - Loss of phone signal or travel delays in remote areas.
+  - Voluntary withdrawal for personal or safety reasons.
+  - Accident or illness.
+  jurisdictions: Global
+  version: 1
+- id: SA-005
+  name: Earlier reporters on the subject were jailed or taken hostage
+  definition: Journalists who previously covered the subject were imprisoned by authorities or held by
+    a non-state group, showing the subject's side can and will deprive critics of liberty.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Data methodology
+    publisher: Committee to Protect Journalists
+    url: https://cpj.org/data-methodology/
+    locator: Imprisoned journalists
+    quote: detained, imprisoned, or otherwise deprived of their liberty by state authorities in connection
+      with their work.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Attacks on the Press in 2024
+    publisher: Committee to Protect Journalists
+    year: '2025'
+    url: https://cpj.org/2025/01/attacks-on-the-press-in-2024/
+    locator: Prison census section
+    quote: More than 65% of imprisoned journalists in the census face anti-state charges, such as false
+      news and terrorism
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: RSF’s 2024 Round-up
+    publisher: Reporters Without Borders
+    year: '2024'
+    url: https://rsf.org/en/rsf-s-2024-round-journalism-suffers-exorbitant-human-cost-due-conflicts-and-repressive-regimes
+    locator: Key figures
+    quote: 55 media workers currently held hostage worldwide
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Two local reporters who covered the governor's land deals are in pre-trial detention on terrorism
+    charges.
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase (charges)
+  - Event (arrest, abduction)
+  - Article (what they had published)
+  checkable: lookups
+  lookup_sources:
+  - CPJ prison census
+  - RSF Barometer (detained, hostages)
+  - Council of Europe Safety of Journalists Platform (detention alerts)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The jailed journalist may face genuine charges unrelated to their work.
+  - Detention may be part of a wider crackdown not specific to this subject.
+  jurisdictions: Global
+  version: 1
+- id: SA-006
+  name: The story was left unfinished because an earlier reporter was silenced
+  definition: The investigation picks up work that a previous journalist could not finish because they
+    were threatened, jailed or killed, so the same people who acted against them may act again.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: About us
+    publisher: Forbidden Stories
+    url: https://forbiddenstories.org/about-us/
+    locator: Mission statement
+    quote: to continue the investigations of other reporters who have been silenced.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: About Green Blood
+    publisher: Forbidden Stories
+    year: '2019'
+    url: https://forbiddenstories.org/about-green-blood/
+    locator: Project description (citing CPJ)
+    quote: at least 13 journalists have been killed after working on environment-related stories
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A team resumes a dead reporter's investigation into a mine's pollution.
+  cases:
+  - name: Cecilio Pineda (Mexico)
+    year: '2017'
+    jurisdiction: Mexico
+    what_happened: Independent reporter who exposed ties between local officials and drug traffickers
+      in Tierra Caliente was murdered in March 2017. Forbidden Stories reported that his number was selected
+      for surveillance by a Mexican NSO client weeks earlier; his phone could not be examined.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://forbiddenstories.org/?p=10760
+    source_title: 'Forbidden Stories: Cecilio Pineda'
+  data_needed:
+  - Person (earlier reporter)
+  - Article / Document (earlier unfinished work)
+  - Event (what happened to them)
+  checkable: person
+  lookup_sources:
+  - Forbidden Stories
+  - CPJ database
+  - UNESCO Observatory
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The earlier reporter may have stopped for personal or funding reasons.
+  - Publishing collaboratively and widely can reduce the benefit of silencing any one reporter.
+  jurisdictions: Global
+  version: 1
+- id: SA-007
+  name: Story concerns organised crime, cartels or drug trafficking
+  definition: The subject is, or is linked to, an organised criminal group, a group that the main safety
+    studies identify as the most frequent suspected killer of journalists and a common source of witness
+    intimidation.
+  areas:
+  - OC
+  - SA
+  status: verified
+  sources:
+  - title: Murders of journalists more than double worldwide
+    publisher: Committee to Protect Journalists
+    year: '2020'
+    url: https://cpj.org/reports/2020/12/murders-journalists-more-than-doubled-killed/
+    locator: Analysis
+    quote: Criminal groups were the most frequently suspected killers of journalists in 2020, while politics
+      was the most dangerous beat.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Marked for Death
+    publisher: Committee to Protect Journalists
+    year: '2005'
+    url: https://cpj.org/reports/2005/05/murderous-05.php
+    locator: Introduction
+    quote: In most cases, journalists were murdered in retaliation for reporting on government corruption,
+      crime, drug trafficking
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Good Practices for the Protection of Witnesses in Criminal Proceedings Involving Organized
+      Crime
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/documents/organized-crime/Witness-protection-manual-Feb08.pdf
+    locator: Chapter on key elements, B. The crime, 1. Organized crime, p. 22
+    quote: Witness intimidation has become such a common feature of criminal investigations and prosecution
+      that protection measures for witnesses are considered an essential element of a country’s arsenal
+      against organized crime.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The company under investigation launders money for a cartel.
+  - The subject's security contractor is run by a former gang leader.
+  cases: []
+  data_needed:
+  - Organization / Company (the group)
+  - Person
+  - Membership / Associate / UnknownLink
+  - Sanction (if the group is listed)
+  - CourtCase
+  checkable: lookups
+  lookup_sources:
+  - Sanctions lists (for example OFAC SDN, EU, UN)
+  - Court records
+  - InSight Crime and OCCRP reporting
+  - Police organised-crime designations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Evidence that the subject belongs to or serves a criminal group is both a wrongdoing signal
+      and a safety signal.
+    source_url: https://cpj.org/reports/2020/12/murders-journalists-more-than-doubled-killed/
+  innocent_explanations:
+  - A loose or historic link (for example a past business partner) may not mean the group is involved
+    today.
+  - Many reporters cover crime safely, especially at national level with institutional support.
+  jurisdictions: Global
+  version: 1
+- id: SA-008
+  name: Story concerns corruption by officials or politically connected people
+  definition: The investigation exposes corruption by politicians, officials or their business associates,
+    the beat most often covered by murdered journalists in CPJ's data.
+  areas:
+  - CO
+  - SA
+  status: verified
+  sources:
+  - title: Protecting journalists who cover corruption is good for development
+    publisher: Committee to Protect Journalists
+    year: '2016'
+    url: https://cpj.org/2016/10/protecting-journalists-who-cover-corruption-is-goo/
+    locator: Body text
+    quote: Of the 246 journalists killed during this time who were working on corruption, 95 percent were
+      murdered.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Murders of journalists more than double worldwide
+    publisher: Committee to Protect Journalists
+    year: '2020'
+    url: https://cpj.org/reports/2020/12/murders-journalists-more-than-doubled-killed/
+    locator: Mexico section
+    quote: a complex web of criminal, drug-trafficking gangs and entrenched official corruption.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The investigation shows a minister's relative won public contracts through a shell company.
+  cases:
+  - name: Arshad Sharif (Pakistan/Kenya)
+    year: '2022'
+    jurisdiction: Kenya
+    what_happened: Pakistani journalist fled Pakistan in August 2022 after death threats over his corruption
+      reporting and was shot by Kenyan police. In July 2024 the Kajiado High Court found the killing arbitrary
+      and unconstitutional (a court ruling on rights, not a criminal conviction).
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://cpj.org/2024/07/kenya-court-rules-police-unlawfully-killed-pakistani-journalist-arshad-sharif/
+    source_title: 'CPJ: Kenya court rules police unlawfully killed Arshad Sharif'
+  data_needed:
+  - Person (official)
+  - Company
+  - Contract / ContractAward
+  - Ownership / Directorship
+  - Family / Associate
+  checkable: records
+  lookup_sources:
+  - Procurement records
+  - Company registries
+  - Asset declarations
+  - CPJ database
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Corruption findings by the investigation raise the danger to the investigator.
+    source_url: https://cpj.org/2016/10/protecting-journalists-who-cover-corruption-is-goo/
+  innocent_explanations:
+  - Most corruption reporting does not lead to violence, especially where courts and police work.
+  jurisdictions: Global
+  version: 1
+- id: SA-009
+  name: Story concerns environmental crime, mining, land or extractive industries
+  definition: The investigation concerns mining, logging, illegal fishing, dams, land grabs or pollution,
+    topics where journalists and land defenders face documented attacks and killings.
+  areas:
+  - EN
+  - SA
+  status: verified
+  sources:
+  - title: UNESCO report reveals 70% of environmental journalists have been attacked for their work (press
+      release)
+    publisher: UNESCO
+    year: '2024'
+    url: https://articles.unesco.org/sites/default/files/medias/fichiers/2024/05/PR_UNESCO-report-reveals-70-environmental-journalists-have-been-attacked-for-their-work_en.pdf
+    locator: Press release, key findings
+    quote: at least 749 journalists and news media outlets reporting on environmental issues were targeted
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Missing Voices (Land and Environmental Defenders report)
+    publisher: Global Witness
+    year: '2024'
+    url: https://globalwitness.org/documents/20688/Global_Witness_Land_and_Environmental_Defenders_2024_report.pdf
+    locator: p. 14
+    quote: In 2023, we documented 196 defender killings.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The investigation traces gold from an unlicensed mine on Indigenous land.
+  cases:
+  - name: Berta Cáceres (Honduras)
+    year: '2016'
+    jurisdiction: Honduras
+    what_happened: Environmental defender opposing a dam was murdered. Roberto David Castillo, president
+      of DESA, the company building the dam, was convicted in 2021 as a co-collaborator and sentenced
+      in June 2022 to 22 years and six months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.ncronline.org/news/environment/former-business-exec-gets-225-years-role-berta-c-ceres-murder
+    source_title: 'NCR: Former business exec gets 22.5 years for role in Berta Cáceres murder'
+  data_needed:
+  - Company (operator)
+  - Ownership
+  - Contract / licence Documents
+  - Address (site)
+  - Person (local defenders, sources)
+  checkable: records
+  lookup_sources:
+  - Mining cadastres and concession maps
+  - Global Witness defenders data
+  - UNESCO report 'Press and planet in danger'
+  - Satellite imagery
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EN
+    reason: Mining was 'the biggest industry driver by far' of defender killings in 2023, so mining-related
+      findings raise risk.
+    source_url: https://globalwitness.org/documents/20688/Global_Witness_Land_and_Environmental_Defenders_2024_report.pdf
+  innocent_explanations:
+  - Many environmental stories are policy or science reporting with little local conflict.
+  - Risk is concentrated in specific countries and remote sites, not the topic everywhere.
+  jurisdictions: Global
+  version: 1
+- id: SA-010
+  name: Subject is a state, its security services or a government that reaches critics abroad
+  definition: The investigation targets a government, intelligence service or ruler who has used violence,
+    abduction, spyware or pressure on family against critics, including outside its own borders.
+  areas:
+  - HR
+  - SA
+  status: verified
+  sources:
+  - title: Transnational Repression
+    publisher: Freedom House
+    url: https://freedomhouse.org/report/transnational-repression
+    locator: Definition
+    quote: governments reaching across borders to silence dissent among diasporas and exiles.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Agnes Callamard Q&A: ‘Saudi is responsible for Khashoggi murder’'
+    publisher: Al Jazeera (reporting the UN Special Rapporteur's report)
+    year: '2019'
+    url: https://www.aljazeera.com/news/2019/6/19/agnes-callamard-qa-saudi-is-responsible-for-khashoggi-murder
+    locator: Article summary of UN report
+    quote: constituted an extrajudicial killing for which the State of the Kingdom of Saudi Arabia is
+      responsible.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An exiled reporter investigates the finances of their home country's ruling family.
+  cases:
+  - name: Jamal Khashoggi
+    year: '2018'
+    jurisdiction: Türkiye / Saudi Arabia (UN inquiry)
+    what_happened: Journalist killed in the Saudi consulate in Istanbul. The UN Special Rapporteur found
+      an extrajudicial killing for which the State of Saudi Arabia is responsible, and said senior officials
+      including the crown prince should be investigated; she said she found no evidence of who ordered
+      it.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.aljazeera.com/news/2019/6/19/agnes-callamard-qa-saudi-is-responsible-for-khashoggi-murder
+    source_title: 'Al Jazeera: Agnes Callamard Q&A'
+  data_needed:
+  - Organization / PublicBody (the agency)
+  - Person (officials)
+  - Event (prior attacks on critics)
+  - Family (relatives still in the country)
+  - Passport (mobility controls)
+  checkable: lookups
+  lookup_sources:
+  - Freedom House transnational repression data
+  - UN Special Procedures reports
+  - Citizen Lab reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HR
+    reason: Evidence that a state targets critics abroad is both a human-rights finding and a danger sign
+      for anyone investigating that state.
+    source_url: https://freedomhouse.org/report/transnational-repression
+  innocent_explanations:
+  - Many governments are criticised by the press without any reprisal.
+  - Visa or passport problems can have ordinary administrative causes.
+  jurisdictions: Global
+  version: 1
+- id: SA-011
+  name: Armed groups, militants or anti-government groups are involved
+  definition: The subject or its protectors include armed or terrorist groups, which CPJ found responsible
+    for a large share of journalist murders.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: 'CPJ Journalist Security Guide: Sustained Risks'
+    publisher: Committee to Protect Journalists
+    year: '2012'
+    url: https://cpj.org/reports/2012/04/sustained-risks/
+    locator: Sustained Risks chapter
+    quote: Antigovernment groups, including terrorists, are responsible for nearly one-third of all journalist
+      murders, according to CPJ research.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Murders of journalists more than double worldwide
+    publisher: Committee to Protect Journalists
+    year: '2020'
+    url: https://cpj.org/reports/2020/12/murders-journalists-more-than-doubled-killed/
+    locator: Afghanistan section
+    quote: Militant groups targeted at least four journalists for murder in retaliation for their work
+      in Afghanistan.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The investigation finds a militia taxes the smuggling route under study.
+  cases: []
+  data_needed:
+  - Organization
+  - Membership
+  - Sanction (terrorist listings)
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - UN, EU and national terrorist sanctions lists
+  - ACLED conflict event data
+  - CPJ database
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Presence of an armed group in a region does not mean it is linked to this subject.
+  jurisdictions: Global
+  version: 1
+- id: SA-012
+  name: The threatening group has the organisation, history of violence and means to act
+  definition: A threat assessment of the person or group that could harm the investigator or witness shows
+    where the threat comes from, a pattern of violence, an organised structure and the means to carry
+    it out.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Good Practices for the Protection of Witnesses in Criminal Proceedings Involving Organized
+      Crime
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/documents/organized-crime/Witness-protection-manual-Feb08.pdf
+    locator: Chapter on admission, C. Criteria for admission, threat assessment item (d), p. 62
+    quote: The group’s capacity, knowledge and available means to carry out threats.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Risk assessment: getting started and security protocol'
+    publisher: Rory Peck Trust
+    url: https://rorypecktrust.org/get-help/safety/risk-assessment/getting-started-and-security-protocol/
+    locator: Getting started
+    quote: identify and assess the range of threats and risks to you, your colleagues and contributors
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A gang with a record of shooting informers knows where the source lives.
+  cases: []
+  data_needed:
+  - Organization / Person (origin of threat)
+  - Event (pattern of violence)
+  - Address (what the group knows)
+  - Note (assessment)
+  checkable: person
+  lookup_sources:
+  - Police and court records
+  - Local journalists and NGOs (Rory Peck advises consulting them)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A group with violent history may have no interest in this story.
+  - Bluster and threats are sometimes made without intent or capacity.
+  jurisdictions: Global
+  version: 1
+- id: SA-013
+  name: Direct threats or warnings to the investigator
+  definition: The investigator receives death threats, warnings to stop, or messages showing someone is
+    watching them.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Marked for Death
+    publisher: Committee to Protect Journalists
+    year: '2005'
+    url: https://cpj.org/reports/2005/05/murderous-05.php
+    locator: Colombia section
+    quote: at least eight received death threats and warnings before being gunned down.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Recommendation CM/Rec(2016)4 on the protection of journalism and safety of journalists
+    publisher: Council of Europe Committee of Ministers
+    year: '2016'
+    url: https://rm.coe.int/09000016806415d9
+    locator: Recommendation, para. 1
+    quote: threatened, harassed, subjected to surveillance, intimidated, arbitrarily deprived of their
+      liberty, physically attacked
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An anonymous call says 'stop writing about the port or your family pays'.
+  cases:
+  - name: Anna Politkovskaya (Russia)
+    year: '2006'
+    jurisdiction: Russia
+    what_happened: Journalist covering Chechnya had been threatened, jailed, forced into exile and poisoned
+      before she was shot. In 2014 a Moscow jury convicted the gunman Rustam Makhmudov and organiser Lom-Ali
+      Gaitukayev (life sentences) and three others; no one was tried as the suspected mastermind.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://cpj.org/data/people/anna-politkovskaya/
+    source_title: 'CPJ: Anna Politkovskaya'
+  data_needed:
+  - Message / Email / Call (the threat)
+  - UserAccount (sender)
+  - Person
+  - Event (date received)
+  - Document (screenshots, recordings)
+  checkable: records
+  lookup_sources:
+  - Council of Europe Safety of Journalists Platform
+  - Mapping Media Freedom
+  - Police reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Angry readers send abuse without intent to act.
+  - Threats may come from unrelated disputes.
+  jurisdictions: Global
+  version: 1
+- id: SA-014
+  name: Physical surveillance or being followed
+  definition: The investigator, a source or a witness notices being watched or followed, which CPJ says
+    often comes before a violent attack.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: 'CPJ Journalist Security Guide: Sustained Risks'
+    publisher: Committee to Protect Journalists
+    year: '2012'
+    url: https://cpj.org/reports/2012/04/sustained-risks/
+    locator: Sustained Risks chapter
+    quote: Physical surveillance of individual journalists often precedes violent attacks.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The same car is parked outside the reporter's home on several nights.
+  - A stranger photographs the source leaving the newsroom.
+  cases: []
+  data_needed:
+  - Event (sightings, dates, places)
+  - Vehicle (plates)
+  - Person (unknown watchers)
+  - Address
+  - Document (photos)
+  checkable: person
+  lookup_sources:
+  - Vehicle registration lookups (where lawful)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Coincidence or heightened anxiety can make ordinary activity look like surveillance.
+  - Police may be watching someone else nearby.
+  jurisdictions: Global
+  version: 1
+- id: SA-015
+  name: Threats or pressure on family members or people close to the investigator or witness
+  definition: Relatives or close contacts are threatened, questioned, harassed or harmed, a known way
+    to pressure someone without reaching them directly.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Transnational Repression
+    publisher: Freedom House
+    url: https://freedomhouse.org/report/transnational-repression
+    locator: Long Distance Threats (includes coercion-by-proxy, family intimidation)
+    quote: do not require physically reaching the individual targeted.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'CPJ Journalist Security Guide: Sustained Risks'
+    publisher: Committee to Protect Journalists
+    year: '2012'
+    url: https://cpj.org/reports/2012/04/sustained-risks/
+    locator: Sustained Risks chapter
+    quote: There may be no greater fear than believing your family members are at risk.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Police visit the exiled reporter's parents and ask about her stories.
+  cases:
+  - name: Griselda Triana (widow of Javier Valdez)
+    year: '2017'
+    jurisdiction: Mexico
+    what_happened: Citizen Lab found she was targeted with Pegasus spyware eleven days after her husband
+      was killed, a week after attempts against two of his colleagues.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://citizenlab.ca/2019/03/nso-spyware-slain-journalists-wife/
+    source_title: 'Citizen Lab: Reckless VII'
+  data_needed:
+  - Family
+  - Person
+  - Event
+  - Address
+  checkable: person
+  lookup_sources:
+  - Freedom House transnational repression data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family may be in a legal dispute or under investigation for unrelated reasons.
+  jurisdictions: Global
+  version: 1
+- id: SA-016
+  name: A powerful person publicly names the investigator and calls for harm
+  definition: A politician, official or media owner shows the investigator's face or details in public
+    and urges people to attack them.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Ahmed Hussein-Suale Divela (database entry)
+    publisher: Committee to Protect Journalists
+    url: https://cpj.org/data/people/ahmed-hussein-suale-divela/
+    locator: Case summary (quoting Kennedy Agyapong on Net 2 TV, May 2018)
+    quote: I'm telling you, beat him,
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Recommendation CM/Rec(2016)4
+    publisher: Council of Europe Committee of Ministers
+    year: '2016'
+    url: https://rm.coe.int/09000016806415d9
+    locator: Appendix I, Guidelines, para. 15
+    quote: State officials and public figures should not undermine or attack the integrity of journalists
+      and other media actors
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A minister posts a reporter's photo calling her a foreign agent.
+  cases:
+  - name: Ahmed Hussein-Suale Divela (Ghana)
+    year: '2019'
+    jurisdiction: Ghana
+    what_happened: Undercover journalist on the Tiger Eye football-corruption film was shot dead in January
+      2019 after politician Kennedy Agyapong broadcast his image and urged violence. A former colleague
+      was charged in 2025 and discharged for lack of evidence; no one has been held accountable.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://cpj.org/data/people/ahmed-hussein-suale-divela/
+    source_title: 'CPJ: Ahmed Hussein-Suale Divela'
+  data_needed:
+  - Person (speaker)
+  - Article / Mention / Message (the statement)
+  - UserAccount
+  - Event
+  checkable: records
+  lookup_sources:
+  - Broadcast archives
+  - Social media archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Public criticism of journalism is legitimate when it does not incite harm or reveal private details.
+  jurisdictions: Global
+  version: 1
+- id: SA-017
+  name: Coordinated smear or disinformation campaign against the investigator
+  definition: Many accounts or outlets attack the investigator's reputation at once, often with false
+    claims, which can prepare the ground for further attacks.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: 'Digital Safety: Protecting against online harassment'
+    publisher: Committee to Protect Journalists
+    year: '2018'
+    url: https://cpj.org/2018/11/digital-safety-protecting-against-online-harassment/
+    locator: Section on orchestrated smear campaigns
+    quote: ascertain who is behind the attack and their motives.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'The Chilling: global study of online violence against women journalists'
+    publisher: ICFJ / UNESCO
+    url: https://www.icfj.org/our-work/chilling-global-study-online-violence-against-women-journalists
+    locator: Key findings
+    quote: One in five women respondents (20%) said they had been attacked or abused offline in incidents
+      seeded online.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Dozens of new accounts post the same edited image of the reporter within an hour.
+  cases: []
+  data_needed:
+  - UserAccount
+  - Message
+  - Article / Mention
+  - Organization (outlets)
+  - Event (timing relative to publication)
+  checkable: lookups
+  lookup_sources:
+  - Social media monitoring tools
+  - Platform transparency reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A story can go viral and draw many genuine critics at once.
+  jurisdictions: Global
+  version: 1
+- id: SA-018
+  name: Online abuse escalating, including doxxing (home address or private details posted)
+  definition: Online harassment grows over time or includes publishing the person's address or private
+    information with calls to act, signs that online abuse may become physical.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: 'Digital Safety: Protecting against online harassment'
+    publisher: Committee to Protect Journalists
+    year: '2018'
+    url: https://cpj.org/2018/11/digital-safety-protecting-against-online-harassment/
+    locator: Monitoring section
+    quote: Review your social media accounts for comments that may indicate that an online threat may
+      escalate into a physical attack.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: The Chilling
+    publisher: ICFJ / UNESCO
+    url: https://www.icfj.org/our-work/chilling-global-study-online-violence-against-women-journalists
+    locator: Key findings
+    quote: Nearly three in four women respondents (73%) said they had experienced online violence.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A forum thread posts the reporter's street and asks who lives nearby.
+  cases: []
+  data_needed:
+  - UserAccount
+  - Message
+  - Address (exposed)
+  - Event (dates, to show escalation)
+  - Document (screenshots)
+  checkable: records
+  lookup_sources:
+  - Data-broker and people-search sites (to see what is exposed)
+  - Company and property registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Addresses can be public in property or company records and shared without malice.
+  - A spike in comments may follow any widely read story.
+  jurisdictions: Global
+  version: 1
+- id: SA-019
+  name: Earlier physical attack, poisoning or attempt on the investigator
+  definition: The investigator has already been assaulted, poisoned, shot at or had an attack attempted,
+    showing intent and capacity.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Anna Politkovskaya (database entry)
+    publisher: Committee to Protect Journalists
+    url: https://cpj.org/data/people/anna-politkovskaya/
+    locator: Case summary
+    quote: threatened, jailed, forced into exile, and poisoned.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Ten years on: Safety of Journalists Platform issued 2,000 alerts'
+    publisher: Council of Europe
+    year: '2025'
+    url: https://www.coe.int/en/web/portal/-/ten-years-on-safety-of-journalists-platform-issued-2-000-alerts-on-serious-threats-to-media-freedom
+    locator: Alert categories
+    quote: attacks on the physical safety and integrity of journalists.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The reporter's car brakes were cut a month after the first story.
+  cases: []
+  data_needed:
+  - Event
+  - Person
+  - Document (medical, police reports)
+  checkable: records
+  lookup_sources:
+  - Council of Europe Safety of Journalists Platform
+  - Police reports
+  - Medical records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Street crime, accidents and illness can be unrelated to the work.
+  jurisdictions: Global
+  version: 1
+- id: SA-020
+  name: Lawsuit with a disproportionate or excessive claim
+  definition: The subject sues the investigator for damages or remedies far out of proportion to the alleged
+    harm, an EU-listed sign of an abusive lawsuit (SLAPP).
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Directive (EU) 2024/1069 on protecting persons who engage in public participation from manifestly
+      unfounded claims or abusive court proceedings
+    publisher: European Union (Official Journal)
+    year: '2024'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202401069
+    locator: Article 4(3)(a)
+    quote: the disproportionate, excessive or unreasonable nature of the claim or part thereof, including
+      the excessive dispute value;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Council of Europe adopts Recommendation on countering the use of SLAPPs
+    publisher: Council of Europe
+    year: '2024'
+    url: https://www.coe.int/en/web/freedom-expression/-/council-of-europe-adopts-recommendation-on-countering-the-use-of-slapps
+    locator: Description of CM/Rec(2024)2 indicators
+    quote: disproportionate, excessive or unreasonable remedies
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A businessman demands 10 million euros from a freelance reporter over one article.
+  cases: []
+  data_needed:
+  - CourtCase (claim value, remedies)
+  - CourtCaseParty
+  - Person / Company (claimant)
+  - Document (pleadings)
+  checkable: records
+  lookup_sources:
+  - Court dockets
+  - CASE coalition SLAPP database
+  - Council of Europe Safety of Journalists Platform
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets indication (a) of Article 4(3) of Directive (EU) 2024/1069 as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The claimant may have suffered real loss from false reporting.
+  - High claims are routine in some legal systems.
+  jurisdictions: European Union (directive); Council of Europe member states (recommendation); concept
+    used globally
+  version: 1
+- id: SA-021
+  name: Multiple lawsuits by the same claimant or associates over similar matters
+  definition: The investigator faces several cases from the subject or people linked to them about the
+    same reporting, which drains time and money.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Directive (EU) 2024/1069
+    publisher: European Union (Official Journal)
+    year: '2024'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202401069
+    locator: Article 4(3)(b)
+    quote: the existence of multiple proceedings initiated by the claimant or associated parties in relation
+      to similar matters;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: SLAPP, Daphne Caruana Galizia, Malta
+    publisher: Columbia Journalism Review
+    url: https://www.cjr.org/analysis/slapp-daphne-caruana-galizia-malta.php
+    locator: On the 42 civil libel suits open at her death
+    quote: most of them brought by Maltese politicians and their business associates.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A minister and his aide each file separate libel suits over the same article.
+  cases:
+  - name: Lawsuits against Daphne Caruana Galizia
+    year: '2017'
+    jurisdiction: Malta
+    what_happened: At her death 42 civil libel suits were open against her, mostly by Maltese politicians
+      and their business associates, including four by the economy minister and his aide; Pilatus Bank
+      filed suit in US courts.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.cjr.org/analysis/slapp-daphne-caruana-galizia-malta.php
+    source_title: 'CJR: SLAPP, Daphne Caruana Galizia, Malta'
+  data_needed:
+  - CourtCase
+  - CourtCaseParty
+  - Associate / Employment (links between claimants)
+  - Representation (shared lawyers)
+  checkable: records
+  lookup_sources:
+  - Court dockets in all jurisdictions where the claimant operates
+  - CASE coalition SLAPP data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets indication (b) of Article 4(3) of Directive (EU) 2024/1069 as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Clusters of suits from politicians and their business associates can map the network the journalist
+      was exposing.
+    source_url: https://www.cjr.org/analysis/slapp-daphne-caruana-galizia-malta.php
+  innocent_explanations:
+  - Several people may each have been genuinely named and harmed by a story.
+  jurisdictions: European Union (directive); concept used globally
+  version: 1
+- id: SA-022
+  name: Claimant or their lawyers intimidate the investigator before or during proceedings
+  definition: Threatening legal letters, harassment or pressure from the claimant or their representatives
+    accompany the lawsuit.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Directive (EU) 2024/1069
+    publisher: European Union (Official Journal)
+    year: '2024'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202401069
+    locator: Article 4(3)(c)
+    quote: intimidation, harassment or threats on the part of the claimant or the claimant’s representatives,
+      before or during the proceedings, as well as similar conduct by the claimant in similar or concurrent
+      cases;
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A law firm writes to the reporter's family warning of ruin if the story runs.
+  cases: []
+  data_needed:
+  - Document / Email (letters)
+  - Representation (claimant's lawyers)
+  - CourtCase
+  checkable: records
+  lookup_sources:
+  - Court records
+  - CASE coalition
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets indication (c) of Article 4(3) of Directive (EU) 2024/1069 as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A firm but proper pre-action letter is a normal legal step.
+  jurisdictions: European Union (directive); concept used globally
+  version: 1
+- id: SA-023
+  name: 'Bad-faith procedural tactics: delay, forum shopping, late withdrawal'
+  definition: The claimant drags out the case, files in a far-off or costly court, or drops the case late
+    to maximise cost and stress.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Directive (EU) 2024/1069
+    publisher: European Union (Official Journal)
+    year: '2024'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202401069
+    locator: Article 4(3)(d)
+    quote: the use in bad faith of procedural tactics, such as delaying proceedings, fraudulent or abusive
+      forum shopping or the discontinuation of cases at a later stage of the proceedings in bad faith.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Council of Europe adopts Recommendation on countering the use of SLAPPs
+    publisher: Council of Europe
+    year: '2024'
+    url: https://www.coe.int/en/web/freedom-expression/-/council-of-europe-adopts-recommendation-on-countering-the-use-of-slapps
+    locator: Description of CM/Rec(2024)2 indicators
+    quote: the engagement in delaying tactics
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A company sues a Maltese reporter in a US court.
+  cases: []
+  data_needed:
+  - CourtCase (venue, dates, filings)
+  - CourtCaseParty
+  - Address (parties' locations vs court)
+  checkable: records
+  lookup_sources:
+  - Court dockets in several jurisdictions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets indication (d) of Article 4(3) of Directive (EU) 2024/1069 as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Delays often come from court backlogs.
+  - Filing abroad may be legitimate where the publication was read there.
+  jurisdictions: European Union (directive); concept used globally
+  version: 1
+- id: SA-024
+  name: Criminal charges against the investigator (criminal defamation, cyber libel, false news, terrorism,
+    anti-state)
+  definition: Authorities open criminal cases against the investigator using defamation, anti-terror or
+    'false news' laws, which the Council of Europe and CPJ identify as tools for silencing journalists.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Recommendation CM/Rec(2016)4
+    publisher: Council of Europe Committee of Ministers
+    year: '2016'
+    url: https://rm.coe.int/09000016806415d9
+    locator: Appendix II, Principles, para. 36 (on defamation, anti-terrorism and similar laws)
+    quote: can prove effective as means of intimidating and silencing journalists and other media actors
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Attacks on the Press in 2024
+    publisher: Committee to Protect Journalists
+    year: '2025'
+    url: https://cpj.org/2025/01/attacks-on-the-press-in-2024/
+    locator: Prison census
+    quote: More than 65% of imprisoned journalists in the census face anti-state charges, such as false
+      news and terrorism
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A reporter is charged with 'spreading false information' after publishing a ministry's contracts.
+  cases:
+  - name: Maria Ressa cyber libel case (Philippines)
+    year: '2020'
+    jurisdiction: Philippines
+    what_happened: A Manila court convicted the Rappler editor of cyber libel with a sentence of up to
+      six years; CPJ called it an attack on press freedom. She was on bail pending appeal.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://cpj.org/2020/06/rappler-editor-maria-ressa-convicted-of-cyber-libel-by-philippines-court/
+    source_title: 'CPJ: Maria Ressa convicted of cyber libel'
+  data_needed:
+  - CourtCase
+  - CourtCaseParty
+  - Person
+  - Article (the reporting at issue)
+  checkable: records
+  lookup_sources:
+  - Court records
+  - CPJ prison census
+  - Council of Europe Safety of Journalists Platform
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The charge may concern conduct unrelated to journalism.
+  - Reporting may in fact have been defamatory.
+  jurisdictions: Global
+  version: 1
+- id: SA-025
+  name: Spyware infection or infection attempt on the investigator's or source's phone
+  definition: Forensic checks find mercenary spyware such as Pegasus or Predator, or the person received
+    messages with malicious links designed to install it.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: 'Bitter Sweet: Supporters of Mexico’s Soda Tax Targeted With NSO Exploit Links'
+    publisher: Citizen Lab
+    year: '2017'
+    url: https://citizenlab.ca/2017/02/bittersweet-nso-mexico-spyware/
+    locator: Key findings
+    quote: The targets received messages with malicious links
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: The Kingdom Came to Canada
+    publisher: Citizen Lab
+    year: '2018'
+    url: https://citizenlab.ca/2018/10/the-kingdom-came-to-canada-how-saudi-linked-digital-espionage-reached-canadian-soil/
+    locator: Key findings
+    quote: We assess with high confidence that Abdulaziz’s phone was infected with NSO’s Pegasus spyware.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Forensic Methodology Report: How to catch NSO Group''s Pegasus'
+    publisher: Amnesty International Security Lab
+    year: '2021'
+    url: https://www.amnesty.org/en/wp-content/uploads/2021/08/DOC1044872021ENGLISH.pdf
+    locator: Introduction
+    quote: Zero-click attacks have been observed since May 2018 and continue until now.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The reporter gets an SMS about a 'court summons' with a short link from an unknown number.
+  cases:
+  - name: Thanasis Koukakis (Greece)
+    year: '2021'
+    jurisdiction: Greece
+    what_happened: Citizen Lab found his phone was compromised with Predator between 12 July and 24 September
+      2021 via a text message link; it could not confirm whether the government or a private company used
+      it.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://ipi.media/greece-journalist-thanasis-koukakis-surveilled-for-10-weeks-with-powerful-new-spyware-tool/
+    source_title: 'IPI: Koukakis surveilled for 10 weeks'
+  - name: Omar Abdulaziz (Canada)
+    year: '2018'
+    jurisdiction: Canada
+    what_happened: Citizen Lab assessed with high confidence that the Saudi dissident's phone was infected
+      with Pegasus.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://citizenlab.ca/2018/10/the-kingdom-came-to-canada-how-saudi-linked-digital-espionage-reached-canadian-soil/
+    source_title: 'Citizen Lab: The Kingdom Came to Canada'
+  data_needed:
+  - Message (suspicious links)
+  - UserAccount
+  - Document (forensic report)
+  - Event (dates of infection)
+  checkable: lookups
+  lookup_sources:
+  - Citizen Lab
+  - Amnesty Security Lab
+  - Access Now Digital Security Helpline
+  - Mobile Verification Toolkit (MVT)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Infection confirmed by forensic analysis (for example Citizen Lab or Amnesty Security Lab
+      using published methods such as MVT)
+    threshold_source: https://www.amnesty.org/en/wp-content/uploads/2021/08/DOC1044872021ENGLISH.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary phishing and scam messages are very common and not state-sponsored.
+  - Phone glitches or battery drain have many ordinary causes.
+  jurisdictions: Global
+  version: 1
+- id: SA-026
+  name: Official spyware threat notification received
+  definition: A phone or platform company warns the user they may have been individually targeted by mercenary
+    spyware.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: About Apple threat notifications and protecting against mercenary spyware
+    publisher: Apple
+    url: https://support.apple.com/en-us/102174
+    locator: Overview
+    quote: may have been individually targeted by mercenary spyware attacks.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The reporter gets an Apple threat notification by email and iMessage.
+  cases: []
+  data_needed:
+  - Email / Message (the notification)
+  - Event (date)
+  - Person
+  checkable: records
+  lookup_sources:
+  - Apple, Google or Meta account security notices
+  - Access Now Digital Security Helpline
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Apple says its investigations cannot reach absolute certainty.
+  - Fake 'notifications' are sometimes used as phishing; check it is genuine.
+  jurisdictions: Global
+  version: 1
+- id: SA-027
+  name: Colleagues or relatives of a killed or threatened journalist are targeted next
+  definition: After a journalist is attacked, their colleagues, family or collaborators become targets
+    of surveillance or threats, showing the attacker is still active and watching the story.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: 'Reckless VII: Wife of Journalist Slain in Cartel-Linked Killing Targeted with NSO Group’s
+      Spyware'
+    publisher: Citizen Lab
+    year: '2019'
+    url: https://citizenlab.ca/2019/03/nso-spyware-slain-journalists-wife/
+    locator: Key findings
+    quote: Triana was targeted a week after infection attempts against two of Valdez's colleagues, Andrés
+      Villarreal and Ismael Bojórquez.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The editor of a murdered reporter receives spyware links a week after the funeral.
+  cases:
+  - name: Colleagues and widow of Javier Valdez
+    year: '2017'
+    jurisdiction: Mexico
+    what_happened: Citizen Lab found Andrés Villarreal and Ismael Bojórquez of Riodoce received Pegasus
+      infection attempts, and Valdez's widow Griselda Triana was targeted eleven days after his murder.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://citizenlab.ca/2019/03/nso-spyware-slain-journalists-wife/
+    source_title: 'Citizen Lab: Reckless VII'
+  data_needed:
+  - Person
+  - Employment (colleagues)
+  - Family
+  - Message
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Citizen Lab
+  - Amnesty Security Lab
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - High-profile killings draw scammers and ordinary harassers to those close to the victim.
+  jurisdictions: Global
+  version: 1
+- id: SA-028
+  name: Investigator's number on a leaked target list, or subject's government is a known spyware customer
+  definition: The investigator or a source appears on a leaked list of surveillance targets, or the government
+    linked to the subject has been identified by researchers as a customer of mercenary spyware.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: 'The Pegasus Project: a worldwide collaboration to counter a global crime'
+    publisher: Forbidden Stories
+    year: '2021'
+    url: https://forbiddenstories.org/the-pegasus-project-a-worldwide-collaboration-to-counter-a-global-crime/
+    locator: Project overview
+    quote: almost 200 journalists from nearly two dozen countries
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Pegasus vs. Predator: Dissident’s Doubly-Infected iPhone Reveals Cytrox Mercenary Spyware'
+    publisher: Citizen Lab
+    year: '2021'
+    url: https://citizenlab.ca/2021/12/pegasus-vs-predator-dissidents-doubly-infected-iphone-reveals-cytrox-mercenary-spyware/
+    locator: Customer identification section
+    quote: 'we conclude that these governments are likely among Cytrox’s customers: Armenia, Egypt, Greece,'
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The Pegasus Project data shows the source's number selected by a client in the subject's country.
+  cases:
+  - name: Cecilio Pineda's number in Pegasus Project data
+    year: '2017'
+    jurisdiction: Mexico
+    what_happened: Forbidden Stories reported his number was selected for surveillance by a Mexican NSO
+      client several weeks before he was murdered; his phone could not be analysed.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://forbiddenstories.org/?p=10760
+    source_title: 'Forbidden Stories: Cecilio Pineda'
+  data_needed:
+  - Person
+  - UserAccount / phone identifiers
+  - Document (leaked list entry)
+  - Organization (spyware vendor, government client)
+  checkable: lookups
+  lookup_sources:
+  - Citizen Lab and Amnesty Security Lab reports
+  - Forbidden Stories Pegasus Project
+  - Government procurement records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Appearing on a selection list does not prove infection.
+  - Being in a customer country does not mean the investigator is targeted.
+  jurisdictions: Global
+  version: 1
+- id: SA-029
+  name: State intelligence or police monitoring of the journalist reported
+  definition: Credible reporting or official records show security services monitored the journalist's
+    communications or movements, which can expose sources.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Recommendation CM/Rec(2016)4
+    publisher: Council of Europe Committee of Ministers
+    year: '2016'
+    url: https://rm.coe.int/09000016806415d9
+    locator: Appendix II, Principles, para. 38 (on surveillance)
+    quote: undermine the protection of journalists' sources
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Greece: Journalist Thanasis Koukakis surveilled for 10 weeks with powerful new spyware tool'
+    publisher: International Press Institute
+    url: https://ipi.media/greece-journalist-thanasis-koukakis-surveilled-for-10-weeks-with-powerful-new-spyware-tool/
+    locator: On Stavros Malichudis
+    quote: Revelations published by Greek newspaper Efimerida ton Syntakton (EFSYN) indicated the EYP
+      had secretly been conducting monitoring of Malichudis.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Leaked intelligence documents list the reporter's sources' meetings.
+  cases:
+  - name: Stavros Malichudis (Greece)
+    year: '2021'
+    jurisdiction: Greece
+    what_happened: EFSYN reported that the Greek intelligence service EYP secretly monitored the journalist;
+      authorities defended EYP's work.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://ipi.media/greece-journalist-thanasis-koukakis-surveilled-for-10-weeks-with-powerful-new-spyware-tool/
+    source_title: IPI
+  data_needed:
+  - Organization (agency)
+  - Document (warrants, leaked records)
+  - Person
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Data-protection authority decisions
+  - Parliamentary inquiries
+  - Freedom-of-information requests
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The journalist may be incidentally recorded in lawful surveillance of another person.
+  jurisdictions: Global
+  version: 1
+- id: SA-030
+  name: Witness or source is an insider cooperating against an organised group
+  definition: The person helping is a former member or associate of the group (a 'collaborator of justice'
+    or crown witness), the kind of witness organised groups most want to silence.
+  areas:
+  - OC
+  - SA
+  status: verified
+  sources:
+  - title: Good Practices for the Protection of Witnesses in Criminal Proceedings Involving Organized
+      Crime
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/documents/organized-crime/Witness-protection-manual-Feb08.pdf
+    locator: C. Criteria for admission, item (c), p. 61
+    quote: The danger that the witness, typically a former collaborator of the defendant, may pose to
+      the public if relocated under a new identity;
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: 'Netherlands: RSF and FPU welcome convictions for the killing of journalist Peter R. de Vries'
+    publisher: Reporters Without Borders
+    year: '2024'
+    url: https://rsf.org/en/netherlands-rsf-and-fpu-welcome-convictions-killing-journalist-peter-r-de-vries
+    locator: Background
+    quote: crown witness Nabil B. in the Marengo trial
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A former accountant of the cartel's front company agrees to talk.
+  cases:
+  - name: Nabil B. (Marengo trial)
+    year: 2018-2021
+    jurisdiction: Netherlands
+    what_happened: After he became a crown witness, his brother (2018), his lawyer Derk Wiersum (2019)
+      and his adviser Peter R. de Vries (2021) were killed; the first two killings are described by RSF
+      as reprisals for his cooperation, and Wiersum's killers were convicted.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.euronews.com/2021/10/11/two-men-found-guilty-of-murdering-dutch-lawyer-linked-to-organised-crime-trial
+    source_title: 'Euronews: Two men found guilty of murdering Dutch lawyer'
+  data_needed:
+  - Person
+  - Membership / Employment (past role in the group)
+  - Associate
+  - CourtCase (cooperation agreement)
+  checkable: person
+  lookup_sources:
+  - Court records
+  - Prosecutor statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Insider witnesses are central to organised-crime prosecutions and are the most at risk.
+    source_url: https://www.unodc.org/documents/organized-crime/Witness-protection-manual-Feb08.pdf
+  innocent_explanations:
+  - Low-level former members may no longer be of interest to the group.
+  jurisdictions: Global
+  version: 1
+- id: SA-031
+  name: Witness or source reports threats, intimidation, harassment, assault or property damage
+  definition: A witness or source says they have been threatened, harassed, assaulted or had property
+    damaged, or simply fear reprisal, because they cooperated.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Good Practices for the Protection of Witnesses in Criminal Proceedings Involving Organized
+      Crime
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/documents/organized-crime/Witness-protection-manual-Feb08.pdf
+    locator: Key elements, 1. Target hardening, p. 29
+    quote: they suffer verbal threats, intimidation, harassment, assault, property damage or simply fear
+      of reprisal as a result of their cooperation with the police.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - A source's shop window is smashed the week after an interview.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Address
+  - Document (police report)
+  - Note (interview record)
+  checkable: person
+  lookup_sources:
+  - Police records
+  - Witness protection authorities
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Vandalism or disputes may be unrelated to the cooperation.
+  jurisdictions: Global
+  version: 1
+- id: SA-032
+  name: Witness is critical and irreplaceable, or the case could dismantle a criminal organisation
+  definition: The witness's evidence cannot be obtained elsewhere or the case threatens a whole organisation,
+    which UNODC lists among factors for admitting witnesses to protection programmes and which raises
+    the incentive to silence them.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Good Practices for the Protection of Witnesses in Criminal Proceedings Involving Organized
+      Crime
+    publisher: UNODC
+    year: '2008'
+    url: https://www.unodc.org/documents/organized-crime/Witness-protection-manual-Feb08.pdf
+    locator: C. Criteria for admission, items (d) and (e), p. 61
+    quote: The critical value of the witness’s trial testimony for the prosecution and the impossibility
+      of gaining such knowledge elsewhere;
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Only one person saw the payments being handed over.
+  cases: []
+  data_needed:
+  - Person
+  - Document (evidence only this person holds)
+  - CourtCase
+  - Organization (target group)
+  checkable: person
+  lookup_sources:
+  - Prosecutor and case records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Corroborating documents may reduce the value of silencing the witness.
+  jurisdictions: Global
+  version: 1
+- id: SA-033
+  name: Source could be identified from access, logs, devices or document traces
+  definition: Only a few people had access to the leaked material, or workplace logs, devices or document
+    metadata could point to who shared it.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: 'Threat modeling: sources module'
+    publisher: Freedom of the Press Foundation
+    url: https://freedom.press/digisec/blog/threat-modeling-sources-module/
+    locator: Module questions
+    quote: Are they using a workplace-provisioned device, or a personal device with workplace software
+      installed?
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Metadata 101
+    publisher: Freedom of the Press Foundation
+    url: https://freedom.press/digisec/blog/metadata-101/
+    locator: Opening definition
+    quote: Metadata is data about data.
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - The leaked PDF still contains the author's name and the department printer ID.
+  cases:
+  - name: Reality Winner (United States)
+    year: '2018'
+    jurisdiction: United States
+    what_happened: An NSA contractor printed a top-secret report and sent a hard copy to an online news
+      outlet; she was arrested on 3 June 2017, pleaded guilty and was sentenced to 63 months. The DOJ
+      release does not say how she was identified.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://justice.gov/opa/pr/federal-government-contractor-sentenced-removing-and-transmitting-classified-materials-news
+    source_title: US DOJ press release
+  data_needed:
+  - Document (with metadata properties)
+  - Person (source)
+  - Employment
+  - Email / Message
+  checkable: records
+  lookup_sources:
+  - Metadata inspection tools (for example ExifTool)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Metadata may have been stripped or may point to a widely shared template.
+  - Many people may have had access.
+  jurisdictions: Global
+  version: 1
+- id: SA-034
+  name: Authorities failed to act on a known risk to the investigator
+  definition: Police or the state knew of real and immediate danger to the journalist and did not protect
+    them, or senior officials fostered impunity.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Landmark public inquiry report finds Maltese State must shoulder responsibility for assassination
+    publisher: Reporters Without Borders
+    year: '2021'
+    url: https://rsf.org/en/landmark-public-inquiry-report-finds-maltese-state-must-shoulder-responsibility-assassination
+    locator: Inquiry findings (quoted)
+    quote: had failed to recognise the real and immediate risks to the life of Daphne Caruana Galizia.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Recommendation CM/Rec(2016)4
+    publisher: Council of Europe Committee of Ministers
+    year: '2016'
+    url: https://rm.coe.int/09000016806415d9
+    locator: Appendix I, Guidelines, para. 9
+    quote: State authorities have a duty to prevent or suppress offences against individuals when they
+      know
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - Police record five threat reports from a reporter and take no action.
+  cases:
+  - name: Public inquiry into the death of Daphne Caruana Galizia
+    year: '2021'
+    jurisdiction: Malta
+    what_happened: The public inquiry board found the State must shoulder responsibility, had created
+      an atmosphere of impunity, and failed to recognise the real and immediate risks to her life; it
+      found no proof the State itself took part in the killing.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://rsf.org/en/landmark-public-inquiry-report-finds-maltese-state-must-shoulder-responsibility-assassination
+    source_title: 'RSF: Landmark public inquiry report'
+  data_needed:
+  - Document (police reports, complaints)
+  - Organization (police unit)
+  - Event
+  checkable: records
+  lookup_sources:
+  - Official inquiries
+  - Ombudsman reports
+  - Council of Europe Safety of Journalists Platform
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Police may lack resources or may not have been told about the threat.
+  jurisdictions: Council of Europe member states (recommendation); concept used globally
+  version: 1
+- id: SA-035
+  name: Investigator is in exile or the subject's government restricts their movement
+  definition: The investigator has fled their country, or the subject's government revokes passports,
+    denies consular help or uses host-country police to reach them.
+  areas:
+  - SA
+  status: verified
+  sources:
+  - title: Transnational Repression
+    publisher: Freedom House
+    url: https://freedomhouse.org/report/transnational-repression
+    locator: Direct Attacks category; see also Mobility Controls and Co-opting Other Countries
+    quote: Origin country tactics that physically reach the individual targeted.
+    quote_verified: true
+    checked: '2026-10-08'
+  - title: Kenya court rules police unlawfully killed Pakistani journalist Arshad Sharif
+    publisher: Committee to Protect Journalists
+    year: '2024'
+    url: https://cpj.org/2024/07/kenya-court-rules-police-unlawfully-killed-pakistani-journalist-arshad-sharif/
+    locator: Background
+    quote: death threats over his reporting on corruption
+    quote_verified: true
+    checked: '2026-10-08'
+  examples:
+  - An exiled reporter's passport renewal is refused by the embassy.
+  cases: []
+  data_needed:
+  - Person
+  - Passport
+  - Address (country of residence)
+  - Event
+  - Organization (embassy, police)
+  checkable: person
+  lookup_sources:
+  - Freedom House transnational repression data
+  - Interpol notice challenges
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Consular delays and passport problems are common for ordinary reasons.
+  jurisdictions: Global
+  version: 1
+not_reached:
+- CASE coalition website and 2023/2024 SLAPP reports (the-case.eu and PDF fetch failed)
+- 'Council of Europe Recommendation CM/Rec(2024)2 full text: only 4 of its 10 SLAPP indicators were visible
+  on the press page; the other 6 are not included'
+- Mapping Media Freedom (mapmf.europeanjournalists.org blocked by robots.txt)
+- IFJ killed-journalists list (not opened)
+- UNESCO Observatory of Killed Journalists statistics page (gave no figures); UNESCO 2022 killings article
+  blocked by robots.txt
+- OHCHR Callamard Khashoggi report (fetch failed; Al Jazeera's report on it was used instead)
+- Amnesty Forensic Methodology web page (fetch failed); PDF read, but the Hatice Cengiz section did not
+  come through
+- CPJ Digital Safety Kit and Physical Safety solo-reporting pages (fetch failed or redirected)
+- IWMF safety and online-violence resources (not opened)
+- OCCRP safety guidance (not opened)
+- GIJN Investigating Organized Crime guide safety chapter (the announcement page had no safety content)
+- Freedom of the Press Foundation doxxing guide (not opened; CPJ used instead)
+- Global Witness 2025 report with 2024 data (only the 2024 report covering 2023 was read)
+- 'UNODC ''Good practices'' publication: read in full via the PDF; the unodc.org MENA mirror failed'
+- Saudi court verdicts in the Khashoggi case (not checked)

@@ -1,0 +1,410 @@
+{
+  "$defs": {
+    "Case": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "year": {
+          "title": "Year",
+          "type": "string"
+        },
+        "jurisdiction": {
+          "title": "Jurisdiction",
+          "type": "string"
+        },
+        "what_happened": {
+          "title": "What Happened",
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/Outcome"
+        },
+        "outcome_verified": {
+          "default": false,
+          "title": "Outcome Verified",
+          "type": "boolean"
+        },
+        "source_url": {
+          "title": "Source Url",
+          "type": "string"
+        },
+        "source_title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Title"
+        }
+      },
+      "required": [
+        "name",
+        "year",
+        "jurisdiction",
+        "what_happened",
+        "outcome",
+        "source_url"
+      ],
+      "title": "Case",
+      "type": "object"
+    },
+    "Checkable": {
+      "enum": [
+        "records",
+        "lookups",
+        "person"
+      ],
+      "title": "Checkable",
+      "type": "string"
+    },
+    "CrossHint": {
+      "additionalProperties": false,
+      "properties": {
+        "target_area": {
+          "title": "Target Area",
+          "type": "string"
+        },
+        "target_indicator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Indicator"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "source_url": {
+          "title": "Source Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "target_area",
+        "reason",
+        "source_url"
+      ],
+      "title": "CrossHint",
+      "type": "object"
+    },
+    "Indicator": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "definition": {
+          "title": "Definition",
+          "type": "string"
+        },
+        "areas": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Areas",
+          "type": "array"
+        },
+        "typology": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Typology"
+        },
+        "status": {
+          "$ref": "#/$defs/Status",
+          "default": "pending"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/Source"
+          },
+          "minItems": 1,
+          "title": "Sources",
+          "type": "array"
+        },
+        "examples": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Examples",
+          "type": "array"
+        },
+        "cases": {
+          "items": {
+            "$ref": "#/$defs/Case"
+          },
+          "title": "Cases",
+          "type": "array"
+        },
+        "data_needed": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Data Needed",
+          "type": "array"
+        },
+        "checkable": {
+          "$ref": "#/$defs/Checkable"
+        },
+        "lookup_sources": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Lookup Sources",
+          "type": "array"
+        },
+        "levels": {
+          "$ref": "#/$defs/Levels"
+        },
+        "threshold_verified": {
+          "default": false,
+          "title": "Threshold Verified",
+          "type": "boolean"
+        },
+        "cross_hints": {
+          "items": {
+            "$ref": "#/$defs/CrossHint"
+          },
+          "title": "Cross Hints",
+          "type": "array"
+        },
+        "innocent_explanations": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Innocent Explanations",
+          "type": "array"
+        },
+        "jurisdictions": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Jurisdictions"
+        },
+        "version": {
+          "default": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "definition",
+        "areas",
+        "sources",
+        "checkable",
+        "levels",
+        "innocent_explanations"
+      ],
+      "title": "Indicator",
+      "type": "object"
+    },
+    "Levels": {
+      "additionalProperties": false,
+      "properties": {
+        "faint": {
+          "title": "Faint",
+          "type": "string"
+        },
+        "strong": {
+          "title": "Strong",
+          "type": "string"
+        },
+        "textbook": {
+          "title": "Textbook",
+          "type": "string"
+        },
+        "threshold_source": {
+          "description": "URL of the source for any number in the levels, or 'none'",
+          "title": "Threshold Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "faint",
+        "strong",
+        "textbook",
+        "threshold_source"
+      ],
+      "title": "Levels",
+      "type": "object"
+    },
+    "Outcome": {
+      "description": "What a case's source establishes. Ordered from a court's finding to a\npublished allegation; an allegation is never shown as a finding.",
+      "enum": [
+        "convicted",
+        "acquitted",
+        "settled",
+        "fined_by_regulator",
+        "found_by_official_inquiry",
+        "alleged_in_reporting"
+      ],
+      "title": "Outcome",
+      "type": "string"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "publisher": {
+          "title": "Publisher",
+          "type": "string"
+        },
+        "year": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Year"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "locator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "page, section or paragraph",
+          "title": "Locator"
+        },
+        "quote": {
+          "minLength": 1,
+          "title": "Quote",
+          "type": "string"
+        },
+        "quote_verified": {
+          "default": false,
+          "title": "Quote Verified",
+          "type": "boolean"
+        },
+        "licence": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Licence"
+        },
+        "checked": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checked"
+        }
+      },
+      "required": [
+        "title",
+        "publisher",
+        "url",
+        "quote"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "Status": {
+      "enum": [
+        "verified",
+        "pending"
+      ],
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "key": {
+      "pattern": "^[A-Z]{2}$",
+      "title": "Key",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "scope": {
+      "title": "Scope",
+      "type": "string"
+    },
+    "indicators": {
+      "items": {
+        "$ref": "#/$defs/Indicator"
+      },
+      "title": "Indicators",
+      "type": "array"
+    },
+    "not_reached": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Not Reached",
+      "type": "array"
+    }
+  },
+  "required": [
+    "key",
+    "name",
+    "scope",
+    "indicators"
+  ],
+  "title": "Area",
+  "type": "object"
+}

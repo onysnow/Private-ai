@@ -13,7 +13,7 @@ from pathlib import Path
 
 import yaml  # type: ignore[import-untyped]  # stubs (types-PyYAML) not installed; ADR-0007
 
-from app.catalogue.models import Area, Glossary, Indicator, Status
+from app.catalogue.models import AREAS, Area, Glossary, Indicator, Status
 
 ROOT = Path(__file__).resolve().parents[3] / "catalogue"
 
@@ -28,7 +28,7 @@ class Catalogue:
         self.by_id = {i.id: i for a in self.areas for i in a.indicators}
 
     def area_names(self) -> set[str]:
-        return {a.key for a in self.areas} | {a.name for a in self.areas}
+        return set(AREAS) | set(AREAS.values()) | {a.key for a in self.areas} | {a.name for a in self.areas}
 
     def verified(self) -> list[Indicator]:
         return [i for a in self.areas for i in a.indicators if i.status is Status.verified]

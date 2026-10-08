@@ -16,6 +16,31 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 ID_PATTERN = re.compile(r"^[A-Z]{2}-\d{3}$")
 NUMBER = re.compile(r"\d")
+# References to a law, article or report carry digits that are not thresholds
+# ("Article 4(3) of Directive (EU) 2024/1069"); they are removed before looking
+# for a number that needs a source.
+REFERENCE = re.compile(
+    r"\b(?:Article|Art\.|Directive|Regulation|Recommendation|Rec|Section|s\.|paragraph|para\.|Annex|Rule|indicator|indication|point|item|principle|chapter|§)\s*(?:\(EU\)\s*)?[\w()./-]*\d[\w()./-]*",
+    re.IGNORECASE,
+)
+
+
+def has_threshold_number(*texts: str) -> bool:
+    """True when the text gives a quantity (a count, a share, an amount) rather
+    than only a reference to a law or report."""
+    return any(NUMBER.search(REFERENCE.sub("", text)) for text in texts)
+
+
+# Every area the catalogue covers. A cross-hint may point to any of them, even
+# before that area's file exists.
+AREAS: dict[str, str] = {
+    "ML": "Money laundering", "BO": "Hidden ownership and shell companies",
+    "SF": "Terrorist financing, proliferation financing and sanctions evasion", "FR": "Tax evasion and fraud",
+    "CO": "Corruption and influence", "PP": "Public procurement, non-profits and elections",
+    "HT": "Human trafficking and forced labour", "HR": "Human rights abuses, war crimes and cultural property",
+    "OC": "Organised crime and illicit goods", "EN": "Environmental crime", "IN": "Information integrity",
+    "CY": "Cybercrime and judging sources", "SA": "Safety of investigators, sources and witnesses",
+}
 
 
 class Strict(BaseModel):
@@ -76,7 +101,7 @@ class Levels(Strict):
 
     @model_validator(mode="after")
     def numbers_need_a_source(self) -> "Levels":
-        if any(NUMBER.search(text) for text in (self.faint, self.strong, self.textbook)) and self.threshold_source.strip().lower() in {"", "none"}:
+        if has_threshold_number(self.faint, self.strong, self.textbook) and self.threshold_source.strip().lower() in {"", "none"}:
             raise ValueError("a level gives a number but threshold_source names no source")
         return self
 
@@ -124,7 +149,7 @@ class Indicator(Strict):
             cases = [c.name for c in self.cases if not c.outcome_verified]
             if cases:
                 raise ValueError(f"{self.id} is verified but these case outcomes are not: {cases}")
-            if NUMBER.search(self.levels.faint + self.levels.strong + self.levels.textbook) and not self.threshold_verified:
+            if has_threshold_number(self.levels.faint, self.levels.strong, self.levels.textbook) and not self.threshold_verified:
                 raise ValueError(f"{self.id} is verified but its threshold numbers are not")
         return self
 
