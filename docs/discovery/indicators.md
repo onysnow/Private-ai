@@ -53,8 +53,13 @@ Status: proposed, 8 October 2026. The catalogue's data and tools exist (`catalog
 - **New sources** (for example the ILO's revised forced-labour indicators, newer FATF reports) are added by running the research step for that area again and reviewing the diff.
 - **Structured data where it exists.** The Open Contracting Partnership's 73 procurement red flags (with formulas and OCDS fields) and the DISARM framework (published as CSV, SQLite and STIX, CC-BY-SA-4.0) can be read in directly rather than retyped; each needs a licence note in the catalogue.
 
+## Alerts (decided by Ony, 9 October 2026)
+
+- Alerts are customisable per reporter.
+- **By default they stay inside the app:** an in-app notification, a small marker on the party or link in any chart, and the flag listed on the Red Flags (indicators) tab. No email or phone unless the reporter turns it on.
+- The safety panel ("Your safety") is built last, after the rest of the catalogue work is done.
+
 ## Not yet decided (for Ony)
 
 1. The Faint and Strong levels wherever no source gives a threshold.
-2. Whether "Your safety" notices can also alert by email or phone.
-3. Whether the DISARM framework (share-alike licence) should be imported whole, which would make the catalogue's DISARM part share-alike too.
+2. Whether the DISARM framework (share-alike licence) should be imported whole, which would make the catalogue's DISARM part share-alike too.

@@ -47,6 +47,11 @@ AREAS: dict[str, str] = {
     "HT": "Human trafficking and forced labour", "HR": "Human rights abuses, war crimes and cultural property",
     "OC": "Organised crime and illicit goods", "EN": "Environmental crime", "IN": "Information integrity",
     "CY": "Cybercrime and judging sources", "SA": "Safety of investigators, sources and witnesses",
+    # Added in the second research round (coverage check, 8 October 2026).
+    "VE": "Violent extremism and hate-motivated attacks", "ES": "Espionage and insider threat",
+    "EF": "Elder financial exploitation", "MA": "Securities market abuse", "AF": "Corporate accounting fraud",
+    "PD": "Prescription drug diversion", "LE": "Labour exploitation and wage theft",
+    "PM": "Police misconduct and state violence", "CA": "Child sexual abuse in institutions",
 }
 
 
