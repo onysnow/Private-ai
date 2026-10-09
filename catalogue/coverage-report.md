@@ -1,26 +1,33 @@
 # Indicator catalogue: coverage report
 
-Made 08 October 2026 from the files in catalogue/.
+Made 09 October 2026 from the files in catalogue/.
 
-**700 indicators in 13 areas; 689 verified, 11 pending. 626 glossary terms.**
+**1464 indicators in 22 areas; 1426 verified, 38 pending. 1144 glossary terms.**
 
 | Area | Indicators | Verified | From records | After lookups | Person only | Cases | Cross-hints | Sources not reached |
 |---|---|---|---|---|---|---|---|---|
-| BO Hidden ownership and shell companies | 46 | 46 | 15 | 18 | 13 | 14 | 12 | 12 |
-| CO Corruption and influence | 50 | 50 | 17 | 23 | 10 | 21 | 11 | 12 |
-| CY Cybercrime and judging sources | 53 | 53 | 25 | 21 | 7 | 13 | 10 | 11 |
-| EN Environmental crime | 68 | 58 | 19 | 47 | 2 | 19 | 25 | 13 |
-| FR Tax evasion and fraud | 58 | 58 | 25 | 22 | 11 | 13 | 13 | 12 |
-| HR Human rights abuses, war crimes and cultural property | 59 | 59 | 19 | 30 | 10 | 0 | 28 | 13 |
-| HT Human trafficking and forced labour | 54 | 54 | 28 | 10 | 16 | 17 | 25 | 14 |
-| IN Information integrity | 47 | 47 | 17 | 20 | 10 | 30 | 16 | 20 |
-| ML Money laundering | 63 | 63 | 27 | 29 | 7 | 12 | 38 | 14 |
-| OC Organised crime and illicit goods | 50 | 49 | 17 | 24 | 9 | 21 | 24 | 11 |
-| PP Public procurement, non-profits and elections | 61 | 61 | 38 | 14 | 9 | 10 | 15 | 13 |
-| SA Safety of investigators, sources and witnesses | 35 | 35 | 14 | 12 | 9 | 25 | 9 | 15 |
-| SF Terrorist financing, proliferation financing and sanctions evasion | 56 | 56 | 18 | 30 | 8 | 15 | 19 | 11 |
-
-Areas with no documented cases yet: HR Human rights abuses, war crimes and cultural property. The research for them returned none; a case round is needed.
+| AF Corporate accounting fraud | 52 | 52 | 18 | 23 | 11 | 14 | 12 | 10 |
+| BO Hidden ownership and shell companies | 63 | 63 | 19 | 27 | 17 | 30 | 27 | 18 |
+| CA Child sexual abuse in institutions | 45 | 45 | 21 | 11 | 13 | 13 | 7 | 11 |
+| CO Corruption and influence | 84 | 84 | 31 | 38 | 15 | 48 | 27 | 17 |
+| CY Cybercrime and judging sources | 70 | 70 | 30 | 25 | 15 | 15 | 18 | 17 |
+| EF Elder financial exploitation | 47 | 47 | 25 | 11 | 11 | 11 | 16 | 11 |
+| EN Environmental crime | 82 | 72 | 22 | 56 | 4 | 26 | 34 | 20 |
+| ES Espionage and insider threat | 42 | 42 | 19 | 12 | 11 | 24 | 5 | 11 |
+| FR Tax evasion and fraud | 97 | 89 | 43 | 36 | 18 | 25 | 31 | 18 |
+| HR Human rights abuses, war crimes and cultural property | 110 | 110 | 21 | 64 | 25 | 77 | 37 | 21 |
+| HT Human trafficking and forced labour | 67 | 67 | 31 | 13 | 23 | 20 | 35 | 21 |
+| IN Information integrity | 55 | 55 | 18 | 26 | 11 | 33 | 16 | 25 |
+| LE Labour exploitation and wage theft | 43 | 42 | 27 | 7 | 9 | 11 | 22 | 10 |
+| MA Securities market abuse | 56 | 56 | 33 | 17 | 6 | 13 | 9 | 12 |
+| ML Money laundering | 98 | 94 | 43 | 43 | 12 | 18 | 60 | 22 |
+| OC Organised crime and illicit goods | 96 | 85 | 29 | 48 | 19 | 27 | 58 | 20 |
+| PD Prescription drug diversion | 50 | 49 | 21 | 14 | 15 | 9 | 10 | 10 |
+| PM Police misconduct and state violence | 42 | 42 | 9 | 20 | 13 | 15 | 6 | 9 |
+| PP Public procurement, non-profits and elections | 85 | 85 | 52 | 19 | 14 | 14 | 19 | 16 |
+| SA Safety of investigators, sources and witnesses | 42 | 42 | 14 | 16 | 12 | 34 | 9 | 19 |
+| SF Terrorist financing, proliferation financing and sanctions evasion | 79 | 79 | 29 | 39 | 11 | 24 | 32 | 16 |
+| VE Violent extremism and hate-motivated attacks | 59 | 56 | 19 | 5 | 35 | 16 | 4 | 10 |
 
 ## Pending indicators
 
@@ -36,9 +43,48 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - **EN-044** Trade in goods under a ban or moratorium: quote not confirmed at https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
 - **EN-045** Shipped timber volume differs from permit or concession volume: quote not confirmed at https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-from-environmental-crime.html
 - **EN-062** Catch not recorded, under-reported, or not matching buyers' purchases: quote not confirmed at https://www.fatf-gafi.org/en/publications/Environmentalcrime/Money-laundering-wildlife-trade.html
+- **FR-059** Wash, cross or pre-arranged trades: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+- **FR-060** Unrelated accounts trading the same thin stock at the same moment: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+- **FR-061** Pump-and-dump: sudden demand and price spike in a thinly traded or low-priced stock: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+- **FR-062** Large trade shortly before news, by someone linked to the issuer: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+- **FR-064** Large block of low-priced or shell-company shares deposited and quickly sold: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+- **FR-065** Shares or funds journalled between unrelated accounts for no clear reason: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+- **FR-066** Securities paid for by third parties with no clear link to the customer: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+- **FR-067** Multiple or nominee brokerage accounts, or brokerage used as a bank: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+- **LE-024** Cashback: workers made to hand back part of their wages: case outcome not confirmed: Fair Work Ombudsman v Rubee Enterprises Pty Ltd and Fares Ghazale (Canteen Cuisine, Albury); case outcome not confirmed: Fair Work Ombudsman v Innovative Associates Pty Ltd and Dila Ram Kharel
+- **ML-095** Undisclosed second citizenship or changed identity details from an investment passport: quote not confirmed at https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html; quote not confirmed at https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html; quote not confirmed at https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html
+- **ML-096** New investment passport used soon after issue to open accounts or set up companies: quote not confirmed at https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html
+- **ML-097** Investment-programme property overvalued or money returned to the investor: quote not confirmed at https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html; quote not confirmed at https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html; quote not confirmed at https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html
+- **ML-098** Investment-passport application run through intermediaries or a family member to hide the real investor: quote not confirmed at https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html; quote not confirmed at https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html
 - **OC-050** Spot-fixing of specific in-match events: quote not confirmed at https://www.unodc.org/res/safeguardingsport/EPUB/V1602591-RESOURCE_GUIDE_ON_GOOD_PRACTICES_IN_THE_INVESTIGATION_OF_MATCH-FIXING.epub
+- **OC-063** Tobacco consignments declared as in transit or for export that end up on the local market: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf; case outcome not confirmed: Box 12 subject, Hezbollah-linked cigarette smuggling (FATF Illicit Tobacco Trade report)
+- **OC-064** Tobacco or excise goods misdescribed or undervalued on customs declarations: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf; case outcome not confirmed: Hong Kong counterfeit cigarette syndicate (FATF Box 5)
+- **OC-065** 'Cheap white' cigarette brands, especially from free trade zones: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+- **OC-066** Repeated bulk buying of tobacco in low-tax or duty-free outlets (bootlegging): quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+- **OC-067** Small bank notes swapped for large ones ('refining'), often at casinos: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+- **OC-068** Ransom paid in bulk cash by air drop or courier, mostly in USD 100 notes: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+- **OC-069** Investors or financiers backing pirate or kidnapping groups for a share of ransoms: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+- **OC-070** Payments to hostage negotiators, middlemen or intermediaries: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+- **OC-071** Ransom or piracy money moved through hawala to a third country: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+- **OC-072** Sudden wealth, property buying or payments to local leaders in piracy-linked coastal areas: quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf; quote not confirmed at https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+- **PD-020** Opioid-benzodiazepine-muscle relaxant 'cocktail' ('Holy Trinity'): quote not confirmed at https://www.cdc.gov/mmwr/volumes/65/rr/rr6501e1.htm
+- **VE-020** Acquiring weapons or ammunition for suspected criminal purposes: case outcome not confirmed: Charleston Emanuel AME Church attack (Dylann Storm Roof)
+- **VE-031** Producing, promoting or heavily consuming violent extremist content: case outcome not confirmed: Charleston Emanuel AME Church attack (Dylann Storm Roof)
+- **VE-032** Posing with weapons and extremist symbols: case outcome not confirmed: Charleston Emanuel AME Church attack (Dylann Storm Roof)
 
 ## Sources the research could not reach
+
+**AF Corporate accounting fraud**
+- standards.auasb.gov.au pages could only be read through WebFetch, which truncates quotes to about 120 characters; quotes ending in '...' are exact prefixes of longer bullets. Direct curl to node/2056 returned 'Page not found' (and PCAOB returned a Cloudflare challenge), so full verbatim text was not saved locally.
+- The AUASB appendix pages do not name the parent standard on the page; their identification as ASA 240 Appendix 2 and 4 comes from the coverage-check brief and the search result title, not from the page text.
+- IAASB ISA 240 (international original, and the revised ISA 240 approved 2025) not opened directly.
+- PCAOB AS 2401 appendix paragraph .85 bullet list not read in full (only heading confirmed); ASA 240 Appendix 2 used instead.
+- Beneish (1999) 'The Detection of Earnings Manipulation', Financial Analysts Journal — original paper not opened; −1.78 threshold taken from CFA Institute blog.
+- ACFE Occupational Fraud 2024: A Report to the Nations full report not opened; percentages come from the ACFE Fraud Week handout, which does not name the edition (matched labels to percentages by chart order).
+- Dechow et al. 2011 financing finding: exact sentence not captured (paraphrase flagged in quote field).
+- Wirecard: Bundestag final report Drucksache 19/30900 itself not opened; Munich criminal trial outcome not checked. WorldCom/Ebbers conviction: no primary DOJ/court page found; only the 2002 SEC complaint was used.
+- Toshiba (Japan SESC), Patisserie Valerie (UK) and Enron special-purpose-entity details not researched.
+- SEC Form 12b-25 late-filing notice and Regulation S-K Item 304 (auditor disagreements) not opened.
 
 **BO Hidden ownership and shell companies**
 - fatf-gafi.org: all PDFs and the FATF glossary are behind a Cloudflare challenge. I used the same Annex E PDF from egmontgroup.org and the full 2018 report from a mirror on the Saudi FIU site (aml.gov.sa). Page numbers come from the report's own page headers.
@@ -53,6 +99,25 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - FinCEN SAR Activity Review Issue 7 (2004), shell company red flags: not opened.
 - Wolfsberg Group and Egmont FIU typology updates after 2018: not reached.
 - FollowTheMoney explorer: property names are from memory and were not re-checked live, in particular CryptoWallet, RealEstate, Debt and the Ownership.ownershipType/sharesType fields.
+- FATF (2013) 'Money Laundering and Terrorist Financing Vulnerabilities of Legal Professionals', Method 6: Litigation (p. 69) and red flags (pp. 77-82): direct download was blocked by Cloudflare, and WebFetch returned only parts of the PDF without the litigation section. So BO-061 is sourced to TI-UK only.
+- Kroll 'Project Tenor' audit of the Moldovan banks (candu.md link cited by TI-UK): not opened; the Moldova facts come from TI-UK's summary.
+- OCCRP Global Laundromat and Grand Theft Moldova investigations: not opened directly; cited only through TI-UK 2017.
+- UK Companies Act 2006 s.251 (UK statutory definition of shadow director): not opened; BO-048 uses the Guernsey definition quoted by StAR.
+- Later outcomes not checked against primary sources: Luca Volontè (Caviar Diplomacy), Ilan Shor (Moldova), and Joshua Dariye's later criminal proceedings in Nigeria.
+- FollowTheMoney explorer not re-checked in this run. The schema names used (Company, LegalEntity, Organization, Person, Directorship, Ownership, Representation, Payment, Contract, ContractAward, Address, BankAccount, Debt, CourtCase, CourtCaseParty, Position, Occupancy, Family, Associate, UnknownLink, Document, Email) are standard FtM, but FtM has no dedicated Trust schema.
+
+**CA Child sexual abuse in institutions**
+- Royal Commission Final Report volume PDFs on childabuseroyalcommission.gov.au: direct download blocked by a Cloudflare challenge; Volume 2 was read through the NZ Abuse in Care Inquiry's copy, and other volumes only through the Commission's summary web pages
+- Royal Commission Volume 14 (sport, recreation, arts, culture, community and hobby groups) summary page: blocked by robots.txt; used the Play by the Rules summary instead
+- Royal Commission Volume 16 religious-institutions page: only partly read (about the first 100,000 characters, plus a targeted pass on the rest); findings on the Jehovah's Witnesses 'two-witness rule' and the seal of confession were not captured
+- Royal Commission Case Study 2 (YMCA NSW) findings: the case-study page gave only hearing dates; the report was not opened
+- IICSA research report 'Child sexual abuse in contemporary institutional contexts' (2021): the executive summary page did not include the seven findings, and the PDF was not opened
+- IICSA investigation reports (Anglican Church/Chichester, Catholic Church, residential schools, Nottinghamshire councils): not opened, apart from the executive-summary mention of Chichester
+- Ryan Report (Ireland, 2009), Murphy Report (Dublin, 2009), Canada Truth and Reconciliation Commission (2015), NZ Royal Commission into Abuse in Care final report (2024): not opened
+- CIASE (Sauvé) report itself: not opened; only Vatican News coverage was read
+- U.S. Department of Education primary press releases for the Penn State (2016) and MSU (2019) fines: not opened; news coverage was used instead (the Campus Safety Magazine link redirected away)
+- Boy Scouts of America 'ineligible volunteer files': no primary source opened
+- Opening pages of the 'Risk profiles for institutional child sexual abuse' attachment: the title page and authors were not visible, and the text read looks like a literature review organised by victim, perpetrator and setting rather than the four dimensions
 
 **CO Corruption and influence**
 - FinCEN Advisory FIN-2018-A003 red-flag list: the bullets sit in an image box on p. 5 and could not be extracted as text (the rest of the advisory was read).
@@ -67,6 +132,11 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - US DOJ press releases for the Menendez verdict (SDNY) and Manafort plea: fetch errors / not found; Menendez outcome taken from DOJ NSD 'Recent FARA Cases' page; Manafort not included.
 - Wolfsberg Group PEP guidance and FATF 2011/2012 corruption typology reports: not reached.
 - UK ACOBA business appointment rules (two-year period): about page did not state the period, so no UK threshold was used.
+- The gap note says FIN-2022-A001 lists 'golden passports', third-party payments for high-value assets, and facilitator transactions shortly before or after sanctions. I read the full advisory text and these are NOT in its red-flag list (pp.8-9). It mentions bribes to get passports or visas only as a typology on p.4. Those items may come from another FinCEN alert, such as the March 2022 alert on Russian elites' real estate and high-value assets, which I did not open.
+- FinCEN Advisory FIN-2018-A003 (Human Rights Abuses and Corruption) red flags were not re-examined.
+- The primary Independent Inquiry Committee (Volcker) Oil-for-Food final report was not opened. The outcome rests on NRGI and NPR.
+- Primary court documents for the Statoil, Griffiths, PDVSA (Shiera/Rincón), Rubiandini, Petrobras and Sphynx/Kensington cases were not opened. Their outcomes come from NRGI's summaries.
+- The Geneva appeal ruling in Steinmetz has no exact date in the source I read. It was in 2022 per the Al Jazeera and Fortune headlines from August 2022, which I did not open.
 
 **CY Cybercrime and judging sources**
 - FATF 'Countering Ransomware Financing' (March 2023) report and its risk-indicator annex: fatf-gafi.org blocked automated fetching (robots / HTML returned instead of PDF)
@@ -80,6 +150,25 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - FinCEN 2025 advisory on Chinese money laundering networks (FIN-2025 CMLN): not opened in detail
 - FinCEN Bitzlato Section 9714 order (2023) and OFAC Blender.io / Tornado Cash designations: not opened
 - UK PHIA Probability Yardstick and Berkeley Protocol on Digital Open Source Investigations: not opened (would add glossary entries on judging sources)
+- 2nd INTERPOL Global Financial Fraud Threat Assessment: could not locate. The WebSearch budget for this turn ran out (the 200-call limit shared by all agents), and the INTERPOL news listing showed only items from August to October 2026, none on it. Only the 2024 INTERPOL news release was used, not the full 2024 assessment PDF.
+- U.S. v. Christina Chapman (Arizona laptop-farm case): the DOJ press-release URLs I tried failed to load, so it is not included as a case.
+- FBI page on North Korean IT workers (fbi.gov) failed to load.
+- FCC SIM-swap news release page failed to load; the full FCC 23-95 order was used instead. Only the first 100,000 characters were read.
+- SIM-swap prosecution case: no DOJ or court source reached because search was unavailable, so CY-064 to CY-066 have no case.
+- Further searches for 2025–2026 DPRK IT worker advisories (for example later IC3 alerts on laptop farms) were not possible because the search budget was used up.
+
+**EF Elder financial exploitation**
+- GAO-10-1046 full PDF (gao.gov/new.items/d101046.pdf) returned Access Denied to direct download; only the HTML version was read, via WebFetch summary, so the individual case narratives were not read
+- NCSC Guardianship Review Protocol detailed accounting red-flag PDF (ncfsc-web.squiz.cloud) was blocked by the egress proxy; only the NCSC landing page was read
+- California WIC 15610.70 on leginfo.legislature.ca.gov was blocked; read via Justia, and only the definition and paragraphs (3)(A) and the first clause of (3)(C) were obtained verbatim
+- CFPB 2016 'Recommendations and Report for Financial Institutions on Preventing and Responding to Elder Financial Exploitation' not opened
+- CFPB/FinCEN 2017 joint memorandum was downloaded but not reviewed
+- FinCEN 2011 Advisory on Account Takeover (FIN-2011-A016) not opened
+- Interagency Statement on EFE (Dec 2024, revised June 2026): only definitions, holds and trusted-contact sections read; it points to the FinCEN 2022 red flags rather than adding new ones
+- Nevada AG release on the April Parks case: read via WebFetch summary, not the raw page
+- People v Marshall (nycourts.gov) sits behind a Cloudflare challenge for direct download; read via WebFetch summary only
+- DOJ release on the Pathan sentencing not opened directly; case facts taken from the FinCEN advisory case study
+- Deed or home-title theft from older owners and nursing-home trust account theft: no primary red-flag list found within this pass
 
 **EN Environmental crime**
 - FATF website PDFs (fatf-gafi.org /content/dam/fatf-gafi/reports/...) blocked automated download (robots/bot check). The FATF 2020 IWT report was read from the OJK Indonesia mirror, the FATF 2021 environmental crime report from the Bank of Russia (cbr.ru) mirror, and the FATF/APG 2015 gold report from a Singapore government mirror; page numbers are the printed FATF page numbers.
@@ -95,6 +184,26 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - Court records for Steinmetz appeal outcome (FATF reported it as under appeal in 2021).
 - A plain-language official definition of 'bill of lading' and of PEP from the FATF Glossary (not opened; PEP definition given from context).
 - FinCEN/US Treasury designations for Xaysavang wildlife network and other IWT sanctions cases.
+- The web search budget for this run ran out after the first fetches, so no further searches were possible. Ony can send a follow-up to continue the research.
+- EIA full report on illegal HFC trade ('Doors wide open', 2019, and the 2021 report): the fetch failed, so no named HFC seizures or prosecutions could be sourced, and EN-078 to EN-080 have no cases.
+- Full operative articles of Regulation (EU) 2024/573 (Articles 11-13 on the non-refillable container ban, quota and labelling): the fetched text was cut off before them, so only recitals are quoted. EN-078 cites Recital 26 in paraphrase; its verbatim wording needs checking.
+- Primary court or HMRC/CPS record for R v Dosanjh, Chahal and Gill: not opened; the case is cited through INTERPOL's guide.
+- OLAF and Europol material on F-gas smuggling operations: not reached.
+- Europol 2009 press-release body text (needs JavaScript): only the summary was readable.
+- Online wildlife cases (e.g. prosecutions over social-media sales): not sourced, because search was unavailable.
+
+**ES Espionage and insider threat**
+- FBI brochure 'The Insider Threat: An Introduction to Detecting and Deterring an Insider Spy' (fbi.gov/file-repository/insider_threat_brochure.pdf): WebFetch returned no indicator text, so its personal and organisational factor lists were not used.
+- FBI counterintelligence insider threat page (fbi.gov/investigate/counterintelligence/the-insider-threat): fetch error.
+- SEAD 4 National Security Adjudicative Guidelines (archive.dni.gov PDF): no machine-readable text. The older 32 CFR Part 147 guidelines were used instead; SEAD 4 wording may differ.
+- eCFR 32 CFR part 147: fetch error (Cornell LII copy used).
+- PERSEREC 'The Expanding Spectrum of Espionage by Americans, 1947-2015' (irp.fas.org/eprint/spectrum.pdf): empty response. The 2002 PERSEREC report was used instead.
+- Direct curl of the CDSE PDF and justice.gov pages was blocked by bot checks; quotes came through WebFetch, which returns quoted extracts, not the raw file. Spot-check the wording against the originals before publishing.
+- Air Force IG directed inspection PDF (afinspectorgeneral.af.mil) was not opened; only the af.mil summary article was read.
+- Xiaolang Zhang guilty plea: no DOJ plea or sentencing release was opened; the plea rests on Fortune's report of court documents (23 Aug 2022).
+- CERT Common Sense Guide to Mitigating Insider Threats (7th ed.) and the CISA Insider Threat Mitigation Guide PDF were not opened.
+- UK NPSA / CPNI insider-risk guidance and Five Eyes 'Think Before You Link' material were not reached (non-US coverage gap).
+- The PERSEREC finding that about one-fourth of spies had a personal crisis beforehand (ES-040) is paraphrased from WebFetch output and not quoted exactly.
 
 **FR Tax evasion and fraud**
 - investor.gov /pyramid-scheme (singular URL) failed; used /pyramid-schemes and 2013 alert instead
@@ -109,6 +218,12 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - Cum-ex/Hanno Berger: only press (Euronews), no German court text
 - Madoff mechanics: SDNY and FBI releases describe plea/sentence only; SEC Lit. Rel. 20959 against auditor Friehling is a complaint (allegation), not a finding
 - Operation Gold Rush (FinCEN case study) is charges only, not used as a case outcome
+- FATF 2009 securities report Annex B (Suspicious Indicators, p. 70), Chapter 4 (insider trading, market manipulation, securities fraud, pp. 48-54) and Annex A glossary: the fetched text stopped at about page 40 and a direct download was blocked. I used FATF quotes only from paras 34, 106 and case studies 1, 3 and 10, and FINRA Regulatory Notice 19-18 for the rest.
+- AUSTRAC 2024 'Indicators of suspicious activity for the securities and derivatives sector': I could not find it by search and did not open it.
+- HMRC 'How to spot missing trader VAT fraud' guidance page: the fetch failed. I used VAT Notice 726 section 6.1 instead.
+- FBI advance-fee schemes page: the fetch failed. The glossary definition is sourced to the FinCEN joint notice.
+- CFPB power-of-attorney definition: the page I fetched had no definition, so I added no glossary entry for power of attorney.
+- Some FinCEN quotes reached me cut short by the fetch tool (FinCEN elder advisory, check alert, timeshare notice). The quoted text matches the start of each red flag but is not the full sentence. Re-check the full wording against the PDFs before publishing.
 
 **HR Human rights abuses, war crimes and cultural property**
 - FATF 'Money Laundering and Terrorist Financing in the Art and Antiquities Market' (2023): the official fatf-gafi.org PDF is behind Cloudflare; read via the regjeringen.no copy, but the WebFetch text stopped partway through Annex A (p. 45), so the indicators after 'Use of social media or financial intermediaries to advertise cultural objects that...' (including any conflict-zone or terrorist-financing indicators) were not reached.
@@ -124,6 +239,14 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - ICC Al Mahdi reparations amount and judgment date: the case page did not state them.
 - Manhattan DA press releases (Steinhardt, Kapoor): manhattan.da.ny.gov blocks robots; facts taken from OCCRP and Hyperallergic reports on them.
 - Interpol cultural property pages, UNESCO 1954 Hague Convention and UNIDROIT 1995 text: not opened.
+- WebSearch: the run's shared search budget (200 calls) was used up before this agent's first search, so no searches were made; all sources were fetched directly from known primary URLs
+- UN Framework of Analysis on un.org / static.un.org (403 from CloudFront); I used the identical text in UN document A/70/741-S/2016/71 at documents.un.org
+- ICC case page for Abd-Al-Rahman (Ali Kushayb): the page I reached still shows deliberations with no verdict, and the guessed URL for a verdict press release returned 'Page not found'. A conviction is therefore not stated or used as a case
+- OHCHR Genocide Convention page (Cloudflare challenge); I used Rome Statute art. 6 instead
+- Full Kenya CIPEV (Waki) report PDF: only the ReliefWeb executive summary was read
+- Myanmar FFM detailed report A/HRC/39/CRP.2 and Syria COI 'They came to destroy' A/HRC/32/CRP.2: the symbol links returned HTML, not the PDFs
+- Framework indicators left out as already covered by existing HR entries: 13(h)/HR-033 (relief obstruction), 13(l)/HR-031 (unacknowledged detention), 11(a)/12(i)/HR-029 (widespread attack), 7(j) displacement/HR-032, 13(p)/HR-027-028 (cultural destruction, pillage), 5(h) arms supply/HR-025
+- Framework indicators not given their own entry because they are hard to check or too general: 1(c) humanitarian crisis, 3(a)(b)(g)-(j) institutional capacity, 5(d) culture of obedience, 6(a)(c)(e)(f)(h)(i)(k), 9(d)-(f), 13(b)(c)(f)(g)(r), 14(c). They are listed here so Ony can decide whether to add them
 
 **HT Human trafficking and forced labour**
 - FATF/APG 'Financial Flows from Human Trafficking' (July 2018) Annex B indicator list: fatf-gafi.org blocks direct download (robots and bot page) and the WebFetch text stopped before Annex B. Only paragraphs 64-65 were quoted, via the fetch tool's summary.
@@ -140,6 +263,13 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - EU Forced Labour Regulation (2024/3015), UK Modern Slavery Act statutory guidance and GLAA indicators, Australian Modern Slavery Act: not opened.
 - AP 'Seafood from Slaves' (Benjina) reporting: not opened, so not used as a case.
 - FinCEN FIN-2020-A008 case studies (Thai sex trafficking funnel accounts): names were not extracted, so not used as a case.
+- UNODC Assessment Toolkit: Trafficking in Persons for the Purpose of Organ Removal (2015). I guessed the PDF URL and the fetch failed; the search did not find a working link. I used the HOTT/de Jong & Ambagtsheer (2016) indicator list, which the UNODC-linked research site names as the indicator source.
+- UNODC Toolkit on the Investigation and Prosecution of Trafficking in Persons for Organ Removal (2022). The toolkit page (unodc.org/.../glo-act2/tip-for-or-toolkit.html) and a guessed PDF URL both failed to fetch, so its red-flag list was not read directly.
+- UNODC 2024 explainer 'Understanding Human Trafficking for Organ Removal'. The fetch failed.
+- The PMC page for de Jong & Ambagtsheer was blocked by a captcha. The full text came from the Europe PMC REST API (same article, PMC4946497).
+- Netcare / St Augustine's Hospital (South Africa) organ-trafficking case. I could not verify it from a primary source, so it was not used.
+- A documented case with tattoo branding (for HT-065). The search budget ran out before I found a court or DOJ source.
+- The UNODC 2022 page's sentence on promised payments that never arrive was captured only as a paraphrase by the fetch tool, not as an exact quote.
 
 **IN Information integrity**
 - Meta Transparency Center Community Standards page on Inauthentic Behavior (page renders only metadata via fetch); policy wording on fake accounts, Foreign or Government Interference not quoted
@@ -162,6 +292,37 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - X/Twitter information operations archive, Stanford Internet Observatory primary reports, Graphika Spamouflage reports, EU DisinfoLab Doppelganger reports, Google TAG bulletins
 - Beall's list criteria and Think.Check.Submit checklist
 - ORI 42 CFR Part 93 eCFR section with definitions (renumbered; used ori.hhs.gov definition page)
+- WebSearch budget for this turn ran out after the first three fetches, so no further searching was possible; a follow-up run could continue.
+- No ORI case with a plagiarism finding was located: the ORI case-summary index (https://ori.hhs.gov/case_summary) does not show finding types, and the two summaries opened (Fernandez, Ke) were fabrication/falsification. IN-053 therefore has no case.
+- No documented case applying GRIM/SPRITE to a specific paper was opened (e.g. the reported Wansink pizza-paper analyses by van der Zee, Anaya and Brown); the Wansink case is attached to IN-055 from Cornell's statement only, which does not mention GRIM.
+- SPRITE preprint page gave only a short abstract excerpt; author list beyond 'Heathers et al.' not confirmed.
+- FollowTheMoney explorer (https://followthemoney.tech/explorer/) not opened to confirm UserAccount/Message property names.
+
+**LE Labour exploitation and wage theft**
+- UK GLAA 'spot the signs' A5 leaflet (https://www.gla.gov.uk/media/qwpdjic2/spot-the-signs-leaflet-a5.pdf): direct download returned HTML, not the PDF; the 2020 GLAA PDF was read through WebFetch instead.
+- Fair Work Ombudsman v Quest South Perth Holdings Pty Ltd [2015] HCA 45 (High Court sham-contracting case): the High Court summary page did not include facts or orders, and the full judgment was not opened, so it is not used as a case.
+- 29 CFR 531.35 and 20 CFR 655.135: eCFR fetch failed; read through Cornell LII, where the fetch tool limits verbatim quote length, so quotes are short fragments.
+- DOL tipped employees Fact Sheet #15 (fetch error); the DOL FLSA tips page was used instead.
+- ILO Forced Labour Convention No. 29, Article 2 text (NORMLEX fetch failed); the forced labour definition is taken from the Off the Books guidance.
+- Off the Books main report (Migrant Justice Institute, 2026), the source of the practical guidance's statistics: not opened.
+- GOV.UK national minimum wage employer guidance (accommodation offset, deductions): the fetched page held only an overview.
+- ATO illegal phoenix activity overview page: had no definition; the 'What is phoenix activity' subpage was used.
+- 7-Eleven inquiry report: only the first 100,000 characters were read; Harvest Trail Inquiry report: only the first 100,000 characters were read.
+- Not researched: US DOL H-2B rules, state-level wage theft laws (e.g. California, New York), UK HMRC national minimum wage naming lists, and ILO guidance on 'decent work' deficits.
+
+**MA Securities market abuse**
+- https://www.sec.gov/enforcement-litigation/insider-trading: fetch errored and curl was blocked; the same SEC text was taken from the Investor.gov glossary copy instead
+- Investor.gov Form 4 glossary page: no text in the entry, so the US Section 16 / Form 4 filing deadline is not sourced and no indicator uses it
+- MAR Article 19(8)/(9) yearly notification threshold amount: not quoted
+- FINRA Rule 2165: not opened directly; the 'specified adult' definition comes from the FINRA 21-03 endnote
+- Commission Delegated Regulation (EU) 2016/957 (STOR suspicious-order reporting) and ESMA MAR guidelines: not opened
+- UK FCA Market Watch newsletters and the FCA Handbook MAR 1 (UK Code of Market Conduct): not opened
+- IOSCO reports on market manipulation and insider trading: not opened
+- FinCEN securities-sector SAR guidance (insider trading and market manipulation SAR categories): not opened
+- DOJ press release on Raj Rajaratnam (justice.gov archive PDF): not opened, so not used
+- Later criminal outcomes in the 2015 hacked-newswire case (US v. Dubovoy, Korchevsky and others): not checked, so it is listed as allegations only
+- FCA Final Notice PDF for Corrado Abbattista: only the FCA press release was read
+- SEC litigation in the 2022 social-media influencer pump-and-dump case: left out because its final outcome was not verified
 
 **ML Money laundering**
 - FATF PDFs on fatf-gafi.org return HTTP 403 to direct download; the TBML indicators were read from an identical copy hosted by the Bank of Russia (cbr.ru) and the VA red flags from a copy hosted by Saudi Arabia's GDFI (aml.gov.sa). FATF landing page for TBML indicators: https://www.fatf-gafi.org/en/publications/Methodsandtrends/Trade-based-money-laundering-indicators.html
@@ -178,6 +339,14 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - Hajiyeva v NCA [2020] EWCA Civ 108: read but not used as a case, because the court upheld an investigative order and made no finding of laundering. It is only cited as a cross-hint and in the glossary.
 - Springer article page for Akartuna et al. returned a JavaScript client challenge. The full text was read through the Springer PDF link with a page-fetch tool, and the supplements were downloaded from static-content.springer.com.
 - City University of Hong Kong repository PDF of Akartuna et al. returned 403
+- FATF, Money Laundering and Terrorist Financing Vulnerabilities of Legal Professionals (2013), Chapter 5 'Red flag indicators' (p. 77 onward): the FATF PDF is behind a bot check for direct download, and the fetch tool's text stopped at p. 50. The 42 red flags were taken from CILEx Regulation's reproduction (cilexregulation.org.uk/wp-content/uploads/2018/12/AML-Red-Flag-Indicators.pdf), which says it collects the FATF June 2013 red flags. Before publishing, check the wording against the FATF original.
+- FATF, Vulnerabilities of Casinos and Gaming Sector (2009) on fatf-gafi.org: blocked by robots/bot check. I used the copy filed as Exhibit RC0310 at the Victorian Royal Commission into the Casino Operator and Licence (rccol.archive.royalcommission.vic.gov.au). The PDF text extraction drops some punctuation, so quotes were picked from cleanly extracted lines.
+- FATF/OECD, Misuse of CBI and RBI Programmes (2023): the fetch tool reached text up to para. 147. I found no annex of red flags in the readable text and could not confirm whether one exists after that point. Page numbers varied between fetches, so paragraph numbers are given instead.
+- AUSTRAC media release 'Federal Court makes ruling in Crown matter': robots disallowed. The enforcement-actions list confirms the A$450m penalty (11 July 2023), but I could not confirm which casino conduct it covered, so Crown is not used as a case.
+- FATF, Risks of gaming and gambling (September 2026) with new risk indicators: I read only the news release, not the report PDF. Worth a follow-up for online gambling and casino indicators.
+- FinCEN Advisory 33 (2003) was read; FinCEN's later IVTS/hawala SAR typologies were not checked.
+- Cullen Commission (British Columbia, 2022) final report on casino laundering: not opened, so not used as a case.
+- AUSTRAC casino page has no 'last updated' date on the fetched content; I assumed 2024 from the gap note (Sept 2024 sector release) and did not verify it.
 
 **OC Organised crime and illicit goods**
 - FATF, Money Laundering through the Football Sector (2009): fatf-gafi.org blocks automated fetching (robots disallowed), so its football and betting indicators are not included.
@@ -191,6 +360,38 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - ATF NFCTA Volumes II and III full reports: not opened. Only the DOJ press release was used.
 - OECD/EUIPO counterfeit trade reports (Mapping global trade in fakes): not reached.
 - Primary court documents for the Šapina (Bochum), Belgian club and Southern Stars cases: not reached. Outcomes are as stated in the UNODC Resource Guide (2016).
+- ESAAMLG, Smuggling of Cigarettes and Associated Money Laundering: the URL could not be found because the shared web-search budget for this run ran out. Tobacco indicators rely only on FATF Illicit Tobacco Trade (2012). The FATF 2012 report has no formal indicator annex; items OC-063 to OC-067 come from its methods paragraphs (24-25, 30, 35, 41, 86-87, 106).
+- FATF Illicit Tobacco Trade: the counterfeit-factory link and named defendants could not be confirmed. Box 12 (Hezbollah) does not name the subject, so no name was added from outside sources.
+- FATF Organised Maritime Piracy (2011) has no formal red-flag list. FATF says only that it 'could consider developing guidance and red flags' (para. 48). OC-068 to OC-072 come from its case studies and narrative.
+- FATF Fentanyl (2022): the first part of the Customer Indicators list (pp. 36-37) was cut off at one indicator. Most of those items overlap with existing OC-012 to OC-018 and were not duplicated.
+- FATF Risks of Gaming and Gambling (2026) includes no named case studies with court or regulator outcomes, so gambling indicators OC-051 to OC-062 have no cases attached.
+- Gambling enforcement cases (e.g. AUSTRAC v Crown Resorts): the AUSTRAC page blocked fetching (robots), and the search budget ran out, so these were not added.
+- County lines and cuckooing court cases (e.g. UK Modern Slavery Act convictions): not reached because the search budget ran out. OC-091 to OC-096 have no cases.
+- Somali pirate negotiator prosecution (US DOJ press release): the fetch failed, so it was not added.
+- FATF gambling, tobacco, piracy and fentanyl PDFs could not be downloaded directly with curl (bot challenge). They were read through WebFetch, which returned some quotes shortened with '...'. The quotes are copied as returned.
+
+**PD Prescription drug diversion**
+- CDC 2022 Clinical Practice Guideline (MMWR 71(3)) recommendation text: page fetch truncated before the dosage recommendations, so whether it keeps the 50/90 MME figures was not checked; the 2016 guideline was used.
+- DEA Pharmacist's Manual and the DEA Diversion practitioner awareness conference slides (deadiversion.usdoj.gov/mtgs/...): not opened.
+- ASHP Guidelines on Preventing Diversion of Controlled Substances (2022): found but not opened; Joint Commission Quick Safety 48 used instead. Joint Commission page shows no date.
+- 21 CFR 1301.74/1306.04/1301.76 were read on Cornell LII; eCFR fetch failed. The full text of 1306.04(a) and 1301.76(b) (including the reporting deadline) was only partly quoted.
+- Holiday CVS (77 FR 62316, 2012) and East Main Street Pharmacy DEA decisions: not opened.
+- DEA 2020+ proposed or final suspicious-order rules (SORS): not opened.
+- National Prescription Opiate Litigation (MDL 2804) settlements with Cardinal, AmerisourceBergen, McKesson, J&J, CVS, Walmart: not opened.
+- Washington Post ARCOS database release: not opened, so ARCOS is not defined in the glossary from a source.
+- NABP consensus document: year not shown on the AMA-hosted copy; several quotes were cut off by the reading tool (marked with an ellipsis).
+- No case with a court outcome was found for hospital-staff diversion (PD-045 to PD-047).
+
+**PM Police misconduct and state violence**
+- Baltimore Consent Decree (mdd.uscourts.gov) Early Intervention System section XIII: the fetched text stopped around paragraph 210, so the EIS indicator list and the exact paragraph 141 duty-to-intervene wording were not read (PM-029 cites the section summary only)
+- Mollen Commission report (New York, 1994): not found online; only a later Commission to Combat Police Corruption report citing it was opened
+- National Registry of Exonerations full 2020 report PDF (law.umich.edu blocked by robots.txt); only the abstract on repository.law.umich.edu was read
+- UChicago Urban Labs EIS paper and Seattle randomized trial cited by the Council on Criminal Justice: not opened
+- Chicago consent decree EIS/Officer Support System paragraphs: not opened
+- Ferguson full report (justice.gov/crt/file/764731/dl) returned the Spanish edition; English summary used instead
+- Jason Van Dyke verdict: no court primary source opened; conviction rests on ABC7 news report found by search (abc7news.com) and UChicago Law page
+- IACP model policy on officer-involved domestic violence and the Lautenberg Amendment: not researched
+- Washington Post 2022 repeat-payout analysis: not opened
 
 **PP Public procurement, non-profits and elections**
 - OECD Guidelines for Fighting Bid Rigging in Public Procurement (2009 and 2025 update) full text: oecd.org PDF blocked by robots; 2025 component page returned navigation only. Used DOJ Antitrust Division guide and an OECD presentation (slide 15) instead.
@@ -206,6 +407,9 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - North Carolina State Board of Elections order (primary source) on the 9th District: not opened; relied on NBC News reporting.
 - European Commission / OLAF case material on specific EU procurement cases (e.g. Hungary): not researched.
 - Integrity Watch Red Flags page lists 20 indicators but only 17 were visible.
+- COCOF 09/0003/00, European Commission 'Information Note on Fraud Indicators for ERDF, ESF and CF' (2009). This is probably where the scheme list in the gap comes from (corrupt payments, mixing of contracts, defective pricing, product substitution). The known EC URL https://ec.europa.eu/regional_policy/sources/docoffic/cocof/2009/cocof_09_0003_00_en.pdf returned HTTP 500, and the web-search budget for this run was already used up, so no other copy could be found. I added nothing for 'mixing of contracts' (charging costs to the wrong contract) or 'defective pricing' (false cost or pricing data), because the 2017 OLAF document I opened does not cover them under those names.
+- Carter Center DRC statement: the direct download (curl) redirected to a 404. The WebFetch tool could read the page, but its summariser caps quotes at about 125 characters, so the three quotes used may be shortened sentences rather than full ones. Please re-check them against the live page. The page shows no publication date; the URL suggests 10 Dec 2011 and the text says the results were announced on 9 Dec 2011.
+- World Bank brochure PDF: I read the official text version (documents.worldbank.org/curated/en/223241573576857116/text/...txt) instead of the PDF; it is the same document.
 
 **SA Safety of investigators, sources and witnesses**
 - CASE coalition website and 2023/2024 SLAPP reports (the-case.eu and PDF fetch failed)
@@ -223,6 +427,10 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - Global Witness 2025 report with 2024 data (only the 2024 report covering 2023 was read)
 - UNODC 'Good practices' publication: read in full via the PDF; the unodc.org MENA mirror failed
 - Saudi court verdicts in the Khashoggi case (not checked)
+- UNESCO Journalists' Safety Indicators (JSI) guidebook: the web.archive URL returned a rate-limit page twice, and the en.unesco.org PDF, the unesco.org JSI page and unesdoc are blocked by robots.txt. No JSI indicators (impunity rates, protection mechanisms, prosecutions of attackers) were added, because I could not quote the source. This needs a retry or a pasted copy of the guidebook.
+- WebSearch budget for this run was used up after the first fetches, so no further sources could be found by search.
+- CPJ pages on El Salvador's 2025 Foreign Agents Law (cpj.org/2025/05/el-salvador-foreign-agents-law/) and on Russia's foreign agent law (cpj.org/reports/2023/12/...): guessed URLs, both returned errors. The El Salvador claim rests only on the gap note, not on a page I opened.
+- Primary text of the Russian foreign agent and undesirable-organisation laws was not opened. Definitions rely on CPJ.
 
 **SF Terrorist financing, proliferation financing and sanctions evasion**
 - FATF Guidance on Proliferation Financing Risk Assessment and Mitigation (2021) on fatf-gafi.org: direct PDF download was blocked (403); read through a copy hosted by the Singapore government (isomer-user-content.by.gov.sg). Some quotes from it are cut at about 110 characters by the fetch tool and are marked with that locator.
@@ -236,11 +444,38 @@ Kept out of Red Flags and the PDF until what is listed is checked.
 - Egmont Group and AUSTRAC terrorism financing indicator lists: not opened.
 - Court records (dockets) for the cases: DOJ and OFAC releases were used instead; Wise Honest forfeiture judgment status not confirmed.
 - BIS 'Know Your Customer' red flags were read from the eCFR versioner API (2025-06-02 version of 15 CFR Part 732).
+- FinCEN Alert FIN-2022-Alert002 (Real Estate, Luxury Goods, and Other High-Value Assets), the fetch of the PDF failed; its red flags were not added
+- REPO Task Force advisory PDF on dfat.gov.au (robots blocked); the Canada.ca HTML version was used instead
+- Primary court records on later rulings in the Amadea forfeiture case (press reports a ruling and sale; not checked against court documents)
+- BIS red flag 28 (IaaS for AI model weights, ECCN 4E091) was not added: it comes from the 2025 AI diffusion rule, and I could not confirm on eCFR whether it is still in force
+- BIS Entity List page itself (bis.gov), defined from the 15 CFR Supplement 3 text instead
 
+**VE Violent extremism and hate-motivated attacks**
+- US Secret Service NTAC 'Mass Attacks in Public Spaces: 2016-2020' (secretservice.gov returned Access Denied to both WebFetch and curl); its concerning-behaviour statistics are not included
+- Meloy, Hoffmann, Guldimann & James (2012) full text (paywalled, Wiley); definitions taken from the Virginia DCJS handout that cites it, and the abstract on boris.unibe.ch
+- TRAP-18 Manual (licensed; only the drreidmeloy.com overview was read)
+- Meloy & Gill (2016) 'The Lone Actor Terrorist and the TRAP-18' full text (definitions taken from the DCJS handout)
+- Full Christchurch Royal Commission report (only the executive summary and DPMC findings sheet were read; reconnaissance, magazines and donations not checked)
+- Norway 22 July Commission (Gjorv) report: not opened; no Breivik case included
+- Europol TE-SAT 2026 full report (only the TE-SAT 2025 summary was read)
+- FBI/DHS 'Making Prevention a Reality' and the EU Radicalisation Awareness Network (RAN) indicator material: not opened
+- Canadian, German and Dutch national prevention-body indicator lists: not searched
+- Court records for the Buffalo case (Gendron guilty plea and federal case) not opened; the case relies on the NY Attorney General report only
+
+
+## Second research round (9 October 2026)
+
+The gaps below were found after the first round (8 October). The second round researched them:
+
+- **Nine new areas:** VE, ES, EF, MA, AF, PD, LE, PM and CA, one for each "NEW" item below.
+- **Gap fills for all 13 first-round areas:** each area's research was given the gaps listed for it below, including the UN atrocity-crimes framework for HR.
+- **Cases for HR:** 54 cases for 43 indicators (the first round had none).
+
+The list is kept as the first round's record. An item is not confirmed as covered until it appears in the files.
 
 ## Gaps found by the coverage critics
 
-Three agents each looked for what the catalogue misses, in a different way. Each item has a source. None of these are in the catalogue yet; adding them is the next research round.
+Three agents each looked for what the catalogue misses, in a different way. Each item has a source. This is the list as found after the first round.
 
 ### Whole areas not yet covered (10)
 
