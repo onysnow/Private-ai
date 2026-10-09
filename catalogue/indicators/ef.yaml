@@ -1,0 +1,2343 @@
+key: EF
+name: Elder financial exploitation
+scope: 'Elder financial exploitation. FinCEN Advisory FIN-2022-A002 (15 June 2022). Behavioural red flags:
+  caregiver shows excessive interest in the person''s finances, speaks for them or controls the conversation;
+  new caretakers, relatives or friends carry out transactions without proper documentation; sudden changes
+  to power of attorney, trusts or estate plans under apparent coercion or when the person lacks capacity;
+  customer seems distressed, fearful or submissive; customer cannot be reached. Financial red flags: a
+  dormant account with a large balance suddenly sees constant withdrawals; closing CDs or accounts regardless
+  of penalties; repeated daily-maximum ATM withdrawals; uncharacteristic nonpayment for services; sudden
+  non-sufficient-funds activity.'
+indicators:
+- id: EF-001
+  name: Caregiver or companion controls the conversation about money
+  definition: A caregiver or other person shows unusual interest in the older person's money, answers
+    for them, or will not leave them alone with bank staff.
+  areas:
+  - EF
+  typology: Elder theft by a trusted person
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: Financial Crimes Enforcement Network (FinCEN), US Treasury
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 9, Behavioral Red Flags
+    quote: A caregiver or other individual shows excessive interest in the older customer’s finances or
+      assets, does not allow the older customer to speak for himself or herself, or is reluctant to leave
+      the older customer’s side during conversations.
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-09'
+  - title: Advisory to Financial Institutions on Filing Suspicious Activity Reports Regarding Elder Financial
+      Exploitation (FIN-2011-A003)
+    publisher: FinCEN
+    year: '2011'
+    url: https://www.fincen.gov/sites/default/files/shared/fin-2011-a003.pdf
+    locator: p. 2, Interactions with customers or caregivers
+    quote: A caregiver or other individual shows excessive interest in the elder’s finances or assets,
+      does not allow the elder to speak for himself, or is reluctant to leave the elder’s side during
+      conversations;
+    quote_verified: true
+    licence: US government work, public domain
+    checked: '2026-10-09'
+  - title: Red Flags (guardianship)
+    publisher: Nevada Supreme Court / nvcourts.gov
+    url: https://nvcourts.gov/__data/assets/pdf_file/0020/12854/red_flags.pdf
+    locator: The Guardian
+    quote: Excessively controls all access to the respondent and insists on being the sole provider of
+      information to friends and family
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - In the Graves case (W.D.N.C.), housekeepers isolated a widow with dementia from friends and family
+    before taking control of her affairs.
+  cases:
+  - name: United States v. Donna Graves (and co-conspirators Gerald Maxwell Harrison, Elizabeth Robin
+      Williams)
+    year: '2021'
+    jurisdiction: US District Court, Western District of North Carolina
+    what_happened: Housekeeping business owner and co-conspirators isolated a widow with dementia, fabricated
+      a power of attorney, emptied her accounts and moved her between residences. Graves was convicted
+      at trial and sentenced to 97 months; Harrison and Williams pleaded guilty.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    source_title: FinCEN Advisory FIN-2022-A002, Case Study on Elder Theft, pp. 4-5
+  data_needed:
+  - Person (older adult; caregiver) with birthDate
+  - Employment or Associate linking caregiver to the older adult
+  - Representation (caregiver acting as agent)
+  - 'Document or Note: bank staff or witness account of the interaction'
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family member or carer legitimately helping a person with hearing, speech or memory problems
+  - Older person asked the companion to speak for them
+  - Cultural norms where an adult child handles a parent's affairs
+  jurisdictions: United States (FinCEN guidance); pattern is general
+  version: 1
+- id: EF-002
+  name: Older person afraid of or submissive to a caregiver
+  definition: The older person shows unusual fear or submission toward a caregiver, or says they fear
+    eviction or a nursing home if they do not hand over money.
+  areas:
+  - EF
+  typology: Elder theft by a trusted person; coercion
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 9, Behavioral Red Flags
+    quote: An older customer shows an unusual degree of fear or submissiveness toward a caregiver, or
+      expresses a fear of eviction or nursing home placement if money is not given to a caretaker.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FIN-2011-A003
+    publisher: FinCEN
+    year: '2011'
+    url: https://www.fincen.gov/sites/default/files/shared/fin-2011-a003.pdf
+    locator: p. 2
+    quote: The elder shows an unusual degree of fear or submissiveness toward a caregiver, or expresses
+      a fear of eviction or nursing home placement if money is not given to a caretaker;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An older person tells a teller they must withdraw cash for a carer or they will be 'put in a home'.
+  cases: []
+  data_needed:
+  - Person (older adult; caregiver)
+  - Employment or Associate (caregiver relationship)
+  - 'Document: interview, witness statement, APS report'
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Anxiety, depression or dementia causing fearfulness unrelated to the carer
+  - Genuine worry about care costs
+  - Misread body language
+  version: 1
+- id: EF-003
+  name: Older person cannot be reached directly
+  definition: The bank or others cannot speak to the older person despite repeated attempts, often because
+    someone else intercepts contact.
+  areas:
+  - EF
+  typology: Isolation of the victim
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 9
+    quote: The financial institution is unable to speak directly with the older customer, despite repeated
+      attempts to contact him or her.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FIN-2011-A003
+    publisher: FinCEN
+    year: '2011'
+    url: https://www.fincen.gov/sites/default/files/shared/fin-2011-a003.pdf
+    locator: p. 2
+    quote: The financial institution is unable to speak directly with the elder, despite repeated attempts
+      to contact him or her;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Red Flags of Elder Abuse
+    publisher: US Department of Justice, Elder Justice Initiative
+    year: '2023'
+    url: https://www.justice.gov/elderjustice/red-flags-elder-abuse
+    locator: Warning signs of emotional/psychological abuse
+    quote: Witnessing a caregiver controlling or isolating an older adult
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Graves case: co-conspirators moved the victim and refused to tell friends and family where she was
+    living (FinCEN 2022, p. 5).'
+  cases:
+  - name: United States v. Donna Graves
+    year: '2021'
+    jurisdiction: US District Court, Western District of North Carolina
+    what_happened: Defendants moved the victim from her home to an apartment and then a rental home, refusing
+      to let friends and family know where she lived.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    source_title: FinCEN Advisory FIN-2022-A002, p. 5
+  data_needed:
+  - Person (older adult)
+  - Address (changes of residence)
+  - 'Event or Note: failed contact attempts'
+  - Associate (gatekeeper)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Hospital stay or illness
+  - Moved in with family or into care
+  - Hearing loss or phone problems
+  version: 1
+- id: EF-004
+  name: New helper transacts without proper authority
+  definition: A new caretaker, relative or friend suddenly starts doing financial transactions for the
+    older person without proper documentation such as a valid power of attorney.
+  areas:
+  - EF
+  typology: Elder theft; unauthorised agency
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 9
+    quote: A new caretaker, relative, or friend suddenly begins conducting financial transactions on behalf
+      of an older customer without proper documentation.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Characteristics of Representative Payees That May Increase the Risk of Benefit Misuse (A-09-08-38055)
+    publisher: Social Security Administration, Office of the Inspector General
+    year: '2009'
+    url: https://oig-files.ssa.gov/audits/full/A-09-08-38055.pdf
+    locator: Results of Review
+    quote: 1 acted as a “de facto” representative payee for 3 beneficiaries without SSA’s knowledge.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A neighbour begins cashing the older person's cheques and using their bank card with no power of attorney
+    on file.
+  cases: []
+  data_needed:
+  - Person (older adult; new helper)
+  - Representation (claimed agency, with startDate)
+  - Document (power of attorney, or its absence)
+  - Payment (transactions initiated by the helper)
+  - BankAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Informal family help that was never formalised
+  - Paperwork filed but not yet processed
+  - Emergency help after a hospital admission
+  version: 1
+- id: EF-005
+  name: Sudden change of power of attorney, trust, will or estate plan
+  definition: Control of the older person's money or estate suddenly passes to a different relative or
+    a new person, especially where undue influence, coercion, forgery or lack of mental capacity is possible.
+  areas:
+  - EF
+  typology: Abuse of power of attorney; undue influence; estate manipulation
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 10
+    quote: An older customer’s financial management changes suddenly, such as through a change of power
+      of attorney, trust, or estate planning vehicles, to a different family member or a new individual,
+      particularly if such changes appear to be done under undue influence, coercion, or forgery or the
+      customer has diminished cognitive abilities and is unable to agree to or understand the consequences
+      of the new arrangement.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Red Flags of Elder Abuse
+    publisher: US Department of Justice, Elder Justice Initiative
+    year: '2023'
+    url: https://www.justice.gov/elderjustice/red-flags-elder-abuse
+    locator: Warning signs of financial exploitation
+    quote: Abrupt changes in a will or other financial documents
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FIN-2011-A003
+    publisher: FinCEN
+    year: '2011'
+    url: https://www.fincen.gov/sites/default/files/shared/fin-2011-a003.pdf
+    locator: p. 2
+    quote: The elderly individual’s financial management changes suddenly, such as through a change of
+      power of attorney to a different family member or a new individual;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Codicils to Brooke Astor's will executed while she had dementia (People v Marshall).
+  - An exterminator persuaded an 86-year-old widow to sign over her power of attorney (US v Hampton).
+  cases:
+  - name: People v Anthony Marshall and Francis Morrissey
+    year: '2013'
+    jurisdiction: 'New York, Appellate Division, First Department (trial: Supreme Court, New York County,
+      2009)'
+    what_happened: Brooke Astor's son and an attorney were convicted after codicils to her will were executed
+      while she lacked capacity; the appeal largely affirmed the convictions, vacating one second-degree
+      grand larceny count against Marshall.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.nycourts.gov/Reporter/3dseries/2013/2013_02032.htm
+    source_title: People v Marshall, 2013 NY Slip Op 02032
+  - name: United States v. Karl Hampton
+    year: '2024'
+    jurisdiction: US District Court, Middle District of Tennessee
+    what_happened: An exterminator met an 86-year-old widow with dementia, persuaded her to sign over
+      power of attorney in April 2019, drained her accounts and took a $500,000 line of credit in her
+      name. Sentenced to 60 months and over $1.2 million restitution.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://justice.gov/usao-mdtn/pr/chattanooga-man-sentenced-60-months-prison-defrauding-elderly-widow-dementia-12
+    source_title: Chattanooga Man Sentenced to 60 Months in Prison for Defrauding Elderly Widow with Dementia
+  data_needed:
+  - Document (power of attorney, will, codicil, trust deed) with date
+  - Representation (agent, client, startDate)
+  - Succession (heir, predecessor)
+  - Person (older adult, new agent) with birthDate
+  - Event (diagnosis or capacity assessment date)
+  checkable: lookups
+  lookup_sources:
+  - Probate court records
+  - Land and deed registries
+  - Medical capacity evidence (by interview or court record)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate estate planning after a death or family falling-out
+  - Previous agent became unable or unwilling to serve
+  - Planned succession as health declines
+  version: 1
+- id: EF-006
+  name: Older person does not know their own finances
+  definition: The older person cannot describe their financial position or suddenly avoids talking about
+    money.
+  areas:
+  - EF
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 10
+    quote: An older customer lacks knowledge about his or her financial status, or shows a sudden reluctance
+      to discuss financial matters.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FIN-2011-A003
+    publisher: FinCEN
+    year: '2011'
+    url: https://www.fincen.gov/sites/default/files/shared/fin-2011-a003.pdf
+    locator: p. 3
+    quote: The elderly customer lacks knowledge about his or her financial status, or shows a sudden reluctance
+      to discuss financial matters.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A credit-union member is unaware of large cheques being cashed on her account by a caregiver (CFPB
+    2019 illustrative pattern).
+  cases: []
+  data_needed:
+  - Person (older adult)
+  - 'Document: interview notes'
+  - BankAccount (activity the person cannot explain)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Person always left finances to a spouse
+  - Normal privacy about money
+  - Early cognitive decline without anyone exploiting it
+  version: 1
+- id: EF-007
+  name: Distressed, anxious or unable to explain account activity
+  definition: The older person appears distressed, fearful or eager to follow others' instructions about
+    their accounts, or cannot answer basic questions about recent activity.
+  areas:
+  - EF
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 9
+    quote: An older customer appears distressed, submissive, fearful, anxious to follow others’ directions
+      related to their financial accounts, or unable to answer basic questions about account activity.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Elder Financial Exploitation: Threat Pattern & Trend Information, June 2022 to June 2023 (Financial
+      Trend Analysis)'
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+    locator: p. 5
+    quote: Filers also noted that elder scam victims who conducted in person transactions often appeared
+      nervous, struggled to maintain a consistent reason for sending their attempted transaction, and
+      may have been on the phone with someone directing their activities throughout the interaction.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A customer gives changing reasons for a large wire.
+  cases: []
+  data_needed:
+  - Person
+  - Document or Note (staff or witness observation)
+  - Payment (attempted transaction)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Nervous, inconsistent explanations during a transfer are a sign the older person is being
+      coached by a stranger scammer rather than robbed by someone they know.
+    source_url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+  innocent_explanations:
+  - General anxiety in public or with technology
+  - Grief or illness
+  - Memory problems with no exploitation
+  version: 1
+- id: EF-008
+  name: Sudden new contact details or overseas connections on the account
+  definition: Contact details on an older person's account change suddenly, or new emails, phone numbers
+    or accounts appear, possibly overseas.
+  areas:
+  - EF
+  typology: Account takeover; elder scam
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 9
+    quote: An older customer’s account shows sudden and unusual changes in contact information or new
+      connections to emails, phone numbers, or accounts that may originate overseas..
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Email and phone on the account change the week before large outgoing transfers.
+  cases: []
+  data_needed:
+  - BankAccount
+  - Email
+  - Address
+  - UserAccount (online banking)
+  - Event (date of change)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FinCEN found account takeover was the most frequently cited typology in elder scam reports.
+    source_url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+  innocent_explanations:
+  - New phone or email set up by a relative
+  - Moved house
+  - Family abroad helping with banking
+  version: 1
+- id: EF-009
+  name: Unexplained activity on the account of an impaired person
+  definition: A person known to have physical, emotional or cognitive impairment has account activity
+    that cannot be explained.
+  areas:
+  - EF
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 9
+    quote: An older customer with known physical, emotional, and cognitive impairment has unexplainable
+      or unusual account activity.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Online purchases from an account belonging to someone with advanced dementia in care.
+  cases: []
+  data_needed:
+  - Person (with Note on impairment)
+  - BankAccount
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Authorised agent paying care costs
+  - Automatic payments set up earlier
+  version: 1
+- id: EF-010
+  name: Taking instructions by phone during a transaction
+  definition: While at the counter, the older person seems to be following instructions from someone on
+    the phone and is nervous or will not hang up.
+  areas:
+  - EF
+  typology: Elder scam (impersonation, tech support, grandparent)
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 9
+    quote: During a transaction, an older customer appears to be taking direction from someone with whom
+      they are speaking on a cell phone, and the older customer seems nervous, leery, or unwilling to
+      hang up.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Customer withdrawing cash for a 'government agent' while on a call.
+  cases: []
+  data_needed:
+  - Person
+  - Note (staff observation)
+  - Payment (attempted)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Phone coaching is typical of stranger scams such as government impersonation run from overseas
+      call centres.
+    source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  innocent_explanations:
+  - Relative helping by phone with a legitimate transaction
+  - Customer checking details with an adviser
+  version: 1
+- id: EF-011
+  name: Urgent payment for a loved one's 'emergency' to an unrelated party
+  definition: The older person is frantic to send money at once for a supposed family emergency, but the
+    payee is an unconnected business or individual.
+  areas:
+  - EF
+  typology: Emergency / person-in-need ('grandparent') scam
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 9
+    quote: An older customer is agitated or frenzied about the need to send money immediately in the face
+      of a purported emergency of a loved one, but the money would be sent to the account of a seemingly
+      unconnected third-party business or individual.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A 'grandson in jail' needs bail wired to a lawyer's account the family has never heard of.
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, purpose)
+  - Person or Company (beneficiary)
+  - Family (to test the claimed relationship)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: This is the stranger-scam side of elder exploitation, which the scam area also covers.
+    source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  innocent_explanations:
+  - A real emergency paid through a legitimate third party such as a hospital or bail bond agent
+  version: 1
+- id: EF-012
+  name: Older person asked to receive and forward money or open accounts
+  definition: An online friend or romantic partner asks the older person to receive and pass on money,
+    or to open a bank account or company for a 'business opportunity', making them a money mule.
+  areas:
+  - EF
+  typology: Romance scam; money mule recruitment
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 9
+    quote: An older customer mentions how an online friend or romantic partner is asking them to receive
+      and forward money to one or more individuals on their behalf or open a bank account for a “business
+      opportunity.”
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Elder Financial Exploitation: Threat Pattern & Trend Information, June 2022 to June 2023'
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+    locator: p. 7, Scams Used to Both Extract and Move Funds
+    quote: Unwitting money mules are often also scam victims.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Suspicious Activity Reports on Elder Financial Exploitation: Issues and Trends'
+    publisher: Consumer Financial Protection Bureau
+    year: '2019'
+    url: https://files.consumerfinance.gov/f/documents/cfpb_suspicious-activity-reports-elder-financial-exploitation_report.pdf
+    locator: Figure 11, Money mule
+    quote: Shortly after receiving these sums, he sent all or nearly all of the funds he received to individuals
+      in one African country.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A retired man receives transfers from Europe and the US and sends nearly all of it on within days
+    (CFPB illustrative pattern, 'flipping').
+  cases: []
+  data_needed:
+  - Payment (incoming and outgoing, dates, amounts)
+  - BankAccount (new, with openingDate)
+  - Company (new LLC in the older person's name)
+  - Person (online contact)
+  - Message or Email
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Older scam victims are used as money mules to move proceeds from other victims; FinCEN describes
+      scams used both to extract and move funds.
+    source_url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+  innocent_explanations:
+  - Genuinely helping relatives abroad with remittances
+  - Real small business started in retirement
+  version: 1
+- id: EF-013
+  name: Drifting away from old relationships toward new 'friends'
+  definition: The older person withdraws from existing family and friends and becomes close to new acquaintances
+    or strangers, often alongside isolation by a carer.
+  areas:
+  - EF
+  typology: Isolation; grooming
+  status: verified
+  sources:
+  - title: FIN-2011-A003
+    publisher: FinCEN
+    year: '2011'
+    url: https://www.fincen.gov/sites/default/files/shared/fin-2011-a003.pdf
+    locator: p. 2
+    quote: The customer moves away from existing relationships and toward new associations with other
+      “friends” or strangers;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 4
+    quote: Criminals frequently exploit victims’ reliance on support and services and will take advantage
+      of any cognitive and physical disabilities, or environmental factors such as social isolation, to
+      establish control over the victims’ accounts, assets, or identity.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Graves case: victim isolated from friends and family before financial control was taken.'
+  cases: []
+  data_needed:
+  - Person
+  - Associate (new and lapsed relationships, with dates)
+  - Family
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Moving to a new area or care home
+  - Family estrangement unrelated to exploitation
+  - Healthy new friendships or a new partner
+  version: 1
+- id: EF-014
+  name: Dormant high-balance account suddenly drained
+  definition: An account with a large balance that had little activity starts showing constant withdrawals.
+  areas:
+  - EF
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 10, Financial Red Flags
+    quote: Dormant accounts with large balances begin to show constant withdrawals.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A savings account untouched for years shows weekly withdrawals after a new carer arrives.
+  cases: []
+  data_needed:
+  - BankAccount (balance)
+  - Payment (series, dates, amounts)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Paying for care or a move
+  - Planned gifts or estate planning
+  - Spending savings in retirement as intended
+  version: 1
+- id: EF-015
+  name: Large purchases of gift cards or prepaid cards
+  definition: The older person buys large numbers of gift cards or prepaid access cards, a common scam
+    payment method.
+  areas:
+  - EF
+  typology: Elder scam payment method
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 10
+    quote: An older customer purchases large numbers of gift cards or prepaid access cards.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Repeated purchases of high-value gift cards over a few days.
+  cases: []
+  data_needed:
+  - Payment (merchant, amount)
+  - Note (card numbers passed on)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Gift cards are a scam payment channel named in the advisory.
+    source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  innocent_explanations:
+  - Holiday presents
+  - Buying cards for a club or charity raffle
+  version: 1
+- id: EF-016
+  name: Sudden interest in buying virtual currency
+  definition: An older person suddenly starts talking about and buying cryptocurrency (convertible virtual
+    currency).
+  areas:
+  - EF
+  typology: Investment or romance scam; crypto kiosk payment
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 10
+    quote: An older customer suddenly begins discussing and buying CVC.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Cash deposits into a crypto kiosk after an online romance.
+  cases: []
+  data_needed:
+  - Payment
+  - CryptoWallet
+  - Company (exchange or kiosk operator)
+  checkable: lookups
+  lookup_sources:
+  - Blockchain explorers
+  - Exchange records (by legal process)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: FinCEN notes romance scams can turn into investment scams, citing its 'pig butchering' alert.
+    source_url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+  innocent_explanations:
+  - Genuine personal investment decision
+  version: 1
+- id: EF-017
+  name: Payment memos such as 'tech support', 'winnings' or 'taxes'
+  definition: Several cheques or wires carry memo lines that match known scam stories, such as tech support
+    fees, prize winnings or taxes.
+  areas:
+  - EF
+  typology: Tech support, lottery and government impersonation scams
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 10
+    quote: An older customer sends multiple checks or wire transfers with descriptors in the memo line
+      such as “tech support services,” “winnings,” or “taxes.”
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Three wires labelled 'tax on prize' to different payees.
+  cases: []
+  data_needed:
+  - Payment (purpose/memo, beneficiary)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: These memo words match the advance-fee and tech-support scam stories.
+    source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  innocent_explanations:
+  - Real IT service bills
+  - Real tax payments to a tax authority
+  version: 1
+- id: EF-018
+  name: Uncharacteristic large or frequent withdrawals and transfers
+  definition: Cash withdrawals or asset transfers from the older person's account are out of character,
+    sudden, unusually frequent or large.
+  areas:
+  - EF
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 10
+    quote: Uncharacteristic, sudden, abnormally frequent, or significant withdrawals of cash or transfers
+      of assets from an older customer’s account.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Red Flags of Elder Abuse
+    publisher: US Department of Justice, Elder Justice Initiative
+    year: '2023'
+    url: https://www.justice.gov/elderjustice/red-flags-elder-abuse
+    locator: Warning signs of financial exploitation
+    quote: Sudden changes in bank accounts or banking practices, including an unexplained withdrawal of
+      large sums of money by a person accompanying the older adult
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'CFPB pattern: an older woman visits the branch several times to withdraw cash, accompanied by her
+    son who is her agent.'
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment (time series against the person's past baseline)
+  - Person (who accompanied or initiated)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Home repairs, medical bills, a move into care
+  - Gifts the person freely chose to make
+  version: 1
+- id: EF-019
+  name: Money sent to people the older person has never met
+  definition: The older person receives and sends money to other states or abroad, to people they have
+    no in-person relationship with, and the explanation suggests a scam or money mule activity.
+  areas:
+  - EF
+  typology: Romance scam; money mule
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 10
+    quote: An older customer receives and transfers money interstate or abroad to recipients with whom
+      they have no in-person relationship, and the explanation seems suspicious or indicative of a scam
+      or money mule scheme.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Suspicious Activity Reports on Elder Financial Exploitation: Issues and Trends'
+    publisher: CFPB
+    year: '2019'
+    url: https://files.consumerfinance.gov/f/documents/cfpb_suspicious-activity-reports-elder-financial-exploitation_report.pdf
+    locator: Figure 11, Romance scam
+    quote: He met her online and this will be their first in-person meeting.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An older man wires money to an online fiancée abroad so she can 'visit' (CFPB illustrative pattern).
+  cases: []
+  data_needed:
+  - Payment (beneficiary, country)
+  - Person (recipient)
+  - Address (recipient country)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Receiving then forwarding funds to unknown recipients is the money mule pattern.
+    source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  innocent_explanations:
+  - Supporting relatives or a sponsored child abroad
+  - Charitable giving
+  version: 1
+- id: EF-020
+  name: Repeated maximum ATM withdrawals
+  definition: Frequent large withdrawals, including taking the daily maximum from an ATM.
+  areas:
+  - EF
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 10
+    quote: Frequent large withdrawals, including daily maximum currency withdrawals from an ATM.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Red Flags of Elder Abuse
+    publisher: US DOJ Elder Justice Initiative
+    year: '2023'
+    url: https://www.justice.gov/elderjustice/red-flags-elder-abuse
+    locator: Warning signs of financial exploitation
+    quote: Unauthorized withdrawal of the older adult’s funds using their ATM card
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FIN-2011-A003
+    publisher: FinCEN
+    year: '2011'
+    url: https://www.fincen.gov/sites/default/files/shared/fin-2011-a003.pdf
+    locator: p. 2
+    quote: Frequent large withdrawals, including daily maximum currency withdrawals from an ATM;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'CFPB pattern: frequent large ATM withdrawals while a caregiver cashes large checks on the account.'
+  cases: []
+  data_needed:
+  - Payment (ATM withdrawals, location, time)
+  - BankAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Person prefers cash for paying a carer or household costs
+  - Travel
+  version: 1
+- id: EF-021
+  name: Sudden bounced payments (non-sufficient funds)
+  definition: Payments start failing for lack of funds, suddenly or often, on an account that used to
+    be healthy.
+  areas:
+  - EF
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 10
+    quote: Sudden or frequent non-sufficient fund activity.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Utility direct debits bounce for the first time in decades.
+  cases: []
+  data_needed:
+  - BankAccount
+  - Payment (returned items)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Pension or benefit payment delayed
+  - Honest mistake or forgetfulness
+  version: 1
+- id: EF-022
+  name: Bills unpaid or care poor despite enough money
+  definition: Services go unpaid, or the person gets substandard care, even though they have the money
+    to pay, suggesting someone else has the money or access.
+  areas:
+  - EF
+  typology: Elder theft; neglect by fiduciary
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 10
+    quote: Uncharacteristic nonpayment for services, which may indicate a loss of funds or of access to
+      funds.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Red Flags of Elder Abuse
+    publisher: US DOJ Elder Justice Initiative
+    year: '2023'
+    url: https://www.justice.gov/elderjustice/red-flags-elder-abuse
+    locator: Warning signs of financial exploitation
+    quote: Provision of substandard care or bills left unpaid despite the availability of adequate financial
+      resources
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Red Flags (guardianship)
+    publisher: nvcourts.gov
+    url: https://nvcourts.gov/__data/assets/pdf_file/0020/12854/red_flags.pdf
+    locator: The Guardian, Financial/Accounting Irregularities
+    quote: Does not pay the bills or pays them late or irregularly
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Care home fees in arrears while the resident's account shows large transfers to a relative.
+  cases: []
+  data_needed:
+  - Debt (care home or utility arrears)
+  - BankAccount (balance)
+  - Payment
+  - CourtCase (collection or eviction)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Forgetfulness or confusion
+  - Billing dispute
+  - Funds tied up in probate or a frozen account
+  version: 1
+- id: EF-023
+  name: Debits out of keeping with the person's habits
+  definition: Card or account debits do not fit the older person's normal spending, for example at places
+    they never go.
+  areas:
+  - EF
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 10
+    quote: Debit transactions that are inconsistent for the older customer.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Red Flags of Elder Abuse
+    publisher: US DOJ Elder Justice Initiative
+    year: '2023'
+    url: https://www.justice.gov/elderjustice/red-flags-elder-abuse
+    locator: Warning signs of financial exploitation
+    quote: Unexplained credit card charges
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Suspicious Activity Reports on Elder Financial Exploitation: Issues and Trends'
+    publisher: CFPB
+    year: '2019'
+    url: https://files.consumerfinance.gov/f/documents/cfpb_suspicious-activity-reports-elder-financial-exploitation_report.pdf
+    locator: Figure 11, Exploitation by family member/fiduciary
+    quote: Some transactions have occurred at liquor stores, casinos, and other businesses that the customer
+      has not patronized previously.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Card used at casinos and liquor stores by an adult son holding power of attorney (CFPB illustrative
+    pattern).
+  cases: []
+  data_needed:
+  - Payment (merchant, location, date)
+  - Person (cardholder and user)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Agent buying things for the person
+  - Person taking up new interests
+  version: 1
+- id: EF-024
+  name: Out-of-character attempts to wire large sums
+  definition: The older person tries to send unusually large wire transfers they would not normally make.
+  areas:
+  - EF
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 10
+    quote: Uncharacteristic attempts to wire large sums of money.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FIN-2011-A003
+    publisher: FinCEN
+    year: '2011'
+    url: https://www.fincen.gov/sites/default/files/shared/fin-2011-a003.pdf
+    locator: p. 2
+    quote: Uncharacteristic attempts to wire large sums of money;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Customer with no wire history tries to send $50,000 abroad.
+  cases: []
+  data_needed:
+  - Payment (attempted, amount, beneficiary)
+  - BankAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - House purchase or deposit
+  - Paying for care or a family wedding
+  version: 1
+- id: EF-025
+  name: Closing CDs or accounts regardless of penalties
+  definition: Term deposits or accounts are closed early even though this incurs penalties, suggesting
+    pressure to raise cash fast.
+  areas:
+  - EF
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 10
+    quote: Closing of CDs or accounts without regard to penalties.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Three certificates of deposit cashed early in one week.
+  cases: []
+  data_needed:
+  - BankAccount (closingDate)
+  - Payment (penalty, destination of funds)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Urgent genuine need such as medical costs
+  - Moving money to a better rate
+  version: 1
+- id: EF-026
+  name: New names added to bank signature cards
+  definition: Additional people are added as signatories on the older person's accounts.
+  areas:
+  - EF
+  status: verified
+  sources:
+  - title: Red Flags of Elder Abuse
+    publisher: US DOJ Elder Justice Initiative
+    year: '2023'
+    url: https://www.justice.gov/elderjustice/red-flags-elder-abuse
+    locator: Warning signs of financial exploitation
+    quote: The inclusion of additional names on an older adult’s bank signature card
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A new 'friend' becomes a joint holder weeks before large withdrawals.
+  cases: []
+  data_needed:
+  - BankAccount
+  - Representation or Ownership (signatory, startDate)
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Adding a trusted child for convenience as health declines
+  - Bank advice to add a joint holder
+  version: 1
+- id: EF-027
+  name: Forged signatures on transactions or titles
+  definition: A forged signature is found on financial transactions or on title documents for the older
+    person's property.
+  areas:
+  - EF
+  typology: Forgery; deed or title theft
+  status: verified
+  sources:
+  - title: Red Flags of Elder Abuse
+    publisher: US DOJ Elder Justice Initiative
+    year: '2023'
+    url: https://www.justice.gov/elderjustice/red-flags-elder-abuse
+    locator: Warning signs of financial exploitation
+    quote: Discovery of a forged signature for financial transactions or for the titles of the older adult’s
+      possessions
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Elder Financial Exploitation: Threat Pattern & Trend Information'
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+    locator: p. 9
+    quote: Perpetrators with access to a victim’s checkbook will write themselves checks and either have
+      victims sign the check or forge the signature.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Morrissey was found to have forged Brooke Astor's signature on a codicil (People v Marshall).
+  cases:
+  - name: People v Francis Morrissey
+    year: '2013'
+    jurisdiction: New York, Appellate Division, First Department
+    what_happened: Conviction affirmed; the attorney was found to have forged Brooke Astor's signature
+      on a codicil to her will.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.nycourts.gov/Reporter/3dseries/2013/2013_02032.htm
+    source_title: People v Marshall, 2013 NY Slip Op 02032
+  data_needed:
+  - Document (cheque, deed, title, codicil)
+  - RealEstate or Vehicle (title)
+  - Person (signer, beneficiary)
+  checkable: lookups
+  lookup_sources:
+  - Recorder of deeds / land registry
+  - Vehicle title registry
+  - Handwriting examination (expert)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Signature changed with age, tremor or illness
+  - Agent signing lawfully under power of attorney
+  version: 1
+- id: EF-028
+  name: Previously uninvolved relatives suddenly claim property
+  definition: Relatives who were not involved before suddenly appear and claim rights to the older person's
+    property or possessions.
+  areas:
+  - EF
+  status: verified
+  sources:
+  - title: Red Flags of Elder Abuse
+    publisher: US DOJ Elder Justice Initiative
+    year: '2023'
+    url: https://www.justice.gov/elderjustice/red-flags-elder-abuse
+    locator: Warning signs of financial exploitation
+    quote: Sudden appearance of previously uninvolved relatives claiming their rights to an older adult’s
+      property or possessions
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A distant nephew files for guardianship weeks after the person inherits a house.
+  cases: []
+  data_needed:
+  - Family
+  - Person
+  - RealEstate
+  - CourtCase and CourtCaseParty (guardianship or probate filings)
+  checkable: lookups
+  lookup_sources:
+  - Probate and guardianship court dockets
+  - Property records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Relative stepping in after learning of a crisis
+  - Reconciliation in later life
+  version: 1
+- id: EF-029
+  name: Unexplained sudden transfer of property or assets
+  definition: Assets such as a house, car or investments are suddenly transferred to a family member or
+    an outsider with no clear reason.
+  areas:
+  - EF
+  typology: Asset or deed transfer
+  status: verified
+  sources:
+  - title: Red Flags of Elder Abuse
+    publisher: US DOJ Elder Justice Initiative
+    year: '2023'
+    url: https://www.justice.gov/elderjustice/red-flags-elder-abuse
+    locator: Warning signs of financial exploitation
+    quote: Unexplained sudden transfer of assets to a family member or someone outside the family
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 4
+    quote: These relationships enable trusted persons to repeatedly abuse the victims by liquidating savings
+      and retirement accounts, stealing Social Security benefit checks and other income, transferring
+      property and other assets, or maxing out credit cards in the name of the victims until most of their
+      assets are stolen.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Graves co-conspirators fraudulently transferred or tried to transfer the victim's assets to themselves
+    (DOJ W.D.N.C., 2020).
+  cases:
+  - name: United States v. Gerald Maxwell Harrison and Elizabeth Robin Williams
+    year: '2020'
+    jurisdiction: US District Court, Western District of North Carolina
+    what_happened: Both pleaded guilty to wire fraud conspiracy, interstate transportation of stolen property
+      and money laundering conspiracy after emptying a dementia victim's accounts, pawning her jewellery,
+      stealing her federal benefits and transferring her assets to themselves; more than $400,000 taken.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-wdnc/pr/two-mint-hill-residents-plead-guilty-federal-charges-stealing-more-400000-elderly
+    source_title: Two Mint Hill Residents Plead Guilty To Federal Charges For Stealing More Than $400,000
+      From Elderly
+  data_needed:
+  - Ownership (owner, asset, startDate, endDate)
+  - RealEstate
+  - Vehicle
+  - Payment (consideration paid, if any)
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Recorder of deeds / land registry
+  - Vehicle title registry
+  - Company registry for shares
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: In the Harrison and Williams case, money laundering conspiracy was among the charges they
+      pleaded guilty to.
+    source_url: https://www.justice.gov/usao-wdnc/pr/two-mint-hill-residents-plead-guilty-federal-charges-stealing-more-400000-elderly
+  innocent_explanations:
+  - Planned lifetime gifts or inheritance planning
+  - Medicaid or tax planning on legal advice
+  - Sale at fair value
+  version: 1
+- id: EF-030
+  name: Paying for services that are not needed
+  definition: The older person is charged for services they do not need.
+  areas:
+  - EF
+  status: verified
+  sources:
+  - title: Red Flags of Elder Abuse
+    publisher: US DOJ Elder Justice Initiative
+    year: '2023'
+    url: https://www.justice.gov/elderjustice/red-flags-elder-abuse
+    locator: Warning signs of financial exploitation
+    quote: The provision of services that are not necessary
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Repeated roof or pest-control 'repairs' billed to the same homeowner.
+  cases: []
+  data_needed:
+  - Contract
+  - Payment
+  - Company (contractor)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Unnecessary services to older people overlap with billing fraud when they are charged to insurance
+      or Medicare.
+    source_url: https://www.justice.gov/elderjustice/red-flags-elder-abuse
+  innocent_explanations:
+  - Cautious upkeep
+  - Services the person genuinely wanted
+  version: 1
+- id: EF-031
+  name: Money or valuables disappear without explanation
+  definition: Funds or valuable belongings go missing with no explanation.
+  areas:
+  - EF
+  status: verified
+  sources:
+  - title: Red Flags of Elder Abuse
+    publisher: US DOJ Elder Justice Initiative
+    year: '2023'
+    url: https://www.justice.gov/elderjustice/red-flags-elder-abuse
+    locator: Warning signs of financial exploitation
+    quote: Unexplained disappearance of funds or valuable possessions
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Jewellery pawned by housekeepers in the Graves case.
+  cases: []
+  data_needed:
+  - Asset or Thing (valuables)
+  - Document (pawn or sale records)
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Pawn shop records (where available to police)
+  - Online marketplace listings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Items misplaced, given away or sold by the person
+  - Memory problems
+  version: 1
+- id: EF-032
+  name: Trusted person uses the victim's money for their own bills and purchases
+  definition: Someone with access to the older person's accounts pays their own bills, writes cheques
+    to themselves, or makes purchases for themselves, usually with little effort to hide it.
+  areas:
+  - EF
+  typology: Elder theft by family or caregiver
+  status: verified
+  sources:
+  - title: 'Elder Financial Exploitation: Threat Pattern & Trend Information, June 2022 to June 2023'
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+    locator: p. 9, Methods of Elder Theft
+    quote: These perpetrators made little or no effort to obfuscate the payments.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Elder Financial Exploitation: Threat Pattern & Trend Information'
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+    locator: p. 9
+    quote: 'Online bill pay: Perpetrators with access to a victim’s account will pay their own bills directly.'
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Suspicious Activity Reports on Elder Financial Exploitation: Issues and Trends'
+    publisher: CFPB
+    year: '2019'
+    url: https://files.consumerfinance.gov/f/documents/cfpb_suspicious-activity-reports-elder-financial-exploitation_report.pdf
+    locator: Figure 11, Theft by caregiver
+    quote: In addition, an individual with a different last name has been cashing large checks drawn on
+      the account in person.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Payments from the victim's account to the carer's own phone, car loan or credit card.
+  cases:
+  - name: United States v. Karl Hampton
+    year: '2024'
+    jurisdiction: US District Court, Middle District of Tennessee
+    what_happened: After obtaining power of attorney, drained the widow's accounts through checks, transfers,
+      cash withdrawals and credit card charges totalling more than $1.2 million.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://justice.gov/usao-mdtn/pr/chattanooga-man-sentenced-60-months-prison-defrauding-elderly-widow-dementia-12
+    source_title: DOJ USAO M.D. Tenn. press release, 10 Sept 2024
+  data_needed:
+  - Payment (payer = victim account, beneficiary = trusted person or their creditors)
+  - BankAccount
+  - Person
+  - Employment or Family (relationship)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Agreed payment to a family carer
+  - Reimbursement for shopping done for the person
+  - Gifts the person authorised
+  version: 1
+- id: EF-033
+  name: 'Perpetrator is close by: adult child or professional caregiver living near the victim'
+  definition: In elder theft, the person taking money is most often an adult child, then a professional
+    carer, and tends to live near the victim.
+  areas:
+  - EF
+  typology: Elder theft profile
+  status: verified
+  sources:
+  - title: 'Elder Financial Exploitation: Threat Pattern & Trend Information, June 2022 to June 2023'
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+    locator: p. 2 and p. 8
+    quote: BSA filers reported adult children as the perpetrators of elder theft in nearly 40 percent
+      of cases, based on a manual review of EFE-related filings.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 4
+    quote: a family member was involved in the theft of assets from older adults in 46 percent of elder
+      theft cases reported between 2013 and 2019.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Use as a prioritisation hint: when theft is suspected, check adult children and paid carers first.'
+  cases: []
+  data_needed:
+  - Family
+  - Employment (carer)
+  - Address (proximity of suspect to victim)
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - People-search and address records
+  - Care agency employment records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Adult children and carers are also the people most likely to be helping legitimately; proximity alone
+    proves nothing
+  version: 1
+- id: EF-034
+  name: 'Account takeover: unauthorised logins, peer-to-peer transfers or new cards'
+  definition: Someone takes over the older person's online banking or card and moves money out by peer-to-peer
+    transfer, bank transfer or fake cheques.
+  areas:
+  - EF
+  typology: Account takeover
+  status: verified
+  sources:
+  - title: 'Elder Financial Exploitation: Threat Pattern & Trend Information, June 2022 to June 2023'
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+    locator: p. 6
+    quote: The unauthorized outgoing transactions were typically peer-to-peer transfers, bank transfers,
+      or fraudulent checks.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Elder Financial Exploitation: Threat Pattern & Trend Information'
+    publisher: FinCEN
+    year: '2024'
+    url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+    locator: p. 2, Key Findings
+    quote: The majority of elder scam-related filings also referenced account takeover activity.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - New device login followed by instant P2P transfers to unknown recipients.
+  cases: []
+  data_needed:
+  - UserAccount (logins, devices)
+  - Payment
+  - BankAccount
+  - Email
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Account takeover is mainly a cyber-enabled technique; FinCEN found it in most elder scam filings.
+    source_url: https://www.fincen.gov/sites/default/files/shared/FTA_Elder_Financial_Exploitation_508Final.pdf
+  innocent_explanations:
+  - Relative logging in with permission
+  - Person using a new phone
+  version: 1
+- id: EF-035
+  name: Request to change the trusted contact to an unknown person
+  definition: An older investor asks their broker to replace their trusted contact, for example swapping
+    a family member for a newly met third party.
+  areas:
+  - EF
+  typology: Securities-account exploitation
+  status: verified
+  sources:
+  - title: 'Regulatory Notice 17-11: Financial Exploitation of Seniors'
+    publisher: FINRA
+    year: '2017'
+    url: https://www.finra.org/industry/notices/17-11
+    locator: Footnote 6
+    quote: a customer's request to change his or her trusted contact person may be a possible red flag
+      of financial exploitation
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Trusted contact changed from daughter to a new 'financial friend' before large withdrawals.
+  cases: []
+  data_needed:
+  - Representation (trusted contact, startDate)
+  - Person
+  - Document (account forms)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: MA
+    reason: Exploitation of senior brokerage accounts is regulated under FINRA Rules 2165 and 4512.
+    source_url: https://www.finra.org/industry/notices/17-11
+  innocent_explanations:
+  - Original contact died or fell out with the person
+  - Person moved and chose someone nearer
+  version: 1
+- id: EF-036
+  name: Guardian living more affluently than before the appointment
+  definition: A court-appointed guardian or conservator's lifestyle looks richer than before they took
+    over the person's affairs.
+  areas:
+  - EF
+  typology: Guardianship / conservatorship abuse
+  status: verified
+  sources:
+  - title: Red Flags (guardianship)
+    publisher: nvcourts.gov
+    url: https://nvcourts.gov/__data/assets/pdf_file/0020/12854/red_flags.pdf
+    locator: The Guardian, Financial/Accounting Irregularities
+    quote: Has a lifestyle that seems more affluent than before the guardianship/conservatorship
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - New cars or property bought by a professional guardian with no new income.
+  cases:
+  - name: State of Nevada v. April Parks, Mark Simmons, Gary Neal Taylor
+    year: '2019'
+    jurisdiction: Nevada, Clark County District Court
+    what_happened: A private professional guardian and co-defendants used her guardianship company to
+      financially exploit elderly wards appointed to them by the court; Parks pleaded guilty to felonies
+      including elder exploitation and perjury and was sentenced to 192-480 months; restitution of $559,205.32
+      ordered.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://ag.nv.gov/News/PR/2019/Attorney_General_Laxalt,_District_Attorney_Wolfson_and_Sheriff_Lombardo_Announce_Sentences_of_April_Parks_and_Co-defendants_in_Nevada%E2%80%99s_Largest_Elder_Exploitation_Case
+    source_title: Attorney General Laxalt ... Announce Sentences of April Parks and Co-defendants in Nevada's
+      Largest Elder Exploitation Case (4 Jan 2019)
+  data_needed:
+  - Person (guardian)
+  - Ownership, RealEstate, Vehicle (guardian's new assets with dates)
+  - Representation (guardianship, startDate)
+  - CourtCase
+  checkable: lookups
+  lookup_sources:
+  - Property and vehicle registries
+  - Court guardianship files
+  - Social media
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Guardians are court-appointed fiduciaries; GAO found courts failed to oversee guardians in
+      12 of 20 cases.
+    source_url: https://gao.gov/assets/a310745.html
+  innocent_explanations:
+  - Guardian's own income rose, inheritance or new job
+  - Spending from savings
+  version: 1
+- id: EF-037
+  name: 'Guardian accounting: many cash cheques or repeated self-reimbursement'
+  definition: A guardian's court accounting shows many cheques written for cash or repeated payments back
+    to the guardian with no explanation.
+  areas:
+  - EF
+  typology: Guardianship / conservatorship abuse
+  status: verified
+  sources:
+  - title: Red Flags (guardianship)
+    publisher: nvcourts.gov
+    url: https://nvcourts.gov/__data/assets/pdf_file/0020/12854/red_flags.pdf
+    locator: Financial/Accounting Irregularities
+    quote: Numerous checks are written for cash
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Red Flags (guardianship)
+    publisher: nvcourts.gov
+    url: https://nvcourts.gov/__data/assets/pdf_file/0020/12854/red_flags.pdf
+    locator: Financial/Accounting Irregularities
+    quote: Guardian/conservator reimburses self repeatedly without explanations
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Red Flags (guardianship)
+    publisher: nvcourts.gov
+    url: https://nvcourts.gov/__data/assets/pdf_file/0020/12854/red_flags.pdf
+    locator: Financial/Accounting Irregularities
+    quote: Use of ATM without court authorization
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Annual accounting lists 30 cheques to 'cash' with no receipts.
+  cases: []
+  data_needed:
+  - Document (court accounting)
+  - Payment (beneficiary = guardian or cash)
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ward's small daily cash needs
+  - Legitimate court-approved fees and expenses
+  version: 1
+- id: EF-038
+  name: 'Guardian accounting: missing income or missing expected expenses'
+  definition: A guardian's accounting has gaps for expected income such as pensions, Social Security or
+    rent, or no entries for expected costs such as insurance.
+  areas:
+  - EF
+  typology: Guardianship / conservatorship abuse
+  status: verified
+  sources:
+  - title: Red Flags (guardianship)
+    publisher: nvcourts.gov
+    url: https://nvcourts.gov/__data/assets/pdf_file/0020/12854/red_flags.pdf
+    locator: Financial/Accounting Irregularities
+    quote: Gaps and missing entries for expected income (e.g., pensions, Social Security, rental income)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Red Flags (guardianship)
+    publisher: nvcourts.gov
+    url: https://nvcourts.gov/__data/assets/pdf_file/0020/12854/red_flags.pdf
+    locator: Financial/Accounting Irregularities
+    quote: No entries for expected expenses (e.g., health insurance, property insurance)
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Ward's rental property appears in the inventory but no rent appears in accountings.
+  cases: []
+  data_needed:
+  - Document (inventory and accountings)
+  - RealEstate
+  - Payment (expected income streams)
+  - CourtCase
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Property vacant
+  - Benefits paid into a different account
+  - Clerical error in the accounting
+  version: 1
+- id: EF-039
+  name: Guardian spending that does not fit the ward's life
+  definition: A guardian's accounting shows large spending that makes no sense for the ward, such as a
+    car they cannot drive, utilities for an empty home, or items not in their home.
+  areas:
+  - EF
+  typology: Guardianship / conservatorship abuse
+  status: verified
+  sources:
+  - title: Red Flags (guardianship)
+    publisher: nvcourts.gov
+    url: https://nvcourts.gov/__data/assets/pdf_file/0020/12854/red_flags.pdf
+    locator: Financial/Accounting Irregularities
+    quote: Has large expenditures in the accounting not appropriate to the respondent's lifestyle or setting
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Red Flags (guardianship)
+    publisher: nvcourts.gov
+    url: https://nvcourts.gov/__data/assets/pdf_file/0020/12854/red_flags.pdf
+    locator: Financial/Accounting Irregularities
+    quote: Automobile is purchased but the respondent cannot drive or use the vehicle
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Utility bills paid for a house while the ward lives in a nursing home and the house is empty.
+  cases: []
+  data_needed:
+  - Document (accounting)
+  - Payment
+  - Vehicle or Thing
+  - Address (ward's actual residence)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Keeping the home ready for a planned return
+  - Vehicle bought to drive the ward to appointments
+  version: 1
+- id: EF-040
+  name: Guardian misses court filings or lets the bond lapse
+  definition: A guardian does not file accountings and other court documents on time, or fails to renew
+    or loses the bond that insures the ward's estate.
+  areas:
+  - EF
+  typology: Guardianship / conservatorship abuse
+  status: verified
+  sources:
+  - title: Red Flags (guardianship)
+    publisher: nvcourts.gov
+    url: https://nvcourts.gov/__data/assets/pdf_file/0020/12854/red_flags.pdf
+    locator: Compliance/Quality of Care Issues; Financial/Accounting Irregularities
+    quote: Does not file court documents, including accountings, on time
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Red Flags (guardianship)
+    publisher: nvcourts.gov
+    url: https://nvcourts.gov/__data/assets/pdf_file/0020/12854/red_flags.pdf
+    locator: Financial/Accounting Irregularities
+    quote: Fails to renew a bond or has a bond revoked
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Guardianships: Cases of Financial Exploitation, Neglect, and Abuse of Seniors (GAO-10-1046)'
+    publisher: US Government Accountability Office
+    year: '2010'
+    url: https://gao.gov/assets/a310745.html
+    locator: What GAO Found
+    quote: In 12 of 20 cases, the courts failed to oversee guardians once they were appointed, allowing
+      the abuse of vulnerable seniors and their assets to continue.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Docket shows no annual accounting filed for three years.
+  cases:
+  - name: GAO review of 20 closed guardianship cases
+    year: '2010'
+    jurisdiction: United States (15 states and DC)
+    what_happened: GAO found guardians stole or improperly obtained $5.4 million from 158 incapacitated
+      victims; courts failed to screen guardians in 6 cases and failed to oversee them in 12.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://gao.gov/assets/a310745.html
+    source_title: 'GAO-10-1046, Guardianships: Cases of Financial Exploitation, Neglect, and Abuse of
+      Seniors'
+  data_needed:
+  - CourtCase (docket events)
+  - Document (accountings, bond)
+  - Representation (guardian)
+  checkable: lookups
+  lookup_sources:
+  - Probate / guardianship court dockets
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lay family guardian overwhelmed or unaware of deadlines
+  - Court backlog
+  version: 1
+- id: EF-041
+  name: Guardian blocks access to the ward and swaps their providers
+  definition: A guardian will not let the ward be interviewed alone and replaces the ward's doctors, bankers
+    or accountants with the guardian's own.
+  areas:
+  - EF
+  typology: Guardianship / conservatorship abuse; isolation
+  status: verified
+  sources:
+  - title: Red Flags (guardianship)
+    publisher: nvcourts.gov
+    url: https://nvcourts.gov/__data/assets/pdf_file/0020/12854/red_flags.pdf
+    locator: The Guardian
+    quote: Does not permit the respondent to be interviewed alone
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Red Flags (guardianship)
+    publisher: nvcourts.gov
+    url: https://nvcourts.gov/__data/assets/pdf_file/0020/12854/red_flags.pdf
+    locator: The Guardian
+    quote: Changes the respondent's providers to his/her own personal providers (e.g., physicians, dentist,
+      accountants, bankers)
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Ward's long-time bank account moved to the guardian's own bank and accountant.
+  cases: []
+  data_needed:
+  - Person (guardian, ward, providers)
+  - Associate or Employment (guardian-provider ties)
+  - BankAccount (changes of institution)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Moving the ward nearer the guardian requires new local providers
+  - Protecting a ward from a harmful relative
+  version: 1
+- id: EF-042
+  name: Fiduciary has their own money troubles
+  definition: The guardian or other fiduciary has financial problems such as tax debts or bankruptcy,
+    or major personal problems.
+  areas:
+  - EF
+  status: verified
+  sources:
+  - title: Red Flags (guardianship)
+    publisher: nvcourts.gov
+    url: https://nvcourts.gov/__data/assets/pdf_file/0020/12854/red_flags.pdf
+    locator: The Guardian
+    quote: Has financial problems (e.g., tax issues, bankruptcy) or personal problems
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Characteristics of Representative Payees That May Increase the Risk of Benefit Misuse (A-09-08-38055)
+    publisher: SSA Office of the Inspector General
+    year: '2009'
+    url: https://oig-files.ssa.gov/audits/full/A-09-08-38055.pdf
+    locator: p. 11-12
+    quote: A representative payee who does not have a reliable source of income is more likely to divert
+      the beneficiary’s funds for their own use.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - SSA OIG found a payee with no earnings who had filed for bankruptcy several times and had a $76,000
+    IRS tax lien.
+  cases: []
+  data_needed:
+  - Person (fiduciary)
+  - Debt
+  - CourtCase (bankruptcy)
+  - Sanction or Note (tax liens)
+  checkable: lookups
+  lookup_sources:
+  - Bankruptcy court records (PACER)
+  - Tax lien and judgment records
+  - Credit or court judgment databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many people with debts manage others' money honestly
+  version: 1
+- id: EF-043
+  name: Representative payee with a high-risk profile
+  definition: 'A person managing others'' Social Security benefits has several traits linked to misuse:
+    serving 4 to 14 beneficiaries, at least one unrelated beneficiary, self-employment income, no wages,
+    or being under 50 with very low earnings.'
+  areas:
+  - EF
+  typology: Representative payee misuse
+  status: verified
+  sources:
+  - title: Characteristics of Representative Payees That May Increase the Risk of Benefit Misuse (A-09-08-38055)
+    publisher: SSA Office of the Inspector General
+    year: '2009'
+    url: https://oig-files.ssa.gov/audits/full/A-09-08-38055.pdf
+    locator: Background and Results of Review
+    quote: We found the NAS characteristics should be used to identify representative payees who have
+      an increased risk of benefit misuse.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An individual with no wages acting as payee for six unrelated beneficiaries.
+  cases:
+  - name: SSA OIG audit of 60 high-risk representative payees
+    year: '2009'
+    jurisdiction: United States
+    what_happened: '42 of 60 payees engaged in practices raising misuse risk: 39 lacked documentation
+      for expenditures, 8 acted as conduit payees, 2 did not meet basic needs, 5 would not confirm beneficiaries
+      were in their care.'
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://oig-files.ssa.gov/audits/full/A-09-08-38055.pdf
+    source_title: SSA OIG A-09-08-38055
+  data_needed:
+  - Person (payee) with birthDate
+  - Representation (payee for each beneficiary)
+  - Family (relatedness)
+  - Employment (wages or self-employment)
+  checkable: lookups
+  lookup_sources:
+  - SSA records (by legal process)
+  - Employment and business registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Payee has at least 3 of the 5 NAS characteristics the SSA OIG audit tested; it found 42
+      of 60 such payees engaged in practices raising misuse risk
+    threshold_source: https://oig-files.ssa.gov/audits/full/A-09-08-38055.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Misused representative payments are a form of public benefits fraud.
+    source_url: https://oig-files.ssa.gov/audits/full/A-09-08-38055.pdf
+  innocent_explanations:
+  - Community volunteers and small care providers often serve several unrelated people properly
+  - Retired people may have no wages
+  version: 1
+- id: EF-044
+  name: Fiduciary commingles funds, deals in cash or keeps no records
+  definition: A person managing someone else's money mixes it with their own, runs things in cash, or
+    cannot document spending.
+  areas:
+  - EF
+  typology: Fiduciary misuse
+  status: verified
+  sources:
+  - title: Characteristics of Representative Payees That May Increase the Risk of Benefit Misuse (A-09-08-38055)
+    publisher: SSA Office of the Inspector General
+    year: '2009'
+    url: https://oig-files.ssa.gov/audits/full/A-09-08-38055.pdf
+    locator: Conclusion and Recommendations
+    quote: Moreover, many of these representative payees engaged in questionable practices, such as failing
+      to maintain documentation to support expenses, operating on a cash basis, or commingling beneficiary
+      funds with their own funds.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Benefits paid into the payee's personal account alongside their wages.
+  cases: []
+  data_needed:
+  - BankAccount (holder, whose funds)
+  - Payment
+  - Document (receipts, ledgers)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Untrained family members unaware of the rules
+  version: 1
+- id: EF-045
+  name: 'Conduit payee: benefits passed straight on with no oversight'
+  definition: A representative payee hands the whole benefit to the beneficiary or someone else without
+    managing it, so no one controls or accounts for it.
+  areas:
+  - EF
+  typology: Representative payee misuse
+  status: verified
+  sources:
+  - title: Characteristics of Representative Payees That May Increase the Risk of Benefit Misuse (A-09-08-38055)
+    publisher: SSA Office of the Inspector General
+    year: '2009'
+    url: https://oig-files.ssa.gov/audits/full/A-09-08-38055.pdf
+    locator: Conduit Payees
+    quote: According to SSA policy, a conduit payee turns over the full amount of benefits to the beneficiary
+      or another person without giving any direction or instruction on how to use the funds.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A payee in Chicago handed the full $785 monthly benefit to a beneficiary with no direction.
+  cases: []
+  data_needed:
+  - Representation (payee)
+  - Payment (benefit in, full amount out)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Beneficiary has regained capacity and should be paid directly
+  version: 1
+- id: EF-046
+  name: 'Undue influence: vulnerable person, influencer with authority, pressure tactics, unfair result'
+  definition: Someone in a position of trust uses pressure that overcomes a vulnerable person's free will
+    and produces an unfair result, judged by the person's vulnerability, the influencer's authority, the
+    tactics used, and how unfair the outcome is.
+  areas:
+  - EF
+  typology: Undue influence (legal test)
+  status: verified
+  sources:
+  - title: California Welfare and Institutions Code section 15610.70
+    publisher: State of California (via Justia)
+    url: https://law.justia.com/codes/california/code-wic/division-9/part-3/chapter-11/article-2/section-15610-70/
+    locator: subdivision (a)
+    quote: excessive persuasion that causes another person to act or refrain from acting by overcoming
+      that person's free will and results in inequity
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: California Welfare and Institutions Code section 15610.70
+    publisher: State of California (via Justia)
+    url: https://law.justia.com/codes/california/code-wic/division-9/part-3/chapter-11/article-2/section-15610-70/
+    locator: (a)(3)(A)
+    quote: Controlling necessaries of life, medication, the victim's interactions with others, access
+      to information, or sleep.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: California Welfare and Institutions Code section 15610.70
+    publisher: State of California (via Justia)
+    url: https://law.justia.com/codes/california/code-wic/division-9/part-3/chapter-11/article-2/section-15610-70/
+    locator: (a)(3)(C)
+    quote: Initiation of changes in personal or property rights, use of haste or secrecy in effecting
+      those changes,
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A carer rushes a dementia patient to a lawyer the family does not know to change a will in the carer's
+    favour.
+  cases: []
+  data_needed:
+  - Person (victim, influencer)
+  - Representation, Employment or Family (source of authority)
+  - Document (will, deed, POA) with dates
+  - Succession or Ownership (who benefits)
+  - Event (medical diagnosis)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (the statute says an inequitable result alone is
+      not enough)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Older people may freely reward those who cared for them
+  - Changes of heart after family conflict
+  - Persuasion that falls short of overcoming free will
+  jurisdictions: California statute; similar tests exist in other US states
+  version: 1
+- id: EF-047
+  name: Victim isolated, moved and denied care while assets drained
+  definition: The exploiter moves the older person, hides where they are, withholds medical care, and
+    abandons them once the money is gone.
+  areas:
+  - EF
+  typology: Elder theft combined with neglect
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: p. 5, Case Study on Elder Theft
+    quote: Over the course of the scheme, Graves and her co-conspirators failed to provide the victim
+      with proper medical care, which greatly diminished the victim’s health.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Red Flags of Elder Abuse
+    publisher: US DOJ Elder Justice Initiative
+    year: '2023'
+    url: https://www.justice.gov/elderjustice/red-flags-elder-abuse
+    locator: Warning signs of neglect and abandonment
+    quote: Unattended or untreated health problems
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Graves case: victim moved twice, friends not told, care withheld, then abandoned.'
+  cases:
+  - name: United States v. Donna Graves
+    year: '2021'
+    jurisdiction: US District Court, Western District of North Carolina
+    what_happened: Convicted of conspiracy to commit wire fraud and money laundering conspiracy; sentenced
+      to 97 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    source_title: FinCEN Advisory FIN-2022-A002, pp. 4-5
+  data_needed:
+  - Address (series of residences)
+  - Person
+  - Event (medical events)
+  - Payment
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CA
+    reason: Financial exploitation here came with neglect; the DOJ lists neglect warning signs alongside
+      financial ones.
+    source_url: https://www.justice.gov/elderjustice/red-flags-elder-abuse
+  innocent_explanations:
+  - Moves for care reasons
+  - Person refuses medical care themselves
+  version: 1
+not_reached:
+- GAO-10-1046 full PDF (gao.gov/new.items/d101046.pdf) returned Access Denied to direct download; only
+  the HTML version was read, via WebFetch summary, so the individual case narratives were not read
+- NCSC Guardianship Review Protocol detailed accounting red-flag PDF (ncfsc-web.squiz.cloud) was blocked
+  by the egress proxy; only the NCSC landing page was read
+- California WIC 15610.70 on leginfo.legislature.ca.gov was blocked; read via Justia, and only the definition
+  and paragraphs (3)(A) and the first clause of (3)(C) were obtained verbatim
+- CFPB 2016 'Recommendations and Report for Financial Institutions on Preventing and Responding to Elder
+  Financial Exploitation' not opened
+- CFPB/FinCEN 2017 joint memorandum was downloaded but not reviewed
+- FinCEN 2011 Advisory on Account Takeover (FIN-2011-A016) not opened
+- 'Interagency Statement on EFE (Dec 2024, revised June 2026): only definitions, holds and trusted-contact
+  sections read; it points to the FinCEN 2022 red flags rather than adding new ones'
+- 'Nevada AG release on the April Parks case: read via WebFetch summary, not the raw page'
+- People v Marshall (nycourts.gov) sits behind a Cloudflare challenge for direct download; read via WebFetch
+  summary only
+- DOJ release on the Pathan sentencing not opened directly; case facts taken from the FinCEN advisory
+  case study
+- 'Deed or home-title theft from older owners and nursing-home trust account theft: no primary red-flag
+  list found within this pass'

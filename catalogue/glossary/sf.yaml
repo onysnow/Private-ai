@@ -575,3 +575,181 @@ terms:
   indicators: []
   areas:
   - SF
+- term: DPRK IT worker
+  definition: A North Korean software or IT worker, usually based abroad, who gets remote jobs by pretending
+    to be from another country and whose pay helps fund North Korea's weapons programmes.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/923126/download?inline
+  cases: []
+  related:
+  - Laptop farm
+  indicators: []
+  areas:
+  - SF
+- term: Laptop farm
+  definition: A home or site, usually in the employer's country, where company laptops sent to remote
+    'employees' are kept switched on so workers abroad can use them remotely and appear to be local.
+  examples: []
+  source_url: https://www.justice.gov/usao-dc/pr/arizona-woman-sentenced-17m-it-worker-fraud-scheme-illegally-generated-revenue-north
+  cases: []
+  related:
+  - DPRK IT worker
+  - Facilitator
+  indicators: []
+  areas:
+  - SF
+- term: Facilitator (DPRK IT worker scheme)
+  definition: A person in the target country who helps foreign workers by lending identities, receiving
+    laptops or forwarding pay.
+  examples: []
+  source_url: https://www.ic3.gov/PSA/2025/PSA250723-4
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Face-swapping
+  definition: Software that replaces a person's face with another in live or recorded video, used to fool
+    video interviews.
+  examples: []
+  source_url: https://ic3.gov/PSA/2025/PSA250123
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Aggravated identity theft
+  definition: A US federal crime of using another real person's identity while committing certain other
+    felonies, such as wire fraud, carrying an added prison term.
+  examples: []
+  source_url: https://www.justice.gov/usao-dc/pr/arizona-woman-sentenced-17m-it-worker-fraud-scheme-illegally-generated-revenue-north
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Know Your Customer red flags (BIS)
+  definition: The US export regulator's published list of warning signs that a buyer may divert goods
+    to a banned user, use or country; exporters must resolve them before shipping.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/15/appendix-Supplement_No_3_to_part_732
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: SME (semiconductor manufacturing equipment)
+  definition: Machines used to make computer chips, such as lithography and etching tools, many of which
+    are export-controlled.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/15/appendix-Supplement_No_3_to_part_732
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: REPO Task Force
+  definition: The Russian Elites, Proxies, and Oligarchs Task Force, a group of governments set up in
+    2022 to find and freeze assets of sanctioned Russians.
+  examples: []
+  source_url: https://www.canada.ca/en/department-finance/programs/financial-sector-policy/global-advisory-on-russian-sanctions-evasion.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Enabler
+  definition: A professional, such as a lawyer, accountant or trust and company service provider, whose
+    skills or accounts help someone hide or move assets.
+  examples: []
+  source_url: https://www.canada.ca/en/department-finance/programs/financial-sector-policy/global-advisory-on-russian-sanctions-evasion.html
+  cases: []
+  related:
+  - Trust and company service provider
+  indicators: []
+  areas:
+  - SF
+- term: Trust and company service provider (TCSP)
+  definition: A business that forms companies and trusts and supplies directors, trustees or registered
+    addresses for clients.
+  examples: []
+  source_url: https://www.canada.ca/en/department-finance/programs/financial-sector-policy/global-advisory-on-russian-sanctions-evasion.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Straw purchaser
+  definition: A person who buys an asset in their own name on behalf of someone else who wants to stay
+    hidden.
+  examples: []
+  source_url: https://www.canada.ca/en/department-finance/programs/financial-sector-policy/global-advisory-on-russian-sanctions-evasion.html
+  cases: []
+  related:
+  - Nominee
+  - Front person
+  indicators: []
+  areas:
+  - SF
+- term: Front person
+  definition: Someone who appears on paper as owner, trustee or manager of assets that are really controlled
+    by another, often sanctioned, person.
+  examples: []
+  source_url: https://home.treasury.gov/news/press-releases/jy0841
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Blocked property
+  definition: Property in which a sanctioned person has an interest; under US sanctions it is frozen and
+    cannot be transferred or dealt in without a licence.
+  examples: []
+  source_url: https://home.treasury.gov/news/press-releases/jy0841
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Attorney trust account (IOLTA)
+  definition: A bank account a lawyer holds for client money, separate from the lawyer's own funds.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/new-york-attorney-pleads-guilty-conspiring-commit-money-laundering-promote-sanctions
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: SWIFT
+  definition: The Society for Worldwide Interbank Financial Telecommunication, the main messaging network
+    banks use to send international payment instructions; some Russian banks were removed from it in 2022.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/2022-03/FinCEN Alert Russian Sanctions Evasion
+    FINAL 508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Convertible virtual currency (CVC)
+  definition: FinCEN's term for digital currency, such as bitcoin, that can be exchanged for ordinary
+    money.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/2022-03/FinCEN Alert Russian Sanctions Evasion
+    FINAL 508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF
+- term: Financial Trend Analysis (FinCEN)
+  definition: A FinCEN report that studies patterns in suspicious activity reports filed by banks on a
+    given topic.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/2022-12/Financial Trend Analysis_Russian Oligarchs
+    FTA _Final.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - SF

@@ -536,3 +536,118 @@ terms:
   indicators: []
   areas:
   - HT
+- term: Trafficking in human beings for the purpose of organ removal (THBOR)
+  definition: Moving, recruiting or holding people by force, fraud, deception, abuse of vulnerability
+    or payment to someone controlling them, so that an organ can be taken from them. It is a form of human
+    trafficking under the UN Trafficking Protocol.
+  examples:
+  - Poor donors lured abroad with a promised payment and operated on in a private clinic
+  source_url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+  cases: []
+  related:
+  - Organ broker
+  - Transplant tourism
+  - Transplant commercialism
+  indicators: []
+  areas:
+  - HT
+- term: Transplant tourism
+  definition: Travelling abroad to get an organ transplant in ways that involve organ trade. The HOTT
+    indicators paper says it can look like trafficking but does not always involve it.
+  examples: []
+  source_url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+  cases: []
+  related:
+  - THBOR
+  - Transplant commercialism
+  indicators: []
+  areas:
+  - HT
+- term: Transplant commercialism
+  definition: Treating organs as goods that are bought and sold. The HOTT paper names it as a form of
+    organ trade that does not always involve trafficking.
+  examples: []
+  source_url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+  cases: []
+  related:
+  - THBOR
+  - Transplant tourism
+  indicators: []
+  areas:
+  - HT
+- term: Organ broker
+  definition: A middleman who finds paid organ donors, arranges their travel and housing, and charges
+    recipients for the transplant.
+  examples:
+  - Levy Izhak Rosenbaum, who pleaded guilty in 2011 to brokering kidney transplants
+  source_url: https://www.justice.gov/archive/usao/nj/Press/files/Rosenbaum,%20Levy%20Izhak%20Plea%20News%20Release.html
+  cases: []
+  related:
+  - THBOR
+  indicators: []
+  areas:
+  - HT
+- term: Valuable consideration (organ sales)
+  definition: Payment or other benefit given in exchange for something. In the US federal case against
+    Rosenbaum, the charge was transferring human organs 'for valuable consideration', meaning for payment.
+  examples: []
+  source_url: https://www.justice.gov/archive/usao/nj/Press/files/Rosenbaum,%20Levy%20Izhak%20Plea%20News%20Release.html
+  cases: []
+  related:
+  - Organ broker
+  indicators: []
+  areas:
+  - HT
+- term: Barrier model
+  definition: A way of mapping a crime as a series of steps (barriers) the criminals must pass, each needing
+    legal or illegal service providers. For organ trafficking these are recruitment, transport, entrance,
+    documents, housing, transplant, aftercare and finance.
+  examples: []
+  source_url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+  cases: []
+  related:
+  - THBOR
+  indicators: []
+  areas:
+  - HT
+- term: HOTT Project
+  definition: An EU-funded research project (2012-2015) on combating trafficking in human beings for the
+    purpose of organ removal. Its indicators come from interviews, victim testimonies and court judgments.
+  examples: []
+  source_url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+  cases: []
+  related:
+  - THBOR
+  indicators: []
+  areas:
+  - HT
+- term: Branding (trafficking)
+  definition: Marking a victim, usually with a tattoo, to show that a trafficker 'owns' or controls them.
+  examples: []
+  source_url: https://www.dhs.gov/sites/default/files/2023-07/BC_YouthIndicatorCard_508c.pdf
+  cases: []
+  related:
+  - HT-065
+  indicators: []
+  areas:
+  - HT
+- term: Blue Campaign
+  definition: The US Department of Homeland Security's national public-awareness campaign against human
+    trafficking, which publishes indicator cards.
+  examples: []
+  source_url: https://www.dhs.gov/sites/default/files/2023-07/BC_YouthIndicatorCard_508c.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT
+- term: EULEX
+  definition: The European Union's rule-of-law mission in Kosovo. Its judges sat on the panel that tried
+    the Medicus clinic organ-trafficking case.
+  examples: []
+  source_url: https://www.aljazeera.com/news/2013/4/29/doctors-jailed-for-kosovo-organ-trafficking
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HT

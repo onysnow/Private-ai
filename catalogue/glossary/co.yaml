@@ -574,3 +574,202 @@ terms:
   indicators: []
   areas:
   - CO
+- term: Kleptocracy
+  definition: Government by people who use their power to steal public wealth for themselves and their
+    circle.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2022-04-14/FinCEN%20Advisory%20Corruption%20FINAL%20508.pdf
+  cases: []
+  related:
+  - PEP
+  - Misappropriation of public assets
+  indicators: []
+  areas:
+  - CO
+- term: Misappropriation or embezzlement of public assets
+  definition: Theft, diversion or misuse of public funds, contracts or resources by an official for personal
+    benefit (UN Convention Against Corruption, Article 17, cited by FinCEN).
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2022-04-14/FinCEN%20Advisory%20Corruption%20FINAL%20508.pdf
+  cases: []
+  related:
+  - Kleptocracy
+  indicators: []
+  areas:
+  - CO
+- term: High-risk jurisdiction
+  definition: A country or territory whose company formation rules, financial sector or law enforcement
+    give little transparency, so money and ownership are easy to hide there.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2022-04-14/FinCEN%20Advisory%20Corruption%20FINAL%20508.pdf
+  cases: []
+  related:
+  - Secrecy jurisdiction
+  - Shell company
+  indicators: []
+  areas:
+  - CO
+- term: Signature bonus
+  definition: A one-off payment a company makes to the government when it signs or is awarded an oil,
+    gas or mining licence; NRGI notes these are especially vulnerable to diversion.
+  examples:
+  - Marathon Oil's Angola bonus, partly paid to a Sonangol account in Jersey
+  source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: National oil company (NOC)
+  definition: A state-owned oil company, such as Sonangol (Angola), NNPC (Nigeria) or PDVSA (Venezuela),
+    which often both sells or licenses resources and competes in the sector.
+  examples: []
+  source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Licence flipping
+  definition: Reselling a licence or contract, or the company holding it, for a big profit soon after
+    winning it, without developing the asset.
+  examples: []
+  source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  cases: []
+  related:
+  - CO-084
+  indicators: []
+  areas:
+  - CO
+- term: Briefcase company
+  definition: Nigerian term for a small, little-known intermediary firm, usually tied to a political figure,
+    that gets state oil cargoes it cannot handle itself and resells them to real traders for a margin.
+  examples: []
+  source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Shelf company
+  definition: A company set up with no operations so that someone can later buy it ready-made and repurpose
+    it; different from but similar to a shell company.
+  examples: []
+  source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  cases: []
+  related:
+  - Shell company
+  indicators: []
+  areas:
+  - CO
+- term: Carried company
+  definition: A partner in a licence-holding consortium that does not have to pay or perform its expected
+    share of the work, because other partners cover it.
+  examples: []
+  source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Front
+  definition: A person who stands in as owner for a hidden owner under an undisclosed agreement, controlled
+    through contracts, powers of attorney or pressure.
+  examples: []
+  source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  cases: []
+  related:
+  - Nominee shareholder
+  indicators: []
+  areas:
+  - CO
+- term: Forced marriage (imposed partner)
+  definition: When an official requires a bidder to partner with a particular company, often inexperienced
+    or politically connected, as a joint venture partner, subcontractor or service provider.
+  examples: []
+  source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  cases: []
+  related:
+  - CO-006
+  indicators: []
+  areas:
+  - CO
+- term: Pre-qualification
+  definition: An early stage of a tender where the government checks that companies meet minimum standards
+    before they may bid.
+  examples: []
+  source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Bid rotation
+  definition: A collusion scheme where competing firms take turns winning contracts in an agreed order.
+  examples: []
+  source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  cases: []
+  related:
+  - Bid rigging
+  indicators: []
+  areas:
+  - CO
+- term: Low-balling
+  definition: Winning with terms that look bad for the company, then renegotiating better terms with an
+    official after the award.
+  examples: []
+  source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Right of first refusal
+  definition: A right given to a company to take up a licence or contract before anyone else is offered
+    it.
+  examples: []
+  source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Single-source (direct) award
+  definition: Giving a contract or licence to one company without a competition.
+  examples: []
+  source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Oil-for-product swap
+  definition: A deal in which a state oil company gives crude oil to a trader in exchange for refined
+    fuels such as petrol, instead of cash.
+  examples: []
+  source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Model contract
+  definition: The standard contract or term sheet a government publishes for a licensing round, against
+    which final signed terms can be compared.
+  examples: []
+  source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO
+- term: Bearer shares
+  definition: Shares owned by whoever physically holds the share certificate, so the owner is not recorded;
+    NRGI lists them as a sign that may hide a PEP owner.
+  examples: []
+  source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CO

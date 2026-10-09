@@ -19,7 +19,7 @@ indicators:
     quote: Omitting entire sources of income.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Omitting specific items where similar items are included (IRM 25.1.2.3(2))
   - Failing to report or explain substantial amounts of income identified as received (IRM 25.1.2.3(2))
@@ -73,7 +73,7 @@ indicators:
     quote: Inability to explain substantial increases in net worth, especially over a period of years.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: IRM 25.1.2.3 Indicators of Fraud (Income)
     publisher: US Internal Revenue Service
     url: https://www.irs.gov/irm/part25/irm_25-001-002
@@ -81,7 +81,7 @@ indicators:
     quote: Substantial personal expenditures exceeding reported resources.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Property, vehicles or luxury goods bought by someone whose returns show modest income
   cases: []
@@ -130,7 +130,7 @@ indicators:
     quote: Inability to explain sources of bank deposits substantially exceeding reported income.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
     publisher: Financial Intelligence Analysis Unit, Malta
     url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
@@ -138,7 +138,7 @@ indicators:
     quote: Frequent amounts of deposits from unexplained sources.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An entity that does not report any revenue but has executed transactions which have been reported
     by third parties (FIAU Annex I s.2)
@@ -180,7 +180,7 @@ indicators:
     quote: Concealing domestic or foreign bank accounts, brokerage accounts, digital assets such as convertible…
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
     publisher: Financial Intelligence Analysis Unit, Malta
     url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
@@ -188,7 +188,7 @@ indicators:
     quote: The customer opens an account and funds are transferred to/from non-cooperative jurisdictions…
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Report of Foreign Bank and Financial Accounts (FBAR)
     publisher: US Internal Revenue Service
     url: https://www.irs.gov/businesses/small-businesses-self-employed/report-of-foreign-bank-and-financial-accounts-fbar
@@ -196,7 +196,7 @@ indicators:
       the calendar year reported.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Customer failed to disclose dual citizenship or tax residence (FIAU Annex I s.1)
   - UBS staff opening accounts in the names of nominees or sham entities for US clients (DOJ 2009)
@@ -270,7 +270,7 @@ indicators:
       large cash transactions.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
     publisher: Financial Intelligence Analysis Unit, Malta
     url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
@@ -279,7 +279,7 @@ indicators:
       justification.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Inadequately explaining dealings in large sums of currency, or the unexplained expenditure of currency
     (IRM 25.1.2.3(2))
@@ -321,7 +321,7 @@ indicators:
     quote: Failing to deposit receipts in a business account, contrary to established practices.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: IRM 25.1.2.3 Indicators of Fraud (Income)
     publisher: US Internal Revenue Service
     url: https://www.irs.gov/irm/part25/irm_25-001-002
@@ -329,7 +329,7 @@ indicators:
     quote: Cashing checks, representing income, at check cashing services and at banks where the taxpayer…
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Checks made payable to vendors and other business payees that are cashed by the taxpayer (IRM 25.1.2.3(4))
   cases: []
@@ -368,7 +368,7 @@ indicators:
       receipt…
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
     publisher: Financial Intelligence Analysis Unit, Malta
     url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
@@ -376,7 +376,7 @@ indicators:
     quote: The customer is non-compliant with tax obligations for a number of years.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Pattern of consistent failure over several years to report income fully (IRM 25.1.2.3(6))
   - Companies which repeatedly fail to comply with their statutorily duty to file copies of their financial…
@@ -418,7 +418,7 @@ indicators:
     quote: Claiming substantial business expense deductions for personal expenditures.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Claiming fictitious or substantially overstated deductions (IRM 25.1.2.3(3))
   - Payment of improper expenses by or for officials or trustees (IRM 25.1.2.3(6))
@@ -456,7 +456,7 @@ indicators:
     quote: Claiming dependency exemptions for nonexistent, deceased, or self-supporting persons.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Providing false or altered documents, such as birth certificates, lease documents, school/medical
     records… (IRM 25.1.2.3(3))
@@ -497,7 +497,7 @@ indicators:
     quote: Multiple sets of books or no records.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
     publisher: Financial Intelligence Analysis Unit, Malta
     url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
@@ -506,7 +506,7 @@ indicators:
       reliability of…
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Failure to keep adequate records, concealment of records, or refusal to make records available (IRM
     25.1.2.3(4))
@@ -544,7 +544,7 @@ indicators:
     quote: Invoices are irregularly numbered, unnumbered or altered.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: IRM 25.1.2.3 Indicators of Fraud (Books and Records)
     publisher: US Internal Revenue Service
     url: https://www.irs.gov/irm/part25/irm_25-001-002
@@ -552,7 +552,7 @@ indicators:
     quote: False entries, or alterations made on the books and records; back-dated or post-dated documents;
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Sales and purchases are not backed by invoices or proper documentation (FIAU Annex I s.5)
   - Backdated applications and related documents (IRM 25.1.2.3(6))
@@ -590,7 +590,7 @@ indicators:
     quote: Checks made payable to third parties that are endorsed back to the taxpayer.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Without credible explanation, a customer routinely cashes high-value checks drawn from accounts associated
     with a health care provider (FinCEN FIN-2026-A001, p.10)
@@ -628,7 +628,7 @@ indicators:
     quote: Amounts on tax return not in agreement with amounts in books.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Recording income items in suspense or asset accounts (IRM 25.1.2.3(4))
   - Intentional under- or over-footing of columns in journal or ledger (IRM 25.1.2.3(4))
@@ -665,14 +665,14 @@ indicators:
       are a factor.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Abusive trust tax evasion schemes - Questions and answers
     publisher: US Internal Revenue Service
     url: https://www.irs.gov/businesses/small-businesses-self-employed/abusive-trust-tax-evasion-schemes-questions-and-answers
     quote: Income that is earned by one person cannot be assigned to another for federal income tax purposes.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Distribution of profits to fictitious partners (IRM 25.1.2.3(5))
   cases: []
@@ -709,7 +709,7 @@ indicators:
     quote: Attempt to hinder or obstruct the examination.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - For example, failure to answer questions; repeated cancelled or rescheduled appointments; refusal
     to provide records; (IRM 25.1.2.3(6))
@@ -749,7 +749,7 @@ indicators:
     quote: Deposits into bank accounts under nominee names.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: IRM 25.1.2.3 Indicators of Fraud (Methods of Concealment)
     publisher: US Internal Revenue Service
     url: https://www.irs.gov/irm/part25/irm_25-001-002
@@ -757,7 +757,7 @@ indicators:
     quote: Asset ownership placed in other names.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
     publisher: Financial Intelligence Analysis Unit, Malta
     url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
@@ -766,7 +766,7 @@ indicators:
       purpose or…
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Conduct of business transactions in false names (IRM 25.1.2.3(7))
   - Use of secret bank accounts for income (IRM 25.1.2.3(7))
@@ -837,7 +837,7 @@ indicators:
       is pending.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 11 U.S.C. 548 Fraudulent transfers and obligations
     publisher: Legal Information Institute, Cornell Law School (US Code)
     url: https://www.law.cornell.edu/uscode/text/11/548
@@ -845,7 +845,7 @@ indicators:
     quote: that was made or incurred on or within 2 years before the date of the filing of the petition
     quote_verified: true
     licence: 'US Code: public domain'
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Inadequacy of consideration; Insolvency of transferor; Close relationship between parties to the transfer
     (IRM 25.1.2.3(7))
@@ -897,7 +897,7 @@ indicators:
     quote: Circular transactions or round-tripping transactions where funds are reinvested into the original…
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The use of shareholders' loans to finance corporate activities (FIAU Annex I s.2)
   - Transactions for which there is no economic, commercial or logical explanation (FIAU Annex I s.2)
@@ -942,7 +942,7 @@ indicators:
       goods…
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Syndicated conservation easements relying on inflated appraisals of undeveloped land (IRS 2021 Dirty
     Dozen)
@@ -990,7 +990,7 @@ indicators:
       provider is…
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN Advisory on Health Care Fraud Schemes (FIN-2026-A001)
     publisher: US Financial Crimes Enforcement Network
     url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
@@ -999,7 +999,7 @@ indicators:
       activity consisting of
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - 'FinCEN red flag 14: many repetitive, vaguely described invoices for ''consulting'' or ''marketing''
     fees (paraphrase)'
@@ -1043,7 +1043,7 @@ indicators:
     quote: The incorporation of companies which are then abandoned shortly after their establishment.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
     publisher: Financial Intelligence Analysis Unit, Malta
     url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
@@ -1051,7 +1051,7 @@ indicators:
     quote: The absence of a local footprint.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The setting up of two or more trading companies in different jurisdictions having the same company
     name (FIAU Annex I s.4)
@@ -1097,7 +1097,7 @@ indicators:
     quote: Inexplicably intricate structures.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
     publisher: Financial Intelligence Analysis Unit, Malta
     url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
@@ -1105,7 +1105,7 @@ indicators:
     quote: The structure includes the use of bearer shares.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - 'Rubber stamping: a board that manifestly lacks the skill or time to run the entity (FIAU Annex I
     s.4)'
@@ -1149,7 +1149,7 @@ indicators:
     quote: Commingling of personal and business accounts.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Funds are withdrawn in ways that the expenditure cannot be tracked (FIAU Annex I s.2)
   cases: []
@@ -1188,7 +1188,7 @@ indicators:
     quote: Structuring/Smurfing.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN Advisory on Health Care Fraud Schemes (FIN-2026-A001)
     publisher: US Financial Crimes Enforcement Network
     url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
@@ -1197,7 +1197,7 @@ indicators:
       in behavior
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - 'FinCEN red flag 22: structuring multiple cash transactions under $10,000 or cancelling once told
     a Currency Transaction Report will be filed (paraphrase)'
@@ -1236,7 +1236,7 @@ indicators:
     quote: The customer demands exceptionally high and atypical levels of confidentiality.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'FIAU Intelligence Factsheet: Tax-Related ML'
     publisher: Financial Intelligence Analysis Unit, Malta
     url: https://fiaumalta.org/wp-content/uploads/2021/12/FIAU-Intelligence-Factsheet-Tax-Related-ML-final.pdf
@@ -1244,7 +1244,7 @@ indicators:
     quote: The customer requests or suggests not to disclose any pertinent information to the tax authorities…
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The customer shows apparent willingness to pay fees above market rates (FIAU Annex I s.3)
   - Transactions surrounded by secrecy (IRM 25.1.2.3(7))
@@ -1284,14 +1284,14 @@ indicators:
     quote: if it sounds too good to be true, it probably is.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: IRS 2021 Dirty Dozen (syndicated conservation easements)
     publisher: US Internal Revenue Service
     url: https://www.irs.gov/newsroom/irs-wraps-up-its-2021-dirty-dozen-scams-list-with-warning-about-promoted-abusive-arrangements
     quote: take a provision of tax law for conservation easements and twist it
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Listed transactions
     publisher: US Internal Revenue Service
     url: https://www.irs.gov/businesses/corporations/listed-transactions
@@ -1299,7 +1299,7 @@ indicators:
       (deemed abusive)
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Micro-captive insurance whose arrangements 'lack many of the attributes of insurance' (IRS 2021)
   - Monetized installment sales where 'an intermediary purchases appreciated property from a seller in
@@ -1346,7 +1346,7 @@ indicators:
     quote: collect multiple reimbursements for taxes that they had only paid once.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Shares bought and sold quickly around the dividend payment date to obscure true ownership (Euronews
     2022)
@@ -1396,14 +1396,14 @@ indicators:
     quote: Be highly suspicious of any "guaranteed" investment opportunity.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Investor Alert: affinity fraud'
     publisher: US Securities and Exchange Commission (Investor.gov)
     url: https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/investor-alert-have-something-common-someone-selling-investment-it-may-make-you-target-fraud
     quote: Investments have risks.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Stanford International Bank CDs paying more than US banks while the stated conservative strategy was
     followed for only about 10-15% of assets (DOJ 2012)
@@ -1464,7 +1464,7 @@ indicators:
       market conditions.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Monthly statements showing near-identical gains through a market crash
   cases: []
@@ -1501,7 +1501,7 @@ indicators:
       regulators.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
   cases: []
   data_needed:
@@ -1537,7 +1537,7 @@ indicators:
     quote: Most Ponzi schemes involve unlicensed individuals or unregistered firms.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
   cases: []
   data_needed:
@@ -1574,14 +1574,14 @@ indicators:
     quote: Avoid investments if you don't understand them or can't get complete information about them.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Investor Alert: affinity fraud'
     publisher: US Securities and Exchange Commission (Investor.gov)
     url: https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/investor-alert-have-something-common-someone-selling-investment-it-may-make-you-target-fraud
     quote: Fraudsters often avoid putting things in writing.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
   cases: []
   data_needed:
@@ -1615,7 +1615,7 @@ indicators:
     quote: Account statement errors may be a sign that funds are not being invested as promised.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - SEC alleged (not a final finding on that page) that Madoff's auditor Friehling & Horowitz 'did not
     perform a meaningful audit of BMIS' (SEC Lit. Rel. 20959, 2009)
@@ -1653,7 +1653,7 @@ indicators:
     quote: Be suspicious if you don't receive a payment or have difficulty cashing out.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Customer makes transfers labelled 'taxes', 'fees' or 'penalties' to a virtual asset provider to release
     funds (FinCEN FIN-2023-Alert005, paraphrase)
@@ -1691,7 +1691,7 @@ indicators:
     quote: Fraudsters may be (or pretend to be) part of the very group they are trying to cheat.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Told to keep the opportunity confidential; 'once-in-a-lifetime' offers with claimed 'inside' information
     (Investor.gov affinity alert)
@@ -1728,14 +1728,14 @@ indicators:
     quote: Be skeptical if you will receive more compensation for recruiting others than for product sales.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Investor Alert: Beware of Pyramid Schemes Posing as Multi-Level Marketing Programs (2013)'
     publisher: US Securities and Exchange Commission (Investor.gov)
     url: https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/investor-30
     quote: Be careful if you are required to pay a buy-in to participate in the program
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Promises of high returns in a short time period; easy money or passive income (Investor.gov)
   cases:
@@ -1782,7 +1782,7 @@ indicators:
     quote: As a general rule, legitimate MLM companies derive revenue primarily from selling products,
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - '''products such as mass-licensed e-books or online advertising on little-used websites'' (Investor.gov)'
   cases: []
@@ -1816,7 +1816,7 @@ indicators:
     quote: If you do not understand how you will be compensated, be cautious.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
   cases: []
   data_needed:
@@ -1850,7 +1850,7 @@ indicators:
       to gain by selling their shares
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Claims of an 'infallible' stock-picking system; subject lines 'designed to quickly pique interest'
     (SEC alert)
@@ -1895,7 +1895,7 @@ indicators:
       a hog before slaughter.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Customer 'takes out a HELOC, home equity loan, or second mortgage' to buy virtual currency (FinCEN)
   - Customer 'appears distressed or anxious to access funds' (FinCEN)
@@ -1939,14 +1939,14 @@ indicators:
     quote: Billing for services that were never rendered—by using genuine patient information, …
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Fraud & Abuse Laws
     publisher: HHS Office of Inspector General
     url: https://oig.hhs.gov/compliance/physician-education/fraud-abuse-laws/
     quote: The civil FCA protects the Government from being overcharged or sold shoddy goods or services.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Esformes billed Medicare and Medicaid for care often unneeded or never provided (DOJ 2019)
   cases:
@@ -1992,7 +1992,7 @@ indicators:
     quote: Unbundling—billing for each step of a procedure as if they are separate procedures.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - '''Billing for more expensive services or procedures than were actually provided or performed, commonly
     known as "upcoding"'' (NHCAA)'
@@ -2028,7 +2028,7 @@ indicators:
     quote: Performing medically unnecessary services solely for the purpose of generating insurance payments
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Misrepresenting non-covered treatments as medically necessary covered treatments (NHCAA)
   cases: []
@@ -2065,14 +2065,14 @@ indicators:
     quote: prohibits the knowing and willful payment of "remuneration" to induce or reward patient referrals
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: The Challenge of Health Care Fraud
     publisher: NHCAA
     url: https://www.nhcaa.org/tools-insights/about-health-care-fraud/the-challenge-of-health-care-fraud/
     quote: Accepting kickbacks for patient referrals.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN Advisory on Health Care Fraud Schemes (FIN-2026-A001)
     publisher: US Financial Crimes Enforcement Network
     url: https://www.fincen.gov/system/files/2026-03/FinCEN-Advisory-Health-Care-Fraud.pdf
@@ -2081,7 +2081,7 @@ indicators:
       correlating
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - 'OIG examples: free rent, lavish hotel stays and meals, excessive pay for medical directorships (paraphrase)'
   - High-value checks sent to individuals (FinCEN red flag 20, paraphrase)
@@ -2133,7 +2133,7 @@ indicators:
       carrier or benefit plan
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Billing a patient more than the required co-pay amount for services already paid by the plan (NHCAA)
   cases: []
@@ -2170,7 +2170,7 @@ indicators:
       reimbursements
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Reimbursements jump shortly after beneficial ownership changes (red flag 9, paraphrase)
   - Low-to-moderate billing for a year or more, then a sudden surge of claims (red flag 17, paraphrase)
@@ -2216,14 +2216,14 @@ indicators:
       and has nominal
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Fraud & Abuse Laws (Exclusion Authorities)
     publisher: HHS Office of Inspector General
     url: https://oig.hhs.gov/compliance/physician-education/fraud-abuse-laws/
     quote: OIG is legally required to exclude from participation in all Federal health care programs
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Owner with no US permanent residence and little health care experience (red flag 1, paraphrase)
   - Account accessed from IP addresses linked to many accounts or foreign jurisdictions (red flag 4, paraphrase)
@@ -2267,7 +2267,7 @@ indicators:
     quote: A customer is a health care provider or supplier that receives significant volumes of reimbursements
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - DME reimbursements with few or no DME purchases (paraphrase)
   - All reimbursements from a single program, unlike typical providers (red flag 13, paraphrase)
@@ -2306,7 +2306,7 @@ indicators:
       related to,
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Funds sent to virtual asset service providers, brokerage accounts or online betting platforms without
     apparent business reason (red flag 24, paraphrase)
@@ -2352,7 +2352,7 @@ indicators:
     quote: Owner/Driver/Passenger(s) have the same or similar soft tissue injury.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Scene Indicators for Law Enforcement
     publisher: NICB
     url: https://www.NICB.org/sites/files/2019-06/Scene_Indicators_for_Law_Enforcement.pdf
@@ -2360,7 +2360,7 @@ indicators:
     quote: Accident occurs late at night in a secluded area.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Sudden or unwarranted stop or lane change, which may indicate a 'caused accident' (NICB)
   - Insured describes 'swoop & squat' scenario (NICB)
@@ -2414,7 +2414,7 @@ indicators:
       wording.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - '''Witness/Participant appears familiar with one or more parties to the loss (accident) and may refer
     to them by first name.'' (NICB)'
@@ -2455,7 +2455,7 @@ indicators:
       by the same person(s).
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Scene Indicators for Law Enforcement
     publisher: NICB
     url: https://www.NICB.org/sites/files/2019-06/Scene_Indicators_for_Law_Enforcement.pdf
@@ -2463,7 +2463,7 @@ indicators:
     quote: Damage to vehicles is inconsistent with the accident facts.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Lack of accident debris at the scene; signs of pre-existing damage (NICB)
   - Older claimant car vs high-value newer insured car, or a commercial fleet vehicle (NICB)
@@ -2506,7 +2506,7 @@ indicators:
       premiums without paying claims.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
   cases: []
   data_needed:
@@ -2545,7 +2545,7 @@ indicators:
       on the insurance policy.
     quote_verified: true
     licence: Not stated
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Soft fraud 'occurs when a policyholder exaggerates an otherwise legitimate claim' (NAIC)
   cases: []
@@ -2584,7 +2584,7 @@ indicators:
     quote: from creditors or the United States Trustee, any property belonging to the estate of a debtor;
     quote_verified: true
     licence: 'US Code: public domain'
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: US Trustee Program Criminal Referrals FY2014 report
     publisher: US Department of Justice, US Trustee Program
     url: https://www.justice.gov/ust/file/criminal_report_fy2014.pdf/dl
@@ -2592,7 +2592,7 @@ indicators:
     quote: false oath or statement (33.0%), concealment of assets (27.3%), bankruptcy fraud scheme (23.6%),
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Kimball hid income in a consulting-company account with statements mailed to an attorney's address
     (DOJ WDMO 2021)
@@ -2648,7 +2648,7 @@ indicators:
       title 11;
     quote_verified: true
     licence: 'US Code: public domain'
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Kimball undervalued collectibles by $24,000 and did not schedule the $116,280 sale of a business interest
     (DOJ WDMO 2021)
@@ -2688,7 +2688,7 @@ indicators:
       were then discharged.
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - '''All credit cards were issued in the recruit''s name, although the subject made most of the charges.''
     (FinCEN case 085)'
@@ -2730,7 +2730,7 @@ indicators:
     quote: and identity theft or use of false/multiple Social Security numbers (17.3%).
     quote_verified: true
     licence: US government work, public domain
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - '''Serial Filer'' is a referral category in Table 1 (p. 5) (16 referrals)'
   cases: []
@@ -2754,6 +2754,2133 @@ indicators:
   - Re-filing after a dismissed case for procedural reasons
   - Typographical errors in SSNs
   version: 1
+- id: FR-059
+  name: Wash, cross or pre-arranged trades
+  definition: The same person, or people acting together, trade a security with themselves or by agreement
+    so no real change of ownership happens, which creates false volume or price.
+  areas:
+  - FR
+  typology: Market manipulation
+  status: pending
+  sources:
+  - title: 'Regulatory Notice 19-18: Guidance to Firms Regarding Suspicious Activity Monitoring and Reporting
+      Obligations'
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: Section III, Potential Red Flags in Securities Trading, item 7
+    quote: engages in pre-arranged or other non-competitive securities trading, including wash or cross
+      trades,
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Laundering and Terrorist Financing in the Securities Sector
+    publisher: FATF
+    year: '2009'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+    locator: Case Study 10 (wash trading), p. 33
+    quote: Insiders conducting similar transactions; and
+    quote_verified: false
+  examples:
+  - Gotbit Consulting, a crypto market maker, made wash trades for client tokens to inflate their price
+    and volume, and used many accounts to hide them (US, 2025).
+  cases:
+  - name: United States v. Aleksei Andriunin and Gotbit Consulting LLC
+    year: '2025'
+    jurisdiction: US (D. Massachusetts)
+    what_happened: Gotbit's founder pleaded guilty to wire fraud and conspiracy to commit market manipulation;
+      the firm made wash trades for client tokens to inflate their price and volume. He was sentenced
+      to eight months, and the firm forfeited about $23 million and must stop operating.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-ma/pr/cryptocurrency-financial-services-firm-gotbit-and-founder-sentenced-market-manipulation
+    source_title: Cryptocurrency Financial Services Firm Gotbit and Founder Sentenced for Market Manipulation
+  data_needed:
+  - Security (ticker, issuer)
+  - Person / Company / LegalEntity holding the brokerage or exchange accounts
+  - BankAccount (brokerage account) with owner
+  - 'Payment (trade executions: date, amount, counterparty)'
+  - Ownership and Associate links between the account holders
+  checkable: records
+  lookup_sources:
+  - Trade blotters or exchange order data (when obtained)
+  - Public blockchain explorers for token trades
+  - Regulator enforcement databases (SEC, FINRA, CFTC)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Pre-arranged trades between linked accounts can move value from one party to another under
+      cover of a trade.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+  - target_area: CY
+    reason: Wash trading is used to make new crypto tokens look actively traded (Gotbit case).
+    source_url: https://www.justice.gov/usao-ma/pr/cryptocurrency-financial-services-firm-gotbit-and-founder-sentenced-market-manipulation
+  innocent_explanations:
+  - Legitimate market making where a firm both buys and sells to keep a market liquid
+  - Tax-loss selling followed by a later repurchase
+  - Rebalancing between accounts of the same owner for genuine portfolio reasons
+  - Two unrelated parties happening to cross at the same time on a thin market
+  jurisdictions: US (FINRA); widely mirrored elsewhere
+  version: 1
+- id: FR-060
+  name: Unrelated accounts trading the same thin stock at the same moment
+  definition: Two or more accounts with no visible connection suddenly buy or sell the same illiquid or
+    low-priced security at the same time, suggesting coordination.
+  areas:
+  - FR
+  typology: Market manipulation (matched or coordinated trading)
+  status: pending
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: Section III, item 12
+    quote: Two or more unrelated customer accounts at the firm trade an illiquid or lowpriced security
+      suddenly and simultaneously.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Laundering and Terrorist Financing in the Securities Sector
+    publisher: FATF
+    year: '2009'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+    locator: Case Study 3, p. 25
+    quote: Use of the same password by several clients.
+    quote_verified: false
+  examples:
+  - Several apparently separate accounts buy the same penny stock within minutes, and later turn out to
+    share a password, address or controller.
+  cases: []
+  data_needed:
+  - Security
+  - Person / Company owning each account
+  - BankAccount (brokerage)
+  - Payment (trade time and size)
+  - Address, Email, Phone shared between account holders
+  - Associate / UnknownLink between holders
+  checkable: records
+  lookup_sources:
+  - Company registry (to find shared directors or addresses)
+  - Trade data obtained from the case
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many investors reacting to the same public news, newsletter or social post
+  - Investment club members or family trading on a shared idea openly
+  - Algorithmic strategies reacting to the same signal
+  jurisdictions: US (FINRA)
+  version: 1
+- id: FR-061
+  name: 'Pump-and-dump: sudden demand and price spike in a thinly traded or low-priced stock'
+  definition: A little-traded or penny stock suddenly attracts heavy buying and a rising price, often
+    alongside promoters or step-by-step buying meant to push the price up, before insiders sell.
+  areas:
+  - FR
+  typology: Market manipulation (pump and dump)
+  status: pending
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: Section III, items 2, 5 and 6
+    quote: There is a sudden spike in investor demand for, coupled with a rising price in, a thinly traded
+      or low-priced security.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: Section III, item 6
+    quote: A customer accumulates stock in small increments throughout the trading day to increase price.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Laundering and Terrorist Financing in the Securities Sector
+    publisher: FATF
+    year: '2009'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+    locator: Para. 34, p. 11
+    quote: Engaging in market manipulation, e.g. “pump & dump” schemes;
+    quote_verified: false
+  - title: Pump and Dump Schemes (glossary)
+    publisher: SEC Investor.gov
+    url: https://www.investor.gov/introduction-investing/investing-basics/glossary/pump-and-dump-schemes
+    quote: spread false or misleading information to create a buying frenzy
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A shell company's stock jumps after a wave of promotional emails while a known stock promoter sells
+    through the broker.
+  cases: []
+  data_needed:
+  - Security (issuer, trading volume history)
+  - Company (issuer) with Directorship and Ownership
+  - Person (promoters, insiders)
+  - Payment (sales by insiders, payments to promoters)
+  - Document (promotional material)
+  checkable: lookups
+  lookup_sources:
+  - Market data (price and volume history)
+  - SEC EDGAR filings and trading suspensions
+  - OTC Markets disclosures
+  - Regulator enforcement databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FATF lists pump-and-dump among methods seen with laundering in the securities sector.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+  innocent_explanations:
+  - Genuine news such as a contract win, approval or takeover offer
+  - Coverage by a well-followed analyst or media outlet
+  - Retail enthusiasm without any promoter behind it
+  jurisdictions: US (FINRA, SEC); international (FATF)
+  version: 1
+- id: FR-062
+  name: Large trade shortly before news, by someone linked to the issuer
+  definition: Someone buys or sells a large position in a stock or option shortly before a major announcement,
+    especially when they or their friends or family work at or for the company.
+  areas:
+  - FR
+  typology: Insider trading
+  status: pending
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: Section III, item 13
+    quote: makes a large purchase or sale of a security, or option on a security, shortly before news
+      or a significant announcement
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: Section III, item 14
+    quote: friends or family who work at or for the securities issuer, which may be a red flag for potential
+      insider trading
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Laundering and Terrorist Financing in the Securities Sector
+    publisher: FATF
+    year: '2009'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+    locator: Case Study 3, p. 25
+    quote: High profits within one day;
+    quote_verified: false
+  examples:
+  - A Goldman Sachs board member phoned a hedge-fund friend within about a minute of a board meeting,
+    and the friend bought Goldman stock before the news was public (US, 2008).
+  cases:
+  - name: United States v. Rajat Gupta
+    year: '2012'
+    jurisdiction: US (S.D.N.Y.)
+    what_happened: Gupta, a Goldman Sachs and P&G director, passed confidential board information to Raj
+      Rajaratnam, who traded on it; for example Rajaratnam bought about $43 million of Goldman stock after
+      a call made about 60 seconds after a board meeting. A jury convicted him of conspiracy and three
+      counts of securities fraud and acquitted him on two counts.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archive/usao/nys/pressreleases/June12/guptarajatverdict.html
+    source_title: Rajat Gupta Convicted In Manhattan Federal Court
+  data_needed:
+  - Security
+  - Person (trader) with Employment, Directorship, Family, Associate links to the issuer
+  - Company (issuer)
+  - Payment (trade time, size, profit)
+  - Event or Document (announcement time)
+  - Call records if obtained (Call schema)
+  checkable: lookups
+  lookup_sources:
+  - Market data and announcement timestamps
+  - SEC Form 4 insider filings
+  - Company registry and board lists
+  - Regulator enforcement databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Pre-scheduled trading plans (10b5-1 plans in the US)
+  - Trades based on public research or rumours already in the market
+  - Coincidental timing in a heavily traded stock
+  - Employee trades made inside an approved trading window
+  jurisdictions: US (FINRA, SEC)
+  version: 1
+- id: FR-063
+  name: 'Spoofing: large orders placed and cancelled before they execute'
+  definition: A trader places orders they intend to cancel, to give a false picture of supply or demand,
+    then trades the other way at the better price.
+  areas:
+  - FR
+  typology: Market manipulation (spoofing / layering)
+  status: verified
+  sources:
+  - title: 7 U.S.C. § 6c(a)(5) Disruptive practices
+    publisher: US Code (via Cornell LII)
+    url: https://www.law.cornell.edu/uscode/text/7/6c
+    locator: § 6c(a)(5)(C)
+    quote: (bidding or offering with the intent to cancel the bid or offer before execution).
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - On the day of the 2010 Flash Crash a trader entered at least 85 spoof sell orders in E-mini S&P futures.
+  cases:
+  - name: United States v. Navinder Singh Sarao
+    year: '2016'
+    jurisdiction: US (N.D. Illinois)
+    what_happened: Sarao pleaded guilty to wire fraud and spoofing; he placed thousands of E-mini S&P
+      500 futures orders he never intended to fill and admitted at least $12.8 million in illicit gains.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/futures-trader-pleads-guilty-illegally-manipulating-futures-market-connection-2010-flash
+    source_title: Futures Trader Pleads Guilty to Illegally Manipulating the Futures Market in Connection
+      With 2010 'Flash Crash'
+  data_needed:
+  - Security (or futures contract)
+  - Person / Company (trader)
+  - Order-book records (orders placed, cancelled, executed) held as Document
+  - Payment (executed trades)
+  checkable: records
+  lookup_sources:
+  - Exchange order-book data (rarely public; usually from court records)
+  - CFTC and DOJ enforcement releases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary cancellation of orders when market conditions change
+  - High-frequency market makers who cancel most orders as part of normal quoting
+  jurisdictions: US (Commodity Exchange Act)
+  version: 1
+- id: FR-064
+  name: Large block of low-priced or shell-company shares deposited and quickly sold
+  definition: A customer deposits physical certificates or transfers in a large block of thinly traded
+    or low-priced shares, often of a public shell company, and sells them soon after.
+  areas:
+  - FR
+  typology: Market manipulation / securities fraud
+  status: pending
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: Section II, item 1
+    quote: representing a large block of thinly traded or low-priced securities
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Laundering and Terrorist Financing in the Securities Sector
+    publisher: FATF
+    year: '2009'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+    locator: Case Study 1, p. 21
+    quote: Use of a public shell company (traded on the stock exchange);
+    quote_verified: false
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: Section III, item 1
+    quote: engages in transactions involving certain types of securities, such as penny stocks, Regulation
+      “S” stocks and bearer bonds
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An account holder deposits millions of shares of a dormant shell company, which are sold within weeks
+    as the stock is promoted.
+  cases: []
+  data_needed:
+  - Security (issuer, share class, price)
+  - Company (issuer, incorporation and filing history)
+  - Person / Company depositing the shares
+  - Ownership (how the depositor obtained the shares)
+  - Payment (sale proceeds and where they went)
+  checkable: lookups
+  lookup_sources:
+  - SEC EDGAR and OTC Markets filings
+  - Company registry
+  - Transfer-agent records (if obtained)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FATF case study shows a public shell company used to pass funds through several accounts.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+  innocent_explanations:
+  - Founders or early employees of a small company legitimately selling vested shares
+  - Shares received in a genuine merger or private placement
+  jurisdictions: US (FINRA); international (FATF)
+  version: 1
+- id: FR-065
+  name: Shares or funds journalled between unrelated accounts for no clear reason
+  definition: Shares or money are moved by internal book entry between accounts that do not appear to
+    be connected, or back and forth, with no business purpose.
+  areas:
+  - FR
+  typology: Securities fraud / laundering through securities accounts
+  status: pending
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: Section II, item 7
+    quote: requests to journal the shares into multiple accounts that do not appear to be related
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: Section IV, item 19
+    quote: excessive journal entries of funds between related or unrelated accounts without any apparent
+      business purpose
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Laundering and Terrorist Financing in the Securities Sector
+    publisher: FATF
+    year: '2009'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+    locator: Para. 106, p. 28
+    quote: Transfers with no apparent business purpose are made between different accounts owned by the
+      customer;
+    quote_verified: false
+  examples:
+  - Newly deposited shares are split into several accounts with different names before being sold.
+  cases: []
+  data_needed:
+  - BankAccount (brokerage) with owner
+  - Person / Company account holders
+  - 'Payment (journal entries: from, to, amount, date)'
+  - Security
+  - Associate / UnknownLink between holders
+  checkable: records
+  lookup_sources:
+  - Company registry (to test whether the account holders are linked)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FATF lists transfers with no business purpose between accounts as a laundering indicator in
+      securities.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+  innocent_explanations:
+  - Gifts or inheritances moved to family members' accounts
+  - Moving holdings between a person's own taxable and retirement accounts
+  - Firm corrections of booking errors
+  jurisdictions: US (FINRA); international (FATF)
+  version: 1
+- id: FR-066
+  name: Securities paid for by third parties with no clear link to the customer
+  definition: Money coming into an investment account arrives from people or companies who have no apparent
+    connection to the account holder, or by cheques with several endorsements.
+  areas:
+  - FR
+  typology: Securities fraud / laundering through securities accounts
+  status: pending
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: Section IV, item 10
+    quote: Payments are made by third party check or money transfer from a source that has no apparent
+      connection to the customer.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Laundering and Terrorist Financing in the Securities Sector
+    publisher: FATF
+    year: '2009'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+    locator: Para. 106, p. 28
+    quote: Incoming payments are made by third-party cheques or cheques with multiple endorsements;
+    quote_verified: false
+  examples:
+  - A brokerage account is funded by wires from several unrelated companies abroad.
+  cases: []
+  data_needed:
+  - Payment (payer, payee, amount, method)
+  - Person / Company (payer and account holder)
+  - BankAccount
+  - Associate / UnknownLink
+  checkable: records
+  lookup_sources:
+  - Company registry
+  - Sanctions lists for the payers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Third-party funding is a FATF laundering indicator in securities.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+  innocent_explanations:
+  - Parents or employers funding an account
+  - Payments from a person's own company or trust
+  jurisdictions: US (FINRA); international (FATF)
+  version: 1
+- id: FR-067
+  name: Multiple or nominee brokerage accounts, or brokerage used as a bank
+  definition: One person opens several accounts or accounts in other people's names, or keeps money parked
+    in a brokerage account without investing it.
+  areas:
+  - FR
+  typology: Securities fraud / laundering through securities accounts
+  status: pending
+  sources:
+  - title: Money Laundering and Terrorist Financing in the Securities Sector
+    publisher: FATF
+    year: '2009'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+    locator: Para. 34, p. 11
+    quote: Opening multiple accounts or nominee accounts;
+    quote_verified: false
+  - title: Money Laundering and Terrorist Financing in the Securities Sector
+    publisher: FATF
+    year: '2009'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+    locator: Para. 34, p. 11
+    quote: Using brokerage accounts as long term depository accounts for funds;
+    quote_verified: false
+  examples:
+  - A trader controls accounts opened in the names of relatives and an employee.
+  cases: []
+  data_needed:
+  - BankAccount (brokerage) with owner
+  - Person (nominee and real controller)
+  - Representation (who has authority on the account)
+  - Family / Employment links
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Separate accounts for different goals (retirement, children, business)
+  - Holding cash between investments
+  jurisdictions: International (FATF, APG)
+  version: 1
+- id: FR-068
+  name: New caregiver, friend or relative suddenly controlling an older person's money
+  definition: Someone new in an older person's life starts handling their transactions or shows unusual
+    interest in their money and assets.
+  areas:
+  - FR
+  typology: Elder financial exploitation (elder theft)
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Behavioral red flags, p. 9
+    quote: A new caretaker, relative, or friend suddenly begins conducting financial transactions on behalf
+      of an older customer
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Behavioral red flags, p. 9
+    quote: A caregiver or other individual shows excessive interest in the older customer's finances or
+      assets
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A paid caregiver adds herself to a disabled client's bank account and cashes life-insurance checks.
+  cases:
+  - name: United States v. Amy Denton
+    year: '2019'
+    jurisdiction: US (E.D. Virginia)
+    what_happened: A caregiver forged her disabled client's signature, had the client sign a durable power
+      of attorney she did not understand, added herself to the client's bank account and took about $100,000
+      of life-insurance money. She was sentenced to more than five years in prison.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-edva/pr/caregiver-sentenced-prison-defrauding-client-100k
+    source_title: Caregiver Sentenced to Prison for Defrauding Client of $100K
+  data_needed:
+  - Person (older person, caregiver) with birthDate
+  - Representation (power of attorney, account authority)
+  - Employment (caregiver)
+  - BankAccount
+  - Payment (who initiated, to whom)
+  - Family / Associate
+  checkable: person
+  lookup_sources:
+  - Court guardianship and probate records
+  - Recorded powers of attorney (county recorder, where recorded)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A family member stepping in after a fall, illness or the death of a spouse
+  - A professional fiduciary appointed by a court
+  - An older person freely choosing a new helper
+  jurisdictions: US (FinCEN)
+  version: 1
+- id: FR-069
+  name: Sudden change to power of attorney, account control or contact details
+  definition: Who manages an older person's money changes abruptly, for example through a new power of
+    attorney, or the account suddenly gets new contact information or new connections.
+  areas:
+  - FR
+  typology: Elder financial exploitation
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Behavioral red flags, p. 10
+    quote: An older customer's financial management changes suddenly, such as through a change of power
+      of attorney
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Behavioral red flags, p. 9
+    quote: An older customer's account shows sudden and unusual changes in contact information or new
+      connections
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A woman who became power of attorney for an elderly woman with dementia used her money for gambling
+    and later sold the victim's house.
+  cases:
+  - name: United States v. Shanan Smith
+    year: '2022'
+    jurisdiction: US (N.D. Iowa)
+    what_happened: Smith became power of attorney for an elderly woman with dementia, took her money for
+      her own use including gambling, and spent leftover proceeds from selling the victim's house. She
+      pleaded guilty to wire fraud and was sentenced to 37 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-ndia/pr/waterloo-woman-who-abused-power-attorney-steal-victim-suffering-dementia-sentenced
+    source_title: Waterloo Woman Who Abused Power of Attorney to Steal from Victim Suffering from Dementia
+      Sentenced
+  data_needed:
+  - 'Representation (power of attorney: agent, principal, start date)'
+  - Person (older person, new agent)
+  - Document (POA instrument, beneficiary change forms)
+  - Address / Email / Phone (contact changes)
+  - BankAccount
+  checkable: records
+  lookup_sources:
+  - County recorder (recorded POAs and deeds)
+  - Probate and guardianship court records
+  - Property records for sales of the older person's home
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Planned estate and care planning
+  - Moving into care, which changes address and contacts
+  - Replacing an agent who has died or stepped down
+  jurisdictions: US (FinCEN)
+  version: 1
+- id: FR-070
+  name: Older person is coached, fearful or rushed during transactions
+  definition: An older person seems to be following someone else's directions, appears frightened or submissive,
+    or is frantic to send money for a supposed emergency.
+  areas:
+  - FR
+  typology: Elder financial exploitation (theft and scams)
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Behavioral red flags, p. 9
+    quote: During a transaction, an older customer appears to be taking direction from someone with whom
+      they are speaking
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Behavioral red flags, p. 9
+    quote: An older customer is agitated or frenzied about the need to send money immediately in the face
+      of a purported emergency
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Behavioral red flags, p. 9
+    quote: An older customer shows an unusual degree of fear or submissiveness toward a caregiver, or
+      expresses a fear of eviction
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An older customer stays on the phone with a 'grandchild' who tells her what to say to the bank teller.
+  cases: []
+  data_needed:
+  - Person (older person)
+  - Document (interview notes, bank staff notes)
+  - Payment
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real family emergencies
+  - Anxiety, hearing loss or confusion unrelated to anyone else
+  - Getting genuine help from a trusted relative on the phone
+  jurisdictions: US (FinCEN)
+  version: 1
+- id: FR-071
+  name: Others block direct contact with the older person
+  definition: The bank or others cannot reach the older person directly despite trying, suggesting someone
+    is isolating them.
+  areas:
+  - FR
+  typology: Elder financial exploitation
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Behavioral red flags, p. 9
+    quote: The financial institution is unable to speak directly with the older customer, despite repeated
+      attempts
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Behavioral red flags, p. 10
+    quote: An older customer lacks knowledge about his or her financial status, or shows a sudden reluctance
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A caregiver always answers the older person's phone and insists on handling bank calls.
+  cases: []
+  data_needed:
+  - Person
+  - Representation
+  - Document (contact attempts, interviews)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Illness, hospital stay or dementia
+  - Hearing or speech impairment
+  - A legitimate agent asked to handle all contact
+  jurisdictions: US (FinCEN)
+  version: 1
+- id: FR-072
+  name: Older person buys many gift cards or prepaid cards, or suddenly buys crypto
+  definition: An older customer purchases large numbers of gift or prepaid cards, or starts discussing
+    and buying virtual currency out of character.
+  areas:
+  - FR
+  typology: Elder financial exploitation (elder scams)
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Financial red flags, p. 10
+    quote: An older customer purchases large numbers of gift cards or prepaid access cards.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Financial red flags, p. 10
+    quote: An older customer suddenly begins discussing and buying CVC.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A retiree buys thousands of dollars of gift cards to pay a caller posing as a government agent.
+  cases: []
+  data_needed:
+  - Person (birthDate)
+  - Payment (card purchases, crypto exchange transfers)
+  - BankAccount
+  - CryptoWallet
+  checkable: records
+  lookup_sources:
+  - Blockchain explorers for crypto destinations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: FinCEN lists sudden crypto purchases by older customers as an exploitation red flag.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  innocent_explanations:
+  - Holiday gift buying
+  - An informed older investor choosing crypto
+  jurisdictions: US (FinCEN)
+  version: 1
+- id: FR-073
+  name: Sudden heavy withdrawals or draining of an older person's accounts
+  definition: Out-of-character large or frequent cash withdrawals or transfers, dormant accounts being
+    emptied, daily ATM maximums, or CDs closed regardless of penalties.
+  areas:
+  - FR
+  typology: Elder financial exploitation
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Financial red flags, p. 10
+    quote: Dormant accounts with large balances begin to show constant withdrawals.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Financial red flags, p. 10
+    quote: Frequent large withdrawals, including daily maximum currency withdrawals from an ATM.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Financial red flags, p. 10
+    quote: Closing of CDs or accounts without regard to penalties.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An older person's savings account, untouched for years, shows daily ATM maximum withdrawals.
+  cases: []
+  data_needed:
+  - BankAccount (balance history)
+  - Payment (withdrawals, transfers)
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Paying for care, a home purchase or medical bills
+  - Helping family openly
+  - Required minimum distributions or planned spending
+  jurisdictions: US (FinCEN)
+  version: 1
+- id: FR-074
+  name: Older person sends money to strangers, online partners or abroad
+  definition: An older customer wires or sends money interstate or abroad to people they do not know well,
+    or says an online friend or romantic partner asked them to receive and forward money.
+  areas:
+  - FR
+  typology: Elder financial exploitation (romance and imposter scams)
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Behavioral red flags, p. 9
+    quote: An older customer mentions how an online friend or romantic partner is asking them to receive
+      and forward money
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Financial red flags, p. 10
+    quote: Uncharacteristic attempts to wire large sums of money.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A widower wires savings overseas to a partner he met online and has never seen in person.
+  cases: []
+  data_needed:
+  - Payment (beneficiary, country)
+  - Person (sender, recipient)
+  - BankAccount
+  - Associate / UnknownLink
+  checkable: records
+  lookup_sources:
+  - Sanctions lists
+  - Scam and fraud-report databases (e.g. FTC Consumer Sentinel, where available)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: An older person asked to receive and forward money may be used as a money mule.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  innocent_explanations:
+  - Supporting real relatives abroad
+  - Paying for overseas property or travel
+  jurisdictions: US (FinCEN)
+  version: 1
+- id: FR-075
+  name: Bounced payments or unpaid bills that are new for an older person
+  definition: An older customer suddenly has insufficient-funds activity or stops paying for services,
+    which can mean money has been taken or access lost.
+  areas:
+  - FR
+  typology: Elder financial exploitation
+  status: verified
+  sources:
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Financial red flags, p. 10
+    quote: Uncharacteristic nonpayment for services, which may indicate a loss of funds or of access to
+      funds.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Advisory on Elder Financial Exploitation (FIN-2022-A002)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+    locator: Financial red flags, p. 10
+    quote: Sudden or frequent non-sufficient fund activity.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A nursing home bill goes unpaid while the resident's agent spends her money (Smith case).
+  cases:
+  - name: United States v. Shanan Smith
+    year: '2022'
+    jurisdiction: US (N.D. Iowa)
+    what_happened: The victim's unpaid nursing-home bill followed the agent's theft; the agent then sold
+      the victim's house. Smith pleaded guilty to wire fraud.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-ndia/pr/waterloo-woman-who-abused-power-attorney-steal-victim-suffering-dementia-sentenced
+    source_title: Waterloo Woman Who Abused Power of Attorney to Steal from Victim Suffering from Dementia
+      Sentenced
+  data_needed:
+  - BankAccount
+  - Payment
+  - Person
+  - Document (care-home invoices, collection notices)
+  checkable: records
+  lookup_sources:
+  - Court records for debt collection or eviction cases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Memory decline causing missed payments
+  - Real financial hardship
+  - Bank or billing errors
+  jurisdictions: US (FinCEN)
+  version: 1
+- id: FR-076
+  name: Washed or altered checks
+  definition: A check shows signs that the original writing was chemically removed or overwritten, or
+    is on check stock that differs from the bank's and the customer's usual checks.
+  areas:
+  - FR
+  typology: Check fraud (mail-theft related)
+  status: verified
+  sources:
+  - title: FinCEN Alert on Nationwide Surge in Mail Theft-Related Check Fraud (FIN-2023-Alert003)
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN%20Alert%20Mail%20Theft-Related%20Check%20Fraud%20FINAL%20508.pdf
+    locator: Red flags, p. 5
+    quote: Examination of suspect checks reveals faded handwriting underneath darker handwriting,
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FinCEN Alert on Mail Theft-Related Check Fraud
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN%20Alert%20Mail%20Theft-Related%20Check%20Fraud%20FINAL%20508.pdf
+    locator: Red flags, p. 4
+    quote: Checks used to withdraw funds from a customer's account appear to be of a noticeably different
+      check stock
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Checks stolen from USPS collection boxes had their payees changed and amounts raised from small sums
+    to thousands of dollars.
+  cases:
+  - name: United States v. Naod Tsegay, Fode Bangoura, Zyier Williams and Najae Thomas
+    year: '2024'
+    jurisdiction: US (E.D. Pennsylvania)
+    what_happened: The men stole checks from blue USPS collection boxes, some using stolen postal Arrow
+      Keys, changed payees and raised amounts, and deposited them into accounts supplied by recruited
+      account holders. All pleaded guilty to bank fraud and related counts; sentences ranged from six
+      to 61 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-edpa/pr/four-philadelphia-area-men-sentenced-prison-schemes-wash-and-alter-checks-stolen-usps
+    source_title: Four Philadelphia-Area Men Sentenced to Prison for Schemes to Wash and Alter Checks
+      Stolen from USPS
+  data_needed:
+  - Document (check images, front and back)
+  - Payment (original vs altered payee and amount)
+  - BankAccount (drawer and depositing account)
+  - Person / Company (payee, depositor)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Writer corrected their own mistake
+  - Faded ink or poor-quality scans
+  - A customer legitimately switched check printers
+  jurisdictions: US (FinCEN)
+  version: 1
+- id: FR-077
+  name: Mailed check never arrived but was cashed into an unknown account
+  definition: A customer reports that a check they mailed did not reach the payee, or that it was deposited
+    into an account they do not recognise, or there are unusual large checks to a new payee.
+  areas:
+  - FR
+  typology: Check fraud (mail-theft related)
+  status: verified
+  sources:
+  - title: FinCEN Alert on Mail Theft-Related Check Fraud
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN%20Alert%20Mail%20Theft-Related%20Check%20Fraud%20FINAL%20508.pdf
+    locator: Red flags, p. 4
+    quote: Customer complains of a check or checks stolen from the mail and then deposited into an unknown
+      account.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FinCEN Alert on Mail Theft-Related Check Fraud
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN%20Alert%20Mail%20Theft-Related%20Check%20Fraud%20FINAL%20508.pdf
+    locator: Red flags, p. 4
+    quote: Non-characteristic large withdrawals on a customer's account via check to a new payee.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A tax payment mailed to a state agency is cashed by a person with no link to the agency.
+  cases: []
+  data_needed:
+  - Document (check image)
+  - Payment (intended payee vs actual depositor)
+  - BankAccount
+  - Person / Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary postal delay or loss
+  - A payee depositing through a different bank or lockbox
+  jurisdictions: US (FinCEN)
+  version: 1
+- id: FR-078
+  name: New or quiet account suddenly takes check deposits, then quick withdrawals
+  definition: A new account seems to exist only to receive checks, or an existing account with no check
+    history suddenly gets check deposits, often by mobile deposit, followed by rapid withdrawals or transfers.
+  areas:
+  - FR
+  typology: Check fraud / money mule accounts
+  status: verified
+  sources:
+  - title: FinCEN Alert on Mail Theft-Related Check Fraud
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN%20Alert%20Mail%20Theft-Related%20Check%20Fraud%20FINAL%20508.pdf
+    locator: Red flags, p. 5
+    quote: New customer opens an account that is seemingly used only for the deposit of checks
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: FinCEN Alert on Mail Theft-Related Check Fraud
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN%20Alert%20Mail%20Theft-Related%20Check%20Fraud%20FINAL%20508.pdf
+    locator: Red flags, p. 4
+    quote: Existing customer with no history of check deposits has new sudden check deposits and withdrawal
+      or transfer of funds.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - People recruited to lend their bank accounts and debit cards receive altered checks, and the organiser
+    withdraws the money.
+  cases: []
+  data_needed:
+  - BankAccount (opening date, history)
+  - Payment (deposits and withdrawals with timestamps)
+  - Person (account holder, who withdraws)
+  - Associate
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Accounts lent by recruited people to move stolen check proceeds are money-mule accounts.
+    source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN%20Alert%20Mail%20Theft-Related%20Check%20Fraud%20FINAL%20508.pdf
+  innocent_explanations:
+  - A new small business or freelancer starting to be paid by check
+  - One-off insurance or refund checks
+  jurisdictions: US (FinCEN)
+  version: 1
+- id: FR-079
+  name: Non-customer cashing large checks with a suspicious story
+  definition: Someone who does not bank there tries to cash one or more large checks in person and gives
+    an explanation that does not hold up or sounds like they are moving money for someone else.
+  areas:
+  - FR
+  typology: Check fraud / money mule
+  status: verified
+  sources:
+  - title: FinCEN Alert on Mail Theft-Related Check Fraud
+    publisher: FinCEN
+    year: '2023'
+    url: https://www.fincen.gov/sites/default/files/shared/FinCEN%20Alert%20Mail%20Theft-Related%20Check%20Fraud%20FINAL%20508.pdf
+    locator: Red flags, p. 5
+    quote: A non-customer that is attempting to cash a large check or multiple large checks in-person
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A person cashes a large business check made out to them and says they were hired online to collect
+    payments.
+  cases: []
+  data_needed:
+  - Person (presenter)
+  - Document (check, ID presented)
+  - Payment
+  - Passport / Identification
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FinCEN says the explanation may indicate money mule activity.
+    source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN%20Alert%20Mail%20Theft-Related%20Check%20Fraud%20FINAL%20508.pdf
+  innocent_explanations:
+  - People without bank accounts who regularly cash checks
+  - Nervous customers giving muddled explanations
+  jurisdictions: US (FinCEN)
+  version: 1
+- id: FR-080
+  name: Unsolicited offer to sell or rent out a timeshare, with upfront fees or taxes
+  definition: A caller or email claims to have a buyer, renter or investor for a person's timeshare, then
+    demands fees, taxes or closing costs in advance, and keeps asking for more.
+  areas:
+  - FR
+  typology: Timeshare exit, re-rent and investment scams (advance-fee fraud)
+  status: verified
+  sources:
+  - title: Joint Notice on Timeshare Fraud Associated with Mexico-Based Transnational Criminal Organizations
+      (FIN-2024-NTC2)
+    publisher: FinCEN, OFAC and FBI
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Joint-Notice-Timeshare-Mexico-508C-FINAL.pdf
+    locator: Typologies, pp. 4–5
+    quote: Mexico-based TCOs are targeting U.S. owners of timeshares in Mexico through complex, often
+      yearslong telemarketing scams.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Treasury press release on CJNG timeshare fraud
+    publisher: US Treasury
+    year: '2024'
+    url: https://home.treasury.gov/news/press-releases/jy2465
+    quote: Unsolicited calls and emails may seem legitimate, but they're actually made by cartel-supported
+      criminals.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Owners are told a buyer is waiting and must pay 'closing costs' and 'taxes'; fake bank dashboards
+    show balances to encourage more payments.
+  cases:
+  - name: OFAC designations of CJNG-linked accountants and companies
+    year: '2024'
+    jurisdiction: US (Treasury, OFAC)
+    what_happened: OFAC sanctioned three Mexican accountants (Griselda Margarita Arredondo Pinzon, Xeyda
+      Del Refugio Foubert Cadena, Emiliano Sanchez Martinez) and four Mexican companies linked to CJNG
+      timeshare fraud. This is an administrative sanctions designation, not a court ruling.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://home.treasury.gov/news/press-releases/jy2465
+    source_title: Treasury, FinCEN, FBI press release (jy2465)
+  data_needed:
+  - Person (victim, callers)
+  - Company (purported broker or law firm)
+  - Payment (fees, beneficiary bank and country)
+  - Email / Phone / Document (offers, fake contracts)
+  - BankAccount (beneficiary)
+  checkable: lookups
+  lookup_sources:
+  - OFAC SDN sanctions list
+  - Company registry (Mexico, US state registries)
+  - State bar directories to check named lawyers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: FinCEN, OFAC and FBI link these schemes to the CJNG cartel, which uses proceeds to fund drug
+      operations.
+    source_url: https://www.fincen.gov/system/files/shared/FinCEN-Joint-Notice-Timeshare-Mexico-508C-FINAL.pdf
+  - target_area: SF
+    reason: Designated persons and companies appear on the OFAC SDN list.
+    source_url: https://home.treasury.gov/news/press-releases/jy2465
+  innocent_explanations:
+  - Legitimate resale brokers who charge only on completion
+  - Resort-run exit programmes with published fees
+  jurisdictions: US and Mexico (FinCEN, OFAC, FBI)
+  version: 1
+- id: FR-081
+  name: Fake lawyers or officials offering to recover losses or unblock funds
+  definition: After a first scam, the victim is contacted by people posing as a law firm or a government
+    body (such as OFAC, Mexico's financial intelligence unit or INTERPOL) who demand more fees to recover
+    or release money.
+  areas:
+  - FR
+  typology: Recovery scam / impersonation
+  status: verified
+  sources:
+  - title: Joint Notice on Timeshare Fraud (FIN-2024-NTC2)
+    publisher: FinCEN, OFAC and FBI
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Joint-Notice-Timeshare-Mexico-508C-FINAL.pdf
+    locator: Typologies, p. 5 (impersonating U.S. law firms; impersonating government authorities)
+    quote: Scammers generally first reestablish contact with victims by impersonating U.S.-based law firms
+      who have knowledge about the initial fraud and then offer to assist the victims in recovering their
+      funds.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A victim receives a letter on fake government letterhead saying their sale funds are frozen and a
+    release fee is due.
+  cases: []
+  data_needed:
+  - Person / Company (claimed lawyer or agency)
+  - Document (letters, letterhead)
+  - Payment
+  - Email / Phone
+  checkable: lookups
+  lookup_sources:
+  - State bar lawyer directories
+  - Official agency contact pages
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Same CJNG-linked networks re-target victims.
+    source_url: https://home.treasury.gov/news/press-releases/jy2465
+  innocent_explanations:
+  - Genuine class actions or regulator restitution programmes, which do not charge victims upfront fees
+  jurisdictions: US and Mexico (FinCEN, OFAC, FBI)
+  version: 1
+- id: FR-082
+  name: Urgent, out-of-character wires to Mexico, including from retirement or trust accounts
+  definition: A customer suddenly sends wires to Mexican banks or brokerages, in urgency, in several structured
+    or repeated amounts, or by drawing on retirement or trust money.
+  areas:
+  - FR
+  typology: Timeshare fraud (victim-side flags)
+  status: verified
+  sources:
+  - title: Joint Notice on Timeshare Fraud (FIN-2024-NTC2)
+    publisher: FinCEN, OFAC and FBI
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Joint-Notice-Timeshare-Mexico-508C-FINAL.pdf
+    locator: Red flags, p. 8
+    quote: A customer is uncharacteristically wiring funds to Mexico and indicates the need to send the
+      funds immediately
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Joint Notice on Timeshare Fraud (FIN-2024-NTC2)
+    publisher: FinCEN, OFAC and FBI
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Joint-Notice-Timeshare-Mexico-508C-FINAL.pdf
+    locator: Red flags, p. 8
+    quote: A customer is uncharacteristically sending international wire transfers from retirement accounts
+      or trust accounts
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A retired couple liquidates part of an IRA to wire 'tax' payments to a Mexican brokerage house.
+  cases: []
+  data_needed:
+  - Payment (beneficiary bank, country, amount, date)
+  - 'BankAccount (source: retirement or trust)'
+  - Person (sender)
+  - Company (beneficiary)
+  checkable: records
+  lookup_sources:
+  - OFAC SDN list for beneficiaries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Buying property or paying genuine resort fees in Mexico
+  - Supporting family in Mexico
+  jurisdictions: US and Mexico
+  version: 1
+- id: FR-083
+  name: Payee is a newly formed Mexican company in timeshare or real estate, or with shell signs
+  definition: The receiving company in a payment is a recently registered Mexican firm in timeshare or
+    real-estate business, shows shell-company signs, or has owners tied to timeshare fraud.
+  areas:
+  - FR
+  typology: Timeshare fraud (counterparty flags)
+  status: verified
+  sources:
+  - title: Joint Notice on Timeshare Fraud (FIN-2024-NTC2)
+    publisher: FinCEN, OFAC and FBI
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Joint-Notice-Timeshare-Mexico-508C-FINAL.pdf
+    locator: Red flags, pp. 8–9
+    quote: A counterparty in a transaction is a new or recently formed or registered Mexican company in
+      the timeshare
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Joint Notice on Timeshare Fraud (FIN-2024-NTC2)
+    publisher: FinCEN, OFAC and FBI
+    year: '2024'
+    url: https://www.fincen.gov/system/files/shared/FinCEN-Joint-Notice-Timeshare-Mexico-508C-FINAL.pdf
+    locator: Red flags, p. 9
+    quote: A counterparty in a transaction is a Mexican company with beneficial owners associated with
+      timeshare fraud
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Victim wires go through US correspondent banks to newly opened Mexican shell companies, then on through
+    trusts (fideicomisos).
+  cases:
+  - name: OFAC designations of CJNG-linked companies
+    year: '2024'
+    jurisdiction: US (Treasury, OFAC)
+    what_happened: OFAC designated four Mexican companies, including Pacific Axis Real Estate, S.A. de
+      C.V., and Realty & Maintenance BJ, S.A. de C.V., as linked to CJNG timeshare fraud (administrative
+      designation).
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://home.treasury.gov/news/press-releases/jy2465
+    source_title: Treasury press release jy2465
+  data_needed:
+  - Company (incorporationDate, jurisdiction, sector)
+  - Ownership (beneficial owners)
+  - Directorship
+  - Payment
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Mexican company registry (Registro Público de Comercio)
+  - OFAC SDN list
+  - OpenSanctions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Funds are laundered onward through shell companies and trusts.
+    source_url: https://www.fincen.gov/system/files/shared/FinCEN-Joint-Notice-Timeshare-Mexico-508C-FINAL.pdf
+  innocent_explanations:
+  - Genuine new property managers or developers in resort areas
+  jurisdictions: US and Mexico
+  version: 1
+- id: FR-084
+  name: 'Missing trader: VAT-registered firm buys goods VAT-free across a border, sells with VAT and disappears'
+  definition: A company registers for VAT, imports goods or services from another EU country without VAT,
+    charges VAT when it resells them domestically, then vanishes or defaults without paying that VAT to
+    the tax authority.
+  areas:
+  - FR
+  typology: Missing trader intra-community (MTIC) VAT fraud
+  status: verified
+  sources:
+  - title: 'VAT Fraud manual VATF23510: What is MTIC fraud'
+    publisher: HMRC
+    url: https://www.gov.uk/hmrc-internal-manuals/vat-fraud/vatf23510
+    locator: VATF23510
+    quote: 'MTIC fraud contains two elements: a missing trader and an intra-community supply.'
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Europol Review 2015: Fraud'
+    publisher: Europol
+    year: '2015'
+    url: https://www.europol.europa.eu/annual_review/2015/fraud.html
+    locator: Fraud section
+    quote: It is estimated that VAT revenue losses incurred by MTIC fraud alone are between EUR 45 billion
+      and EUR 53 billion each year
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: VAT Fraud manual VATF23520
+    publisher: HMRC
+    url: https://www.gov.uk/hmrc-internal-manuals/vat-fraud/vatf23520
+    locator: VATF23520 (defaulter)
+    quote: The important thing to remember is that this is the entity that defaults on its VAT liability.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Mobile phones were traded through UK missing traders controlled from Luxembourg in more than a thousand
+    batches (2000–2001).
+  cases:
+  - name: R v Sangha, Meehan and McAllister
+    year: '2008'
+    jurisdiction: England and Wales (Court of Appeal)
+    what_happened: The three were convicted at Worcester Crown Court in 2006 of cheating the public revenue
+      for their part in a mobile-phone VAT carousel using missing traders such as Eurocoin (UK) Ltd; the
+      Court of Appeal judgment of 18 November 2008 dealt with confiscation.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://caselaw.nationalarchives.gov.uk/ewca/crim/2008/2562
+    source_title: Sangha & Ors, R. v [2008] EWCA Crim 2562
+  data_needed:
+  - Company (incorporationDate, dissolutionDate, vatCode, jurisdiction)
+  - Directorship
+  - Address (shared or virtual offices)
+  - Payment
+  - Contract / Document (invoices)
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - EU VIES VAT-number check
+  - Company registry (formation and dissolution dates)
+  - Court and tax-tribunal decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Europol calls MTIC fraud organised, sophisticated tax fraud carried out by criminals.
+    source_url: https://www.europol.europa.eu/annual_review/2015/fraud.html
+  innocent_explanations:
+  - Genuine new importers that fail and go insolvent
+  - Late VAT returns caused by cash-flow problems
+  jurisdictions: EU and UK
+  version: 1
+- id: FR-085
+  name: Goods go round in a circle through a chain of buffer companies (carousel)
+  definition: The same goods or services pass through a chain of companies and across borders, often ending
+    back where they started, with no real end customer, while one company reclaims VAT that another never
+    paid.
+  areas:
+  - FR
+  typology: Carousel VAT fraud
+  status: verified
+  sources:
+  - title: 'VAT Fraud manual VATF23540: Carousel fraud'
+    publisher: HMRC
+    url: https://www.gov.uk/hmrc-internal-manuals/vat-fraud/vatf23540
+    locator: VATF23540
+    quote: Carousel fraud is like acquisition fraud (VATF23530), except that the goods or services do
+      not end up with an end consumer.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: VAT Fraud manual VATF23520
+    publisher: HMRC
+    url: https://www.gov.uk/hmrc-internal-manuals/vat-fraud/vatf23520
+    locator: VATF23520 (buffer)
+    quote: A UK VAT registered taxable person who is placed in the transaction chain between the defaulter
+      and the broker.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Europol Review 2015: Fraud'
+    publisher: Europol
+    year: '2015'
+    url: https://www.europol.europa.eu/annual_review/2015/fraud.html
+    quote: Also known as 'carousel fraud', the fraud takes advantage of legislation which allows trading
+      across Member State borders to be VAT free
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - In Sangha, UK buffer companies paid VAT on purchases to foreign suppliers controlled by the organiser
+    instead of to the missing traders.
+  cases:
+  - name: R v Sangha, Meehan and McAllister
+    year: '2008'
+    jurisdiction: England and Wales
+    what_happened: Defendants controlled UK buffer companies (Bridge GSM Products, B-Tel-Com) in a mobile-phone
+      carousel; convicted of cheating the public revenue.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://caselaw.nationalarchives.gov.uk/ewca/crim/2008/2562
+    source_title: Sangha & Ors, R. v [2008] EWCA Crim 2562
+  data_needed:
+  - Company (each trader in the chain)
+  - Contract / Document (invoices with serial numbers, dates)
+  - Payment (order and timing)
+  - Directorship / Ownership linking chain members
+  checkable: records
+  lookup_sources:
+  - Company registries in each country
+  - EU VIES VAT check
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Proceeds of the unpaid VAT are moved through the chain's payments.
+    source_url: https://caselaw.nationalarchives.gov.uk/ewca/crim/2008/2562
+  innocent_explanations:
+  - Legitimate wholesale distribution chains with several intermediaries
+  - Re-export of goods that were returned
+  jurisdictions: EU and UK
+  version: 1
+- id: FR-086
+  name: Risk-free deals, fixed margins, third-party or offshore payments in high-value trade
+  definition: A supplier offers high-value deals with no commercial risk, fixed profit margins, no formal
+    contract, below-market prices, or asks for payment to a third party or offshore account, often from
+    a new business with little history.
+  areas:
+  - FR
+  typology: MTIC VAT fraud (trader-side warning signs)
+  status: verified
+  sources:
+  - title: 'VAT Notice 726: joint and several liability for unpaid VAT'
+    publisher: HMRC
+    url: https://www.gov.uk/government/publications/vat-notice-726-joint-and-several-liability-for-unpaid-vat/vat-notice-726-joint-and-several-liability-for-unpaid-vat
+    locator: Section 6.1
+    quote: require you to make third party payments or payments to an offshore bank account?
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: VAT Notice 726
+    publisher: HMRC
+    url: https://www.gov.uk/government/publications/vat-notice-726-joint-and-several-liability-for-unpaid-vat/vat-notice-726-joint-and-several-liability-for-unpaid-vat
+    locator: Section 6.1
+    quote: do deals with your customer or supplier involve consistent or predetermined profit margins
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: VAT Notice 726
+    publisher: HMRC
+    url: https://www.gov.uk/government/publications/vat-notice-726-joint-and-several-liability-for-unpaid-vat/vat-notice-726-joint-and-several-liability-for-unpaid-vat
+    locator: Section 6.1
+    quote: are they high value deals offered by a newly established supplier with minimal trading history,
+      low credit rating?
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A buyer and a seller both contact a trader within hours offering a matched deal in phones at a pre-set
+    margin.
+  cases: []
+  data_needed:
+  - Company (incorporationDate)
+  - Contract
+  - Payment (payee vs supplier, offshore accounts)
+  - Document (invoices, price lists)
+  checkable: records
+  lookup_sources:
+  - Company registry
+  - Credit reference agencies
+  - VIES VAT check
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Back-to-back trading by genuine brokers
+  - Factoring arrangements that send payments to a finance company
+  - New firms with good supplier relationships
+  jurisdictions: UK
+  version: 1
+- id: FR-087
+  name: Reported profits but no cash from operations
+  definition: A company reports earnings and growth but keeps showing negative operating cash flow or
+    cannot generate cash from its operations.
+  areas:
+  - FR
+  typology: Financial statement fraud
+  status: verified
+  sources:
+  - title: 'AS 2401: Consideration of Fraud in a Financial Statement Audit'
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Para. .85, A.2 Incentives/Pressures, item 1
+    quote: Recurring negative cash flows from operations or an inability to generate cash flows from operations
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Revenue and profit rise each quarter while cash from operations stays negative and the gap is filled
+    by new borrowing or share issues.
+  cases: []
+  data_needed:
+  - Company
+  - Document (financial statements, cash-flow statements across years)
+  checkable: lookups
+  lookup_sources:
+  - SEC EDGAR or national company-accounts filings
+  - Annual reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Fast-growing firms investing in stock and receivables
+  - Seasonal businesses
+  - Long-term contracts where cash arrives at milestones
+  jurisdictions: US (PCAOB); used internationally
+  version: 1
+- id: FR-088
+  name: Significant unusual or complex transactions near period end
+  definition: Large, unusual or highly complex deals are booked close to the end of a reporting period,
+    when they can move the reported results.
+  areas:
+  - FR
+  typology: Financial statement fraud
+  status: verified
+  sources:
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Para. .85, A.2 Opportunities, item 1
+    quote: Significant or highly complex transactions or significant unusual transactions, especially
+      those close to period end
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A big sale with unusual return rights is signed on the last day of the quarter and reversed the next
+    quarter.
+  cases: []
+  data_needed:
+  - Contract (date, counterparty, terms)
+  - Payment
+  - Company
+  - Document (quarterly filings)
+  checkable: records
+  lookup_sources:
+  - SEC EDGAR filings and later restatements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Sales teams closing deals before deadlines
+  - Genuine year-end acquisitions or refinancings
+  jurisdictions: US (PCAOB)
+  version: 1
+- id: FR-089
+  name: Significant related-party transactions outside the normal course of business
+  definition: The company does large deals with parties connected to its owners or managers that fall
+    outside its ordinary business, or that are not audited or are audited by another firm.
+  areas:
+  - FR
+  typology: Financial statement fraud
+  status: verified
+  sources:
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Para. .85, A.2 Opportunities, item 1
+    quote: a significant related party transaction outside the normal course of business
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Luckin Coffee used related parties to fabricate more than $300 million of retail sales.
+  cases:
+  - name: SEC v. Luckin Coffee Inc.
+    year: '2020'
+    jurisdiction: US (SEC)
+    what_happened: The SEC charged that from about April 2019 to January 2020 Luckin fabricated over $300
+      million of retail sales using related parties, inflated expenses by over $190 million and altered
+      records. Luckin agreed to pay a $180 million penalty without admitting or denying the allegations.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/news/press-release/2020-319
+    source_title: SEC press release 2020-319
+  data_needed:
+  - Company
+  - Person (directors, owners)
+  - Ownership / Directorship / Family (to establish relatedness)
+  - Contract / Payment
+  - Document (related-party note in accounts)
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - SEC EDGAR filings (related-party disclosures)
+  - Beneficial ownership registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Related-party deals can hide self-dealing by owners or officials; Luckin used related parties
+      to fake sales.
+    source_url: https://www.sec.gov/news/press-release/2020-319
+  innocent_explanations:
+  - Family businesses that trade within the group on fair terms
+  - Disclosed and board-approved deals at market prices
+  jurisdictions: US (PCAOB)
+  version: 1
+- id: FR-090
+  name: High turnover of senior management, lawyers or board members
+  definition: Top executives, legal counsel or directors leave unusually often.
+  areas:
+  - FR
+  typology: Financial statement fraud
+  status: verified
+  sources:
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Para. .85, A.2 Opportunities, item 3
+    quote: High turnover of senior management, counsel, or board members
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Three chief financial officers leave within two years.
+  cases: []
+  data_needed:
+  - Directorship / Employment (start and end dates)
+  - Person
+  - Company
+  - Document (8-K or equivalent notices)
+  checkable: lookups
+  lookup_sources:
+  - Company registry officer histories
+  - SEC EDGAR 8-K Item 5.02 filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Takeovers, restructuring or a new strategy
+  - Retirements and normal career moves
+  - Start-up phases where roles change
+  jurisdictions: US (PCAOB)
+  version: 1
+- id: FR-091
+  name: Strained relations or frequent disputes with the auditor
+  definition: Management is in conflict with its current or previous auditor over accounting, auditing
+    or reporting, or the relationship is otherwise strained.
+  areas:
+  - FR
+  typology: Financial statement fraud
+  status: verified
+  sources:
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Para. .85, A.2 Attitudes/Rationalizations
+    quote: Frequent disputes with the current or predecessor auditor on accounting, auditing, or reporting
+      matters
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Para. .85, A.2 Attitudes/Rationalizations
+    quote: The relationship between management and the current or predecessor auditor is strained
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An auditor resigns and the filing announcing it mentions disagreements over revenue recognition.
+  cases: []
+  data_needed:
+  - Company
+  - Representation (auditor engagement)
+  - Document (auditor change filings, audit opinions)
+  checkable: lookups
+  lookup_sources:
+  - SEC EDGAR 8-K Item 4.01 (auditor changes)
+  - PCAOB AuditorSearch
+  - National company-accounts filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Honest disagreements over complex new accounting rules
+  - Fee disputes
+  - Rotation of auditors required by law
+  jurisdictions: US (PCAOB)
+  version: 1
+- id: FR-092
+  name: Rapid growth or profits well above similar companies
+  definition: The company grows much faster or earns much more than others in its industry.
+  areas:
+  - FR
+  typology: Financial statement fraud
+  status: verified
+  sources:
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Para. .85, A.2 Incentives/Pressures, item 1
+    quote: Rapid growth or unusual profitability, especially compared to that of other companies in the
+      same industry
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A payments firm reports margins several times higher than its competitors.
+  cases: []
+  data_needed:
+  - Company
+  - Document (financial statements of the company and peers)
+  checkable: lookups
+  lookup_sources:
+  - SEC EDGAR and peer company filings
+  - Industry statistics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A genuinely better product or patent
+  - Early stage of a growing market
+  - One-off gains disclosed as such
+  jurisdictions: US (PCAOB)
+  version: 1
+- id: FR-093
+  name: Heavy pressure to hit forecasts and management fixated on the share price
+  definition: Management is under strong pressure to meet analysts', lenders' or investors' expectations
+    and shows excessive interest in keeping the stock price or earnings trend up.
+  areas:
+  - FR
+  typology: Financial statement fraud
+  status: verified
+  sources:
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Para. .85, A.2 Incentives/Pressures, item 2
+    quote: Excessive pressure exists for management to meet the requirements or expectations of third
+      parties
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Para. .85, A.2 Attitudes/Rationalizations
+    quote: Excessive interest by management in maintaining or increasing the entity's stock price or earnings
+      trend
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Executives' bonuses depend on hitting quarterly targets and they publicly promise ever-rising earnings.
+  cases: []
+  data_needed:
+  - Company
+  - Person (executives)
+  - Document (earnings calls, guidance, compensation disclosures)
+  - Ownership (executive shareholdings)
+  checkable: person
+  lookup_sources:
+  - SEC EDGAR proxy statements
+  - Earnings-call transcripts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Normal investor-relations activity
+  - Pay linked to share price is common and legal
+  jurisdictions: US (PCAOB)
+  version: 1
+- id: FR-094
+  name: Management dominated by one person or a small group without checks
+  definition: One person or a small group controls management in a company they do not own outright, with
+    no compensating controls.
+  areas:
+  - FR
+  typology: Financial statement fraud
+  status: verified
+  sources:
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Para. .85, A.2 Opportunities, item 2
+    quote: Domination of management by a single person or small group (in a nonowner-managed business)
+      without compensating controls
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The chief executive also chairs the board, picks the audit committee and approves all major payments
+    alone.
+  cases: []
+  data_needed:
+  - Directorship / Employment (roles held)
+  - Person
+  - Company
+  - Document (governance disclosures)
+  checkable: lookups
+  lookup_sources:
+  - Company registry officer lists
+  - SEC EDGAR proxy statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Founder-led companies at an early stage
+  - Small companies with few staff
+  jurisdictions: US (PCAOB)
+  version: 1
+- id: FR-095
+  name: Key figures resting on large estimates or judgments
+  definition: Important assets, liabilities, revenues or expenses depend on significant estimates that
+    are hard to check.
+  areas:
+  - FR
+  typology: Financial statement fraud
+  status: verified
+  sources:
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Para. .85, A.2 Opportunities, item 1
+    quote: Assets, liabilities, revenues, or expenses based on significant estimates
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Most of a firm's profit comes from revaluing assets it holds, using its own model.
+  cases: []
+  data_needed:
+  - Company
+  - Document (accounting-policy notes, valuation reports)
+  checkable: person
+  lookup_sources:
+  - Annual reports and audit opinions (critical audit matters)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Industries such as insurance, banking and property, where estimates are unavoidable
+  jurisdictions: US (PCAOB)
+  version: 1
+- id: FR-096
+  name: Known history of securities-law or other legal violations
+  definition: The company or its management has a record of breaking securities laws or other laws and
+    regulations.
+  areas:
+  - FR
+  typology: Financial statement fraud
+  status: verified
+  sources:
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Para. .85, A.2 Attitudes/Rationalizations
+    quote: Known history of violations of securities laws or other laws and regulations
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A chief executive was barred by a regulator at a previous company.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Sanction (regulatory actions, bars)
+  - Document (court judgments)
+  checkable: lookups
+  lookup_sources:
+  - SEC litigation and administrative proceedings
+  - FINRA BrokerCheck
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Minor technical breaches long resolved
+  - Same name, different person
+  jurisdictions: US (PCAOB)
+  version: 1
+- id: FR-097
+  name: Large cash handled with weak segregation of duties or poor asset records
+  definition: Large amounts of cash are kept or processed while the same people handle and record it,
+    or records of assets are inadequate, making theft easy.
+  areas:
+  - FR
+  typology: Misappropriation of assets (embezzlement)
+  status: verified
+  sources:
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Para. .85, A.3 Opportunities, item 2
+    quote: Inadequate segregation of duties or independent checks
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Para. .85, A.3 Opportunities, item 1
+    quote: Large amounts of cash on hand or processed
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A single bookkeeper collects payments, deposits them and reconciles the bank statements.
+  cases: []
+  data_needed:
+  - Employment (roles and duties)
+  - Person
+  - Company
+  - Document (internal-control reports, audit letters)
+  - BankAccount
+  checkable: person
+  lookup_sources:
+  - Public-body audit reports (for government entities)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: In public bodies, weak controls over cash enable embezzlement of public funds.
+    source_url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+  innocent_explanations:
+  - Small organisations with too few staff to separate duties
+  - Cash-heavy businesses such as shops and restaurants
+  jurisdictions: US (PCAOB)
+  version: 1
 not_reached:
 - investor.gov /pyramid-scheme (singular URL) failed; used /pyramid-schemes and 2013 alert instead
 - 'justice.gov/ust/bankruptcy-fraud and /ust/criminal-enforcement: fetch errors; used FY2014 USTP criminal
@@ -2771,3 +4898,18 @@ not_reached:
 - 'Madoff mechanics: SDNY and FBI releases describe plea/sentence only; SEC Lit. Rel. 20959 against auditor
   Friehling is a complaint (allegation), not a finding'
 - Operation Gold Rush (FinCEN case study) is charges only, not used as a case outcome
+- 'FATF 2009 securities report Annex B (Suspicious Indicators, p. 70), Chapter 4 (insider trading, market
+  manipulation, securities fraud, pp. 48-54) and Annex A glossary: the fetched text stopped at about page
+  40 and a direct download was blocked. I used FATF quotes only from paras 34, 106 and case studies 1,
+  3 and 10, and FINRA Regulatory Notice 19-18 for the rest.'
+- 'AUSTRAC 2024 ''Indicators of suspicious activity for the securities and derivatives sector'': I could
+  not find it by search and did not open it.'
+- 'HMRC ''How to spot missing trader VAT fraud'' guidance page: the fetch failed. I used VAT Notice 726
+  section 6.1 instead.'
+- 'FBI advance-fee schemes page: the fetch failed. The glossary definition is sourced to the FinCEN joint
+  notice.'
+- 'CFPB power-of-attorney definition: the page I fetched had no definition, so I added no glossary entry
+  for power of attorney.'
+- Some FinCEN quotes reached me cut short by the fetch tool (FinCEN elder advisory, check alert, timeshare
+  notice). The quoted text matches the start of each red flag but is not the full sentence. Re-check the
+  full wording against the PDFs before publishing.

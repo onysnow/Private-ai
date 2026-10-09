@@ -1,0 +1,2885 @@
+key: MA
+name: Securities market abuse
+scope: 'Securities market abuse (manipulation and insider trading). FINRA Regulatory Notice 21-03 (10
+  Feb 2021). Manipulation: reverse or forward splits that concentrate shares among a few holders; marking
+  the close (buying just before market close); small buys by a customer with a very large position, apparently
+  to move the price; customers suddenly trading a thinly traded stock on both sides of the market; sell-only
+  routing through omnibus or DVP/RVP accounts. Insider-related: officers, former officers, significant
+  shareholders or their families trading before an announcement or a promotion campaign. Issuer and customer
+  flags: abrupt changes of name, ticker or business model; current or past shell status; unsupported revenue
+  or partnership claims; large deposits of thinly traded shares; several new overseas accounts depositing
+  the same issuer''s shares.'
+indicators:
+- id: MA-001
+  name: Abrupt or repeated changes of company name, ticker or business model
+  definition: The company keeps changing its name, ticker or line of business, often to jump on whatever
+    trend is popular, which can hide the lack of a real business ahead of a pump-and-dump.
+  areas:
+  - MA
+  typology: Pump and dump (issuer-side)
+  status: verified
+  sources:
+  - title: 'Regulatory Notice 21-03: FINRA Shares Observations and Guidance on Fraud Involving Low-Priced
+      Securities'
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Potential Indicators of Fraud Involving Low-Priced Securities > Issuers
+    quote: abrupt or frequent changes of issuer name, ticker symbol or business model, or abrupt expansion
+      of an existing business model, often to benefit from the latest trend
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Microcap Fraud
+    publisher: SEC Office of Investor Education (Investor.gov)
+    url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/microcap-fraud
+    quote: Frequent changes in company name or business plan may suggest no real business operations.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Regulatory Notice 19-18: FINRA Provides Guidance to Firms Regarding Suspicious Activity Monitoring
+      and Reporting Obligations'
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: II. Potential Red Flags in Deposits of Securities
+    quote: were issued by a company that has been through several recent name changes or business combinations
+      or recapitalizations;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A former cannabis company renames itself and announces COVID-19 test kits (FINRA's own example).
+  cases: []
+  data_needed:
+  - Company (name, previousName, incorporationDate, status)
+  - Security (ticker, issuer)
+  - Document (filings, press releases, with dates)
+  checkable: lookups
+  lookup_sources:
+  - SEC EDGAR filing history
+  - OTC Markets issuer pages and compliance flags
+  - Company registry (name-change history)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: AF
+    reason: Repeated reinvention of the business model often comes with revenue or partnership claims
+      the accounts cannot support.
+    source_url: https://www.finra.org/rules-guidance/notices/21-03
+  innocent_explanations:
+  - Genuine pivot after a failed product
+  - Rebranding after a merger or acquisition
+  - Name change after a change of control in a real business
+  jurisdictions: US (FINRA/SEC guidance); pattern applies generally
+  version: 1
+- id: MA-002
+  name: Issuer is, or recently was, a shell company
+  definition: The company has, or recently had, almost no operations or assets, which makes it easy to
+    use for a pump-and-dump or a reverse merger.
+  areas:
+  - MA
+  typology: Pump and dump (issuer-side)
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Issuers; endnote citing Exchange Act Rule 12b-2
+    quote: currently or previously a shell company;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Microcap Fraud
+    publisher: Investor.gov (SEC)
+    url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/microcap-fraud
+    quote: Penny stocks that are aggressively promoted may be stocks of dormant shell companies
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: II. Deposits of Securities
+    quote: were issued by a shell company;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Dormant listed shell is revived, merges with a private firm, then is heavily promoted.
+  cases: []
+  data_needed:
+  - Company (status, incorporationDate)
+  - Security (issuer)
+  - Document (10-K/10-Q showing nominal operations and assets)
+  checkable: lookups
+  lookup_sources:
+  - SEC EDGAR (shell-company check box on filings)
+  - OTC Markets shell flag
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the Rule 12b-2 definition quoted by FINRA: no or nominal operations, and no or nominal
+      assets (or assets that are only cash and cash equivalents, or cash plus nominal other assets).'
+    threshold_source: https://www.finra.org/rules-guidance/notices/21-03
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - SPACs and blank-check vehicles set up openly to do a deal
+  - Company winding down after selling its business
+  - Start-ups not yet trading
+  version: 1
+- id: MA-003
+  name: Stock split or reorganisation that concentrates shares in a few hands
+  definition: A reverse or forward split, reverse merger or recapitalisation leaves most of the tradable
+    shares with a small group who may act together.
+  areas:
+  - MA
+  typology: Pump and dump (control of the float)
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Issuers
+    quote: that appear to concentrate the shares into the hands of a small number of shareholders, who
+      may be acting in coordination
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Reverse split plus reverse merger after which a few offshore holders own nearly all free-trading shares.
+  cases: []
+  data_needed:
+  - Ownership (owner, asset, percentage, startDate)
+  - Security
+  - Company
+  - Person
+  - Associate
+  checkable: lookups
+  lookup_sources:
+  - SEC EDGAR (8-K, 13D/G, shareholder lists)
+  - Transfer agent records (via subpoena or leak)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Reverse split to meet an exchange minimum price
+  - Founder-held companies with naturally concentrated ownership
+  - Legitimate restructuring after bankruptcy
+  version: 1
+- id: MA-004
+  name: Officers or service providers with misconduct records or many penny-stock ties
+  definition: Executives, lawyers, auditors, transfer agents or promoters linked to the company have regulatory
+    or criminal histories, or keep turning up at other low-priced issuers.
+  areas:
+  - MA
+  typology: Pump and dump (repeat players)
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Issuers
+    quote: who have a history of regulatory or criminal violations, or are associated with multiple low-priced
+      stock issuers;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: II. Deposits of Securities
+    quote: were issued by a company whose officers or insiders have a history of regulatory or criminal
+      violations, or are associated with multiple low-priced stock issuers.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The same transfer agent, auditor and promoter appear across several issuers that were later suspended.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Directorship (director, organization, role)
+  - Employment
+  - Representation (agent, client)
+  - Sanction / court records
+  checkable: lookups
+  lookup_sources:
+  - FINRA BrokerCheck
+  - SEC litigation releases and trading suspensions
+  - Court records (PACER)
+  - Company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: AF
+    reason: FINRA names attorneys, auditors, transfer agents and consultants as the repeat players to
+      check.
+    source_url: https://www.finra.org/rules-guidance/notices/21-03
+  innocent_explanations:
+  - Small-cap specialist firms legitimately serve many small issuers
+  - Old, minor or resolved violations
+  - Common names producing false matches
+  version: 1
+- id: MA-005
+  name: No current, adequate public financial information
+  definition: The company does not publish up-to-date accounts, or its SEC filings are late, incomplete
+    or missing.
+  areas:
+  - MA
+  typology: Pump and dump (issuer-side)
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Issuers
+    quote: not providing current and adequate publicly available financial information
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: II. Deposits of Securities
+    quote: were issued by a company whose SEC filings are not current, are incomplete, or nonexistent;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Issuer quoted OTC with no filings for two years while issuing promotional press releases.
+  cases: []
+  data_needed:
+  - Company
+  - Security
+  - Document (filing dates, filing types)
+  checkable: lookups
+  lookup_sources:
+  - SEC EDGAR
+  - OTC Markets delinquency flags
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small firms filing late through auditor problems
+  - Companies legally exempt from reporting
+  - Foreign issuers reporting at home
+  version: 1
+- id: MA-006
+  name: Revenue or scale claims the company cannot support
+  definition: The company announces revenue targets or growth that its experience, assets or finances
+    could not plausibly deliver.
+  areas:
+  - MA
+  typology: Pump and dump (false information)
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Issuers
+    quote: making claims about projected scale and revenue targets that are not supported by the issuer’s
+      experience, assets or financial condition
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A cannabinoid-products company says it could earn millions shipping COVID-19 home test kits (FINRA's
+    example).
+  cases: []
+  data_needed:
+  - Company
+  - Document (press releases, filings, financial statements)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: AF
+    reason: Unsupported revenue claims can come with false figures in the accounts.
+    source_url: https://www.finra.org/rules-guidance/notices/21-03
+  innocent_explanations:
+  - Over-optimistic but honest management
+  - Forward-looking statements with proper caveats
+  - Real contract not yet in the accounts
+  version: 1
+- id: MA-007
+  name: Unverifiable partnership, joint-venture or financing claims
+  definition: The company touts deals with private partners or funders whose existence or finances cannot
+    be checked.
+  areas:
+  - MA
+  typology: Pump and dump (false information)
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Issuers
+    quote: making unsupported claims regarding partnerships, joint ventures or financing agreements with
+      private entities
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Press release about a new partner whose financial condition cannot be independently verified.
+  cases: []
+  data_needed:
+  - Company (both parties)
+  - Contract
+  - Document (press release)
+  - UnknownLink
+  checkable: lookups
+  lookup_sources:
+  - Company registries for the named partner
+  - Partner's own website and filings
+  - Calls to the named partner
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Confidentiality clauses limit what can be confirmed
+  - Genuine early-stage or memorandum-of-understanding deals
+  version: 1
+- id: MA-008
+  name: Promotion campaign after a dormant period
+  definition: A quiet company suddenly issues a burst of press releases or social media posts that its
+    filings and website do not back up.
+  areas:
+  - MA
+  typology: Pump and dump (promotion)
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Issuers
+    quote: conducting increased social media, press release or related investor outreach campaigns after
+      a period of apparent dormancy
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - No news for 18 months, then daily press releases in one week as volume jumps.
+  cases: []
+  data_needed:
+  - Company
+  - Document (press releases with dates)
+  - Event
+  - Trade/volume data (no FtM schema; keep as Table)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New management restarting investor relations
+  - Real news after a long development period
+  version: 1
+- id: MA-009
+  name: No verifiable sign of real business activity
+  definition: The company has little or no working website, staff, job ads or independent coverage, and
+    its stock is promoted more than its products.
+  areas:
+  - MA
+  typology: Pump and dump (issuer-side)
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Issuers
+    quote: lacking verifiable evidence of the issuer’s business activities, such as limited or no operational
+      website, social media accounts
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Microcap Fraud
+    publisher: Investor.gov (SEC)
+    url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/microcap-fraud
+    quote: Be wary if the company’s stock seems to be more heavily promoted than its products or services.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: II. Deposits of Securities
+    quote: were issued by a company that has no apparent business, revenues or products;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Registered office is a mail drop; no products for sale; website is a template.
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Document
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - Web archive and domain records
+  - Job sites
+  - Street-level imagery for the address
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Pre-revenue research firms with small teams
+  - Business-to-business firms with little public presence
+  version: 1
+- id: MA-010
+  name: Paid or seemingly independent hype that cannot be checked
+  definition: Promoters, newsletters, ads or 'independent' research push the stock with claims nobody
+    can confirm, sometimes with pay disclosures that hide who is really paying.
+  areas:
+  - MA
+  typology: Pump and dump (promotion)
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Third-Party Promotional Activities
+    quote: hyping and promoting issuers (or their products or services), especially where the information
+      cannot be reliably confirmed;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Microcap Fraud
+    publisher: Investor.gov (SEC)
+    url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/microcap-fraud
+    quote: Additionally, the disclosures may not reveal that the underlying source of the compensation
+      is a company insider or affiliate.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Newsletter discloses it was paid by an 'unaffiliated third party' that turns out to be controlled
+    by an insider.
+  cases:
+  - name: United States v. David Levy
+    year: '2014'
+    jurisdiction: US (S.D.N.Y., federal criminal)
+    what_happened: Jury convicted Levy for orchestrating pump-and-dump schemes and a money-laundering
+      conspiracy; DOJ says his wife worked with him to secretly fund and distribute misleading third-party
+      buy recommendations, after which conspirators sold into the pumped-up volume. Sentenced to nine
+      years.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/leader-pump-and-dump-stock-fraud-scheme-sentenced-manhattan-federal-court-nine-years
+    source_title: Leader of Pump-and-Dump Stock Fraud Scheme Sentenced in Manhattan Federal Court to Nine
+      Years
+  data_needed:
+  - Person / Company (promoter)
+  - Payment (payer, beneficiary, amount, date)
+  - Document (promotions, disclaimers)
+  - Associate
+  checkable: lookups
+  lookup_sources:
+  - Promotion disclaimers
+  - Corporate registries for the payer
+  - SEC litigation releases on touting
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate paid investor-relations work with full disclosure
+  - Genuine independent analyst enthusiasm
+  version: 1
+- id: MA-011
+  name: Promoter or commentator trades against their own public tips
+  definition: Someone with an audience recommends or talks up a stock they already hold, then profits
+    as the price reacts, without properly disclosing the conflict.
+  areas:
+  - MA
+  typology: Scalping / biased recommendations
+  status: verified
+  sources:
+  - title: Regulation (EU) No 596/2014 (Market Abuse Regulation)
+    publisher: European Parliament and Council (EUR-Lex)
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Annex I, Section B(b)
+    quote: whether orders to trade are given or transactions are undertaken by persons before or after
+      the same persons or persons linked to them produce or disseminate investment recommendations which
+      are erroneous, biased, or demonstrably influenced by material interest.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Article 12(2)(d)
+    quote: the taking advantage of occasional or regular access to the traditional or electronic media
+      by voicing an opinion about a financial instrument
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: III. Potential Red Flags in Securities Trading
+    quote: Individuals known throughout the industry to be stock promoters sell securities through the
+      broker-dealer.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Influencer posts 'strong buy' on a stock bought the day before and sells within hours of the post.
+  cases: []
+  data_needed:
+  - Person
+  - Security
+  - Document (posts with timestamps)
+  - Trade records (no FtM schema; keep as Table)
+  - Ownership
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Commentator disclosed the position clearly and held it
+  - Trade made for reasons unrelated to the post (pre-set plan)
+  version: 1
+- id: MA-012
+  name: Spike in social media and chat-room promotion
+  definition: Mentions of the stock on social media, message boards and chat rooms jump suddenly, often
+    with unverifiable claims.
+  areas:
+  - MA
+  typology: Pump and dump (promotion)
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Third-Party Promotional Activities
+    quote: and activity on investor chat rooms or message boards; or
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Pump and Dump Schemes
+    publisher: Investor.gov (SEC)
+    url: https://www.investor.gov/introduction-investing/investing-basics/glossary/pump-and-dump-schemes
+    quote: Microcap companies are particularly vulnerable to pump and dump schemes because there is often
+      limited publicly-available information about microcap companies.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Hundreds of near-identical posts about one penny stock from new accounts over two days.
+  cases: []
+  data_needed:
+  - Document (posts, accounts, timestamps)
+  - Person / UserAccount
+  - Security
+  checkable: lookups
+  lookup_sources:
+  - Social media archives
+  - Message-board histories
+  - Account-creation dates
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real news going viral
+  - Organic retail-investor enthusiasm (meme stocks)
+  version: 1
+- id: MA-013
+  name: Unsolicited calls or texts touting a specific stock
+  definition: Investors or brokers receive cold calls, texts or emails pushing one particular stock.
+  areas:
+  - MA
+  typology: Pump and dump (promotion)
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Third-Party Promotional Activities
+    quote: conducting unsolicited phone calls or sending text alerts to tout specific stocks to garner
+      interest from registered representatives and investors.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Microcap Fraud
+    publisher: Investor.gov (SEC)
+    url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/microcap-fraud
+    quote: If you receive an unsolicited stock promotion, be cautious.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Mass text 'XYZ about to explode, buy before Monday'.
+  cases: []
+  data_needed:
+  - Document (texts, call logs, emails)
+  - Person / Company (sender)
+  - Security
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate broker outreach to existing clients within rules
+  version: 1
+- id: MA-014
+  name: Large deposits of thinly traded low-priced shares
+  definition: A customer deposits a big block of a rarely traded penny stock, often a large part of the
+    float, ready to sell into a promotion.
+  areas:
+  - MA
+  typology: Pump and dump (distribution)
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Firm Customers
+    quote: customers that deposit large blocks of thinly traded low-priced securities, whether the securities
+      are marked with a restrictive legend or not
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: II. Deposits of Securities
+    quote: were recently issued or represent a large percentage of the float for the security;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - New account deposits 30% of an issuer's free float the week before a promotion.
+  cases: []
+  data_needed:
+  - Ownership
+  - Security
+  - Person / Company (account holder)
+  - BankAccount / brokerage account (no exact FtM schema; use BankAccount)
+  - Document (deposit records)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded. FINRA treats 'low-priced' as penny stocks (generally
+      under $5 a share) or microcaps (market capitalisation under about $250 to $300 million).
+    threshold_source: https://www.finra.org/rules-guidance/notices/21-03
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Founders or early investors moving long-held shares to a broker
+  - Estate or divorce transfers
+  version: 1
+- id: MA-015
+  name: Deposit, sell at once, wire the money out
+  definition: A customer repeatedly deposits shares, sells them straight away and moves the cash elsewhere.
+  areas:
+  - MA
+  - ML
+  typology: Pump and dump (cash-out)
+  status: verified
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: II. Deposits of Securities
+    quote: immediately selling the shares and then wiring, or otherwise transferring out the proceeds
+      of the sale(s).
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Three cycles in a month of deposit, liquidate, wire to an offshore bank.
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, amount, date)
+  - BankAccount
+  - Security
+  - Person / Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FINRA lists this pattern in its anti-money-laundering suspicious-activity guidance; the proceeds
+      of manipulation are moved on fast.
+    source_url: https://www.finra.org/rules-guidance/notices/19-18
+  innocent_explanations:
+  - Holder needs cash and has no plan to reinvest
+  - Employee selling vested stock
+  version: 1
+- id: MA-016
+  name: Shares and paperwork that do not fit their claimed origin
+  definition: Shares arrive without the restriction you would expect from when and how they were obtained,
+    or the customer's story about getting them does not add up or changes.
+  areas:
+  - MA
+  typology: Unregistered distribution
+  status: verified
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: II. Deposits of Securities
+    quote: The lack of a restrictive legend on deposited shares seems inconsistent with the date the customer
+      acquired the securities
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: II. Deposits of Securities
+    quote: Such documents could include questionable legal opinions or securities purchase agreements.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Unlegended shares acquired last month in a private placement, backed by a boilerplate legal opinion.
+  cases: []
+  data_needed:
+  - Document (certificates, legal opinions, purchase agreements)
+  - Ownership
+  - Security
+  - Representation (lawyer giving opinion)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legend properly removed after the holding period
+  - Clerical errors by a transfer agent
+  version: 1
+- id: MA-017
+  name: Many new or 'unrelated' accounts with the same stock or introducer
+  definition: Several new accounts, often overseas and online-only, deposit the same issuer's shares,
+    share an introducer, or sell in a coordinated way.
+  areas:
+  - MA
+  typology: Nominee accounts / coordinated selling
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Firm Customers
+    quote: who either deposit shares of the same issuer or were introduced by the same individual to the
+      firm; or
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: II. Deposits of Securities
+    quote: Seemingly unrelated clients open accounts on or at about the same time, deposit the same low-priced
+      security and subsequently liquidate the security in a manner that suggests coordination.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Five overseas accounts opened in one week, all referred by one consultant, all depositing the same
+    ticker.
+  cases: []
+  data_needed:
+  - Person / Company (account holders)
+  - Associate
+  - UnknownLink
+  - Address
+  - Email
+  - Ownership
+  - Security
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Members of one investor club or family investing together
+  - A legitimate adviser bringing several clients
+  version: 1
+- id: MA-018
+  name: Deposited shares quickly split across unrelated accounts
+  definition: Soon after depositing shares, the customer asks to move them into several accounts with
+    no obvious link, or to sell or transfer them.
+  areas:
+  - MA
+  typology: Nominee accounts / concealment
+  status: verified
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: II. Deposits of Securities
+    quote: requests to journal the shares into multiple accounts that do not appear to be related
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Block deposited Monday; journaled to four accounts Tuesday; all four sell Wednesday.
+  cases: []
+  data_needed:
+  - Ownership
+  - Security
+  - Person / Company
+  - UnknownLink
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Gifts to family members
+  - Splitting holdings between personal and retirement accounts
+  version: 1
+- id: MA-019
+  name: Sell-only flow through omnibus, DVP/RVP or master/sub accounts
+  definition: Large or frequent sell orders in penny stocks, with no buys, arrive through layered accounts
+    that hide who the real seller is.
+  areas:
+  - MA
+  typology: Distribution through layered accounts
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Firm Customers
+    quote: customers, including financial institutions, that route high volume or frequent sell orders
+      (with no buys) for low-priced securities to the firm for execution
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: III. Securities Trading
+    quote: The account is using a master/sub structure, which enables trading anonymity with respect to
+      the sub-accounts’ activity
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A foreign bank's omnibus account sells millions of shares of one microcap over a month and never buys.
+  cases: []
+  data_needed:
+  - Company (intermediary)
+  - BankAccount
+  - Security
+  - Trade records (Table)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Institutions selling on behalf of many genuine clients
+  - Execution-only relationships where buys go elsewhere
+  version: 1
+- id: MA-020
+  name: Push to restart quoting after a trend pivot or trading suspension
+  definition: Someone asks a broker to file to start or resume price quotes for a company that just changed
+    business or was recently suspended from trading.
+  areas:
+  - MA
+  typology: Pump and dump (set-up)
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Firm Customers
+    quote: customers or other parties that request the firm file a FINRA Form 211
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: II. Deposits of Securities
+    quote: were issued by a company that has been the subject of a prior trading suspension; or
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Shell suspended by the SEC last year seeks new quotations under a new name.
+  cases: []
+  data_needed:
+  - Company
+  - Security
+  - Sanction (trading suspension as a regulatory measure)
+  - Document (Form 211)
+  checkable: lookups
+  lookup_sources:
+  - SEC trading suspensions list
+  - FINRA OTC data / OTC Markets
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Company cured the reporting gap that caused the suspension
+  - Legitimate new listing after a real restructuring
+  version: 1
+- id: MA-021
+  name: Small buys by a big holder, or creeping buys that lift the price
+  definition: A person who already holds a lot of the stock places small purchases, or buys in small steps
+    through the day, or keeps raising the bid, in ways that look aimed at pushing the price up.
+  areas:
+  - MA
+  typology: Price manipulation (advancing the bid)
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Firm Customers
+    quote: small purchases executed on behalf of a customer who owns a very large amount of the same low-priced
+      stock
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: III. Securities Trading
+    quote: A customer accumulates stock in small increments throughout the trading day to increase price.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Annex I, Section A(b)
+    quote: the extent to which orders to trade given or transactions undertaken by persons with a significant
+      buying or selling position in a financial instrument
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: European Commission (EUR-Lex)
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 1, point 6(d)
+    quote: Entering orders to trade which increase the bid (or decrease the offer) for a financial instrument
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Holder of 40% of a stock buys 100 shares at a time, each a tick higher.
+  cases: []
+  data_needed:
+  - Ownership
+  - Security
+  - Person
+  - Trade/order records (Table)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Averaging into a position to limit market impact
+  - Illiquid market where only small lots are available
+  version: 1
+- id: MA-022
+  name: Marking the close or other reference prices
+  definition: Trades or orders clustered at the open, close, auction or settlement time that push the
+    reference price up or down, sometimes with big orders cancelled seconds before the auction price is
+    fixed.
+  areas:
+  - MA
+  typology: Marking the close
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Firm Customers
+    quote: customers that engage in a pattern of purchasing a low-priced security right before market
+      close (which may be indicative of an attempt to mark the close);
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: III. Securities Trading
+    quote: A customer attempts to influence the closing price of a stock by executing purchase or sale
+      orders at or near the close of the market.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Article 12(2)(b)
+    quote: the buying or selling of financial instruments, at the opening or closing of the market, which
+      has or is likely to have the effect of misleading investors acting on the basis of the prices displayed
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 1, point 5(d)(i)
+    quote: cancelling these orders a few seconds before the order book is frozen for computing the auction
+      price
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 7 U.S. Code § 6c (Commodity Exchange Act)
+    publisher: Legal Information Institute, Cornell Law School
+    url: https://www.law.cornell.edu/uscode/text/7/6c
+    locator: § 6c(a)(5)(B)
+    quote: demonstrates intentional or reckless disregard for the orderly execution of transactions during
+      the closing period
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Buy orders in the last two minutes on the day a swap or fund valuation is calculated.
+  cases:
+  - name: United States v. Bill Hwang (Archegos Capital Management)
+    year: '2024'
+    jurisdiction: US (S.D.N.Y., federal criminal)
+    what_happened: Convicted after a nine-week jury trial (July 2024) of racketeering conspiracy, securities
+      fraud and related counts; sentenced in December 2024 to 18 years. DOJ says the group marked prices
+      up at the close to trigger payouts to Archegos and lied to counterparties about the portfolio.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/founder-and-head-archegos-capital-management-bill-hwang-sentenced-18-years-prison
+    source_title: Founder And Head Of Archegos Capital Management Bill Hwang Sentenced To 18 Years In
+      Prison
+  data_needed:
+  - Security
+  - Trade/order records with timestamps (Table)
+  - Person / Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Index funds and others that must trade at the close
+  - Hedging or rebalancing timed to official prices
+  - Executing customer market-on-close orders
+  version: 1
+- id: MA-023
+  name: 'Wash trades: no real change of owner'
+  definition: Trades where the buyer and seller are the same person or people acting together, so no real
+    ownership or risk changes hands.
+  areas:
+  - MA
+  typology: Wash trading
+  status: verified
+  sources:
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Annex I, Section A(c)
+    quote: whether transactions undertaken lead to no change in beneficial ownership of a financial instrument
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 1, point 3(a)(i)
+    quote: unusual repetition of a transaction among a small number of parties over a certain period of
+      time;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: III. Securities Trading
+    quote: A customer engages in pre-arranged or other non-competitive securities trading, including wash
+      or cross trades, with no apparent business purpose.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Two accounts with the same beneficial owner trade the same block back and forth all day.
+  cases: []
+  data_needed:
+  - Ownership (beneficial owner of each account)
+  - Person / Company
+  - Associate
+  - Trade records (Table)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Accidental self-matches by different desks of one firm
+  - Tax-motivated sales and repurchases
+  version: 1
+- id: MA-024
+  name: Matched or opposite-side orders between colluding parties
+  definition: Buy and sell orders of nearly the same size and price entered at nearly the same time by
+    one party or colluding parties, or customers suddenly trading a thin stock on both sides.
+  areas:
+  - MA
+  typology: Improper matched orders
+  status: verified
+  sources:
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 1, point 3(c)
+    quote: with very similar quantity and similar price, by the same party or different but colluding
+      parties — usually known as ‘improper matched orders’
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Firm Customers
+    quote: on opposite sides of the market, potentially leading to manipulative trading;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Two related accounts post a buy and a sell for 50,000 shares at the same price within one second.
+  cases: []
+  data_needed:
+  - Person / Company
+  - Associate
+  - UnknownLink
+  - Trade/order records (Table)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Coincidental matching in a thin market
+  - Legitimate negotiated block crosses reported properly
+  version: 1
+- id: MA-025
+  name: Painting the tape
+  definition: Trades done to show up on public price screens and create the look of activity or price
+    movement.
+  areas:
+  - MA
+  typology: Painting the tape
+  status: verified
+  sources:
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 1, point 3(b)
+    quote: shown on a public display facility to give the impression of activity or price movement
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Dozens of tiny prints at rising prices in an otherwise dead stock just before a promotion email.
+  cases: []
+  data_needed:
+  - Security
+  - Trade records (Table)
+  - Person / Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small retail orders in an illiquid stock
+  - Algorithmic slicing of a genuine order
+  version: 1
+- id: MA-026
+  name: One person or a few make up a big share of daily volume and move the price
+  definition: A single trader or small group accounts for a large part of the day's trading in a stock,
+    and the price shifts noticeably as a result.
+  areas:
+  - MA
+  typology: Price manipulation / concentration
+  status: verified
+  sources:
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Annex I, Section A(a)
+    quote: represent a significant proportion of the daily volume of transactions in the relevant financial
+      instrument
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: III. Securities Trading
+    quote: The customer’s activity represents a significant proportion of the daily trading volume in
+      a thinly traded or low-priced security.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 1, point 1(a)(i)
+    quote: or by only one person using one or different accounts, or by a limited number of persons;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - One account is 60% of volume on three days the price doubles.
+  cases: []
+  data_needed:
+  - Security
+  - Person / Company
+  - Trade records and daily volume (Table)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Market makers naturally dominate illiquid stocks
+  - Large investor building a disclosed stake
+  version: 1
+- id: MA-027
+  name: Sudden surge in demand and price in a thin stock
+  definition: A rarely traded or penny stock suddenly sees heavy buying together with a rising price.
+  areas:
+  - MA
+  typology: Pump and dump (pump phase)
+  status: verified
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: III. Securities Trading
+    quote: There is a sudden spike in investor demand for, coupled with a rising price in, a thinly traded
+      or low-priced security.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Volume up 50 times normal and price up 300% in a week with no filing explaining why.
+  cases: []
+  data_needed:
+  - Security
+  - Price and volume history (Table)
+  - Document (news, filings)
+  checkable: lookups
+  lookup_sources:
+  - Market data (OTC Markets, exchange data)
+  - SEC EDGAR for news that would explain the move
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine material news
+  - Short squeeze driven by real buyers
+  - Index inclusion
+  version: 1
+- id: MA-028
+  name: Unrelated accounts trade an illiquid stock at the same moment
+  definition: Two or more accounts with no known link suddenly trade the same illiquid stock at the same
+    time.
+  areas:
+  - MA
+  typology: Coordinated trading
+  status: verified
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: III. Securities Trading
+    quote: Two or more unrelated customer accounts at the firm trade an illiquid or lowpriced security
+      suddenly and simultaneously.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Four accounts in different countries all buy the same microcap within the same minute.
+  cases: []
+  data_needed:
+  - Person / Company
+  - UnknownLink
+  - Address
+  - Email
+  - Trade records (Table)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Accounts reacting to the same public news or alert
+  - Followers of the same newsletter
+  version: 1
+- id: MA-029
+  name: 'Spoofing and layering: orders placed to be cancelled'
+  definition: Placing large or many orders on one side of the market with no intention of executing them,
+    to trick others into trading, then trading on the other side and cancelling the fake orders.
+  areas:
+  - MA
+  typology: Spoofing / layering
+  status: verified
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: III. Securities Trading
+    quote: A customer engages in a frequent pattern of placing orders on one side of the market, usually
+      inside the existing National Best Bid or Offer (NBBO), followed by the customer entering orders
+      on the other side of the market
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 1, point 5(e)
+    quote: Submitting multiple or large orders to trade often away from the touch on one side of the order
+      book in order to execute a trade on the other side of the order book.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Annex I, Section A(f)
+    quote: or more generally the representation of the order book available to market participants, and
+      are removed before they are executed
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 7 U.S. Code § 6c (Commodity Exchange Act)
+    publisher: Legal Information Institute, Cornell Law School
+    url: https://www.law.cornell.edu/uscode/text/7/6c
+    locator: § 6c(a)(5)(C)
+    quote: (bidding or offering with the intent to cancel the bid or offer before execution)
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Ten large sell orders above the best offer appear, a small buy fills at a lower price, and the sell
+    orders vanish within a second.
+  cases:
+  - name: United States v. Navinder Singh Sarao
+    year: '2016'
+    jurisdiction: US (federal criminal)
+    what_happened: Futures trader pleaded guilty to one count of wire fraud and one count of spoofing;
+      DOJ says he placed thousands of orders he did not intend to trade, using an automated trading program
+      among other techniques, in connection with the 2010 'Flash Crash'.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/futures-trader-pleads-guilty-illegally-manipulating-futures-market-connection-2010-flash
+    source_title: Futures Trader Pleads Guilty to Illegally Manipulating the Futures Market in Connection
+      With 2010 "Flash Crash"
+  - name: JPMorgan Chase & Co. (precious metals and US Treasuries spoofing)
+    year: '2020'
+    jurisdiction: US (federal criminal)
+    what_happened: Entered a deferred prosecution agreement and agreed to pay over $920 million; DOJ says
+      precious-metals desk traders placed orders to buy and sell futures with the intent to cancel them
+      before execution.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/jpmorgan-chase-co-agrees-pay-920-million-connection-schemes-defraud-precious-metals-and-us
+    source_title: JPMorgan Chase & Co. Agrees To Pay $920 Million in Connection with Schemes to Defraud
+      Precious Metals and U.S. Treasuries Markets
+  - name: SEC v. Lek Securities Corp. and Samuel Lek (Avalon FA Ltd trading)
+    year: '2019'
+    jurisdiction: US (S.D.N.Y., civil)
+    what_happened: 'Consent final judgments: Lek Securities paid a $1 million penalty plus disgorgement
+      and accepted a monitor; Sam Lek paid $420,000. Both admitted that Avalon''s trading through Lek
+      violated securities laws. SEC says Avalon profited from layering (placing and cancelling orders
+      to trick others) and cross-market manipulation.'
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/news/press-release/2019-205
+    source_title: SEC Obtains Final Judgment Against Brokerage Firm and CEO in Layering and Manipulation
+      Case (Press Release 2019-205)
+  - name: 'FCA Final Notice: Corrado Abbattista'
+    year: '2020'
+    jurisdiction: UK
+    what_happened: FCA fined the former Fenician Capital CIO £100,000 and banned him; it found he placed
+      large misleading CFD orders he did not intend to execute while placing smaller orders on the opposite
+      side (January to May 2017). His Upper Tribunal reference was withdrawn.
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.fca.org.uk/news/press-releases/fca-fines-and-prohibits-hedge-fund-chief-investment-officer-market-abuse
+    source_title: FCA fines and prohibits hedge fund Chief Investment Officer for market abuse
+  data_needed:
+  - Security
+  - Order book and order lifecycle records (Table)
+  - Person / Company
+  - Employment (trader to firm)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine orders cancelled because the market moved
+  - Market makers updating quotes
+  - Hedging orders legitimately withdrawn
+  jurisdictions: US (CEA, SEC/FINRA), EU and UK (MAR)
+  version: 1
+- id: MA-030
+  name: Order flooding and momentum ignition
+  definition: Sending huge numbers of orders, cancellations or updates to slow others down or hide a strategy,
+    or firing orders to start a price trend and then trading against it; a high cancel-to-trade ratio
+    is a sign.
+  areas:
+  - MA
+  typology: Quote stuffing / momentum ignition (algorithmic)
+  status: verified
+  sources:
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 1, point 4(e)
+    quote: Entering large number of orders to trade and/or cancellations and/or updates to orders to trade
+      so as to create uncertainty for other participants
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 1, point 4(f)
+    quote: This practice may also be illustrated by the high ratio of cancelled orders (e.g. order to
+      trade ratio)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Article 12(2)(c)(iii)
+    quote: in particular by entering orders to initiate or exacerbate a trend;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An algorithm sends 20,000 orders in a minute and cancels 99.9% of them.
+  cases: []
+  data_needed:
+  - Order lifecycle records (Table)
+  - Company (trading firm)
+  - Security
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - High-frequency market making naturally cancels most orders
+  - Software malfunction
+  version: 1
+- id: MA-031
+  name: Quick position reversals and price moves that snap back
+  definition: Orders and trades bunched in a short time that flip position and move the price, which then
+    reverses.
+  areas:
+  - MA
+  typology: Price manipulation
+  status: verified
+  sources:
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Annex I, Section A(e)
+    quote: are concentrated within a short time span in the trading session and lead to a price change
+      which is subsequently reversed;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Annex I, Section A(d)
+    quote: include position reversals in a short period
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Trader buys heavily for ten minutes, price jumps 8%, trader sells, price falls back.
+  cases: []
+  data_needed:
+  - Trade records (Table)
+  - Security
+  - Person / Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Day trading on news that turns out to be wrong
+  - Stop-loss triggers
+  version: 1
+- id: MA-032
+  name: Holding the price near a derivative's trigger point
+  definition: Trading in the days before a derivative or convertible expires or is issued that keeps the
+    price above or below a strike or barrier, or shifts the settlement price.
+  areas:
+  - MA
+  typology: Creation of a floor or ceiling
+  status: verified
+  sources:
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 1, point 1(b)(i)
+    quote: increasing or decreasing or maintaining the price during the days preceding the issue, optional
+      redemption or expiry of a related derivative or convertible;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 1, point 1(b)(iii)
+    quote: below or above a strike price or other element used to determine the pay-out (e.g. barrier)
+      of a related derivative at expiration date;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Seller of barrier options sells the underlying hard on expiry day to keep it below the barrier.
+  cases: []
+  data_needed:
+  - Security (underlying and derivative)
+  - Trade records (Table)
+  - Contract (derivative terms)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Delta hedging by option dealers near expiry
+  - Natural 'pinning' around popular strikes
+  version: 1
+- id: MA-033
+  name: Trading in one market or product to move another
+  definition: Trading on one venue, or in one instrument, to push the price of the same or a related instrument
+    elsewhere, such as trading shares to move option prices.
+  areas:
+  - MA
+  typology: Cross-venue / cross-product manipulation
+  status: verified
+  sources:
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 1, point 2(d)
+    quote: with a view to improperly influencing the price of a related financial instrument in another
+      or in the same trading venue or outside a trading venue
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: SEC Press Release 2019-205
+    publisher: US Securities and Exchange Commission
+    year: '2019'
+    url: https://www.sec.gov/news/press-release/2019-205
+    quote: cross-market manipulation, which involved buying or selling stocks to artificially impact options
+      prices
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Buying a stock aggressively to lift prices of call options already held, then selling the calls.
+  cases:
+  - name: SEC v. Lek Securities Corp. and Samuel Lek (Avalon FA Ltd trading)
+    year: '2019'
+    jurisdiction: US (S.D.N.Y., civil)
+    what_happened: Consent final judgments with admissions that Avalon's trading through Lek violated
+      securities laws, including cross-market manipulation of stocks to affect options prices.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/news/press-release/2019-205
+    source_title: SEC Press Release 2019-205
+  data_needed:
+  - Security (both instruments)
+  - Trade records across venues (Table)
+  - Person / Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate hedging across instruments
+  - Arbitrage between venues
+  version: 1
+- id: MA-034
+  name: 'Cornering supply: abusive squeeze or dominant position'
+  definition: Using control over supply, demand or delivery of an instrument or commodity to force others
+    to deal at distorted prices.
+  areas:
+  - MA
+  typology: Abusive squeeze / corner
+  status: verified
+  sources:
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Article 12(2)(a)
+    quote: to secure a dominant position over the supply of or demand for a financial instrument
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 1, point 2(b)
+    quote: in order to materially distort, or likely to distort, the prices at which other parties have
+      to deliver, take delivery or defer delivery
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A trader holds most deliverable bonds and most futures, forcing shorts to settle at inflated prices.
+  cases: []
+  data_needed:
+  - Ownership / positions (Table)
+  - Security
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Large holder with a genuine need for delivery
+  - Natural shortage of supply
+  version: 1
+- id: MA-035
+  name: Misleading commodity storage or empty cargo-ship movements
+  definition: Moving or storing physical commodities, or sailing an empty cargo ship, to give a false
+    picture of supply or demand that affects related financial prices.
+  areas:
+  - MA
+  typology: Commodity-linked deception
+  status: verified
+  sources:
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 2, point 1(g)
+    quote: Movement of an empty cargo ship, which might create a false or misleading impression as to
+      the supply of, or the demand for, or the price or value of a commodity
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 2, point 1(f)
+    quote: Movement or storage of physical commodities, which might create a misleading impression as
+      to the supply of, or demand for, or price or value of, a commodity
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Metal shuffled between warehouses to lengthen queues and lift premiums while the mover holds related
+    futures.
+  cases: []
+  data_needed:
+  - Vessel
+  - Company (owner, charterer)
+  - Address (warehouse, port)
+  - Security (related contracts)
+  checkable: lookups
+  lookup_sources:
+  - Ship tracking (AIS)
+  - Warehouse stock reports
+  - Exchange position reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ballast voyages are normal shipping operations
+  - Storage driven by contango economics
+  version: 1
+- id: MA-036
+  name: Hidden ownership through nominees
+  definition: Holding shares through colluding people or entities so that required ownership disclosures
+    hide who really holds them.
+  areas:
+  - MA
+  typology: Concealing ownership
+  status: verified
+  sources:
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 1, point 3(d)
+    quote: Transaction or series of transactions designed to conceal the ownership of a financial instrument
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Schedules 13D and 13G (glossary)
+    publisher: Investor.gov (SEC)
+    url: https://www.investor.gov/introduction-investing/investing-basics/glossary/schedules-13d-and-13g
+    quote: more than five percent of a voting class of a company's equity securities
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Promoter controls 40% of a float through six offshore companies each holding under 5%.
+  cases: []
+  data_needed:
+  - Ownership (owner, asset, percentage)
+  - Company
+  - Person
+  - Associate
+  - UnknownLink
+  - Document (13D/13G filings)
+  checkable: lookups
+  lookup_sources:
+  - SEC EDGAR beneficial-ownership filings
+  - Offshore and company registries
+  - Leaked data (e.g. ICIJ Offshore Leaks)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'In the US: one person or group controls more than 5% of a voting class without a Schedule
+      13D/13G filing. Otherwise meets the published definition as worded.'
+    threshold_source: https://www.investor.gov/introduction-investing/investing-basics/glossary/schedules-13d-and-13g
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Custodian or nominee holdings that are legal and properly disclosed
+  - Separate investors who are truly independent
+  version: 1
+- id: MA-037
+  name: 'Pump and dump: buy, hype, sell'
+  definition: Building a position, pushing the price up with more buying or false positive news, then
+    selling at the inflated price.
+  areas:
+  - MA
+  typology: Pump and dump
+  status: verified
+  sources:
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 1, point 4(c)
+    quote: When the price is at an artificial high level, the long position held is sold out — usually
+      known as ‘pump and dump’
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Pump and Dump Schemes
+    publisher: Investor.gov (SEC)
+    url: https://www.investor.gov/introduction-investing/investing-basics/glossary/pump-and-dump-schemes
+    quote: Once the fraudsters dump their shares and stop hyping the stock, the stock price typically
+      falls and investors lose money.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Promoters buy at $0.05, run an email campaign, sell at $0.80; the price returns to $0.04.
+  cases:
+  - name: United States v. David Levy
+    year: '2014'
+    jurisdiction: US (S.D.N.Y., federal criminal)
+    what_happened: Jury conviction for orchestrating pump-and-dump schemes and a money-laundering conspiracy;
+      nine-year sentence and forfeiture.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/leader-pump-and-dump-stock-fraud-scheme-sentenced-manhattan-federal-court-nine-years
+    source_title: Leader of Pump-and-Dump Stock Fraud Scheme Sentenced in Manhattan Federal Court to Nine
+      Years
+  data_needed:
+  - Ownership
+  - Security
+  - Person / Company
+  - Payment
+  - Document (promotions)
+  - Trade records (Table)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Proceeds are usually moved on; in the Levy case the jury also convicted of a money-laundering
+      conspiracy.
+    source_url: https://www.justice.gov/usao-sdny/pr/leader-pump-and-dump-stock-fraud-scheme-sentenced-manhattan-federal-court-nine-years
+  innocent_explanations:
+  - Early investors selling into a genuine rally
+  - Honest promotion followed by disappointing results
+  version: 1
+- id: MA-038
+  name: 'Trash and cash: short, smear, cover'
+  definition: Taking a short position, pushing the price down with more selling or false negative news,
+    then closing the position after the fall.
+  areas:
+  - MA
+  typology: Trash and cash (short and distort)
+  status: verified
+  sources:
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 1, point 4(d)
+    quote: When the price has fallen, the position held is closed — usually known as ‘trash and cash’
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Anonymous 'fraud report' published after the author shorted; author covers the next day.
+  cases: []
+  data_needed:
+  - Person / Company
+  - Security
+  - Document (reports, posts)
+  - Trade records (Table)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Activist short sellers publishing accurate, disclosed research
+  - Honest bearish analysis
+  version: 1
+- id: MA-039
+  name: Spreading false information or rumours, or news of stake changes around odd price moves
+  definition: Putting out false or misleading information or rumours, by the people trading or those linked
+    to them, that moves the price their way; includes news of large stake changes released just before
+    or after an unusual price move.
+  areas:
+  - MA
+  typology: Information-based manipulation
+  status: verified
+  sources:
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Article 12(1)(c)
+    quote: including the dissemination of rumours, where the person who made the dissemination knew, or
+      ought to have known, that the information was false or misleading;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Annex I, Section B(a)
+    quote: are preceded or followed by dissemination of false or misleading information by the same persons
+      or by persons linked to them;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 2, point 1(c)(i)
+    quote: dissemination of news through the media related to the increasing (or decreasing) of a qualified
+      holding before or shortly after an unusual movement of the price of a financial instrument;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Fake takeover rumour posted by an account linked to someone who bought call options that morning.
+  cases: []
+  data_needed:
+  - Person / Company
+  - Associate
+  - Document (posts, articles, timestamps)
+  - Security
+  - Trade records (Table)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Honest error later corrected
+  - Journalism based on sources that proved wrong
+  version: 1
+- id: MA-040
+  name: Announcing a long-term stake, then selling right away
+  definition: Publicly disclosing a position while stressing it is a long-term investment, then closing
+    it immediately after the announcement.
+  areas:
+  - MA
+  typology: Information-based manipulation
+  status: verified
+  sources:
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 2, point 1(b)
+    quote: closing such position immediately after having publicly disclosed and having put emphasis on
+      the long holding period of the investment
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Investor files a stake disclosure praising 'a long-term holding' and sells it all within a week.
+  cases: []
+  data_needed:
+  - Ownership (startDate, endDate)
+  - Document (disclosure)
+  - Person / Company
+  - Security
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real change of circumstances after the disclosure
+  - Forced selling (margin call, redemptions)
+  version: 1
+- id: MA-041
+  name: Collusive buying straight after an IPO
+  definition: Colluding parties buy in the secondary market just after shares are allocated in a new issue
+    to push the price to an artificial level and draw in other investors.
+  areas:
+  - MA
+  typology: IPO after-market manipulation
+  status: verified
+  sources:
+  - title: Commission Delegated Regulation (EU) 2016/522
+    publisher: EUR-Lex
+    year: '2016'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+    locator: Annex II, Section 1, point 1(a)
+    quote: after the allocation in the primary market in order to post the price to an artificial level
+      and generate interest from other investors
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Allocated investors and their associates keep buying in the first days of trading, then sell to the
+    public.
+  cases: []
+  data_needed:
+  - Person / Company
+  - Associate
+  - Security
+  - Ownership
+  - Trade records (Table)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Disclosed price stabilisation under legal safe harbours
+  - Genuine demand for a popular issue
+  version: 1
+- id: MA-042
+  name: Benchmark rigging
+  definition: Submitting false inputs to a benchmark such as an interest-rate index, or otherwise manipulating
+    how it is calculated, often to favour one's own trading positions.
+  areas:
+  - MA
+  typology: Benchmark manipulation
+  status: verified
+  sources:
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Article 12(1)(d)
+    quote: transmitting false or misleading information or providing false or misleading inputs in relation
+      to a benchmark
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Barclays fined £59.5 million for significant failings in relation to LIBOR and EURIBOR
+    publisher: Financial Services Authority (FCA archive)
+    year: '2012'
+    url: https://fca.org.uk/news/press-releases/barclays-fined-595-million-libor-euribor
+    quote: making submissions which formed part of the LIBOR and EURIBOR setting process that took into
+      account requests from Barclays’ interest rate derivatives traders.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Messages from derivatives traders asking rate submitters for a higher or lower figure.
+  cases:
+  - name: Barclays Bank Plc (LIBOR and EURIBOR)
+    year: '2012'
+    jurisdiction: UK
+    what_happened: FSA fined Barclays £59.5 million (after a 30% settlement discount) for misconduct including
+      LIBOR and EURIBOR submissions that took account of requests from its derivatives traders, and for
+      trying to influence other banks' EURIBOR submissions.
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://fca.org.uk/news/press-releases/barclays-fined-595-million-libor-euribor
+    source_title: Barclays fined £59.5 million for significant failings in relation to LIBOR and EURIBOR
+  data_needed:
+  - Company
+  - Person
+  - Employment
+  - Email / Message
+  - Document (submissions)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Submissions based on genuine judgement in thin markets
+  - Ordinary communication between desks that did not affect submissions
+  version: 1
+- id: MA-043
+  name: Big trade just before price-moving news
+  definition: A large purchase or sale of a stock or option shortly before an announcement that moves
+    the price, especially by insiders, major shareholders or their families.
+  areas:
+  - MA
+  typology: Insider dealing
+  status: verified
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: III. Securities Trading
+    quote: The customer makes a large purchase or sale of a security, or option on a security, shortly
+      before news or a significant announcement is issued that affects the price of the security.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Firm Customers
+    quote: current officers, former officers, significant shareholders or family members of these individuals,
+      who trade low-priced securities prior to a corporate announcement or stock promotion campaign;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Article 8(1)
+    quote: insider dealing arises where a person possesses inside information and uses that information
+      by acquiring or disposing of
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Director's brother sells his whole holding two days before a failed trial result is published.
+  cases:
+  - name: United States v. Christopher Collins
+    year: '2020'
+    jurisdiction: US (S.D.N.Y., federal criminal)
+    what_happened: Former congressman sentenced to 26 months in prison for participating in an insider-trading
+      scheme and making false statements to the FBI; DOJ says he notified his son Cameron so he could
+      trade ahead of the public announcement of failed drug-trial results.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/former-congressman-christopher-collins-sentenced-insider-trading-scheme-and-lying
+    source_title: Former Congressman Christopher Collins Sentenced For Insider Trading Scheme And Lying
+      To Federal Law Enforcement Agents
+  data_needed:
+  - Person
+  - Family
+  - Directorship / Employment
+  - Security
+  - Trade records with timestamps (Table)
+  - Document (announcement with timestamp)
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Pre-arranged trading plan (e.g. US Rule 10b5-1 plan)
+  - Coincidence after public speculation
+  - Trade based on public analysis
+  version: 1
+- id: MA-044
+  name: Unusual short-dated, out-of-the-money call buying before a takeover
+  definition: A burst of cheap, short-term bullish options on a target company shortly before a takeover
+    is announced.
+  areas:
+  - MA
+  typology: Insider dealing via options
+  status: verified
+  sources:
+  - title: 'Informed Options Trading Prior to Takeover Announcements: Insider Trading? (Management Science
+      65(12): 5697-5720)'
+    publisher: Augustin, Brenner and Subrahmanyam (INFORMS)
+    year: '2019'
+    url: https://ideas.repec.org/a/inm/ormnsc/v65y2019i12p5697-5720.html
+    locator: Abstract
+    quote: About 25% of all takeovers have positive abnormal volumes, which are greater for short-dated,
+      out-of-the-money calls, consistent with bullish directional trading before the announcement.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Weekly call options on the target trade at ten times normal volume three days before a bid.
+  cases: []
+  data_needed:
+  - Security (options, target equity)
+  - Options volume data (Table)
+  - Event (deal announcement date)
+  - Company (target, bidder, advisers)
+  checkable: lookups
+  lookup_sources:
+  - Options exchange volume data
+  - Merger announcement dates (EDGAR 8-K, press releases)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded. The study found positive abnormal option volume
+      before about 25% of 1,859 US takeovers, and that the SEC litigated only about 8% of deals in the
+      sample.
+    threshold_source: https://ideas.repec.org/a/inm/ormnsc/v65y2019i12p5697-5720.html
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Market rumours and speculation
+  - Deal predictable from public information
+  - Activist ownership filings
+  version: 1
+- id: MA-045
+  name: Trader has friends or family inside the issuer
+  definition: The person trading has relatives, friends or business contacts who work at the company,
+    and so could be a 'tippee'.
+  areas:
+  - MA
+  typology: Tipping
+  status: verified
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: III. Securities Trading
+    quote: The customer is known to have friends or family who work at or for the securities issuer, which
+      may be a red flag for potential insider trading
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Insider Trading (glossary)
+    publisher: Investor.gov (SEC)
+    url: https://www.investor.gov/introduction-investing/investing-basics/glossary/insider-trading
+    quote: Friends, business associates, family members, and other "tippees" of such officers, directors,
+      and employees, who traded the securities after receiving such information;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Article 10(1)
+    quote: unlawful disclosure of inside information arises where a person possesses inside information
+      and discloses that information to any other person
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The son of a board member sells shares the day after a board meeting on bad trial results (Collins).
+  cases:
+  - name: United States v. Christopher Collins
+    year: '2020'
+    jurisdiction: US (S.D.N.Y., federal criminal)
+    what_happened: Sentenced to 26 months; DOJ says he notified his son so he could trade before the public
+      announcement.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/former-congressman-christopher-collins-sentenced-insider-trading-scheme-and-lying
+    source_title: Former Congressman Christopher Collins Sentenced For Insider Trading Scheme And Lying
+      To Federal Law Enforcement Agents
+  data_needed:
+  - Person
+  - Family
+  - Associate
+  - Directorship
+  - Employment
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - Company officer and director lists
+  - Social media and public records for family links
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family members often invest in a relative's employer out of loyalty
+  - Trades well away from any news
+  version: 1
+- id: MA-046
+  name: Trade out of character at a perfect moment
+  definition: Someone who never invested this way, or in this industry, suddenly does so just at the right
+    time, with no reasonable explanation.
+  areas:
+  - MA
+  typology: Insider dealing
+  status: verified
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: III. Securities Trading
+    quote: the customer may never have invested in equity securities or may have never invested in a given
+      industry, but does so at an opportune time
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - First-ever options purchase, in a biotech, three days before an acquisition.
+  cases: []
+  data_needed:
+  - Person
+  - Trade history (Table)
+  - Security
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Beginner's luck
+  - A new adviser or windfall changing investing habits
+  version: 1
+- id: MA-047
+  name: Staff of the issuer's advisers trading its stock
+  definition: Employees of law firms, banks, brokers or printers working on a company's deal trade its
+    securities.
+  areas:
+  - MA
+  typology: Misappropriation
+  status: verified
+  sources:
+  - title: Insider Trading (glossary)
+    publisher: Investor.gov (SEC)
+    url: https://www.investor.gov/introduction-investing/investing-basics/glossary/insider-trading
+    quote: Employees of law, banking, brokerage and printing firms who traded based on information they
+      obtained in connection with providing services to the corporation whose securities they traded;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Paralegal on a merger team buys the target's shares through a friend's account.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Representation (adviser to issuer)
+  - Company
+  - Security
+  checkable: lookups
+  lookup_sources:
+  - Deal documents naming advisers
+  - Professional directories and LinkedIn
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: AF
+    reason: The leak comes through the professionals hired by the company.
+    source_url: https://www.investor.gov/introduction-investing/investing-basics/glossary/insider-trading
+  innocent_explanations:
+  - Staff not on the deal team
+  - Trades cleared by the firm's compliance department
+  version: 1
+- id: MA-048
+  name: Officials or 'political intelligence' contacts trading on government information
+  definition: Government employees, or consultants who gather information from them, trade or tip on confidential
+    government information.
+  areas:
+  - MA
+  typology: Misappropriation (public sector)
+  status: verified
+  sources:
+  - title: Insider Trading (glossary)
+    publisher: Investor.gov (SEC)
+    url: https://www.investor.gov/introduction-investing/investing-basics/glossary/insider-trading
+    quote: Political intelligence consultants who may tip or trade based on material, nonpublic information
+      they obtain from government employees; and
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Staffer trades ahead of a regulatory decision their agency has not yet announced.
+  cases: []
+  data_needed:
+  - Person
+  - Employment (public body)
+  - Associate
+  - Security
+  - Document (financial disclosures)
+  checkable: lookups
+  lookup_sources:
+  - Official financial-disclosure and periodic-transaction reports
+  - Lobbying registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Trading on official information is a misuse of public office; the Collins case involved a
+      sitting congressman who was a company board member.
+    source_url: https://www.justice.gov/usao-sdny/pr/former-congressman-christopher-collins-sentenced-insider-trading-scheme-and-lying
+  innocent_explanations:
+  - Trades made through blind trusts
+  - Information was already public
+  version: 1
+- id: MA-049
+  name: '''Shadow trading'' in a linked company'
+  definition: Someone with confidential news about their own company trades instead in a comparable or
+    economically linked company whose price the news will move.
+  areas:
+  - MA
+  typology: Shadow trading
+  status: verified
+  sources:
+  - title: 'Litigation Release No. 25970: Matthew Panuwat'
+    publisher: US Securities and Exchange Commission
+    year: '2024'
+    url: https://www.sec.gov/enforcement-litigation/litigation-releases/lr-25970
+    quote: Rather than buying the securities of Medivation, Panuwat used the confidential information
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Executive learns his firm is being bought and buys call options in a close competitor.
+  cases:
+  - name: SEC v. Matthew Panuwat
+    year: '2024'
+    jurisdiction: US (N.D. Cal., civil)
+    what_happened: After an eight-day trial the jury returned a verdict for the SEC (civil liability,
+      not a criminal conviction). The SEC says that minutes after learning of Pfizer's planned acquisition
+      of his employer Medivation, he bought short-term call options in Incyte, a comparable company.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.sec.gov/enforcement-litigation/litigation-releases/lr-25970
+    source_title: Litigation Release No. 25970
+  data_needed:
+  - Person
+  - Employment
+  - Company (employer and peer)
+  - Security
+  - Trade records (Table)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary sector investing unrelated to inside news
+  - Employer policy expressly allowing trades in peers
+  jurisdictions: US (SEC civil theory upheld at jury trial)
+  version: 1
+- id: MA-050
+  name: Senior manager trades during a closed period
+  definition: A senior manager of an EU or UK listed company trades its shares or debt in the 30 days
+    before an interim or year-end report.
+  areas:
+  - MA
+  typology: Closed-period breach
+  status: verified
+  sources:
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Article 19(11)
+    quote: during a closed period of 30 calendar days before the announcement of an interim financial
+      report or a year-end report
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - CFO sells shares 12 days before annual results.
+  cases: []
+  data_needed:
+  - Person
+  - Directorship / Employment
+  - Security
+  - Document (PDMR notification, results calendar)
+  - Event
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: A PDMR transaction in the issuer's shares, debt or linked instruments within 30 calendar
+      days before an interim or year-end report, without a permission under Article 19(12).
+    threshold_source: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Issuer permitted it under Article 19(12), e.g. severe financial difficulty or employee share schemes
+  - Results date moved after the trade
+  jurisdictions: EU and UK (MAR)
+  version: 1
+- id: MA-051
+  name: Manager or close associate trade notified late or not at all
+  definition: A senior manager, or a spouse, child or company linked to them, trades and does not report
+    it to the issuer and regulator within three business days.
+  areas:
+  - MA
+  typology: Disclosure breach
+  status: verified
+  sources:
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Article 19(1)
+    quote: Such notifications shall be made promptly and no later than three business days after the date
+      of the transaction.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A director's family company sells shares; the notification is published three weeks later.
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Company (closely associated)
+  - Ownership
+  - Document (notification with dates)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Notification later than three business days after the transaction, once the yearly threshold
+      in Article 19(8)/(9) is reached.
+    threshold_source: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Below the annual reporting threshold
+  - Administrative delay by a broker
+  - Person did not know the trade was made on their behalf
+  jurisdictions: EU and UK (MAR)
+  version: 1
+- id: MA-052
+  name: Order cancelled or changed after getting inside information
+  definition: Cancelling or amending an order placed earlier, once the person learns inside information
+    about that instrument.
+  areas:
+  - MA
+  typology: Insider dealing (order amendment)
+  status: verified
+  sources:
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Article 8(1)
+    quote: The use of inside information by cancelling or amending an order concerning a financial instrument
+      to which the information relates where the order was placed before the person concerned possessed
+      the inside information, shall also be considered to be insider dealing.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Standing sell order withdrawn an hour after the holder attends a confidential board briefing on good
+    news.
+  cases: []
+  data_needed:
+  - Person
+  - Order lifecycle records (Table)
+  - Event (meeting dates)
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Cancellation for reasons unrelated to the information (the MAR presumption can be rebutted, recital
+    25)
+  jurisdictions: EU and UK (MAR)
+  version: 1
+- id: MA-053
+  name: 'Front running: trading ahead of known client or block orders'
+  definition: A broker or trader uses knowledge of a client's pending order or an upcoming block trade
+    to trade first for their own benefit.
+  areas:
+  - MA
+  typology: Front running
+  status: verified
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: III. Securities Trading
+    quote: The customer appears to buy or sell securities based on advanced knowledge of pending customer
+      orders.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'FINRA Rule 5270: Front Running of Block Transactions'
+    publisher: FINRA
+    url: https://www.finra.org/rules-guidance/rulebooks/finra-rules/5270
+    quote: has material, non-public market information concerning an imminent block transaction in that
+      security
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulation (EU) No 596/2014
+    publisher: EUR-Lex
+    year: '2014'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+    locator: Article 7(1)(d)
+    quote: information conveyed by a client and relating to the client’s pending orders in financial instruments
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Trader's personal account buys minutes before the desk executes a large client purchase.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Company (broker)
+  - Order and trade records (Table)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Permitted hedging of a block facilitation
+  - Independent decision made before knowing of the order
+  version: 1
+- id: MA-054
+  name: Trading linked to hacked accounts or stolen unpublished news
+  definition: Trades that appear connected to cyber break-ins, such as hijacked brokerage accounts or
+    press releases stolen before publication.
+  areas:
+  - CY
+  - MA
+  typology: Hacking-based trading
+  status: verified
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: III. Securities Trading
+    quote: A customer engages in transactions suspected to be associated with cyber breaches of customer
+      accounts, including potentially unauthorized disbursements of funds or trades.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: SEC Charges 32 Defendants in Scheme to Trade on Hacked News Releases (Press Release 2015-163)
+    publisher: US Securities and Exchange Commission
+    year: '2015'
+    url: https://www.sec.gov/newsroom/press-releases/2015-163
+    quote: used this nonpublic information in a short window of opportunity to place illicit trades
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Repeated trades minutes before earnings releases from one newswire.
+  cases:
+  - name: SEC v. Dubovoy et al. (hacked newswire releases)
+    year: '2015'
+    jurisdiction: US (civil, SEC complaint)
+    what_happened: SEC charged 32 defendants, alleging that hackers stole hundreds of earnings releases
+      from newswires before publication and traders used them to trade. These are charges only; later
+      outcomes were not checked.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.sec.gov/newsroom/press-releases/2015-163
+    source_title: SEC Charges 32 Defendants in Scheme to Trade on Hacked News Releases
+  data_needed:
+  - Person / Company
+  - Document (release timestamps)
+  - Trade records (Table)
+  - UnknownLink
+  - Email / IP data
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: The information or account access came from a computer intrusion.
+    source_url: https://www.sec.gov/newsroom/press-releases/2015-163
+  innocent_explanations:
+  - Algorithms reacting very fast to genuinely published news
+  - Account owner forgot an authorised trade
+  version: 1
+- id: MA-055
+  name: Inexperienced or older investors pushed into penny stocks
+  definition: Customers, especially people 65 or older or with impairments, are solicited to buy low-priced
+    stocks they have never held, that do not fit their profile, or that become a large part of their savings.
+  areas:
+  - MA
+  typology: Pump and dump (victim side)
+  status: verified
+  sources:
+  - title: Regulatory Notice 21-03
+    publisher: FINRA
+    year: '2021'
+    url: https://www.finra.org/rules-guidance/notices/21-03
+    locator: Firm Customers; endnote on FINRA Rule 2165
+    quote: who are being solicited to purchase low-priced securities where (1) the customer has not invested
+      in low-priced securities previously
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Retired client's account goes from bond funds to 60% in one microcap after cold calls.
+  cases: []
+  data_needed:
+  - Person (birthDate)
+  - Security
+  - Ownership
+  - Document (account records, call notes)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded. FINRA Rule 2165 defines a 'specified adult' as
+      a person aged 65 or older, or 18 or older with an impairment that leaves them unable to protect
+      their interests.
+    threshold_source: https://www.finra.org/rules-guidance/notices/21-03
+  threshold_verified: true
+  cross_hints:
+  - target_area: EF
+    reason: FINRA singles out specified adults (65+ or impaired) as targets of low-priced securities solicitation.
+    source_url: https://www.finra.org/rules-guidance/notices/21-03
+  innocent_explanations:
+  - Informed customer choosing speculative investments
+  - Small speculative allocation within a diversified account
+  version: 1
+- id: MA-056
+  name: Regulators or grand juries asking about a customer's trading
+  definition: A firm receives regulatory inquiries or subpoenas about its customers' trading.
+  areas:
+  - MA
+  typology: Investigative signal
+  status: verified
+  sources:
+  - title: Regulatory Notice 19-18
+    publisher: FINRA
+    year: '2019'
+    url: https://www.finra.org/rules-guidance/notices/19-18
+    locator: III. Securities Trading
+    quote: The firm receives regulatory inquiries or grand jury or other subpoenas concerning the firm’s
+      customers’ trading.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Broker gets a subpoena about one account's trading in a suspended stock.
+  cases: []
+  data_needed:
+  - Document (subpoenas, inquiry letters)
+  - Person / Company
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Customer is a witness, not a suspect
+  - Routine regulator sweeps across many firms
+  version: 1
+not_reached:
+- 'https://www.sec.gov/enforcement-litigation/insider-trading: fetch errored and curl was blocked; the
+  same SEC text was taken from the Investor.gov glossary copy instead'
+- 'Investor.gov Form 4 glossary page: no text in the entry, so the US Section 16 / Form 4 filing deadline
+  is not sourced and no indicator uses it'
+- 'MAR Article 19(8)/(9) yearly notification threshold amount: not quoted'
+- 'FINRA Rule 2165: not opened directly; the ''specified adult'' definition comes from the FINRA 21-03
+  endnote'
+- 'Commission Delegated Regulation (EU) 2016/957 (STOR suspicious-order reporting) and ESMA MAR guidelines:
+  not opened'
+- 'UK FCA Market Watch newsletters and the FCA Handbook MAR 1 (UK Code of Market Conduct): not opened'
+- 'IOSCO reports on market manipulation and insider trading: not opened'
+- 'FinCEN securities-sector SAR guidance (insider trading and market manipulation SAR categories): not
+  opened'
+- 'DOJ press release on Raj Rajaratnam (justice.gov archive PDF): not opened, so not used'
+- 'Later criminal outcomes in the 2015 hacked-newswire case (US v. Dubovoy, Korchevsky and others): not
+  checked, so it is listed as allegations only'
+- 'FCA Final Notice PDF for Corrado Abbattista: only the FCA press release was read'
+- 'SEC litigation in the 2022 social-media influencer pump-and-dump case: left out because its final outcome
+  was not verified'

@@ -21,7 +21,7 @@ indicators:
     quote: excessive commissions to third-party agents or consultants;
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: SFO enters into €991m Deferred Prosecution Agreement with Airbus as part of a €3.6bn global
       resolution
     publisher: UK Serious Fraud Office
@@ -30,7 +30,7 @@ indicators:
     locator: Press release, 31 January 2020
     quote: paid bribes through agents around the world to stack the decks in its favour
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A sales agent receives 15-25% of a government contract value for introductions, when comparable agents
     in the sector receive a few percent.
@@ -88,7 +88,7 @@ indicators:
     quote: unreasonably large discounts to third-party distributors;
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
     publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
     year: '2020'
@@ -98,7 +98,7 @@ indicators:
       to pay the bribes.
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A distributor selling to a state hospital gets a 40% discount while other distributors get 10%.
   - Rebates are paid to a distributor after a government tender is won.
@@ -142,7 +142,7 @@ indicators:
     quote: third-party “consulting agreements” that include only vaguely described services;
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Glencore Entered Guilty Pleas to Foreign Bribery and Market Manipulation Schemes
     publisher: U.S. Department of Justice
     year: '2022'
@@ -151,7 +151,7 @@ indicators:
     quote: Glencore concealed the bribe payments by entering into sham consulting agreements
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Ericsson Agrees to Pay More Than $1 Billion to Resolve Foreign Corrupt Practices Act Case
     publisher: U.S. Attorney's Office, Southern District of New York
     year: '2019'
@@ -160,7 +160,7 @@ indicators:
     quote: The agents were often engaged through sham contracts and paid pursuant to false invoices.
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A 'market advisory' contract with no deliverables, paid in lump sums timed to tender decisions.
   - Invoices describing 'services rendered' with no reports, emails or work product behind them.
@@ -226,7 +226,7 @@ indicators:
       engaged;
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A travel agency or car dealer paid as a 'technical consultant' on a power-plant contract.
   - A newly formed company with a generic name and no staff paid for engineering advice.
@@ -270,7 +270,7 @@ indicators:
     quote: the third party is related to or closely associated with the foreign official;
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The local partner on a ministry contract is owned by the minister's brother-in-law.
   - A consultant shares an address or directors with a company owned by the procurement chief.
@@ -327,7 +327,7 @@ indicators:
       foreign official;
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Emails in which an official names the consultant a bidder 'must' use.
   - A subcontract created late in negotiations at a ministry's suggestion.
@@ -372,7 +372,7 @@ indicators:
     quote: the third party is merely a shell company incorporated in an offshore jurisdiction; and
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Advisory on Human Rights Abuses Enabled by Corrupt Senior Foreign Political Figures and their
       Financial Facilitators (FIN-2018-A003)
     publisher: FinCEN, U.S. Department of the Treasury
@@ -383,7 +383,7 @@ indicators:
       of the proceeds of corruption.
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A BVI company with nominee directors invoices for 'consulting' on an African mining licence.
   - Odebrecht's bribe system paid through shell companies and offshore accounts.
@@ -447,7 +447,7 @@ indicators:
     quote: the third party requests payment to offshore bank accounts.
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A Nigerian agent asks for fees to go to an account in Switzerland held by a different company name.
   cases: []
@@ -489,7 +489,7 @@ indicators:
       purpose.
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
     publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
     year: '2020'
@@ -498,7 +498,7 @@ indicators:
     quote: Do not advance funds or pay for reimbursements in cash.
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - '''Training trips'' for officials that are mostly sightseeing (the FCPA Guide cites trips costing
     $25,000-$55,000 each).'
@@ -546,7 +546,10 @@ indicators:
     textbook: Meets the published definition as worded
     threshold_source: none
   threshold_verified: true
-  cross_hints: []
+  cross_hints:
+  - target_area: ES
+    reason: In the Francis case, bribes bought classified Navy information including ship schedules.
+    source_url: https://www.justice.gov/opa/pr/defense-contractor-and-its-ceo-plead-guilty-corruption-conspiracy-involving-scores-navy
   innocent_explanations:
   - The FCPA Guide says items of nominal value such as cab fare, reasonable meals and promotional items
     are unlikely to improperly influence an official.
@@ -572,7 +575,7 @@ indicators:
       an official’s family members, as an indirect way of corruptly influencing a foreign official.
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: JPMorgan Chase Paying $264 Million to Settle FCPA Charges (Press Release 2016-241)
     publisher: U.S. Securities and Exchange Commission
     year: '2016'
@@ -582,7 +585,7 @@ indicators:
       government officials
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Interns hired outside the normal process at the request of state-bank executives.
   - A contractor pays the tuition of a procurement official's child.
@@ -638,7 +641,7 @@ indicators:
       decisions regarding your business in that country?
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A donation to a foundation chaired by a minister's spouse shortly before a licence decision.
   cases: []
@@ -685,7 +688,7 @@ indicators:
       identified transactions;
     quote_verified: true
     licence: © United Nations
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Siemens AG and Three Subsidiaries Plead Guilty to Foreign Corrupt Practices Act Violations
     publisher: U.S. Department of Justice
     year: '2008'
@@ -694,7 +697,7 @@ indicators:
     quote: included cash desks and slush funds
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Ledger accounts used to keep credit balances for officials (FCPA Guide p. 40).
   - Odebrecht's off-book 'Division of Structured Operations'.
@@ -752,7 +755,7 @@ indicators:
       identification of their objects; (e) The use of false documents;
     quote_verified: true
     licence: © United Nations
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
     publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
     year: '2020'
@@ -762,7 +765,7 @@ indicators:
       were passed on to foreign officials through an agent
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Officials' sightseeing trips booked as 'consulting fees' (FCPA Guide p. 15).
   - Invoices from a supplier that has no staff, address or delivery records.
@@ -807,7 +810,7 @@ indicators:
     quote: (f) The intentional destruction of bookkeeping documents earlier than foreseen by the law.
     quote_verified: true
     licence: © United Nations
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Records for a disputed contract year are missing while other years are complete.
   cases: []
@@ -849,7 +852,7 @@ indicators:
       business with a particular party.
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: A Resource Guide to the U.S. Foreign Corrupt Practices Act, Second Edition
     publisher: U.S. Department of Justice and U.S. Securities and Exchange Commission
     year: '2020'
@@ -859,7 +862,7 @@ indicators:
       it one.
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Payments to customs officials for reduced duties booked in a 'facilitating payment' account.
   - Paying an inspector to ignore a missing permit.
@@ -904,7 +907,7 @@ indicators:
       owner.
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
     publisher: Financial Action Task Force
     year: '2013'
@@ -913,7 +916,7 @@ indicators:
     quote: Use of corporate vehicles without valid business reason.
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A minister's property held through a chain of three companies in different jurisdictions.
   - Obiang acquired US assets 'through intermediaries and corporate entities' (DOJ).
@@ -969,7 +972,7 @@ indicators:
     quote: Use of family members or close associates as legal owner.
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
     publisher: Financial Action Task Force
     year: '2013'
@@ -978,7 +981,7 @@ indicators:
     quote: Use of intermediaries when this does not match with normal business practices…
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A governor's driver is listed as the sole shareholder of a road-building company.
   - A president's child holds stakes in businesses that receive state contracts.
@@ -1039,7 +1042,7 @@ indicators:
       of funds.
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
     publisher: Financial Action Task Force
     year: '2013'
@@ -1048,7 +1051,7 @@ indicators:
     quote: The PEP provides inaccurate or incomplete information.
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A declared salary that cannot explain a portfolio of foreign properties, and no answer when asked.
   cases: []
@@ -1095,7 +1098,7 @@ indicators:
       explain in relation to his or her lawful income.
     quote_verified: true
     licence: © United Nations
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Proceeds of Crime Act 2002, section 362B (Unexplained wealth orders: requirements)'
     publisher: UK Parliament (legislation.gov.uk)
     year: 2017 (inserted by Criminal Finances Act 2017)
@@ -1104,7 +1107,7 @@ indicators:
     quote: the value of the property is greater than £50,000
     quote_verified: true
     licence: Open Government Licence v3.0
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An official on less than $100,000 a year who amassed over $300 million in assets (DOJ, Obiang).
   - A mayor's family buys several flats in cash during his term.
@@ -1173,7 +1176,7 @@ indicators:
     quote: The PEP has control over regulatory approvals, including awarding licences and concessions.
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
     publisher: Financial Action Task Force
     year: '2013'
@@ -1183,7 +1186,7 @@ indicators:
       operations.
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A mining minister whose relative's company holds a mining licence granted by that ministry.
   cases: []
@@ -1229,7 +1232,7 @@ indicators:
     quote: The PEP does not reveal all positions (including those that are ex officio).
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An official lists himself as 'consultant' on a company filing while chairing a state-owned enterprise's
     board ex officio.
@@ -1275,7 +1278,7 @@ indicators:
     quote: (Consistent) use of rounded amounts, where this cannot be explained by the expected business.
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
     publisher: Financial Action Task Force
     year: '2013'
@@ -1284,7 +1287,7 @@ indicators:
     quote: Use of large amounts of cash in the business relationship.
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
     publisher: Financial Action Task Force
     year: '2013'
@@ -1293,7 +1296,7 @@ indicators:
     quote: A PEP uses multiple bank accounts for no apparent commercial or other reason.
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Monthly deposits of exactly $50,000 in cash into a deputy minister's account.
   cases: []
@@ -1337,7 +1340,7 @@ indicators:
       with.
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
     publisher: Financial Action Task Force
     year: '2013'
@@ -1346,7 +1349,7 @@ indicators:
     quote: Personal and business related money flows are difficult to distinguish from each other.
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Funds from a state fund deal pass through accounts in Singapore, Switzerland and the UAE before buying
     US property (pattern in the 1MDB matters).
@@ -1411,7 +1414,7 @@ indicators:
       PEP.
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'FATF Guidance: Politically Exposed Persons (Recommendations 12 and 22)'
     publisher: Financial Action Task Force
     year: '2013'
@@ -1421,7 +1424,7 @@ indicators:
       business with the PEP.
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A regulator fines a bank for failing to check a PEP's funds; the PEP then moves to a smaller bank.
   cases: []
@@ -1471,7 +1474,7 @@ indicators:
       or state agencies.
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A PEP-linked company supplying a defence ministry, or holding a mining or extraction licence.
   cases: []
@@ -1516,7 +1519,7 @@ indicators:
     quote: Payments received from unknown or un-associated third parties.
     quote_verified: true
     licence: © FATF/OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A deputy's account receives transfers from a construction company's director shortly after a budget
     vote.
@@ -1563,7 +1566,7 @@ indicators:
       existence and origins of their illicit funds.
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A $30 million Malibu mansion acquired for an Equatoguinean minister through corporate entities (DOJ,
     Obiang).
@@ -1619,7 +1622,7 @@ indicators:
       influence the performance of their official duties and responsibilities.
     quote_verified: true
     licence: © OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: United Nations Convention against Corruption
     publisher: United Nations Office on Drugs and Crime
     year: '2004'
@@ -1629,7 +1632,7 @@ indicators:
       investments, assets and substantial gifts or benefits from which a conflict of interest may result
     quote_verified: true
     licence: © United Nations
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A councillor votes on rezoning land owned by his wife's company.
   - A regulator approves a merger involving a firm in which she holds shares.
@@ -1691,7 +1694,7 @@ indicators:
     quote: Government personnel or their families acquiring a financial interest or employment in a contractor
       or subcontractor.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Recommendation of the Council on OECD Guidelines for Managing Conflict of Interest in the Public
       Service (OECD/LEGAL/0316)
     publisher: OECD
@@ -1703,7 +1706,7 @@ indicators:
       the part of a public official within the public organisation.
     quote_verified: true
     licence: © OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The project manager's son joins the winning contractor's payroll a month after award.
   cases: []
@@ -1755,7 +1758,7 @@ indicators:
       widely regarded as a conflict of interest situation.
     quote_verified: true
     licence: © OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Secret meeting at an airport between an Air Force procurement chief and a Boeing executive about a
     job (Druyun/Sears).
@@ -1811,7 +1814,7 @@ indicators:
     quote: within 1 year after the termination of his or her service
     quote_verified: true
     licence: US Code (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: United Nations Convention against Corruption
     publisher: United Nations Office on Drugs and Crime
     year: '2004'
@@ -1821,7 +1824,7 @@ indicators:
       period of time, on the professional activities of former public officials
     quote_verified: true
     licence: © United Nations
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Corruptionary: Revolving door'
     publisher: Transparency International
     url: https://www.transparency.org/en/corruptionary/revolving-door
@@ -1829,7 +1832,7 @@ indicators:
     quote: the term 'revolving door' refers to the movement of individuals between positions of public
       office and jobs
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A former senator registers as a lobbyist and meets former Senate colleagues within two years of leaving.
   - A former agency head represents a company before the same agency within a year.
@@ -1882,7 +1885,7 @@ indicators:
       United States
     quote_verified: true
     licence: US Code (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A cabinet official leaves and within months advises an embassy on lobbying Congress.
   cases: []
@@ -1928,7 +1931,7 @@ indicators:
       arrangement with their employing organisation.
     quote_verified: true
     licence: © OECD
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A health ministry director is a board member of a drug distributor that supplies the ministry.
   cases: []
@@ -1974,7 +1977,7 @@ indicators:
     quote: FARA requires the registration of, and disclosures by, an 'agent of a foreign principal'
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A businessman arranges meetings for a foreign government's officials with a senator while being paid
     by that government's allies.
@@ -2035,7 +2038,11 @@ indicators:
     textbook: Meets the published definition as worded
     threshold_source: none
   threshold_verified: true
-  cross_hints: []
+  cross_hints:
+  - target_area: ES
+    reason: DOJ's National Security Division prosecutes unregistered foreign agents, including cases involving
+      agents of the PRC and Russia.
+    source_url: https://www.justice.gov/nsd-fara/recent-cases
   innocent_explanations:
   - Agents properly registered under the LDA are exempt from FARA unless a foreign government or political
     party is the principal beneficiary.
@@ -2060,7 +2067,7 @@ indicators:
     quote: This material is distributed by (name of registrant) on behalf of (name of foreign principal).
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Op-eds, ads or social posts placed by a registered agent without the statement.
   cases: []
@@ -2104,14 +2111,14 @@ indicators:
       years after a contribution
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Corruptionary: Political contribution'
     publisher: Transparency International
     url: https://www.transparency.org/en/corruptionary/political-contribution
     locator: Glossary entry
     quote: Any contribution, made in cash or in kind, to support a political cause.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An asset manager's partners donate to a state treasurer who then awards the firm a pension mandate.
   - Construction-firm executives give to a mayor's campaign weeks before a contract award.
@@ -2163,7 +2170,7 @@ indicators:
     quote: companies with boards connected to the winning (losing) party experience a significant and
       large increase (decrease)
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - After an election, a firm whose chair is a former minister of the winning party sees its contract
     wins triple.
@@ -2214,7 +2221,7 @@ indicators:
       agreement
     quote_verified: true
     licence: US government work (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Corruptionary: Lobbying'
     publisher: Transparency International
     url: https://www.transparency.org/en/corruptionary/lobbying
@@ -2222,7 +2229,7 @@ indicators:
     quote: Any activity carried out to influence a government or institution's policies and decisions
       in favour of a specific cause
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A golf trip for a congressman paid by a lobbying firm, followed by statements in the Congressional
     Record for its clients.
@@ -2280,7 +2287,7 @@ indicators:
     quote: shaping, and affecting formulation of the rules of the game through private payments to public
       officials
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A businessperson's own lawyers draft the decree that authorises a project her companies benefit from
     (as reported in the Luanda Leaks).
@@ -2357,14 +2364,14 @@ indicators:
       a special favour to a family member or friend, even though he or she may not be qualified or deserving.
     quote_verified: true
     licence: © United Nations
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Corruptionary: Nepotism'
     publisher: Transparency International
     url: https://www.transparency.org/en/corruptionary/nepotism
     locator: Glossary entry
     quote: Form of favouritism based on acquaintances and familiar relationships
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A mayor's nephew is hired as head of a municipal department with no relevant experience.
   - A state company's CEO appoints her spouse's firm as sole supplier.
@@ -2411,7 +2418,7 @@ indicators:
     locator: Glossary entry
     quote: Form of favouritism in which a person is selected, regardless of qualifications or entitlement,
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'E4J Secondary Education: Anti-Corruption, Teacher''s Guide - Glossary'
     publisher: United Nations Office on Drugs and Crime
     url: https://www.unodc.org/documents/e4j/Secondary/Anti-Corruption_Glossary.pdf
@@ -2419,7 +2426,7 @@ indicators:
     quote: 'Clientelism: the exchange of personal favours for political support.'
     quote_verified: true
     licence: © United Nations
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Party campaign staff appointed to state-company boards right after an election.
   cases: []
@@ -2465,7 +2472,7 @@ indicators:
     locator: Table 3 (red flags and results)
     quote: Less than four bidders
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Uncovering High-Level Corruption: Cross-National Objective Corruption Risk Indicators Using
       Public Procurement Data (British Journal of Political Science)'
     publisher: Mihály Fazekas and Gábor Kocsis (Cambridge University Press)
@@ -2474,7 +2481,7 @@ indicators:
     locator: Abstract
     quote: two objective proxy measures of high-level corruption in public procurement
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A road contract in a market with dozens of firms receives one bid.
   cases: []
@@ -2523,7 +2530,7 @@ indicators:
     locator: Table 3 (red flag 1)
     quote: less than 6 weeks for ICB, less than 4 weeks for NCB
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An international tender advertised for 10 days over a holiday period.
   cases: []
@@ -2565,7 +2572,7 @@ indicators:
     locator: Annex, Table A1
     quote: Improperly disqualifying or discarding the bid or proposal of a contractor (World Bank, 2006).
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The lowest bid is rejected for a missing stamp on one page while the winner's similar error is waived.
   cases: []
@@ -2608,7 +2615,7 @@ indicators:
     locator: Contract award discussion (Table 3 commentary)
     quote: Extended negotiations may arise due to side negotiations centering on kickbacks.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A contract awarded in January is signed in July with changed terms.
   cases: []
@@ -2650,7 +2657,7 @@ indicators:
     locator: Red flag 12 (Table 2, Table 3 and text)
     quote: 30 percent or more
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A $10 million bridge contract ends at $16 million after repeated variation orders.
   cases: []
@@ -2697,7 +2704,7 @@ indicators:
     locator: '''Unobservable red flags'''
     quote: Identification of pressures on Bid Evaluation Committee members.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Committee members report calls from a minister's office before scoring.
   cases: []
@@ -2741,7 +2748,7 @@ indicators:
     quote: to improperly obtain or reward favorable treatment in connection with a prime contract
     quote_verified: true
     licence: US Code (public domain)
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A subcontractor pays the prime contractor's project manager 5% of each invoice.
   cases: []
@@ -2785,7 +2792,7 @@ indicators:
     quote: The solicitation or acceptance by a public official, directly or indirectly, of an undue advantage
     quote_verified: true
     licence: © United Nations
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Corruptionary: Solicitation'
     publisher: Transparency International
     url: https://www.transparency.org/en/corruptionary/solicitation
@@ -2793,7 +2800,7 @@ indicators:
     quote: The act of a person asking, ordering or enticing someone else to commit bribery or another
       crime.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A permit officer tells an applicant the file will move faster after a 'fee' paid in cash.
   cases: []
@@ -2838,7 +2845,7 @@ indicators:
       or public authority of the State Party an undue advantage
     quote_verified: true
     licence: © United Nations
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A former minister's associate is paid a 'success fee' to get a licence approved, with no registered
     lobbying.
@@ -2868,6 +2875,1930 @@ indicators:
   - Success fees for legal or technical work on applications.
   jurisdictions: Global (UNCAC Art. 18 optional; criminalised in e.g. France and Spain)
   version: 1
+- id: CO-051
+  name: Same firms keep winning long-term government contracts through an opaque selection
+  definition: Long-term public contracts go again and again to the same company, or to companies with
+    the same or similar owners, without a clear, open selection process.
+  areas:
+  - CO
+  typology: Procurement favouritism / kleptocracy
+  status: verified
+  sources:
+  - title: FinCEN Advisory on Kleptocracy and Foreign Public Corruption (FIN-2022-A001)
+    publisher: US Treasury, Financial Crimes Enforcement Network (FinCEN)
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-04-14/FinCEN%20Advisory%20Corruption%20FINAL%20508.pdf
+    locator: p.8, Financial Red Flag Indicators, flag 1
+    quote: Transactions involving long-term government contracts consistently awarded, through an opaque
+      selection process, to the same legal entity or entities that share similar beneficial ownership
+      structures.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-09'
+  examples:
+  - A ministry gives three 10-year maintenance contracts in a row to two firms that turn out to have the
+    same beneficial owner, with no tender notice published.
+  cases: []
+  data_needed:
+  - ContractAward (supplier, contract, date, decisionReason, callForTenders)
+  - Contract (authority, procedure, method, startDate, endDate)
+  - Company
+  - Ownership (owner, asset, percentage)
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - Procurement notice and award databases
+  - Company registry and beneficial ownership registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FinCEN lists this as a financial red flag that banks should consider when reporting suspicious
+      transactions linked to laundering the proceeds of corruption.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2022-04-14/FinCEN%20Advisory%20Corruption%20FINAL%20508.pdf
+  innocent_explanations:
+  - Only a few firms in the country can do the work
+  - A framework agreement legitimately runs for years with the same supplier
+  - Common ownership is a normal corporate group that bids openly
+  - Records of the selection exist but are not published online
+  jurisdictions: Global (FinCEN guidance for US financial institutions on foreign corruption)
+  version: 1
+- id: CO-052
+  name: Services to state bodies supplied by companies registered in high-risk jurisdictions
+  definition: A state-owned company or public institution buys services from a firm registered in a high-risk
+    or secrecy jurisdiction.
+  areas:
+  - CO
+  typology: Kleptocracy / embezzlement of public assets
+  status: verified
+  sources:
+  - title: FinCEN Advisory on Kleptocracy and Foreign Public Corruption (FIN-2022-A001)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-04-14/FinCEN%20Advisory%20Corruption%20FINAL%20508.pdf
+    locator: p.8, Red Flag Indicators, flag 2
+    quote: Transactions involving services provided to state-owned companies or public institutions by
+      companies registered in high-risk jurisdictions.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-09'
+  examples:
+  - A national oil company pays a British Virgin Islands company for 'technical services' that a local
+    contractor could provide.
+  cases:
+  - name: Lambert / Transportation Logistics Inc. (TENEX bribery)
+    year: '2019'
+    jurisdiction: United States (District of Maryland)
+    what_happened: Payments for fictitious services, described in fake invoices purportedly from Russian
+      state nuclear supplier TENEX, were wired to shell companies in Latvia, Cyprus and Switzerland to
+      bribe a TENEX official. A jury found the company's former president guilty of FCPA, wire fraud and
+      conspiracy counts.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-md/pr/former-president-maryland-based-transportation-company-found-guilty-federal-charges
+    source_title: Former President of Maryland-based Transportation Company Found Guilty of Federal Charges
+  data_needed:
+  - Company (jurisdiction, incorporationDate)
+  - PublicBody or Company (state-owned)
+  - Contract
+  - Payment (payer, beneficiary, amount, date)
+  checkable: lookups
+  lookup_sources:
+  - Company registry of the supplier's jurisdiction
+  - FATF high-risk and monitored jurisdictions lists
+  - Procurement or payment records of the state body
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Offshore suppliers are a common conduit for bribe payments laundered through shell companies.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2022-04-14/FinCEN%20Advisory%20Corruption%20FINAL%20508.pdf
+  innocent_explanations:
+  - International groups often contract through holding or trading companies in offshore centres for tax
+    or legal reasons
+  - The supplier is an established firm that simply chose that place to register
+  jurisdictions: Global
+  version: 1
+- id: CO-053
+  name: Official or embassy business run through personal accounts
+  definition: Payments for an embassy or other government business go through an official's personal bank
+    account rather than a government account.
+  areas:
+  - CO
+  typology: Kleptocracy / misappropriation
+  status: verified
+  sources:
+  - title: FinCEN Advisory on Kleptocracy and Foreign Public Corruption (FIN-2022-A001)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-04-14/FinCEN%20Advisory%20Corruption%20FINAL%20508.pdf
+    locator: p.8, Red Flag Indicators, flag 3
+    quote: Transactions involving official embassy or foreign government business conducted through personal
+      accounts.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-09'
+  examples:
+  - Visa fees or a consulate's rent are paid into a diplomat's personal account.
+  cases: []
+  data_needed:
+  - Person (position)
+  - BankAccount (holder)
+  - Payment (payer, beneficiary, purpose)
+  - PublicBody
+  - Employment or Position
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Mixing public and personal funds is a FinCEN-listed red flag for laundering corruption proceeds.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2022-04-14/FinCEN%20Advisory%20Corruption%20FINAL%20508.pdf
+  innocent_explanations:
+  - A small mission has no local bank account and an official advances costs and is later reimbursed
+  - Emergency payments when government accounts are frozen or unavailable
+  jurisdictions: Global
+  version: 1
+- id: CO-054
+  name: Government-contract invoices priced well above market or with thin detail
+  definition: Invoices or prices under a government contract are much higher than market rates, or the
+    paperwork is oddly simple and lacks normal details such as valuations of goods and services.
+  areas:
+  - CO
+  typology: Overpricing / inflated contracts
+  status: verified
+  sources:
+  - title: FinCEN Advisory on Kleptocracy and Foreign Public Corruption (FIN-2022-A001)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-04-14/FinCEN%20Advisory%20Corruption%20FINAL%20508.pdf
+    locator: p.9, Red Flag Indicators, flag 7
+    quote: Documents corroborating transactions involving government contracts (e.g., invoices) that include
+      charges at substantially higher prices than market rates or that include overly simple documentation
+      or lack traditional details (e.g., valuations for good and services).
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-09'
+  - title: 'Twelve Red Flags: Corruption Risks in the Award of Extractive Sector Licenses and Contracts'
+    publisher: Natural Resource Governance Institute (NRGI)
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.37, Red flag 11, specific warning signs
+    quote: The final terms include prices that are substantially lower or higher than market price—e.g.,
+      a contract that allows a company to buy hydrocarbons from the government at steep discounts, or
+      sell them to the government for premiums not otherwise obtainable in the market.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A state firm buys a drilling rig from a middleman for far more than the middleman paid days earlier.
+  cases:
+  - name: Naftogaz oil rig purchase
+    year: '2011'
+    jurisdiction: Ukraine
+    what_happened: A local NGO reported that the winning bidder bought the rig from a Norwegian vendor
+      for USD 248 million, about 38 percent less than the price it sold it to a Naftogaz subsidiary for,
+      days later. Officials said the difference was procurement and transport costs; investigative reporting
+      questioned this.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, pp.14-15 and 30
+  data_needed:
+  - Contract (amount, title)
+  - ContractAward (amount, supplier)
+  - Payment
+  - Document (invoice)
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - Market price references or comparable contracts
+  - Procurement databases
+  - Trade and customs data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Overpricing moves excess value to a supplier, which can then pass it on as a kickback; FinCEN
+      lists it among laundering red flags.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2022-04-14/FinCEN%20Advisory%20Corruption%20FINAL%20508.pdf
+  innocent_explanations:
+  - Extra transport, insurance, customisation or urgency costs
+  - Market prices moved between quote and delivery
+  - Small or simple purchases genuinely need little paperwork
+  jurisdictions: Global
+  version: 1
+- id: CO-055
+  name: Payments that do not match the paperwork or rely on vague, old or fake documents
+  definition: Payment amounts differ from the totals in the supporting documents, the payment details
+    are vague, or old or fraudulent documents are used to justify the transfer.
+  areas:
+  - CO
+  typology: Kleptocracy / bribery concealment
+  status: verified
+  sources:
+  - title: FinCEN Advisory on Kleptocracy and Foreign Public Corruption (FIN-2022-A001)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-04-14/FinCEN%20Advisory%20Corruption%20FINAL%20508.pdf
+    locator: p.9, Red Flag Indicators, flag 8
+    quote: Transactions involving payments that do not match the total amounts set out in the underlying
+      documentation, or that involve vague payment details or the use of old or fraudulent documentation
+      to justify transfer of funds.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-09'
+  examples:
+  - A contract says USD 2 million but USD 2.4 million is wired, with the payment reference 'services'.
+  - A 2015 invoice is reused to justify a 2021 transfer.
+  cases: []
+  data_needed:
+  - Payment (amount, date, purpose)
+  - Contract (amount)
+  - Document (invoice, date)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Use of fraudulent documentation to justify transfers is also a document-fraud signal.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2022-04-14/FinCEN%20Advisory%20Corruption%20FINAL%20508.pdf
+  innocent_explanations:
+  - Instalments, currency conversion, bank charges or approved variations
+  - Clerical errors or lazy payment references
+  - Long-running contracts where an old master document still applies
+  jurisdictions: Global
+  version: 1
+- id: CO-056
+  name: Fictitious email addresses used to justify payments
+  definition: Emails from made-up or fake addresses are used, with false invoices, to support payments,
+    especially international ones.
+  areas:
+  - CO
+  typology: Bribery concealment / false documentation
+  status: verified
+  sources:
+  - title: FinCEN Advisory on Kleptocracy and Foreign Public Corruption (FIN-2022-A001)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/advisory/2022-04-14/FinCEN%20Advisory%20Corruption%20FINAL%20508.pdf
+    locator: p.9, Red Flag Indicators, flag 9
+    quote: Transactions involving fictitious email addresses and false invoices to justify payments, particularly
+      for international transactions.
+    quote_verified: true
+    licence: US government work (public domain)
+    checked: '2026-10-09'
+  examples:
+  - A 'supplier' writes from a free webmail address that imitates a real company's domain, and the domain
+    has no website or was registered a week earlier.
+  cases: []
+  data_needed:
+  - Email (from, to, sender, date)
+  - Document (invoice)
+  - Payment
+  - Company (website, email)
+  checkable: lookups
+  lookup_sources:
+  - Domain registration (WHOIS) records
+  - Company registry and the company's own website
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Fictitious email addresses are also used in business email compromise and invoice fraud.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2022-04-14/FinCEN%20Advisory%20Corruption%20FINAL%20508.pdf
+  innocent_explanations:
+  - Small firms use free webmail
+  - Staff use personal email when systems are down
+  - A company changed its domain name
+  jurisdictions: Global
+  version: 1
+- id: CO-057
+  name: Seemingly unqualified company allowed to compete for or win an award
+  definition: A company without real technical, operational or financial capacity (no experience, staff,
+    equipment, accounts, office or website) is allowed to bid for, or wins, a licence or contract.
+  areas:
+  - CO
+  - EN
+  typology: Extractive licence and contract award corruption
+  status: verified
+  sources:
+  - title: 'Twelve Red Flags: Corruption Risks in the Award of Extractive Sector Licenses and Contracts'
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.11, Red flag 1
+    quote: A company that does not have significant technical, operational or financial capabilities either
+      participates in an award process or wins an award.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.11, Red flag 1, specific warning signs
+    quote: The company does not show other basic attributes of functioning businesses— for instance, a
+      physical address or office space, staff or a website.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A purported exploration company with no geologists or engineers wins a mining licence.
+  - A company that fails the pre-qualification standards is selected anyway.
+  - Other consortium members agree to 'carry' the company financially.
+  cases:
+  - name: NNPC crude oil sales to 'briefcase companies'
+    year: '2012'
+    jurisdiction: Nigeria
+    what_happened: A government task force found that many buyers of NNPC crude did not show trading expertise
+      and had little commercial or financial capacity; NRGI research later found some were used to channel
+      payments to PEPs.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, p.13 (citing Report of the Petroleum Revenue Special Task Force,
+      2012)
+  - name: AIMROC gold mining licence
+    year: '2012'
+    jurisdiction: Azerbaijan
+    what_happened: A newly incorporated company received a 30-year licence for five gold fields; journalists
+      found only one geologist in the records of its four owning entities, and corporate filings listed
+      two daughters of President Ilham Aliyev as managers of companies in the ownership chain. No charges
+      have been brought.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, p.12 (citing RFE/RL reporting by Khadija Ismayilova and Nushaba
+      Fatullayeva)
+  - name: PDVSA contract to Trenaco
+    year: '2016'
+    jurisdiction: Venezuela
+    what_happened: Reuters reported that PDVSA gave a small Swiss-registered trucking and trading company
+      a contract worth up to USD 4.5 billion to drill up to 600 wells; the deal foundered after oil companies
+      protested about its lack of qualifications.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, p.13 (citing Reuters, 26 July 2016)
+  data_needed:
+  - Company (incorporationDate, website, sector, address)
+  - ContractAward or License (awards)
+  - Employment
+  - Document (pre-qualification file, audited accounts)
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - Company registry and filed accounts
+  - Licensing cadastre or tender records
+  - Industry databases and news archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EN
+    reason: Unqualified licence holders often fail to develop or responsibly operate oil, gas and mining
+      assets.
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  innocent_explanations:
+  - Local-content rules require a local partner that is meant to learn from experienced partners
+  - First-come-first-served mining licences may go to companies with no operating capacity to encourage
+    early interest
+  - Junior explorers often sell to larger firms after a discovery
+  - A special-purpose vehicle of an established parent company
+  jurisdictions: Global; extractive sectors
+  version: 1
+- id: CO-058
+  name: Winning company formed shortly before, or even after, the award
+  definition: The company was registered only a short time before the licence or contract was awarded,
+    or after it, so it looks set up just for that award.
+  areas:
+  - CO
+  - EN
+  typology: Extractive licence and contract award corruption
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.11, Red flag 1, specific warning signs
+    quote: The company was incorporated or otherwise legally registered only shortly before, or even after,
+      the award. It may appear that the company was set up specifically for the award.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A licence is awarded to a company incorporated five days earlier.
+  cases:
+  - name: OPL 245 (Malabu Oil and Gas)
+    year: '2021'
+    jurisdiction: Nigeria / Italy
+    what_happened: Nigeria's petroleum minister granted oil block OPL 245 in 1998 to Malabu, set up five
+      days before the award; NRGI reports the minister held at least 30 percent of Malabu under an alias.
+      In the later Milan bribery trial over the 2011 sale of the block, the tribunal acquitted all defendants
+      on 17 March 2021, and proceedings were dropped in July 2022.
+    outcome: acquitted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/OPL_245_bribery_affair
+    source_title: NRGI, Twelve Red Flags, pp.12 and 27; Wikipedia, OPL 245 bribery affair (for trial outcome)
+  data_needed:
+  - Company (incorporationDate)
+  - License or ContractAward (date)
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some countries require bidders to register locally before applying
+  - Special-purpose vehicles are set up for legal, accounting or tax reasons by established parents
+  - Junior mining companies are often new
+  jurisdictions: Global
+  version: 1
+- id: CO-059
+  name: Company or owner with a record of corruption or misconduct competes or wins
+  definition: A bidder, or someone who owns part of it, is under investigation, indicted, convicted, or
+    has a long record of litigation suggesting unethical business, and still competes for or wins an award.
+  areas:
+  - CO
+  typology: Extractive licence and contract award corruption
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.14, Red flag 2
+    quote: A company involved in the award process, or an individual with an ownership interest in it,
+      has a reputation for, or a record of participation in, corruption or other misconduct.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A trading company charged with subsidy fraud keeps its state oil contract for two more years.
+  cases:
+  - name: NNPC oil-for-product swaps
+    year: '2017'
+    jurisdiction: Nigeria
+    what_happened: A company charged in 2012 over the fuel subsidy scandal kept trading for the government
+      under the same swap contract until late 2014; a Nigerian court later sentenced two of its principals
+      to prison for subsidy fraud.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, p.14 (citing Premium Times, 26 January 2017)
+  data_needed:
+  - Company
+  - Person
+  - Ownership
+  - CourtCase (via documentedBy / courtCase)
+  - Sanction
+  - ContractAward
+  checkable: lookups
+  lookup_sources:
+  - Court records
+  - Sanctions and debarment lists (e.g. World Bank debarred firms)
+  - News archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Rivals sometimes make false accusations
+  - Accusations were investigated and cleared
+  - The company has changed ownership and management since the misconduct
+  jurisdictions: Global
+  version: 1
+- id: CO-060
+  name: A politically exposed person is a shareholder, creditor or paid adviser of a bidder
+  definition: A bidder or winner openly has a politically exposed person (PEP) as a shareholder, or pays
+    a PEP or their firm as a consultant or service provider, or borrows from a PEP.
+  areas:
+  - CO
+  typology: Extractive licence and contract award corruption / PEP
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.16, Red flag 3
+    quote: A company might channel payments to the PEP via a third-party business relationship, such as
+      a consultancy or a subcontractor.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.16, Red flag 3, specific warning signs
+    quote: The company engages a PEP or his/her firm as a consultant or service provider.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A senior presidential aide is the sole shareholder of a company holding stakes in the affiliates that
+    won a state fuel deal.
+  cases:
+  - name: Sphynx companies / Kensington International v Republic of Congo
+    year: '2005'
+    jurisdiction: United Kingdom (High Court, Commercial Court) / Republic of Congo
+    what_happened: A 2005 English High Court judgment in a civil case found that a Congolese oil official
+      ran Sphynx Bermuda, an oil-buying company, as his own while holding it through a nominee and a British
+      Virgin Islands holding company 'because he did not want his connection to be known'. This is a civil
+      court finding, not a criminal conviction.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, p.20 (citing Kensington International Ltd v Republic of Congo
+      [2005] EWHC 2684)
+  data_needed:
+  - Person (PEP; Position)
+  - Ownership
+  - Representation or Employment (consultancy)
+  - Debt (debtor, creditor)
+  - Company
+  - ContractAward
+  checkable: lookups
+  lookup_sources:
+  - PEP databases
+  - Company registry and beneficial ownership registers
+  - Asset and interest declarations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - PEPs may lawfully own shares where rules allow and the interest is declared
+  - The PEP's role has no influence over the award
+  - A former PEP whose public role ended long ago
+  jurisdictions: Global
+  version: 1
+- id: CO-061
+  name: Sham or questionable loan agreement with a PEP-linked party
+  definition: A loan, promissory note or other debt between a bidder and a PEP or PEP-linked company looks
+    made up, for example short, vague on repayment, with odd terms and no default penalties, and may hide
+    a transfer of value.
+  areas:
+  - CO
+  typology: Bribery concealment
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.16, Red flag 3, specific warning signs
+    quote: The PEP or his/her company provides the company up for the award with a questionable-looking
+      loan agreement, promissory note or other debt instrument.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.47, endnote 62
+    quote: Some common warning signs that a loan agreement might not be genuine include brevity and lack
+      of detail, especially on repayment processes and obligations; unbalanced interest rates or other
+      financial terms; and lack of stated penalties for default.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Three USD 100 million loan agreements are signed between shell companies to create a paper reason
+    for handing ownership of holding companies to officials.
+  cases:
+  - name: US v. Frederic Bourke (SOCAR privatization bribery, Kožený scheme)
+    year: '2009'
+    jurisdiction: United States (Southern District of New York)
+    what_happened: A jury found investor Frederic Bourke guilty of conspiracy to violate the FCPA and
+      the Travel Act and of false statements, over a scheme to bribe senior Azerbaijani officials to rig
+      the privatization of SOCAR. NRGI reports that prosecutors alleged three sham USD 100 million loan
+      agreements created a false paper trail for transferring ownership of holding companies to the officials.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/connecticut-investor-found-guilty-massive-scheme-bribe-senior-government-officials-republic
+    source_title: US DOJ, Connecticut Investor Found Guilty in Massive Scheme to Bribe Senior Government
+      Officials in the Republic of Azerbaijan (10 July 2009); NRGI, Twelve Red Flags, p.17
+  data_needed:
+  - Debt (debtor, creditor, amount, startDate, endDate)
+  - Document (loan agreement)
+  - Company
+  - Person (PEP)
+  - Ownership
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Informal family or shareholder loans are often short and loosely written
+  - Bridge financing between related companies
+  jurisdictions: Global
+  version: 1
+- id: CO-062
+  name: Bidder shares an address, agent, phone or office with a PEP-linked firm
+  definition: A bidder or one of its owners shares a registered or physical address, registered agent,
+    office, phone number or other business set-up with a company owned or controlled by a PEP or someone
+    linked to one.
+  areas:
+  - CO
+  typology: Hidden PEP beneficial ownership
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.19, Red flag 4, specific warning signs
+    quote: The company shares a registered or actual physical address, registered agent, office space,
+      phone number, or other business infrastructure with another firm that is owned or controlled by
+      a PEP, or with an individual linked to a PEP.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The investment firm that owns a local oil partner has the same registered address as a company owned
+    by three top officials.
+  cases:
+  - name: Cobalt International Energy / Nazaki Oil and Gas, Angola
+    year: '2012'
+    jurisdiction: Angola / United States
+    what_happened: A Financial Times journalist noticed that Nazaki's owner GAI had the same registered
+      address as an oil company owned by three senior Angolan officials; when questioned, two of the officials
+      admitted that they and the third held interests in Nazaki through GAI. A US FCPA probe was later
+      closed without public explanation.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, pp.18-19 (citing Financial Times reporting)
+  data_needed:
+  - Company (address, phone, email)
+  - Address
+  - Representation (registered agent)
+  - Ownership
+  - Person (PEP)
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Beneficial ownership registers
+  - Leaks databases (e.g. ICIJ Offshore Leaks)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many unrelated companies share the address of a law firm or corporate services provider
+  - Business centres and serviced offices host many firms
+  jurisdictions: Global
+  version: 1
+- id: CO-063
+  name: Shareholder whose modest job could not pay for the stake (possible front)
+  definition: A person with a large stake in a bidder has an ordinary job unrelated to the sector that
+    would not let them buy the stake, or does not even know they are an owner, suggesting they front for
+    someone else.
+  areas:
+  - CO
+  typology: Hidden PEP beneficial ownership / nominee front
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.18, Red flag 4, specific warning signs
+    quote: A shareholder with a significant interest in the company has a modest occupation that is unrelated
+      to extractives, and that would not generate sufficient income to buy his/her stake or otherwise
+      contribute financially to the company.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.19, Red flag 4, specific warning signs
+    quote: When contacted, a shareholder is unaware that he or she is an owner of the company, suggesting
+      that his or her identity may have been used without his or her knowledge or permission.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A driver or a relative of a minister owns 40 percent of a company that wins a mining licence.
+  cases: []
+  data_needed:
+  - Person (occupation)
+  - Ownership (percentage, shareValue)
+  - Employment
+  - Family
+  - Associate
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Straw owners and fronts are a standard method to hide beneficial ownership of laundered assets.
+    source_url: https://www.fincen.gov/sites/default/files/advisory/2022-04-14/FinCEN%20Advisory%20Corruption%20FINAL%20508.pdf
+  innocent_explanations:
+  - Inherited wealth or a family business stake
+  - Shares given as reward for founding work
+  - An employee share scheme
+  jurisdictions: Global
+  version: 1
+- id: CO-064
+  name: Shareholder records do not account for all shares, or hold a large unissued block
+  definition: The company's list of shareholders does not add up to all issued shares, or a large block
+    of authorised shares stays unissued, which may be held in reserve for a hidden owner.
+  areas:
+  - CO
+  typology: Hidden PEP beneficial ownership
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.18, Red flag 4, specific warning signs
+    quote: A list of shareholders for the company—whether contained in a corporate filing or some other
+      official document—does not fully account for all of the company's issued shares.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.18, Red flag 4, specific warning signs
+    quote: The company's shareholder structure includes a significant block of authorized but unissued
+      shares.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Filings list owners of 70 percent of issued shares; the other 30 percent are not named anywhere.
+  cases: []
+  data_needed:
+  - Company (capital)
+  - Ownership (percentage, sharesCount)
+  - Document (corporate filing)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Filing errors or outdated registry data
+  - Unissued shares kept for future investors or staff options, which NRGI notes is common
+  jurisdictions: Global
+  version: 1
+- id: CO-065
+  name: Official waives pre-qualification or adds a company to the bidder list
+  definition: An official takes unusual steps to let a particular company compete, such as exempting it
+    from pre-qualification or putting its name on the approved bidder list.
+  areas:
+  - CO
+  typology: Official intervention in an award
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.21, Red flag 5, specific warning signs
+    quote: An official takes unusual steps to ensure that a company is allowed to compete. For example,
+      he/she might grant the company an exemption from the prequalification process, or insert the company's
+      name on the list of approved bidders.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A company is pre-qualified for a tender before it has even applied.
+  cases:
+  - name: '''Petrogate'', PetroPeru and Discover Petroleum'
+    year: '2008'
+    jurisdiction: Peru
+    what_happened: An official investigation found PetroPeru officials changed the tender requirements
+      to favour Discover Petroleum International and qualified it before it applied. The board member
+      and lobbyist were charged in 2014 but no convictions were secured.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, p.23
+  - name: PDVSA oil equipment contracts bribery (US prosecutions)
+    year: '2016'
+    jurisdiction: United States / Venezuela
+    what_happened: Two US-based businessmen, an associate and three PDVSA procurement officials pleaded
+      guilty to FCPA and money-laundering offences; the officials had agreed to put the businessmen's
+      companies on approved bidder lists and give inside bidding information.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, p.22
+  data_needed:
+  - ContractAward
+  - Contract (procedure, criteria)
+  - Person (official; Position)
+  - Company
+  - Document (pre-qualification list, minutes)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Late addition to fix an administrative mistake
+  - Rules allow pre-qualification waivers for firms already pre-qualified elsewhere
+  jurisdictions: Global
+  version: 1
+- id: CO-066
+  name: Bidder given confidential information not shared with others
+  definition: An official gives one bidder preferential access to confidential information, such as geological
+    data or rivals' bid documents, to help it prepare its bid.
+  areas:
+  - CO
+  typology: Official intervention in an award
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.21, Red flag 5, specific warning signs
+    quote: An official gives a winning or competing company preferential access to confidential information—e.g.,
+      geological data—to use in crafting its bid.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A consultant passes a bidder copies of competitors' bid documents.
+  cases:
+  - name: Statoil / Horton Investment (Iran South Pars)
+    year: '2006'
+    jurisdiction: United States / Norway / Iran
+    what_happened: According to US court filings summarised by NRGI, a consultant whose beneficial owner
+      was the son of a former Iranian president gave Statoil non-public information and competitors' bid
+      documents. Statoil paid at least USD 5.2 million; it was fined USD 3.5 million by Norwegian prosecutors
+      in 2004 and settled with the US DOJ in 2006 for USD 10.5 million.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, p.33
+  data_needed:
+  - Document
+  - Email
+  - Person (official)
+  - Company
+  - ContractAward
+  - UnknownLink
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Data rooms open to all bidders
+  - An incumbent operator already holds the data from earlier work
+  jurisdictions: Global
+  version: 1
+- id: CO-067
+  name: Licence given to a company that did not bid for it, or swapped after the round
+  definition: A company receives a licence or contract it did not bid for, or is allowed to swap the one
+    it won for another, often after bidding has closed.
+  areas:
+  - CO
+  - EN
+  typology: Official intervention in an award
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.21, Red flag 5, specific warning signs
+    quote: A company is granted a license or contract that it did not bid for, or allowed to swap the
+      license or contract it won for another.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - After an oil licensing round closes, regulators let a well-connected winner swap its block for a more
+    valuable one.
+  cases:
+  - name: Nigeria 2006 oil licensing round
+    year: '2006'
+    jurisdiction: Nigeria
+    what_happened: A later parliamentary probe found blocks awarded without requisite approvals and, after
+      the round closed, to companies that did not submit timely offers, concluding the round 'was a purely
+      discretionary award of oil blocks'.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, p.31
+  data_needed:
+  - License (awards, date)
+  - ContractAward
+  - Company
+  - Document (bid register)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A block became unavailable (for example, a border dispute) and a substitute was offered under published
+    rules
+  - A relinquished block re-offered under a standing open-door process
+  jurisdictions: Global
+  version: 1
+- id: CO-068
+  name: Senior official overrides the selection result or the top bid is rejected
+  definition: An official with final or high-level authority overturns the decision of the people charged
+    with selecting the winner, or the winning or highest-ranked bid is not accepted.
+  areas:
+  - CO
+  typology: Official intervention in an award
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.21, Red flag 5, specific warning signs
+    quote: An official with final or high-level decision-making authority overrides the outcome of the
+      award process, or otherwise alters the decision of the officials originally charged with selecting
+      the winners.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A minister signs a licence for the second-ranked bidder against the evaluation committee's recommendation.
+  cases: []
+  data_needed:
+  - ContractAward (decisionReason)
+  - Document (evaluation report, minutes)
+  - Person (official; Position)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The top bidder failed later due diligence
+  - Legitimate policy or national-security review
+  - Errors found in the evaluation
+  jurisdictions: Global
+  version: 1
+- id: CO-069
+  name: Award process departs from its own rules or is unusually discretionary or secret
+  definition: The award does not follow the government's own rules, standards or criteria, or is run with
+    an unusually high degree of discretion or secrecy.
+  areas:
+  - CO
+  typology: Official intervention in an award
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.21, Red flag 5, specific warning signs
+    quote: The conduct of the award process departs from the government's established rules, standards
+      or criteria, and/or exhibits a high or unusual degree of discretion and/or secrecy.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A competitive licensing round is announced, but only invited companies are allowed to take part.
+  cases:
+  - name: Nigeria 2006 oil licensing round
+    year: '2006'
+    jurisdiction: Nigeria
+    what_happened: Only invited companies could compete and some received rights of first refusal; a parliamentary
+      probe concluded the round was a discretionary award to 'whomsoever the operators of the bid round
+      desired'.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, p.31
+  data_needed:
+  - Contract (procedure, method, criteria)
+  - License
+  - Document (rules, notices)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - NRGI notes discretion and secrecy are very common in some countries
+  - Emergencies or security reasons allowed under the rules
+  jurisdictions: Global
+  version: 1
+- id: CO-070
+  name: Same official or state company both regulates and competes for awards
+  definition: An official makes or influences decisions at several points of the award, or a state-owned
+    company that competes commercially in the sector also controls who wins awards in it.
+  areas:
+  - CO
+  - EN
+  typology: Conflict of interest
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.27, Red flag 7, specific warning signs
+    quote: An official at a state-owned company that seeks commercial opportunities in the sector also
+      has influence over the award of such opportunities.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Twelve Red Flags (quoting OECD, Corruption in the Extractive Value Chain, 2016)
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.28, Red flag 7, OECD case studies
+    quote: a public officer was holding a position both in the operating state-owned enterprise and in
+      the overseeing body in charge of approving extractive projects.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The head of the national oil company, which partners in licences, also sits on the body that approves
+    them.
+  cases:
+  - name: Cobalt International Energy / Nazaki Oil and Gas
+    year: '2012'
+    jurisdiction: Angola
+    what_happened: Manuel Vicente headed the national oil company Sonangol while, as he and another official
+      told the Financial Times, holding an interest in Nazaki, a local partner in the consortium awarded
+      two offshore blocks. NRGI says the extent of his influence over the award is not clear.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, p.28
+  data_needed:
+  - Person (Position)
+  - Membership or Directorship
+  - PublicBody
+  - Company (state-owned)
+  - License or ContractAward
+  checkable: lookups
+  lookup_sources:
+  - Government and state-company websites and gazettes
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many countries' laws give the national oil company both roles
+  - Recusal and separation rules may be in place
+  jurisdictions: Global
+  version: 1
+- id: CO-071
+  name: Linked companies bid against each other to fake competition
+  definition: Several bids come from companies tied to the same person or parent, or a linked company
+    submits a bid that looks deliberately weak, so the competition is only for show.
+  areas:
+  - CO
+  typology: Bid rigging / constrained competition
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.29, Red flag 8, specific warning signs
+    quote: Multiple companies linked to a single individual or parent company submit bids for a single
+      license or contract.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.29, Red flag 8, specific warning signs
+    quote: One or more linked companies submit bids that appear intentionally defective or uncompetitive.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The only two bidders for a rig contract turn out to have the same network of nominee directors.
+  cases:
+  - name: PDVSA oil equipment contracts bribery (US prosecutions)
+    year: '2016'
+    jurisdiction: United States / Venezuela
+    what_happened: Two businessmen pleaded guilty; prosecutors alleged they paid PDVSA officials partly
+      to propose bidding panel lists with more than one company they owned, 'to create the false impression
+      that the bidding process was competitive', hiding the links with nominee owners.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, p.30
+  data_needed:
+  - ContractAward
+  - Company
+  - Ownership
+  - Directorship
+  - Address
+  - Document (bids)
+  checkable: lookups
+  lookup_sources:
+  - Company registry and beneficial ownership registers
+  - Tender records listing all bidders
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Group companies may bid separately for different lots where rules allow and links are disclosed
+  - Shared formation agents create apparent links between unrelated firms
+  jurisdictions: Global
+  version: 1
+- id: CO-072
+  name: Winner pays or hires a losing bidder after the award
+  definition: After the award, the winner makes payments to a losing bidder or hires it as a subcontractor
+    or service provider, suggesting the two agreed in advance who would win.
+  areas:
+  - CO
+  typology: Bid rigging / constrained competition
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.29, Red flag 8, specific warning signs
+    quote: The winning company provides benefits to a losing bidder after the award takes place—e.g.,
+      makes payments to the loser or hires it as a subcontractor or other service provider—suggesting
+      that the two companies may have colluded to favor the winner.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The runner-up in a road tender appears months later as the winner's main subcontractor.
+  cases: []
+  data_needed:
+  - ContractAward
+  - Contract (subcontract)
+  - Payment
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Few specialist firms exist, so rivals often subcontract to each other
+  - The loser had capacity the winner needed
+  jurisdictions: Global
+  version: 1
+- id: CO-073
+  name: Winners take turns in a predictable order (bid rotation)
+  definition: Two or more competing companies win contracts in a repeating, predictable order, which suggests
+    they are sharing out the work between them.
+  areas:
+  - CO
+  typology: Bid rigging / constrained competition
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.29, Red flag 8, specific warning signs
+    quote: Two or more competing companies win licenses or contracts in a repetitive, predictable order,
+      suggesting they are colluding in the common anti-competitive scheme known as "bid rotation."
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Over 20 tenders, companies A, B and C win in turn, A-B-C-A-B-C.
+  cases:
+  - name: Petrobras / Operation Car Wash (Lava Jato)
+    year: '2016'
+    jurisdiction: Brazil
+    what_happened: Evidence summarised in US court documents shows Petrobras directors met with a cartel
+      of at least 16 companies to agree which firms got which contracts, with about three percent of contract
+      value paid as kickbacks; Brazilian prosecutors had obtained at least 16 convictions by mid-2016.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, pp.25-26 and 30
+  data_needed:
+  - ContractAward (supplier, date)
+  - Contract (authority)
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Capacity limits mean a firm that just won cannot take on more work and bids high
+  - Small markets with few suppliers
+  jurisdictions: Global
+  version: 1
+- id: CO-074
+  name: Rights of first refusal given without clear reason
+  definition: The government gives one or more companies a right of first refusal over a licence or contract
+    without an apparent strong commercial or public-policy reason.
+  areas:
+  - CO
+  - EN
+  typology: Constrained competition
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.29, Red flag 8, specific warning signs
+    quote: The government gives one or more companies rights of first refusal over a license or contract
+      without any apparent strong commercial or public policy justification.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Blocks are reserved for invited companies that promise to build infrastructure, which is never built.
+  cases: []
+  data_needed:
+  - License
+  - Contract (procedure, method)
+  - Company
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A company that discovered a deposit may hold a contractual right of first refusal
+  - Rights tied to infrastructure-for-resources deals approved openly
+  jurisdictions: Global
+  version: 1
+- id: CO-075
+  name: Award made without competition where a tender is normal
+  definition: A licence or contract is awarded to a single source, without a competition, where a competition
+    would be more usual or appropriate.
+  areas:
+  - CO
+  typology: Constrained competition
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.29, Red flag 8, specific warning signs
+    quote: The government awards the license or contract on a single source basis when a competition would
+      be more typical or appropriate.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Offshore oil blocks are handed to a consortium by negotiation although earlier blocks were auctioned.
+  cases: []
+  data_needed:
+  - Contract (procedure, method)
+  - ContractAward (decisionReason)
+  - License
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - High geological risk or low market interest
+  - First-come-first-served rules for unexplored mining areas
+  - Legal exceptions for urgency or unique suppliers
+  jurisdictions: Global
+  version: 1
+- id: CO-076
+  name: Intermediary gives the bidder access to senior officials others do not get
+  definition: A hired fixer arranges meetings with top officials, or other access, that rival bidders
+    do not get, often while doing little real work.
+  areas:
+  - CO
+  typology: Third-party intermediary corruption
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.32, Red flag 9, specific warning signs
+    quote: The intermediary helps the company arrange meetings with high level officials, or other types
+      of access that other companies competing for the award do not receive.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An ambassador, offered a fee, sets up a meeting between a company and the president and oil minister.
+  cases:
+  - name: Griffiths Energy International (Chad)
+    year: '2013'
+    jurisdiction: Canada / Chad / United States
+    what_happened: Griffiths offered Chad's ambassador to the US and Canada a USD 2 million fee; he set
+      up a meeting with Chad's president and oil minister, and the fee was later paid to a company owned
+      by his wife. Griffiths was found guilty under Canada's Corruption of Foreign Public Officials Act
+      and fined about USD 10.35 million.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, p.33
+  data_needed:
+  - Representation (agent, client)
+  - Contract (consultancy)
+  - Payment
+  - Person (official; Position)
+  - Family
+  - Associate
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate, registered lobbyists and trade promotion bodies arrange meetings
+  - Embassies routinely help their country's companies
+  jurisdictions: Global
+  version: 1
+- id: CO-077
+  name: Award payment diverted from the proper government account
+  definition: A payment the winning company makes for an award, such as a signature bonus, goes to a non-government
+    account, or goes into a government account and then quickly out to private accounts linked to a PEP.
+  areas:
+  - CO
+  - EN
+  typology: Diversion of award payments / embezzlement
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.35, Red flag 10
+    quote: A red flag arises when a company makes one such payment, but then some or all of the funds
+      are re-routed outside of government coffers.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.35, Red flag 10, specific warning signs
+    quote: The award is structured so that payments from the company flow from into government accounts
+      and then quickly out to private accounts.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A signature bonus is paid to a state oil company's account in Jersey, and part of it is sent on to
+    a private security firm owned by a former minister.
+  cases:
+  - name: Iraq Oil-for-Food Programme
+    year: '2005'
+    jurisdiction: United Nations / Iraq
+    what_happened: Oil traders that won rights to buy Iraqi crude under the UN programme paid secret side
+      payments to the Iraqi government through shell companies and offshore accounts; the independent
+      inquiry's final report found about 2,200 companies paid kickbacks and bribes totalling about USD
+      1.8 billion.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.npr.org/2005/10/27/4978658/report-cites-major-fraud-in-iraq-oil-for-food-program
+    source_title: NRGI, Twelve Red Flags, p.36; NPR, Report Cites Major Fraud in Iraq Oil-for-Food Program
+      (27 Oct 2005)
+  - name: Marathon Oil signature bonus, Angola
+    year: '2000'
+    jurisdiction: Angola
+    what_happened: According to official documents reviewed by investigative journalists, Sonangol moved
+      part of a USD 13.7 million signature-bonus instalment from its Jersey account to a private security
+      company owned by a former minister and to a foundation run by the president, without explanation.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, p.35
+  data_needed:
+  - Payment (payer, beneficiary, amount, date)
+  - BankAccount (holder, bank, country)
+  - PublicBody
+  - Company
+  - Person (PEP)
+  checkable: lookups
+  lookup_sources:
+  - EITI reports
+  - Government budget and treasury reports
+  - Leaked or court-disclosed bank records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Diverted award payments are proceeds of embezzlement and are usually moved through shell companies
+      and offshore accounts, as in Oil-for-Food.
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  - target_area: SA
+    reason: In Oil-for-Food, the diverted kickbacks broke a UN-monitored sanctions programme and funded
+      the regime.
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  innocent_explanations:
+  - Legally mandated transfers onward to sub-national governments or funds
+  - State company accounts abroad used for normal trade finance
+  jurisdictions: Global
+  version: 1
+- id: CO-078
+  name: Unusual payment instructions, split payments or part-cash payment for an award
+  definition: The agency collecting award payments gives unclear or unusual instructions, or a single
+    payment is split across several accounts or paid partly by wire and partly in cash.
+  areas:
+  - CO
+  typology: Diversion of award payments
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.35, Red flag 10, specific warning signs
+    quote: A single payment is broken into pieces and wired to multiple accounts.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.35, Red flag 10, specific warning signs
+    quote: A company makes a single payment in multiple forms—for example, the company wires a portion
+      and pays the balance by physically delivering cash.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A licence fee is wired to three different accounts at the ministry's request, with the remainder handed
+    over in cash.
+  cases: []
+  data_needed:
+  - Payment (amount, date, beneficiary)
+  - BankAccount
+  - Document (payment instructions)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Splitting payments and mixing in cash are standard laundering techniques.
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  innocent_explanations:
+  - Law may split fees between several funds or agencies
+  - Banking restrictions in the country
+  jurisdictions: Global
+  version: 1
+- id: CO-079
+  name: Award payments missing from government financial reports
+  definition: Some or all of a payment made for an award does not appear in the financial reports of the
+    government body that should have received it, or the government publishes no details of such payments.
+  areas:
+  - CO
+  - EN
+  typology: Diversion of award payments
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.35, Red flag 10, specific warning signs
+    quote: Some or all of a payment that a company makes does not appear on the financial reports of the
+      government body in charge of collecting the payments.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Oil companies say they paid bonuses for prospecting rights, but the petroleum authority's reports
+    show no such income.
+  cases:
+  - name: Cambodian National Petroleum Authority signature bonuses
+    year: '2009'
+    jurisdiction: Cambodia
+    what_happened: Global Witness reported that several international oil companies paid multi-million
+      dollar bonuses to the CNPA for prospecting rights, but the amounts were not recorded in relevant
+      government financial reports; the parties did not respond to its questions.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, pp.35-36
+  data_needed:
+  - Payment
+  - PublicBody
+  - Document (budget or EITI report, company annual report)
+  checkable: lookups
+  lookup_sources:
+  - EITI reports
+  - Company payments-to-governments reports (e.g. EU/UK/Canada extractive disclosure laws)
+  - Government budget documents
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Timing differences between payment and reporting periods
+  - Payments recorded under a different agency or budget line
+  jurisdictions: Global
+  version: 1
+- id: CO-080
+  name: Award terms far more favourable to the winner than market norms or similar deals
+  definition: The agreed terms of a licence or contract differ significantly from industry norms, the
+    model contract, the government's own valuation or other similar deals, in the company's favour, without
+    a change in market conditions.
+  areas:
+  - CO
+  - EN
+  typology: Below-value award
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.37, Red flag 11
+    quote: If the terms of licenses or contracts depart significantly from expectations, past examples
+      or industry norms, this may warrant extra scrutiny from oversight actors.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.37, Red flag 11
+    quote: There is no global rule for how much deviation is too much; only close scrutiny of the underlying
+      industry and country context can support informed judgment calls in that regard.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A signature bonus of USD 10 million for deepwater blocks when a decade earlier three similar blocks
+    fetched USD 870 million.
+  cases:
+  - name: Cobalt International Energy, Angola blocks 9 and 21
+    year: '2010'
+    jurisdiction: Angola
+    what_happened: NRGI reports that the blocks were awarded on a non-competitive basis for a signature
+      bonus of only USD 10 million, while international companies paid USD 870 million for three ultra-deepwater
+      blocks in 1999 at lower oil prices.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, p.39
+  data_needed:
+  - License or Contract (amount, criteria)
+  - ContractAward (amount)
+  - Document (model contract, valuation)
+  checkable: lookups
+  lookup_sources:
+  - Published contracts (e.g. ResourceContracts.org)
+  - Comparable licensing rounds
+  - Government valuation documents
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: EN
+    reason: Below-value awards transfer public resource wealth to private holders.
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  innocent_explanations:
+  - Poor negotiation, inexperience or weak bargaining power
+  - Market shifts forced a less attractive deal
+  - Deliberate investment incentives
+  - Government set unrealistic expectations
+  jurisdictions: Global
+  version: 1
+- id: CO-081
+  name: Terms changed in the winner's favour after agreement or just before signing
+  definition: The final terms are significantly better for the company than those first agreed, or terms
+    are changed shortly before signing in the company's favour.
+  areas:
+  - CO
+  typology: Below-value award
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.37, Red flag 11, specific warning signs
+    quote: One or more terms of the license or contract are changed only shortly before signing, in a
+      manner that favors the company.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.29, Red flag 8, specific warning signs
+    quote: The government accepts a bid from a company with terms that do not favor the company, then
+      subsequently renegotiates more favorable terms—suggesting the company and an official could have
+      engaged in "low-balling."
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The royalty rate in the signed contract is lower than in the term sheet the bidder won with.
+  cases: []
+  data_needed:
+  - Contract (versions, contractDate)
+  - ContractAward (amended)
+  - Document (drafts, term sheet)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate final negotiation on technical points
+  - Changes required by new law or market events
+  jurisdictions: Global
+  version: 1
+- id: CO-082
+  name: Government makes no valuation of the asset it awards
+  definition: The responsible agency does not try to work out the value of the licence or contract it
+    is giving away.
+  areas:
+  - CO
+  - EN
+  typology: Below-value award
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.37, Red flag 11, specific warning signs
+    quote: The responsible government agency makes no effort to assess the value of the license or contract
+      it is awarding.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A state mining company sells a stake in a copper project with no independent valuation on file.
+  cases: []
+  data_needed:
+  - License or Contract
+  - Document (valuation report)
+  - PublicBody
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Early-stage exploration areas have little data to value
+  - Agencies lack capacity or budget for valuations
+  jurisdictions: Global
+  version: 1
+- id: CO-083
+  name: Non-standard sweeteners for the winner (tax holidays, skewed formulas, state loans)
+  definition: The award includes unusual provisions that cut the winner's obligations or add value for
+    it, such as excessive tax holidays, skewed currency or conversion formulas, long payment windows,
+    or state loans and guarantees.
+  areas:
+  - CO
+  typology: Below-value award
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.38, Red flag 11, specific warning signs
+    quote: These could include excessive tax holidays, unclear or skewed currency conversion formulas
+      or rates; unusually long payment windows; or concessionary credit lines, debt guarantees, or other
+      non-standard financial support from the government to the winner, either as terms of the sale or
+      in side deals with the winner.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An oil-for-product swap contract gives the trader an excessive allowance for oil 'lost' in refining.
+  cases:
+  - name: NNPC offshore processing (oil-for-product swap) contracts
+    year: '2015'
+    jurisdiction: Nigeria
+    what_happened: NRGI research estimated losses of up to USD 381 million in one year from three technical
+      provisions in one contract; after a change of government NNPC cancelled three such contracts, saying
+      they were skewed in favour of the companies.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, p.38
+  data_needed:
+  - Contract (terms)
+  - Debt (state loan to winner)
+  - Document
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Published investment-incentive policies
+  - Industry-standard terms the reviewer is unfamiliar with
+  jurisdictions: Global
+  version: 1
+- id: CO-084
+  name: Licence or stake resold for a large profit soon after award, with little work done (flipping)
+  definition: A company that won a licence or contract cheaply resells it, or its owners sell their shares,
+    for a large profit shortly after the award without having done substantial work on it.
+  areas:
+  - CO
+  - EN
+  typology: Licence flipping
+  status: verified
+  sources:
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.40, Red flag 12
+    quote: In the first, a company that won a license or contract for a relatively low upfront cost resells,
+      or "flips" it for a big return without having worked to develop the underlying asset.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Twelve Red Flags
+    publisher: NRGI
+    year: '2017'
+    url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    locator: p.40, Red flag 12
+    quote: In the second, the company's shareholders sell their equity for large profits shortly after
+      the award, suggesting they acquired the license or contract merely to boost the sales price.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A company pays USD 2 million for an oil block and sells it 13 years later for USD 1.1 billion with
+    no development.
+  cases:
+  - name: BSGR / Beny Steinmetz, Simandou iron ore (Guinea)
+    year: '2022'
+    jurisdiction: Switzerland (Geneva) / Guinea
+    what_happened: BSGR obtained Simandou permits in 2008, reportedly spent USD 165 million, and sold
+      51 percent to Vale in 2010 for USD 2.5 billion. A Geneva court convicted Steinmetz in 2021 of bribing
+      foreign public officials over the mining rights, and the Geneva appeals court upheld that conviction
+      (sentence cut to three years).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://news.yahoo.com/geneva-appeals-court-upholds-conviction-114801630.html
+    source_title: NRGI, Twelve Red Flags, p.40; Yahoo News (AP), Geneva appeals court upholds conviction
+      of Israeli tycoon
+  - name: OPL 245 resale (Malabu to Shell and Eni)
+    year: '2021'
+    jurisdiction: Nigeria / Italy
+    what_happened: Malabu acquired the block in 1998 for USD 2 million up front and received USD 1.1 billion
+      via the Nigerian government in 2011 after doing nothing substantial. The Milan tribunal acquitted
+      all defendants in the bribery trial in March 2021.
+    outcome: acquitted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/OPL_245_bribery_affair
+    source_title: NRGI, Twelve Red Flags, p.40; Wikipedia, OPL 245 bribery affair
+  - name: Uranex / Resource Generation, Cameroon
+    year: '2016'
+    jurisdiction: Cameroon / Australia
+    what_happened: A 2016 investigative report found that Uranex shareholders, including a former parliamentarian,
+      a ruling-party mayor and a general's son, earned a 37,900 percent one-year return when selling to
+      ResGen months after receiving uranium licences, with no evidence of substantial development spending.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+    source_title: NRGI, Twelve Red Flags, p.41
+  data_needed:
+  - License (awards, amount, date)
+  - Ownership (startDate, endDate, shareValue)
+  - Payment
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - Licensing cadastre
+  - Stock exchange announcements
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Resale profits can be the route by which value from a corrupt award is paid out to hidden
+      owners through offshore structures.
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  - target_area: EN
+    reason: Flipping means resources are not developed and public revenue is lost; NRGI cites an estimated
+      USD 1.36 billion loss to DRC from five discounted asset sales.
+    source_url: https://resourcegovernance.org/sites/default/files/documents/corruption-risks-in-the-award-of-extractive-sector-licenses-and-contracts.pdf
+  innocent_explanations:
+  - NRGI notes there is nothing inherently suspect about selling assets for profit
+  - Junior explorers' business model is to sell after a discovery
+  - Commodity prices rose sharply
+  jurisdictions: Global
+  version: 1
 not_reached:
 - 'FinCEN Advisory FIN-2018-A003 red-flag list: the bullets sit in an image box on p. 5 and could not
   be extracted as text (the rest of the advisory was read).'
@@ -2891,3 +4822,15 @@ not_reached:
 - 'Wolfsberg Group PEP guidance and FATF 2011/2012 corruption typology reports: not reached.'
 - 'UK ACOBA business appointment rules (two-year period): about page did not state the period, so no UK
   threshold was used.'
+- The gap note says FIN-2022-A001 lists 'golden passports', third-party payments for high-value assets,
+  and facilitator transactions shortly before or after sanctions. I read the full advisory text and these
+  are NOT in its red-flag list (pp.8-9). It mentions bribes to get passports or visas only as a typology
+  on p.4. Those items may come from another FinCEN alert, such as the March 2022 alert on Russian elites'
+  real estate and high-value assets, which I did not open.
+- FinCEN Advisory FIN-2018-A003 (Human Rights Abuses and Corruption) red flags were not re-examined.
+- The primary Independent Inquiry Committee (Volcker) Oil-for-Food final report was not opened. The outcome
+  rests on NRGI and NPR.
+- Primary court documents for the Statoil, Griffiths, PDVSA (Shiera/Rincón), Rubiandini, Petrobras and
+  Sphynx/Kensington cases were not opened. Their outcomes come from NRGI's summaries.
+- The Geneva appeal ruling in Steinmetz has no exact date in the source I read. It was in 2022 per the
+  Al Jazeera and Fortune headlines from August 2022, which I did not open.

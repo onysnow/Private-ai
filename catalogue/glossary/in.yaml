@@ -490,3 +490,94 @@ terms:
   indicators: []
   areas:
   - IN
+- term: Bot
+  definition: A social media account run wholly or partly by software that posts or reacts automatically.
+  examples: []
+  source_url: https://medium.com/dfrlab/botspot-twelve-ways-to-spot-a-bot-aedc7d9c110c
+  cases: []
+  related:
+  - Botnet
+  - Amplification
+  indicators: []
+  areas:
+  - IN
+- term: Botnet
+  definition: A group of bot accounts controlled together, for example to boost one post at the same moment.
+  examples: []
+  source_url: https://medium.com/dfrlab/botspot-twelve-ways-to-spot-a-bot-aedc7d9c110c
+  cases: []
+  related:
+  - Bot
+  indicators: []
+  areas:
+  - IN
+- term: Amplification
+  definition: Boosting other users' posts by reposting, liking or quoting them so they reach more people.
+  examples: []
+  source_url: https://medium.com/dfrlab/botspot-twelve-ways-to-spot-a-bot-aedc7d9c110c
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Commercial botnet
+  definition: A botnet that mostly posts advertising and is hired out to people who want their posts amplified.
+  examples: []
+  source_url: https://medium.com/dfrlab/botspot-twelve-ways-to-spot-a-bot-aedc7d9c110c
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: URL shortener / automation service (e.g. ift.tt, IFTTT)
+  definition: A service that shortens links or posts automatically on a schedule or trigger; a timeline
+    full of one automation shortener suggests automated posting.
+  examples:
+  - ift.tt (IFTTT)
+  - ow.ly (HootSuite)
+  source_url: https://medium.com/dfrlab/botspot-twelve-ways-to-spot-a-bot-aedc7d9c110c
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Office of Research Integrity (ORI)
+  definition: The US Department of Health and Human Services office that oversees and makes findings on
+    research misconduct in federally funded health research.
+  examples: []
+  source_url: https://ori.hhs.gov/definition-misconduct
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: GRIM test (Granularity-Related Inconsistency of Means)
+  definition: A check of whether a reported average of whole-number data is mathematically possible given
+    the sample size and number of items.
+  examples: []
+  source_url: https://peerj.com/preprints/2064.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: SPRITE (Sample Parameter Reconstruction via Iterative TEchniques)
+  definition: A method that tries to rebuild plausible raw data sets from reported summary statistics,
+    to see whether any realistic data could produce them.
+  examples: []
+  source_url: https://peerj.com/preprints/26968/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN
+- term: Likert-type scale
+  definition: A survey answer scale with whole-number steps (for example 1 to 7 from 'strongly disagree'
+    to 'strongly agree'), the kind of data GRIM is designed to check.
+  examples: []
+  source_url: https://peerj.com/preprints/2064.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - IN

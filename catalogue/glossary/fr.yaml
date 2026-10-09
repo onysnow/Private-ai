@@ -509,3 +509,263 @@ terms:
   indicators: []
   areas:
   - FR
+- term: Wash trade
+  definition: A trade in which the buyer and seller are the same person or are acting together, so ownership
+    does not really change; used to fake trading activity.
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/19-18
+  cases: []
+  related:
+  - Cross trade
+  - Market manipulation
+  indicators: []
+  areas:
+  - FR
+- term: Pump-and-dump scheme
+  definition: Fraudsters spread false or misleading hype to push up a stock's price, then sell their own
+    shares at the high price, leaving later buyers with losses.
+  examples: []
+  source_url: https://www.investor.gov/introduction-investing/investing-basics/glossary/pump-and-dump-schemes
+  cases: []
+  related:
+  - Penny stock
+  - Stock promoter
+  indicators: []
+  areas:
+  - FR
+- term: Insider trading
+  definition: Buying or selling a security on the basis of important non-public information, in breach
+    of a duty of trust or confidence.
+  examples: []
+  source_url: https://www.investor.gov/introduction-investing/investing-basics/glossary/insider-trading
+  cases: []
+  related:
+  - Material non-public information
+  indicators: []
+  areas:
+  - FR
+- term: Spoofing
+  definition: Placing bids or offers in a market with the intent to cancel them before they execute, to
+    mislead other traders; illegal under US commodities law.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/7/6c
+  cases: []
+  related:
+  - Layering
+  - Market manipulation
+  indicators: []
+  areas:
+  - FR
+- term: Journaling (securities)
+  definition: Moving shares or cash between brokerage accounts by internal book entry rather than by a
+    trade or outside payment.
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/19-18
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Penny stock / low-priced security
+  definition: A thinly traded, low-priced share, which is easier to manipulate; FINRA lists trading in
+    penny stocks among red flags.
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/19-18
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Public shell company
+  definition: A listed company with few or no operations, which can be used as a vehicle for share schemes
+    or to move funds.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/ML%20and%20TF%20in%20the%20Securities%20Sector.pdf.coredownload.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Elder financial exploitation
+  definition: The illegal or improper use of an older adult's funds, property or assets.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related:
+  - Elder theft
+  - Elder scam
+  indicators: []
+  areas:
+  - FR
+- term: Elder theft
+  definition: Theft of an older adult's assets, funds or income by someone they trust, such as a relative
+    or caregiver.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Elder scam
+  definition: A scheme where an older adult is persuaded to send money to a stranger or imposter for a
+    promised benefit.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2022-06-15/FinCEN%20Advisory%20Elder%20Financial%20Exploitation%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Check washing
+  definition: Using chemicals to remove the ink on a stolen check so the payee and often the amount can
+    be rewritten.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/shared/FinCEN%20Alert%20Mail%20Theft-Related%20Check%20Fraud%20FINAL%20508.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Money mule
+  definition: Someone who transfers or moves illegally acquired money on behalf of someone else.
+  examples: []
+  source_url: https://www.fbi.gov/how-we-can-help-you/scams-and-safety/common-frauds-and-scams/money-mules
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Timeshare exit / resale scam
+  definition: A scam where callers claim to have a buyer for a victim's timeshare and charge fees for
+    a sale that never happens.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/shared/FinCEN-Joint-Notice-Timeshare-Mexico-508C-FINAL.pdf
+  cases: []
+  related:
+  - Re-rent scam
+  - Advance-fee scheme
+  indicators: []
+  areas:
+  - FR
+- term: Advance-fee scheme
+  definition: A fraud in which the victim pays money up front for a promised benefit (a sale, loan, prize
+    or recovery) that never arrives.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/shared/FinCEN-Joint-Notice-Timeshare-Mexico-508C-FINAL.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: CJNG (Cartel de Jalisco Nueva Generación)
+  definition: A Mexico-based transnational criminal organisation that US authorities link to timeshare
+    fraud targeting US owners.
+  examples: []
+  source_url: https://home.treasury.gov/news/press-releases/jy2465
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Fideicomiso
+  definition: A Mexican trust arrangement; the joint notice says cartel networks move timeshare-fraud
+    funds through shell companies and such trusts.
+  examples: []
+  source_url: https://www.fincen.gov/system/files/shared/FinCEN-Joint-Notice-Timeshare-Mexico-508C-FINAL.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: MTIC fraud (missing trader intra-community fraud)
+  definition: VAT fraud in which a trader buys goods VAT-free from another EU country, sells them with
+    VAT and disappears without paying that VAT.
+  examples: []
+  source_url: https://www.gov.uk/hmrc-internal-manuals/vat-fraud/vatf23510
+  cases: []
+  related:
+  - Carousel fraud
+  - Missing trader
+  indicators: []
+  areas:
+  - FR
+- term: Carousel fraud
+  definition: MTIC fraud where the goods or services do not reach an end consumer but go round a chain,
+    usually back to the starting country.
+  examples: []
+  source_url: https://www.gov.uk/hmrc-internal-manuals/vat-fraud/vatf23540
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Missing trader / defaulter
+  definition: The VAT-registered company in an MTIC chain that charges VAT but fails to file or pay it.
+  examples: []
+  source_url: https://www.gov.uk/hmrc-internal-manuals/vat-fraud/vatf23520
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Buffer (VAT fraud)
+  definition: A VAT-registered company placed in the chain between the defaulter and the broker to hide
+    the link.
+  examples: []
+  source_url: https://www.gov.uk/hmrc-internal-manuals/vat-fraud/vatf23520
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Broker (VAT fraud)
+  definition: The company at the end of an MTIC chain that exports or dispatches the goods and claims
+    a VAT repayment.
+  examples: []
+  source_url: https://www.gov.uk/hmrc-internal-manuals/vat-fraud/vatf23520
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Fraud risk factor
+  definition: A condition, such as pressure, opportunity or attitude, that auditors treat as raising the
+    risk of fraud; not proof of fraud.
+  examples: []
+  source_url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Operating cash flow
+  definition: The cash a business actually generates from its everyday operations, as shown in the cash-flow
+    statement.
+  examples: []
+  source_url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Related-party transaction
+  definition: A deal between a company and people or companies connected to it, such as owners, directors
+    or their relatives.
+  examples: []
+  source_url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR
+- term: Segregation of duties
+  definition: Splitting tasks such as handling, recording and checking money between different people
+    so no one person can steal and hide it.
+  examples: []
+  source_url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - FR

@@ -568,3 +568,178 @@ terms:
   indicators: []
   areas:
   - EN
+- term: Carbon credit (offset)
+  definition: A certificate that stands for one tonne of carbon dioxide (or equivalent) cut or removed,
+    which can be bought to offset emissions.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related:
+  - Emission allowance
+  - Carbon registry
+  indicators: []
+  areas:
+  - EN
+- term: EU Emissions Trading System (EU ETS)
+  definition: The EU's cap-and-trade market, where companies must hold allowances for their emissions
+    and can buy and sell them.
+  examples: []
+  source_url: https://www.europol.europa.eu/media-press/newsroom/news/carbon-credit-fraud-causes-more-5-billion-euros-damage-for-european-taxpayer
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Emission allowance
+  definition: A permit under a cap-and-trade system to emit one tonne of CO2, which can be traded.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Carbon registry
+  definition: An electronic register, like a bank account system, that records who holds which carbon
+    credits or allowances and tracks their transfer and retirement.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Clean Development Mechanism (CDM)
+  definition: A UN scheme under the Kyoto Protocol that issued credits for emission-cutting projects in
+    developing countries.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Additionality
+  definition: The test of whether a project's emission cuts would not have happened without the money
+    from carbon credits.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Double counting / recycled credits
+  definition: Counting or selling the same emission reduction more than once, including putting back on
+    sale credits already surrendered.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Verifier (third-party auditor)
+  definition: An independent firm that checks a project's emission reductions before credits are issued.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Missing Trader Intra-Community (MTIC) / carousel fraud
+  definition: A VAT fraud in which goods or allowances are bought VAT-free from another EU state and resold
+    with VAT, after which the seller disappears without paying the VAT; the goods often go round in circles.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Ponzi scheme
+  definition: A fraud that pays earlier investors with money from new investors instead of real profits.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Phishing
+  definition: Fake emails or websites that trick people into handing over login details or bank information.
+  examples: []
+  source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: HFC (hydrofluorocarbon)
+  definition: Man-made refrigerant gases with a strong warming effect, being phased down under EU law
+    and the Kigali Amendment.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R0573
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: HFO (hydrofluoroolefin)
+  definition: Newer refrigerant gases with low warming effect that are less tightly regulated than HFCs.
+  examples: []
+  source_url: https://eia-international.org/news/illegal-smuggling-of-refrigerant-gases-into-europe-continues-as-the-climate-crisis-worsens/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: F-gases (fluorinated greenhouse gases)
+  definition: The group of man-made fluorine gases, including HFCs, that EU Regulation 2024/573 controls.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R0573
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: HFC quota
+  definition: The amount of HFCs the European Commission lets each producer or importer place on the EU
+    market.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R0573
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: F-gas Portal
+  definition: The EU's online registry of companies dealing in F-gases; a valid registration works as
+    a licence, and it is connected to customs systems.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R0573
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Non-refillable (disposable) container
+  definition: A single-use gas cylinder; EU law bans them for F-gases except for lab use.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R0573
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN
+- term: Dark web
+  definition: Parts of the internet reached only with special software such as Tor, where hidden markets
+    sell illegal goods.
+  examples: []
+  source_url: https://baselgovernance.org/sites/default/files/2021-11/cte_5.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - EN

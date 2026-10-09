@@ -21,11 +21,22 @@ indicators:
       p. 33; Supplement on Gold, Step 2(B), p. 87
     quote: The minerals originate from or have been transported via a conflict-affected or high-risk area.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - UN Group of Experts (S/2024/432) found Rubaya minerals in DRC were moved via Mushaki under M23 control
     and became ineligible for trade.
-  cases: []
+  cases:
+  - name: 'Kaloti / Valcambi: Sudanese gold linked to Darfur militias and the RSF'
+    year: '2020'
+    jurisdiction: UAE / Switzerland / Sudan
+    what_happened: Global Witness reported that Kaloti in Dubai sourced over 57 tonnes of Sudanese gold
+      in 2012. It cited a UN estimate that at least 30 of the 65 tonnes Sudan exported to the UAE that
+      year were tied to Darfur militias. It also reported that Kaloti later bought from a company linked
+      to the RSF, and that Swiss refiner Valcambi bought about 20 tonnes from Kaloti in 2018-19.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://globalwitness.org/en/campaigns/conflict-resources/beneath-shine-tale-two-gold-refiners/
+    source_title: 'Global Witness, ''Beneath the shine: A tale of two gold refiners'' (16 July 2020)'
   data_needed:
   - Address (country, region) for mine site, trader and exporter
   - Contract or Payment between supplier and buyer (date, amount, purpose)
@@ -75,7 +86,7 @@ indicators:
       resources or expected production levels of the mineral in question (i.e. the declared volumes of
       mineral from that country are out of keeping with its known reserves or expected production levels).
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - UN Group of Experts reported circulation of fraudulently imported DRC gold to Kigali and Kampala as
     transit routes (S/2024/432, paras 208-209).
@@ -123,7 +134,7 @@ indicators:
     quote: The gold is claimed to originate from a country through which gold from conflict-affected and
       high-risk areas is known or reasonably suspected to transit.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Final report of the Group of Experts on the Democratic Republic of the Congo (S/2024/432)
     publisher: United Nations Security Council
     year: '2024'
@@ -132,10 +143,20 @@ indicators:
     quote: Several sources reported that Kampala remained a transit route for gold illegally imported
       from the Democratic Republic of the Congo
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Kampala and Kigali named as transit routes for DRC gold (S/2024/432).
-  cases: []
+  cases:
+  - name: Republic of the Congo expelled from the Kimberley Process
+    year: '2004'
+    jurisdiction: Republic of the Congo (Kimberley Process)
+    what_happened: The Republic of the Congo was removed from the Kimberley Process because it could not
+      prove the origin of the diamonds it exported. Most of these were believed to come from the neighbouring
+      DRC. It was readmitted in 2007.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Kimberley_Process_Certification_Scheme
+    source_title: Wikipedia, 'Kimberley Process Certification Scheme'
   data_needed:
   - Document (certificate of origin, airway bill)
   - Company (exporter, refiner) with Address
@@ -175,7 +196,7 @@ indicators:
       in a country where gold from conflict-affected and high-risk areas is known or reasonably suspected
       to transit.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
   cases: []
   data_needed:
@@ -216,9 +237,20 @@ indicators:
     quote: Suppliers or other known upstream companies are known to have sourced gold from a red flag
       location of gold origin and transit in the last 12 months.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
-  cases: []
+  cases:
+  - name: Valcambi sourcing from Kaloti
+    year: '2020'
+    jurisdiction: Switzerland / UAE
+    what_happened: Global Witness reported that Valcambi bought about 20 tonnes of gold directly from
+      Kaloti in 2018 and 2019. In the same period, Kaloti was reported to be buying Sudanese gold, including
+      from the Central Bank of Sudan and from a company linked to the RSF. Global Witness also reported
+      that Valcambi's auditor KPMG 'turned a blind eye' to this high-risk supplier.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://globalwitness.org/en/campaigns/conflict-resources/beneath-shine-tale-two-gold-refiners/
+    source_title: 'Global Witness, ''Beneath the shine: A tale of two gold refiners'' (16 July 2020)'
   data_needed:
   - Company (supplier)
   - Contract/Payment with date and counterparty
@@ -258,7 +290,7 @@ indicators:
       locations of gold origin and transit, or have shareholder or other interests in suppliers of gold
       from one of the above-mentioned red flag locations of gold origin and transit.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
   cases: []
   data_needed:
@@ -299,7 +331,7 @@ indicators:
       laundering laws, anti-corruption laws, customs controls and other relevant governmental oversight
       laws are weakly enforced; informal banking systems operate, and cash is extensively used.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
   cases: []
   data_needed:
@@ -342,9 +374,19 @@ indicators:
       1 which give rise to a reasonable suspicion that the gold may contribute to conflict or serious
       abuses associated with the extraction, transport or trade of gold.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
-  cases: []
+  cases:
+  - name: Sudan-to-UAE gold flows tied to Darfur militias (Kaloti)
+    year: '2020'
+    jurisdiction: Sudan / UAE
+    what_happened: Global Witness cited a UN estimate that at least 30 of 65 tonnes of Sudanese gold exported
+      to the UAE in 2012 were tied to Darfur militias. It also reported that in 2019 the Central Bank
+      of Sudan appeared to buy gold from mines occupied by the SLA/Abdul Wahid armed group.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://globalwitness.org/en/campaigns/conflict-resources/beneath-shine-tale-two-gold-refiners/
+    source_title: Global Witness, 'Beneath the shine' (16 July 2020)
   data_needed:
   - Document (KYC files)
   - Payment
@@ -380,7 +422,7 @@ indicators:
     quote: illegally control mine sites or otherwise control transportation routes, points where minerals
       are traded and upstream actors in the supply chain
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Final report of the Group of Experts on the DRC (S/2024/432)
     publisher: United Nations Security Council
     year: '2024'
@@ -389,11 +431,21 @@ indicators:
     quote: Mining sites in the Rubaya area remained under the control of the armed group Coalition des
       patriotes résistants congolais-Force de frappe (PARECO-FF)
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Rubaya (DRC) coltan sites under PARECO-FF, with M23 controlling the smuggling route (S/2024/432).
   - Mai-Mai Yakutumba controlling gold mining in Fizi territory (S/2024/432, para 189).
-  cases: []
+  cases:
+  - name: M23 seizure of the Rubaya coltan mining area
+    year: '2024'
+    jurisdiction: DR Congo (North Kivu)
+    what_happened: M23 rebels said they had seized Rubaya for its tantalum deposits (AP, 3 May 2024).
+      The town was reported to be still under M23 control in March 2026 (BBC). This rests on news reporting
+      cited by Wikipedia. I could not open the UN Group of Experts report.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Rubaya
+    source_title: Wikipedia, 'Rubaya' (citing AP 3 May 2024 and BBC 5 March 2026)
   data_needed:
   - Organization (armed group)
   - Ownership / Directorship (armed group members in upstream companies)
@@ -438,7 +490,7 @@ indicators:
     quote: illegally tax or extort money or minerals at point of access to mine sites, along transportation
       routes or at points where minerals are traded
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Final report of the Group of Experts on the DRC (S/2024/432)
     publisher: United Nations Security Council
     year: '2024'
@@ -447,12 +499,32 @@ indicators:
     quote: All armed groups in Fizi territory maintained an illegal taxation system on various economic
       activities, in particular gold mining
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Fizi territory gold taxation by armed groups (S/2024/432).
   - Lafarge Cement Syria paid ISIS 750 Syrian pounds per ton of cement sold, which executives likened
     to taxes (DOJ, 2022).
-  cases: []
+  cases:
+  - name: M23 taxes on coltan export and transport at Rubaya
+    year: '2026'
+    jurisdiction: DR Congo (North Kivu)
+    what_happened: After taking Rubaya, the rebels were reported to have imposed taxes on the export and
+      transport of coltan (AP, 5 March 2026).
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Rubaya
+    source_title: Wikipedia, 'Rubaya' (citing AP explainer, 5 March 2026)
+  - name: 'Chiquita Brands International: payments to the AUC'
+    year: '2007'
+    jurisdiction: United States / Colombia
+    what_happened: Chiquita's Colombian subsidiary Banadex made over 100 payments totalling more than
+      $1.7m to the AUC paramilitaries (1997-2004). The AUC leader implied that not paying could bring
+      harm to staff and property. Chiquita pleaded guilty to transactions with a specially designated
+      global terrorist and paid a $25m fine.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archive/opa/pr/2007/March/07_nsd_161.html
+    source_title: US DOJ press release, March 2007
   data_needed:
   - Payment (payer, beneficiary, purpose, amount, date)
   - Document (receipts, roadblock tickets)
@@ -494,11 +566,33 @@ indicators:
     url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
     quote: the equivalent of approximately $5.92 million
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - 'Lafarge and Lafarge Cement Syria: monthly payments to armed groups for checkpoint passage around
     the Jalabiya plant, 2013-2014.'
-  cases: []
+  cases:
+  - name: 'Lafarge / Lafarge Cement Syria: payments to ISIS and al-Nusrah'
+    year: '2022'
+    jurisdiction: United States (also France, convicted 13 April 2026)
+    what_happened: LCS paid monthly 'donations' to armed groups so that employees, customers and suppliers
+      could pass checkpoints near the Jalabiya cement plant in 2013-14. Lafarge and LCS pleaded guilty
+      in the US to conspiring to provide material support to foreign terrorist organisations ($777.8m
+      plea deal). A French court also convicted Lafarge of terrorist financing on 13 April 2026, per Wikipedia.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+    source_title: US DOJ, 'Lafarge pleads guilty to conspiring to provide material support to foreign
+      terrorist organizations'
+  - name: 'Chiquita Brands International: ''security payments'' to the AUC'
+    year: '2007'
+    jurisdiction: United States / Colombia
+    what_happened: Payments to the AUC were recorded as 'security payments', but Chiquita received no
+      security services. Prosecutors described them as protection payments that funded the group. Chiquita
+      pleaded guilty and was fined $25m.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archive/opa/pr/2007/March/07_nsd_161.html
+    source_title: US DOJ press release, March 2007
   data_needed:
   - Payment (payer, beneficiary, purpose, amount, date)
   - Representation / Associate (intermediary acting for company)
@@ -537,7 +631,7 @@ indicators:
     url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
     quote: conspiring to provide material support and resources in Northern Syria from 2013 to 2014
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: OECD Due Diligence Guidance - Annex II
     publisher: OECD
     year: '2016'
@@ -546,10 +640,19 @@ indicators:
     quote: procuring minerals from, making payments to or otherwise providing logistical assistance or
       equipment to, non-state armed groups or their affiliates
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Lafarge Cement Syria bought raw materials from ISIS-controlled suppliers (DOJ, 2022).
-  cases: []
+  cases:
+  - name: 'Lafarge Cement Syria: raw materials bought from ISIS-controlled suppliers'
+    year: '2022'
+    jurisdiction: United States / Syria
+    what_happened: Per the DOJ, LCS 'purchased raw materials needed to manufacture cement from ISIS-controlled
+      suppliers' as part of the material-support conspiracy it pleaded guilty to.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+    source_title: US DOJ, Lafarge guilty plea press release (Oct 2022)
   data_needed:
   - Contract / Payment (supplier, goods, amount)
   - Company (supplier) with Address
@@ -589,11 +692,21 @@ indicators:
     url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
     quote: false descriptions of services rendered
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Lafarge executives had intermediaries form companies with names not obviously tied to them; intermediaries
     received about $1.11 million (DOJ, 2022).
-  cases: []
+  cases:
+  - name: 'Lafarge: intermediaries, unrelated entity names and false invoices'
+    year: '2022'
+    jurisdiction: United States / Syria
+    what_happened: Lafarge executives required intermediaries to create business entities with names not
+      obviously linked to them. They also 'created invoices with false descriptions of services rendered'
+      for an intermediary to submit to LCS, to hide payments to ISIS.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+    source_title: US DOJ, Lafarge guilty plea press release (Oct 2022)
   data_needed:
   - Company (incorporationDate, jurisdiction)
   - Representation (intermediary acting for principal)
@@ -632,11 +745,21 @@ indicators:
     url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
     quote: backdated
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A termination agreement with an intermediary was backdated to 18 August 2014, shortly after a UN Security
     Council resolution on ISIS and ANF (DOJ, 2022).
-  cases: []
+  cases:
+  - name: 'Lafarge: backdated termination agreement and personal email use'
+    year: '2022'
+    jurisdiction: United States / Syria
+    what_happened: To make it look as if an intermediary had stopped negotiating with ISIS after a UN
+      Security Council resolution, executives backdated the termination agreement to 18 August 2014. Many
+      executives used personal email addresses rather than corporate ones.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/lafarge-pleads-guilty-conspiring-provide-material-support-foreign-terrorist-organizations
+    source_title: US DOJ, Lafarge guilty plea press release (Oct 2022)
   data_needed:
   - Document (dates of creation vs. stated date)
   - Email (sender domains)
@@ -672,7 +795,7 @@ indicators:
     quote: direct or indirect support to public or private security forces who illegally control mine
       sites, transportation routes and upstream actors in the supply chain
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - 'UN Group of Experts annex 110: illegal taxation by FARDC in Misisi (S/2024/432).'
   cases: []
@@ -718,7 +841,7 @@ indicators:
     quote: We will not offer, promise, give or demand any bribes, and will resist the solicitation of
       bribes to conceal or disguise the origin of minerals
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
   cases: []
   data_needed:
@@ -759,7 +882,7 @@ indicators:
     quote: any forms of forced or compulsory labour, which means work or service which is exacted from
       any person under the menace of penalty and for which said person has not offered himself voluntarily
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: The economic interests of the Myanmar military (A/HRC/42/CRP.3)
     publisher: UN Independent International Fact-Finding Mission on Myanmar
     year: '2019'
@@ -769,10 +892,20 @@ indicators:
       violence, have been perpetrated by the Tatmadaw in mining areas, particularly in Kachin State, in
       connection with their business activities.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Tatmadaw jade and ruby mining areas in Kachin (UN FFM 2019).
-  cases: []
+  cases:
+  - name: Child labour in artisanal cobalt mining, DRC
+    year: '2016'
+    jurisdiction: DR Congo
+    what_happened: Amnesty International documented thousands of children mining cobalt by hand in DRC
+      artisanal mines. It described deep, accident-prone tunnels, no protective equipment and dangerous
+      cobalt exposure, and traced the cobalt into global brands' supply chains.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.amnesty.org/en/documents/afr62/3183/2016/en/
+    source_title: Amnesty International, 'This is what we die for' (AFR 62/3183/2016, 19 Jan 2016)
   data_needed:
   - Person (workers, ages)
   - Employment
@@ -814,7 +947,7 @@ indicators:
     quote: Gasabo Gold Refinery managers reported the absence of an established procedure for tracing
       the exact origin of gold delivered by customers to the refinery.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - 'Gasabo Gold Refinery, Kigali (S/2024/432): Group concluded due diligence policy revealed shortcomings.'
   cases: []
@@ -852,7 +985,7 @@ indicators:
     url: https://www.kimberleyprocess.com/en/what-kp
     quote: must be accompanied by a valid KP certificate, certifying that the diamonds are conflict-free
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Charles Taylor convicted (SCSL) for aiding and abetting RUF crimes in exchange for diamonds.
   cases: []
@@ -896,18 +1029,50 @@ indicators:
     quote: planning as well as aiding and abetting crimes committed by rebel forces in exchange for diamonds
       during the civil war
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: The Public Prosecutor v. Guus Kouwenhoven
     publisher: International Crimes Database (T.M.C. Asser Instituut)
     year: '2017'
     url: https://www.internationalcrimesdatabase.org/Case/3309/The-Public-Prosecutor-v-Guus-Kouwenhoven/
     quote: guilty for illegal trafficking of weapons and ammunitions and complicity in war crimes
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Charles Taylor (Liberia) and RUF diamonds.
   - Guus Kouwenhoven's logging companies used to import, store and distribute weapons for Taylor's regime.
-  cases: []
+  cases:
+  - name: Prosecutor v. Charles Taylor (SCSL)
+    year: '2012'
+    jurisdiction: Special Court for Sierra Leone
+    what_happened: The former Liberian president was convicted on 11 counts of aiding and abetting and
+      planning RUF war crimes and crimes against humanity, including pillage and use of child soldiers.
+      He was accused of supplying the RUF with weapons in exchange for diamonds. He was sentenced to 50
+      years, upheld on appeal in 2013.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Charles_Taylor_(Liberian_politician)
+    source_title: Wikipedia, 'Charles Taylor (Liberian politician)'
+  - name: Guus Kouwenhoven (Oriental Timber Corporation)
+    year: '2017'
+    jurisdiction: Netherlands
+    what_happened: The head of Liberia's main timber company, which was used as cover for arms smuggling
+      to Taylor's regime, was convicted in absentia on retrial in April 2017 of illegal arms trafficking
+      and complicity in war crimes. He was sentenced to 19 years, after an earlier acquittal had been
+      overturned by the Dutch Supreme Court.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Guus_Kouwenhoven
+    source_title: Wikipedia, 'Guus Kouwenhoven'
+  - name: Fowler Report on UNITA sanctions-busting
+    year: '2000'
+    jurisdiction: Angola (UN Security Council)
+    what_happened: A UN panel found that UNITA sold or bartered diamonds for cash or weapons, earning
+      at least $3.72bn in 1992-98 despite sanctions. It named states, companies and individuals involved,
+      including the de Deker brothers' arms-for-diamonds deals.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Fowler_Report
+    source_title: Wikipedia, 'Fowler Report'
   data_needed:
   - Company (logging/mining company)
   - Ownership / Directorship
@@ -955,10 +1120,20 @@ indicators:
       elected civilian oversight and provides financial support for the Tatmadaw's operations with their
       wide array of international human rights and humanitarian law violations.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - 'MEHL and MEC: 120 owned businesses and 27 closely affiliated (UN FFM 2019).'
-  cases: []
+  cases:
+  - name: 'UN Fact-Finding Mission on Myanmar: economic interests of the Tatmadaw (MEHL and MEC)'
+    year: '2019'
+    jurisdiction: Myanmar (UN Human Rights Council)
+    what_happened: The Mission mapped the military-owned conglomerates MEHL and MEC and their subsidiaries.
+      It concluded that business with them supports the Tatmadaw's financial capacity, the force the Mission
+      linked to atrocities against the Rohingya, and it called for targeted sanctions.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.ohchr.org/sites/default/files/Documents/HRBodies/HRCouncil/FFM-Myanmar/EconomicInterestsMyanmarMilitary/A_HRC_42_CRP_3.pdf
+    source_title: OHCHR, 'Economic interests of the Myanmar military' (A/HRC/42/CRP.3, Aug/Sept 2019)
   data_needed:
   - Ownership (owner, asset, percentage)
   - Directorship
@@ -1002,10 +1177,20 @@ indicators:
     quote: 15 foreign companies have joint ventures and at least 44 foreign companies have other forms
       of commercial ties with Tatmadaw businesses.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Foreign joint ventures with MEHL/MEC (UN FFM 2019).
-  cases: []
+  cases:
+  - name: Foreign joint ventures with MEHL and MEC
+    year: '2019'
+    jurisdiction: Myanmar (UN Human Rights Council)
+    what_happened: The Mission found that 14 foreign companies had joint ventures with Tatmadaw conglomerates
+      and at least 44 others had other commercial ties. It said any such business 'poses a high risk of
+      contributing to, or being linked to, violations'.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.ohchr.org/sites/default/files/Documents/HRBodies/HRCouncil/FFM-Myanmar/EconomicInterestsMyanmarMilitary/A_HRC_42_CRP_3.pdf
+    source_title: OHCHR, A/HRC/42/CRP.3 (2019)
   data_needed:
   - Ownership (joint venture shareholders)
   - Contract
@@ -1044,10 +1229,20 @@ indicators:
       donations that were solicited in September 2017 by senior Tatmadaw leadership in support of the
       "clearance operations" that began in August 2017 against the Rohingya in northern Rakhine.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Donations to the Tatmadaw, September 2017 (UN FFM 2019, Annex IV).
-  cases: []
+  cases:
+  - name: Company donations to the Tatmadaw during the 2017 'clearance operations'
+    year: '2019'
+    jurisdiction: Myanmar (UN Human Rights Council)
+    what_happened: The Mission found that at least 45 companies and organisations gave the Tatmadaw $6.15m
+      in donations. Senior military leaders solicited them in September 2017 to support the clearance
+      operations against the Rohingya.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.ohchr.org/sites/default/files/Documents/HRBodies/HRCouncil/FFM-Myanmar/EconomicInterestsMyanmarMilitary/A_HRC_42_CRP_3.pdf
+    source_title: OHCHR, A/HRC/42/CRP.3 (2019)
   data_needed:
   - Payment (payer, beneficiary, amount, date, purpose)
   - Event (operation dates)
@@ -1084,10 +1279,21 @@ indicators:
       northern Rakhine in furtherance of the Tatmadaw's objective of re-engineering the region in a way
       that erases evidence of Rohingya belonging in Myanmar
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - UEHRD projects in northern Rakhine (UN FFM 2019).
-  cases: []
+  cases:
+  - name: UEHRD development projects in northern Rakhine
+    year: '2019'
+    jurisdiction: Myanmar (UN Human Rights Council)
+    what_happened: The Mission found that private companies with enduring Tatmadaw links were financing
+      development projects in northern Rakhine under the UEHRD. It said these projects 'consolidate the
+      consequences' of crimes against the Rohingya, erase evidence of their belonging and block their
+      return.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.ohchr.org/sites/default/files/Documents/HRBodies/HRCouncil/FFM-Myanmar/EconomicInterestsMyanmarMilitary/A_HRC_42_CRP_3.pdf
+    source_title: OHCHR, A/HRC/42/CRP.3 (2019)
   data_needed:
   - Contract / ContractAward (authority, supplier)
   - Company
@@ -1129,10 +1335,31 @@ indicators:
       the Tatmadaw since 2016, after the Tatmadaw's dismal human rights record was widely and publicly
       known.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Arms suppliers to the Tatmadaw (UN FFM 2019, Annex VI).
-  cases: []
+  cases:
+  - name: 'Frans van Anraat: chemical precursors supplied to Saddam Hussein''s Iraq'
+    year: '2005'
+    jurisdiction: Netherlands
+    what_happened: From 1984, a Dutch businessman supplied thousands of tons of chemicals, including raw
+      materials for mustard and nerve gas, to Iraq. He was convicted of complicity in war crimes (sentence
+      raised to 17 years on appeal in 2007, then set at 16.5 years by the Supreme Court). He was acquitted
+      of complicity in genocide.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Frans_van_Anraat
+    source_title: Wikipedia, 'Frans van Anraat'
+  - name: Arms and dual-use suppliers to the Tatmadaw
+    year: '2019'
+    jurisdiction: Myanmar (UN Human Rights Council)
+    what_happened: The Mission found that at least 14 foreign companies from seven states had supplied
+      arms to the Tatmadaw since 2016, and that seven private firms supplied or tried to supply dual-use
+      technology. It said many knew or should have known the human rights risk.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.ohchr.org/sites/default/files/Documents/HRBodies/HRCouncil/FFM-Myanmar/EconomicInterestsMyanmarMilitary/A_HRC_42_CRP_3.pdf
+    source_title: OHCHR, A/HRC/42/CRP.3 (2019)
   data_needed:
   - Contract
   - Payment
@@ -1176,7 +1403,7 @@ indicators:
     quote: Conscripting or enlisting children under the age of fifteen years into the national armed forces
       or using them to participate actively in hostilities
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Final report of the Group of Experts on the DRC (S/2024/432)
     publisher: United Nations Security Council
     year: '2024'
@@ -1184,10 +1411,28 @@ indicators:
     locator: Summary
     quote: All armed actors recruited and used children in hostilities on an unprecedented scale.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Thomas Lubanga Dyilo convicted by the ICC (2012).
-  cases: []
+  cases:
+  - name: Prosecutor v. Thomas Lubanga Dyilo
+    year: '2012'
+    jurisdiction: International Criminal Court (DR Congo)
+    what_happened: Lubanga was convicted of the war crimes of enlisting and conscripting children under
+      15 and using them in hostilities. He was sentenced to 14 years, upheld on appeal in December 2014.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.icc-cpi.int/drc/lubanga
+    source_title: ICC case page, The Prosecutor v. Thomas Lubanga Dyilo
+  - name: Prosecutor v. Bosco Ntaganda
+    year: '2019'
+    jurisdiction: International Criminal Court (DR Congo)
+    what_happened: Ntaganda was convicted on all 18 counts, including recruitment of child soldiers, and
+      sentenced to 30 years. The conviction was confirmed on appeal on 30 March 2021.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Bosco_Ntaganda
+    source_title: Wikipedia, 'Bosco Ntaganda'
   data_needed:
   - Person (age, birthDate)
   - Membership / Employment in armed group
@@ -1228,7 +1473,7 @@ indicators:
       or charitable purposes, historic monuments, hospitals and places where the sick and wounded are
       collected, provided they are not military objectives
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: UN Security Council Resolution 2199 (2015)
     publisher: United Nations Security Council
     year: '2015'
@@ -1238,11 +1483,21 @@ indicators:
       whether such destruction is incidental or deliberate, including targeted destruction of religious
       sites and objects
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - 'Ahmad Al Faqi Al Mahdi: destruction of historical and religious monuments in Timbuktu, 2012 (ICC,
     convicted).'
-  cases: []
+  cases:
+  - name: Prosecutor v. Ahmad Al Faqi Al Mahdi (Timbuktu)
+    year: '2016'
+    jurisdiction: International Criminal Court (Mali)
+    what_happened: Al Mahdi admitted guilt and was convicted of the war crime of intentionally attacking
+      historic and religious monuments in Timbuktu (30 June to 11 July 2012). He was sentenced to 9 years,
+      and a reparations order followed.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.icc-cpi.int/mali/al-mahdi
+    source_title: ICC case page, The Prosecutor v. Al Mahdi
   data_needed:
   - Event (date, location, involved)
   - Image / Video (before/after, satellite)
@@ -1284,10 +1539,28 @@ indicators:
     locator: Art. 8(2)(b)(xvi) and 8(2)(e)(v)
     quote: Pillaging a town or place, even when taken by assault
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Wazalendo groups 'looting, extorting, kidnapping and murdering civilians' (S/2024/432 summary).
-  cases: []
+  cases:
+  - name: Prosecutor v. Germain Katanga (Bogoro attack)
+    year: '2014'
+    jurisdiction: International Criminal Court (DR Congo)
+    what_happened: Katanga was convicted as an accessory to murder (a crime against humanity) and to war
+      crimes including pillaging, destruction of property and attacks on civilians, all in the 24 February
+      2003 attack on Bogoro. He was sentenced to 12 years.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.icc-cpi.int/drc/katanga
+    source_title: ICC case page, The Prosecutor v. Germain Katanga
+  - name: Prosecutor v. Charles Taylor (pillage count)
+    year: '2012'
+    jurisdiction: Special Court for Sierra Leone
+    what_happened: Taylor's convictions for aiding and abetting RUF crimes included pillage.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Charles_Taylor_(Liberian_politician)
+    source_title: Wikipedia, 'Charles Taylor (Liberian politician)'
   data_needed:
   - Event
   - Asset / Payment (proceeds)
@@ -1326,10 +1599,20 @@ indicators:
       committed as part of a widespread or systematic attack directed against any civilian population,
       with knowledge of the attack
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - 'Anwar R., Koblenz Higher Regional Court, 2022: crimes against humanity at al-Khatib Branch 251.'
-  cases: []
+  cases:
+  - name: Anwar Raslan (Koblenz, Al-Khatib Branch 251)
+    year: '2022'
+    jurisdiction: Germany (universal jurisdiction)
+    what_happened: A former Syrian intelligence officer was convicted of crimes against humanity (killing,
+      torture, severe deprivation of liberty, rape and sexual coercion), including 27 counts of murder.
+      He was sentenced to life, and the Federal Court of Justice upheld it in August 2024.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Anwar_Raslan
+    source_title: Wikipedia, 'Anwar Raslan'
   data_needed:
   - Event (date, location, victims)
   - Person (victims, perpetrators)
@@ -1367,10 +1650,22 @@ indicators:
       late spring 2011 on provides key evidence of the systematic and extensive killing of those arrested
       in the intelligence services' prisons.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - 'Caesar files: 26,938 image files depicting 6,821 people (Koblenz judgment).'
-  cases: []
+  cases:
+  - name: Caesar photographs and the Koblenz trial
+    year: '2022'
+    jurisdiction: Syria / Germany
+    what_happened: About 55,000 images of roughly 11,000 detainees who died in custody showed numbered
+      bodies, many emaciated or with signs of torture. The reference numbers were tied to security branches
+      and to hospital records. Former prosecutors with forensic experts authenticated them, and HRW corroborated
+      them in 2015. The Koblenz trial that convicted Anwar Raslan of crimes against humanity relied mostly
+      on Caesar Report data.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Caesar_Report
+    source_title: Wikipedia, 'Caesar Report'
   data_needed:
   - Image (contentHash, date)
   - Person (victim)
@@ -1407,9 +1702,19 @@ indicators:
       by a refusal to acknowledge that deprivation of freedom or to give information on the fate or whereabouts
       of those persons'
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
-  cases: []
+  cases:
+  - name: Trial of the Juntas (Argentina)
+    year: '1985'
+    jurisdiction: Argentina
+    what_happened: The former junta leaders were tried for kidnapping, torture, forced disappearance and
+      murder during the Dirty War. CONADEP had documented 8,960 cases of forced disappearance. Videla
+      and Massera were sentenced to life and three others convicted, while four defendants were acquitted.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Trial_of_the_Juntas
+    source_title: Wikipedia, 'Trial of the Juntas'
   data_needed:
   - Person (missing)
   - Event (arrest)
@@ -1445,10 +1750,20 @@ indicators:
       concerned by expulsion or other coercive acts from the area in which they are lawfully present,
       without grounds permitted under international law'
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Rohingya 'clearance operations' from August 2017 (UN FFM 2019).
-  cases: []
+  cases:
+  - name: Prosecutor v. Šainović et al. (Kosovo)
+    year: '2009'
+    jurisdiction: ICTY
+    what_happened: Former Yugoslav deputy prime minister Nikola Šainović was convicted of crimes against
+      humanity and war crimes, including deportation and forcible transfer of Kosovo Albanian civilians
+      in 1999. He was sentenced to 22 years, reduced to 18 on appeal in 2014.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Nikola_%C5%A0ainovi%C4%87
+    source_title: Wikipedia, 'Nikola Šainović'
   data_needed:
   - Event
   - Address
@@ -1486,9 +1801,20 @@ indicators:
       indispensable to their survival, including wilfully impeding relief supplies as provided for under
       the Geneva Conventions
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
-  cases: []
+  cases:
+  - name: Siege of Eastern Ghouta (UN Commission of Inquiry on Syria)
+    year: '2018'
+    jurisdiction: Syria (UN Human Rights Council)
+    what_happened: The Commission reported that Syrian forces blocked access roads and systematically
+      confiscated food, fuel and medicine at checkpoints, with denial of food used as a military strategy
+      from 2013. In June 2018 it concluded that siege-related crimes, including deliberate starvation
+      of civilians, amounted to crimes against humanity.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Siege_of_Eastern_Ghouta
+    source_title: Wikipedia, 'Siege of Eastern Ghouta' (citing A/HRC/25/65 and A/HRC/37/72)
   data_needed:
   - Event
   - Vehicle (convoys)
@@ -1523,9 +1849,20 @@ indicators:
     locator: Chapter VI, para. 187 (Content analysis)
     quote: These include circular reporting, decontextualization of information and misinterpretation.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
-  cases: []
+  cases:
+  - name: 'Al-Ahli Arab Hospital explosion: misattributed videos'
+    year: '2023'
+    jurisdiction: Gaza / Israel
+    what_happened: A Channel 12 video from Netivot was first presented as showing the rocket that caused
+      the blast. The New York Times found it showed an Israeli interceptor launch and an unrelated explosion
+      more than 20 seconds earlier. The AP later corrected its reliance on a 'key' video, and a CCTV clip
+      cited as evidence showed a different explosion.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Al-Ahli_Arab_Hospital_explosion
+    source_title: Wikipedia, 'Al-Ahli Arab Hospital explosion'
   data_needed:
   - Image / Video (contentHash, sourceUrl, publishedAt)
   - Document (reverse-image search results)
@@ -1563,9 +1900,19 @@ indicators:
     quote: Where metadata have been stripped, open source researchers should seek other ways to verify
       an item.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
-  cases: []
+  cases:
+  - name: 'Al-Ahli Arab Hospital explosion: timestamp and audio inconsistencies'
+    year: '2023'
+    jurisdiction: Gaza / Israel
+    what_happened: An IDF-linked video was found to carry timestamps at least 40 minutes after the blast,
+      and the post was later edited. Channel 4 and Earshot reported that an IDF-released audio recording
+      had been edited to combine two separately recorded channels.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Al-Ahli_Arab_Hospital_explosion
+    source_title: Wikipedia, 'Al-Ahli Arab Hospital explosion'
   data_needed:
   - Image / Video / Document (contentHash, date, author, generator)
   checkable: records
@@ -1599,7 +1946,7 @@ indicators:
       a piece of information or evidence, and documentation of the control, date and time, transfer, analysis
       and disposition of any such evidence.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
   cases: []
   data_needed:
@@ -1637,9 +1984,19 @@ indicators:
     quote: In considering the independence of sources, examine whether they may be associated with relevant
       entities (e.g. parties to a conflict).
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
-  cases: []
+  cases:
+  - name: 'Al-Ahli Arab Hospital explosion: casualty claims from a party to the conflict'
+    year: '2023'
+    jurisdiction: Gaza / Israel
+    what_happened: Early figures came from the Hamas-run Gaza Health Ministry and were never independently
+      verified. HRW called the reported death-to-injury ratio unusually high. The New York Times published
+      an Editors' Note saying its coverage 'relied too heavily on claims by Hamas'.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Al-Ahli_Arab_Hospital_explosion
+    source_title: Wikipedia, 'Al-Ahli Arab Hospital explosion'
   data_needed:
   - Person / Organization (source)
   - Associate / Membership
@@ -1679,11 +2036,21 @@ indicators:
     quote: External corroboration is provided by information that lies outside a digital item itself but
       that coincides with and thus supports the veracity of the item's content.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - MH17 judgment relied on photographs and videos of a Buk TELAR, intercepted calls, mast data and satellite
     images together (District Court of The Hague, 2022).
-  cases: []
+  cases:
+  - name: 'Al-Ahli Arab Hospital explosion: cause not independently established'
+    year: '2023'
+    jurisdiction: Gaza / Israel
+    what_happened: HRW (Nov 2023) said an Israeli airstrike was 'highly unlikely', but there was no independent
+      site access, shrapnel was reportedly removed, and trajectory and crater analyses were disputed by
+      the WSJ, NYT, Le Monde, Washington Post and Forensic Architecture. The cause remains unconfirmed.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Al-Ahli_Arab_Hospital_explosion
+    source_title: Wikipedia, 'Al-Ahli Arab Hospital explosion'
   data_needed:
   - Image / Video
   - Address (geocoded)
@@ -1720,7 +2087,7 @@ indicators:
     locator: s. 2.8, p. 3
     quote: The antiquity is presented with very limited or no documentation or provenance.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: UN Security Council Resolution 2347 (2017)
     publisher: United Nations Security Council
     year: '2017'
@@ -1728,7 +2095,7 @@ indicators:
     locator: para. 8
     quote: which lack clearly documented and certified provenance
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: ICOM Code of Ethics for Museums
     publisher: International Council of Museums
     url: https://icom.museum/wp-content/uploads/2018/07/ICOM-code-En-web.pdf
@@ -1736,11 +2103,32 @@ indicators:
     quote: Due diligence in this regard should establish the full history of the item since discovery
       or production.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - 'Michael Steinhardt reportedly said: "There''s no provenance for it. If I see a piece and I like it,
     then I buy it." (OCCRP on Manhattan DA case, 2021).'
-  cases: []
+  cases:
+  - name: Hobby Lobby Iraqi artifacts
+    year: '2017'
+    jurisdiction: United States (E.D.N.Y.)
+    what_happened: In December 2010, Hobby Lobby agreed to buy more than 5,500 Iraqi artifacts for $1.6m
+      from dealers. Many lacked documented ownership history. Hobby Lobby consented to forfeiture and
+      paid $3m.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-edny/pr/united-states-files-civil-action-forfeit-thousands-ancient-iraqi-artifacts-imported
+    source_title: US DOJ (EDNY), civil action to forfeit Iraqi artifacts imported by Hobby Lobby (5 July
+      2017)
+  - name: Michael Steinhardt antiquities surrender
+    year: '2021'
+    jurisdiction: United States (New York)
+    what_happened: Steinhardt surrendered 180 stolen antiquities worth about $70m, acquired from dealers
+      including Giacomo Medici and Robert Hecht, and accepted a lifetime ban on acquiring antiquities.
+      In exchange, the grand jury investigation was dismissed.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Michael_Steinhardt
+    source_title: Wikipedia, 'Michael Steinhardt' (citing the Manhattan DA and the Statement of Facts)
   data_needed:
   - Asset (object) with description
   - Document (provenance records, export licences, invoices)
@@ -1777,9 +2165,21 @@ indicators:
     locator: s. 2.4, p. 2
     quote: Of particular concern are references that lack specificity, like "private collection."
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
-  cases: []
+  cases:
+  - name: Gilgamesh Dream Tablet
+    year: '2021'
+    jurisdiction: United States (E.D.N.Y.)
+    what_happened: The tablet was sold in 2007 with a false provenance letter saying it had been in a
+      box of miscellaneous bronze fragments bought at a 1981 auction. The letter travelled with it through
+      several sales until a London auction house sold it to Hobby Lobby in 2014. The court ordered forfeiture,
+      with Hobby Lobby's consent.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/rare-cuneiform-tablet-bearing-portion-epic-gilgamesh-forfeited-united-states
+    source_title: US DOJ, 'Rare cuneiform tablet bearing portion of Epic of Gilgamesh forfeited to the
+      United States' (July 2021)
   data_needed:
   - Document (catalogues, exhibition records)
   - Ownership
@@ -1811,9 +2211,19 @@ indicators:
     locator: s. 2.8, p. 3
     quote: Contradictory or inconsistent information about the same object.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
-  cases: []
+  cases:
+  - name: 'Gilgamesh Dream Tablet: conflicting histories'
+    year: '2021'
+    jurisdiction: United States (E.D.N.Y.)
+    what_happened: The 1981 auction account in the provenance letter conflicts with the DOJ's account.
+      According to the DOJ, a dealer bought the tablet in 2003, 'encrusted with dirt and unreadable',
+      and shipped it to the US undeclared, and it was identified as Gilgamesh only after cleaning.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/rare-cuneiform-tablet-bearing-portion-epic-gilgamesh-forfeited-united-states
+    source_title: US DOJ Gilgamesh forfeiture press release (July 2021)
   data_needed:
   - Document (multiple)
   - Asset
@@ -1847,7 +2257,7 @@ indicators:
     quote: Documentation for the object (e.g. authorisation, export licenses, provenance documents) appears
       to be false.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: U.S. Attorney Announces $12 Million Settlement Of Civil Forfeiture Action Against Estate Of
       Antiquities Trafficker
     publisher: US Attorney's Office, SDNY
@@ -1855,10 +2265,30 @@ indicators:
     url: https://www.justice.gov/usao-sdny/pr/us-attorney-announces-12-million-settlement-civil-forfeiture-action-against-estate
     quote: primarily by creating false provenance documents and falsifying invoices and shipping documents
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Douglas Latchford (alleged; indictment dismissed on his death; estate settled for $12 million in 2023).
-  cases: []
+  cases:
+  - name: 'Gilgamesh Dream Tablet: false provenance letter'
+    year: '2021'
+    jurisdiction: United States (E.D.N.Y.)
+    what_happened: The DOJ stated that the 1981 provenance letter supplied in 2007 was false. The tablet
+      was forfeited.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/rare-cuneiform-tablet-bearing-portion-epic-gilgamesh-forfeited-united-states
+    source_title: US DOJ Gilgamesh forfeiture press release (July 2021)
+  - name: Subhash Kapoor (Art of the Past)
+    year: '2022'
+    jurisdiction: India (Tamil Nadu); United States (Manhattan DA indictment pending)
+    what_happened: An Indian court convicted Kapoor in November 2022 of dishonestly receiving and dealing
+      in stolen property and of criminal conspiracy over idols stolen from Tamil Nadu temples. The Manhattan
+      DA separately alleges, in an indictment not yet tried, that he supplied stolen objects with fraudulent
+      ownership documents.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Subhash_Kapoor_(art_dealer)
+    source_title: Wikipedia, 'Subhash Kapoor (art dealer)'
   data_needed:
   - Document (licence numbers, stamps, issuing authority)
   - Asset
@@ -1897,10 +2327,20 @@ indicators:
     quote: Indication of recent presence in an active conflict zone where excavation or export permission
       would have bene unlikely under the circumstances.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - 'Steinhardt case: a bull''s-head statue traced to Lebanon, taken during the civil war (OCCRP, 2021).'
-  cases: []
+  cases:
+  - name: Hobby Lobby Iraqi artifacts bought in 2010
+    year: '2017'
+    jurisdiction: United States / Iraq
+    what_happened: In 2010, while Iraq was still in armed conflict, Hobby Lobby bought thousands of artifacts
+      from modern-day Iraq that were smuggled through the UAE and Israel. Its own cultural property expert
+      warned they might have been looted from Iraqi archaeological sites.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-edny/pr/united-states-files-civil-action-forfeit-thousands-ancient-iraqi-artifacts-imported
+    source_title: US DOJ (EDNY) Hobby Lobby forfeiture press release (5 July 2017)
   data_needed:
   - Asset
   - Address (findspot, transit)
@@ -1943,11 +2383,21 @@ indicators:
     quote: illegally removed from Iraq since 6 August 1990 and from Syria since 15 March 2011, including
       by prohibiting cross-border trade in such items
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - 'Hobby Lobby: about 5,500 artifacts (cuneiform tablets, cylinder seals, bullae) of Iraqi origin; settled
     2017.'
-  cases: []
+  cases:
+  - name: Hobby Lobby Iraqi cuneiform tablets and bullae
+    year: '2017'
+    jurisdiction: United States / Iraq
+    what_happened: Thousands of cuneiform tablets and clay bullae from modern-day Iraq were shipped to
+      the US in 2010-11, long after the 6 August 1990 cut-off. They were forfeited under a settlement
+      that included a $3m payment.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-edny/pr/united-states-files-civil-action-forfeit-thousands-ancient-iraqi-artifacts-imported
+    source_title: US DOJ (EDNY) Hobby Lobby forfeiture press release (5 July 2017)
   data_needed:
   - Asset (object, origin)
   - Document (export date evidence)
@@ -1989,7 +2439,7 @@ indicators:
     url: https://www.justice.gov/usao-edny/pr/united-states-files-civil-action-forfeit-thousands-ancient-iraqi-artifacts-imported
     quote: falsely declared that the Artifacts' country of origin was Turkey
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and Terrorist Financing in the Art and Antiquities Market
     publisher: FATF
     year: '2023'
@@ -1997,10 +2447,19 @@ indicators:
     locator: Annex A, p. 45
     quote: Imported or exported items not declared to the relevant customs administration(s).
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Hobby Lobby packages labelled 'clay tiles (sample)' and declared from Turkey and Israel (EDNY, 2017).
-  cases: []
+  cases:
+  - name: Hobby Lobby shipments labelled as tile samples
+    year: '2017'
+    jurisdiction: United States
+    what_happened: Shipments were described as 'ceramic tiles' or 'clay tiles (sample)'. Five intercepted
+      packages falsely declared Turkey as the country of origin, and a later one falsely declared Israel.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-edny/pr/united-states-files-civil-action-forfeit-thousands-ancient-iraqi-artifacts-imported
+    source_title: US DOJ (EDNY) Hobby Lobby forfeiture press release (5 July 2017)
   data_needed:
   - Document (customs declarations, shipping labels)
   - Asset
@@ -2038,7 +2497,7 @@ indicators:
     locator: s. 2.8, p. 3
     quote: Payment requests in currency or jurisdictions with no apparent connection to the transaction.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: United States Files Civil Action To Forfeit Thousands Of Ancient Iraqi Artifacts Imported By
       Hobby Lobby
     publisher: US Attorney's Office, EDNY
@@ -2047,10 +2506,19 @@ indicators:
     quote: wired payment for the Artifacts to seven personal bank accounts held in the names of other
       individuals
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Hobby Lobby payments to seven personal accounts (EDNY, 2017).
-  cases: []
+  cases:
+  - name: Hobby Lobby payments to seven personal accounts
+    year: '2017'
+    jurisdiction: United States / UAE
+    what_happened: On a second dealer's instructions, Hobby Lobby paid for the artifacts by wiring money
+      to seven personal bank accounts held by other individuals.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-edny/pr/united-states-files-civil-action-forfeit-thousands-ancient-iraqi-artifacts-imported
+    source_title: US DOJ (EDNY) Hobby Lobby forfeiture press release (5 July 2017)
   data_needed:
   - Payment (payer, beneficiary, beneficiary account, currency)
   - BankAccount
@@ -2088,7 +2556,7 @@ indicators:
     quote: Presence of natural or legal persons known to be involved in, or suspected of, trafficking
       in cultural objects.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Antiquities Transaction Due Diligence Toolkit (Annex)
     publisher: Responsible Art Market Initiative
     url: https://kernochan.law.columbia.edu/sites/default/files/content/Symposium%20March%201/Anquities%20Supplement%20to%20Due%20Diligence%20Toolkit%20(4873-9119-0428.1)_VF.pdf
@@ -2096,11 +2564,41 @@ indicators:
     quote: A seller or intermediary who has been reported frequently in connection with unauthorized excavation
       or cultural property sales.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Subhash Kapoor convicted (Kumbakonam, 2022); 235 of 307 artifacts repatriated to India by the Manhattan
     DA related to his dealings (Hyperallergic).
-  cases: []
+  cases:
+  - name: Giacomo Medici
+    year: '2004'
+    jurisdiction: Italy
+    what_happened: A Rome court convicted antiquities dealer Medici, sentencing him to 10 years and a
+      €10m fine. This followed the 1995 raid on his Geneva Freeport premises, where thousands of photographs
+      of objects were found.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Giacomo_Medici_(art_dealer)
+    source_title: Wikipedia, 'Giacomo Medici (art dealer)'
+  - name: Subhash Kapoor
+    year: '2022'
+    jurisdiction: India
+    what_happened: Convicted in Tamil Nadu of receiving and dealing in stolen idols and of conspiracy.
+      He is linked to a smuggling operation worth about $100m that sold temple objects to museums worldwide,
+      and he still faces a Manhattan indictment.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Subhash_Kapoor_(art_dealer)
+    source_title: Wikipedia, 'Subhash Kapoor (art dealer)'
+  - name: Michael Steinhardt's purchases from Medici and Hecht
+    year: '2021'
+    jurisdiction: United States (New York)
+    what_happened: The Manhattan DA's Statement of Facts said Steinhardt acquired stolen antiquities from
+      named traffickers, including Giacomo Medici and Robert Hecht. He surrendered 180 objects under an
+      agreement.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Michael_Steinhardt
+    source_title: Wikipedia, 'Michael Steinhardt'
   data_needed:
   - Person / Company
   - Sanction / court records
@@ -2137,7 +2635,7 @@ indicators:
     locator: s. 2.8, p. 3
     quote: Suspiciously low price, or price out of line with the market segment.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and Terrorist Financing in the Art and Antiquities Market
     publisher: FATF
     year: '2023'
@@ -2145,7 +2643,7 @@ indicators:
     locator: Annex A, p. 45
     quote: Unusually high profit margins on the sale of an item of art, antiquity or other cultural objects.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
   cases: []
   data_needed:
@@ -2188,9 +2686,18 @@ indicators:
     quote: Sales or purchases of art where a client is not familiar with, or interested in, the provenance,
       history, style, genre, or artist of an object.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
-  cases: []
+  cases:
+  - name: 'Hobby Lobby: did not meet the purported owner'
+    year: '2017'
+    jurisdiction: United States
+    what_happened: Hobby Lobby went ahead with the $1.6m purchase without meeting or communicating with
+      the purported owner of the artifacts, despite its own expert's looting warning.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-edny/pr/united-states-files-civil-action-forfeit-thousands-ancient-iraqi-artifacts-imported
+    source_title: US DOJ (EDNY) Hobby Lobby forfeiture press release (5 July 2017)
   data_needed:
   - Document (correspondence)
   - Payment
@@ -2227,9 +2734,21 @@ indicators:
     quote: Use of shell companies, trusts, or third-party intermediaries, including art dealers, brokers,
       advisers, or interior designers, to purchase, hold, or sell cultural objects.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
-  cases: []
+  cases:
+  - name: Rotenberg art purchases after US sanctions (Senate PSI)
+    year: '2020'
+    jurisdiction: United States
+    what_happened: A Senate Permanent Subcommittee on Investigations report found that companies linked
+      to the sanctioned Rotenberg brothers spent more than $18m on art in May-November 2014. The money
+      was traced through shell companies, and purchases were made through Moscow art adviser Gregory Baltser's
+      firm, including at Sotheby's.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.theartnewspaper.com/2020/07/30/senate-investigation-finds-art-market-secrecy-allowed-russian-billionaire-brothers-friends-of-putin-to-evade-government-sanctions
+    source_title: The Art Newspaper, 'Senate investigation finds art market secrecy allowed Russian billionaire
+      brothers... to evade government sanctions' (30 July 2020)
   data_needed:
   - Company (jurisdiction, incorporationDate)
   - Ownership
@@ -2272,7 +2791,7 @@ indicators:
     locator: Annex A, p. 45
     quote: Cash transactions, in particular using large bulks of cash.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
   cases: []
   data_needed:
@@ -2308,7 +2827,7 @@ indicators:
     quote: Unwillingness of a customer to provide identification information to receive an art-collateralized
       loan, or early repayment or use of cash to pay such a loan.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
   cases: []
   data_needed:
@@ -2348,7 +2867,7 @@ indicators:
       for the loss, theft, or destruction of privately held or donated high-value art in circumstances
       where other information has suggested the art has a low value.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
   cases: []
   data_needed:
@@ -2384,7 +2903,7 @@ indicators:
     url: https://atharproject.org/reportsAndPublications/facebooks-black-market-in-antiquities
     quote: 36% of posts offering artifacts have identifiable locations in conflict zones.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and Terrorist Financing in the Art and Antiquities Market
     publisher: FATF
     year: '2023'
@@ -2392,11 +2911,21 @@ indicators:
     locator: Annex A, p. 45 (indicator text was cut off in the copy reached)
     quote: Use of social media or financial intermediaries to advertise cultural objects
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - 'ATHAR: 95 Arabic Facebook groups with 1,947,195 members; participants included individuals associated
     with Hay''at Tahrir al-Sham (alleged in reporting).'
-  cases: []
+  cases:
+  - name: Facebook's black market in antiquities (ATHAR Project)
+    year: '2019'
+    jurisdiction: Middle East and North Africa (online)
+    what_happened: Researchers analysed 95 Arabic-language Facebook groups with about 1.95 million members.
+      In the Syria case study, 36% of posts offering artifacts had locations in conflict zones and 44%
+      in bordering countries. Large objects were offered in situ, before excavation.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://atharproject.org/report2019/
+    source_title: ATHAR Project, 'Facebook's black market in antiquities' (2019)
   data_needed:
   - UserAccount
   - Image (posts)
@@ -2436,7 +2965,7 @@ indicators:
     quote: analysis of materials and condition can yield important information that rules out authenticity
       or give clues to other concerns related to excavation. (e.g., damage, or soil).
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: ICOM Code of Ethics for Museums
     publisher: International Council of Museums
     url: https://icom.museum/wp-content/uploads/2018/07/ICOM-code-En-web.pdf
@@ -2445,9 +2974,19 @@ indicators:
       involved unauthorised or unscientific fieldwork, or intentional destruction or damage of monuments,
       archaeological or geological sites
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
-  cases: []
+  cases:
+  - name: Giacomo Medici archive photographs
+    year: '2004'
+    jurisdiction: Italy
+    what_happened: Thousands of photographs seized at Medici's Geneva Freeport premises showed objects
+      from the moment they came out of the ground through to their reconstructed state at sale. This evidence
+      led to his 2004 conviction in Rome.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://en.wikipedia.org/wiki/Giacomo_Medici_(art_dealer)
+    source_title: Wikipedia, 'Giacomo Medici (art dealer)'
   data_needed:
   - Asset
   - Image
@@ -2481,7 +3020,7 @@ indicators:
     locator: s. 2.4, p. 2
     quote: Databases of lost and stolen art should be checked
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
   cases: []
   data_needed:
@@ -2521,7 +3060,7 @@ indicators:
     locator: Arts 4(1), 5(1) and Annex Parts B-C
     quote: The import of the cultural goods listed in Part C of the Annex shall require an importer statement.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples: []
   cases: []
   data_needed:
@@ -2562,7 +3101,7 @@ indicators:
     url: https://www.justice.gov/usao-dc/pr/united-states-files-complaint-seeking-forfeiture-antiquities-associated-islamic-state
     quote: excavation permits and receipts of collections written on ISIL letterhead
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: UN Security Council Resolution 2199 (2015)
     publisher: United Nations Security Council
     year: '2015'
@@ -2572,7 +3111,7 @@ indicators:
       cultural heritage items from archaeological sites, museums, libraries, archives, and other sites
       in Iraq and Syria
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Abu Sayyaf raid records (May 2015), forfeiture complaint (alleged, 2016).
   cases: []
@@ -2613,10 +3152,21 @@ indicators:
     url: https://www.justice.gov/usao-edny/pr/united-states-files-civil-action-forfeit-thousands-ancient-iraqi-artifacts-imported
     quote: carries a risk that such objects may have been looted from archaeological sites in Iraq
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Hobby Lobby received this warning in October 2010 (EDNY, 2017).
-  cases: []
+  cases:
+  - name: Hobby Lobby ignored its expert's looting warning
+    year: '2017'
+    jurisdiction: United States
+    what_happened: In October 2010, a cultural property expert retained by Hobby Lobby warned that the
+      objects might have been looted from Iraqi sites and that improper origin declarations could lead
+      to seizure. Hobby Lobby went ahead with the purchase in December 2010 without meeting the purported
+      owner.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-edny/pr/united-states-files-civil-action-forfeit-thousands-ancient-iraqi-artifacts-imported
+    source_title: US DOJ (EDNY) Hobby Lobby forfeiture press release (5 July 2017)
   data_needed:
   - Document (memos, emails)
   - Email
@@ -2633,6 +3183,2687 @@ indicators:
   innocent_explanations:
   - Warnings may be followed by due diligence that resolves the concern.
   jurisdictions: Global
+  version: 1
+- id: HR-060
+  name: Emergency laws or extraordinary security measures that erode fundamental rights
+  definition: The government imposes emergency powers or special security rules that strip away basic
+    rights, which the UN treats as a sign that the ground is being prepared for atrocity crimes.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 7 (enabling circumstances or preparatory action)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (transmitted as A/70/741-S/2016/71)
+    publisher: United Nations Secretary-General / Office on Genocide Prevention and the Responsibility
+      to Protect
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 7, para. 36(a), p. 12
+    quote: (a) Imposition of emergency laws or extraordinary security measures that erode fundamental
+      rights;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A decree suspends habeas corpus in one region only
+  - 'A curfew and ban on gatherings applied only to one ethnic or religious group (Myanmar FFM, para.
+    28: restrictions ''applied in a discriminatory manner against the Rohingya'')'
+  cases: []
+  data_needed:
+  - Document (title, publisher, date, sourceUrl) for the decree or law
+  - PublicBody (name, jurisdiction) that issued it
+  - Event (name, startDate, endDate, location) for the period of emergency
+  - Address / location the measure covers
+  checkable: lookups
+  lookup_sources:
+  - Official gazettes and legislation databases
+  - UN treaty body derogation notices (ICCPR art. 4 notifications)
+  - News archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine natural disaster, epidemic or terrorist attack requiring temporary measures
+  - Measures that are time-limited, proportionate and notified to UN bodies
+  - Routine renewal of long-standing security legislation
+  jurisdictions: Any country (UN Framework applies worldwide)
+  version: 1
+- id: HR-061
+  name: Suspension of, or interference with, vital state institutions, especially if a protected group
+    loses representation
+  definition: Courts, parliament, electoral bodies or other key institutions are suspended, packed or
+    reshaped in a way that shifts power and shuts a protected group out.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 7
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 7, para. 36(b), p. 12
+    quote: (b) Suspension of or interference with vital State institutions, or measures that result in
+      changes in their composition or balance of power, particularly if this results in the exclusion
+      or lack of representation of protected groups;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Dissolution of a constitutional court
+  - Mass dismissal of judges or officials from one group
+  cases: []
+  data_needed:
+  - PublicBody (name, jurisdiction)
+  - Position and Occupancy (holder, post, startDate, endDate) for officials removed or appointed
+  - Person (name, ethnicity where recorded in sources, nationality)
+  - Document (decree, date)
+  checkable: lookups
+  lookup_sources:
+  - Official gazettes
+  - Government appointment registers
+  - News archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful institutional reform or restructuring
+  - Elections changing the composition of parliament
+  - Court-ordered removal of officials for misconduct
+  jurisdictions: Any country
+  version: 1
+- id: HR-062
+  name: Security forces strengthened, reorganised, mobilised or suddenly deployed against a protected
+    group
+  definition: Troops, police or security units are built up, reorganised or moved into an area in a way
+    aimed at a particular group or civilian population.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 7, 8 and 12 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 7, para. 36(c), p. 12
+    quote: (c) Strengthening of the security apparatus, its reorganization or mobilization against protected
+      groups, populations or individuals;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 8, para. 38(a), p. 13; Risk factor 12, para. 48(g), p. 18
+    quote: (a) Sudden deployment of security forces or commencement of armed hostilities;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Airlift of light infantry divisions into one region weeks before 'clearance operations' (Myanmar,
+    2017)
+  cases:
+  - name: Myanmar - troop build-up before August 2017 operations in northern Rakhine
+    year: '2018'
+    jurisdiction: Myanmar (UN Human Rights Council fact-finding mission)
+    what_happened: The UN fact-finding mission found a large build-up of troops and equipment across northern
+      Rakhine from early August 2017, and said the logistical planning it required indicated the operations
+      that followed were foreseen and planned.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/api/symbol/access?s=A/HRC/39/64&l=en&t=pdf
+    source_title: Report of the independent international fact-finding mission on Myanmar (A/HRC/39/64),
+      para. 48
+  data_needed:
+  - Organization / PublicBody (military unit, police force)
+  - Event (name, date, location, involved) for deployments
+  - Trip or Vehicle / Airplane movements where available
+  - Image and Video (satellite or user footage with date and location)
+  checkable: lookups
+  lookup_sources:
+  - Satellite imagery
+  - Flight tracking
+  - Open-source video geolocation
+  - Official military announcements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Response to a real armed attack or insurgency
+  - Routine troop rotation or exercises
+  - Deployment for disaster relief or elections security
+  jurisdictions: Any country
+  version: 1
+- id: HR-063
+  name: Acquisition of large quantities of arms, ammunition or other means to inflict harm
+  definition: A state or group buys or gathers unusually large stocks of weapons, ammunition, or other
+    items that can be used to hurt people, or weapons hard to get inside the country.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 5, 7, 11 and 12 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 7, para. 36(d), p. 12
+    quote: (d) Acquisition of large quantities of arms and ammunition or of other objects that could be
+      used to inflict harm;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 12, para. 48(f), p. 18
+    quote: (f) Access to and use of weaponry or other instruments not easily obtained inside the country;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 5, para. 32(a), p. 10
+    quote: (a) Availability of personnel and of arms and ammunition, or of the financial resources, public
+      or private, for their procurement;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Import of bulk quantities of machetes or small arms out of line with past trade
+  - Procurement of weapons from abroad through intermediaries
+  cases: []
+  data_needed:
+  - Contract and ContractAward (authority, supplier, amount, date, title)
+  - Payment (payer, beneficiary, amount, date, purpose)
+  - Company (name, jurisdiction) for suppliers and brokers
+  - Vessel / Airplane and Trip for shipments
+  - Sanction (entity, program) for embargoed parties
+  checkable: lookups
+  lookup_sources:
+  - Customs and trade statistics (e.g. UN Comtrade)
+  - Arms transfer databases
+  - UN sanctions panel reports
+  - Ship and flight tracking
+  - Company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Weapons 'not easily obtained inside the country' must be imported, so the trail runs through
+      brokers, shippers and payments that sanctions and arms-trafficking checks cover.
+    source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  innocent_explanations:
+  - Routine re-equipment of a national army
+  - Legitimate agricultural tool imports
+  - Recorded purchases under a lawful defence budget
+  jurisdictions: Any country
+  version: 1
+- id: HR-064
+  name: Creation of, or increased support to, militia, paramilitary or parallel armed structures
+  definition: New militias or paramilitary groups are formed, armed, trained or funded, or old ones are
+    reactivated, often alongside parallel political or military structures for one group.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 5, 7 and 12 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 7, para. 36(e), p. 12
+    quote: (e) Creation of, or increased support to, militia or paramilitary groups;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 12, para. 48(d), p. 17
+    quote: (d) Establishment of parallel institutions or autonomous political or military structures,
+      or organization of a network of potential perpetrators belonging to a specific ethnic, religious,
+      national, racial or political group;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Weapons handed to youth militia at a rally (Bagosora judgement, section 2.4.3)
+  - Militias from earlier clashes reactivated by politicians and business leaders (Kenya 2007-08)
+  cases:
+  - name: Prosecutor v. Bagosora et al. (Military I), ICTR-98-41
+    year: '2008'
+    jurisdiction: International Criminal Tribunal for Rwanda
+    what_happened: The Trial Chamber found that Bagosora, Kabiligi and Nsengiyumva played a role in the
+      creation, arming and training of civilian militia, but that it was not proven beyond reasonable
+      doubt that this was aimed at genocide, so all four accused were acquitted of conspiracy to commit
+      genocide. Bagosora was convicted of other crimes; his 35-year sentence was affirmed on appeal on
+      14 December 2011; Kabiligi was acquitted on all counts.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://unictr.irmct.org/sites/unictr.org/files/case-documents/ictr-98-41/trial-judgements/en/081218.pdf
+    source_title: Bagosora et al. Trial Judgement, 18 December 2008, paras. 9-11
+  - name: Kenya - Commission of Inquiry into Post-Election Violence (CIPEV / Waki Commission)
+    year: '2008'
+    jurisdiction: Kenya
+    what_happened: The Commission found that armed militias formed during the 1990s ethnic clashes were
+      never demobilised, which made it easy for political and business leaders to reactivate them for
+      the 2007-08 post-election violence.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://reliefweb.int/report/kenya/kenya-commission-inquiry-post-election-violence-cipev-final-report
+    source_title: CIPEV final report, executive summary (ReliefWeb)
+  - name: Ethiopia - International Commission of Human Rights Experts on Ethiopia
+    year: '2022'
+    jurisdiction: Ethiopia
+    what_happened: The Commission listed 'proliferation of local militias and other armed groups across
+      the country' among the UN Framework indicators it found reflected in Ethiopia.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/api/symbol/access?s=A/HRC/51/46&l=en&t=pdf
+    source_title: Report of the international Commission of Human Rights Experts on Ethiopia (A/HRC/51/46),
+      para. 127(c)
+  data_needed:
+  - Organization (name, jurisdiction) for the militia
+  - Membership (member, organization, role, startDate)
+  - Person (name) for leaders and backers
+  - Payment (payer, beneficiary, amount, date) for funding
+  - Event (date, location, involved) for training or weapons handovers
+  checkable: person
+  lookup_sources:
+  - Court judgements
+  - UN inquiry reports
+  - Local reporting and witness interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful, state-regulated community self-defence or reserve forces
+  - Neighbourhood watch groups without weapons
+  - Integration of former fighters under a peace agreement
+  jurisdictions: Any country
+  version: 1
+- id: HR-065
+  name: Strict control of communication channels, internet shutdowns or blackouts
+  definition: Authorities cut or tightly control internet, phone, broadcast or other communication channels
+    for a population, which hides abuses and isolates the group.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 7
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 7, para. 36(f), p. 12
+    quote: (f) Imposition of strict control on the use of communication channels, or banning access to
+      them;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Region-wide internet and telephone blackout during military operations (Tigray, from 4 November 2020)
+  cases:
+  - name: Ethiopia - Tigray communications and banking blackout
+    year: '2022'
+    jurisdiction: Ethiopia
+    what_happened: The UN Commission found the Federal Government suspended electricity, Internet, telecommunications
+      and banking services in Tigray on 4 November 2020, and listed strict controls on communication channels,
+      including Internet shutdowns, among the UN Framework indicators present.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/api/symbol/access?s=A/HRC/51/46&l=en&t=pdf
+    source_title: A/HRC/51/46, paras. 73 and 127(e)
+  data_needed:
+  - Event (name, startDate, endDate, location, organizer)
+  - PublicBody (regulator or ministry ordering it)
+  - Company (telecom operators)
+  - Document (shutdown orders)
+  checkable: lookups
+  lookup_sources:
+  - Internet measurement data (network outage and censorship monitors)
+  - Telecom operator statements
+  - Court filings challenging shutdowns
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Technical outage, cable cut or power failure
+  - Short exam-period shutdown (still a rights concern but a different purpose)
+  - Damage to infrastructure from fighting
+  jurisdictions: Any country
+  version: 1
+- id: HR-066
+  name: Expulsion or restriction of NGOs, international organisations, media or other observers
+  definition: Aid agencies, UN bodies, journalists or monitors are expelled, refused entry, or heavily
+    restricted in where they can go and what they can do.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 6, 7 and 14 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 7, para. 36(g), p. 12
+    quote: (g) Expulsion or refusal to allow the presence of non-governmental organizations, international
+      organizations, media or other relevant actors, or imposition of severe restrictions on their services
+      and movements;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 14, para. 52(e), p. 20
+    quote: (e) Interference, limitation or prohibition of access or movement of humanitarian or peacekeeping
+      operations or their personnel;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Revocation of aid agency registrations with immediate effect
+  - Visa refusals for UN investigators or foreign reporters
+  cases:
+  - name: Sudan - expulsion of 13 international NGOs, March 2009
+    year: '2009'
+    jurisdiction: Sudan
+    what_happened: The UN Secretary-General reported to the Security Council that on 4 March 2009 Sudan's
+      Humanitarian Aid Commission revoked the registrations of and expelled 13 international NGOs and
+      dissolved 3 national NGOs, for allegedly collaborating with ICC investigations; senior officials
+      publicly confirmed the expulsions. This is an official UN report, not a court ruling.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/api/symbol/access?s=S/2009/201&l=en&t=pdf
+    source_title: Report of the Secretary-General on UNAMID (S/2009/201), para. 26
+  data_needed:
+  - Organization (NGO or agency name, jurisdiction)
+  - PublicBody (authority that expelled it)
+  - Document (revocation orders, date)
+  - Event (date, location)
+  - Person (expelled staff or journalists)
+  checkable: lookups
+  lookup_sources:
+  - UN Secretary-General and OCHA reports
+  - Press freedom monitors
+  - NGO statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine security risk making access unsafe
+  - Organisation broke registration or tax law
+  - Lawful visa or accreditation rules applied evenly
+  jurisdictions: Any country
+  version: 1
+- id: HR-067
+  name: Rising violations against a protected group or new laws and measures that discriminate against
+    it
+  definition: Killings, assaults, arrests or other abuses against members of a group increase, or new
+    laws and policies single the group out for worse treatment.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 7, 9 and 12 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 7, para. 36(h), pp. 12-13
+    quote: (h) Increased violations of the right to life, physical integrity, liberty or security of members
+      of protected groups, populations or individuals, or recent adoption of measures or legislation that
+      affect or deliberately discriminate against them;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 9, para. 41(a), p. 14; Risk factor 12, para. 48(b), p. 17
+    quote: (b) Adoption of discriminatory security procedures against different groups of the civilian
+      population;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Travel authorisation system that applies to one group only
+  - Rising arbitrary arrests on ethnic grounds
+  cases:
+  - name: Myanmar - discriminatory restrictions on the Rohingya
+    year: '2018'
+    jurisdiction: Myanmar
+    what_happened: The UN fact-finding mission found Rohingya movement long restricted through a discriminatory
+      travel authorisation system, plus discriminatory rules on marriage, children and birth registration.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/api/symbol/access?s=A/HRC/39/64&l=en&t=pdf
+    source_title: A/HRC/39/64, para. 23
+  data_needed:
+  - Document (law, decree, policy; date, publisher)
+  - Event (incident date, location, involved)
+  - Person (victims, with group membership as recorded by sources)
+  - PublicBody (issuing authority)
+  checkable: records
+  lookup_sources:
+  - Legislation databases
+  - Human rights monitoring datasets
+  - UN treaty body reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - General crime increase affecting all groups
+  - Neutral law with uneven but unintended effects
+  - Reporting increase rather than incident increase
+  jurisdictions: Any country
+  version: 1
+- id: HR-068
+  name: Increased serious violence against women and children, or conditions that facilitate sexual violence
+  definition: Attacks on women and children rise, or circumstances are created that make sexual violence
+    easier, including as a tool of terror.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 7
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 7, para. 36(i), p. 13
+    quote: (i) Increased serious acts of violence against women and children, or creation of conditions
+      that facilitate acts of sexual violence against those groups, including as a tool of terror;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Detention of women in facilities controlled by armed men without oversight
+  - Reports of rape during searches of one community
+  cases: []
+  data_needed:
+  - Event (date, location, involved)
+  - Organization (unit or group accused)
+  - Document (medical, NGO or UN reports)
+  - Address (detention sites)
+  checkable: person
+  lookup_sources:
+  - UN Secretary-General reports on conflict-related sexual violence
+  - Medical and NGO documentation
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Better reporting or new services leading to more recorded cases
+  - General rise in crime not linked to a group or a party
+  - Isolated crimes by individuals punished by authorities
+  jurisdictions: Any country
+  version: 1
+- id: HR-069
+  name: Segregation, confinement or transfer of a group to camps, ghettos or assigned locations
+  definition: A group is collected, separated and moved or held in camps or set areas, often under life-threatening
+    conditions.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 7
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 7, para. 36(j), p. 13
+    quote: (j) Imposition of life-threatening living conditions or the deportation, seizure, collection,
+      segregation, evacuation or forced displacement or transfer of protected groups, populations or individuals
+      to camps, rural areas, ghettos or other assigned locations;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Displaced people held in camps without freedom of movement and prevented from going home
+  cases:
+  - name: Myanmar - confinement of displaced Rohingya in central Rakhine camps
+    year: '2018'
+    jurisdiction: Myanmar
+    what_happened: The UN fact-finding mission found displaced Rohingya held in camps without freedom
+      of movement or adequate food, health care, education or livelihoods, and said the confinement exceeded
+      any justifiable security measure and was arbitrary deprivation of liberty.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/api/symbol/access?s=A/HRC/39/64&l=en&t=pdf
+    source_title: A/HRC/39/64, para. 29
+  data_needed:
+  - Address (camp or site location)
+  - Event (date of transfer, organizer)
+  - Image (satellite imagery of camps)
+  - Document (official orders)
+  - PublicBody (administering authority)
+  checkable: lookups
+  lookup_sources:
+  - Satellite imagery
+  - Displacement tracking (UN agencies)
+  - Official orders
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Temporary evacuation for safety with free return
+  - Camps run for disaster relief with free movement
+  - Voluntary relocation with consent
+  jurisdictions: Any country
+  version: 1
+- id: HR-070
+  name: Destruction or plundering of homes, livelihoods, essential goods or installations of a group
+  definition: Homes, farms, businesses, water, food or other essential installations belonging to or needed
+    by a group are destroyed or looted.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 7, 10 and 11 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 7, para. 36(k), p. 13
+    quote: (k) Destruction or plundering of essential goods or installations for protected groups, populations
+      or individuals, or of property related to cultural and religious identity;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 10, para. 44(h), p. 16
+    quote: (h) Attacks against or destruction of homes, farms, businesses or other livelihoods of a protected
+      group and/or of their cultural or religious symbols and property.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Villages of one group burned while neighbouring villages are untouched
+  - Systematic looting of crops and livestock
+  cases: []
+  data_needed:
+  - Address / RealEstate (property, owner)
+  - Image (before-and-after satellite imagery)
+  - Event (date, location, involved)
+  - Person (owners)
+  checkable: lookups
+  lookup_sources:
+  - Satellite imagery and fire-detection data
+  - Land registries
+  - Witness interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Collateral damage from fighting not aimed at a group
+  - Accidental fires
+  - Lawful demolition with compensation
+  jurisdictions: Any country
+  version: 1
+- id: HR-071
+  name: Marking of people or their property based on group membership
+  definition: People, homes or shops are marked, listed or labelled by the group they belong to, which
+    makes them easy to find and target.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 7
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 7, para. 36(l), p. 13
+    quote: (l) Marking of people or their property based on affiliation to a group;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Painted symbols on houses of a religious minority
+  - Compulsory identity cards stating ethnicity
+  cases: []
+  data_needed:
+  - Image (photos of markings, date, location)
+  - Address
+  - Document (identity card rules)
+  - Identification (type, issuer)
+  checkable: person
+  lookup_sources:
+  - Open-source photos and video
+  - Identity document regulations
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Census or address-numbering marks
+  - Religious or cultural signs put up by owners themselves
+  - Graffiti unconnected to targeting
+  jurisdictions: Any country
+  version: 1
+- id: HR-072
+  name: Increased politicisation of identity, past events or grievances
+  definition: Leaders increasingly use ethnic, religious or national identity, or old grievances, as a
+    political tool and a reason for violence.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 4, 7 and 13 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 7, para. 36(m), p. 13
+    quote: (m) Increased politicization of identity, past events or motives to engage in violence;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 4, para. 29(h), p. 10; Risk factor 13, para. 50(d), p. 18
+    quote: (d) Promotion of ethnicity or religion as a determinant of national allegiance or allegiance
+      to a party of the conflict;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Campaign messages that equate one ethnic group with the nation
+  cases:
+  - name: Ethiopia - politicisation of identity
+    year: '2022'
+    jurisdiction: Ethiopia
+    what_happened: The UN Commission listed 'politicization of identity' among UN Framework indicators
+      reflected in Ethiopia.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/api/symbol/access?s=A/HRC/51/46&l=en&t=pdf
+    source_title: A/HRC/51/46, para. 127(b)
+  data_needed:
+  - Article (author, publishedAt, publisher)
+  - Message / Video (speaker, date)
+  - Person (speaker, Position)
+  - Organization (party)
+  checkable: person
+  lookup_sources:
+  - Media monitoring
+  - Speech archives
+  - Social media archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate identity-based advocacy for rights
+  - Historical commemoration without hostility
+  - Normal electoral appeals to community interests
+  jurisdictions: Any country
+  version: 1
+- id: HR-073
+  name: Inflammatory rhetoric, propaganda, hate speech or incitement against a protected group
+  definition: Speech, broadcasts or posts that stir hatred, dehumanise, or call for violence against a
+    group, increasing in volume or intensity.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 7, 8, 11 and 13 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 7, para. 36(n), p. 13
+    quote: (n) Increased inflammatory rhetoric, propaganda campaigns or hate speech targeting protected
+      groups, populations or individuals.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 8, para. 38(g), p. 14; Risk factor 11, para. 46(d), p. 17
+    quote: (g) Acts of incitement or hate propaganda targeting particular groups or individuals;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Rabat Plan of Action (A/HRC/22/17/Add.4, appendix)
+    publisher: Office of the UN High Commissioner for Human Rights
+    year: '2013'
+    url: https://www.ohchr.org/sites/default/files/Rabat_draft_outcome.pdf
+    locator: Para. 29, p. 11
+    quote: 'In this regard, a six-part threshold test was proposed for expressions considered as criminal
+      offences:'
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Rome Statute of the International Criminal Court
+    publisher: International Criminal Court
+    year: '1998'
+    url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+    locator: Article 25(3)(e)
+    quote: In respect of the crime of genocide, directly and publicly incites others to commit genocide;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Radio broadcasts calling a group 'cockroaches' (RTLM, Rwanda 1994)
+  - State-linked social media posts dehumanising a minority (Myanmar)
+  cases:
+  - name: Nahimana, Barayagwiza and Ngeze v. The Prosecutor (Media case), ICTR-99-52-A
+    year: '2007'
+    jurisdiction: International Criminal Tribunal for Rwanda
+    what_happened: The Appeals Chamber affirmed Nahimana's conviction (as a superior) for direct and public
+      incitement to commit genocide in respect of RTLM broadcasts after 6 April 1994, and Ngeze's conviction
+      for directly and publicly inciting genocide through material published in his newspaper Kangura
+      in 1994; some other convictions were reversed and sentences reduced (30, 32 and 35 years).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://unictr.irmct.org/sites/unictr.org/files/case-documents/ictr-99-52/appeals-chamber-judgements/en/071128.pdf
+    source_title: Appeal Judgement, 28 November 2007, Disposition, pp. 344-345
+  - name: Prosecutor v. Akayesu, ICTR-96-4-T
+    year: '1998'
+    jurisdiction: International Criminal Tribunal for Rwanda
+    what_happened: The Trial Chamber found Akayesu guilty of genocide and of direct and public incitement
+      to commit genocide (Count 4).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://unictr.irmct.org/sites/unictr.org/files/case-documents/ictr-96-4/trial-judgements/en/980902.pdf
+    source_title: Akayesu Trial Judgement, 2 September 1998, Verdict
+  - name: Myanmar - hate speech and Facebook
+    year: '2018'
+    jurisdiction: Myanmar
+    what_happened: The UN fact-finding mission found the authorities fostered a climate in which hate
+      speech thrives, and said Facebook had been 'a useful instrument for those seeking to spread hate'
+      with a slow and ineffective response.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/api/symbol/access?s=A/HRC/39/64&l=en&t=pdf
+    source_title: A/HRC/39/64, paras. 73-74
+  - name: Ethiopia - hate speech as key indicator
+    year: '2022'
+    jurisdiction: Ethiopia
+    what_happened: The UN Commission found hate speech attacking and dehumanising ethnic groups, 'a key
+      indicator of future atrocity crimes', showed no sign of abating.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/api/symbol/access?s=A/HRC/51/46&l=en&t=pdf
+    source_title: A/HRC/51/46, para. 2 and para. 127(a)
+  data_needed:
+  - Article / Message / Video / Audio (author, publishedAt, publisher, bodyText)
+  - Person (speaker) with Position or Occupancy
+  - Organization (broadcaster, party, page owner)
+  - Ownership (owner, asset) for media outlets
+  - Mention (resolved entity, document)
+  checkable: person
+  lookup_sources:
+  - Media monitoring and broadcast archives
+  - Social media archives
+  - Platform transparency reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Speech meets all six parts of the Rabat threshold test: context, speaker, intent, content
+      and form, extent of the speech act, and likelihood including imminence'
+    threshold_source: https://www.ohchr.org/sites/default/files/Rabat_draft_outcome.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: IN
+    reason: Hate campaigns spread through platforms and coordinated accounts; the Myanmar mission tied
+      the spread to Facebook and to false or incomplete information.
+    source_url: https://documents.un.org/api/symbol/access?s=A/HRC/39/64&l=en&t=pdf
+  innocent_explanations:
+  - Heated but lawful political criticism
+  - Satire, art or reporting that quotes hate speech to expose it
+  - Isolated remarks by people with no audience or influence
+  jurisdictions: Any country; incitement to genocide is a crime under the Rome Statute and ICTR Statute
+  version: 1
+- id: HR-074
+  name: Armed conflict, security crisis or spillover from conflict in neighbouring countries
+  definition: The country is in, or under strain from, armed conflict, a security crisis, or fighting
+    and tension spilling over from neighbouring states.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 1 and 8 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 1, para. 20(a)-(c), p. 7
+    quote: (b) Security crisis caused by, among other factors, defection from peace agreements, armed
+      conflict in neighbouring countries, threats of external interventions or acts of terrorism;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 8, para. 38(b), p. 13
+    quote: (b) Spillover of armed conflicts or serious tensions in neighbouring countries;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Peace agreement collapses
+  - Refugees and armed groups crossing from a neighbouring war
+  cases: []
+  data_needed:
+  - Event (name, startDate, location, involved)
+  - Organization (armed groups)
+  - Document (peace agreements)
+  checkable: lookups
+  lookup_sources:
+  - Conflict event datasets
+  - UN Security Council reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Conflict exists but parties respect humanitarian law
+  - Neighbouring conflict without cross-border effects
+  jurisdictions: Any country
+  version: 1
+- id: HR-075
+  name: International measures perceived as threatening state sovereignty
+  definition: Sanctions, investigations, warrants or interventions by outside bodies are seen by the government
+    as an attack on its sovereignty, which can provoke a backlash.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 8 (triggering factors)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 8, para. 38(c), p. 13
+    quote: (c) Measures taken by the international community perceived as threatening to a State's sovereignty;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Government retaliates against aid groups after an international arrest warrant
+  cases: []
+  data_needed:
+  - Event (date, organizer)
+  - Sanction (entity, authority, program, startDate)
+  - Document (resolutions, warrants)
+  checkable: lookups
+  lookup_sources:
+  - UN Security Council resolutions
+  - Sanctions lists
+  - Court press releases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Diplomatic protest without any domestic crackdown
+  - Lawful legal challenge to the measure
+  jurisdictions: Any country
+  version: 1
+- id: HR-076
+  name: Abrupt or irregular regime change, transfer of power, or political instability
+  definition: A coup, sudden change of government, power struggle, severe repression or growing armed
+    opposition destabilises the state.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 1 and 8 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 8, para. 38(d), p. 13
+    quote: (f) Political tension caused by autocratic regimes or severe political repression;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 1, para. 20(d)-(f), (j), p. 7
+    quote: (f) Political tension caused by autocratic regimes or severe political repression;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Military coup
+  - Mass protests met with force
+  cases: []
+  data_needed:
+  - Event (date, location)
+  - Position and Occupancy (office holders before and after)
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - News archives
+  - Political leadership databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Peaceful, constitutional change of government
+  - Protests handled lawfully
+  jurisdictions: Any country
+  version: 1
+- id: HR-077
+  name: Attacks on leaders, prominent individuals or opposing groups, or terrorist attacks
+  definition: An assassination, attack on a prominent figure, or major terrorist attack sharply raises
+    tension and can spark mass violence.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 8
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 8, para. 38(e), p. 13
+    quote: (e) Attacks against the life, physical integrity, liberty or security of leaders, prominent
+      individuals or members of opposing groups; other serious acts of violence, such as terrorist attacks;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Shooting down of the Rwandan President's plane on 6 April 1994, after which targeted killings began
+    immediately (Bagosora judgement, para. 13)
+  cases: []
+  data_needed:
+  - Event (date, location, involved)
+  - Person (victim, Position)
+  checkable: lookups
+  lookup_sources:
+  - News archives
+  - Conflict event datasets
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Isolated criminal attack with no group dimension
+  - Attack promptly investigated without collective blame
+  jurisdictions: Any country
+  version: 1
+- id: HR-078
+  name: Religious events or acts of religious intolerance or disrespect
+  definition: Religious festivals, or real or perceived insults to a religion (including abroad), become
+    flashpoints for violence.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 8
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 8, para. 38(f), p. 13
+    quote: (f) Religious events or real or perceived acts of religious intolerance or disrespect, including
+      outside national borders;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Desecration of a place of worship followed by calls for revenge
+  cases: []
+  data_needed:
+  - Event (date, location)
+  - Article / Message (reports, posts)
+  - Address (religious site)
+  checkable: lookups
+  lookup_sources:
+  - News archives
+  - Religious freedom monitors
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Peaceful religious events
+  - Incident condemned by all sides and quickly resolved
+  jurisdictions: Any country
+  version: 1
+- id: HR-079
+  name: Census, elections or related processes, or measures that destabilise them
+  definition: Elections, a census, or disputes about them act as triggers for violence, especially where
+    results are contested.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 8
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 8, para. 38(h), p. 14
+    quote: (h) Census, elections, pivotal activities related to those processes, or measures that destabilize
+      them;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Contested presidential result followed by organised ethnic attacks
+  cases:
+  - name: Kenya - 2007-08 post-election violence (CIPEV)
+    year: '2008'
+    jurisdiction: Kenya
+    what_happened: The Commission found the violence after the 2007 elections was spontaneous in some
+      areas and planned and organised in others, often involving politicians and business leaders, and
+      amounted to systematic attacks on Kenyans based on ethnicity and political leaning.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://reliefweb.int/report/kenya/kenya-commission-inquiry-post-election-violence-cipev-final-report
+    source_title: CIPEV final report, executive summary (ReliefWeb)
+  data_needed:
+  - Event (election or census dates, location)
+  - PublicBody (electoral commission)
+  - Document (results, complaints)
+  checkable: lookups
+  lookup_sources:
+  - Electoral commission data
+  - Election observer reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary, peaceful elections
+  - Disputes resolved through courts
+  jurisdictions: Any country
+  version: 1
+- id: HR-080
+  name: Severe economic shock, resource scarcity or deep inequality
+  definition: Economic crisis, sudden shocks, scarcity of resources, mass unemployment or deep inequality
+    between groups put the state under strain.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 1 and 8 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 1, para. 20(g)-(i), p. 7
+    quote: (i) Economic instability caused by acute poverty, mass unemployment or deep horizontal inequalities;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 8, para. 38(i), p. 14
+    quote: (i) Sudden changes that affect the economy or the workforce, including as a result of financial
+      crises, natural disasters or epidemics;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Currency collapse
+  - Drought causing competition over land and water
+  cases: []
+  data_needed:
+  - Event (date, location)
+  - Document (economic statistics)
+  checkable: lookups
+  lookup_sources:
+  - National statistics
+  - World Bank / IMF data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Economic hardship without identity-based blame or violence
+  jurisdictions: Any country
+  version: 1
+- id: HR-081
+  name: Discovery of natural resources or exploitation projects that seriously affect a group's livelihood
+  definition: New finds of minerals, oil or land value, or large extraction projects, threaten the livelihoods
+    of a group and can spark violence.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 4 and 8 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 8, para. 38(j), p. 14
+    quote: (j) Discovery of natural resources or launching of exploitation projects that have a serious
+      impact on the livelihoods and sustainability of groups or civilian populations;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Mining concession granted on land occupied by an indigenous group
+  cases: []
+  data_needed:
+  - Permit / Contract (authority, holder, date)
+  - Company (name, jurisdiction)
+  - Ownership (owner, asset)
+  - Address / RealEstate (concession area)
+  checkable: lookups
+  lookup_sources:
+  - Mining cadastres
+  - Company registries
+  - Land registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HR
+    reason: Resource discovery or extraction projects can draw in armed actors and companies, linking
+      the early-warning picture to supply-chain red flags.
+    source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  innocent_explanations:
+  - Project with free, prior and informed consent and fair compensation
+  - Exploration that has not affected anyone yet
+  jurisdictions: Any country
+  version: 1
+- id: HR-082
+  name: Commemorations of past crimes or glorification of perpetrators
+  definition: Anniversaries or commemorations of past atrocities or historic traumas, especially if they
+    glorify perpetrators, raise tensions between groups.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 8
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 8, para. 38(k), p. 14
+    quote: (k) Commemoration events of past crimes or of traumatic or historical episodes that can exacerbate
+      tensions between groups, including the glorification of perpetrators of atrocities;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Rally honouring a convicted war criminal
+  cases: []
+  data_needed:
+  - Event (date, location, organizer)
+  - Person (honoured individual)
+  - Article / Video
+  checkable: lookups
+  lookup_sources:
+  - News archives
+  - Social media archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Remembrance of victims aimed at reconciliation
+  jurisdictions: Any country
+  version: 1
+- id: HR-083
+  name: Accountability processes perceived as unfair
+  definition: Trials, warrants or truth processes that one side sees as biased can trigger backlash or
+    violence.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 8
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 8, para. 38(l), p. 14
+    quote: (l) Acts related to accountability processes, particularly when perceived as unfair.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Aid groups expelled after an international court issues a warrant (Sudan, March 2009; see HR-066)
+  cases: []
+  data_needed:
+  - CourtCase (name, court, date)
+  - Event (date of verdict or warrant)
+  - Person (accused)
+  checkable: lookups
+  lookup_sources:
+  - Court records
+  - News archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful appeal or public criticism without violence
+  jurisdictions: Any country
+  version: 1
+- id: HR-084
+  name: Impunity for past atrocities or serious violations
+  definition: Past atrocities or serious abuses have gone unpunished or are tolerated, which makes repetition
+    more likely.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 2 and 9 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 2, para. 23(b)-(c), p. 8
+    quote: (c) Policy or practice of impunity for or tolerance of serious violations of international
+      human rights and humanitarian law, of atrocity crimes, or of their incitement;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 9, para. 41(c), p. 15
+    quote: (c) History of atrocity crimes committed with impunity against protected groups;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Officers accused of massacres promoted rather than prosecuted
+  - Amnesty laws covering atrocity crimes
+  cases:
+  - name: Bosnia and Herzegovina v. Serbia and Montenegro (Application of the Genocide Convention)
+    year: '2007'
+    jurisdiction: International Court of Justice
+    what_happened: The ICJ found the Srebrenica killings of July 1995 were genocide and held that Serbia
+      violated its obligations to prevent that genocide and to punish its perpetrators, including by not
+      fully cooperating with the ICTY over Ratko Mladic. This is a ruling on State responsibility, not
+      a criminal conviction.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.icj-cij.org/case/91
+    source_title: ICJ, Judgment of 26 February 2007 (case page)
+  data_needed:
+  - CourtCase (status)
+  - Person (accused) with Position / Occupancy after the events
+  - Document (amnesty laws)
+  checkable: lookups
+  lookup_sources:
+  - Court records
+  - Official appointment records
+  - UN reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Investigations underway but slow
+  - Accused acquitted after a fair trial
+  jurisdictions: Any country
+  version: 1
+- id: HR-085
+  name: Continued support to groups accused of serious violations, or failure to condemn them
+  definition: A state, outside power or other actor keeps giving arms, money, training or political backing
+    to a group accused of grave abuses, or refuses to condemn it.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 2 and 5 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 2, para. 23(e), p. 8
+    quote: (e) Continuation of support to groups accused of involvement in serious violations of international
+      human rights and humanitarian law, including atrocity crimes, or failure to condemn their actions;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 5, para. 32(h), p. 11
+    quote: (h) Armed, financial, logistic, training or other support of external actors, including States,
+      international or regional organizations, private companies, or others.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Foreign government keeps funding a militia after UN reports of massacres
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, amount, date)
+  - Contract (authority, supplier)
+  - Organization / PublicBody (backer)
+  - Sanction (entity, program)
+  - UnknownLink (subject, object)
+  checkable: lookups
+  lookup_sources:
+  - UN sanctions panel reports
+  - Arms transfer databases
+  - Government budget documents
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Support to groups accused of atrocities is a common basis for UN and national sanctions designations,
+      so backers may appear on sanctions lists.
+    source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  innocent_explanations:
+  - Support conditioned on and used for human rights training or reform
+  - Support ended once allegations emerged
+  jurisdictions: Any country
+  version: 1
+- id: HR-086
+  name: Justification, biased accounts or denial of serious violations or atrocities
+  definition: Officials or influential voices deny, excuse or distort past or current atrocities.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 2
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 2, para. 23(f), p. 8
+    quote: (f) Justification, biased accounts or denial of serious violations of international human rights
+      and humanitarian law or atrocity crimes;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Official statements denying documented massacres
+  cases: []
+  data_needed:
+  - Article / Message / Video (speaker, date)
+  - Person (speaker, Position)
+  checkable: person
+  lookup_sources:
+  - Media monitoring
+  - Official statements archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Good-faith dispute over facts pending investigation
+  - Lawful defence arguments in court
+  jurisdictions: Any country
+  version: 1
+- id: HR-087
+  name: 'Weak rule of law: no independent judiciary, no civilian control of security forces, high corruption'
+  definition: Courts are not independent, the military and police are not under civilian control, or corruption
+    and poor governance are severe, so nothing checks abuses.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 3 (weakness of state structures)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 3, para. 26(c)-(f), p. 9
+    quote: (d) Lack of effective civilian control of security forces;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 3, para. 26(e), p. 9
+    quote: (e) High levels of corruption or poor governance;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Military answers to no civilian authority
+  - Victims have no court where they can bring claims
+  cases: []
+  data_needed:
+  - PublicBody
+  - Position / Occupancy (who controls security forces)
+  - Document (constitution, laws)
+  checkable: lookups
+  lookup_sources:
+  - Governance and corruption indices
+  - UN treaty body reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: The Framework names high corruption and poor governance as a weakness of state structures
+      that raises atrocity risk.
+    source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  innocent_explanations:
+  - Low capacity in a poor state without hostile intent
+  - Reforms underway
+  jurisdictions: Any country
+  version: 1
+- id: HR-088
+  name: Political, economic or strategic motives for violence against a group, including control of resources
+    or territory
+  definition: Actors stand to gain power, wealth, resources, land or an ethnically uniform area by attacking
+    a group.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 4 (motives or incentives)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 4, para. 29(a)-(d), pp. 9-10
+    quote: (c) Strategic or military interests, including those based on protection or seizure of territory
+      and resources;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 4, para. 29(d), p. 10
+    quote: (d) Other interests, including those aimed at rendering an area homogeneous in its identity;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Land cleared of a group later allocated to companies or another group
+  cases: []
+  data_needed:
+  - RealEstate / Address (land)
+  - Ownership (owner, asset, startDate)
+  - Company
+  - Permit / Contract (land or resource grants)
+  checkable: lookups
+  lookup_sources:
+  - Land registries
+  - Concession records
+  - Company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: BO
+    reason: Economic motives such as 'control over the distribution of resources' leave traces in land,
+      concession and ownership records.
+    source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  innocent_explanations:
+  - Ordinary political or economic competition by lawful means
+  jurisdictions: Any country
+  version: 1
+- id: HR-089
+  name: Supremacist or extremist identity ideology, or a group framed as a threat or as disloyal
+  definition: An ideology of one identity's supremacy spreads, or a group is portrayed as a threat, disloyal,
+    or as supporters of armed opposition.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 4
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 4, para. 29(e)-(g), p. 10
+    quote: (g) Ideologies based on the supremacy of a certain identity or on extremist versions of identity;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 4, para. 29(f), p. 10
+    quote: (f) Real or perceived membership of or support for armed opposition groups by protected groups,
+      populations or individuals;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Whole community labelled as 'terrorists' after an insurgent attack
+  cases: []
+  data_needed:
+  - Article / Message (author, date)
+  - Organization (movement, party)
+  - Person (ideologues)
+  checkable: person
+  lookup_sources:
+  - Media monitoring
+  - Party documents
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real security threat from a specific armed group, addressed without collective blame
+  jurisdictions: Any country
+  version: 1
+- id: HR-090
+  name: Capacity to transport personnel and weapons and to mobilise large numbers of supporters
+  definition: Actors have the logistics to move fighters and weapons and the means to recruit and mobilise
+    large numbers of people.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 5 (capacity)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 5, para. 32(b)-(c), p. 10
+    quote: (c) Capacity to encourage or recruit large numbers of supporters from populations or groups,
+      and availability of the means to mobilize them;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Fleets of vehicles hired to carry attackers to distant villages
+  cases: []
+  data_needed:
+  - Vehicle / Trip (owner, date, route)
+  - Payment (hire of vehicles)
+  - Organization
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Vehicle registries
+  - Witness interviews
+  - Satellite imagery
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary logistics of armies or parties
+  - Large rallies for lawful campaigning
+  jurisdictions: Any country
+  version: 1
+- id: HR-091
+  name: Companies acting as enablers by supplying goods, services or technical support to perpetrators
+  definition: Businesses supply goods, services, transport, finance or technical help that keep perpetrators
+    going.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 5
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 5, para. 32(f), p. 11
+    quote: (f) Presence of commercial actors or companies that can serve as enablers by providing goods,
+      services, or other forms of practical or technical support that help to sustain perpetrators;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Telecom firm supplying surveillance tools to a unit accused of atrocities
+  - Fuel supplier to an armed group
+  cases: []
+  data_needed:
+  - Company (name, jurisdiction)
+  - Contract / ContractAward (authority, supplier, amount)
+  - Payment
+  - Ownership and Directorship
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Procurement records
+  - Sanctions lists
+  - Trade data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Enablers are found through contracts, payments and ownership links; the Framework names companies
+      as enablers that help sustain perpetrators.
+    source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  innocent_explanations:
+  - Supplies for civilian use with due diligence
+  - Contract ended once risks were known
+  jurisdictions: Any country
+  version: 1
+- id: HR-092
+  name: Financial or political backing from influential or wealthy national actors
+  definition: Rich or powerful people inside the country fund or politically protect those preparing or
+    committing violence.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 5
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 5, para. 32(g), p. 11
+    quote: (g) Financial, political or other support of influential or wealthy national actors;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Business leaders paying militias during an election crisis (Kenya 2007-08, see HR-064 case)
+  cases: []
+  data_needed:
+  - Person (name)
+  - Payment (payer, beneficiary, amount, date)
+  - Company / Ownership
+  - Associate / UnknownLink
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Court records
+  - Inquiry reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Funding of violence by wealthy actors moves through payments and companies that financial-crime
+      checks can trace; Kenya's inquiry found political and business leaders reactivated militias.
+    source_url: https://reliefweb.int/report/kenya/kenya-commission-inquiry-post-election-violence-cipev-final-report
+  innocent_explanations:
+  - Lawful political donations
+  - Charitable giving to a community
+  jurisdictions: Any country
+  version: 1
+- id: HR-093
+  name: No free media or strong civil society, and little international presence or attention
+  definition: There is no independent press or organised civil society, and few UN, NGO or foreign observers,
+    so abuses go unseen.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 6 (absence of mitigating factors)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 6, para. 34(b)-(d), p. 11
+    quote: (b) Lack of a strong, organized and representative national civil society and of a free, diverse
+      and independent national media;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Only state media operate in the affected region
+  cases: []
+  data_needed:
+  - Organization (media, NGOs)
+  - Ownership (media ownership)
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Press freedom indices
+  - Media ownership databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Remote area with little coverage for practical reasons
+  jurisdictions: Any country
+  version: 1
+- id: HR-094
+  name: State refuses to cooperate with international human rights mechanisms
+  definition: The government ignores or blocks UN investigators, rapporteurs or treaty bodies.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 6
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 6, para. 34(g), p. 11
+    quote: (g) Limited cooperation of the State with international and regional human rights mechanisms;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - No response to a UN mission's requests for access (Myanmar FFM, para. 6)
+  cases: []
+  data_needed:
+  - PublicBody
+  - Document (correspondence, requests)
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - UN mission and rapporteur reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Delays from capacity limits
+  - Cooperation through alternative channels
+  jurisdictions: Any country
+  version: 1
+- id: HR-095
+  name: Neighbouring states close borders, force returns or restrict aid to people at risk
+  definition: Nearby countries shut people out, send them back, or block help, leaving the group with
+    nowhere safe to go.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 6
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 6, para. 34(j), p. 12
+    quote: (j) Lack of support by neighbouring States to protect populations at risk and in need of refuge,
+      including by closure of borders, forced repatriation or aid restriction;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Border closed to fleeing civilians
+  cases: []
+  data_needed:
+  - Event (date, location)
+  - PublicBody (border authority)
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - UNHCR data
+  - News archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Temporary closure for health reasons with exceptions for asylum
+  jurisdictions: Any country
+  version: 1
+- id: HR-096
+  name: Denial of a protected group's existence or identity, including mass statelessness
+  definition: Authorities deny that a group exists or refuse to recognise parts of its identity, for example
+    by stripping citizenship or banning its name.
+  areas:
+  - HR
+  typology: 'Atrocity early warning - Risk factor 9 (genocide: intergroup tensions)'
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 9, para. 41(b), p. 15
+    quote: (b) Denial of the existence of protected groups or of recognition of elements of their identity;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Group called foreign 'Bengali' and denied citizenship under the 1982 law (Myanmar)
+  cases:
+  - name: Myanmar - de facto statelessness of the Rohingya
+    year: '2018'
+    jurisdiction: Myanmar
+    what_happened: The UN fact-finding mission found that successive citizenship laws and policies had
+      become increasingly exclusionary and that most Rohingya were de facto stateless, arbitrarily deprived
+      of nationality.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/api/symbol/access?s=A/HRC/39/64&l=en&t=pdf
+    source_title: A/HRC/39/64, para. 21
+  data_needed:
+  - Document (citizenship law)
+  - Identification (type, issuer)
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - Nationality laws
+  - UNHCR statelessness data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Statelessness from administrative gaps rather than policy
+  - Census categories in dispute but rights still protected
+  jurisdictions: Any country
+  version: 1
+- id: HR-097
+  name: Documents or statements revealing intent to target or destroy a group
+  definition: Official papers, manifestos, speeches or posts show, directly or by clear implication, an
+    intent to target or destroy a group.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 10 and 12 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 10, para. 44(a), p. 15
+    quote: (a) Official documents, political manifestos, media records or any other documentation through
+      which a direct intent, or incitement, to target a protected group is revealed, or can be inferred
+      in a way that the implicit message could reasonably lead to acts of destruction against that group;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Prosecutor v. Akayesu, Trial Judgement
+    publisher: International Criminal Tribunal for Rwanda
+    year: '1998'
+    url: https://unictr.irmct.org/sites/unictr.org/files/case-documents/ictr-96-4/trial-judgements/en/980902.pdf
+    locator: Para. 523
+    quote: The Chamber considers that it is possible to deduce the genocidal intent inherent in a particular
+      act charged from the general context of the perpetration of other culpable acts systematically directed
+      against that same group, whether these acts were committed by the same offender or by others.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Commander's post calling a group an 'unfinished job'
+  cases:
+  - name: Myanmar - Senior General Min Aung Hlaing statement
+    year: '2018'
+    jurisdiction: Myanmar
+    what_happened: The UN fact-finding mission cited a Facebook post by the Commander-in-Chief calling
+      'the Bengali problem' 'an unfinished job', and listed the specific utterances of commanders among
+      factors pointing to genocidal intent; it concluded there was sufficient information to warrant investigation
+      and prosecution of senior officials for genocide.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/api/symbol/access?s=A/HRC/39/64&l=en&t=pdf
+    source_title: A/HRC/39/64, paras. 35, 85-87
+  data_needed:
+  - Document / Article / Message (author, date, bodyText)
+  - Person (author, Position)
+  - PublicBody / Organization
+  checkable: person
+  lookup_sources:
+  - Official archives
+  - Social media archives
+  - Leaked documents
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Statement taken out of context
+  - Harsh language about an armed group, not a protected group
+  jurisdictions: Any country
+  version: 1
+- id: HR-098
+  name: Measures affecting reproduction or separating or transferring a group's children
+  definition: Policies limit births in a group or take its children away to another group.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 10
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 10, para. 44(d), p. 16
+    quote: (d) Development of policies or measures that seriously affect the reproductive rights of women,
+      or that contemplate the separation or forcible transfer of children belonging to protected groups;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Rome Statute of the International Criminal Court
+    publisher: International Criminal Court
+    year: '1998'
+    url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+    locator: Article 6(d)-(e)
+    quote: (d) Imposing measures intended to prevent births within the group; (e) Forcibly transferring
+      children of the group to another group.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Limits on the number and spacing of children for one group (Myanmar FFM, para. 23)
+  - Children of a group placed in state institutions or other families
+  cases: []
+  data_needed:
+  - Document (policy, law)
+  - Person (children, parents)
+  - Family (person, relative)
+  - PublicBody / Organization (institutions)
+  - Address
+  checkable: person
+  lookup_sources:
+  - Laws and regulations
+  - Adoption and institution records
+  - Interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - General family-planning policy applied equally and voluntarily
+  - Child protection removals with judicial oversight
+  jurisdictions: Any country; these acts are genocide when done with intent to destroy (Rome Statute art.
+    6(d)-(e))
+  version: 1
+- id: HR-099
+  name: Dehumanising or especially cruel violence meant to humiliate, terrorise or change a group's identity
+  definition: Violence is used in forms that degrade or dehumanise a group, aim to spread terror and break
+    it apart, or force a change of its identity.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 10 and 13 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 10, para. 44(e), p. 16
+    quote: (e) Resort to methods or practices of violence that are particularly harmful against or that
+      dehumanize a protected group, that reveal an intention to cause humiliation, fear or terror to fragment
+      the group, or that reveal an intention to change its identity;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Public mutilation or sexual violence before family members
+  - Forced conversion
+  cases:
+  - name: Ethiopia - dehumanising violence based on ethnicity
+    year: '2022'
+    jurisdiction: Ethiopia
+    what_happened: The UN Commission listed 'particularly dehumanizing types of violence inflicted upon
+      civilians on the basis of their ethnicity and perceived allegiance with the enemy' among UN Framework
+      indicators present.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/api/symbol/access?s=A/HRC/51/46&l=en&t=pdf
+    source_title: A/HRC/51/46, para. 127(d)
+  data_needed:
+  - Event (date, location, involved)
+  - Video / Image
+  - Document (medical, witness statements)
+  checkable: person
+  lookup_sources:
+  - Witness interviews
+  - Verified open-source footage
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Criminal violence without a group dimension
+  jurisdictions: Any country
+  version: 1
+- id: HR-100
+  name: Public euphoria at having control over a protected group
+  definition: Leaders or supporters publicly celebrate dominance over a group and its existence.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 10
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 10, para. 44(g), p. 16
+    quote: (g) Expressions of public euphoria at having control over a protected group and its existence;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Soldiers filming themselves celebrating over detained civilians
+  cases: []
+  data_needed:
+  - Video / Image / Message (author, date)
+  - Person (speaker or poster)
+  - Organization (unit)
+  checkable: person
+  lookup_sources:
+  - Social media archives
+  - Open-source footage
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Celebration of a military victory over armed fighters, not civilians
+  jurisdictions: Any country
+  version: 1
+- id: HR-101
+  name: Violence against civilians grows in scale, area, organisation or coordination
+  definition: Attacks hit more people or places, become more severe, or show growing organisation, logistics
+    and coordination.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 11 (signs of widespread or systematic attack)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 11, para. 46(b)-(c), pp. 16-17
+    quote: (c) Increase in the level of organization or coordination of violent acts and weapons used
+      against a civilian population;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Attackers organised along ethnic lines travel long distances with logistics to burn homes
+  cases:
+  - name: Kenya - coordinated ethnic attacks after 2007 elections (CIPEV)
+    year: '2008'
+    jurisdiction: Kenya
+    what_happened: The Commission found attackers organised along ethnic lines, assembled considerable
+      logistical means and travelled long distances to attack people because of their ethnicity and political
+      persuasion.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://reliefweb.int/report/kenya/kenya-commission-inquiry-post-election-violence-cipev-final-report
+    source_title: CIPEV final report, executive summary (ReliefWeb)
+  data_needed:
+  - Event (date, location, involved) over time
+  - Organization
+  - Vehicle / Trip
+  checkable: records
+  lookup_sources:
+  - Conflict event datasets
+  - Satellite imagery
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - More reporting rather than more incidents
+  - Spread of ordinary crime
+  jurisdictions: Any country
+  version: 1
+- id: HR-102
+  name: Lists of targets or other evidence of a plan or policy to attack civilians
+  definition: Lists of people to be arrested or killed, plans, or other documents point to a state or
+    organisational policy to attack civilians.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 11 and 12 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 12, para. 48(a), p. 17
+    quote: (a) Official documents, political manifestos, media records, or any other documentation through
+      which the existence of a State or organizational plan or policy to target civilian populations or
+      protected groups is directly revealed, or could be inferred;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Rome Statute of the International Criminal Court
+    publisher: International Criminal Court
+    year: '1998'
+    url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+    locator: Article 7(2)(a)
+    quote: '"Attack directed against any civilian population" means a course of conduct involving the
+      multiple commission of acts referred to in paragraph 1 against any civilian population, pursuant
+      to or in furtherance of a State or organizational policy to commit such attack;'
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Army asked to compile lists of 'enemy accomplices' defined by ethnicity
+  cases:
+  - name: Prosecutor v. Bagosora et al. (Military I), ICTR-98-41 - conspiracy charge
+    year: '2008'
+    jurisdiction: International Criminal Tribunal for Rwanda
+    what_happened: The Trial Chamber found Nsengiyumva was involved in maintaining lists of suspected
+      accomplices of the RPF and that there were indications that might be construed as evidence of a
+      plan, but held conspiracy to commit genocide was not the only reasonable inference and acquitted
+      all accused of that charge. Lists alone did not prove a genocidal plan.
+    outcome: acquitted
+    outcome_verified: true
+    source_url: https://unictr.irmct.org/sites/unictr.org/files/case-documents/ictr-98-41/trial-judgements/en/081218.pdf
+    source_title: Bagosora et al. Trial Judgement, 18 December 2008, paras. 9-13
+  data_needed:
+  - Document (lists, orders; author, date)
+  - Person (listed individuals, authors)
+  - PublicBody / Organization
+  - Mention (person, document)
+  checkable: person
+  lookup_sources:
+  - Leaked or seized documents
+  - Court exhibits
+  - Witness interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful wanted lists of named suspects with due process
+  - Administrative lists (voters, staff) misread as target lists
+  jurisdictions: Any country; a 'State or organizational policy' is an element of crimes against humanity
+    under Rome Statute art. 7(2)(a)
+  version: 1
+- id: HR-103
+  name: Measures that alter the ethnic, religious or political make-up of a population or area
+  definition: Policies or actions change who lives in an area, for example by expelling one group and
+    settling another.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 12
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 12, para. 48(c), p. 17
+    quote: (c) Adoption of measures that result in the alteration of the ethnic, religious, racial or
+      political composition of the overall population, including in defined geographical areas;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Resettlement programmes moving another group onto cleared land
+  cases:
+  - name: Myanmar - exclusionary policies to alter demographic composition
+    year: '2018'
+    jurisdiction: Myanmar
+    what_happened: The UN fact-finding mission listed 'exclusionary policies, including to alter the demographic
+      composition of Rakhine State' among factors pointing to genocidal intent.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/api/symbol/access?s=A/HRC/39/64&l=en&t=pdf
+    source_title: A/HRC/39/64, para. 85
+  data_needed:
+  - Address / RealEstate
+  - Document (resettlement plans)
+  - Project (name, participants)
+  - PublicBody
+  checkable: lookups
+  lookup_sources:
+  - Census and population data
+  - Land registries
+  - Satellite imagery
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Voluntary migration
+  - Urban development with consent and compensation
+  jurisdictions: Any country
+  version: 1
+- id: HR-104
+  name: State institutions or senior political or military authorities involved in violence
+  definition: Government bodies or high-ranking officials take part in, order or facilitate violence,
+    or deliberately fail to stop it to encourage it.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 12
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 12, para. 48(h) and (j), p. 18
+    quote: (j) Involvement of State institutions or high-level political or military authorities in violent
+      acts.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Local officials guide attackers to targets
+  cases:
+  - name: Myanmar - Tatmadaw as main perpetrator
+    year: '2018'
+    jurisdiction: Myanmar
+    what_happened: The UN fact-finding mission found the Tatmadaw was the main perpetrator of serious
+      violations in Kachin, Rakhine and Shan States, with police and border guards also perpetrators and
+      local authorities, militias, politicians and monks participating or assisting.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/api/symbol/access?s=A/HRC/39/64&l=en&t=pdf
+    source_title: A/HRC/39/64, para. 90
+  data_needed:
+  - Person (official) with Position / Occupancy
+  - PublicBody
+  - Event (involved)
+  - Document (orders)
+  checkable: person
+  lookup_sources:
+  - Inquiry reports
+  - Witness interviews
+  - Official records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Officials present to restore order
+  - Individual misconduct punished by the state
+  jurisdictions: Any country
+  version: 1
+- id: HR-105
+  name: Development, acquisition or threatened use of indiscriminate or prohibited weapons, and refusal
+    of inspections
+  definition: A party plans, makes, stores or threatens to use weapons that cannot tell civilians from
+    fighters or cause needless suffering, and blocks independent inspection.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 10, 11 and 13 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 13, para. 50(j)-(k), p. 19
+    quote: (k) Refusal to allow inspections by competent and independent bodies into allegations of conduct
+      included in (j) above, or action to stop such conduct;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 11, para. 46(h), p. 17
+    quote: (h) Signs of development or increased use of means or methods of violence that are incapable
+      of distinguishing between civilian and military targets or that are capable of mass destruction,
+      persecution or weakening of communities.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Purchases of chemical precursors by a military entity
+  - Inspectors denied access to an alleged attack site
+  cases: []
+  data_needed:
+  - Contract / Payment (precursor or weapon purchases)
+  - Company
+  - Vessel / Trip
+  - Document (inspection requests)
+  - Image (munition remnants)
+  checkable: lookups
+  lookup_sources:
+  - Weapons inspection body reports
+  - Export control and sanctions lists
+  - Open-source munition identification
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Indiscriminate or prohibited weapons depend on controlled goods, so the trail runs through
+      export controls and sanctions.
+    source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  innocent_explanations:
+  - Dual-use chemicals for legitimate industry
+  - Inspection delayed for genuine safety reasons
+  jurisdictions: Any country
+  version: 1
+- id: HR-106
+  name: Fragmentation of parties to a conflict or breakdown of chains of command
+  definition: Armed parties split into factions or lose command control, so no one restrains fighters.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 13 and 14 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 13, para. 50(a), p. 18; Risk factor 14, para. 52(d), p. 20
+    quote: (a) Fragmentation of parties to the conflict or disintegration or absence of chains of command
+      within them;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Splinter groups form after a peace deal
+  cases: []
+  data_needed:
+  - Organization (armed groups)
+  - Membership (member, organization, role)
+  - Person (commanders)
+  checkable: lookups
+  lookup_sources:
+  - Conflict monitoring reports
+  - UN panel reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Reorganisation into a unified force under a peace process
+  jurisdictions: Any country
+  version: 1
+- id: HR-107
+  name: Rules of engagement or laws allowing disproportionate or indiscriminate force, or no-survivors
+    orders
+  definition: Orders, rules or laws permit force out of proportion or without distinguishing civilians,
+    or threaten warfare with no quarter.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 13 (war crimes)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 13, para. 50(m)-(n), p. 19
+    quote: (m) Issuance of rules of engagement or legislation that allow the disproportionate or indiscriminate
+      use of force, or failure to take action to avoid launching such attacks or to conduct military operations
+      in heavily populated areas or to non-military targets;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 13, para. 50(q), p. 19
+    quote: (q) Threats or orders of warfare without concessions or where there would be no survivors;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Order declaring a whole area a free-fire zone
+  cases: []
+  data_needed:
+  - Document (orders, rules; author, date)
+  - Person (issuing commander)
+  - Organization
+  checkable: person
+  lookup_sources:
+  - Leaked orders
+  - Court exhibits
+  - Official statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Rhetoric not reflected in actual orders
+  - Rules consistent with humanitarian law but loosely worded
+  jurisdictions: Any country
+  version: 1
+- id: HR-108
+  name: 'Perfidy: misuse of protected emblems or fighters disguised as civilians'
+  definition: Fighters misuse Red Cross, UN or truce symbols, remove protective signs, or pose as civilians
+    to deceive the enemy.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factors 13 and 14 (merged)
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 13, para. 50(o), p. 19
+    quote: (o) Use of methods of warfare that reveal treachery, including taking advantage of the symbols
+      or emblems of humanitarian or peacekeeping personnel, or not wearing uniforms or distinctive combat
+      gear to portray combatants as civilians;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 14, para. 52(f)-(g), p. 20
+    quote: (f) Tampering with or removal of signs identifying protected objects or locations where humanitarian
+      or peacekeeping operations are stationed or providing support;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Armed men using a vehicle marked as an ambulance
+  cases: []
+  data_needed:
+  - Image / Video (date, location)
+  - Vehicle
+  - Organization
+  checkable: person
+  lookup_sources:
+  - Verified open-source footage
+  - Humanitarian security incident reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Irregular forces without uniforms who do not feign civilian status
+  - Misidentified vehicles
+  jurisdictions: Any country
+  version: 1
+- id: HR-109
+  name: Logistics prepared for moving or confining large numbers of people
+  definition: Personnel, transport and facilities are prepared to move or hold large numbers of people,
+    or to carry out medical experiments.
+  areas:
+  - HR
+  typology: Atrocity early warning - Risk factor 13
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 13, para. 50(i), p. 19
+    quote: (i) Evidence of preparation of personnel and logistics enabling the transportation, movement
+      or confinement of large numbers of people, or the conducting of medical experiments;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - New fenced compounds built near a minority area
+  - Procurement of buses or trains without clear civilian purpose
+  cases: []
+  data_needed:
+  - Contract / ContractAward (construction or transport)
+  - Company
+  - Address
+  - Image (satellite imagery)
+  checkable: lookups
+  lookup_sources:
+  - Satellite imagery
+  - Procurement records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful prison or camp building
+  - Evacuation planning for disasters
+  jurisdictions: Any country
+  version: 1
+- id: HR-110
+  name: Threats, attacks or obstruction against humanitarian or peacekeeping personnel
+  definition: Aid workers or peacekeepers are threatened, attacked, seen as partisan, or attacked near
+    their bases and routes.
+  areas:
+  - HR
+  typology: 'Atrocity early warning - Risk factor 14 (war crimes: threats to humanitarian or peacekeeping
+    operations)'
+  status: verified
+  sources:
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 14, para. 52(h)-(j), p. 20
+    quote: (i) Discourse or evidence of plans that suggest a threat, or the incitement or tolerance of
+      acts of violence against humanitarian or peacekeeping operations and personnel;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Framework of Analysis for Atrocity Crimes (A/70/741-S/2016/71)
+    publisher: United Nations
+    year: '2016'
+    url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+    locator: Risk factor 14, para. 52(a)-(b), p. 20
+    quote: (a) Perceptions of partiality or political interference by humanitarian or peacekeeping operations,
+      their members, the broader international community, international, regional or national organizations,
+      individual countries, or others sponsoring or participating in the operations;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Shelling near a UN base
+  - Officials accuse an aid agency of helping the enemy
+  cases:
+  - name: Ethiopia - obstruction of humanitarian access
+    year: '2022'
+    jurisdiction: Ethiopia
+    what_happened: The UN Commission listed 'obstruction of humanitarian access and attacks on humanitarian
+      aid workers' among UN Framework indicators present in Ethiopia.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://documents.un.org/api/symbol/access?s=A/HRC/51/46&l=en&t=pdf
+    source_title: A/HRC/51/46, para. 127(g)
+  data_needed:
+  - Event (date, location, involved)
+  - Organization (agency)
+  - Address (bases, routes)
+  - Message / Article (threats)
+  checkable: lookups
+  lookup_sources:
+  - Aid worker security databases
+  - UN mission reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Crossfire not aimed at aid workers
+  - Criminal robbery unrelated to the conflict
+  jurisdictions: Any country
   version: 1
 not_reached:
 - 'FATF ''Money Laundering and Terrorist Financing in the Art and Antiquities Market'' (2023): the official
@@ -2659,3 +5890,20 @@ not_reached:
 - 'Manhattan DA press releases (Steinhardt, Kapoor): manhattan.da.ny.gov blocks robots; facts taken from
   OCCRP and Hyperallergic reports on them.'
 - 'Interpol cultural property pages, UNESCO 1954 Hague Convention and UNIDROIT 1995 text: not opened.'
+- 'WebSearch: the run''s shared search budget (200 calls) was used up before this agent''s first search,
+  so no searches were made; all sources were fetched directly from known primary URLs'
+- UN Framework of Analysis on un.org / static.un.org (403 from CloudFront); I used the identical text
+  in UN document A/70/741-S/2016/71 at documents.un.org
+- 'ICC case page for Abd-Al-Rahman (Ali Kushayb): the page I reached still shows deliberations with no
+  verdict, and the guessed URL for a verdict press release returned ''Page not found''. A conviction is
+  therefore not stated or used as a case'
+- OHCHR Genocide Convention page (Cloudflare challenge); I used Rome Statute art. 6 instead
+- 'Full Kenya CIPEV (Waki) report PDF: only the ReliefWeb executive summary was read'
+- 'Myanmar FFM detailed report A/HRC/39/CRP.2 and Syria COI ''They came to destroy'' A/HRC/32/CRP.2: the
+  symbol links returned HTML, not the PDFs'
+- 'Framework indicators left out as already covered by existing HR entries: 13(h)/HR-033 (relief obstruction),
+  13(l)/HR-031 (unacknowledged detention), 11(a)/12(i)/HR-029 (widespread attack), 7(j) displacement/HR-032,
+  13(p)/HR-027-028 (cultural destruction, pillage), 5(h) arms supply/HR-025'
+- 'Framework indicators not given their own entry because they are hard to check or too general: 1(c)
+  humanitarian crisis, 3(a)(b)(g)-(j) institutional capacity, 5(d) culture of obedience, 6(a)(c)(e)(f)(h)(i)(k),
+  9(d)-(f), 13(b)(c)(f)(g)(r), 14(c). They are listed here so Ony can decide whether to add them'

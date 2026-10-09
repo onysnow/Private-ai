@@ -23,7 +23,7 @@ indicators:
     quote: raw or squared wooden logs, plastic waste or pellets, frozen food, fish maws, various kinds
       of beans, stone or quartz blocks.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and the Illegal Wildlife Trade
     publisher: FATF
     year: '2020'
@@ -32,7 +32,7 @@ indicators:
     quote: Importantly, criminals incorporate shell and front companies in the both source or destination
       countries for the illicit wildlife
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A Kenyan 'tea trading' company set up to hide ivory inside tea sacks (FATF 2020 Box 6)
   - Front companies importing garlic and citric acid and exporting seafood/shells to hide ivory (Mikocheni
@@ -99,7 +99,7 @@ indicators:
     quote: Use of common containers, consignees, transporter, clearing agents, or exporters as seen in
       other cases believed to involve IWT.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A consignee named in a past ivory seizure appears as buyer on a new timber shipment
   cases: []
@@ -147,7 +147,7 @@ indicators:
     quote: Large cash deposit by government officials working in wildlife protection agencies, border
       control or customs and revenue officials.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and the Illegal Wildlife Trade
     publisher: FATF
     year: '2020'
@@ -156,7 +156,7 @@ indicators:
     quote: who have specific management or oversight authority of government stockpiles of seized ivory,
       rhino horn, timber, or other illegal wildlife products.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering from Environmental Crime
     publisher: FATF
     year: '2021'
@@ -166,7 +166,7 @@ indicators:
       (or family members of) with a position of responsibility related to the management or preservation
       of natural resources (e.g. forestry or mining officials).
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A CITES Management Authority employee makes repeated cash deposits far above salary
   - A police officer's brother-in-law's account receives proceeds from armadillo sales (Indonesia, FATF
@@ -222,7 +222,7 @@ indicators:
     quote: Activity involving PEPs and wealthy businessmen/women, particularly those with environmental,
       game, or forestry oversight or environmental or wildlife-related businesses
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering from Environmental Crime
     publisher: FATF
     year: '2021'
@@ -231,7 +231,7 @@ indicators:
     quote: PEP or public official with responsibilities for environment management/protection or land/tenure
       rights travelling to offshore jurisdictions for undisclosed business activities.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A forestry minister's relative holds shares in a logging concessionaire
   - A mining official makes repeated trips to an offshore financial centre
@@ -286,7 +286,7 @@ indicators:
       stores, safari companies, pharmaceutical companies making medicines containing wildlife and wildlife
       collectors or reserves.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and the Illegal Wildlife Trade
     publisher: FATF
     year: '2020'
@@ -295,7 +295,7 @@ indicators:
     quote: Legitimate pet stores and private “zoos”, “farms” or “parks” are often used to facilitate the
       illicit pet trade
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A private 'tiger zoo' selling cubs and parts using false receipts (FATF 2020 Box 4)
   - A fish farm used to hold smuggled glass eels before export (German and UK cases)
@@ -340,7 +340,7 @@ indicators:
     quote: Transactions to licenced pet shop suppliers/breeders that originate from overseas, and/or incommensurate
       with stated business activities.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and the Illegal Wildlife Trade
     publisher: FATF
     year: '2020'
@@ -349,7 +349,7 @@ indicators:
     quote: Large transactions to licenced pet shop suppliers/breeders where there is significant discrepancies
       between the animal/product ordered and the value of the good.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A small reptile breeder receives large overseas wires
   - A breeder pays an individual previously convicted of poaching
@@ -394,7 +394,7 @@ indicators:
     quote: Individual or beneficial owner(s) of a corporate domiciled in jurisdiction that is a prominent
       transit or demand country for illegal wildlife.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and the Illegal Wildlife Trade
     publisher: FATF
     year: '2020'
@@ -403,7 +403,7 @@ indicators:
     quote: Individuals or companies suspected of being involved, or linked to, IWT networks using bank
       accounts and addresses located in different countries.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A Ugandan-resident Liberian national receiving wires from Asian buyers (Kromah case)
   cases: []
@@ -448,7 +448,7 @@ indicators:
     quote: Shipments of legal wildlife (fauna and flora) with anomalous, incomplete, or otherwise suspicious
       CITES certificates.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and the Illegal Wildlife Trade
     publisher: FATF
     year: '2020'
@@ -456,7 +456,7 @@ indicators:
     locator: Box 2, p.11
     quote: wild-caught animals falsely declared as captive-bred, wildlife falsely declared as being pre-Convention
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - CITES permit numbers that do not exist in the issuing country's records
   - Large exports of 'captive-bred' animals of a species that rarely breeds in captivity
@@ -515,7 +515,7 @@ indicators:
     locator: Annex A, B, p.61
     quote: Transaction references using specimen names or veiled speech.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and the Illegal Wildlife Trade
     publisher: FATF
     year: '2020'
@@ -524,7 +524,7 @@ indicators:
     quote: Transactions using names of ingredients or products in the traditional medical trade that refer
       to CITIES species.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Wire memo reading 'horn' or 'scales'
   - Invoice for traditional medicine ingredient named after pangolin
@@ -565,7 +565,7 @@ indicators:
     quote: Illogical or anomalous loans between trading or import/export companies in key IWT source or
       transit countries.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
     publisher: FATF / APG
     year: '2015'
@@ -573,7 +573,7 @@ indicators:
     locator: Section 4 Red flags, Payment behaviour, p.22
     quote: Granting of loans (with zero interest rates) to foreign companies.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An import company lends money to an unrelated exporter in a wildlife source country with no repayment
     terms
@@ -617,7 +617,7 @@ indicators:
     quote: Switched bills of lading by traders previously implicated in criminal activity involving wildlife
       trafficking or trade fraud investigations or prosecutions.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering from Environmental Crime
     publisher: FATF
     year: '2021'
@@ -627,7 +627,7 @@ indicators:
       change ownership and Bill of Lading en route, often in a customs free trade zone, and is imported
       at recipient countries at higher declared values.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - '''Tea'' shipments that changed destination twice and consignee name en route (FATF 2020 Box 6)'
   cases: []
@@ -677,7 +677,7 @@ indicators:
       and shipping documents and invoice, relative to the actual goods shipped or quoted price or the
       actual value in payments made.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering from Environmental Crime
     publisher: FATF
     year: '2021'
@@ -686,7 +686,7 @@ indicators:
     quote: False or questionable statements on bank loans, letters of credit, customs and shipping documents
       associated with the timber trade.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
     publisher: FATF / APG
     year: '2015'
@@ -694,7 +694,7 @@ indicators:
     locator: Section 4, Trade-based behaviour, p.21
     quote: Misclassification of gold purity, weight, origin and value on customs declaration forms.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
     publisher: FATF / APG
     year: '2015'
@@ -703,7 +703,7 @@ indicators:
     quote: Consignment size or type of commodity being shipped appears inconsistent with the scale or
       capacity of the exporter or importer’s having regard to their regular business activities
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Mongolian oak from Russia declared as Welsh oak (Lumber Liquidators)
   - Glass eels declared as 'chilled fish' (UK case)
@@ -763,7 +763,7 @@ indicators:
     quote: Co-mingling of funds through related businesses and export/sale of undervalued products, using
       back-to-back invoicing suggesting ongoing illegal transfer pricing scheme.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
     publisher: FATF / APG
     year: '2015'
@@ -771,7 +771,7 @@ indicators:
     locator: Section 4, Product differentiation, p.21
     quote: Gold prices higher than those of the local gold market.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Logs exported to an affiliate at half the world price then resold at full price from a tax haven
   cases: []
@@ -820,7 +820,7 @@ indicators:
     quote: One risk indicator for this case was that the final destination was East Asia that is not a
       major export market for tea from Africa.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and the Illegal Wildlife Trade
     publisher: FATF
     year: '2020'
@@ -829,7 +829,7 @@ indicators:
     quote: One other suspicious element of the case was that the company purported to send the shrimp
       to Vietnam, although Vietnam is one of the most important suppliers in the world of this commodity.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: What to look for (factsheet)
     publisher: ROUTES Partnership
     year: ''
@@ -837,7 +837,7 @@ indicators:
     locator: Cargo handler indicators
     quote: Cargo origin does not match declared contents
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - African tea shipped to East Asia
   - French 'shrimp' exports to Vietnam that hid glass eels
@@ -890,7 +890,7 @@ indicators:
     locator: Annex A, B, p.61
     quote: Payments for wildlife shipping are often masked as payment for gold or to gold trading business.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A freight company with no gold licence pays a gold trader in a wildlife source country
   cases: []
@@ -934,7 +934,7 @@ indicators:
     quote: Escrow-type transactions from/to accounts and companies with same beneficial owner in particular
       for payment of cross-border and transcontinental shipments.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Company A in Africa and Company B in Asia, both owned by one person, pass the same sum between them
     around each shipment
@@ -979,7 +979,7 @@ indicators:
     quote: Third-party wire transfers/cash deposits to, or withdrawals by, known wildlife poachers and
       traffickers.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and the Illegal Wildlife Trade
     publisher: FATF
     year: '2020'
@@ -988,7 +988,7 @@ indicators:
     quote: International wire transfers from known wildlife traffickers to a relative’s accounts as tuition,
       allowance, or family support payments.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and the Illegal Wildlife Trade
     publisher: FATF
     year: '2020'
@@ -997,7 +997,7 @@ indicators:
     quote: Transactions from known traffickers to individuals who then pay for couriers or packages via
       the post.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A Malawi kingpin's transactions with his daughter's and workers' accounts with no clear purpose (FATF
     2020 Box 16)
@@ -1054,7 +1054,7 @@ indicators:
     quote: Transactions for hired vehicles and domestic accommodation from known members of a trafficking
       syndicate who are not present in the country or region within a country.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and the Illegal Wildlife Trade
     publisher: FATF
     year: '2020'
@@ -1063,7 +1063,7 @@ indicators:
     quote: Airline passengers traveling on high-risk IWT routes on tickets paid for by a third party or
       in cash.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and the Illegal Wildlife Trade
     publisher: FATF
     year: '2020'
@@ -1071,7 +1071,7 @@ indicators:
     locator: Annex A, B, p.62
     quote: Rental card transactions with two bookings close in time in neighbouring countries.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A trafficker in Asia pays for a car hire near a national park in Africa
   cases: []
@@ -1115,7 +1115,7 @@ indicators:
     locator: Annex A, B, p.62
     quote: Middleman transactions – large incoming payments followed by smaller outgoing payments.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A dealer receives one wire from Asia then pays many local suppliers in small amounts
   cases: []
@@ -1156,7 +1156,7 @@ indicators:
     quote: Large dollar wire transfers between wildlife farms and firms operating in inconsistent lines
       of business.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and the Illegal Wildlife Trade
     publisher: FATF
     year: '2020'
@@ -1164,7 +1164,7 @@ indicators:
     locator: Annex A, B, p.62
     quote: Payments between entities operating in disparate lines of business.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering from Environmental Crime
     publisher: FATF
     year: '2021'
@@ -1173,7 +1173,7 @@ indicators:
     quote: Frequent payments from companies in the extractive sector to suppliers or beneficiaries unrelated
       to the legal person’s activity or business.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering from Environmental Crime
     publisher: FATF
     year: '2021'
@@ -1181,7 +1181,7 @@ indicators:
     locator: Annex A, Economic Activities (waste), p.56
     quote: Unexplained investment or sponsorship in entities that are not associated with waste.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Italian waste network laundering through simulated sports sponsorship (FATF 2021 Box 3.4)
   - Brazilian hairdressers receiving funds and passing them to illegal emerald miners (FATF 2021 Box 3.3)
@@ -1248,7 +1248,7 @@ indicators:
     locator: Annex A, C. Other, p.62
     quote: Payments from companies/owners from industries using IWT products
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A medicine manufacturer pays an individual named in a pangolin seizure
   cases: []
@@ -1289,7 +1289,7 @@ indicators:
     quote: Adverse media connected to wildlife or environmental crimes identified in open and available
       sources on individuals and/or entities involved in reviewed financial transactions.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering from Environmental Crime
     publisher: FATF
     year: '2021'
@@ -1299,7 +1299,7 @@ indicators:
       organizations (public and confidential) as being involved in bribery, corruption, environmental
       or other organised crimes.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Elemetal kept buying from suppliers linked in open sources to criminally derived gold (US DOJ 2018)
   cases:
@@ -1353,7 +1353,7 @@ indicators:
     locator: para 39, p.21
     quote: Countries highlighted that criminals are also using informal MVTS networks
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and the Illegal Wildlife Trade
     publisher: FATF
     year: '2020'
@@ -1362,7 +1362,7 @@ indicators:
     quote: examples of criminals misusing pre-paid cards, mobile apps or social media-based platforms
       linked to bank accounts, to transfer and launder funds from IWT
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - About USD 1 million of iTunes prepaid cards seized from suspected rhino horn traffickers in South
     Africa (FATF 2020 Box 10)
@@ -1417,7 +1417,7 @@ indicators:
       and luxury items (e.g., vehicles, jewellery and artwork) to launder proceeds from IWT at the integration
       stage.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A rhino horn syndicate laundering about USD 1 million through cash purchases of property and luxury
     vehicles (FATF 2020 Box 7)
@@ -1484,7 +1484,7 @@ indicators:
     quote: Companies operating in the logging sector with frequent transactions to offshore financial
       centres.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
     publisher: FATF / APG
     year: '2015'
@@ -1493,7 +1493,7 @@ indicators:
     quote: Registration of a trading company in a tax haven even though its business relates to another
       jurisdiction.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
     publisher: FATF / APG
     year: '2015'
@@ -1501,7 +1501,7 @@ indicators:
     locator: Section 4, Company behaviour, p.21
     quote: Use of a corporate structure of shell companies located across the jurisdictions.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Gertler's Fleurette Properties using offshore companies for DRC mining deals (FATF 2021 Box A C.2)
   cases: []
@@ -1547,7 +1547,7 @@ indicators:
     quote: Large cash withdrawals from financial institutions operating in rural areas that may be in
       proximity to illegal mining or logging areas.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
     publisher: FATF / APG
     year: '2015'
@@ -1555,7 +1555,7 @@ indicators:
     locator: Section 4, Payment behaviour, p.22
     quote: Significant cash withdrawals from bank accounts by participants within the gold trading industry.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Weekly six-figure withdrawals at a branch near an illegal gold field
   cases: []
@@ -1596,7 +1596,7 @@ indicators:
     quote: Sudden and unexplained increases in economic activity (formal and informal) in rural or isolated
       zones, particularly in source countries for illegal logging and mining.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Mobile money volumes in a forest district triple in a year with no new legal project
   cases: []
@@ -1639,7 +1639,7 @@ indicators:
       gas stations) to beneficiaries in areas known as a source of gold mining and illegal logging and
       illegal land clearing.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A fuel station invoicing an illegal mine for diesel instead of pump payments (FATF footnote 28)
   cases: []
@@ -1680,7 +1680,7 @@ indicators:
     locator: Annex A, Transaction and Cash Flows, p.53
     quote: Receiving deposits and wire transfers from several origins without economic or financial grounds.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering from Environmental Crime
     publisher: FATF
     year: '2021'
@@ -1690,7 +1690,7 @@ indicators:
       from foreign nationals (or companies owned by foreign nationals) where there is no clear business
       relationship.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A timber dealer's account fed by dozens of foreign individuals, then emptied in cash
   cases: []
@@ -1731,7 +1731,7 @@ indicators:
     quote: Transfers from country where the gold smelters are located to source countries for gold, and
       almost immediate cash withdrawal of majority of the transfer.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
     publisher: FATF / APG
     year: '2015'
@@ -1739,7 +1739,7 @@ indicators:
     locator: Section 4, Payment behaviour, p.22
     quote: Large amount of funds transferred internationally and then withdrawn very quickly.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - NTR Metals in Miami paid Chilean smugglers by wire for gold hand-carried to the US (FATF 2021 Box
     3.5)
@@ -1794,7 +1794,7 @@ indicators:
     quote: Increase in transactions between entities or individuals not registered in mining/logging sector
       (i.e., non-license-holding) and equipment leasing companies and equipment sales companies
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An individual with no concession buys excavators and mercury
   cases: []
@@ -1838,7 +1838,7 @@ indicators:
     quote: Recently created companies that register gold exports for significant amounts and noticeably
       brief period of operations.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering from Environmental Crime
     publisher: FATF
     year: '2021'
@@ -1848,7 +1848,7 @@ indicators:
       income inconsistent with the activity being undertaken, where the primary customer or beneficiary
       is a related corporate entity.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
     publisher: FATF / APG
     year: '2015'
@@ -1856,7 +1856,7 @@ indicators:
     locator: Section 4, Company behaviour, p.20
     quote: Changes to business name of entities registered to deal in gold.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A company formed six months ago exports tonnes of gold then stops filing
   cases: []
@@ -1898,7 +1898,7 @@ indicators:
     quote: Aberrations/anomalous bank activity (i.e., sudden, or unexplained changes to cash flows) or
       corporate revenues of company operating in natural resource supply chains (e.g. processing, harvesting).
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering from Environmental Crime
     publisher: FATF
     year: '2021'
@@ -1908,7 +1908,7 @@ indicators:
       by the official production capacity, the production capacity of similar companies in their sector,
       or the number of employees.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
     publisher: FATF / APG
     year: '2015'
@@ -1916,7 +1916,7 @@ indicators:
     locator: Section 4, Gold mining behaviour, p.23
     quote: Licensed mines where the production has decreased with no apparent explanation.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A sawmill with 10 staff reports sales typical of a 200-staff mill
   cases:
@@ -1970,7 +1970,7 @@ indicators:
     locator: Annex A, Customers, p.54
     quote: Customers with mining licenses operating in or around active conflict zones.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected
       and High-Risk Areas, 3rd ed.
     publisher: OECD
@@ -1979,7 +1979,7 @@ indicators:
     locator: Supplement on Gold, Step 2.B, Red flag locations, p.86
     quote: The gold originates from or has been transported through a conflict-affected or high-risk area.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected
       and High-Risk Areas, 3rd ed.
     publisher: OECD
@@ -1990,7 +1990,7 @@ indicators:
       locations of gold origin and transit, or have shareholder or other interests in suppliers of gold
       from one of the above-mentioned red flag locations of gold origin and transit.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A gold exporter sourcing from eastern DRC mining sites
   cases: []
@@ -2040,7 +2040,7 @@ indicators:
     quote: Individual identified as a manager or director of several companies linked to environmental
       extraction.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
     publisher: FATF / APG
     year: '2015'
@@ -2049,7 +2049,7 @@ indicators:
     quote: Numerous sole proprietorship businesses/private limited companies set up by seemingly unrelated
       people (proxies) but controlled by the same group of people.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
     publisher: FATF / APG
     year: '2015'
@@ -2057,7 +2057,7 @@ indicators:
     locator: Section 4, Company behaviour, p.21
     quote: Significant number of companies registered to one natural person.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The same director listed on six gold-trading firms registered at different addresses
   cases: []
@@ -2101,7 +2101,7 @@ indicators:
     quote: Frequent buying and selling of shares in companies holding agricultural or logging permits,
       especially transactions involving shareholders in third party jurisdictions.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A plantation permit holder changes owners three times in two years through foreign holding companies
   cases: []
@@ -2286,7 +2286,7 @@ indicators:
     quote: Natural person or business sells gold saying that it comes from a place with no extraction
       license or from places with no gold mines.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
     publisher: FATF / APG
     year: '2015'
@@ -2294,7 +2294,7 @@ indicators:
     locator: Section 4, Gold mining behaviour, p.22
     quote: Production and commercialisation of gold by a person or business without a license.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Lumber Liquidators imported from suppliers 'unable to provide documentation of legal harvest' (US
     DOJ 2015)
@@ -2368,7 +2368,7 @@ indicators:
     quote: The gold is claimed to originate from a country that has limited known reserves or stocks,
       likely resources or expected production levels of gold
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A country with almost no mines reporting large gold exports
   cases: []
@@ -2466,7 +2466,7 @@ indicators:
     quote: Gold is transhipped through one or more such high risk / sensitive jurisdictions for no apparent
       economic reason.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected
       and High-Risk Areas, 3rd ed.
     publisher: OECD
@@ -2476,7 +2476,7 @@ indicators:
     quote: The gold is claimed to originate from a country through which gold from conflict-affected and
       high-risk areas is known or reasonably suspected to transit.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Gold from a land-locked conflict country declared as originating in its neighbour
   cases: []
@@ -2599,7 +2599,7 @@ indicators:
     quote: The development of mining activities using machinery and equipment that is not in accordance
       with the characteristics of the licensed small or artisanal mining.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
     publisher: FATF / APG
     year: '2015'
@@ -2607,7 +2607,7 @@ indicators:
     locator: Section 4, Gold mining behaviour, p.23
     quote: The development of mining activities in prohibited areas.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Dredges and excavators on an artisanal permit
   - Mining inside a national park
@@ -2653,7 +2653,7 @@ indicators:
       in a country where gold from conflict-affected and high-risk areas is known or reasonably suspected
       to transit.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - '''Scrap jewellery'' exports from a hub that also receives artisanal gold from conflict areas'
   cases: []
@@ -2694,7 +2694,7 @@ indicators:
     quote: Suppliers or other known upstream companies are known to have sourced gold from a red flag
       location of gold origin and transit in the last 12 months.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A trader's purchase records show gold bought in a conflict zone eight months ago
   cases: []
@@ -2737,7 +2737,7 @@ indicators:
     quote: Criminals frequently trade illegal gold through illicit shell companies using false or incomplete
       documents.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Elemetal/NTR buying from 'gold collectors' and rotating front companies (2012-2016)
   cases:
@@ -2795,7 +2795,7 @@ indicators:
       timeframe, or when large amounts are purchased at once, or when there are structured cash deposits
       into an account to finance a single gold bullion purchase.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money laundering and terrorist financing risks and vulnerabilities associated with gold
     publisher: FATF / APG
     year: '2015'
@@ -2803,7 +2803,7 @@ indicators:
     locator: Section 4, Payment behaviour, p.22
     quote: Original source of funds to buy gold bullion cannot be established.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Several cash deposits just under the reporting limit followed by one bullion purchase
   cases: []
@@ -2847,7 +2847,7 @@ indicators:
     quote: Purchases of companies by persons lacking adequate knowledge and experience in the waste sector
       to manage entities operating in a highly regulated sector.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering from Environmental Crime
     publisher: FATF
     year: '2021'
@@ -2855,7 +2855,7 @@ indicators:
     locator: Annex A, Metals and Waste Sector, p.56
     quote: Has shares sold at lower than book value, and
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - New shareholders bought an Italian metals and waste firm far below market value and had limited skills
     to run it (FATF 2021 Box 3.2)
@@ -2911,7 +2911,7 @@ indicators:
     locator: Annex A, Lack of experience/background, p.56
     quote: High volume/value of cash deposits and withdrawals by waste management sector companies.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A waste hauler withdrawing most incoming payments in cash
   cases: []
@@ -2949,7 +2949,7 @@ indicators:
     quote: Large international funds transfer between local waste management sector companies and known
       source countries for waste trafficking.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A UK recycler paid by buyers in Indonesia and India for mixed household waste (Biffa)
   cases: []
@@ -2990,7 +2990,7 @@ indicators:
     locator: Annex A, Metals and Waste Sector, p.56
     quote: Lacks an adequate organizational structure,
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering from Environmental Crime
     publisher: FATF
     year: '2021'
@@ -2998,7 +2998,7 @@ indicators:
     locator: Annex A, Metals and Waste Sector, p.56
     quote: Holds an address that is not linked to any economic activity,
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A licensed waste processor registered at a residential flat with no site
   cases: []
@@ -3041,7 +3041,7 @@ indicators:
     quote: Waste management sector companies with payments or trade invoices for types of waste unaligned
       with those they are authorised to process.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A plastics recycler invoicing for hazardous industrial sludge
   cases: []
@@ -3081,7 +3081,7 @@ indicators:
     quote: Sudden and unexplained investment in waste facilities from entities with unclear beneficial
       ownership information.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An offshore trust funds a new landfill operator
   cases: []
@@ -3121,7 +3121,7 @@ indicators:
     locator: Annex A, Economic Activities (waste), p.56
     quote: Costs are lower than expected industry standards.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A contractor quoting half the market rate for hazardous waste disposal
   cases: []
@@ -3166,7 +3166,7 @@ indicators:
     quote: Plastic waste shipments are falsely declared as destined for recovery, or misdeclared as raw
       material.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Strategic Analysis Report: Emerging criminal trends in the global plastic waste market since
       January 2018'
     publisher: INTERPOL
@@ -3176,7 +3176,7 @@ indicators:
     quote: Illegal shipped contaminated plastic waste is concealed in the container by being placed behind
       the “clean” plastic waste that is declared on shipping documents;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Basel Convention on the Control of Transboundary Movements of Hazardous Wastes and their Disposal
       (text revised 2025)
     publisher: UNEP / Secretariat of the Basel Convention
@@ -3185,7 +3185,7 @@ indicators:
     locator: Article 9(1)(d), p.15
     quote: that does not conform in a material way with the documents; or
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Biffa containers declared as paper but full of mixed household waste (2021)
   cases:
@@ -3244,7 +3244,7 @@ indicators:
     quote: The use of transit countries to disguise the origin of the waste shipment has been commonly
       observed modus operandi for such illegal shipments.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Strategic Analysis Report: Emerging criminal trends in the global plastic waste market since
       January 2018'
     publisher: INTERPOL
@@ -3254,7 +3254,7 @@ indicators:
     quote: Misdeclaration of the final destination of plastic waste shipments, using a transit country
       in a free trade zone.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Plastic waste booked to one Asian port then re-exported to a neighbour
   cases: []
@@ -3298,7 +3298,7 @@ indicators:
     quote: There has been an increase in accidental and deliberate waste fires, almost certain in export
       countries, and probable in European and South-East Asian import countries as well.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - About 80 waste fires in Poland in early 2018 (INTERPOL report)
   cases: []
@@ -3347,7 +3347,7 @@ indicators:
     quote: fished without a valid licence, authorisation or permit issued by the flag State or the relevant
       coastal State; or
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Council Regulation (EC) No 1005/2008
     publisher: Council of the European Union (EUR-Lex)
     year: '2008'
@@ -3356,7 +3356,7 @@ indicators:
     quote: fished in a closed area, during a closed season, without or after attainment of a quota or
       beyond a closed depth; or
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Council Regulation (EC) No 1005/2008
     publisher: Council of the European Union (EUR-Lex)
     year: '2008'
@@ -3364,7 +3364,7 @@ indicators:
     locator: Article 3(1)(e)
     quote: used prohibited or non-compliant fishing gear; or
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Vessel tracks showing fishing patterns inside a marine protected area
   cases: []
@@ -3408,7 +3408,7 @@ indicators:
     locator: Article 3(1)(b)
     quote: not fulfilled its obligations to record and report catch or catch-related data
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and the Illegal Wildlife Trade
     publisher: FATF
     year: '2020'
@@ -3417,7 +3417,7 @@ indicators:
     quote: noted discrepancies between the fishing records of fishermen who supplied two fish trading
       companies and their purchases.
     quote_verified: false
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Hout Bay Fishing under-reported rock lobster catches to South African authorities (Bengis case)
   cases:
@@ -3472,7 +3472,7 @@ indicators:
     locator: Article 3(1)(f)
     quote: falsified or concealed its markings, identity or registration; or
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Two vessels broadcasting the same MMSI number
   - Hull name painted over
@@ -3520,7 +3520,7 @@ indicators:
     quote: Should a pattern of possible flag hopping (that is, frequent changes of flag) emerge, it is
       possible that the vessel has been used for IUU fishing.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Council Regulation (EC) No 1005/2008
     publisher: Council of the European Union (EUR-Lex)
     year: '2008'
@@ -3528,7 +3528,7 @@ indicators:
     locator: Article 3(1)(l)
     quote: no nationality and is therefore a stateless vessel, in accordance with international law.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A longliner registered under four flags in five years
   cases: []
@@ -3570,7 +3570,7 @@ indicators:
     locator: Q&A on methods
     quote: more than 50 nautical miles from shore
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Hot spots of unseen fishing vessels (Welch et al., Science Advances)
     publisher: NOAA Institutional Repository
     year: '2022'
@@ -3578,7 +3578,7 @@ indicators:
     locator: Abstract
     quote: obscures up to 6% (>4.9 M hours) of vessel activity
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A vessel's track stops near a contested EEZ border and resumes days later
   cases: []
@@ -3621,7 +3621,7 @@ indicators:
     locator: Materials and methods, Two-vessel encounter
     quote: locations where a fishing vessel and a transshipment vessel were continuously within 500 m
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Identifying Global Patterns of Transshipment Behavior (Miller et al.)
     publisher: Frontiers in Marine Science
     year: '2018'
@@ -3629,7 +3629,7 @@ indicators:
     locator: Materials and methods, Single-vessel loitering
     quote: locations where a transshipment vessel traveled at speeds of < 2 knots for at least 8 h
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Council Regulation (EC) No 1005/2008
     publisher: Council of the European Union (EUR-Lex)
     year: '2008'
@@ -3638,7 +3638,7 @@ indicators:
     quote: transhipped or participated in joint fishing operations with, supported or re-supplied other
       fishing vessels
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A reefer carrier meeting several longliners on the high seas
   cases: []
@@ -3686,7 +3686,7 @@ indicators:
     locator: Abstract
     quote: We find that 72–76% of the world's industrial fishing vessels are not publicly tracked
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Sentinel-1 radar detections of vessels in an EEZ with no AIS match
   cases: []
@@ -3727,7 +3727,7 @@ indicators:
     locator: Article 3(1)(g)
     quote: concealed, tampered with or disposed of evidence relating to an investigation; or
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Bengis defendants bribed South African fisheries inspectors (US DOJ 2013)
   cases: []
@@ -3757,6 +3757,776 @@ indicators:
   - Observer reports can be contested
   jurisdictions: Global
   version: 1
+- id: EN-069
+  name: Carbon credits that do not exist, are sold more than once, or are re-used after being surrendered
+  definition: A seller offers carbon credits it does not really hold, sells the same credits to several
+    buyers, or puts already-used credits back on the market.
+  areas:
+  - EN
+  typology: Carbon market fraud
+  status: verified
+  sources:
+  - title: Guide to Carbon Trading Crime
+    publisher: INTERPOL Environmental Crime Programme
+    year: '2013'
+    url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+    locator: Section 4.2, p. 14-15
+    quote: selling the same carbon credits over and over to multiple parties
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The same project serial numbers appear on sale documents given to two different buyers
+  - Credits offered for sale after a registry shows them as surrendered or retired
+  cases:
+  - name: Hungarian government resale of surrendered credits ("recycling")
+    year: '2010'
+    jurisdiction: Hungary / EU
+    what_happened: Hungary resold 2 million surrendered carbon credits, which re-entered the EU emissions
+      trading system; the BlueNext exchange suspended trading and the European Commission later closed
+      the loophole. INTERPOL describes the first sale as legal and the re-entry into the EU ETS as not.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+    source_title: INTERPOL Guide to Carbon Trading Crime, Section 4.2, p. 15
+  data_needed:
+  - Company (seller, buyer)
+  - Contract (credit sale agreement)
+  - Payment
+  - Document (registry statements, credit serial numbers, retirement certificates)
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - Carbon registry public records (e.g. Verra, Gold Standard, EU Union Registry)
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clerical error in serial numbers on paperwork
+  - Legitimate resale of credits that have not been retired
+  - Delays between a sale and the registry update
+  jurisdictions: Global; voluntary and compliance carbon markets
+  version: 1
+- id: EN-070
+  name: Offset project measurements checked by a verifier who is paid by the developer, skips site visits,
+    or may be bribed
+  definition: The emission cuts behind a project's credits were checked by an auditor that has a conflict
+    of interest, did not visit the site, or may have been bribed or worked with the developer.
+  areas:
+  - EN
+  typology: Carbon market fraud - manipulated measurements
+  status: verified
+  sources:
+  - title: Guide to Carbon Trading Crime
+    publisher: INTERPOL Environmental Crime Programme
+    year: '2013'
+    url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+    locator: Section 4.1, p. 12-13
+    quote: Even independent third party auditors, however, may be susceptible to bribes or collusion to
+      manipulate the results.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The verification report has no record of a site visit
+  - The verifier and the developer share directors or owners
+  cases:
+  - name: UN suspension of verification firms DNV and SGS
+    year: 2008-2009
+    jurisdiction: UN Clean Development Mechanism
+    what_happened: The UN temporarily suspended the verifiers DNV (2008) and SGS (2009) after finding
+      they had approved projects without surveying them.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+    source_title: INTERPOL Guide to Carbon Trading Crime, Section 4.1, p. 13
+  data_needed:
+  - Company (project developer, verifier)
+  - Directorship
+  - Ownership
+  - Payment (developer to verifier)
+  - Document (validation and verification reports)
+  checkable: person
+  lookup_sources:
+  - Carbon standard project registries
+  - UNFCCC CDM project database
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: INTERPOL names auditor bribery and collusion as a way to inflate credits.
+    source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  innocent_explanations:
+  - In most schemes, developers paying verifiers is the normal arrangement
+  - Remote verification can be allowed (for example during travel restrictions)
+  jurisdictions: Global
+  version: 1
+- id: EN-071
+  name: Offset project that would have happened anyway (not additional), such as one finished before approval
+  definition: A project claims credits for emission cuts that would have happened anyway, for example
+    because it was already built or running before it was approved.
+  areas:
+  - EN
+  typology: Carbon market fraud - additionality
+  status: verified
+  sources:
+  - title: Guide to Carbon Trading Crime
+    publisher: INTERPOL Environmental Crime Programme
+    year: '2013'
+    url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+    locator: Section 4.1.1, p. 13
+    quote: The difficulty in assessing additionality provides ample opportunity to manipulate the process
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Construction or commissioning dates come before the project's registration date
+  - The project was already profitable without carbon revenue
+  cases: []
+  data_needed:
+  - Company (developer)
+  - Document (project design document, construction permits, financial statements)
+  - RealEstate (project site)
+  checkable: person
+  lookup_sources:
+  - UNFCCC CDM project database
+  - Carbon standard registries
+  - Local planning and permit records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some schemes allow projects that started earlier to apply under a set grace period
+  - The developer may have counted on carbon revenue from the start and recorded that decision
+  jurisdictions: Global
+  version: 1
+- id: EN-072
+  name: Offset project built on forged land or forest ownership papers, or on remote land with unclear
+    boundaries
+  definition: A developer claims rights over forest or land for carbon credits using forged documents
+    or bribes, often where boundaries are poorly marked.
+  areas:
+  - EN
+  typology: Carbon market fraud - false land rights
+  status: verified
+  sources:
+  - title: Guide to Carbon Trading Crime
+    publisher: INTERPOL Environmental Crime Programme
+    year: '2013'
+    url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+    locator: Section 4.2, p. 14
+    quote: documents were forged and bribes paid to facilitate the process
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Forest carbon rights are sold over land held by communities or the state
+  - The land title was registered just before the credit sale
+  cases: []
+  data_needed:
+  - RealEstate
+  - Ownership
+  - Company
+  - Person
+  - Document (land titles, concession or carbon-rights agreements)
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Land registry
+  - Cadastre or forest concession maps
+  - Satellite imagery
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: INTERPOL describes bribes being paid to make forged land claims go through.
+    source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  innocent_explanations:
+  - Customary land rights often go unregistered, so the paperwork is genuinely incomplete
+  - Boundary disputes can be honest
+  jurisdictions: Mainly forest-rich developing countries
+  version: 1
+- id: EN-073
+  name: Carbon credit investment sold with promised high returns or false links to recognised standards
+  definition: Investors are pitched carbon credits or offsets with guaranteed high returns, or with false
+    claims of approval by legitimate bodies or standards, often by cold-calling.
+  areas:
+  - EN
+  typology: Carbon investment fraud / Ponzi scheme
+  status: verified
+  sources:
+  - title: Guide to Carbon Trading Crime
+    publisher: INTERPOL Environmental Crime Programme
+    year: '2013'
+    url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+    locator: Section 4.3, p. 16
+    quote: advertising false connections to legitimate organizations and environmental standards
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Telemarketers sell credits to retail investors at a large mark-up
+  - Sales materials use the logos of standards the credits are not registered under
+  cases:
+  - name: California carbon credit Ponzi scheme (named as such by INTERPOL)
+    year: 2004-2005
+    jurisdiction: United States (California)
+    what_happened: INTERPOL reports that a scheme "used false invoices and sales documents to establish
+      a Ponzi scheme in the year 2000". The organiser was indicted in 2004 on six counts of wire fraud,
+      pleaded guilty to one in 2005, and received five years' probation.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+    source_title: INTERPOL Guide to Carbon Trading Crime, Section 4.3, p. 16
+  data_needed:
+  - Company
+  - Person
+  - Payment
+  - Document (sales materials, invoices)
+  - Email
+  checkable: lookups
+  lookup_sources:
+  - Financial regulator warning lists
+  - Carbon standard registries
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Carbon credits are used as the product in boiler-room and Ponzi investment fraud.
+    source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  innocent_explanations:
+  - Legitimate brokers do market credits, and prices can rise
+  - Overly enthusiastic marketing can be careless without being fraudulent
+  jurisdictions: Global
+  version: 1
+- id: EN-074
+  name: 'VAT missing-trader (carousel) fraud in emission allowances: short-lived traders and sudden trading
+    spikes'
+  definition: Traders buy emission allowances VAT-free from another EU country, resell them at home with
+    VAT added, then disappear without paying the VAT; signs include chains of new, short-lived trading
+    companies and sudden jumps in exchange volume.
+  areas:
+  - EN
+  typology: Missing Trader Intra-Community (MTIC) VAT fraud
+  status: verified
+  sources:
+  - title: Guide to Carbon Trading Crime
+    publisher: INTERPOL Environmental Crime Programme
+    year: '2013'
+    url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+    locator: Section 4.5, p. 18-19
+    quote: carousel fraud or Missing Trader Intra-Community fraud
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Carbon credit fraud causes more than 5 billion euros damage for European taxpayer
+    publisher: Europol
+    year: '2009'
+    url: https://www.europol.europa.eu/media-press/newsroom/news/carbon-credit-fraud-causes-more-5-billion-euros-damage-for-european-taxpayer
+    locator: Press release summary
+    quote: up to 90% of the whole market volume was caused by fraudulent activities
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'EU emissions trading: an open door for crime (reporting Europol)'
+    publisher: Carbon Trade Watch
+    url: https://www.carbontradewatch.org/articles/eu-emissions-trading-an-open-door-for-crime-europol.html
+    locator: Article body
+    quote: Criminals establish themselves in one EU member state and open a trading account with the national
+      carbon credit registry.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A newly formed company with no history opens a registry account and trades millions of euros of allowances
+    within weeks
+  - The buyer pays VAT to a seller that then cannot be found
+  - Allowances move through buffer companies and money goes offshore
+  cases:
+  - name: R v Dosanjh, Chahal and Gill
+    year: '2012'
+    jurisdiction: United Kingdom (Southwark Crown Court)
+    what_happened: Three defendants were found guilty of carbon-trading carousel fraud and jailed for
+      a combined 35 years; INTERPOL cites EUR 276 million in turnover and EUR 41 million in unpaid VAT
+      over 69 days.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+    source_title: INTERPOL Guide to Carbon Trading Crime, Section 4.5, p. 19
+  - name: EU ETS VAT fraud, Europol estimate
+    year: '2009'
+    jurisdiction: European Union
+    what_happened: Europol estimated about EUR 5 billion in lost national tax revenue from fraudulent
+      EU ETS trading over about 18 months. France, the Netherlands, Spain and the UK changed their VAT
+      rules in response.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.europol.europa.eu/media-press/newsroom/news/carbon-credit-fraud-causes-more-5-billion-euros-damage-for-european-taxpayer
+    source_title: Europol press release
+  data_needed:
+  - Company (missing trader, buffer, broker)
+  - Ownership
+  - Directorship
+  - Payment
+  - Address
+  - Document (VAT returns, registry transaction logs, invoices)
+  - UserAccount (registry account)
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - VAT number validation (EU VIES)
+  - Carbon registry transaction logs
+  - Exchange volume data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: The same MTIC method is used on mobile phones, electricity and gas; this is a VAT fraud carried
+      out through an environmental market.
+    source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  innocent_explanations:
+  - Cross-border VAT-free buying is lawful in itself
+  - New trading firms do enter carbon markets
+  - Trading volume rises for policy or price reasons
+  jurisdictions: European Union
+  version: 1
+- id: EN-075
+  name: Carbon broker or trader manipulating the market or trading against its own client advice
+  definition: A broker tells clients to buy or sell carbon products while doing the opposite itself, or
+    traders move prices or index weightings, or embezzle.
+  areas:
+  - EN
+  typology: Securities fraud / market manipulation in carbon markets
+  status: verified
+  sources:
+  - title: Guide to Carbon Trading Crime
+    publisher: INTERPOL Environmental Crime Programme
+    year: '2013'
+    url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+    locator: Section 4.6, p. 19
+    quote: issuing buy/sell recommendations to their customers on the one hand, while doing the opposite
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The broker's own trading book runs opposite to its published client recommendations
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Employment
+  - Payment
+  - Document (trade records, client recommendations)
+  checkable: records
+  lookup_sources:
+  - Financial regulator enforcement records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Hedging, or market-making duties that require positions opposite to clients
+  - Separate desks with information barriers
+  jurisdictions: Global
+  version: 1
+- id: EN-076
+  name: Carbon credits or offset projects used to launder money
+  definition: Criminal money is used to buy carbon credits, or is put into offset projects (for example
+    wind farms in developing countries) to make it look clean.
+  areas:
+  - EN
+  typology: Money laundering through carbon markets
+  status: verified
+  sources:
+  - title: Guide to Carbon Trading Crime
+    publisher: INTERPOL Environmental Crime Programme
+    year: '2013'
+    url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+    locator: Section 4.8, p. 21
+    quote: criminals may purchase carbon credits as a way of introducing illicit proceeds into the financial
+      system
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An investor with no clear source of funds buys large blocks of credits and resells them quickly at
+    a loss
+  - An offset project receives investment from offshore companies with hidden owners
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Ownership
+  - Payment
+  - Document (source-of-funds records)
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Beneficial ownership registers
+  - Sanctions lists
+  - Adverse media
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: INTERPOL describes carbon credits as a possible way into the financial system for criminal
+      money.
+    source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  innocent_explanations:
+  - Funds and companies do invest in offsets legitimately
+  - Losses on resale can reflect real price changes
+  jurisdictions: Global
+  version: 1
+- id: EN-077
+  name: Carbon registry accounts hacked or phished, and stolen allowances moved on fast
+  definition: Criminals take over registry accounts through phishing emails or hacking (or cold-call victims
+    for bank details), then move the stolen allowances quickly through other registries and sell them.
+  areas:
+  - EN
+  typology: Cybercrime against carbon registries
+  status: verified
+  sources:
+  - title: Guide to Carbon Trading Crime
+    publisher: INTERPOL Environmental Crime Programme
+    year: '2013'
+    url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+    locator: Section 4.9, p. 22-23
+    quote: computer hackers stole 2 million carbon credits from registries in Austria, the Czech Republic,
+      Estonia, Greece and Poland
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Guide to Carbon Trading Crime
+    publisher: INTERPOL Environmental Crime Programme
+    year: '2013'
+    url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+    locator: Section 4.10, p. 24
+    quote: 250,000 credits were stolen, worth €3.2 million
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Emails asking account holders to re-register on a lookalike registry site
+  - Credits move out of an account to another country's registry and are sold the same day
+  - Cold calls offering carbon tax compensation in return for bank details
+  cases:
+  - name: Holcim Romania registry theft
+    year: '2010'
+    jurisdiction: Romania / Liechtenstein
+    what_happened: About 1.6 million credits (around EUR 23.5 million) were stolen from the Romanian registry;
+      police in Romania and Liechtenstein traced and returned 600,000 of them. No prosecution outcome
+      is reported.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+    source_title: INTERPOL Guide to Carbon Trading Crime, Section 4.9, p. 22
+  - name: German registry phishing attack
+    year: '2010'
+    jurisdiction: Germany and others
+    what_happened: Phishing emails led to the theft of 250,000 credits worth EUR 3.2 million; registries
+      in nine countries closed, and the German registry was shut for a week. No prosecution outcome is
+      reported.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+    source_title: INTERPOL Guide to Carbon Trading Crime, Section 4.10, p. 24
+  data_needed:
+  - UserAccount
+  - Email
+  - Company
+  - Person
+  - Payment
+  - Document (registry transfer logs)
+  checkable: records
+  lookup_sources:
+  - Registry incident notices
+  - Lists of stolen allowance serial numbers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: Account takeover through phishing and hacking is the core method.
+    source_url: https://www.interpol.int/content/download/5172/file/Guide%20to%20Carbon%20Trading%20Crime.pdf
+  innocent_explanations:
+  - Legitimate quick transfers between a company's own accounts
+  - Real registry notices asking users to update their details
+  jurisdictions: European Union, Australia and others
+  version: 1
+- id: EN-078
+  name: HFC refrigerant declared or labelled as an HFO or another less-regulated gas
+  definition: Climate-damaging HFC refrigerant gases are passed off at customs or on sale as less-regulated
+    alternatives such as HFOs, to get round EU quota limits.
+  areas:
+  - EN
+  typology: Illegal trade in fluorinated gases (F-gases)
+  status: verified
+  sources:
+  - title: Illegal smuggling of refrigerant gases into Europe continues as the climate crisis worsens
+    publisher: Environmental Investigation Agency (EIA)
+    url: https://eia-international.org/news/illegal-smuggling-of-refrigerant-gases-into-europe-continues-as-the-climate-crisis-worsens/
+    locator: Article body
+    quote: disguising HFCs as less-regulated hydrofluoroolefin (HFO) refrigerant alternatives
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Regulation (EU) 2024/573 on fluorinated greenhouse gases
+    publisher: European Union (EUR-Lex)
+    year: '2024'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R0573
+    locator: Recital 26
+    quote: To facilitate the enforcement of the placing on the market prohibitions and the restrictions
+      on products and equipment that contain fluorinated greenhouse gases or whose functioning relies
+      upon those gases, including when placed on the market in containers, it is important to establish
+      the necessary labelling requirements for those goods.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The customs declaration says HFO-1234yf, but a gas test shows R-134a
+  - Gas sourced from Turkiye or China is trafficked in through Bulgaria or Romania
+  cases: []
+  data_needed:
+  - Company (importer, consignee)
+  - Document (customs declarations, labels, gas analysis certificates)
+  - Address
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Customs data
+  - EU F-gas Portal registration
+  - Trade statistics (exporter vs importer mirror data)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: EIA links the illegal HFC trade to significant tax evasion.
+    source_url: https://eia-international.org/news/illegal-smuggling-of-refrigerant-gases-into-europe-continues-as-the-climate-crisis-worsens/
+  - target_area: FR
+    reason: Misdeclaration at the EU's external borders is the main method.
+    source_url: https://eia-international.org/news/illegal-smuggling-of-refrigerant-gases-into-europe-continues-as-the-climate-crisis-worsens/
+  innocent_explanations:
+  - Honest mistakes in HS codes or product names
+  - Blends that legally contain both HFC and HFO components
+  jurisdictions: European Union (also applies under the Kigali Amendment phase-downs elsewhere)
+  version: 1
+- id: EN-079
+  name: Refrigerant gas sold or imported in disposable (non-refillable) cylinders
+  definition: F-gases turn up in single-use cylinders, which EU law bans; this is a common sign of smuggled
+    refrigerant.
+  areas:
+  - EN
+  typology: Illegal trade in fluorinated gases (F-gases)
+  status: verified
+  sources:
+  - title: Regulation (EU) 2024/573 on fluorinated greenhouse gases
+    publisher: European Union (EUR-Lex)
+    year: '2024'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R0573
+    locator: Recital 24
+    quote: Non-refillable containers for fluorinated greenhouse gases should be prohibited.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Illegal smuggling of refrigerant gases into Europe continues as the climate crisis worsens
+    publisher: Environmental Investigation Agency (EIA)
+    url: https://eia-international.org/news/illegal-smuggling-of-refrigerant-gases-into-europe-continues-as-the-climate-crisis-worsens/
+    locator: Article body
+    quote: avoiding banned disposable cylinders
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Photos in a seized consignment or a sales listing show single-use refrigerant cans or cylinders
+  cases: []
+  data_needed:
+  - Company
+  - Document (photos, invoices, customs declarations)
+  - Address
+  checkable: records
+  lookup_sources:
+  - Customs seizure records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Laboratory and analytical uses are exempted under the regulation
+  - Old stock or cylinders outside the EU, where rules differ
+  jurisdictions: European Union
+  version: 1
+- id: EN-080
+  name: HFCs placed on the EU market without quota or F-gas Portal registration
+  definition: A company imports or sells HFCs without holding the quota or the F-gas Portal registration
+    that EU law requires, often bringing them in through countries on the EU's external border.
+  areas:
+  - EN
+  typology: Illegal trade in fluorinated gases (F-gases)
+  status: verified
+  sources:
+  - title: Regulation (EU) 2024/573 on fluorinated greenhouse gases
+    publisher: European Union (EUR-Lex)
+    year: '2024'
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R0573
+    locator: Recitals 28 and 35
+    quote: the Commission should continue to allocate quota to individual producers and importers for
+      the placing on the market of HFCs
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Illegal smuggling of refrigerant gases into Europe continues as the climate crisis worsens
+    publisher: Environmental Investigation Agency (EIA)
+    url: https://eia-international.org/news/illegal-smuggling-of-refrigerant-gases-into-europe-continues-as-the-climate-crisis-worsens/
+    locator: Article body
+    quote: Trafficked from Bulgaria and other countries on the edge of the bloc
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The importer is not listed as a registered F-gas Portal undertaking
+  - Sales volumes are far above the company's allocated quota
+  - Gas sourced from Turkiye or China arrives via Bulgaria or Romania for buyers in Greece, Germany, France,
+    Italy, Portugal or Spain
+  cases: []
+  data_needed:
+  - Company
+  - Document (quota allocation, customs declarations, invoices)
+  - Address
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - EU F-gas Portal and quota records
+  - Customs data
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Gas is pre-charged in equipment covered by authorisations
+  - Quota is transferred lawfully from another holder
+  - The buyer is a distributor reselling gas already placed on the market by a quota holder
+  jurisdictions: European Union
+  version: 1
+- id: EN-081
+  name: Wildlife or wildlife parts openly advertised or auctioned on social media or online marketplaces
+  definition: Protected live animals or parts such as ivory or rhino horn are posted for sale or auctioned
+    on social media or marketplaces, often with the seller's personal phone number.
+  areas:
+  - EN
+  typology: Online wildlife trafficking
+  status: verified
+  sources:
+  - title: Wildlife trafficking online (Basel Institute on Governance, Quick Guide / working paper cte_5)
+    publisher: Basel Institute on Governance
+    year: '2021'
+    url: https://baselgovernance.org/sites/default/files/2021-11/cte_5.pdf
+    locator: Section 'Drilling down from the tip of the iceberg' and 'How policy priorities and regulations
+      (would) support enforcement efforts'
+    quote: auctioning live wild animals and whole pieces of ivory or rhino horn openly to their followers
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A Facebook group post auctioning a live primate with a mobile number to call
+  - Listings that keep appearing despite the platform's ban on live animal sales
+  cases: []
+  data_needed:
+  - Person
+  - UserAccount (social media profile)
+  - Document (posts, screenshots)
+  - Payment
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Social media and marketplace monitoring
+  - CITES species lists
+  - Phone number reverse lookup
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful captive-bred or permitted species are sold online
+  - Antiques that are lawful under exemptions
+  - Scam ads with no real animal behind them
+  jurisdictions: Global
+  version: 1
+- id: EN-082
+  name: Wildlife sold on the dark web for cryptocurrency
+  definition: Wildlife products are sold on dark-web markets and paid for in cryptocurrency, often by
+    more professional sellers tied to other crime.
+  areas:
+  - EN
+  typology: Online wildlife trafficking
+  status: verified
+  sources:
+  - title: Wildlife trafficking online (Basel Institute on Governance, Quick Guide / working paper cte_5)
+    publisher: Basel Institute on Governance
+    year: '2021'
+    url: https://baselgovernance.org/sites/default/files/2021-11/cte_5.pdf
+    locator: Sections 'Shining a light into the dark web' and 'Following the (virtual) money'
+    quote: Cryptocurrencies are mostly used for illegal transactions on the dark web
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A darknet vendor listing rhino horn powder with a Bitcoin or Monero price
+  cases: []
+  data_needed:
+  - UserAccount (vendor handle)
+  - CryptoWallet
+  - Payment
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Dark-web market monitoring
+  - Blockchain analytics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Basel notes that dark-web wildlife sellers are more professional and likely tied to other
+      crimes, such as drug and arms trafficking.
+    source_url: https://baselgovernance.org/sites/default/files/2021-11/cte_5.pdf
+  innocent_explanations:
+  - Many dark-web listings are scams with no real goods
+  - Some cryptocurrency use is ordinary and lawful
+  jurisdictions: Global
+  version: 1
 not_reached:
 - FATF website PDFs (fatf-gafi.org /content/dam/fatf-gafi/reports/...) blocked automated download (robots/bot
   check). The FATF 2020 IWT report was read from the OJK Indonesia mirror, the FATF 2021 environmental
@@ -3779,3 +4549,16 @@ not_reached:
 - A plain-language official definition of 'bill of lading' and of PEP from the FATF Glossary (not opened;
   PEP definition given from context).
 - FinCEN/US Treasury designations for Xaysavang wildlife network and other IWT sanctions cases.
+- The web search budget for this run ran out after the first fetches, so no further searches were possible.
+  Ony can send a follow-up to continue the research.
+- 'EIA full report on illegal HFC trade (''Doors wide open'', 2019, and the 2021 report): the fetch failed,
+  so no named HFC seizures or prosecutions could be sourced, and EN-078 to EN-080 have no cases.'
+- 'Full operative articles of Regulation (EU) 2024/573 (Articles 11-13 on the non-refillable container
+  ban, quota and labelling): the fetched text was cut off before them, so only recitals are quoted. EN-078
+  cites Recital 26 in paraphrase; its verbatim wording needs checking.'
+- 'Primary court or HMRC/CPS record for R v Dosanjh, Chahal and Gill: not opened; the case is cited through
+  INTERPOL''s guide.'
+- 'OLAF and Europol material on F-gas smuggling operations: not reached.'
+- 'Europol 2009 press-release body text (needs JavaScript): only the summary was readable.'
+- 'Online wildlife cases (e.g. prosecutions over social-media sales): not sourced, because search was
+  unavailable.'

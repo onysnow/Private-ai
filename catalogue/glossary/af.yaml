@@ -1,0 +1,322 @@
+area: AF
+terms:
+- term: Fraudulent financial reporting
+  definition: Deliberately misstating or leaving out amounts or disclosures in financial statements to
+    mislead readers.
+  examples: []
+  source_url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+  cases: []
+  related:
+  - Misappropriation of assets
+  indicators: []
+  areas:
+  - AF
+- term: Misappropriation of assets
+  definition: Theft of a company's assets (cash, stock, equipment) where the theft makes the financial
+    statements misleading.
+  examples: []
+  source_url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+  cases: []
+  related:
+  - Fraudulent financial reporting
+  indicators: []
+  areas:
+  - AF
+- term: Fraud risk factors
+  definition: Conditions that make fraud more likely; auditors group them into incentives or pressures,
+    opportunities, and attitudes or rationalisations. They are examples, not proof.
+  examples: []
+  source_url: https://standards.auasb.gov.au/node/2056
+  cases: []
+  related:
+  - Fraud triangle
+  indicators: []
+  areas:
+  - AF
+- term: Fraud triangle (incentive, opportunity, rationalisation)
+  definition: 'The three conditions usually present when fraud happens: a reason or pressure, a chance
+    (such as weak controls), and a way for the person to justify it to themselves.'
+  examples: []
+  source_url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Management override of controls
+  definition: Managers bypassing controls that otherwise seem to work, for example by posting false entries;
+    it can happen in unpredictable ways.
+  examples: []
+  source_url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Those charged with governance
+  definition: The people overseeing the company's direction and accountability, usually the board and
+    audit committee.
+  examples: []
+  source_url: https://standards.auasb.gov.au/node/2056
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Related-party transaction
+  definition: A deal between the company and someone connected to it, such as an owner, executive, their
+    family or a company they control.
+  examples: []
+  source_url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Significant unusual transaction
+  definition: A large deal outside the normal course of business or unusual in timing, size or nature;
+    auditors treat these as a fraud risk.
+  examples: []
+  source_url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Side agreement
+  definition: An informal or hidden agreement that changes the terms of a written sales contract, such
+    as a right to return goods.
+  examples: []
+  source_url: https://standards.auasb.gov.au/node/2056
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Bill-and-hold sale
+  definition: A sale billed to the customer while the goods stay with the seller; it can be used to book
+    revenue early.
+  examples: []
+  source_url: https://www.sec.gov/litigation/litreleases/lr17710.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Channel stuffing
+  definition: Pushing more product onto distributors or customers than they need, often with discounts,
+    to boost current-period sales.
+  examples: []
+  source_url: https://www.sec.gov/litigation/litreleases/lr17710.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Pull forward
+  definition: Shipping orders earlier than customers asked for, to count the sales in the current quarter.
+  examples: []
+  source_url: https://www.sec.gov/news/press-release/2021-78
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Cookie-jar reserves
+  definition: Excess reserves set aside in good times and released later to inflate income.
+  examples: []
+  source_url: https://www.sec.gov/litigation/litreleases/lr17710.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Journal entry / post-closing entry
+  definition: A record posted directly into the accounts; a post-closing entry is made after the period's
+    books are closed. Unusual ones are a known way to falsify results.
+  examples: []
+  source_url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Suspense account
+  definition: A temporary account for entries whose correct account is not yet known.
+  examples: []
+  source_url: https://standards.auasb.gov.au/node/2058
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Segregation of duties
+  definition: Splitting tasks so no single person can start, approve and record a transaction and also
+    hold the asset.
+  examples: []
+  source_url: https://standards.auasb.gov.au/node/2056
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Confirmation (audit)
+  definition: A direct written reply from a third party (bank, customer) to the auditor confirming a balance
+    or terms.
+  examples: []
+  source_url: https://standards.auasb.gov.au/node/2058
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Accruals and accrual quality
+  definition: The gap between reported profit and cash flow; unusually high accruals mean more of profit
+    rests on management judgement.
+  examples: []
+  source_url: https://www.thecaq.org/wp-content/uploads/2018/03/Dechow-et-al-2011-Contemporary_Accounting_Research.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Soft assets
+  definition: Assets whose values rest heavily on judgement rather than cash or property, giving room
+    to adjust figures.
+  examples: []
+  source_url: https://www.thecaq.org/wp-content/uploads/2018/03/Dechow-et-al-2011-Contemporary_Accounting_Research.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Beneish M-score
+  definition: A model combining eight accounting ratios to flag likely earnings manipulators; a score
+    of −1.78 or higher is classed as a manipulator in the version described by CFA Institute.
+  examples: []
+  source_url: https://rpc.cfainstitute.org/blogs/enterprising-investor/2013/detetecting-earnings-manipulation-and-fraud-a-light-tutorial-on-probit-analysis
+  cases: []
+  related:
+  - F-score
+  indicators: []
+  areas:
+  - AF
+- term: F-score
+  definition: A scaled probability from a model built on SEC enforcement cases that estimates how likely
+    a company-year is to contain a material misstatement.
+  examples: []
+  source_url: https://www.thecaq.org/wp-content/uploads/2018/03/Dechow-et-al-2011-Contemporary_Accounting_Research.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: AAER (Accounting and Auditing Enforcement Release)
+  definition: SEC publications announcing enforcement actions involving accounting or auditing; used as
+    a database of known misstatement cases.
+  examples: []
+  source_url: https://www.thecaq.org/wp-content/uploads/2018/03/Dechow-et-al-2011-Contemporary_Accounting_Research.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: EPS Initiative
+  definition: An SEC programme that uses data analytics to find earnings management, such as small adjustments
+    that let a company just meet earnings-per-share forecasts.
+  examples: []
+  source_url: https://www.sec.gov/news/press-release/2020-226
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Consensus EPS (analyst estimates)
+  definition: The average of analysts' forecasts of earnings per share; missing it can hurt a share price,
+    creating pressure.
+  examples: []
+  source_url: https://www.sec.gov/news/press-release/2020-226
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Form 8-K Item 4.01 (auditor change)
+  definition: US filing a listed company must make when its auditor resigns, declines re-appointment or
+    is dismissed.
+  examples: []
+  source_url: https://www.sec.gov/files/form8-k.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Form 8-K Item 4.02 (non-reliance / restatement)
+  definition: US filing a listed company must make when it concludes earlier financial statements should
+    no longer be relied on because of an error.
+  examples: []
+  source_url: https://www.sec.gov/files/form8-k.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Neither admit nor deny settlement
+  definition: A settlement with the SEC in which the party accepts penalties without admitting or denying
+    the allegations; it is not a court finding of guilt.
+  examples: []
+  source_url: https://www.sec.gov/news/press-release/2020-319
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Deferred prosecution agreement (DPA)
+  definition: An agreement under which a prosecutor suspends criminal charges against a company in return
+    for conditions such as a fine; used by the UK SFO with Tesco.
+  examples: []
+  source_url: https://www.fca.org.uk/news/press-releases/tesco-pay-redress-market-abuse
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Market abuse (false or misleading statement)
+  definition: Under UK rules, publishing information that gives a false or misleading impression about
+    the value of shares or bonds.
+  examples: []
+  source_url: https://www.fca.org.uk/news/press-releases/tesco-pay-redress-market-abuse
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Bilanzbetrug (balance-sheet fraud)
+  definition: German term for falsifying a company's accounts; the Bundestag inquiry used it for Wirecard.
+  examples: []
+  source_url: https://www.bundestag.de/dokumente/textarchiv/2021/kw25-de-3ua-bericht-847030
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Behavioural red flag
+  definition: A personal behaviour (e.g. living beyond means) that fraud examiners have often seen in
+    people committing fraud; ACFE data show 84% of fraudsters showed at least one.
+  examples: []
+  source_url: https://acfe.com/-/media/files/fraudweek/pdfs/2024-fraud-week/behavioral-red-flags-of-fraud.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF
+- term: Reverse merger / non-traditional market entry
+  definition: Getting a stock-market listing by merging into an existing listed shell rather than an ordinary
+    public offering; listed as a fraud risk factor.
+  examples: []
+  source_url: https://standards.auasb.gov.au/node/2056
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - AF

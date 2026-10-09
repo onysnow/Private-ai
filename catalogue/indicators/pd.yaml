@@ -1,0 +1,2439 @@
+key: PD
+name: Prescription drug diversion
+scope: 'Prescription drug diversion and pill mills (pharmaceutical crime). DEA red flags for prescribers:
+  cursory or no medical exams; brief visits; multiple drugs in the same class or excessive quantities;
+  starting patients on high-dose narcotics; ignoring signs of abuse or toxicology results; coaching patients
+  on what to say; non-medical staff choosing the drug; patient overdose deaths. Pharmacy red flags from
+  DEA''s Hills Pharmacy decision (81 FR 49816, 2016): many people bringing the same prescriptions in the
+  same quantities from the same doctor; high cash prices for controlled substances; patients living far
+  from the pharmacy; ''trinity'' combinations (an opioid, a benzodiazepine and a muscle relaxer); doses
+  above recognised thresholds; pattern prescribing; several household members on the same drugs.'
+indicators:
+- id: PD-001
+  name: Cursory or no medical examination before controlled-substance prescribing
+  definition: The prescriber gives controlled drugs after a superficial exam, or none at all.
+  areas:
+  - PD
+  typology: Prescriber / pill mill
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners - Questions to Consider'
+    quote: Does the practitioner conduct cursory medical exams or any medical exam at all?
+    quote_verified: true
+    licence: US federal government work (public domain)
+    checked: '2026-10-09'
+  - title: Three Defendants Sentenced in Opioid Pill Mill Case
+    publisher: US Attorney's Office, Northern District of Texas
+    year: '2017'
+    url: https://www.justice.gov/usao-ndtx/pr/three-defendants-sentenced-opioid-pill-mill-case
+    locator: press release, 26 May 2017
+    quote: without conducting medical exams of patients
+    quote_verified: true
+    licence: US federal government work (public domain)
+    checked: '2026-10-09'
+  examples:
+  - Dr. Richard Andrews signed oxycodone 30mg prescriptions without examining patients (NDTX, 2017).
+  cases:
+  - name: United States v. Faridi, Andrews and Kigham (McAllen Medical Clinic)
+    year: '2017'
+    jurisdiction: US, N.D. Texas
+    what_happened: A doctor signed oxycodone prescriptions for recruited fake patients without exams;
+      clinic owner, doctor and a pharmacist pleaded guilty (money laundering conspiracy, oxycodone distribution
+      conspiracy, misprision of felony).
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-ndtx/pr/three-defendants-sentenced-opioid-pill-mill-case
+    source_title: Three Defendants Sentenced in Opioid Pill Mill Case
+  data_needed:
+  - Person (prescriber, patient)
+  - Document (medical chart, visit notes, prescription)
+  - Employment (prescriber at clinic Company)
+  checkable: person
+  lookup_sources:
+  - Court records / indictments
+  - State medical board disciplinary orders
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Established patient on a stable regimen seen for a routine renewal
+  - Exam documented elsewhere (specialist, hospital) and relied on
+  - Poor note-taking rather than no exam
+  - Telehealth follow-ups allowed under rules in force at the time
+  jurisdictions: US (DEA guidance); concept general
+  version: 1
+- id: PD-002
+  name: Brief initial and follow-up visits
+  definition: Office visits are so short that a proper assessment is unlikely.
+  areas:
+  - PD
+  typology: Prescriber / pill mill
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners - Questions to Consider'
+    quote: Are the initial office visits or follow-up visits brief?
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Clinic schedules show dozens of controlled-substance patients per doctor per hour.
+  cases: []
+  data_needed:
+  - Person (prescriber, patients)
+  - Document (appointment logs, billing records)
+  - Payment (visit fees)
+  checkable: records
+  lookup_sources:
+  - Medicare billing data (CMS)
+  - Court exhibits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Medication-management visits for stable patients are legitimately short
+  - High-volume clinics with nurse pre-work
+  - Billing codes may not reflect real time spent
+  jurisdictions: US
+  version: 1
+- id: PD-003
+  name: No diagnostic testing or specialist referrals
+  definition: The prescriber does not order tests or refer patients to other treatment, relying only on
+    controlled drugs.
+  areas:
+  - PD
+  typology: Prescriber / pill mill
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners - Questions to Consider'
+    quote: Does the doctor do diagnostic testing or refer patients out for diagnostic testing?
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners - Questions to Consider'
+    quote: Is the practitioner referring patients to other specialists (surgery, physical therapy, etc.)?
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Charts show no imaging, labs or physiotherapy referrals across hundreds of chronic-pain patients.
+  cases: []
+  data_needed:
+  - Document (charts, referral and lab orders)
+  - Person (prescriber, patient)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Diagnosis already established by earlier providers
+  - Patient declined or could not afford tests
+  - Palliative or end-of-life care
+  jurisdictions: US
+  version: 1
+- id: PD-004
+  name: Multiple drugs of the same class / therapeutic duplication
+  definition: Patients get two or more drugs that do the same job, for example two immediate-release opioids
+    at once.
+  areas:
+  - PD
+  typology: Prescriber and pharmacy red flag
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners'
+    quote: Does the practitioner prescribe multiple drugs within the same drug category?
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Stakeholders' Challenges and Red Flag Warning Signs Related to Prescribing and Dispensing Controlled
+      Substances
+    publisher: National Association of Boards of Pharmacy (hosted by AMA)
+    url: https://www.ama-assn.org/media/7796/download
+    locator: Section 3.C Pharmacists - Medication Taking/Supply, p. 15
+    quote: Therapeutic duplication of two or more long-acting and/or two or more short-acting opiates.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Hills Pharmacy, LLC; Decision and Order (81 FR 49816)
+    publisher: US DEA / Federal Register
+    year: '2016'
+    url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+    locator: 81 FR 49820
+    quote: the simultaneous prescribing of two immediate release opioids, which he stated ``would be inappropriate
+      therapy.''
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Oxycodone IR and hydromorphone IR prescribed together to the same patient.
+  cases: []
+  data_needed:
+  - Document (prescriptions, dispensing records)
+  - Person (prescriber, patient)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Long-acting plus short-acting breakthrough dosing is common and accepted
+  - Transition between drugs (overlap during switch)
+  - Cancer or palliative pain
+  jurisdictions: US
+  version: 1
+- id: PD-005
+  name: Excessive quantities relative to the condition / large prescriptions
+  definition: Prescriptions are for far more pills than the stated condition would need.
+  areas:
+  - PD
+  typology: Prescriber and pharmacy red flag
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners'
+    quote: Does the practitioner prescribe excessive quantities of controlled substances relative to the
+      medical condition
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Stakeholders' Challenges and Red Flag Warning Signs (NABP consensus document)
+    publisher: National Association of Boards of Pharmacy
+    url: https://www.ama-assn.org/media/7796/download
+    locator: Section 3.C, p. 15
+    quote: Patient presents prescriptions for large quantities or large number of prescriptions for controlled
+      substances.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Walgreens Agrees to Pay Up to $350M for Illegally Filling Unlawful Opioid Prescriptions
+    publisher: US Department of Justice (reposted by DOL OIG)
+    year: '2025'
+    url: https://www.oig.dol.gov/public/Press%20Releases/Walgreens%20Agrees%20to%20Pay%20Up%20to%20$350M%20for%20Illegally%20Filling%20Unlawful%20Opioid%20Prescriptions%20and%20for.pdf
+    locator: press release, 21 April 2025 (allegations)
+    quote: excessive quantities of opioids
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Hills Pharmacy filled 196 and 240 tablets of hydromorphone 8 mg for two people (81 FR 49816).
+  cases:
+  - name: Walgreens civil settlement (Controlled Substances Act and False Claims Act)
+    year: '2025'
+    jurisdiction: US federal
+    what_happened: DOJ alleged Walgreens filled prescriptions for excessive opioid quantities, early fills
+      and the 'trinity' despite red flags; Walgreens agreed to pay $300 million plus up to $50 million
+      more; the release says there was no determination of liability.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.oig.dol.gov/public/Press%20Releases/Walgreens%20Agrees%20to%20Pay%20Up%20to%20$350M%20for%20Illegally%20Filling%20Unlawful%20Opioid%20Prescriptions%20and%20for.pdf
+    source_title: Walgreens Agrees to Pay Up to $350M
+  data_needed:
+  - Document (prescriptions)
+  - Person (patient, prescriber)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Opioid-tolerant cancer or palliative patients
+  - Mail-order 90-day supplies
+  - Patient lives far from pharmacy and fills less often
+  jurisdictions: US
+  version: 1
+- id: PD-006
+  name: High daily opioid dose / starting patients on high doses
+  definition: Patients start on, or are escalated to, high daily opioid doses without careful justification.
+  areas:
+  - PD
+  typology: Prescriber / pharmacy red flag
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners'
+    quote: or does the practitioner just start patients on a high-dose narcotic?
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: CDC Guideline for Prescribing Opioids for Chronic Pain - United States, 2016 (MMWR Recomm Rep
+      65(1))
+    publisher: US Centers for Disease Control and Prevention
+    year: '2016'
+    url: https://www.cdc.gov/mmwr/volumes/65/rr/rr6501e1.htm
+    locator: Recommendation 5
+    quote: should carefully reassess evidence of individual benefits and risks when considering increasing
+      dosage to ≥50 morphine milligram equivalents (MME)/day, and should avoid increasing dosage to ≥90
+      MME/day or carefully justify a decision to titrate dosage to ≥90 MME/day
+    quote_verified: true
+    licence: US federal government work (public domain)
+    checked: '2026-10-09'
+  - title: Hills Pharmacy, LLC; Decision and Order (81 FR 49816)
+    publisher: US DEA / Federal Register
+    year: '2016'
+    url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+    locator: 81 FR 49820 (expert testimony on oxycodone for opioid-naive patients)
+    quote: when being presented with a prescription for a dose that would exceed 80 milligrams in one
+      day
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - New patients started on oxycodone 30mg several times a day.
+  cases: []
+  data_needed:
+  - Document (prescriptions with strength, quantity, days supply)
+  - Person (patient)
+  checkable: records
+  lookup_sources:
+  - Medicare Part D prescriber data (CMS)
+  levels:
+    faint: To be set by Ony
+    strong: 'Dose of 50 MME/day or more (CDC 2016: reassess benefits and risks)'
+    textbook: Dose of 90 MME/day or more without documented justification (CDC 2016 Recommendation 5);
+      this is clinical guidance, not a legal limit
+    threshold_source: https://www.cdc.gov/mmwr/volumes/65/rr/rr6501e1.htm
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Opioid-tolerant patients transferred on existing high doses
+  - Cancer, palliative or sickle-cell pain (outside the 2016 guideline's scope)
+  - Tapering patients who started high elsewhere
+  jurisdictions: US
+  version: 1
+- id: PD-007
+  name: Prescriber ignores signs of abuse, PDMP doctor-shopping alerts or warnings from family
+  definition: The prescriber keeps prescribing despite clear signs the patient misuses or sells the drug.
+  areas:
+  - PD
+  typology: Prescriber
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners (examples listed: patient under the influence, doctor
+      shopping in PDMP, family warnings)'
+    quote: Does the practitioner ignore signs of abuse?
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Stakeholders' Challenges and Red Flag Warning Signs (NABP consensus document)
+    publisher: National Association of Boards of Pharmacy
+    url: https://www.ama-assn.org/media/7796/download
+    locator: Section 3.B Prescribers - Illicit/Illegal, p. 14
+    quote: Prescriber receives reliable information that patient is diverting or selling medication, or
+      "borrowing" drugs from others.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Chart notes record a relative's call that the patient sells pills, followed by an unchanged refill.
+  cases: []
+  data_needed:
+  - Document (charts, PDMP reports, correspondence)
+  - Person (prescriber, patient, Family members)
+  - Family
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Prescriber investigated and reasonably found the warning unfounded
+  - Warnings came from a hostile ex-partner
+  - Tapering slowly to avoid withdrawal or abandonment
+  jurisdictions: US
+  version: 1
+- id: PD-008
+  name: Prescriber ignores toxicology (urine drug test) results
+  definition: Drug tests show missing prescribed drugs or illicit drugs, and prescribing continues unchanged.
+  areas:
+  - PD
+  typology: Prescriber
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners'
+    quote: Does the practitioner ignore toxicology reports?
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: CDC Guideline for Prescribing Opioids for Chronic Pain 2016
+    publisher: US CDC
+    url: https://www.cdc.gov/mmwr/volumes/65/rr/rr6501e1.htm
+    locator: Recommendation 10
+    quote: clinicians should use urine drug testing before starting opioid therapy and consider urine
+      drug testing at least annually
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Test negative for the prescribed oxycodone (suggesting it is sold) but refills continue.
+  cases: []
+  data_needed:
+  - Document (lab results, charts)
+  - Person (patient, prescriber)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - False positive or negative test results
+  - Patient ran out early for a documented reason
+  - Prescriber addressed the result in a way not written in the chart
+  jurisdictions: US
+  version: 1
+- id: PD-009
+  name: Practice or clinic treats patients mostly or only with controlled substances
+  definition: The prescriber or clinic gives controlled drugs to nearly every patient and offers little
+    else.
+  areas:
+  - PD
+  typology: Pill mill
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners'
+    quote: Does the practitioner only treat patients with narcotic controlled substances?
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Florida Statutes s. 458.3265 Pain-management clinics
+    publisher: Florida Legislature
+    url: http://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0400-0499/0458/Sections/0458.3265.html
+    locator: s. 458.3265(1)(a)1.c.(II)
+    quote: Where in any month a majority of patients are prescribed opioids, benzodiazepines, barbiturates,
+      or carisoprodol
+    quote_verified: true
+    licence: State statute (public)
+    checked: '2026-10-09'
+  examples:
+  - Atlanta Medical Group (Cartersville, GA) was among the 'Top 15' oxycodone purchasers in the US in
+    2011 (NDGA press release).
+  cases: []
+  data_needed:
+  - Company (clinic)
+  - Document (dispensing and prescription data)
+  - Person (prescribers)
+  checkable: lookups
+  lookup_sources:
+  - State clinic registration records (e.g. Florida pain-management clinic registry)
+  - Medicare Part D prescriber data
+  - DEA ARCOS purchase data where released
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: In Florida, a facility where in any month a majority of patients are prescribed opioids,
+      benzodiazepines, barbiturates or carisoprodol (for chronic non-malignant pain) must register as
+      a pain-management clinic; otherwise meets the DEA definition as worded
+    threshold_source: http://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0400-0499/0458/Sections/0458.3265.html
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate registered pain-management or palliative practice
+  - Addiction-treatment clinics prescribing buprenorphine
+  - Oncology practices
+  jurisdictions: US; Florida statute
+  version: 1
+- id: PD-010
+  name: Prescribing continues although the drug is not working
+  definition: Controlled drugs are kept up even when the record shows no treatment benefit.
+  areas:
+  - PD
+  typology: Prescriber
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners'
+    quote: Does the practitioner continue to prescribe controlled substances to patients even though it
+      would be ineffective for treatment purposes?
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Pain scores unchanged for a year while doses rise.
+  cases: []
+  data_needed:
+  - Document (charts, pain and function scores)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clinical judgement that stopping would cause harm
+  - Partial benefit not captured in notes
+  jurisdictions: US
+  version: 1
+- id: PD-011
+  name: Non-medical staff choose the drug or fill in prescriptions; pre-signed prescriptions
+  definition: Office staff decide what is prescribed or write prescriptions that the doctor just signs,
+    or blank pre-signed pads are used.
+  areas:
+  - PD
+  typology: Pill mill
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners'
+    quote: Does the practitioner allow the non-medical staff to determine the narcotic to be prescribed,
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Two Pill Mill Owners Convicted
+    publisher: US Attorney's Office, Northern District of Georgia
+    year: '2014'
+    url: https://www.justice.gov/usao-ndga/pr/two-pill-mill-owners-convicted
+    locator: press release, 26 March 2014 (paraphrase as returned; office manager)
+    quote: Atkins herself filled out prescriptions for the doctor to sign
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'NDTX: clinic owner Faridi sometimes filled out prescriptions the doctor had already signed (2017).'
+  cases: []
+  data_needed:
+  - Person (staff, prescriber)
+  - Employment
+  - Document (prescriptions, handwriting)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Staff legitimately prepare renewals for doctor review (common, lawful in many states for non-controlled
+    drugs)
+  - Electronic prescribing templates pre-populated by staff
+  jurisdictions: US
+  version: 1
+- id: PD-012
+  name: Prescriber coaches patients on what to say
+  definition: The prescriber tells patients which symptoms to report so they qualify for the drugs they
+    want.
+  areas:
+  - PD
+  typology: Prescriber
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners'
+    quote: Does the practitioner coach patients on what to say so that patients can get the narcotics
+      that they want?
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Undercover recordings in which a doctor suggests a pain level to state.
+  cases: []
+  data_needed:
+  - Document (recordings, interviews)
+  - Person
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Explaining pain scales to patients who do not understand them
+  jurisdictions: US
+  version: 1
+- id: PD-013
+  name: Prescriber breaks own pain-management policies or ignores outside warnings
+  definition: The prescriber does not follow their own written rules, or ignores warnings from insurers,
+    police, other doctors or family.
+  areas:
+  - PD
+  typology: Prescriber
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners'
+    quote: Does the practitioner violate his own pain management policies and guidelines?
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners'
+    quote: Does the practitioner ignore warnings from insurance companies, law enforcement, other practitioners,
+      family members, etc.?
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Pain contract requires pill counts that are never done.
+  cases: []
+  data_needed:
+  - Document (clinic policies, insurer letters, correspondence)
+  - Company (clinic, insurer)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Policy exception for documented clinical reasons
+  - Insurer warnings that were automated and inaccurate
+  jurisdictions: US
+  version: 1
+- id: PD-014
+  name: Prescriber receives non-medical payment (sex, guns, drugs) or kickbacks for prescriptions
+  definition: Prescriptions are exchanged for something other than ordinary medical fees, including bribes
+    from drug makers.
+  areas:
+  - PD
+  typology: Prescriber corruption
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners'
+    quote: Does the practitioner receive other compensation for narcotic prescriptions (sex, guns, drugs,
+      etc.)?
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Founder and Former Chairman of the Board of Insys Therapeutics Sentenced to 66 Months in Prison
+    publisher: US Attorney's Office, District of Massachusetts
+    year: '2020'
+    url: https://www.justice.gov/usao-ma/pr/founder-and-former-chairman-board-insys-therapeutics-sentenced-66-months-prison
+    locator: press release, 23 January 2020
+    quote: used as a vehicle to pay bribes and kickbacks to targeted practitioners
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Insys speaker programs paid prescribers of Subsys (fentanyl spray).
+  cases:
+  - name: United States v. Kapoor et al. (Insys Therapeutics)
+    year: '2019'
+    jurisdiction: US, D. Massachusetts
+    what_happened: Insys founder John Kapoor and four executives were convicted of racketeering conspiracy
+      for bribing prescribers through speaker programs and misleading insurers; Kapoor was sentenced to
+      66 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-ma/pr/founder-and-former-chairman-board-insys-therapeutics-sentenced-66-months-prison
+    source_title: Founder and Former Chairman of the Board of Insys Therapeutics Sentenced to 66 Months
+      in Prison
+  data_needed:
+  - Person (prescriber)
+  - Company (manufacturer)
+  - Payment
+  - Representation
+  checkable: lookups
+  lookup_sources:
+  - CMS Open Payments (manufacturer payments to doctors)
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Kickbacks for prescriptions billed to insurers are also Anti-Kickback Statute and insurance-fraud
+      offences.
+    source_url: https://www.justice.gov/opa/pr/opioid-manufacturer-purdue-pharma-pleads-guilty-fraud-and-kickback-conspiracies
+  - target_area: CO
+    reason: Speaker fees used as bribes are a bribery typology.
+    source_url: https://www.justice.gov/usao-ma/pr/founder-and-former-chairman-board-insys-therapeutics-sentenced-66-months-prison
+  innocent_explanations:
+  - Legitimate paid speaking or consulting disclosed under Open Payments
+  - Research grants
+  jurisdictions: US
+  version: 1
+- id: PD-015
+  name: Visit fees charged whether or not a prescription is given; cash-only fees
+  definition: The clinic's income depends on prescriptions, often paid in cash per visit.
+  areas:
+  - PD
+  typology: Pill mill business model
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners'
+    quote: Does the doctor still charge patients for visits if the patients do not receive narcotic prescriptions?
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Three Defendants Sentenced in Opioid Pill Mill Case
+    publisher: US Attorney's Office, Northern District of Texas
+    year: '2017'
+    url: https://www.justice.gov/usao-ndtx/pr/three-defendants-sentenced-opioid-pill-mill-case
+    locator: press release, 26 May 2017 (fees for fake patient visits payable only in cash)
+    quote: cash payments
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - McAllen Medical Clinic collected cash per fake patient visit (NDTX 2017).
+  cases: []
+  data_needed:
+  - Payment (cash receipts, deposits)
+  - Company (clinic)
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Cash-heavy pill-mill proceeds are laundered; NDTX clinic owner pleaded guilty to money-laundering
+      conspiracy.
+    source_url: https://www.justice.gov/usao-ndtx/pr/three-defendants-sentenced-opioid-pill-mill-case
+  innocent_explanations:
+  - Uninsured patients routinely pay cash
+  - Practices that do not take insurance (concierge, direct pay)
+  jurisdictions: US
+  version: 1
+- id: PD-016
+  name: Patient overdose deaths linked to the prescriber
+  definition: Patients of the prescriber die of drug overdoses.
+  areas:
+  - PD
+  typology: Prescriber
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners'
+    quote: Are patient deaths attributed to drug abuse or overdose?
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Stakeholders' Challenges and Red Flag Warning Signs (NABP consensus document)
+    publisher: National Association of Boards of Pharmacy
+    url: https://www.ama-assn.org/media/7796/download
+    locator: Section 3.B, p. 13
+    quote: Patient suffers an unintentional (or intentional) overdose.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Nine patients of Dr. Hsiu Ying 'Lisa' Tseng died within under three years (DEA press release 2016).
+  cases:
+  - name: People v. Hsiu Ying 'Lisa' Tseng
+    year: '2015'
+    jurisdiction: US, California (Los Angeles County)
+    what_happened: A jury convicted the Rowland Heights doctor of three counts of second-degree murder
+      and 19 counts of unlawful controlled-substance prescribing; sentenced to 30 years to life in 2016.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.dea.gov/press-releases/2016/02/05/doctor-receives-30-years-life-prescription-drug-overdose-case
+    source_title: Doctor Receives 30 Years To Life In Prescription Drug Overdose Case (DEA)
+  data_needed:
+  - Person (deceased patients, prescriber)
+  - Document (death certificates, coroner reports, prescriptions)
+  checkable: lookups
+  lookup_sources:
+  - Coroner / medical examiner records
+  - Court records
+  - State medical board
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Overdose from drugs obtained elsewhere
+  - Very sick patient population (palliative, addiction treatment)
+  - Death certificate mentions drugs without causation
+  jurisdictions: US
+  version: 1
+- id: PD-017
+  name: Prescriber or staff use inventory for personal use / self-prescribing
+  definition: The practitioner takes controlled drugs from stock or writes prescriptions for themselves.
+  areas:
+  - PD
+  typology: Insider diversion
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners'
+    quote: Does the practitioner use inventory for personal use?
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Quick Safety 48: Drug diversion and impaired health care workers'
+    publisher: The Joint Commission
+    url: https://jointcommission.org/resources/news-and-multimedia/newsletters/newsletters/quick-safety/quick-safety-48-drug-diversion-and-impaired-health-care-workers
+    locator: Patterns and trends that indicate potential diversion
+    quote: Self-prescribed controlled substances by prescriber.
+    quote_verified: true
+    licence: Copyright The Joint Commission
+    checked: '2026-10-09'
+  examples:
+  - 'NDGA: the clinic doctor was ''frequently incapacitated due to intoxication''.'
+  cases: []
+  data_needed:
+  - Person
+  - Document (inventory, prescriptions)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Emergency self-treatment where allowed
+  - Recording error
+  jurisdictions: US
+  version: 1
+- id: PD-018
+  name: Patients travel long distances or come from out of state
+  definition: Many patients come from far away, passing closer doctors or pharmacies.
+  areas:
+  - PD
+  typology: Prescriber and pharmacy red flag
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Practitioners'
+    quote: Do patients travel a great distance to see the practitioner?
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Hills Pharmacy, LLC; Decision and Order (81 FR 49816)
+    publisher: US DEA / Federal Register
+    year: '2016'
+    url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+    locator: 81 FR 49816 (Order to Show Cause red flags)
+    quote: individuals residing long distances from the pharmacy.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Masters Pharmaceutical, Inc. v. DEA, No. 15-1335
+    publisher: US Court of Appeals, D.C. Circuit
+    year: '2017'
+    url: https://media.cadc.uscourts.gov/opinions/docs/2017/06/15-1335-1682127.pdf
+    locator: opinion, 30 June 2017
+    quote: multiple cars in the pharmacy parking lot with out-of-state license plates
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Over 98% of Atlanta Medical Group patients came from surrounding states, mostly Kentucky and Tennessee
+    (NDGA 2014).
+  cases: []
+  data_needed:
+  - Address (patient, prescriber, pharmacy)
+  - Person
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Out-of-state patient flows can mark interstate trafficking of pills resold 'like street drugs'.
+    source_url: https://www.justice.gov/usao-ndtx/pr/three-defendants-sentenced-opioid-pill-mill-case
+  innocent_explanations:
+  - Rural areas with few specialists
+  - Specialist referral centres draw patients from far
+  - Patient works near the clinic but lives elsewhere
+  jurisdictions: US
+  version: 1
+- id: PD-019
+  name: Prescriber is an outlier for high-risk patients (Medicare Part D)
+  definition: A prescriber orders opioids for an unusually large number of patients with extreme use or
+    doctor-shopping patterns.
+  areas:
+  - PD
+  typology: Prescriber data analytics
+  status: verified
+  sources:
+  - title: 'HHS OIG Data Brief OEI-02-17-00250: Opioids in Medicare Part D'
+    publisher: US HHS Office of Inspector General
+    year: '2017'
+    url: https://oig.hhs.gov/OEI/REPORTS/OEI-02-17-00250.PDF
+    locator: footnote 31, p. 16
+    quote: more than 3 standard deviations above the mean and in the top 0.3 percent.
+    quote_verified: true
+    licence: US federal government work (public domain)
+    checked: '2026-10-09'
+  examples:
+  - OIG flagged prescribers with at least 44 extreme-use beneficiaries or at least 21 apparent doctor-shopping
+    beneficiaries.
+  cases: []
+  data_needed:
+  - Person (prescriber, patients)
+  - Document (claims data)
+  checkable: lookups
+  lookup_sources:
+  - CMS Medicare Part D Prescriber public use file
+  - State PDMP aggregate data (not public)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'More than 3 standard deviations above the mean and in the top 0.3% of prescribers for extreme-use
+      or doctor-shopping beneficiaries (OIG 2017: at least 44 or 21 such beneficiaries respectively)'
+    threshold_source: https://oig.hhs.gov/OEI/REPORTS/OEI-02-17-00250.PDF
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Pain, oncology or palliative specialists naturally have many high-dose patients
+  - Prescriber inherited patients from a closed clinic
+  jurisdictions: US (Medicare)
+  version: 1
+- id: PD-020
+  name: Opioid-benzodiazepine-muscle relaxant 'cocktail' ('Holy Trinity')
+  definition: An opioid, a benzodiazepine and carisoprodol are prescribed together, a combination widely
+    abused.
+  areas:
+  - PD
+  typology: Prescriber and pharmacy red flag
+  status: pending
+  sources:
+  - title: Hills Pharmacy, LLC; Decision and Order (81 FR 49816)
+    publisher: US DEA / Federal Register
+    year: '2016'
+    url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+    locator: 81 FR 49820 (expert testimony)
+    quote: it's called the Holy Trinity, which would be oxycodone, which is an opioid, a benzodiazepine,
+      which would be a tranquilizer such as Xanax, and a muscle relaxer like Soma.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Stakeholders' Challenges and Red Flag Warning Signs (NABP consensus document)
+    publisher: National Association of Boards of Pharmacy
+    url: https://www.ama-assn.org/media/7796/download
+    locator: Section 3.C, p. 15 (quote truncated as read)
+    quote: Patient presents prescriptions for highly abused "cocktails" (combination of opiate, benzodiazepine…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: CDC Guideline for Prescribing Opioids for Chronic Pain 2016
+    publisher: US CDC
+    url: https://www.cdc.gov/mmwr/volumes/65/rr/rr6501e1.htm
+    locator: Recommendation 11
+    quote: Clinicians should avoid prescribing opioid pain medication and benzodiazepines concurrently
+      whenever possible
+    quote_verified: false
+  examples:
+  - Walgreens settlement allegations included filling the 'trinity' (2025).
+  cases: []
+  data_needed:
+  - Document (prescriptions)
+  - Person (patient, prescriber)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: Opioid plus benzodiazepine for the same patient at the same time (CDC Recommendation 11)
+    textbook: Opioid plus benzodiazepine plus carisoprodol together (the 'trinity' as described in Hills
+      Pharmacy)
+    threshold_source: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Different prescribers for genuine separate conditions (anxiety and pain)
+  - Short overlap during a medication change
+  - Palliative care
+  jurisdictions: US
+  version: 1
+- id: PD-021
+  name: 'Pattern prescribing: many people, same drugs, same quantities, same doctor'
+  definition: Many patients bring near-identical controlled-drug prescriptions from the same prescriber.
+  areas:
+  - PD
+  typology: Pharmacy red flag
+  status: verified
+  sources:
+  - title: Hills Pharmacy, LLC; Decision and Order (81 FR 49816)
+    publisher: US DEA / Federal Register
+    year: '2016'
+    url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+    locator: 81 FR 49816
+    quote: multiple individuals presenting prescriptions for the same drugs in the same quantities from
+      the same doctor
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Hills Pharmacy, LLC; Decision and Order (81 FR 49816)
+    publisher: US DEA / Federal Register
+    year: '2016'
+    url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+    locator: 81 FR 49820 (definition of 'pattern prescribing')
+    quote: same medications, the same groups of medications, same combinations of medications in very
+      similar quantities and very similar doses
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Hills Pharmacy dispensed large, substantially similar quantities over one week in 2011.
+  cases:
+  - name: Hills Pharmacy, LLC (DEA Docket No. 15-4)
+    year: '2016'
+    jurisdiction: US federal (DEA administrative)
+    what_happened: DEA found pharmacists failed their corresponding responsibility by filling prescriptions
+      despite unresolved red flags and found inventory discrepancies; registration revoked (no fine).
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+    source_title: Hills Pharmacy, LLC; Decision and Order, 81 FR 49816
+  data_needed:
+  - Document (dispensing records)
+  - Person (patients, prescriber)
+  - Company (pharmacy, clinic)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Specialist with standard protocols (e.g. post-surgical packs)
+  - Clinic serving a single condition
+  jurisdictions: US
+  version: 1
+- id: PD-022
+  name: Patients arrive in groups or share unexplained common factors
+  definition: Patients come together, from the same clinic, with the same drugs, often all paying cash.
+  areas:
+  - PD
+  typology: Pharmacy and prescriber red flag
+  status: verified
+  sources:
+  - title: Stakeholders' Challenges and Red Flag Warning Signs (NABP consensus document)
+    publisher: National Association of Boards of Pharmacy
+    url: https://www.ama-assn.org/media/7796/download
+    locator: Section 3.C, p. 14 (quote truncated as read)
+    quote: Patients travel in groups and/or have unexplainable common factors in their relationships with
+      each other…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Hills Pharmacy, LLC; Decision and Order (81 FR 49816)
+    publisher: US DEA / Federal Register
+    year: '2016'
+    url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+    locator: 81 FR 49820
+    quote: people coming in from the same clinic, all getting the same drugs in large quantities and all
+      willing to pay cash.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A van drops several out-of-state patients at a pharmacy, each with the same oxycodone prescription.
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Associate
+  - Document (dispensing logs, CCTV)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family members or care-home residents with a shared carer
+  - Patients sharing transport in rural areas
+  jurisdictions: US
+  version: 1
+- id: PD-023
+  name: High cash payments for controlled substances
+  definition: Patients pay high prices in cash for controlled drugs, often though they have insurance.
+  areas:
+  - PD
+  typology: Pharmacy red flag
+  status: verified
+  sources:
+  - title: Hills Pharmacy, LLC; Decision and Order (81 FR 49816)
+    publisher: US DEA / Federal Register
+    year: '2016'
+    url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+    locator: 81 FR 49816
+    quote: individuals paying high prices . . . for controlled substances with cash
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Masters Pharmaceutical, Inc. v. DEA, No. 15-1335
+    publisher: US Court of Appeals, D.C. Circuit
+    year: '2017'
+    url: https://media.cadc.uscourts.gov/opinions/docs/2017/06/15-1335-1682127.pdf
+    locator: opinion (The Drug Shoppe), 30 June 2017
+    quote: 85 percent of the controlled substance prescriptions it filled were paid for with cash.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'The Drug Shoppe: 85% of controlled prescriptions paid in cash (Masters, 2017).'
+  cases: []
+  data_needed:
+  - Payment
+  - Company (pharmacy)
+  - Document (point-of-sale records)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Cash-dominated controlled-drug sales generate proceeds needing placement; pill-mill owners
+      have been convicted of money laundering.
+    source_url: https://www.justice.gov/usao-ndga/pr/two-pill-mill-owners-convicted
+  innocent_explanations:
+  - Uninsured patients
+  - Insurer refused cover or prior authorisation pending
+  - Discount-card pricing cheaper than co-pay
+  jurisdictions: US
+  version: 1
+- id: PD-024
+  name: Several members of one household on the same controlled drugs
+  definition: Multiple people at one address all receive the same controlled medications.
+  areas:
+  - PD
+  typology: Pharmacy red flag
+  status: verified
+  sources:
+  - title: Hills Pharmacy, LLC; Decision and Order (81 FR 49816)
+    publisher: US DEA / Federal Register
+    year: '2016'
+    url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+    locator: 81 FR 49820
+    quote: multiple people living in one household all receiving the same medications.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Three adults at one address each filling oxycodone 30mg #180 from the same prescriber.'
+  cases: []
+  data_needed:
+  - Address
+  - Person
+  - Family
+  - Document (prescriptions)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Hereditary conditions in a family
+  - Group homes or shared housing
+  - Same accident (e.g. car crash) injuring several people
+  jurisdictions: US
+  version: 1
+- id: PD-025
+  name: Facially invalid, altered or forged prescriptions
+  definition: Prescriptions miss required details (such as patient address), show changed quantities,
+    or look forged.
+  areas:
+  - PD
+  typology: Pharmacy red flag / patient fraud
+  status: verified
+  sources:
+  - title: Hills Pharmacy, LLC; Decision and Order (81 FR 49816)
+    publisher: US DEA / Federal Register
+    year: '2016'
+    url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+    locator: 81 FR 49816
+    quote: facially invalid . . . as it contained no patient address.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Stakeholders' Challenges and Red Flag Warning Signs (NABP consensus document)
+    publisher: National Association of Boards of Pharmacy
+    url: https://www.ama-assn.org/media/7796/download
+    locator: Section 3.C, p. 15 (quote truncated as read)
+    quote: Handwritten prescription is presented at the pharmacy looking altered (quantity changed) or
+      flawlessly thorough…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Patients'
+    quote: Patient alters prescriptions
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - '''30'' changed to ''80'' on a handwritten oxycodone prescription.'
+  cases: []
+  data_needed:
+  - Document (prescription images)
+  - Person
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Prescriber corrected their own error
+  - Clerical omission of address by a busy office
+  jurisdictions: US
+  version: 1
+- id: PD-026
+  name: Prescriber's DEA registration or licence expired, suspended or revoked, or prescribing outside
+    scope
+  definition: The prescriber is not authorised to prescribe the drug, or the drug falls outside their
+    specialty or practice limits.
+  areas:
+  - PD
+  typology: Pharmacy red flag
+  status: verified
+  sources:
+  - title: Stakeholders' Challenges and Red Flag Warning Signs (NABP consensus document)
+    publisher: National Association of Boards of Pharmacy
+    url: https://www.ama-assn.org/media/7796/download
+    locator: Section 3.C Illicit/Illegal, p. 15
+    quote: Prescriber's DEA registration or state license has expired/suspended/revoked.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Stakeholders' Challenges and Red Flag Warning Signs (NABP consensus document)
+    publisher: National Association of Boards of Pharmacy
+    url: https://www.ama-assn.org/media/7796/download
+    locator: Section 3.C, p. 15 (quote truncated as read)
+    quote: Patient presents prescription from prescriber who is prescribing outside the scope of his/her
+      practice…
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A dentist writing monthly oxycodone for chronic back pain.
+  cases: []
+  data_needed:
+  - Person (prescriber)
+  - Sanction (licence action, registration revocation)
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - DEA registration validation
+  - State medical / pharmacy board licence lookup
+  - Federal Register DEA decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Licence lapse for paperwork reasons, renewed shortly after
+  - Specialty overlap (e.g. a family doctor treating pain)
+  jurisdictions: US
+  version: 1
+- id: PD-027
+  name: Early refills
+  definition: Controlled-drug prescriptions are filled well before the previous supply should have run
+    out.
+  areas:
+  - PD
+  typology: Pharmacy red flag
+  status: verified
+  sources:
+  - title: Walgreens Agrees to Pay Up to $350M for Illegally Filling Unlawful Opioid Prescriptions
+    publisher: US Department of Justice (reposted by DOL OIG)
+    year: '2025'
+    url: https://www.oig.dol.gov/public/Press%20Releases/Walgreens%20Agrees%20to%20Pay%20Up%20to%20$350M%20for%20Illegally%20Filling%20Unlawful%20Opioid%20Prescriptions%20and%20for.pdf
+    locator: press release, 21 April 2025 (allegations)
+    quote: filled significantly early
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Hills Pharmacy, LLC; Decision and Order (81 FR 49816)
+    publisher: US DEA / Federal Register
+    year: '2016'
+    url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+    locator: 81 FR 49830 (pharmacy's own protocol testimony)
+    quote: check the PDMP to see any doctor shopping or any early filling
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A 30-day supply refilled on day 18 for several consecutive months.
+  cases: []
+  data_needed:
+  - Document (dispensing history with days supply)
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Travel or vacation supply
+  - Dose increase by prescriber
+  - Lost or stolen medication with police report
+  jurisdictions: US
+  version: 1
+- id: PD-028
+  name: Prescriptions in other people's names / one person collects for many
+  definition: A patient requests or presents controlled-drug prescriptions in the names of others, or
+    one person picks up many people's prescriptions.
+  areas:
+  - PD
+  typology: Patient / pharmacy red flag
+  status: verified
+  sources:
+  - title: Stakeholders' Challenges and Red Flag Warning Signs (NABP consensus document)
+    publisher: National Association of Boards of Pharmacy
+    url: https://www.ama-assn.org/media/7796/download
+    locator: Section 3.C, p. 14 (quote truncated as read)
+    quote: Patient presents prescriptions for controlled substances written in the names of other people…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Three Defendants Sentenced in Opioid Pill Mill Case
+    publisher: US Attorney's Office, Northern District of Texas
+    year: '2017'
+    url: https://www.justice.gov/usao-ndtx/pr/three-defendants-sentenced-opioid-pill-mill-case
+    locator: press release, 26 May 2017 (as returned; GenPharm Pharmacy)
+    quote: filling prescriptions for 30mg oxycodone written for multiple different individuals and dispensing
+      the filled prescriptions to a single individual, and not to the individuals named on the prescription.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Pharmacist Ndufola Kigham dispensed more than 70,000 oxycodone 30mg pills on illegitimate prescriptions
+    (NDTX).
+  cases: []
+  data_needed:
+  - Person
+  - Document (pickup signatures, ID logs)
+  - Associate
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Carers collecting for housebound family members
+  - Parents collecting for children
+  jurisdictions: US
+  version: 1
+- id: PD-029
+  name: Patient wants only the controlled drugs from a set of prescriptions
+  definition: The patient brings several prescriptions but fills only the controlled ones.
+  areas:
+  - PD
+  typology: Pharmacy red flag
+  status: verified
+  sources:
+  - title: Stakeholders' Challenges and Red Flag Warning Signs (NABP consensus document)
+    publisher: National Association of Boards of Pharmacy
+    url: https://www.ama-assn.org/media/7796/download
+    locator: Section 3.C, p. 15 (quote truncated as read)
+    quote: Patient presents several prescriptions written for controlled and non-controlled substances,
+      but only wants…
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Patient declines the anti-inflammatory and laxative but fills the oxycodone.
+  cases: []
+  data_needed:
+  - Document (dispensing records, abandoned prescriptions)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Patient already has the non-controlled drugs at home
+  - Cost of non-covered drugs
+  jurisdictions: US
+  version: 1
+- id: PD-030
+  name: Controlled substances make up an unusually high share of a pharmacy's prescriptions
+  definition: Most of what the pharmacy dispenses is controlled drugs, unlike typical pharmacies.
+  areas:
+  - PD
+  typology: Pharmacy / distributor due diligence
+  status: verified
+  sources:
+  - title: Masters Pharmaceutical, Inc. v. DEA, No. 15-1335
+    publisher: US Court of Appeals, D.C. Circuit
+    year: '2017'
+    url: https://media.cadc.uscourts.gov/opinions/docs/2017/06/15-1335-1682127.pdf
+    locator: opinion (City View pharmacy), 30 June 2017
+    quote: 60 percent of the prescriptions filled by the pharmacy were for controlled substances.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Masters Pharmaceutical, Inc. v. DEA, No. 15-1335
+    publisher: US Court of Appeals, D.C. Circuit
+    year: '2017'
+    url: https://media.cadc.uscourts.gov/opinions/docs/2017/06/15-1335-1682127.pdf
+    locator: opinion (Englewood Specialty Pharmacy)
+    quote: controlled substances prescriptions comprised nearly 70 percent of all prescriptions the pharmacy
+      dispensed.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - City View (60%) and Englewood Specialty Pharmacy (nearly 70%) in Masters.
+  cases:
+  - name: Masters Pharmaceutical, Inc. v. DEA
+    year: '2017'
+    jurisdiction: US, D.C. Circuit
+    what_happened: DEA revoked the distributor's registration for shipping suspicious orders without dispelling
+      suspicion; the court denied review and upheld the revocation as reasonable (regulatory sanction,
+      not a fine).
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://media.cadc.uscourts.gov/opinions/docs/2017/06/15-1335-1682127.pdf
+    source_title: Masters Pharmaceutical, Inc. v. DEA, No. 15-1335
+  data_needed:
+  - Company (pharmacy)
+  - Document (dispensing data, distributor due-diligence files)
+  checkable: lookups
+  lookup_sources:
+  - DEA ARCOS data (where released)
+  - Distributor due-diligence records produced in litigation
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (the figures above are case facts, not published
+      thresholds)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Pharmacy beside a hospice, cancer centre or pain specialist
+  - Specialty or compounding pharmacy
+  jurisdictions: US
+  version: 1
+- id: PD-031
+  name: Pharmacists pressured for speed or denied prescriber-risk information
+  definition: A pharmacy chain pushes pharmacists to fill fast and withholds internal data on problem
+    prescribers.
+  areas:
+  - PD
+  typology: Corporate / chain pharmacy
+  status: verified
+  sources:
+  - title: Walgreens Agrees to Pay Up to $350M for Illegally Filling Unlawful Opioid Prescriptions
+    publisher: US Department of Justice (reposted by DOL OIG)
+    year: '2025'
+    url: https://www.oig.dol.gov/public/Press%20Releases/Walgreens%20Agrees%20to%20Pay%20Up%20to%20$350M%20for%20Illegally%20Filling%20Unlawful%20Opioid%20Prescriptions%20and%20for.pdf
+    locator: press release, 21 April 2025 (allegations, no determination of liability)
+    quote: intentionally deprived its own pharmacists of crucial information.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Allegation: Walgreens ''pressured its pharmacists to fill prescriptions quickly''.'
+  cases: []
+  data_needed:
+  - Company
+  - Employment
+  - Document (internal policies, emails, metrics)
+  - Email
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary productivity targets with compliance carve-outs
+  - Data-sharing limits for privacy or legal reasons
+  jurisdictions: US
+  version: 1
+- id: PD-032
+  name: Controlled-substance inventory discrepancies, thefts or significant losses
+  definition: Stock counts do not match records (overages or shortages), or losses recur.
+  areas:
+  - PD
+  typology: Registrant recordkeeping
+  status: verified
+  sources:
+  - title: Hills Pharmacy, LLC; Decision and Order (81 FR 49816)
+    publisher: US DEA / Federal Register
+    year: '2016'
+    url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+    locator: 81 FR 49819 (audit)
+    quote: Respondent had overages in six of the drugs, the most significant being 1,306 dosage units
+      (du) of oxycodone 30 mg
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 21 CFR 1301.76 Other security controls for practitioners
+    publisher: Cornell LII (US Code of Federal Regulations)
+    url: https://www.law.cornell.edu/cfr/text/21/1301.76
+    locator: s. 1301.76(b) (theft or significant loss; factors include pattern of losses over time)
+    quote: The registrant shall notify the Field Division Office of the Administration in his area, in
+      writing,
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Hills Pharmacy shortage of 4,135 units of hydromorphone 4 mg.
+  cases: []
+  data_needed:
+  - Company (registrant)
+  - Document (inventories, DEA 222 forms, loss reports)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Counting or data-entry errors
+  - Unrecorded returns or transfers
+  - Genuine external burglary
+  jurisdictions: US
+  version: 1
+- id: PD-033
+  name: Doctor shopping and pharmacy shopping
+  definition: A patient gets the same or similar controlled drugs from several prescribers and pharmacies
+    that do not know about each other.
+  areas:
+  - PD
+  typology: Patient diversion
+  status: verified
+  sources:
+  - title: 'HHS OIG Data Brief OEI-02-17-00250: Opioids in Medicare Part D'
+    publisher: US HHS Office of Inspector General
+    year: '2017'
+    url: https://oig.hhs.gov/OEI/REPORTS/OEI-02-17-00250.PDF
+    locator: Methodology, p. 12
+    quote: received opioids from four or more prescribers and four or more pharmacies.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Stakeholders' Challenges and Red Flag Warning Signs (NABP consensus document)
+    publisher: National Association of Boards of Pharmacy
+    url: https://www.ama-assn.org/media/7796/download
+    locator: Section 3.C, p. 15 (quote truncated as read)
+    quote: Patient obtains same or similar controlled substance prescription from multiple health care
+      practitioners…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Patients'
+    quote: Patient deceives doctors or seeks alternate doctors while normal doctor is out of the office
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - PDMP shows six prescribers and five pharmacies in three months.
+  cases: []
+  data_needed:
+  - Person (patient, prescribers)
+  - Company (pharmacies)
+  - Document (PDMP or claims data)
+  checkable: lookups
+  lookup_sources:
+  - State PDMP (restricted)
+  - Insurer claims data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'OIG 2017: average daily dose above 120 MED for any 90-day period, opioids for 90+ days
+      in the year, and opioids from 4+ prescribers and 4+ pharmacies'
+    threshold_source: https://oig.hhs.gov/OEI/REPORTS/OEI-02-17-00250.PDF
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Coordinated care across specialists and a hospital
+  - Moving house or changing insurer
+  - Pharmacy stock shortages forcing use of several pharmacies
+  jurisdictions: US
+  version: 1
+- id: PD-034
+  name: Patient receives extreme amounts of opioids
+  definition: A patient's average daily opioid dose is very high for a whole year.
+  areas:
+  - PD
+  typology: Patient / prescriber data analytics
+  status: verified
+  sources:
+  - title: 'HHS OIG Data Brief OEI-02-17-00250: Opioids in Medicare Part D'
+    publisher: US HHS Office of Inspector General
+    year: '2017'
+    url: https://oig.hhs.gov/OEI/REPORTS/OEI-02-17-00250.PDF
+    locator: p. 4 box
+    quote: an average daily MED greater than 240 mg for 12 months.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - OIG counted Part D beneficiaries above this level in 2016.
+  cases: []
+  data_needed:
+  - Person (patient)
+  - Document (claims data)
+  checkable: lookups
+  lookup_sources:
+  - Insurer / Medicare claims data
+  - PDMP
+  levels:
+    faint: To be set by Ony
+    strong: Average daily MED above 120 mg for any 90-day period (OIG 2017 measure used with doctor shopping)
+    textbook: Average daily MED above 240 mg for the entire year and opioids for 360 days or more (OIG
+      2017)
+    threshold_source: https://oig.hhs.gov/OEI/REPORTS/OEI-02-17-00250.PDF
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Cancer, hospice or palliative patients (OIG excluded some of these)
+  - Long-term opioid-tolerant patients
+  jurisdictions: US (Medicare)
+  version: 1
+- id: PD-035
+  name: Drug-seeking presentation by the patient
+  definition: Behaviour such as demanding specific drugs, textbook symptoms, refusing exams or records,
+    or claiming lost or stolen medication.
+  areas:
+  - PD
+  typology: Patient diversion
+  status: verified
+  sources:
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Patients (also: demands immediate attention, recites textbook symptoms,
+      unwilling to give permission to obtain past records)'
+    quote: Patient claims they failed to pack medication, lost it, or that it was stolen
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Stakeholders' Challenges and Red Flag Warning Signs (NABP consensus document)
+    publisher: National Association of Boards of Pharmacy
+    url: https://www.ama-assn.org/media/7796/download
+    locator: Section 3.B, p. 13
+    quote: Patient declines physical examination, or permission to obtain past records, or to undergo
+      diagnostic tests.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Patient says earlier clinic 'burned down' so records are unavailable.
+  cases: []
+  data_needed:
+  - Person
+  - Document (charts, police reports)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine pain patients who have learned to name what works
+  - Real thefts and losses
+  - Patients with pseudo-addiction from undertreated pain
+  jurisdictions: US
+  version: 1
+- id: PD-036
+  name: Patient indicates sharing or selling, or offers to buy others' pills
+  definition: A patient says drugs will be shared or sold, or tries to buy other patients' pills.
+  areas:
+  - PD
+  typology: Patient diversion
+  status: verified
+  sources:
+  - title: Stakeholders' Challenges and Red Flag Warning Signs (NABP consensus document)
+    publisher: National Association of Boards of Pharmacy
+    url: https://www.ama-assn.org/media/7796/download
+    locator: Section 3.B p. 14 and 3.C p. 15
+    quote: Patient indicates that drugs will be shared with others or sold.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: 'Potential Diversion: Patients'
+    quote: Patient offers to buy other patient's pills
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Witness statements of pill sales in a clinic car park.
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Payment
+  - Document (statements)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Diverted pills are resold on the street; NDTX pills were distributed 'like street drugs' in
+      Texas and Louisiana.
+    source_url: https://www.justice.gov/usao-ndtx/pr/three-defendants-sentenced-opioid-pill-mill-case
+  innocent_explanations:
+  - Joking or misunderstood remark
+  - Rumour from a hostile source
+  jurisdictions: US
+  version: 1
+- id: PD-037
+  name: Recruited or paid 'patients' (sponsors, crews)
+  definition: People, often poor or homeless, are paid to pose as patients to obtain prescriptions that
+    organisers then fill and sell.
+  areas:
+  - PD
+  typology: Organised pill-mill scheme
+  status: verified
+  sources:
+  - title: Three Defendants Sentenced in Opioid Pill Mill Case
+    publisher: US Attorney's Office, Northern District of Texas
+    year: '2017'
+    url: https://www.justice.gov/usao-ndtx/pr/three-defendants-sentenced-opioid-pill-mill-case
+    locator: press release, 26 May 2017 (description of recruited patients)
+    quote: often homeless or of limited means
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - At least 150,000 oxycodone 30mg pills distributed in Dallas from January 2013 to July 2014.
+  cases: []
+  data_needed:
+  - Person (recruiters, recruited patients)
+  - Associate
+  - Payment
+  - Address
+  - Company (clinic, pharmacy)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Recruiting homeless or poor people as fake patients exploits vulnerable people; check for
+      coercion.
+    source_url: https://www.justice.gov/usao-ndtx/pr/three-defendants-sentenced-opioid-pill-mill-case
+  innocent_explanations:
+  - Outreach programmes legitimately bringing low-income patients to care
+  - Shelter transport to clinics
+  jurisdictions: US
+  version: 1
+- id: PD-038
+  name: 'Distributor: orders of unusual size'
+  definition: A pharmacy or practitioner orders far more of a controlled drug than usual or than peers.
+  areas:
+  - PD
+  typology: Suspicious order (distributor/manufacturer)
+  status: verified
+  sources:
+  - title: 21 CFR 1301.74 Other security controls for non-practitioners
+    publisher: Cornell LII (US Code of Federal Regulations)
+    url: https://www.law.cornell.edu/cfr/text/21/1301.74
+    locator: s. 1301.74(b)
+    quote: Suspicious orders include orders of unusual size, orders deviating substantially from a normal
+      pattern,
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - McKesson shipped an average of 9,650 hydrocodone pills a day to Sav-Rite No. 1 in Kermit, WV (House
+    E&C report, p. 16).
+  cases:
+  - name: 'Red Flags and Warning Signs Ignored: Opioid Distribution and Enforcement Concerns in West Virginia'
+    year: '2018'
+    jurisdiction: US Congress (House Energy and Commerce Committee, majority staff)
+    what_happened: Committee found distributors shipped about 9 million opioids in two years to one pharmacy
+      in Kermit (pop. 406) and 20.8 million to pharmacies in Williamson, and 'appeared to turn a blind
+      eye to red flags'.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.ruralhealthinfo.org/assets/2616-9819/Opioid-Distribution-Report-FinalREV.pdf
+    source_title: Red Flags and Warning Signs Ignored (House E&C, 19 Dec 2018)
+  data_needed:
+  - Company (distributor, pharmacy)
+  - Contract (supply agreement)
+  - Document (order and shipment records)
+  checkable: lookups
+  lookup_sources:
+  - DEA ARCOS data (released via litigation)
+  - Congressional reports
+  - Court exhibits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (no numeric size threshold in the regulation)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - New pharmacy ramping up, or one taking over a closed pharmacy's patients
+  - Hospice or hospital supply
+  - Seasonal stocking before holidays
+  jurisdictions: US
+  version: 1
+- id: PD-039
+  name: 'Distributor: orders deviating from normal pattern or of unusual frequency'
+  definition: Orders change sharply from a customer's normal pattern or come unusually often.
+  areas:
+  - PD
+  typology: Suspicious order
+  status: verified
+  sources:
+  - title: 21 CFR 1301.74 Other security controls for non-practitioners
+    publisher: Cornell LII (US Code of Federal Regulations)
+    url: https://www.law.cornell.edu/cfr/text/21/1301.74
+    locator: s. 1301.74(b)
+    quote: orders of unusual frequency.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Red Flags and Warning Signs Ignored (House E&C Committee)
+    publisher: US House Energy and Commerce Committee
+    year: '2018'
+    url: https://www.ruralhealthinfo.org/assets/2616-9819/Opioid-Distribution-Report-FinalREV.pdf
+    locator: p. 14
+    quote: distribution of hydrocodone to Tug Valley Pharmacy increased more than 1,000 percent in a five-month-period
+      in 2007
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - 'Tug Valley Pharmacy, Williamson WV: 1,000%+ increase in five months.'
+  cases: []
+  data_needed:
+  - Company
+  - Document (time-series order data)
+  checkable: lookups
+  lookup_sources:
+  - ARCOS
+  - Distributor records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Nearby pharmacy closed
+  - New prescriber or clinic opened locally
+  - Change of wholesaler
+  jurisdictions: US
+  version: 1
+- id: PD-040
+  name: Shipments out of proportion to local population
+  definition: Volumes of opioids delivered to a town or pharmacy far exceed what its population could
+    plausibly use.
+  areas:
+  - PD
+  typology: Distribution analytics
+  status: verified
+  sources:
+  - title: Red Flags and Warning Signs Ignored (House E&C Committee)
+    publisher: US House Energy and Commerce Committee
+    year: '2018'
+    url: https://www.ruralhealthinfo.org/assets/2616-9819/Opioid-Distribution-Report-FinalREV.pdf
+    locator: Executive summary, p. 4
+    quote: 20.8 million opioids were shipped to pharmacies in the town of Williamson
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Red Flags and Warning Signs Ignored (House E&C Committee)
+    publisher: US House Energy and Commerce Committee
+    year: '2018'
+    url: https://www.ruralhealthinfo.org/assets/2616-9819/Opioid-Distribution-Report-FinalREV.pdf
+    locator: p. 19 (H.D. Smith)
+    quote: provided Sav-Rite No. 1 in Kermit, population 406, with more than 1.48 million doses of hydrocodone
+      and oxycodone
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Kermit, WV; Williamson, WV.
+  cases: []
+  data_needed:
+  - Company (pharmacy, distributor)
+  - Address
+  - Document (shipment data, census population)
+  checkable: lookups
+  lookup_sources:
+  - ARCOS data
+  - Census population data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Pharmacy serves a wide rural catchment beyond the town
+  - Pharmacy supplies nursing homes or hospices
+  jurisdictions: US
+  version: 1
+- id: PD-041
+  name: No effective suspicious-order monitoring, or flagged orders shipped without due diligence
+  definition: A distributor lacks a working system to catch suspicious orders, or ships them without dispelling
+    the suspicion.
+  areas:
+  - PD
+  typology: Distributor compliance failure
+  status: verified
+  sources:
+  - title: McKesson Agrees to Pay Record $150 Million Settlement for Failure to Report Suspicious Orders
+    publisher: US Department of Justice
+    year: '2017'
+    url: https://www.justice.gov/opa/pr/mckesson-agrees-pay-record-150-million-settlement-failure-report-suspicious-orders
+    locator: press release, 17 January 2017 (allegation)
+    quote: failed to design and implement an effective system to detect and report 'suspicious orders'
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Red Flags and Warning Signs Ignored (House E&C Committee)
+    publisher: US House Energy and Commerce Committee
+    year: '2018'
+    url: https://www.ruralhealthinfo.org/assets/2616-9819/Opioid-Distribution-Report-FinalREV.pdf
+    locator: Executive summary, p. 7
+    quote: The Committee also found that one distributor lacked any formal order monitoring program.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 21 CFR 1301.74
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/cfr/text/21/1301.74
+    locator: s. 1301.74(b)
+    quote: The registrant shall design and operate a system to disclose to the registrant suspicious orders
+      of controlled substances.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - AmerisourceBergen 'responded inconsistently when pharmacies triggered repeated suspicious orders'
+    (E&C p. 16).
+  cases:
+  - name: McKesson Corporation civil settlement
+    year: '2017'
+    jurisdiction: US federal
+    what_happened: McKesson paid a $150 million civil penalty to settle allegations it failed to detect
+      and report suspicious orders, and agreed to suspend controlled-substance sales from distribution
+      centres in Colorado, Ohio, Michigan and Florida for multiple years.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/mckesson-agrees-pay-record-150-million-settlement-failure-report-suspicious-orders
+    source_title: McKesson Agrees to Pay Record $150 Million Settlement
+  data_needed:
+  - Company (distributor)
+  - Document (compliance policies, suspicious order reports to DEA)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - System existed but documentation was not produced
+  - Due diligence done informally (calls, visits) without records
+  jurisdictions: US
+  version: 1
+- id: PD-042
+  name: Distributor cuts off a customer without telling DEA
+  definition: A distributor stops supplying a suspicious pharmacy but does not report it, so the pharmacy
+    can switch suppliers.
+  areas:
+  - PD
+  typology: Distributor compliance failure
+  status: verified
+  sources:
+  - title: Red Flags and Warning Signs Ignored (House E&C Committee)
+    publisher: US House Energy and Commerce Committee
+    year: '2018'
+    url: https://www.ruralhealthinfo.org/assets/2616-9819/Opioid-Distribution-Report-FinalREV.pdf
+    locator: p. 17 (H.D. Smith)
+    quote: only provided documentation indicating it informed DEA about six of the terminations
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Pharmacy terminated by one wholesaler appears on another's customer list next month.
+  cases: []
+  data_needed:
+  - Company (distributor, pharmacy)
+  - Contract (supply relationships over time)
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - ARCOS supplier data
+  - Litigation document repositories
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Termination for credit or commercial reasons, not suspicion
+  jurisdictions: US
+  version: 1
+- id: PD-043
+  name: Manufacturer markets to prescribers it believes are diverting
+  definition: A drug maker keeps promoting to doctors it has reason to think are diverting, while claiming
+    an effective anti-diversion programme.
+  areas:
+  - PD
+  typology: Manufacturer
+  status: verified
+  sources:
+  - title: Opioid Manufacturer Purdue Pharma Pleads Guilty to Fraud and Kickback Conspiracies
+    publisher: US Department of Justice
+    year: '2020'
+    url: https://www.justice.gov/opa/pr/opioid-manufacturer-purdue-pharma-pleads-guilty-fraud-and-kickback-conspiracies
+    locator: press release, 24 November 2020
+    quote: Purdue represented to the DEA that it maintained an effective anti-diversion program
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Purdue marketed to over 100 providers it had good reason to believe were diverting.
+  cases:
+  - name: United States v. Purdue Pharma L.P.
+    year: '2020'
+    jurisdiction: US, D. New Jersey
+    what_happened: Purdue pleaded guilty to a dual-object conspiracy to defraud the US and violate the
+      FDCA, and two counts of conspiracy to violate the Anti-Kickback Statute; plea included a $3.544
+      billion criminal fine and $2 billion forfeiture.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/opioid-manufacturer-purdue-pharma-pleads-guilty-fraud-and-kickback-conspiracies
+    source_title: Opioid Manufacturer Purdue Pharma Pleads Guilty to Fraud and Kickback Conspiracies
+  data_needed:
+  - Company (manufacturer)
+  - Person (prescribers, sales reps)
+  - Employment
+  - Document (call notes, internal lists)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Purdue also paid an EHR company (Practice Fusion) for referrals, a kickback scheme.
+    source_url: https://www.justice.gov/opa/pr/opioid-manufacturer-purdue-pharma-pleads-guilty-fraud-and-kickback-conspiracies
+  innocent_explanations:
+  - Internal flag based on weak data later cleared
+  - Detailing for non-controlled products
+  jurisdictions: US
+  version: 1
+- id: PD-044
+  name: Manufacturer urges higher doses and misleads insurers on prior authorisation
+  definition: A drug maker pushes prescribers to raise doses and its staff give insurers false diagnoses
+    to get drugs approved.
+  areas:
+  - PD
+  typology: Manufacturer
+  status: verified
+  sources:
+  - title: Founder and Former Chairman of the Board of Insys Therapeutics Sentenced to 66 Months in Prison
+    publisher: US Attorney's Office, District of Massachusetts
+    year: '2020'
+    url: https://www.justice.gov/usao-ma/pr/founder-and-former-chairman-board-insys-therapeutics-sentenced-66-months-prison
+    locator: press release, 23 January 2020
+    quote: used a script of false and misleading representations about patient diagnoses
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Insys 'urging them to prescribe Subsys in higher and higher doses'.
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Document (prior authorisation calls, scripts)
+  - Payment
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: False diagnoses to insurers are insurance fraud.
+    source_url: https://www.justice.gov/usao-ma/pr/founder-and-former-chairman-board-insys-therapeutics-sentenced-66-months-prison
+  innocent_explanations:
+  - Hub services that legitimately help patients with insurer paperwork
+  - Dose-titration guidance in approved labelling
+  jurisdictions: US
+  version: 1
+- id: PD-045
+  name: 'Hospital staff: controlled drugs removed without orders, dispensing-cabinet discrepancies or
+    overrides'
+  definition: Health workers take controlled drugs from automated cabinets without a doctor's order, or
+    with overrides and count discrepancies.
+  areas:
+  - PD
+  typology: Health-care worker diversion
+  status: verified
+  sources:
+  - title: 'Quick Safety 48: Drug diversion and impaired health care workers'
+    publisher: The Joint Commission
+    url: https://jointcommission.org/resources/news-and-multimedia/newsletters/newsletters/quick-safety/quick-safety-48-drug-diversion-and-impaired-health-care-workers
+    locator: Patterns and trends that indicate potential diversion
+    quote: 'Controlled substances are removed: With no doctor''s orders.'
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Quick Safety 48
+    publisher: The Joint Commission
+    url: https://jointcommission.org/resources/news-and-multimedia/newsletters/newsletters/quick-safety/quick-safety-48-drug-diversion-and-impaired-health-care-workers
+    locator: Patterns and trends that indicate potential diversion
+    quote: 'Controlled substances are removed: With no doctor''s orders.'
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - One nurse's fentanyl withdrawals far exceed colleagues' on the same unit.
+  cases: []
+  data_needed:
+  - Person (staff)
+  - Employment
+  - Document (cabinet audit logs)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Emergency overrides in urgent care
+  - Sicker patient assignments
+  - System or barcode faults
+  jurisdictions: US (accreditation guidance)
+  version: 1
+- id: PD-046
+  name: 'Hospital staff: waste not witnessed or taken from waste containers'
+  definition: Leftover controlled drug is not disposed of with a witness, or is retrieved from unsecured
+    waste.
+  areas:
+  - PD
+  typology: Health-care worker diversion
+  status: verified
+  sources:
+  - title: Quick Safety 48
+    publisher: The Joint Commission
+    url: https://jointcommission.org/resources/news-and-multimedia/newsletters/newsletters/quick-safety/quick-safety-48-drug-diversion-and-impaired-health-care-workers
+    locator: Patterns and trends that indicate potential diversion
+    quote: Waste is not adequately witnessed.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Quick Safety 48
+    publisher: The Joint Commission
+    url: https://jointcommission.org/resources/news-and-multimedia/newsletters/newsletters/quick-safety/quick-safety-48-drug-diversion-and-impaired-health-care-workers
+    locator: Patterns and trends that indicate potential diversion
+    quote: Controlled substance waste is removed from unsecure waste container.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Same co-worker repeatedly 'witnesses' one nurse's waste after the fact.
+  cases: []
+  data_needed:
+  - Person
+  - Document (waste logs)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Short staffing makes witnesses unavailable
+  - Documentation catch-up at shift end
+  jurisdictions: US
+  version: 1
+- id: PD-047
+  name: 'Hospital staff: patients still in pain despite documented doses; documentation anomalies'
+  definition: Patients complain of pain though records say medication was given, or documentation is late,
+    done by others, or recorded without administration.
+  areas:
+  - PD
+  typology: Health-care worker diversion
+  status: verified
+  sources:
+  - title: Quick Safety 48
+    publisher: The Joint Commission
+    url: https://jointcommission.org/resources/news-and-multimedia/newsletters/newsletters/quick-safety/quick-safety-48-drug-diversion-and-impaired-health-care-workers
+    locator: Patterns and trends that indicate potential diversion
+    quote: Patients continue to complain about excessive pain, despite documented administration of pain
+      medication.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Quick Safety 48
+    publisher: The Joint Commission
+    url: https://jointcommission.org/resources/news-and-multimedia/newsletters/newsletters/quick-safety/quick-safety-48-drug-diversion-and-impaired-health-care-workers
+    locator: 'Patterns and trends (also: late documentation of certain medications only; frequent efforts
+      to help other nurses administer pain medication)'
+    quote: Medication is documented as given but not administered to the patient.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A nurse often offers to give other nurses' patients their opioid doses.
+  cases: []
+  data_needed:
+  - Person (staff, patients)
+  - Document (medication administration records, complaints)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Undertreated pain or tolerance
+  - Helpful team culture
+  - Busy shifts delaying charting
+  jurisdictions: US
+  version: 1
+- id: PD-048
+  name: Clinic owned or run by non-physicians
+  definition: A pain clinic is owned or financed by people who are not doctors, who push volume.
+  areas:
+  - PD
+  typology: Pill mill business model
+  status: verified
+  sources:
+  - title: Florida Statutes s. 458.3265 Pain-management clinics
+    publisher: Florida Legislature
+    url: http://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0400-0499/0458/Sections/0458.3265.html
+    locator: s. 458.3265(1)(d) (grounds to deny registration)
+    quote: not fully owned by a physician licensed under this chapter or chapter 459
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Two Pill Mill Owners Convicted
+    publisher: US Attorney's Office, Northern District of Georgia
+    year: '2014'
+    url: https://www.justice.gov/usao-ndga/pr/two-pill-mill-owners-convicted
+    locator: press release, 26 March 2014 (owners pushed the doctor to see as many patients as possible)
+    quote: month-long jury trial
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Muhammad Faridi, not a physician, owned McAllen Medical Clinic (NDTX).
+  cases: []
+  data_needed:
+  - Company (clinic)
+  - Ownership
+  - Directorship
+  - Person (owners, doctors)
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - State clinic registration
+  - Medical licence lookup
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: In Florida, a registered pain-management clinic not fully owned by licensed physicians (unless
+      exempt) is grounds to deny registration; elsewhere meets the published definition as worded
+    threshold_source: http://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0400-0499/0458/Sections/0458.3265.html
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Hospital systems and corporate practice where state law allows
+  - Management companies with physician ownership of the clinical entity
+  jurisdictions: US; Florida statute
+  version: 1
+- id: PD-049
+  name: Pill-mill proceeds hidden in multiple or third-party accounts
+  definition: Clinic profits are spread across many bank accounts, some in other people's names.
+  areas:
+  - PD
+  typology: Proceeds laundering
+  status: verified
+  sources:
+  - title: Two Pill Mill Owners Convicted
+    publisher: US Attorney's Office, Northern District of Georgia
+    year: '2014'
+    url: https://www.justice.gov/usao-ndga/pr/two-pill-mill-owners-convicted
+    locator: press release, 26 March 2014 (profits hidden in multiple bank accounts, many in third-party
+      names)
+    quote: federal drug and money laundering charges
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Atlanta Medical Group profits in third-party accounts.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Ownership
+  - Associate
+  - Family
+  checkable: lookups
+  lookup_sources:
+  - Bank records (subpoena)
+  - Company registry
+  - Property records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Third-party accounts to hide proceeds is a classic laundering typology; owners convicted of
+      money laundering.
+    source_url: https://www.justice.gov/usao-ndga/pr/two-pill-mill-owners-convicted
+  innocent_explanations:
+  - Ordinary business with multiple operating accounts
+  - Family members legitimately co-owning accounts
+  jurisdictions: US
+  version: 1
+- id: PD-050
+  name: Missing, fictitious or faked medical records
+  definition: No records are kept for controlled-drug visits, or records are invented or falsified, sometimes
+    after an investigation starts.
+  areas:
+  - PD
+  typology: Prescriber / patient fraud
+  status: verified
+  sources:
+  - title: Doctor Receives 30 Years To Life In Prescription Drug Overdose Case
+    publisher: US DEA
+    year: '2016'
+    url: https://www.dea.gov/press-releases/2016/02/05/doctor-receives-30-years-life-prescription-drug-overdose-case
+    locator: press release, 5 February 2016
+    quote: faked medical records when authorities began investigating
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Preventing Diversion (DEA-DC-13)
+    publisher: US DEA Diversion Control Division
+    url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+    locator: Possible Signs of Drug-Seeking
+    quote: Fictitious records
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Tseng sometimes kept no records of visits or prescriptions.
+  cases: []
+  data_needed:
+  - Document (charts with metadata, audit trails)
+  - Person
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Poor record-keeping or system migration losses
+  - Late but honest chart completion
+  jurisdictions: US
+  version: 1
+not_reached:
+- 'CDC 2022 Clinical Practice Guideline (MMWR 71(3)) recommendation text: page fetch truncated before
+  the dosage recommendations, so whether it keeps the 50/90 MME figures was not checked; the 2016 guideline
+  was used.'
+- 'DEA Pharmacist''s Manual and the DEA Diversion practitioner awareness conference slides (deadiversion.usdoj.gov/mtgs/...):
+  not opened.'
+- 'ASHP Guidelines on Preventing Diversion of Controlled Substances (2022): found but not opened; Joint
+  Commission Quick Safety 48 used instead. Joint Commission page shows no date.'
+- 21 CFR 1301.74/1306.04/1301.76 were read on Cornell LII; eCFR fetch failed. The full text of 1306.04(a)
+  and 1301.76(b) (including the reporting deadline) was only partly quoted.
+- 'Holiday CVS (77 FR 62316, 2012) and East Main Street Pharmacy DEA decisions: not opened.'
+- 'DEA 2020+ proposed or final suspicious-order rules (SORS): not opened.'
+- 'National Prescription Opiate Litigation (MDL 2804) settlements with Cardinal, AmerisourceBergen, McKesson,
+  J&J, CVS, Walmart: not opened.'
+- 'Washington Post ARCOS database release: not opened, so ARCOS is not defined in the glossary from a
+  source.'
+- 'NABP consensus document: year not shown on the AMA-hosted copy; several quotes were cut off by the
+  reading tool (marked with an ellipsis).'
+- No case with a court outcome was found for hospital-staff diversion (PD-045 to PD-047).

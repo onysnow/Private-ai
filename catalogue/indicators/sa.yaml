@@ -33,14 +33,14 @@ indicators:
     quote: a targeted killing, whether premeditated or spontaneous, in direct reprisal for the journalist’s
       work.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Ján Kuciak (database entry)
     publisher: Committee to Protect Journalists
     url: https://cpj.org/data/people/jan-kuciak/
     locator: Case summary
     quote: reported on government corruption and investigated tax fraud
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Businessman accused of masterminding Caruana Galizia assassination stands trial in Malta
     publisher: ICIJ
     year: '2026'
@@ -48,7 +48,7 @@ indicators:
     locator: On Alfred and George Degiorgio
     quote: are serving 40-year prison sentences
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The subject's associates were convicted of killing a reporter who wrote about the subject's business
     deals.
@@ -146,7 +146,7 @@ indicators:
     quote: From 2019 onwards, he became a trust person and advisor to crown witness Nabil B. in the turbulent
       "Marengo-trial".
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Marked for Death
     publisher: Committee to Protect Journalists
     year: '2005'
@@ -155,7 +155,7 @@ indicators:
     quote: All had reported on government and police corruption, drug dealing, and the activities of crime
       syndicates.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A cooperating witness's brother, then his lawyer, then his adviser are each killed over three years.
   - Three local reporters who covered the same mayor's links to traffickers are shot within two years.
@@ -236,7 +236,7 @@ indicators:
     locator: Key findings / methodology
     quote: the vast majority – 77% – of journalists' murderers have escaped with full impunity.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 85 per cent of journalist killings go unpunished
     publisher: UN Geneva
     year: '2024'
@@ -244,7 +244,7 @@ indicators:
     locator: News article on UNESCO report
     quote: around 85 percent of the cases did not make it to court
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The country is on CPJ's Global Impunity Index.
   - Two earlier murders of reporters covering the same port have no convictions.
@@ -286,14 +286,14 @@ indicators:
     locator: Key figures
     quote: 95 missing journalists
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Dom Phillips (database entry)
     publisher: Committee to Protect Journalists
     url: https://cpj.org/data/people/dom-phillips/
     locator: Case summary
     quote: interviewing local residents and people defending Indigenous territory from illegal fishing
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A fixer stops answering after meeting a source linked to an illegal mine.
   cases:
@@ -348,7 +348,7 @@ indicators:
     quote: detained, imprisoned, or otherwise deprived of their liberty by state authorities in connection
       with their work.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Attacks on the Press in 2024
     publisher: Committee to Protect Journalists
     year: '2025'
@@ -357,7 +357,7 @@ indicators:
     quote: More than 65% of imprisoned journalists in the census face anti-state charges, such as false
       news and terrorism
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: RSF’s 2024 Round-up
     publisher: Reporters Without Borders
     year: '2024'
@@ -365,7 +365,7 @@ indicators:
     locator: Key figures
     quote: 55 media workers currently held hostage worldwide
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Two local reporters who covered the governor's land deals are in pre-trial detention on terrorism
     charges.
@@ -406,7 +406,7 @@ indicators:
     locator: Mission statement
     quote: to continue the investigations of other reporters who have been silenced.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: About Green Blood
     publisher: Forbidden Stories
     year: '2019'
@@ -414,7 +414,7 @@ indicators:
     locator: Project description (citing CPJ)
     quote: at least 13 journalists have been killed after working on environment-related stories
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A team resumes a dead reporter's investigation into a mine's pollution.
   cases:
@@ -467,7 +467,7 @@ indicators:
     quote: Criminal groups were the most frequently suspected killers of journalists in 2020, while politics
       was the most dangerous beat.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Marked for Death
     publisher: Committee to Protect Journalists
     year: '2005'
@@ -476,7 +476,7 @@ indicators:
     quote: In most cases, journalists were murdered in retaliation for reporting on government corruption,
       crime, drug trafficking
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Good Practices for the Protection of Witnesses in Criminal Proceedings Involving Organized
       Crime
     publisher: UNODC
@@ -487,7 +487,7 @@ indicators:
       that protection measures for witnesses are considered an essential element of a country’s arsenal
       against organized crime.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The company under investigation launders money for a cartel.
   - The subject's security contractor is run by a former gang leader.
@@ -538,7 +538,7 @@ indicators:
     quote: Of the 246 journalists killed during this time who were working on corruption, 95 percent were
       murdered.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Murders of journalists more than double worldwide
     publisher: Committee to Protect Journalists
     year: '2020'
@@ -546,7 +546,7 @@ indicators:
     locator: Mexico section
     quote: a complex web of criminal, drug-trafficking gangs and entrenched official corruption.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The investigation shows a minister's relative won public contracts through a shell company.
   cases:
@@ -603,7 +603,7 @@ indicators:
     locator: Press release, key findings
     quote: at least 749 journalists and news media outlets reporting on environmental issues were targeted
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Missing Voices (Land and Environmental Defenders report)
     publisher: Global Witness
     year: '2024'
@@ -611,7 +611,7 @@ indicators:
     locator: p. 14
     quote: In 2023, we documented 196 defender killings.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The investigation traces gold from an unlicensed mine on Indigenous land.
   cases:
@@ -668,7 +668,7 @@ indicators:
     locator: Definition
     quote: governments reaching across borders to silence dissent among diasporas and exiles.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Agnes Callamard Q&A: ‘Saudi is responsible for Khashoggi murder’'
     publisher: Al Jazeera (reporting the UN Special Rapporteur's report)
     year: '2019'
@@ -677,7 +677,7 @@ indicators:
     quote: constituted an extrajudicial killing for which the State of the Kingdom of Saudi Arabia is
       responsible.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An exiled reporter investigates the finances of their home country's ruling family.
   cases:
@@ -735,7 +735,7 @@ indicators:
     quote: Antigovernment groups, including terrorists, are responsible for nearly one-third of all journalist
       murders, according to CPJ research.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Murders of journalists more than double worldwide
     publisher: Committee to Protect Journalists
     year: '2020'
@@ -744,7 +744,7 @@ indicators:
     quote: Militant groups targeted at least four journalists for murder in retaliation for their work
       in Afghanistan.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The investigation finds a militia taxes the smuggling route under study.
   cases: []
@@ -786,14 +786,14 @@ indicators:
     locator: Chapter on admission, C. Criteria for admission, threat assessment item (d), p. 62
     quote: The group’s capacity, knowledge and available means to carry out threats.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Risk assessment: getting started and security protocol'
     publisher: Rory Peck Trust
     url: https://rorypecktrust.org/get-help/safety/risk-assessment/getting-started-and-security-protocol/
     locator: Getting started
     quote: identify and assess the range of threats and risks to you, your colleagues and contributors
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A gang with a record of shooting informers knows where the source lives.
   cases: []
@@ -833,7 +833,7 @@ indicators:
     locator: Colombia section
     quote: at least eight received death threats and warnings before being gunned down.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Recommendation CM/Rec(2016)4 on the protection of journalism and safety of journalists
     publisher: Council of Europe Committee of Ministers
     year: '2016'
@@ -842,7 +842,7 @@ indicators:
     quote: threatened, harassed, subjected to surveillance, intimidated, arbitrarily deprived of their
       liberty, physically attacked
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An anonymous call says 'stop writing about the port or your family pays'.
   cases:
@@ -894,7 +894,7 @@ indicators:
     locator: Sustained Risks chapter
     quote: Physical surveillance of individual journalists often precedes violent attacks.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The same car is parked outside the reporter's home on several nights.
   - A stranger photographs the source leaving the newsroom.
@@ -934,7 +934,7 @@ indicators:
     locator: Long Distance Threats (includes coercion-by-proxy, family intimidation)
     quote: do not require physically reaching the individual targeted.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'CPJ Journalist Security Guide: Sustained Risks'
     publisher: Committee to Protect Journalists
     year: '2012'
@@ -942,7 +942,7 @@ indicators:
     locator: Sustained Risks chapter
     quote: There may be no greater fear than believing your family members are at risk.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Police visit the exiled reporter's parents and ask about her stories.
   cases:
@@ -988,7 +988,7 @@ indicators:
     locator: Case summary (quoting Kennedy Agyapong on Net 2 TV, May 2018)
     quote: I'm telling you, beat him,
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Recommendation CM/Rec(2016)4
     publisher: Council of Europe Committee of Ministers
     year: '2016'
@@ -997,7 +997,7 @@ indicators:
     quote: State officials and public figures should not undermine or attack the integrity of journalists
       and other media actors
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A minister posts a reporter's photo calling her a foreign agent.
   cases:
@@ -1046,7 +1046,7 @@ indicators:
     locator: Section on orchestrated smear campaigns
     quote: ascertain who is behind the attack and their motives.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'The Chilling: global study of online violence against women journalists'
     publisher: ICFJ / UNESCO
     url: https://www.icfj.org/our-work/chilling-global-study-online-violence-against-women-journalists
@@ -1054,7 +1054,7 @@ indicators:
     quote: One in five women respondents (20%) said they had been attacked or abused offline in incidents
       seeded online.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Dozens of new accounts post the same edited image of the reporter within an hour.
   cases: []
@@ -1095,14 +1095,14 @@ indicators:
     quote: Review your social media accounts for comments that may indicate that an online threat may
       escalate into a physical attack.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: The Chilling
     publisher: ICFJ / UNESCO
     url: https://www.icfj.org/our-work/chilling-global-study-online-violence-against-women-journalists
     locator: Key findings
     quote: Nearly three in four women respondents (73%) said they had experienced online violence.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A forum thread posts the reporter's street and asks who lives nearby.
   cases: []
@@ -1142,7 +1142,7 @@ indicators:
     locator: Case summary
     quote: threatened, jailed, forced into exile, and poisoned.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Ten years on: Safety of Journalists Platform issued 2,000 alerts'
     publisher: Council of Europe
     year: '2025'
@@ -1150,7 +1150,7 @@ indicators:
     locator: Alert categories
     quote: attacks on the physical safety and integrity of journalists.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The reporter's car brakes were cut a month after the first story.
   cases: []
@@ -1191,7 +1191,7 @@ indicators:
     quote: the disproportionate, excessive or unreasonable nature of the claim or part thereof, including
       the excessive dispute value;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Council of Europe adopts Recommendation on countering the use of SLAPPs
     publisher: Council of Europe
     year: '2024'
@@ -1199,7 +1199,7 @@ indicators:
     locator: Description of CM/Rec(2024)2 indicators
     quote: disproportionate, excessive or unreasonable remedies
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A businessman demands 10 million euros from a freelance reporter over one article.
   cases: []
@@ -1242,14 +1242,14 @@ indicators:
     quote: the existence of multiple proceedings initiated by the claimant or associated parties in relation
       to similar matters;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: SLAPP, Daphne Caruana Galizia, Malta
     publisher: Columbia Journalism Review
     url: https://www.cjr.org/analysis/slapp-daphne-caruana-galizia-malta.php
     locator: On the 42 civil libel suits open at her death
     quote: most of them brought by Maltese politicians and their business associates.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A minister and his aide each file separate libel suits over the same article.
   cases:
@@ -1304,7 +1304,7 @@ indicators:
       before or during the proceedings, as well as similar conduct by the claimant in similar or concurrent
       cases;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A law firm writes to the reporter's family warning of ruin if the story runs.
   cases: []
@@ -1343,7 +1343,7 @@ indicators:
     quote: the use in bad faith of procedural tactics, such as delaying proceedings, fraudulent or abusive
       forum shopping or the discontinuation of cases at a later stage of the proceedings in bad faith.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Council of Europe adopts Recommendation on countering the use of SLAPPs
     publisher: Council of Europe
     year: '2024'
@@ -1351,7 +1351,7 @@ indicators:
     locator: Description of CM/Rec(2024)2 indicators
     quote: the engagement in delaying tactics
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A company sues a Maltese reporter in a US court.
   cases: []
@@ -1390,7 +1390,7 @@ indicators:
     locator: Appendix II, Principles, para. 36 (on defamation, anti-terrorism and similar laws)
     quote: can prove effective as means of intimidating and silencing journalists and other media actors
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Attacks on the Press in 2024
     publisher: Committee to Protect Journalists
     year: '2025'
@@ -1399,7 +1399,7 @@ indicators:
     quote: More than 65% of imprisoned journalists in the census face anti-state charges, such as false
       news and terrorism
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A reporter is charged with 'spreading false information' after publishing a ministry's contracts.
   cases:
@@ -1449,7 +1449,7 @@ indicators:
     locator: Key findings
     quote: The targets received messages with malicious links
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: The Kingdom Came to Canada
     publisher: Citizen Lab
     year: '2018'
@@ -1457,7 +1457,7 @@ indicators:
     locator: Key findings
     quote: We assess with high confidence that Abdulaziz’s phone was infected with NSO’s Pegasus spyware.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Forensic Methodology Report: How to catch NSO Group''s Pegasus'
     publisher: Amnesty International Security Lab
     year: '2021'
@@ -1465,7 +1465,7 @@ indicators:
     locator: Introduction
     quote: Zero-click attacks have been observed since May 2018 and continue until now.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The reporter gets an SMS about a 'court summons' with a short link from an unknown number.
   cases:
@@ -1526,7 +1526,7 @@ indicators:
     locator: Overview
     quote: may have been individually targeted by mercenary spyware attacks.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The reporter gets an Apple threat notification by email and iMessage.
   cases: []
@@ -1567,7 +1567,7 @@ indicators:
     quote: Triana was targeted a week after infection attempts against two of Valdez's colleagues, Andrés
       Villarreal and Ismael Bojórquez.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The editor of a murdered reporter receives spyware links a week after the funeral.
   cases:
@@ -1616,7 +1616,7 @@ indicators:
     locator: Project overview
     quote: almost 200 journalists from nearly two dozen countries
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Pegasus vs. Predator: Dissident’s Doubly-Infected iPhone Reveals Cytrox Mercenary Spyware'
     publisher: Citizen Lab
     year: '2021'
@@ -1624,7 +1624,7 @@ indicators:
     locator: Customer identification section
     quote: 'we conclude that these governments are likely among Cytrox’s customers: Armenia, Egypt, Greece,'
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The Pegasus Project data shows the source's number selected by a client in the subject's country.
   cases:
@@ -1674,7 +1674,7 @@ indicators:
     locator: Appendix II, Principles, para. 38 (on surveillance)
     quote: undermine the protection of journalists' sources
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Greece: Journalist Thanasis Koukakis surveilled for 10 weeks with powerful new spyware tool'
     publisher: International Press Institute
     url: https://ipi.media/greece-journalist-thanasis-koukakis-surveilled-for-10-weeks-with-powerful-new-spyware-tool/
@@ -1682,7 +1682,7 @@ indicators:
     quote: Revelations published by Greek newspaper Efimerida ton Syntakton (EFSYN) indicated the EYP
       had secretly been conducting monitoring of Malichudis.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Leaked intelligence documents list the reporter's sources' meetings.
   cases:
@@ -1734,7 +1734,7 @@ indicators:
     quote: The danger that the witness, typically a former collaborator of the defendant, may pose to
       the public if relocated under a new identity;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Netherlands: RSF and FPU welcome convictions for the killing of journalist Peter R. de Vries'
     publisher: Reporters Without Borders
     year: '2024'
@@ -1742,7 +1742,7 @@ indicators:
     locator: Background
     quote: crown witness Nabil B. in the Marengo trial
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A former accountant of the cartel's front company agrees to talk.
   cases:
@@ -1796,7 +1796,7 @@ indicators:
     quote: they suffer verbal threats, intimidation, harassment, assault, property damage or simply fear
       of reprisal as a result of their cooperation with the police.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A source's shop window is smashed the week after an interview.
   cases: []
@@ -1839,7 +1839,7 @@ indicators:
     quote: The critical value of the witness’s trial testimony for the prosecution and the impossibility
       of gaining such knowledge elsewhere;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Only one person saw the payments being handed over.
   cases: []
@@ -1877,14 +1877,14 @@ indicators:
     quote: Are they using a workplace-provisioned device, or a personal device with workplace software
       installed?
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Metadata 101
     publisher: Freedom of the Press Foundation
     url: https://freedom.press/digisec/blog/metadata-101/
     locator: Opening definition
     quote: Metadata is data about data.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The leaked PDF still contains the author's name and the department printer ID.
   cases:
@@ -1933,7 +1933,7 @@ indicators:
     locator: Inquiry findings (quoted)
     quote: had failed to recognise the real and immediate risks to the life of Daphne Caruana Galizia.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Recommendation CM/Rec(2016)4
     publisher: Council of Europe Committee of Ministers
     year: '2016'
@@ -1942,7 +1942,7 @@ indicators:
     quote: State authorities have a duty to prevent or suppress offences against individuals when they
       know
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Police record five threat reports from a reporter and take no action.
   cases:
@@ -1990,7 +1990,7 @@ indicators:
     locator: Direct Attacks category; see also Mobility Controls and Co-opting Other Countries
     quote: Origin country tactics that physically reach the individual targeted.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Kenya court rules police unlawfully killed Pakistani journalist Arshad Sharif
     publisher: Committee to Protect Journalists
     year: '2024'
@@ -1998,7 +1998,7 @@ indicators:
     locator: Background
     quote: death threats over his reporting on corruption
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An exiled reporter's passport renewal is refused by the embassy.
   cases: []
@@ -2023,6 +2023,482 @@ indicators:
   - Consular delays and passport problems are common for ordinary reasons.
   jurisdictions: Global
   version: 1
+- id: SA-036
+  name: Gendered or sexualised threats against a woman investigator or source
+  definition: A woman journalist, researcher or source gets threats of rape or sexual assault, sexualised
+    abuse or misogynistic attacks connected to her reporting.
+  areas:
+  - SA
+  typology: Gender-based online violence
+  status: verified
+  sources:
+  - title: 'The Chilling: Global trends in online violence against women journalists (ICFJ/UNESCO research
+      discussion paper)'
+    publisher: International Center for Journalists (ICFJ) and UNESCO
+    year: '2021'
+    url: https://www.icfj.org/sites/default/files/2023-02/ICFJ%20Unesco_TheChilling_OnlineViolence.pdf
+    locator: p. 20
+    quote: online violence includes assault in the form of threats of rape and murder
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'The Chilling: Global trends in online violence against women journalists'
+    publisher: ICFJ and UNESCO
+    year: '2021'
+    url: https://www.icfj.org/sites/default/files/2023-02/ICFJ%20Unesco_TheChilling_OnlineViolence.pdf
+    locator: p. 11 (survey findings)
+    quote: sexual violence was identified by 18% (n=129)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'The Chilling: A global study of online violence against women journalists (project page)'
+    publisher: ICFJ
+    url: https://www.icfj.org/our-work/chilling-global-study-online-violence-against-women-journalists
+    quote: Threats of physical (25%) and sexual violence (18%) plagued the women journalists surveyed.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Messages threatening rape against a woman reporter after she publishes on the subject
+  - A rape threat made against a woman journalist's newborn child, as Patricia Devlin described to the
+    ICFJ/UNESCO researchers
+  cases:
+  - name: Maria Ressa (Rappler, Philippines)
+    year: '2021'
+    jurisdiction: Philippines
+    what_happened: In the foreword to the ICFJ/UNESCO study, Ressa wrote that she has been repeatedly
+      threatened with rape and murder, and that the attacks are fuelled by the state.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.icfj.org/sites/default/files/2023-02/ICFJ%20Unesco_TheChilling_OnlineViolence.pdf
+    source_title: The Chilling (ICFJ/UNESCO), Foreword p. 6
+  - name: Patricia Devlin (Northern Ireland)
+    year: '2021'
+    jurisdiction: United Kingdom (Northern Ireland)
+    what_happened: 'The study reports that Devlin received a rape threat against her newborn child and
+      quotes her: "I can no longer brush it off."'
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.icfj.org/sites/default/files/2023-02/ICFJ%20Unesco_TheChilling_OnlineViolence.pdf
+    source_title: The Chilling (ICFJ/UNESCO), p. 40
+  data_needed:
+  - Person (gender, role)
+  - Document or Email (the threatening messages, with dates and sender accounts)
+  - UnknownLink or Associate (links between the accounts sending threats and the subject)
+  - Event (date and platform of each threat)
+  checkable: person
+  lookup_sources:
+  - Platform reports and archived posts
+  - Police reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Generic misogynistic abuse by strangers that targets many women online and has no link to the story
+    or the subject
+  - Abuse set off by an unrelated viral post or a personal dispute
+  - Impersonation or trolling by people with no means or intent to act
+  jurisdictions: Global
+  version: 1
+- id: SA-037
+  name: 'Online abuse spills offline: an attack or harassment in person that began online'
+  definition: Abuse, threats or doxxing online is followed by harassment, stalking or a physical attack
+    in person, so the online campaign has become a real-world danger.
+  areas:
+  - SA
+  typology: Online-to-offline escalation
+  status: verified
+  sources:
+  - title: 'The Chilling: A global study of online violence against women journalists (project page)'
+    publisher: ICFJ
+    url: https://www.icfj.org/our-work/chilling-global-study-online-violence-against-women-journalists
+    quote: One in five women respondents (20%) said they had been attacked or abused offline in incidents
+      seeded online.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'The Chilling: Global trends in online violence against women journalists'
+    publisher: ICFJ and UNESCO
+    year: '2021'
+    url: https://www.icfj.org/sites/default/files/2023-02/ICFJ%20Unesco_TheChilling_OnlineViolence.pdf
+    locator: p. 32 (Trend 2)
+    quote: online violence against women journalists can spill offline with significant impact
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'The Chilling: Global trends in online violence against women journalists'
+    publisher: ICFJ and UNESCO
+    year: '2021'
+    url: https://www.icfj.org/sites/default/files/2023-02/ICFJ%20Unesco_TheChilling_OnlineViolence.pdf
+    locator: p. 9 (recommendations to judicial actors, on online violence)
+    quote: a potential indicator of future offline harm
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - After the home address is posted online, strangers turn up at the investigator's home
+  - Users threaten in a thread to confront a reporter at a named event, and someone then does
+  cases: []
+  data_needed:
+  - Person
+  - Address (home or workplace that was exposed)
+  - Document (screenshots of the online posts)
+  - 'Event (the offline incident: date, place, police report number)'
+  - UnknownLink (between the online accounts and the people involved offline)
+  checkable: person
+  lookup_sources:
+  - Police incident records
+  - Platform archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - 'Coincidence: an ordinary local crime, such as a burglary or street incident, unrelated to the online
+    abuse'
+  - A neighbour, fan or member of the public turning up without hostile intent
+  - A dispute about something else
+  jurisdictions: Global
+  version: 1
+- id: SA-038
+  name: Interpol Red Notice or diffusion sought against the investigator by the subject's government
+  definition: The government the investigator reports on asks Interpol to circulate an alert (a Red Notice
+    or a less formal diffusion) so other countries arrest the investigator abroad. This is a known tactic
+    of transnational repression.
+  areas:
+  - SA
+  typology: Transnational repression (abuse of Interpol)
+  status: verified
+  sources:
+  - title: Red Notices
+    publisher: INTERPOL
+    url: https://www.interpol.int/en/How-we-work/Notices/Red-Notices
+    quote: A Red Notice is an international alert for a wanted person, but it is not an arrest warrant.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Collaboration and Resistance: Tracking Transnational Repression in 2025'
+    publisher: Freedom House
+    year: '2026'
+    url: https://freedomhouse.org/report/special-report/2026/collaboration-and-resistance-tracking-transnational-repression-2025
+    quote: In at least 11 cases of detention or unlawful deportation, perpetrator governments were able
+      to use Interpol notices
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Collaboration and Resistance: Tracking Transnational Repression in 2025'
+    publisher: Freedom House
+    year: '2026'
+    url: https://freedomhouse.org/report/special-report/2026/collaboration-and-resistance-tracking-transnational-repression-2025
+    quote: A core vulnerability of Interpol continues to be its default acceptance of the validity of
+      accusations made by member states.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: INTERPOL campaign
+    publisher: Fair Trials
+    url: https://www.fairtrials.org/campaigns/interpol/
+    quote: to persecute refugees, journalists and peaceful political activists
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Legal documents (INTERPOL Constitution, Article 3)
+    publisher: INTERPOL
+    url: https://www.interpol.int/en/Who-we-are/Legal-framework/Legal-documents
+    locator: Constitution, Article 3
+    quote: It is strictly forbidden for the Organization to undertake any intervention or activities of
+      a political, military, religious or racial character.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The investigator is stopped at a border because of a Red Notice requested by the government they reported
+    on
+  - A domestic arrest in absentia or a wanted-list entry, followed by a request for an international alert
+  cases:
+  - name: Yassir Arman
+    year: '2025'
+    jurisdiction: Kenya / Sudan
+    what_happened: Freedom House reports that the Sudanese opposition politician was detained at Nairobi
+      airport on a Red Notice requested by Sudan. He is a politician, not a journalist; the case shows
+      how the mechanism works.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://freedomhouse.org/report/special-report/2026/collaboration-and-resistance-tracking-transnational-repression-2025
+    source_title: Freedom House, Collaboration and Resistance (2026)
+  - name: Ivania Cruz and Rudy Joya
+    year: '2025'
+    jurisdiction: El Salvador / Spain
+    what_happened: Freedom House reports that Interpol confirmed it issued Red Notices in May 2025 against
+      these two Spain-based Salvadoran lawyers.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://freedomhouse.org/report/special-report/2026/collaboration-and-resistance-tracking-transnational-repression-2025
+    source_title: Freedom House, Collaboration and Resistance (2026)
+  data_needed:
+  - Person
+  - 'Sanction (model the notice as a wanted alert: authority, country requesting it, start date, reason)'
+  - Document (the charge sheet or warrant behind the request)
+  - 'Event (detention or border stop: date and place)'
+  - Passport
+  checkable: lookups
+  lookup_sources:
+  - INTERPOL public Red Notice search (most notices are not public)
+  - Court and extradition records in the host country
+  - Domestic wanted lists of the requesting state
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A genuine ordinary criminal case against the person, unrelated to the reporting
+  - A notice issued over a real commercial or tax dispute
+  - A name mix-up with another wanted person
+  jurisdictions: Global; any INTERPOL member state
+  version: 1
+- id: SA-039
+  name: Detention, deportation or abduction abroad at the request of the subject's government
+  definition: An investigator or source living abroad is detained, deported back or abducted (rendition)
+    with the help or at the request of the government they report on.
+  areas:
+  - SA
+  typology: Transnational repression (direct attacks; co-opting host countries)
+  status: verified
+  sources:
+  - title: Transnational Repression
+    publisher: Freedom House
+    url: https://freedomhouse.org/report/transnational-repression
+    quote: It is governments reaching across borders to silence dissent among diasporas and exiles
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Transnational Repression
+    publisher: Freedom House
+    url: https://freedomhouse.org/report/transnational-repression
+    quote: Rendition, i.e. abduction or kidnapping.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Collaboration and Resistance: Tracking Transnational Repression in 2025'
+    publisher: Freedom House
+    year: '2026'
+    url: https://freedomhouse.org/report/special-report/2026/collaboration-and-resistance-tracking-transnational-repression-2025
+    quote: armed men briefly abducted Maria Sarungi Tsehai
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The host country starts deportation proceedings against an exiled reporter after a request from the
+    origin state
+  - An exiled critic is taken across a border and turns up in custody at home
+  cases:
+  - name: Maria Sarungi Tsehai
+    year: '2025'
+    jurisdiction: Kenya / Tanzania
+    what_happened: Freedom House reports that armed men briefly abducted the Tanzanian activist.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://freedomhouse.org/report/special-report/2026/collaboration-and-resistance-tracking-transnational-repression-2025
+    source_title: Freedom House, Collaboration and Resistance (2026)
+  - name: Kizza Besigye
+    year: '2024'
+    jurisdiction: Kenya / Uganda
+    what_happened: Freedom House reports that domestic law enforcement admitted assisting Ugandan agents
+      in his rendition in November 2024.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://freedomhouse.org/report/special-report/2026/collaboration-and-resistance-tracking-transnational-repression-2025
+    source_title: Freedom House, Collaboration and Resistance (2026)
+  data_needed:
+  - Person
+  - 'Event (detention, deportation or abduction: date, place, authority)'
+  - Document (deportation order, court record)
+  - Address (country and city of residence)
+  - Passport
+  checkable: lookups
+  lookup_sources:
+  - Host-country court and immigration records
+  - Freedom House transnational repression data
+  - News archives
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary immigration enforcement over an expired visa or residency status
+  - Arrest over an unrelated local offence
+  jurisdictions: Global
+  version: 1
+- id: SA-040
+  name: Passport cancelled or consular services refused by the subject's government
+  definition: The origin state cancels the investigator's passport or refuses to issue or renew one, so
+    they cannot travel freely or are stuck abroad.
+  areas:
+  - SA
+  typology: Transnational repression (mobility controls)
+  status: verified
+  sources:
+  - title: Transnational Repression
+    publisher: Freedom House
+    url: https://freedomhouse.org/report/transnational-repression
+    quote: When origin countries restrict individuals' ability to travel.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Transnational Repression
+    publisher: Freedom House
+    url: https://freedomhouse.org/report/transnational-repression
+    quote: Denial of consular service, including issuing or renewing passports
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An embassy refuses to renew an exiled reporter's passport
+  - The investigator's passport is declared invalid while they are abroad
+  cases: []
+  data_needed:
+  - Person
+  - Passport (number, issuing authority, status, expiry)
+  - Document (consular refusal letter)
+  - Event
+  checkable: person
+  lookup_sources:
+  - The person's own documents and correspondence
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary administrative delays or backlogs
+  - Missing documents or unpaid fees
+  - A legitimate dual-nationality rule
+  jurisdictions: Global
+  version: 1
+- id: SA-041
+  name: Investigator or outlet designated a 'foreign agent', with labelling duties, frozen earnings and
+    criminal liability
+  definition: A government lists the journalist or outlet as a 'foreign agent' (or similar), which forces
+    labels on their work, can trap their income in controlled accounts, and leads to fines and criminal
+    cases for not complying.
+  areas:
+  - SA
+  typology: Administrative and financial pressure on the press
+  status: verified
+  sources:
+  - title: Russia preps to block income of 'foreign agent' journalists
+    publisher: Committee to Protect Journalists (CPJ)
+    year: '2025'
+    url: https://cpj.org/2025/02/russia-preps-to-block-income-of-foreign-agent-journalists/
+    quote: However, the government can withdraw money from agents' accounts to pay fines imposed for failing
+      to apply that label
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Russia preps to block income of 'foreign agent' journalists
+    publisher: CPJ
+    year: '2025'
+    url: https://cpj.org/2025/02/russia-preps-to-block-income-of-foreign-agent-journalists/
+    quote: However, the government can withdraw money from agents' accounts to pay fines imposed for failing
+      to apply that label
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The outlet is added to the justice ministry's foreign agent register
+  - The investigator is fined, or a criminal case is opened, for not putting the label on their posts
+  cases:
+  - name: Sergey Smirnov (Mediazona)
+    year: '2024'
+    jurisdiction: Russia
+    what_happened: CPJ reports that a criminal case was opened against him in December 2024 for failing
+      to label content as a foreign agent, and that he could be jailed for two years if convicted. He
+      is one of 18 journalists prosecuted or fined under the legislation in late 2024.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://cpj.org/2025/02/russia-preps-to-block-income-of-foreign-agent-journalists/
+    source_title: CPJ, Russia preps to block income of 'foreign agent' journalists
+  data_needed:
+  - Person or Organization
+  - 'Sanction (the designation: authority, program ''foreign agent register'', start date)'
+  - Document (court records of fines and criminal cases)
+  - Payment (fines; frozen or seized income)
+  - BankAccount (special account)
+  checkable: lookups
+  lookup_sources:
+  - Government foreign agent registries (for example, the Russian Ministry of Justice register)
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A transparency registration law that is applied evenly and has no punishments beyond disclosure (for
+    example, foreign-lobbying disclosure rules)
+  - An outlet that really is foreign-funded and is registered only for administrative reasons
+  jurisdictions: Russia; similar laws elsewhere (CPJ names El Salvador, 2025)
+  version: 1
+- id: SA-042
+  name: Outlet declared an 'undesirable organisation', or the investigator arrested in absentia or placed
+    on a wanted list
+  definition: The government bans the investigator's outlet as 'undesirable', which makes working with
+    it a crime, or orders the investigator's arrest while they are abroad and puts them on a wanted list.
+  areas:
+  - SA
+  typology: Legal harassment; transnational repression
+  status: verified
+  sources:
+  - title: Russia preps to block income of 'foreign agent' journalists
+    publisher: CPJ
+    year: '2025'
+    url: https://cpj.org/2025/02/russia-preps-to-block-income-of-foreign-agent-journalists/
+    locator: CPJ's report of Ivan Kolpakov's account (paraphrased by the fetch tool; check the exact wording)
+    quote: Frankly speaking, we have not complied with foreign agent legislation in any form since 2023,
+      when Meduza was banned as an “undesirable” organization.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The outlet is added to the undesirable-organisations list
+  - A court orders a reporter's arrest in absentia over 'false information' about the armed forces
+  cases:
+  - name: Tatyana Felgenhauer and Kirill Martynov
+    year: '2024'
+    jurisdiction: Russia
+    what_happened: CPJ reports that both journalists were arrested in absentia in late 2024.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://cpj.org/2025/02/russia-preps-to-block-income-of-foreign-agent-journalists/
+    source_title: CPJ, Russia preps to block income of 'foreign agent' journalists
+  - name: Roman Anin (IStories)
+    year: '2025'
+    jurisdiction: Russia
+    what_happened: CPJ reports that Anin faces arrest for allegedly spreading 'false information' about
+      Russia's armed forces and is on a wanted list, and that IStories has been declared undesirable.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://cpj.org/2025/02/russia-preps-to-block-income-of-foreign-agent-journalists/
+    source_title: CPJ, Russia preps to block income of 'foreign agent' journalists
+  data_needed:
+  - Organization
+  - Person
+  - 'Sanction (designation or wanted listing: authority, date)'
+  - Document (court order)
+  checkable: lookups
+  lookup_sources:
+  - Government undesirable-organisation lists
+  - Interior ministry wanted lists
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A genuine criminal case for an ordinary offence that has nothing to do with the reporting
+  jurisdictions: Russia, and states with similar laws
+  version: 1
 not_reached:
 - CASE coalition website and 2023/2024 SLAPP reports (the-case.eu and PDF fetch failed)
 - 'Council of Europe Recommendation CM/Rec(2024)2 full text: only 4 of its 10 SLAPP indicators were visible
@@ -2042,3 +2518,14 @@ not_reached:
 - Global Witness 2025 report with 2024 data (only the 2024 report covering 2023 was read)
 - 'UNODC ''Good practices'' publication: read in full via the PDF; the unodc.org MENA mirror failed'
 - Saudi court verdicts in the Khashoggi case (not checked)
+- 'UNESCO Journalists'' Safety Indicators (JSI) guidebook: the web.archive URL returned a rate-limit page
+  twice, and the en.unesco.org PDF, the unesco.org JSI page and unesdoc are blocked by robots.txt. No
+  JSI indicators (impunity rates, protection mechanisms, prosecutions of attackers) were added, because
+  I could not quote the source. This needs a retry or a pasted copy of the guidebook.'
+- WebSearch budget for this run was used up after the first fetches, so no further sources could be found
+  by search.
+- 'CPJ pages on El Salvador''s 2025 Foreign Agents Law (cpj.org/2025/05/el-salvador-foreign-agents-law/)
+  and on Russia''s foreign agent law (cpj.org/reports/2023/12/...): guessed URLs, both returned errors.
+  The El Salvador claim rests only on the gap note, not on a page I opened.'
+- Primary text of the Russian foreign agent and undesirable-organisation laws was not opened. Definitions
+  rely on CPJ.

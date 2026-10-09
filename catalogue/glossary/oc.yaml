@@ -473,3 +473,353 @@ terms:
   indicators: []
   areas:
   - OC
+- term: County lines
+  definition: Drug dealing in which a city-based network sends drugs to other towns, taking orders through
+    a dedicated phone number and often using children or vulnerable people to carry and sell.
+  examples: []
+  source_url: https://www.nationalcrimeagency.gov.uk/what-we-do/crime-threats/drug-trafficking/county-lines
+  cases: []
+  related:
+  - Deal line
+  - Cuckooing
+  - Child criminal exploitation
+  indicators: []
+  areas:
+  - OC
+- term: Deal line
+  definition: The mobile phone number a county lines network uses to take drug orders; it is treated as
+    a valuable brand and passed between members.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+  cases: []
+  related:
+  - County lines
+  indicators: []
+  areas:
+  - OC
+- term: Cuckooing
+  definition: Taking over a vulnerable person's home to deal or store drugs, also called forced home invasion.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+  cases: []
+  related:
+  - County lines
+  indicators: []
+  areas:
+  - OC
+- term: Child criminal exploitation
+  definition: When a person or group uses a power imbalance to coerce, control, manipulate or deceive
+    someone under 18 into crime.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+  cases: []
+  related:
+  - County lines
+  - Debt bondage
+  indicators: []
+  areas:
+  - OC
+- term: Debt bondage
+  definition: Keeping someone working for a criminal group by making them owe a debt, often a fake one
+    or one created by a staged robbery.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+  cases: []
+  related:
+  - Child criminal exploitation
+  indicators: []
+  areas:
+  - OC
+- term: Chip dumping
+  definition: Deliberately losing chips or money to another player, often in poker, to move value from
+    one account to another.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+  cases: []
+  related:
+  - Collusion
+  indicators: []
+  areas:
+  - OC
+- term: Junket
+  definition: An arrangement in which an operator brings high-spending gamblers to a casino, often handling
+    their travel, credit and money.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Sham merchant
+  definition: An illegal operator that hides gambling payments by posing as a different kind of business
+    to the card networks.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: White-label arrangement
+  definition: A setup in which one company runs the gambling platform and licence while another puts its
+    own brand on it.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Cheap whites
+  definition: Cigarettes made legally in one country, mostly for smuggling into other markets where they
+    have no legal sale.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Counterfeit cigarettes
+  definition: Copies of branded cigarettes and packaging made by people who do not own the trademark.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Bootlegging
+  definition: Buying smaller amounts of tobacco in low-tax places or duty-free shops to resell where tax
+    is higher.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: In-transit system
+  definition: Customs rules that let goods pass through a country without paying duty, which smugglers
+    abuse by diverting the goods to the local market.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+  cases: []
+  related:
+  - Pseudo export
+  indicators: []
+  areas:
+  - OC
+- term: Refining
+  definition: Exchanging small bank notes for large ones to make cash easier to carry and hide.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Smurfing
+  definition: Splitting cash into many small deposits made by several people from the same group so none
+    of them triggers a report.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+  cases: []
+  related:
+  - Structuring
+  indicators: []
+  areas:
+  - OC
+- term: Piracy (UNCLOS)
+  definition: Illegal violence, detention or robbery committed for private ends by the crew of a private
+    ship against another ship on the high seas.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Kidnap for ransom (KFR)
+  definition: Seizing a person and demanding money for their release; FATF studies it as a source of criminal
+    profit and of terrorist financing.
+  examples: []
+  source_url: https://fatf-gafi.org/en/publications/Methodsandtrends/Organisedmaritimepiracyandrelatedkidnappingforransom.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Ransom air drop
+  definition: Delivering a ransom in cash by dropping it from an aircraft near the hijacked ship.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Hawala
+  definition: An informal money-transfer system in which brokers pay out money in one place against money
+    received in another and settle between themselves later, without moving funds through banks.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+  cases: []
+  related:
+  - Alternative remittance system
+  indicators: []
+  areas:
+  - OC
+- term: Bearer negotiable instrument (BNI)
+  definition: A paper instrument, such as a bearer cheque, traveller's cheque, money order or promissory
+    note, that whoever holds it can cash.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Cash courier
+  definition: A person who physically carries cash or bearer instruments across a border, lawfully or
+    to smuggle it.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  cases: []
+  related:
+  - FATF Recommendation 32
+  indicators: []
+  areas:
+  - OC
+- term: FATF Recommendation 32
+  definition: The global standard requiring countries to detect cross-border movement of cash and BNIs,
+    with a declaration or disclosure duty above a threshold of no more than USD/EUR 15,000.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Cross-border report (CBR)
+  definition: A record customs makes of a cash declaration, a failure to declare, or a false declaration
+    at a border, which is passed to the financial intelligence unit.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Ungazetted entry point
+  definition: A border crossing that is not an officially designated port of entry, so using it with goods
+    or cash avoids customs.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: ESAAMLG
+  definition: The Eastern and Southern Africa Anti-Money Laundering Group, a FATF-style regional body
+    that sets and checks anti-money-laundering standards for its member countries.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Vehicle cloning
+  definition: Giving a stolen vehicle the identity (chassis number, plates, registration) of a legitimate
+    or written-off vehicle of the same model.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Chop shop
+  definition: A place where stolen vehicles are taken apart so the parts can be sold, or shipped as spares
+    and rebuilt elsewhere.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Pseudo export
+  definition: Declaring goods as in transit or for export when they are actually sold on the local market
+    without duty.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+  cases: []
+  related:
+  - In-transit system
+  indicators: []
+  areas:
+  - OC
+- term: Round tripping (vehicles)
+  definition: Exporting a vehicle, deregistering it, and bringing it back or re-registering it elsewhere
+    to dodge duty or hide its history.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Bonded warehouse
+  definition: A customs-licensed warehouse where imported goods can be stored without paying duty until
+    they are released or re-exported.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Proxy registration
+  definition: Registering a vehicle or asset in the name of someone who is not the real owner.
+  examples: []
+  source_url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Professional money laundering network
+  definition: People or businesses who launder money for criminals as a paid service, often through accounts
+    that behave like unlicensed money-transfer businesses.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+  cases: []
+  related:
+  - Underground banking
+  indicators: []
+  areas:
+  - OC
+- term: Pay-through (transit) account
+  definition: An account where money comes in and goes straight back out, used to pass funds along rather
+    than for real business.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC
+- term: Fentanyl precursor
+  definition: A chemical used to make fentanyl or related synthetic opioids, often bought from overseas
+    chemical sellers.
+  examples: []
+  source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - OC

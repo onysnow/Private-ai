@@ -1,0 +1,265 @@
+area: VE
+terms:
+- term: Homegrown violent extremist (HVE)
+  definition: A person living mainly in the US who supports or prepares for terrorism to further the aims
+    of a foreign terrorist organisation, while acting on their own rather than under its direction.
+  examples: []
+  source_url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+  cases: []
+  related:
+  - Domestic violent extremist (DVE)
+  indicators: []
+  areas:
+  - VE
+- term: Domestic violent extremist (DVE)
+  definition: A person based mainly in the US who seeks political or social goals, wholly or partly, through
+    unlawful force or violence, without direction from a foreign group.
+  examples: []
+  source_url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+  cases: []
+  related:
+  - Homegrown violent extremist (HVE)
+  indicators: []
+  areas:
+  - VE
+- term: Mobilization (stage)
+  definition: In the NCTC/FBI/DHS booklet, physical or online actions suggesting an attack or extremist
+    travel may be imminent.
+  examples: []
+  source_url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+  cases: []
+  related:
+  - Preparation (stage)
+  - Motivation (stage)
+  indicators: []
+  areas:
+  - VE
+- term: Preparation (stage)
+  definition: Actions suggesting an attack or extremist travel may happen in the near term.
+  examples: []
+  source_url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Motivation (stage)
+  definition: Actions that build, solidify or communicate violent ideological beliefs.
+  examples: []
+  source_url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Behavior type
+  definition: 'One of six labels the booklet uses to describe an indicator: Travel, Intent, Tactics, Financial,
+    Relationship or Ideology.'
+  examples: []
+  source_url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Constitutionally protected activity
+  definition: Lawful speech, belief, association and protest; the booklet warns that law enforcement action
+    should never be based on these alone and that strong rhetoric or activism is not extremism.
+  examples: []
+  source_url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Violent extremism
+  definition: The beliefs and actions of people who support or use violence to achieve ideological, religious
+    or political goals.
+  examples: []
+  source_url: https://www.livingsafetogether.gov.au/Documents/preventing-violent-extremism-and-radicalisation-in-australia.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Radicalisation
+  definition: The process by which a person's beliefs move from conventional to radical; it becomes a
+    concern when the person begins to advocate or use violence for a political, religious or ideological
+    goal.
+  examples: []
+  source_url: https://www.livingsafetogether.gov.au/Documents/preventing-violent-extremism-and-radicalisation-in-australia.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Disengagement
+  definition: When a person stops using violence but keeps a non-violent radical ideology.
+  examples: []
+  source_url: https://www.livingsafetogether.gov.au/Documents/preventing-violent-extremism-and-radicalisation-in-australia.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Warning behaviours
+  definition: 'Acts that are evidence of increasing or accelerating risk of targeted violence: sudden,
+    dynamic changes in behaviour that call for an operational response.'
+  examples: []
+  source_url: https://boris.unibe.ch/7532
+  cases: []
+  related:
+  - TRAP-18
+  - Proximal warning behaviour
+  indicators: []
+  areas:
+  - VE
+- term: TRAP-18 (Terrorist Radicalization Assessment Protocol)
+  definition: A structured professional tool that codes 8 proximal warning behaviours and 10 longer-term
+    distal characteristics to organise information about a person of concern.
+  examples: []
+  source_url: https://drreidmeloy.com/training/trap-18/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Proximal warning behaviour
+  definition: A near-term behaviour in TRAP-18 suggesting risk is rising now (pathway, fixation, identification,
+    novel aggression, energy burst, leakage, last resort, directly communicated threat).
+  examples: []
+  source_url: https://www.dcjs.virginia.gov/sites/dcjs.virginia.gov/files/training-events/4193/summaryofproximalanddistalwarningbehaviors.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Distal characteristic
+  definition: A longer-term background factor in TRAP-18, such as grievance, ideology or a history of
+    violence, that raises concern only together with other signs.
+  examples: []
+  source_url: https://www.dcjs.virginia.gov/sites/dcjs.virginia.gov/files/training-events/4193/summaryofproximalanddistalwarningbehaviors.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Leakage
+  definition: Telling a third party about an intent to harm a target through an attack.
+  examples: []
+  source_url: https://www.dcjs.virginia.gov/sites/dcjs.virginia.gov/files/training-events/4193/summaryofproximalanddistalwarningbehaviors.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Pathway behaviour
+  definition: Any research, planning, preparation or carrying out of an attack.
+  examples: []
+  source_url: https://www.dcjs.virginia.gov/sites/dcjs.virginia.gov/files/training-events/4193/summaryofproximalanddistalwarningbehaviors.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Lone offender terrorism
+  definition: In the FBI study, an attack where one person was both the main planner and the main attacker,
+    motivated by an extremist ideology rather than only personal motives.
+  examples: []
+  source_url: https://www.fbi.gov/file-repository/lone-offender-terrorism-report-111319.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Grievance
+  definition: A real or perceived injustice or feeling of being wronged.
+  examples: []
+  source_url: https://www.fbi.gov/file-repository/lone-offender-terrorism-report-111319.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Bystander
+  definition: In the FBI study, a family member, friend, co-worker or other person who sees an offender's
+    behaviour before an attack and could report it.
+  examples: []
+  source_url: https://www.fbi.gov/file-repository/lone-offender-quick-reference.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Hate crime
+  definition: For FBI statistics, a criminal offence against a person or property motivated wholly or
+    partly by bias against race, religion, disability, sexual orientation, ethnicity, gender or gender
+    identity.
+  examples: []
+  source_url: https://www.fbi.gov/investigate/civil-rights/hate-crimes
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Channel
+  definition: A voluntary UK multi-agency programme that supports people judged vulnerable to being drawn
+    into terrorism.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/the-prevent-duty-safeguarding-learners-susceptible-to-radicalisation/the-prevent-duty-practical-guidance-for-designated-safeguarding-leads
+  cases: []
+  related:
+  - Prevent
+  indicators: []
+  areas:
+  - VE
+- term: Prevent duty
+  definition: The UK legal duty on schools and other bodies to help stop people being drawn into terrorism,
+    including by referring concerns.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/the-prevent-duty-safeguarding-learners-susceptible-to-radicalisation/the-prevent-duty-practical-guidance-for-designated-safeguarding-leads
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Susceptibility factor
+  definition: In UK Prevent guidance, a background circumstance such as isolation, bullying or trauma
+    that can make someone more vulnerable but is not an indicator of radicalisation in itself.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/the-prevent-duty-safeguarding-learners-susceptible-to-radicalisation/the-prevent-duty-practical-guidance-for-designated-safeguarding-leads
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Manifesto / last-will statement
+  definition: A document or video released by an attacker, often just before an attack, setting out their
+    reasons; the NCTC booklet treats releasing one as a Mobilization indicator.
+  examples: []
+  source_url: https://archive.dni.gov/files/NCTC/documents/news_documents/Mobilization_Indicators_Booklet_2021.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: TE-SAT terrorism categories
+  definition: Europol's report groups terrorism as jihadist, right-wing, left-wing and anarchist, ethno-nationalist
+    and separatist, and other or not specified forms.
+  examples: []
+  source_url: https://www.europol.europa.eu/cms/sites/default/files/documents/TE-SAT%202025%20-%20Summary%20-%20EN.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE
+- term: Royal Commission of Inquiry
+  definition: In New Zealand, the highest form of independent public inquiry set up by government; one
+    examined the 15 March 2019 Christchurch mosque attacks.
+  examples: []
+  source_url: https://chchroyalinquiry.cwp.govt.nz/the-report/executive-summary-2/executive-summary
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - VE

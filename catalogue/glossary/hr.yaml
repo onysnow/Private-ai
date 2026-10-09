@@ -487,3 +487,209 @@ terms:
   indicators: []
   areas:
   - HR
+- term: Atrocity crimes
+  definition: The UN's umbrella term for genocide, crimes against humanity and war crimes.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related:
+  - Genocide
+  - Crimes against humanity
+  - War crimes
+  indicators: []
+  areas:
+  - HR
+- term: Framework of Analysis for Atrocity Crimes
+  definition: A UN tool (2014, sent to the General Assembly and Security Council in 2016) listing 14 risk
+    factors and their indicators, used to judge whether atrocity crimes may be coming.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related:
+  - Risk factor
+  - Indicator
+  indicators: []
+  areas:
+  - HR
+- term: Risk factor
+  definition: In the UN Framework, a condition that raises the chance of atrocity crimes or shows they
+    may be happening; eight are common to all such crimes and six are specific to genocide, crimes against
+    humanity or war crimes.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Indicator (atrocity early warning)
+  definition: A sign that shows whether, and how strongly, a risk factor is present; the Framework's lists
+    are not exhaustive or ranked.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Enabling circumstances or preparatory action
+  definition: 'Risk factor 7: events or measures that create an environment for atrocities or suggest
+    someone is preparing them.'
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Triggering factors
+  definition: 'Risk factor 8: events, sometimes unrelated, that can suddenly worsen a situation or set
+    off atrocities, such as elections or assassinations.'
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Mitigating factors
+  definition: Things that can prevent or reduce violence, such as a free press, civil society or international
+    presence; their absence is Risk factor 6.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Protected group
+  definition: In the Framework, any national, ethnical, racial or religious group protected by Article
+    2 of the Genocide Convention.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Genocidal intent
+  definition: The specific intent to destroy a protected group in whole or in part; courts may infer it
+    from context and from other acts systematically aimed at the same group.
+  examples: []
+  source_url: https://unictr.irmct.org/sites/unictr.org/files/case-documents/ictr-96-4/trial-judgements/en/980902.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Attack directed against any civilian population
+  definition: Under the Rome Statute, repeated crimes against civilians carried out under or to further
+    a state or organisational policy; the context needed for crimes against humanity.
+  examples: []
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Direct and public incitement to commit genocide
+  definition: Directly and publicly urging others to commit genocide; a crime even if no genocide follows.
+  examples:
+  - RTLM radio and Kangura newspaper, Rwanda 1994
+  source_url: https://www.icc-cpi.int/sites/default/files/RS-Eng.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Rabat threshold test
+  definition: Six questions from the UN Rabat Plan of Action (context, speaker, intent, content and form,
+    extent, likelihood including imminence) for deciding when hateful speech is serious enough to be a
+    crime.
+  examples: []
+  source_url: https://www.ohchr.org/sites/default/files/Rabat_draft_outcome.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Militia / paramilitary group
+  definition: An armed group outside, or alongside, the regular armed forces, often formed or backed by
+    political actors; their creation or support is a Framework indicator.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Internet shutdown / communications blackout
+  definition: Deliberate cutting or blocking of internet, phone or other communication services for an
+    area or population.
+  examples: []
+  source_url: https://documents.un.org/api/symbol/access?s=A/HRC/51/46&l=en&t=pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Statelessness (de facto)
+  definition: Being in practice without any nationality, as the UN mission found for most Rohingya after
+    exclusionary citizenship laws.
+  examples: []
+  source_url: https://documents.un.org/api/symbol/access?s=A/HRC/39/64&l=en&t=pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Impunity
+  definition: Serious crimes going unpunished; the Framework treats a policy or practice of impunity as
+    a risk factor for future atrocities.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Fact-finding mission / commission of inquiry
+  definition: A body appointed by the UN (for example by the Human Rights Council) to investigate violations
+    and report findings; it is not a court and its findings are not convictions.
+  examples: []
+  source_url: https://documents.un.org/api/symbol/access?s=A/HRC/39/64&l=en&t=pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Conspiracy to commit genocide
+  definition: An agreement to commit genocide; at the ICTR, when proved only by circumstantial evidence,
+    it must be the only reasonable inference from the evidence.
+  examples: []
+  source_url: https://unictr.irmct.org/sites/unictr.org/files/case-documents/ictr-98-41/trial-judgements/en/081218.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: Perfidy (treachery)
+  definition: Deceiving the enemy by misusing protected symbols such as Red Cross or UN emblems, or by
+    fighters pretending to be civilians.
+  examples: []
+  source_url: https://documents.un.org/doc/undoc/gen/n16/042/32/pdf/n1604232.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR
+- term: International Criminal Tribunal for Rwanda (ICTR)
+  definition: The UN court that tried those most responsible for the 1994 Rwandan genocide; its records
+    are now held by the International Residual Mechanism for Criminal Tribunals (IRMCT).
+  examples: []
+  source_url: https://unictr.irmct.org/en/cases/ictr-99-52
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - HR

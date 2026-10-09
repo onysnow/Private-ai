@@ -520,3 +520,302 @@ terms:
   indicators: []
   areas:
   - ML
+- term: Casino chips
+  definition: Tokens a casino sells for cash or credit to use at its tables; they can be cashed back at
+    the cage and are a store of value.
+  examples: []
+  source_url: https://rccol.archive.royalcommission.vic.gov.au/sites/default/files/2021-08/Exhibit%20RC0310%20Annexure%20b%2C%20Financial%20Action%20Task%20Force%20report%20re%20Vulnerabilities%20of%20Casinos%20and%20Gaming%20Sector%2C%20March%202009.pdf
+  cases: []
+  related:
+  - Cage
+  - Refining
+  indicators: []
+  areas:
+  - ML
+- term: Cage (casino cashier)
+  definition: The casino's cashier desk, where chips are bought and cashed, deposits are taken and casino
+    cheques or wires are issued.
+  examples: []
+  source_url: https://www.fincen.gov/resources/statutes-regulations/guidance/recognizing-suspicious-activity-red-flags-casinos-and-card
+  cases: []
+  related:
+  - Front money
+  indicators: []
+  areas:
+  - ML
+- term: Minimal play
+  definition: Gambling very little with money brought into a casino before cashing out, a sign the aim
+    was to move money rather than gamble.
+  examples: []
+  source_url: https://www.fincen.gov/resources/statutes-regulations/guidance/recognizing-suspicious-activity-red-flags-casinos-and-card
+  cases: []
+  related:
+  - ML-064
+  indicators: []
+  areas:
+  - ML
+- term: Refining
+  definition: Swapping many small-denomination notes for fewer large ones (or a cheque), which makes illicit
+    cash easier to carry and hide.
+  examples: []
+  source_url: https://rccol.archive.royalcommission.vic.gov.au/sites/default/files/2021-08/Exhibit%20RC0310%20Annexure%20b%2C%20Financial%20Action%20Task%20Force%20report%20re%20Vulnerabilities%20of%20Casinos%20and%20Gaming%20Sector%2C%20March%202009.pdf
+  cases: []
+  related:
+  - ML-065
+  indicators: []
+  areas:
+  - ML
+- term: Front money
+  definition: Money a player deposits with a casino in advance to gamble against; it sits in a casino
+    deposit account.
+  examples: []
+  source_url: https://www.fincen.gov/resources/statutes-regulations/guidance/recognizing-suspicious-activity-red-flags-casinos-and-card
+  cases: []
+  related:
+  - ML-069
+  indicators: []
+  areas:
+  - ML
+- term: Casino marker
+  definition: A form of credit a casino extends to a player, used to buy chips and repaid later.
+  examples: []
+  source_url: https://www.fincen.gov/resources/statutes-regulations/guidance/recognizing-suspicious-activity-red-flags-casinos-and-card
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Junket
+  definition: An organised gambling tour that brings players to a casino, often including travel, credit
+    and the movement of their money; run by the casino or an independent junket operator.
+  examples:
+  - A junket operator flies VIP players to Macao and arranges their gambling funds.
+  source_url: https://rccol.archive.royalcommission.vic.gov.au/sites/default/files/2021-08/Exhibit%20RC0310%20Annexure%20b%2C%20Financial%20Action%20Task%20Force%20report%20re%20Vulnerabilities%20of%20Casinos%20and%20Gaming%20Sector%2C%20March%202009.pdf
+  cases: []
+  related:
+  - ML-070
+  indicators: []
+  areas:
+  - ML
+- term: TITO ticket (ticket-in, ticket-out)
+  definition: A paper voucher a gaming machine prints when a player cashes out credits, which is redeemed
+    at the cage or a kiosk.
+  examples: []
+  source_url: https://rccol.archive.royalcommission.vic.gov.au/sites/default/files/2021-08/Exhibit%20RC0310%20Annexure%20b%2C%20Financial%20Action%20Task%20Force%20report%20re%20Vulnerabilities%20of%20Casinos%20and%20Gaming%20Sector%2C%20March%202009.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: EGM (electronic gaming machine)
+  definition: A poker machine or slot machine; AUSTRAC's term for gaming machines.
+  examples: []
+  source_url: https://austrac.gov.au/business/how-comply-guidance-and-resources/guidance-resources/indicators-suspicious-activity-casino-sector
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Player rating
+  definition: A casino's record of how much and how long a patron gambles, used for rewards; falsifying
+    it can make cashed-out chips look like winnings.
+  examples: []
+  source_url: https://rccol.archive.royalcommission.vic.gov.au/sites/default/files/2021-08/Exhibit%20RC0310%20Annexure%20b%2C%20Financial%20Action%20Task%20Force%20report%20re%20Vulnerabilities%20of%20Casinos%20and%20Gaming%20Sector%2C%20March%202009.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Surrender (of an insurance policy)
+  definition: Cancelling a life insurance or investment policy before it matures and taking its cash value,
+    usually minus a surrender charge.
+  examples: []
+  source_url: https://bsaaml.ffiec.gov/manual/Appendices/07
+  cases: []
+  related:
+  - ML-074
+  indicators: []
+  areas:
+  - ML
+- term: Single (lump-sum) premium
+  definition: Paying for an insurance policy in one large payment instead of instalments.
+  examples: []
+  source_url: https://www.austrac.gov.au/business/how-comply-guidance-and-resources/guidance-resources/indicators-suspicious-activity-life-insurance-sector
+  cases: []
+  related:
+  - ML-075
+  indicators: []
+  areas:
+  - ML
+- term: Beneficiary (of a policy)
+  definition: The person or entity named to receive the payout from an insurance policy.
+  examples: []
+  source_url: https://www.austrac.gov.au/business/how-comply-guidance-and-resources/guidance-resources/indicators-suspicious-activity-life-insurance-sector
+  cases: []
+  related:
+  - ML-076
+  indicators: []
+  areas:
+  - ML
+- term: Mirror trade
+  definition: A pair of matched trades in which one party buys and a linked party sells the same security
+    in the same quantity and at the same price, usually in different currencies or countries, used to
+    move money with no real investment.
+  examples: []
+  source_url: https://www.dfs.ny.gov/reports_and_publications/press_releases/pr1701301
+  cases: []
+  related:
+  - ML-078
+  indicators: []
+  areas:
+  - ML
+- term: Wash trade
+  definition: Buying and selling the same security at the same time or in matching amounts so that ownership
+    does not really change; it lacks economic purpose.
+  examples: []
+  source_url: https://www.austrac.gov.au/business/how-comply-guidance-and-resources/guidance-resources/indicators-suspicious-activity-securities-and-derivatives-sector
+  cases: []
+  related:
+  - ML-079
+  indicators: []
+  areas:
+  - ML
+- term: Loan-back
+  definition: A scheme in which a person's own illicit money is lent back to them, or secures a loan to
+    them, so it returns looking like borrowed money.
+  examples: []
+  source_url: https://bsaaml.ffiec.gov/manual/Appendices/07
+  cases: []
+  related:
+  - ML-080
+  indicators: []
+  areas:
+  - ML
+- term: Monetary instrument
+  definition: A paper payment item such as a money order, traveller's cheque or cashier's cheque that
+    can be bought with cash.
+  examples: []
+  source_url: https://bsaaml.ffiec.gov/manual/Appendices/07
+  cases: []
+  related:
+  - ML-082
+  indicators: []
+  areas:
+  - ML
+- term: Casa de cambio
+  definition: A currency exchange house, common in Mexico and Latin America, that changes money and sends
+    payments.
+  examples: []
+  source_url: https://bsaaml.ffiec.gov/manual/Appendices/07
+  cases: []
+  related:
+  - ML-082
+  indicators: []
+  areas:
+  - ML
+- term: Informal value transfer system (IVTS) / hawala
+  definition: Any system or network that takes money in one place and pays the same value to someone elsewhere,
+    often outside the regular banking system; hawala is a common traditional form.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2022-07-05/FIN-2010-A11-updated_508.pdf
+  cases: []
+  related:
+  - ML-083
+  indicators: []
+  areas:
+  - ML
+- term: Unlicensed money transmitter
+  definition: A business that sends money for others without the required state licence or federal registration,
+    a crime in the US.
+  examples: []
+  source_url: https://www.fincen.gov/sites/default/files/advisory/2022-07-05/FIN-2010-A11-updated_508.pdf
+  cases: []
+  related:
+  - ML-083
+  indicators: []
+  areas:
+  - ML
+- term: Sham litigation
+  definition: A fake or collusive lawsuit or debt claim, settled or enforced quickly, used to make a transfer
+    of money look like a legal judgment or settlement.
+  examples: []
+  source_url: https://cilexregulation.org.uk/wp-content/uploads/2018/12/AML-Red-Flag-Indicators.pdf
+  cases: []
+  related:
+  - ML-084
+  indicators: []
+  areas:
+  - ML
+- term: Power of attorney
+  definition: A legal document giving one person authority to act for another, for example to manage or
+    sell their assets.
+  examples: []
+  source_url: https://cilexregulation.org.uk/wp-content/uploads/2018/12/AML-Red-Flag-Indicators.pdf
+  cases: []
+  related:
+  - ML-088
+  indicators: []
+  areas:
+  - ML
+- term: Retainer
+  definition: The engagement of a lawyer by a client for a particular piece of work.
+  examples: []
+  source_url: https://cilexregulation.org.uk/wp-content/uploads/2018/12/AML-Red-Flag-Indicators.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Back-to-back (ABC) property transaction
+  definition: A property bought and quickly resold, often between connected parties, with the price rising
+    sharply each time.
+  examples: []
+  source_url: https://cilexregulation.org.uk/wp-content/uploads/2018/12/AML-Red-Flag-Indicators.pdf
+  cases: []
+  related:
+  - ML-040
+  indicators: []
+  areas:
+  - ML
+- term: Residence by investment (RBI)
+  definition: A government programme granting residence rights (a 'golden visa') in exchange for a qualifying
+    investment.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html
+  cases: []
+  related:
+  - Citizenship by investment (CBI)
+  indicators: []
+  areas:
+  - ML
+- term: Money merry-go-round
+  definition: A scheme in which the same investment money is recycled through several CBI/RBI applicants
+    or bogus investment schemes so each appears to have invested.
+  examples: []
+  source_url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/misuse-CBI-RBI-programmes.html
+  cases: []
+  related:
+  - ML-097
+  indicators: []
+  areas:
+  - ML
+- term: Non-prosecution agreement
+  definition: A deal in which prosecutors agree not to bring charges in return for the company paying
+    money and accepting conditions; it is not a conviction.
+  examples: []
+  source_url: https://www.dea.gov/press-releases/2013/08/27/operator-venetian-resort-las-vegas-agrees-return-over-47-million-after
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML
+- term: Civil penalty order (AUSTRAC)
+  definition: A court-ordered fine in a civil (not criminal) case that AUSTRAC brings against a business
+    for breaking Australia's AML/CTF Act.
+  examples: []
+  source_url: https://www.austrac.gov.au/lists-enforcement-actions-taken
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ML

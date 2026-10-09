@@ -435,3 +435,125 @@ terms:
   indicators: []
   areas:
   - CY
+- term: SIM swap fraud
+  definition: A criminal pretends to be a mobile customer and gets the carrier to move the customer's
+    number to a SIM the criminal controls, so they receive the victim's calls and security codes.
+  examples: []
+  source_url: https://docs.fcc.gov/public/attachments/FCC-23-95A1.pdf
+  cases: []
+  related:
+  - Port-out fraud
+  - Account takeover
+  indicators: []
+  areas:
+  - CY
+- term: Port-out fraud
+  definition: A criminal pretends to be a mobile customer and has the customer's number transferred to
+    a different phone company under the criminal's control.
+  examples: []
+  source_url: https://docs.fcc.gov/public/attachments/FCC-23-95A1.pdf
+  cases: []
+  related:
+  - SIM swap fraud
+  indicators: []
+  areas:
+  - CY
+- term: DPRK IT workers
+  definition: Skilled IT workers from North Korea who get remote jobs abroad under false or borrowed identities
+    to earn money for the North Korean government, in breach of sanctions.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/923126/download?inline
+  cases: []
+  related:
+  - Laptop farm
+  - Sanctions evasion
+  indicators: []
+  areas:
+  - CY
+- term: Laptop farm
+  definition: A location, often a home in the employer's country, where a facilitator keeps company laptops
+    switched on so remote workers abroad can control them and appear to be local.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/justice-department-announces-coordinated-nationwide-actions-combat-north-korean-remote
+  cases: []
+  related:
+  - DPRK IT workers
+  - Remote desktop
+  indicators: []
+  areas:
+  - CY
+- term: Remote desktop (port 3389)
+  definition: Software that lets someone control a computer from another location; port 3389 is the network
+    port commonly used by Microsoft's Remote Desktop Protocol and is named as a red flag in the DPRK IT
+    worker guidance.
+  examples: []
+  source_url: https://ofac.treasury.gov/media/923126/download?inline
+  cases: []
+  related:
+  - Laptop farm
+  indicators: []
+  areas:
+  - CY
+- term: E-Verify
+  definition: A U.S. government system employers use to confirm that a new hire is allowed to work in
+    the United States; the FBI says errors in it during hiring can be a warning sign.
+  examples: []
+  source_url: https://www.ic3.gov/PSA/2024/PSA240516
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Face-swapping / deepfake
+  definition: Using AI to replace or generate a person's face or voice in video so someone appears to
+    be another person, reported by the FBI in job interviews.
+  examples: []
+  source_url: https://www.ic3.gov/PSA/2025/PSA250123
+  cases: []
+  related:
+  - AI-enabled fraud
+  indicators: []
+  areas:
+  - CY
+- term: Data extortion
+  definition: Stealing an organisation's data or code and demanding payment not to release or sell it.
+  examples: []
+  source_url: https://www.ic3.gov/PSA/2025/PSA250123
+  cases: []
+  related:
+  - Ransomware
+  indicators: []
+  areas:
+  - CY
+- term: Romance baiting
+  definition: INTERPOL's term for a scheme that mixes a fake romantic relationship with a fake crypto
+    investment, also called pig butchering.
+  examples: []
+  source_url: https://www.interpol.int/en/News-and-Events/News/2024/INTERPOL-Financial-Fraud-assessment-A-global-threat-boosted-by-technology
+  cases: []
+  related:
+  - Investment fraud
+  - Forced criminality
+  indicators: []
+  areas:
+  - CY
+- term: Fraud-as-a-service (phishing-as-a-service, ransomware-as-a-service)
+  definition: A criminal business model where tools or services for fraud or attacks are sold or rented
+    to other criminals.
+  examples: []
+  source_url: https://www.interpol.int/en/News-and-Events/News/2024/INTERPOL-Financial-Fraud-assessment-A-global-threat-boosted-by-technology
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY
+- term: Tech-support fraud
+  definition: A scam in which criminals pose as technical support to convince victims their device has
+    a problem and get payment or remote access.
+  examples: []
+  source_url: https://www.interpol.int/en/News-and-Events/News/2024/INTERPOL-Financial-Fraud-assessment-A-global-threat-boosted-by-technology
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CY

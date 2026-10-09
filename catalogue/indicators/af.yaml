@@ -1,0 +1,2720 @@
+key: AF
+name: Corporate accounting fraud
+scope: 'Corporate accounting and financial-statement fraud. Fraud risk factors from the auditing standard
+  (ISA/ASA 240, ''Examples of Fraud Risk Factors''), grouped as incentives or pressures, opportunities,
+  and attitudes or rationalisations. Fraudulent financial reporting: heavy pressure on management to meet
+  investor or analyst profit expectations; significant related-party transactions outside the normal course
+  of business; management with an unusually high tolerance for risk. Misappropriation of assets: employees
+  with access to valuable assets who face personal financial obligations; weak segregation of duties or
+  independent checks; tolerance of petty theft. A US equivalent is PCAOB AU 316.85.'
+indicators:
+- id: AF-001
+  name: Company's financial stability or profitability under threat
+  definition: The company is losing money, burning cash, losing customers or facing strong outside shocks,
+    which gives managers a reason to dress up the numbers.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: incentive or pressure'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2 to the fraud auditing standard, ASA 240)
+    publisher: Auditing and Assurance Standards Board (AUASB)
+    year: ''
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Fraudulent financial reporting, Incentives/Pressures, first bullet group
+    quote: Operating losses making the threat of bankruptcy, foreclosure, or hostile takeover imminent.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Incentives/Pressures
+    quote: High degree of competition or market saturation, accompanied by declining margins.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Recurring negative operating cash flow while reported earnings grow
+  - Declining margins in a saturated market
+  - Pandemic, war or sanctions disrupting the business (listed in the same group)
+  cases: []
+  data_needed:
+  - 'Company (financial statement figures, not an FTM schema: revenue, margin, operating cash flow)'
+  - Debt
+  - Sanction (where sanctions affect the jurisdiction)
+  checkable: lookups
+  lookup_sources:
+  - Company annual reports and filings (e.g. SEC EDGAR, Companies House)
+  - Industry data
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Whole industry in a downturn
+  - Normal losses of a start-up or turnaround
+  - Honest companies under pressure far outnumber those that commit fraud
+  jurisdictions: Auditing standard used in Australia; mirrors the international standard ISA 240 and US
+    AS 2401
+  version: 1
+- id: AF-002
+  name: Rapid growth or unusual profitability compared with peers
+  definition: The company grows or earns far faster than similar companies, which can mean the numbers
+    are inflated.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: incentive or pressure'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Incentives/Pressures
+    quote: Rapid growth or unusual profitability especially compared to that of other companies in the
+      same industry.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Predicting Material Accounting Misstatements (Dechow, Ge, Larson and Sloan, Contemporary Accounting
+      Research 2011)
+    publisher: Contemporary Accounting Research (copy hosted by the Center for Audit Quality)
+    year: '2011'
+    url: https://www.thecaq.org/wp-content/uploads/2018/03/Dechow-et-al-2011-Contemporary_Accounting_Research.pdf
+    locator: Findings on cash sales
+    quote: we find that cash sales are increasing during misstatement periods
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Luckin Coffee reported fast sales growth later found by the SEC (in a settled complaint) to include
+    more than $300 million of fabricated sales
+  cases:
+  - name: Luckin Coffee Inc.
+    year: '2020'
+    jurisdiction: United States (SEC)
+    what_happened: The SEC alleged Luckin intentionally fabricated more than $300 million in retail sales
+      between about April 2019 and January 2020, using related parties to create false sales. Luckin agreed
+      to pay a $180 million penalty without admitting or denying the allegations.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/news/press-release/2020-319
+    source_title: SEC press release 2020-319
+  data_needed:
+  - Company (revenue and profit figures by period; not FTM properties)
+  - Company peers in the same industry
+  checkable: lookups
+  lookup_sources:
+  - Company filings
+  - Industry peer filings or databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A genuinely better product or new market
+  - Acquisitions
+  - Early-stage companies grow fast from a small base
+  version: 1
+- id: AF-003
+  name: Heavy pressure to meet analyst, investor or internal targets
+  definition: Managers or staff face strong pressure to hit profit or revenue targets set by analysts,
+    investors, lenders or the board.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: incentive or pressure'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Incentives/Pressures
+    quote: Excessive pressure exists for management to meet the requirements or expectations of third
+      parties...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Incentives/Pressures
+    quote: There is excessive pressure on management or operating personnel to meet financial targets
+      established...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: SEC press release 2020-226 (EPS Initiative actions)
+    publisher: US Securities and Exchange Commission
+    year: '2020'
+    url: https://www.sec.gov/news/press-release/2020-226
+    locator: Interface Inc. findings
+    quote: made unsupported, manual accounting adjustments that were not compliant with GAAP
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Earnings just meet or beat the analyst consensus quarter after quarter
+  - Year-end adjustments made when forecasts showed a miss
+  cases:
+  - name: Interface Inc.; Patrick C. Lynch; Gregory J. Bauer
+    year: '2020'
+    jurisdiction: United States (SEC)
+    what_happened: 'The SEC found Interface made unsupported manual accounting adjustments in 2015 and
+      2016, often when internal forecasts suggested it would miss analyst EPS estimates. Penalties: company
+      $5 million, former CFO $70,000, former controller $45,000; neither admitted nor denied.'
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/news/press-release/2020-226
+    source_title: SEC press release 2020-226
+  - name: Under Armour, Inc.
+    year: '2021'
+    jurisdiction: United States (SEC)
+    what_happened: The SEC found Under Armour pulled forward $408 million in existing orders over six
+      quarters to meet analysts' revenue estimates without disclosing this. It agreed to pay $9 million
+      without admitting or denying the findings.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/news/press-release/2021-78
+    source_title: SEC press release 2021-78
+  data_needed:
+  - Company (reported earnings per share; analyst consensus — outside FTM)
+  - Document (earnings calls, guidance)
+  checkable: lookups
+  lookup_sources:
+  - Analyst consensus data
+  - Company filings and earnings call transcripts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Target pressure exists at almost every listed company
+  - Consistently meeting guidance can reflect conservative guidance
+  version: 1
+- id: AF-004
+  name: Management fixated on the share price or earnings trend
+  definition: Managers show excessive interest in keeping the share price or earnings trend up, or promise
+    analysts and lenders aggressive results.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: attitude or rationalisation'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Attitudes/Rationalisations
+    quote: Excessive interest by management in maintaining or increasing the entity’s stock price or earnings
+      trend.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Attitudes/Rationalisations
+    quote: The practice by management of committing to analysts, creditors, and other third parties to
+      achieve...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Public promises of a precise growth rate every year
+  - Executives talk mainly about the share price
+  cases:
+  - name: Jeffrey K. Skilling (Enron)
+    year: '2006'
+    jurisdiction: United States (federal court, Houston)
+    what_happened: A jury convicted Enron's former CEO of conspiracy, securities fraud, insider trading
+      and false statements to auditors over a scheme that made Enron appear to be growing steadily and
+      healthier than it was, inflating its stock price. He was resentenced in 2013 to 168 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/former-enron-ceo-jeffrey-skilling-resentenced-168-months-fraud-conspiracy-charges
+    source_title: 'DOJ: Former Enron CEO Jeffrey Skilling resentenced to 168 months'
+  data_needed:
+  - Person (executives)
+  - Document (earnings calls, press releases, guidance)
+  checkable: person
+  lookup_sources:
+  - Earnings call transcripts
+  - Press releases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Executives are legitimately judged on shareholder value
+  - Confident guidance is common and usually honest
+  version: 1
+- id: AF-005
+  name: Need for new financing or close to breaching loan or listing terms
+  definition: The company needs new loans or share issues, or is close to breaking loan covenants or stock-exchange
+    listing rules, giving a reason to make results look better.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: incentive or pressure'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Incentives/Pressures
+    quote: Marginal ability to meet exchange listing requirements or debt repayment or other debt covenant
+      requirements.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Incentives/Pressures
+    quote: Need to obtain additional debt or equity financing, or qualify for government assistance or...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Predicting Material Accounting Misstatements (Dechow et al. 2011)
+    publisher: Contemporary Accounting Research
+    year: '2011'
+    url: https://www.thecaq.org/wp-content/uploads/2018/03/Dechow-et-al-2011-Contemporary_Accounting_Research.pdf
+    locator: 'Findings: financing'
+    quote: we find that misstating firms are actively raising financing in misstating years
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Results improve just before a bond or share issue
+  - Covenant ratios sit just above the limit
+  cases: []
+  data_needed:
+  - Company
+  - Debt
+  - Security
+  checkable: lookups
+  lookup_sources:
+  - Loan agreements and covenant disclosures in filings
+  - Stock exchange notices
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Growing companies raise money routinely
+  - Many firms operate near covenant limits without misreporting
+  version: 1
+- id: AF-006
+  name: Managers' personal wealth tied to reported results
+  definition: Managers or board members hold large stakes, get pay tied to hitting numbers, or have personally
+    guaranteed company debts.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: incentive or pressure'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Incentives/Pressures (personal financial situation of management)
+    quote: Significant portions of their compensation (e.g., bonuses, stock options, and earn-out arrangements)...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Incentives/Pressures
+    quote: Personal guarantees of debts of the entity.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Bonus thresholds set exactly at the reported figure
+  - Executive sells shares soon after strong results
+  cases: []
+  data_needed:
+  - Person
+  - Ownership
+  - Directorship
+  - Employment
+  - Debt (personal guarantees)
+  - Security
+  checkable: lookups
+  lookup_sources:
+  - Proxy statements / remuneration reports
+  - Insider trading filings (e.g. SEC Form 4)
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Performance pay and founder ownership are normal and encouraged by governance codes
+  version: 1
+- id: AF-007
+  name: Negative media attention on the company or its managers
+  definition: The company or its leaders are under critical press coverage, which can add pressure to
+    show good results.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: incentive or pressure'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Incentives/Pressures
+    quote: Negative media attention on the entity or key members of management.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Short-seller reports or investigative articles questioning the accounts
+  cases: []
+  data_needed:
+  - Document (news articles)
+  - Company
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - News archives
+  - Short-seller research reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Critical coverage is often wrong or unrelated to accounting
+  version: 1
+- id: AF-008
+  name: Significant related-party transactions outside normal business
+  definition: Large deals with people or companies connected to management or owners, especially unusual
+    ones or ones with parties not audited, can be used to create fake revenue or move money.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: opportunity'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Opportunities
+    quote: Significant related-party transactions not in the ordinary course of business or with related...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'AS 2401: Consideration of Fraud in a Financial Statement Audit'
+    publisher: Public Company Accounting Oversight Board (PCAOB)
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Paragraph .67
+    quote: The transaction involves unconsolidated related parties, including variable interest entities;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Paragraph .67
+    quote: The transaction occurs with a party that falls outside the definition of a related party (as
+      defined by...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Sales to a customer secretly controlled by the chairman
+  - Purchases from a supplier owned by an executive's relative
+  cases:
+  - name: Luckin Coffee Inc.
+    year: '2020'
+    jurisdiction: United States (SEC)
+    what_happened: The SEC alleged Luckin fabricated sales by using related parties to create false sales
+      transactions through three purchasing schemes; settled for $180 million without admitting or denying.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/news/press-release/2020-319
+    source_title: SEC press release 2020-319
+  data_needed:
+  - Company
+  - Person
+  - Ownership
+  - Directorship
+  - Family
+  - Associate
+  - Payment
+  - Contract
+  - UnknownLink
+  checkable: lookups
+  lookup_sources:
+  - Company registries (ownership and directors of counterparties)
+  - Related-party notes in financial statements
+  - Beneficial ownership registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Related parties and hidden counterparties can also be used to move or layer funds
+    source_url: https://standards.auasb.gov.au/node/2056
+  innocent_explanations:
+  - Family firms and groups routinely trade with related parties
+  - Disclosed, priced-at-market related-party deals are lawful
+  version: 1
+- id: AF-009
+  name: Results depend on subjective estimates, or estimates keep changing
+  definition: Key figures (asset values, contract profits, reserves) rest on judgement, or the company
+    keeps changing estimates without a change in facts; this lets profit be moved between periods.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: opportunity (estimates, reserves, contract accounting)'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Opportunities
+    quote: Assets, liabilities, revenues, or expenses based on significant estimates that involve subjective...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4, Other
+    quote: Frequent changes in accounting estimates that do not appear to result from changed circumstances.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Predicting Material Accounting Misstatements (Dechow et al. 2011)
+    publisher: Contemporary Accounting Research
+    year: '2011'
+    url: https://www.thecaq.org/wp-content/uploads/2018/03/Dechow-et-al-2011-Contemporary_Accounting_Research.pdf
+    locator: Findings
+    quote: the percentage of soft assets is high
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Reserves built up in a good year and released in a bad year (cookie-jar reserves)
+  - Long-term construction contract margins revised favourably
+  cases:
+  - name: Albert J. Dunlap and Russell A. Kersh (Sunbeam)
+    year: '2002'
+    jurisdiction: United States (SEC)
+    what_happened: The SEC alleged improper 'cookie-jar' reserves created at year-end 1996 were used to
+      inflate 1997 income, alongside improper bill-and-hold sales and channel stuffing. Both consented
+      to judgments without admitting or denying; penalties $500,000 and $200,000 and officer-and-director
+      bars.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/litigation/litreleases/lr17710.htm
+    source_title: SEC Litigation Release 17710
+  - name: Richard Adam and Zafar Khan (Carillion plc)
+    year: '2026'
+    jurisdiction: United Kingdom (FCA)
+    what_happened: The FCA fined the two former finance directors (£232,800 and £138,900) for failing
+      to reflect known problems in company announcements and to ensure contract accounting judgments in
+      UK construction were made and reported appropriately. Fines imposed after they withdrew their challenges.
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.fca.org.uk/news/press-releases/fca-fines-former-finance-directors-carillion-plc
+    source_title: FCA fines former finance directors of Carillion plc (in liquidation)
+  data_needed:
+  - Company (reserve, provision and contract balances by period; not FTM properties)
+  - Document (accounting policy notes)
+  checkable: records
+  lookup_sources:
+  - Financial statement notes on estimates and provisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many industries (construction, insurance, banking) are estimate-heavy by nature
+  - Estimates are legitimately revised as information arrives
+  version: 1
+- id: AF-010
+  name: Significant, unusual or highly complex transactions, especially near period end
+  definition: Big, odd or complicated deals, especially just before the books close, that lack business
+    sense or help hit a target.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: opportunity (significant unusual transactions)'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Opportunities
+    quote: Significant, unusual, or highly complex transactions, especially those close to period end
+      that pose...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Paragraph .67
+    quote: The transaction lacks commercial or economic substance, or is part of a larger series of connected,
+      linked...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Paragraph .67
+    quote: The transaction enables the company to achieve certain financial targets;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Paragraph .67
+    quote: Management is placing more emphasis on the need for a particular accounting treatment than
+      on the underlying...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A large sale and buy-back with the same counterparty at quarter end
+  - A deal through several entities whose only effect is the accounting result
+  - Counterparty without the money to pay (AS 2401 .67)
+  cases: []
+  data_needed:
+  - Contract
+  - Payment
+  - Company
+  - UnknownLink
+  checkable: records
+  lookup_sources:
+  - Company registry for counterparty substance
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Real deals often close at quarter end because of sales cycles
+  - Complex financing and tax structuring is common and lawful
+  version: 1
+- id: AF-011
+  name: Operations, bank accounts or intermediaries in secrecy jurisdictions without clear reason
+  definition: Significant bank accounts, subsidiaries or middlemen in tax havens or unfamiliar jurisdictions
+    with no clear business reason.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: opportunity'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Opportunities
+    quote: Significant bank accounts or subsidiary or branch operations in tax-haven jurisdictions for
+      which...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Opportunities
+    quote: Use of business intermediaries for which there appears to be no clear business justification.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Large cash balance held with a small offshore bank or trustee
+  - Sales booked through agents in a third country
+  cases: []
+  data_needed:
+  - Company
+  - BankAccount
+  - Address
+  - Ownership
+  - Representation
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Company registries in the offshore jurisdiction
+  - Leak databases (e.g. ICIJ Offshore Leaks)
+  - Subsidiary lists in filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Offshore accounts and intermediaries without business purpose are also classic layering tools
+    source_url: https://standards.auasb.gov.au/node/2056
+  - target_area: CO
+    reason: Unjustified intermediaries can be used to pass bribes
+    source_url: https://standards.auasb.gov.au/node/2056
+  innocent_explanations:
+  - Multinationals use regional holding companies and local agents legitimately
+  - Tax planning is lawful
+  version: 1
+- id: AF-012
+  name: Side agreements that change revenue contracts
+  definition: Hidden or informal agreements change the terms of a sale (return rights, extra payments,
+    cancellations), so booked revenue is not real.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: revenue manipulation'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Opportunities
+    quote: Modifying, revoking, or amending revenue contracts through the use of side agreements that
+      are...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Paragraph .54
+    quote: Confirming with customers certain relevant contract terms and the absence of side agreements,
+      because the...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Customer letter allowing return of goods 'sold' at quarter end
+  - Emails promising a later rebate not in the contract
+  cases: []
+  data_needed:
+  - Contract
+  - Document
+  - Email
+  - Company
+  checkable: person
+  lookup_sources:
+  - Customer interviews or confirmations
+  - Internal emails (leaks, court records)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Contract amendments are normal if properly documented and accounted for
+  version: 1
+- id: AF-013
+  name: Revenue pulled forward, bill-and-hold sales or channel stuffing
+  definition: 'Sales are booked early: goods are shipped before customers want them, billed but kept in
+    the seller''s warehouse, or pushed onto distributors with discounts.'
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: revenue manipulation'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Attitudes/Rationalisations
+    quote: Rationalising the use of unreasonable assumptions affecting the timing and amount of revenue...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Note to paragraph .66A
+    quote: (ii) bill and hold sales
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Detecting Earnings Manipulation and Fraud: A Light Tutorial on Probit Analysis (CFA Institute
+      Enterprising Investor)'
+    publisher: CFA Institute
+    year: '2013'
+    url: https://rpc.cfainstitute.org/blogs/enterprising-investor/2013/detetecting-earnings-manipulation-and-fraud-a-light-tutorial-on-probit-analysis
+    locator: Variables of the Beneish model
+    quote: days sales in receivables index (DSRI) for revenue inflation
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Receivables grow much faster than sales
+  - Big quarter-end shipments followed by returns
+  cases:
+  - name: Under Armour, Inc.
+    year: '2021'
+    jurisdiction: United States (SEC)
+    what_happened: SEC found it moved up shipments of $408 million in existing orders customers had asked
+      to ship in later quarters, to meet analysts' revenue estimates; $9 million settlement, neither admitting
+      nor denying.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/news/press-release/2021-78
+    source_title: SEC press release 2021-78
+  - name: Albert J. Dunlap and Russell A. Kersh (Sunbeam)
+    year: '2002'
+    jurisdiction: United States (SEC)
+    what_happened: SEC alleged revenue recognised on sales including bill-and-hold sales that did not
+      meet accounting rules, and channel stuffing through discounts and inducements; consent judgments
+      without admitting or denying.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/litigation/litreleases/lr17710.htm
+    source_title: SEC Litigation Release 17710
+  - name: Tesco plc / Tesco Stores Limited
+    year: '2017'
+    jurisdiction: United Kingdom (FCA and SFO)
+    what_happened: 'FCA found market abuse: the 29 August 2014 trading update gave a false or misleading
+      impression; Tesco said the overstatement was principally due to accelerated recognition of commercial
+      income and delayed accrual of costs. Tesco Stores Limited agreed a deferred prosecution agreement
+      with the SFO over false accounting with a fine of £128,992,500; redress about £85 million.'
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.fca.org.uk/news/press-releases/tesco-pay-redress-market-abuse
+    source_title: 'FCA: Tesco to pay redress for market abuse'
+  data_needed:
+  - Company (revenue, receivables, returns by quarter; not FTM properties)
+  - Contract
+  - Document
+  checkable: records
+  lookup_sources:
+  - Quarterly filings
+  - Distributor or customer interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Customers genuinely order early (price rises, promotions)
+  - Bill-and-hold can be legitimate if strict accounting criteria are met
+  version: 1
+- id: AF-014
+  name: Unconventional route to the stock market or aggressive stock promotion
+  definition: The company listed through a reverse merger or shell, or hypes its shares through press
+    releases, newsletters or websites.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: opportunity'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Opportunities
+    quote: Non-traditional entry to capital markets by the entity, for example, through an acquisition
+      by, or...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Opportunities
+    quote: Aggressive stock promotions by the entity through press releases, investment newsletters, website...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Listing via a dormant shell company
+  - Paid promotional newsletters touting the stock
+  cases: []
+  data_needed:
+  - Company
+  - Security
+  - Ownership
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Securities filings (e.g. EDGAR)
+  - Stock promotion disclosures
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: MA
+    reason: Shell listings and promotion campaigns are also pump-and-dump markers
+    source_url: https://www.finra.org/rules-guidance/notices/21-03
+  innocent_explanations:
+  - SPACs and reverse mergers are lawful listing routes
+  - Investor relations campaigns are normal
+  version: 1
+- id: AF-015
+  name: 'Weak oversight: management dominated by one person or small group, board not effective'
+  definition: One person or a small group runs the company without effective checks from the board or
+    audit committee.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: opportunity (governance)'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Opportunities (monitoring of management)
+    quote: Domination of management by a single person or small group (in a non-owner-managed business)...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Opportunities
+    quote: Oversight by those charged with governance over the financial reporting process and internal
+      control is not effective.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Paragraph .08
+    quote: management override of controls that otherwise may appear to be operating effectively
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - CEO who is also chair with a board of friends
+  - Audit committee without financial expertise
+  cases: []
+  data_needed:
+  - Person
+  - Directorship
+  - Associate
+  - Family
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - Company registry (directors)
+  - Proxy statements / governance reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Founder-led companies are often dominated by the founder without misconduct
+  version: 1
+- id: AF-016
+  name: Complex or unstable organisation, unclear who controls the company
+  definition: A structure that is hard to understand, with unusual legal entities or unclear controlling
+    owners.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: opportunity'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Opportunities (complex or unstable structure)
+    quote: Difficulty in determining the organisation or individuals that have controlling interest in
+      the entity.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Opportunities
+    quote: Overly complex organisational structure involving unusual legal entities or managerial lines
+      of authority.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Paragraph .67
+    quote: The form of the transaction is overly complex (e.g., the transaction involves multiple entities…
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Chains of holding companies in several jurisdictions
+  - Nominee shareholders
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Person
+  - Directorship
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Company registries
+  - Beneficial ownership registers
+  - OpenCorporates / OpenOwnership
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: BO
+    reason: Hidden control is also a core money-laundering red flag
+    source_url: https://standards.auasb.gov.au/node/2056
+  innocent_explanations:
+  - Large groups have many subsidiaries for tax, regulation and liability reasons
+  version: 1
+- id: AF-017
+  name: High turnover of senior managers, lawyers, board members or finance staff
+  definition: Senior executives, legal counsel, directors or accounting/internal-audit staff keep leaving.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: opportunity'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Opportunities
+    quote: High turnover of senior management, legal counsel, or those charged with governance.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Opportunities (internal control deficiencies)
+    quote: High turnover rates or employment of staff in accounting, IT, or the internal audit function
+      that are not effective.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Three CFOs in two years
+  - Directors resign shortly before results
+  cases: []
+  data_needed:
+  - Person
+  - Directorship
+  - Employment (start and end dates)
+  checkable: lookups
+  lookup_sources:
+  - Company registry director filings
+  - SEC 8-K Item 5.02 departures
+  - LinkedIn
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Turnover follows takeovers, restructurings or a tight labour market
+  version: 1
+- id: AF-018
+  name: Weak internal controls left unfixed
+  definition: The company lacks proper controls (monitoring, fraud-risk programme, whistleblower line,
+    working IT systems) or management does not fix known weaknesses.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: opportunity and attitude'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Opportunities (internal control deficiencies)
+    quote: Inadequate fraud risk management program, including lack of a whistleblower program.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Attitudes/Rationalisations
+    quote: Management failing to remedy known significant deficiencies in internal control on a timely
+      basis.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Opportunities
+    quote: Overly complex IT environment relative to the nature of the entity's business, legacy IT systems...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Material weakness reported by the auditor year after year
+  - No hotline for staff to report concerns
+  cases: []
+  data_needed:
+  - Company
+  - Document (auditor reports on internal control, management letters)
+  checkable: lookups
+  lookup_sources:
+  - Auditor reports (SOX 404 opinions)
+  - Annual reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small or fast-growing firms often have immature controls without any fraud
+  version: 1
+- id: AF-019
+  name: Poor ethical tone and non-finance managers meddling in accounting choices
+  definition: Leaders have not built a culture of honesty, or managers outside finance push hard on which
+    accounting policies or estimates are used.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: attitude or rationalisation'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Attitudes/Rationalisations
+    quote: Management and those charged with governance have not created a culture of honesty and ethical...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Attitudes/Rationalisations
+    quote: Non-financial management’s excessive participation in or preoccupation with the selection of...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4, Other
+    quote: Tolerance of violations of the entity's code of conduct.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Sales chief decides revenue recognition
+  - Former staff describe pressure to 'make the number'
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Document (interviews, internal communications)
+  checkable: person
+  lookup_sources:
+  - Former employee interviews
+  - Employment tribunal or whistleblower filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Operational managers often have valid input on estimates (e.g. project progress)
+  version: 1
+- id: AF-020
+  name: History of securities-law or other violations, or fraud claims
+  definition: The company, its leaders or its board have past violations of securities or other laws,
+    or fraud claims against them.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: attitude or rationalisation'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Attitudes/Rationalisations
+    quote: Known history of violations of securities laws or other laws and regulations, or claims against
+      the...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - CFO previously barred by a regulator at another company
+  - Prior class action alleging accounting fraud
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Sanction
+  - Directorship
+  - Document (court and regulator records)
+  checkable: lookups
+  lookup_sources:
+  - Regulator enforcement databases (SEC, FCA, ASIC)
+  - Court records (PACER, CourtListener)
+  - Debarment and disqualification registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawsuits are often filed after any share-price drop and many are dismissed
+  - Past technical violations may be unrelated
+  version: 1
+- id: AF-021
+  name: Unusually high tolerance for risk in management
+  definition: Management and the board accept risks that most companies would not.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: attitude or rationalisation'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Attitudes/Rationalisations
+    quote: Management and those charged with governance demonstrate an unusually high tolerance to risk
+      or...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Bet-the-company acquisitions
+  - Very high leverage
+  cases: []
+  data_needed:
+  - Company
+  - Debt
+  - Person
+  checkable: person
+  lookup_sources:
+  - Filings
+  - Interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Entrepreneurial risk-taking is lawful and often rewarded
+  version: 1
+- id: AF-022
+  name: False statements elsewhere, or aggressive valuation and impairment assumptions
+  definition: Management makes false or misleading statements outside the accounts, or uses unrealistic
+    assumptions in deal valuations, impairment tests or forecasts.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: attitude or rationalisation'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Attitudes/Rationalisations
+    quote: Management and those charged with governance make materially false or misleading statements
+      in other...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Attitudes/Rationalisations
+    quote: Applying aggressive valuation assumptions in mergers and acquisitions to support high purchase
+      prices...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4, Conflicting or missing evidence
+    quote: Information about overly optimistic projections obtained from listening to the entity's earning's
+      calls...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Press release figures that differ from the filed accounts
+  - Goodwill never impaired despite falling sales
+  cases: []
+  data_needed:
+  - Document
+  - Company
+  - Person
+  checkable: person
+  lookup_sources:
+  - Press releases vs filings
+  - Earnings call transcripts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Optimism in forecasts is common and not illegal if honestly held
+  version: 1
+- id: AF-023
+  name: Owner-manager mixes personal and business money; shareholder disputes
+  definition: In a closely held company the owner treats company money as their own, or shareholders are
+    in conflict.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: attitude or rationalisation'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Attitudes/Rationalisations
+    quote: The owner-manager makes no distinction between personal and business transactions.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Attitudes/Rationalisations
+    quote: Dispute between shareholders in a closely held entity.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Company pays the owner's home renovation
+  - Minority shareholder lawsuit over accounts
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Ownership
+  - Payment
+  - BankAccount
+  checkable: records
+  lookup_sources:
+  - Court records of shareholder disputes
+  - Company registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Personal spending run through a company is also a common tax-evasion pattern
+    source_url: https://standards.auasb.gov.au/node/2056
+  innocent_explanations:
+  - Small business owners often mix accounts through poor bookkeeping, not fraud
+  version: 1
+- id: AF-024
+  name: Justifying doubtful accounting as 'immaterial', or small adjustments that just hit the target
+  definition: Management repeatedly defends questionable accounting as too small to matter, including
+    small adjustments that move earnings per share by a cent to meet expectations.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: earnings management'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Attitudes/Rationalisations
+    quote: Recurring attempts by management to justify marginal or inappropriate accounting on the basis
+      of materiality.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: SEC press release 2020-226
+    publisher: US Securities and Exchange Commission
+    year: '2020'
+    url: https://www.sec.gov/news/press-release/2020-226
+    locator: Fulton Financial findings
+    quote: created the misleading appearance of consistent earnings across multiple reporting periods
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - EPS beats consensus by exactly one cent repeatedly
+  cases:
+  - name: Fulton Financial Corporation
+    year: '2020'
+    jurisdiction: United States (SEC)
+    what_happened: SEC found a mortgage-servicing-rights valuation allowance inconsistent with its stated
+      method, later reversed, raising EPS by a penny in a quarter it would otherwise have missed; $1.5
+      million penalty, neither admitting nor denying.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/news/press-release/2020-226
+    source_title: SEC press release 2020-226
+  data_needed:
+  - Company (EPS by quarter, analyst consensus; not FTM properties)
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Analyst consensus history
+  - Quarterly filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Materiality judgements are a normal and required part of accounting
+  version: 1
+- id: AF-025
+  name: Strained or obstructed relationship with the auditor
+  definition: Management fights with, pressures, misleads or restricts the auditor, or refuses to correct
+    errors, add disclosures or allow confirmations.
+  areas:
+  - AF
+  typology: 'Fraudulent financial reporting: attitude; circumstance indicating possible fraud'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Attitudes/Rationalisations
+    quote: Frequent disputes with the current or predecessor auditor on accounting, auditing, or reporting
+      matters.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Attitudes/Rationalisations
+    quote: Restrictions on the auditor that inappropriately limit access to people or information or the
+      ability...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4, Problematic or unusual relationships between the auditor and management
+    quote: An unwillingness to allow the auditor to send a confirmation request.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4
+    quote: Unusual delays by the entity in providing requested information.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Form 8-K (General instructions)
+    publisher: US Securities and Exchange Commission
+    url: https://www.sec.gov/files/form8-k.pdf
+    locator: Item 4.01 Changes in Registrant's Certifying Accountant
+    quote: If an independent accountant who was previously engaged as the principal accountant to audit
+      the registrant's
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Auditor resigns or is dismissed (disclosed on SEC Form 8-K Item 4.01)
+  - Late filings while the audit is unfinished
+  - Management refuses the auditor a private meeting with the audit committee
+  cases:
+  - name: The Kraft Heinz Company; Eduardo Pelleissone; Klaus Hofmann
+    year: '2021'
+    jurisdiction: United States (SEC)
+    what_happened: SEC found Kraft recognised unearned supplier discounts and kept false and misleading
+      supplier contracts; the former COO and former procurement chief failed to give the company's accountants
+      accurate information. Kraft paid a $62 million penalty without admitting or denying.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/news/press-release/2021-174
+    source_title: SEC press release 2021-174
+  data_needed:
+  - Company
+  - Representation (auditor engaged by company)
+  - Document (auditor change filings, audit reports)
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - SEC EDGAR 8-K Item 4.01 and Item 4.02 filings
+  - PCAOB Form AP auditor database
+  - Late-filing notices (SEC Form 12b-25)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Auditor changes happen for fees, rotation rules or mergers
+  - Genuine technical disagreements occur
+  version: 1
+- id: AF-026
+  name: Discrepancies in the accounting records
+  definition: Transactions are missing, recorded wrongly or late, unsupported or unauthorised, or big
+    last-minute adjustments change the result.
+  areas:
+  - AF
+  typology: Circumstance indicating possible fraud
+  status: verified
+  sources:
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4, Discrepancies in the accounting records
+    quote: Unsupported or unauthorised balances or transactions.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4, Discrepancies in the accounting records
+    quote: Last-minute adjustments that significantly affect financial results (e.g., inventory adjustments).
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Operating costs booked as capital assets
+  - Large inventory adjustment after period end
+  cases:
+  - name: WorldCom, Inc.
+    year: '2002'
+    jurisdiction: United States (SEC)
+    what_happened: In a civil complaint the SEC alleged WorldCom transferred approximately $3.8 billion
+      of its costs to capital accounts, inflating earnings. This release records the allegation only,
+      not the later outcome.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.sec.gov/litigation/litreleases/lr17588.htm
+    source_title: SEC Litigation Release 17588
+  data_needed:
+  - Document (ledgers, journals)
+  - Payment
+  - Contract
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Bookkeeping errors and system migrations
+  - Legitimate post-closing adjustments from audit
+  version: 1
+- id: AF-027
+  name: Missing, altered or copy-only documents; signature problems
+  definition: Supporting documents are missing, look altered, lack approvals, carry inconsistent signatures,
+    or exist only as photocopies or scans when originals should exist.
+  areas:
+  - AF
+  typology: Circumstance indicating possible fraud (conflicting or missing evidence)
+  status: verified
+  sources:
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4, Conflicting or missing evidence
+    quote: Documents that appear to have been altered.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4
+    quote: Signature or handwriting discrepancies and invalid electronic signatures.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4
+    quote: Unavailability of other than photocopied or electronically transmitted documents when documents...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Invoices with identical layouts from supposedly different customers
+  - Bank letters only available as PDF
+  cases:
+  - name: Satyam Computer Services Limited
+    year: '2011'
+    jurisdiction: United States (SEC)
+    what_happened: SEC said former senior managers created more than 6,000 phony invoices, producing more
+      than $1 billion in fictitious cash and cash-related balances, half the company's total assets. Satyam
+      settled for a $10 million penalty.
+    outcome: settled
+    outcome_verified: true
+    source_url: https://www.sec.gov/news/press/2011/2011-81.htm
+    source_title: SEC press release 2011-81
+  data_needed:
+  - Document
+  - Person (signatories)
+  - Company
+  checkable: records
+  lookup_sources:
+  - Document forensics (metadata)
+  - Issuing bank or customer for originals
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Paperless processes make scans normal
+  - Lost documents after office moves
+  version: 1
+- id: AF-028
+  name: Unexplained reconciling items and ledgers that do not agree
+  definition: Reconciliations carry large unexplained items, sub-ledgers do not agree to the main accounts,
+    or there are many credit entries in receivables.
+  areas:
+  - AF
+  typology: Circumstance indicating possible fraud
+  status: verified
+  sources:
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4
+    quote: Significant unexplained items on reconciliations.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4
+    quote: Subsidiary ledgers, which do not reconcile with control accounts.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4
+    quote: Large numbers of credit entries and other adjustments made to accounts receivable records.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Bank reconciliation with a growing 'unreconciled difference'
+  cases: []
+  data_needed:
+  - Document (reconciliations, ledgers)
+  - BankAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Timing differences and system errors
+  version: 1
+- id: AF-029
+  name: Unusual balance-sheet changes or ratio trends
+  definition: Balance-sheet items or key ratios move in ways that don't fit the business or past trends.
+  areas:
+  - AF
+  typology: Circumstance indicating possible fraud (analytical)
+  status: verified
+  sources:
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4, Conflicting or missing evidence
+    quote: Unusual balance sheet changes, or changes in trends or important financial report ratios or
+      relationships...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Predicting Material Accounting Misstatements (Dechow et al. 2011)
+    publisher: Contemporary Accounting Research
+    year: '2011'
+    url: https://www.thecaq.org/wp-content/uploads/2018/03/Dechow-et-al-2011-Contemporary_Accounting_Research.pdf
+    locator: Findings on accruals
+    quote: all measures of accrual quality are unusually high in misstating years
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Profit rising while operating cash flow falls (high accruals)
+  - Receivables or inventory growing much faster than sales
+  cases: []
+  data_needed:
+  - Company (financial statement figures over several years; not FTM properties)
+  checkable: records
+  lookup_sources:
+  - Filed financial statements (XBRL data from SEC EDGAR or national registries)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Acquisitions, new accounting standards or business model change alter ratios
+  version: 1
+- id: AF-030
+  name: Beneish M-score in the 'likely manipulator' range
+  definition: A formula combining eight ratios from the accounts (receivables, margins, asset quality,
+    sales growth, depreciation, overheads, leverage, accruals) classifies the company as a likely earnings
+    manipulator.
+  areas:
+  - AF
+  typology: Statistical screen for earnings manipulation
+  status: verified
+  sources:
+  - title: 'Detecting Earnings Manipulation and Fraud: A Light Tutorial on Probit Analysis'
+    publisher: CFA Institute (Enterprising Investor, Dennis McLeavey)
+    year: '2013'
+    url: https://rpc.cfainstitute.org/blogs/enterprising-investor/2013/detetecting-earnings-manipulation-and-fraud-a-light-tutorial-on-probit-analysis
+    locator: Classification rule
+    quote: Firms with Z-scores greater than or equal to −1.78 will be classified as manipulators.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Rising days-sales-in-receivables and falling gross margin together
+  cases: []
+  data_needed:
+  - Company (two consecutive years of financial statement figures; not FTM properties)
+  checkable: records
+  lookup_sources:
+  - Filed financial statements / XBRL
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: M-score of −1.78 or higher (classified as a manipulator by the model as described by CFA
+      Institute)
+    threshold_source: https://rpc.cfainstitute.org/blogs/enterprising-investor/2013/detetecting-earnings-manipulation-and-fraud-a-light-tutorial-on-probit-analysis
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The model gives many false positives, especially for fast-growing or financial companies
+  - Mergers distort year-on-year indices
+  version: 1
+- id: AF-031
+  name: High F-score (misstatement prediction model)
+  definition: A model built from SEC enforcement cases scores the company as more likely than average
+    to have materially misstated its accounts, based on accruals, soft assets, cash sales, financing and
+    other signs.
+  areas:
+  - AF
+  typology: Statistical screen for misstatement
+  status: verified
+  sources:
+  - title: Predicting Material Accounting Misstatements (Dechow, Ge, Larson and Sloan)
+    publisher: Contemporary Accounting Research
+    year: '2011'
+    url: https://www.thecaq.org/wp-content/uploads/2018/03/Dechow-et-al-2011-Contemporary_Accounting_Research.pdf
+    locator: Model description
+    quote: The output of these models is a scaled logistic probability for each firm-year that we term
+      the F-score.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Predicting Material Accounting Misstatements
+    publisher: Contemporary Accounting Research
+    year: '2011'
+    url: https://www.thecaq.org/wp-content/uploads/2018/03/Dechow-et-al-2011-Contemporary_Accounting_Research.pdf
+    locator: Results
+    quote: only 20 percent of the public firms have an F-score greater than 1.4
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - High accruals plus heavy operating-lease use plus new share issue
+  cases: []
+  data_needed:
+  - Company (financial statement figures, share issuance, employee numbers)
+  checkable: records
+  lookup_sources:
+  - Filed financial statements / XBRL
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (the paper notes only 20% of firms score above
+      1.4; it gives no single flagging cut-off in the passage read)
+    threshold_source: https://www.thecaq.org/wp-content/uploads/2018/03/Dechow-et-al-2011-Contemporary_Accounting_Research.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - A probability screen, not proof; most high-scoring firms are not enforcement cases
+  version: 1
+- id: AF-032
+  name: Unexplained inventory movements or missing assets
+  definition: Inventory balances, variances or turnover move without explanation, or significant stock
+    or equipment cannot be found.
+  areas:
+  - AF
+  typology: Circumstance indicating possible fraud
+  status: verified
+  sources:
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4
+    quote: Unexplained fluctuations in stock account balances, inventory variances and turnover rates.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4
+    quote: Missing inventory or physical assets of significant magnitude.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Stock count far below book value
+  cases: []
+  data_needed:
+  - Document (stock records)
+  - Address (warehouses)
+  checkable: records
+  lookup_sources:
+  - Site visits, satellite imagery of claimed facilities
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Spoilage, shrinkage, counting errors
+  version: 1
+- id: AF-033
+  name: Third-party confirmations that don't match the books
+  definition: Banks, customers or others confirming balances give answers that differ from the company's
+    records, or far fewer or more replies come back than expected.
+  areas:
+  - AF
+  typology: Circumstance indicating possible fraud
+  status: verified
+  sources:
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4
+    quote: Unusual discrepancies between the entity's records and confirmation replies.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4
+    quote: Fewer responses to confirmations than anticipated or a greater number of responses than anticipated.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Bank says the claimed cash balance does not exist
+  cases: []
+  data_needed:
+  - BankAccount
+  - Company
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Direct confirmation from banks or customers (rarely available to journalists; leaks, court filings)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Timing differences, disputed invoices, slow responders
+  version: 1
+- id: AF-034
+  name: Missing electronic evidence, audit logs switched off, inappropriate system access
+  definition: Electronic records that should exist are missing, logs are turned off, or staff have system
+    access beyond what their job needs.
+  areas:
+  - AF
+  typology: Circumstance indicating possible fraud (IT)
+  status: verified
+  sources:
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4, Other
+    quote: Controls or audit logs being switched off
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4
+    quote: Unavailable or missing electronic evidence, inconsistent with the entity's record retention
+      practices or policies.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Email archive gap covering the quarter end
+  cases: []
+  data_needed:
+  - Document
+  - Email
+  - Person
+  - Employment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - System failures, migrations, legitimate retention policies
+  version: 1
+- id: AF-035
+  name: Inconsistent, vague or implausible answers from management or staff
+  definition: When asked questions, managers or employees give answers that conflict, are vague or don't
+    make sense.
+  areas:
+  - AF
+  typology: Circumstance indicating possible fraud
+  status: verified
+  sources:
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4
+    quote: Inconsistent, vague, or implausible responses from management or employees arising from enquiries...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - CFO's explanation of a cash balance changes between interviews
+  cases: []
+  data_needed:
+  - Person
+  - Document (interview notes)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Staff may simply not know the answer
+  - Legal advice to say little
+  version: 1
+- id: AF-036
+  name: Extensive use of suspense accounts
+  definition: Many entries are parked in temporary 'suspense' accounts instead of the right accounts.
+  areas:
+  - AF
+  typology: Circumstance indicating possible fraud
+  status: verified
+  sources:
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4, Other
+    quote: Extensive use of suspense accounts.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Large suspense balance carried for months
+  cases: []
+  data_needed:
+  - Document (general ledger)
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Short-term use while items are researched is normal
+  version: 1
+- id: AF-037
+  name: Accounting policies out of line with industry norms
+  definition: The company accounts for things differently from its peers, usually in a way that flatters
+    results.
+  areas:
+  - AF
+  typology: Circumstance indicating possible fraud
+  status: verified
+  sources:
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4, Other
+    quote: Accounting policies that appear to be at variance with industry norms.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Capitalising costs that peers expense
+  cases: []
+  data_needed:
+  - Company
+  - Document (accounting policy notes)
+  checkable: lookups
+  lookup_sources:
+  - Peer company filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Different business models can justify different policies
+  version: 1
+- id: AF-038
+  name: Fraud allegations from tips, whistleblowers or anonymous complaints
+  definition: Anonymous emails, letters, calls, tips or complaints allege fraud.
+  areas:
+  - AF
+  typology: Circumstance indicating possible fraud
+  status: verified
+  sources:
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4, Other
+    quote: Allegations of fraud through anonymous emails, letters, telephone calls, tips or complaints...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Whistleblower letter to the board
+  - Short-seller report questioning cash balances
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  - Email
+  checkable: person
+  lookup_sources:
+  - Whistleblower filings, short-seller reports, court filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Tips can be malicious, mistaken or from short-sellers with a financial interest
+  version: 1
+- id: AF-039
+  name: Suspicious journal entries
+  definition: Manual book entries to odd or rarely used accounts, made by people who don't normally post
+    entries, at or after period end with little explanation, or in round numbers.
+  areas:
+  - AF
+  typology: Management override of controls
+  status: verified
+  sources:
+  - title: 'AS 2401: Consideration of Fraud in a Financial Statement Audit'
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Paragraph .61
+    quote: recorded at the end of the period or as post-closing entries that have little or no explanation
+      or description
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Paragraph .61
+    quote: made by individuals who typically do not make journal entries
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: AS 2401
+    publisher: PCAOB
+    url: https://pcaobus.org/oversight/standards/auditing-standards/details/AS2401
+    locator: Paragraph .61
+    quote: containing round numbers or a consistent ending number
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - CFO posts a round $5,000,000 entry to revenue on the last day of the quarter
+  cases: []
+  data_needed:
+  - Document (journal entry listing with user, date, account, amount, description)
+  - Person
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Period-end accruals and audit adjustments are normally manual and often round
+  version: 1
+- id: AF-040
+  name: Employees with access to assets under personal financial pressure
+  definition: Staff or managers who handle cash or valuable assets are in debt or financial difficulty.
+  areas:
+  - AF
+  typology: 'Misappropriation of assets: incentive or pressure'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation of assets, Incentives/Pressures
+    quote: Personal financial obligations may create pressure on management or employees with access to
+      cash or other assets…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Behavioral Red Flags of Fraud (Fraud Week 2024 handout)
+    publisher: Association of Certified Fraud Examiners (ACFE)
+    year: '2024'
+    url: https://acfe.com/-/media/files/fraudweek/pdfs/2024-fraud-week/behavioral-red-flags-of-fraud.pdf
+    locator: Chart of behavioural red flags
+    quote: Financial difficulties
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Bookkeeper with court judgments for unpaid debts
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Debt
+  checkable: lookups
+  lookup_sources:
+  - Court judgment and bankruptcy registers
+  - Liens and debt records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (ACFE reports 27% of fraudsters showed financial
+      difficulties; a prevalence figure, not a threshold)
+    threshold_source: https://acfe.com/-/media/files/fraudweek/pdfs/2024-fraud-week/behavioral-red-flags-of-fraud.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Most people in debt never steal
+  version: 1
+- id: AF-041
+  name: 'Employee grievance: layoffs, pay changes, dissatisfaction'
+  definition: Expected layoffs, pay or benefit cuts, missed promotions or open resentment towards the
+    employer.
+  areas:
+  - AF
+  typology: 'Misappropriation of assets: incentive and rationalisation'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Incentives/Pressures
+    quote: Known or anticipated future employee layoffs.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Attitudes/Rationalisations
+    quote: Behaviour indicating displeasure or dissatisfaction with the entity or its treatment of the
+      employee.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Theft rises after a restructuring announcement
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Company
+  checkable: person
+  lookup_sources:
+  - Interviews
+  - Employment tribunal records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Grievances are common and rarely lead to theft
+  version: 1
+- id: AF-042
+  name: Assets that are easy to steal
+  definition: Large amounts of cash, small high-value stock, or assets easily turned into cash.
+  areas:
+  - AF
+  typology: 'Misappropriation of assets: opportunity'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Opportunities
+    quote: Large amounts of cash on hand or processed.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Opportunities
+    quote: Easily convertible assets, such as bearer bonds, diamonds, or computer chips.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Cash-intensive retail
+  - Electronics warehouse
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many legitimate businesses handle cash and valuable goods
+  version: 1
+- id: AF-043
+  name: Weak segregation of duties, approvals, reconciliations or safeguards
+  definition: One person can start, approve and record transactions, or there are no independent checks,
+    timely reconciliations, approvals or physical protection over assets.
+  areas:
+  - AF
+  typology: 'Misappropriation of assets: opportunity'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Opportunities
+    quote: Inadequate segregation of duties or independent checks.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Opportunities
+    quote: Lack of complete and timely reconciliations of assets.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Opportunities
+    quote: Inadequate system of authorisation and approval of transactions (e.g., in purchasing).
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Same clerk sets up suppliers and releases payments
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Payment
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Small organisations often cannot separate duties fully
+  version: 1
+- id: AF-044
+  name: Little oversight of senior managers' expenses
+  definition: Executives' travel and other reimbursements are not properly reviewed.
+  areas:
+  - AF
+  typology: 'Misappropriation of assets: opportunity'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Opportunities
+    quote: Inadequate oversight of senior management expenditures, such as travel and other re- imbursements.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - CEO approves own expense claims
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Document
+  checkable: records
+  lookup_sources:
+  - Public-sector expense disclosures / FOIA
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Unchecked expenses of public officials are also an abuse-of-office pattern
+    source_url: https://standards.auasb.gov.au/node/2056
+  innocent_explanations:
+  - Senior travel can be legitimately high
+  version: 1
+- id: AF-045
+  name: Key control staff never take leave or won't share duties
+  definition: People in key control roles have no mandatory holiday, or refuse to let others do their
+    work, so nobody else sees their records.
+  areas:
+  - AF
+  typology: 'Misappropriation of assets: opportunity; behavioural red flag'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Opportunities
+    quote: Lack of mandatory vacations for employees performing key control functions.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Behavioral Red Flags of Fraud
+    publisher: ACFE
+    year: '2024'
+    url: https://acfe.com/-/media/files/fraudweek/pdfs/2024-fraud-week/behavioral-red-flags-of-fraud.pdf
+    locator: Chart of behavioural red flags
+    quote: Control issues, unwillingness to share duties
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Accounts payable clerk who has not taken a holiday in years
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded (ACFE: 13% of fraudsters; prevalence, not threshold)'
+    threshold_source: https://acfe.com/-/media/files/fraudweek/pdfs/2024-fraud-week/behavioral-red-flags-of-fraud.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Dedicated or understaffed employees
+  version: 1
+- id: AF-046
+  name: Living beyond means
+  definition: A person's lifestyle (homes, cars, spending) does not match their known income.
+  areas:
+  - AF
+  typology: 'Misappropriation of assets: behavioural red flag'
+  status: verified
+  sources:
+  - title: Behavioral Red Flags of Fraud
+    publisher: ACFE
+    year: '2024'
+    url: https://acfe.com/-/media/files/fraudweek/pdfs/2024-fraud-week/behavioral-red-flags-of-fraud.pdf
+    locator: Chart of behavioural red flags
+    quote: Living beyond means
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4, Other
+    quote: Discrepancy between earnings and lifestyle.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Attitudes/Rationalisations
+    quote: Changes in behaviour or lifestyle that may indicate assets have been misappropriated.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Clerk on modest salary buys property for cash
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Ownership (property, vehicles)
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Property records
+  - Vehicle and boat registries
+  - Social media
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded (ACFE: 39% of fraudsters, the most common red
+      flag; 84% showed at least one behavioural red flag — prevalence, not thresholds)'
+    threshold_source: https://acfe.com/-/media/files/fraudweek/pdfs/2024-fraud-week/behavioral-red-flags-of-fraud.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Unexplained wealth is also a sign of bribe-taking
+    source_url: https://acfe.com/-/media/files/fraudweek/pdfs/2024-fraud-week/behavioral-red-flags-of-fraud.pdf
+  - target_area: ES
+    reason: Unexplained affluence is also a listed insider-threat financial indicator (CDSE job aid, per
+      the coverage check)
+    source_url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+  innocent_explanations:
+  - Inheritance, spouse's income, side business, debt-funded spending
+  version: 1
+- id: AF-047
+  name: Unusually close relationship with a supplier or customer; weak supplier controls
+  definition: An employee is unusually close to a vendor or customer, or the company does not properly
+    vet and monitor suppliers.
+  areas:
+  - AF
+  typology: 'Misappropriation of assets: behavioural red flag and opportunity'
+  status: verified
+  sources:
+  - title: Behavioral Red Flags of Fraud
+    publisher: ACFE
+    year: '2024'
+    url: https://acfe.com/-/media/files/fraudweek/pdfs/2024-fraud-week/behavioral-red-flags-of-fraud.pdf
+    locator: Chart of behavioural red flags
+    quote: Unusually close association with vendor/customer
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Opportunities
+    quote: Inadequate controls in supplier management, including changes in the supply chain, that may
+      expose the entity to…
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Buyer's relative owns the supplier
+  - Supplier shares an address or bank account with an employee
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Employment
+  - Family
+  - Associate
+  - Ownership
+  - Address
+  - BankAccount
+  - Payment
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - Company registry (supplier owners and directors)
+  - Address matching
+  - Procurement records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded (ACFE: 20% of fraudsters; prevalence, not threshold)'
+    threshold_source: https://acfe.com/-/media/files/fraudweek/pdfs/2024-fraud-week/behavioral-red-flags-of-fraud.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: PP
+    reason: Close buyer–vendor ties are a core kickback and conflict-of-interest pattern
+    source_url: https://acfe.com/-/media/files/fraudweek/pdfs/2024-fraud-week/behavioral-red-flags-of-fraud.pdf
+  innocent_explanations:
+  - Long business relationships naturally become friendly
+  - Small towns have overlapping networks
+  version: 1
+- id: AF-048
+  name: Weak IT access controls enabling theft
+  definition: Managers don't understand IT well enough to supervise IT staff, or access to automated records
+    and system logs is not controlled or reviewed.
+  areas:
+  - AF
+  typology: 'Misappropriation of assets: opportunity'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Opportunities
+    quote: Inadequate management understanding of IT, which enables IT employees to perpetrate a misappropriation.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Opportunities
+    quote: Inadequate access controls over automated records, including controls over and review of computer
+      systems event logs.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Shared admin passwords in the payments system
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Document
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Common in small organisations without IT staff
+  version: 1
+- id: AF-049
+  name: Tolerance of petty theft and disregard for controls
+  definition: Small thefts are tolerated, controls are overridden, or management ignores the need to monitor
+    theft risk.
+  areas:
+  - AF
+  typology: 'Misappropriation of assets: attitude or rationalisation'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Attitudes/Rationalisations
+    quote: Tolerance of petty theft.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Attitudes/Rationalisations
+    quote: Disregard for controls over misappropriation of assets by overriding existing controls or by
+      failing to take appropriate…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Attitudes/Rationalisations
+    quote: Rationalising misappropriations committed during severe economic downturns by intending to
+      pay back the entity when…
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Known shortages written off without investigation
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Cost of chasing tiny losses can exceed the loss
+  version: 1
+- id: AF-050
+  name: 'Behavioural warning signs: defensiveness, bullying, ''wheeler-dealer'' attitude, unusual behaviour'
+  definition: A person becomes irritable, suspicious or defensive, bullies others, acts like a wheeler-dealer,
+    or behaves unusually or inconsistently.
+  areas:
+  - AF
+  typology: Behavioural red flag
+  status: verified
+  sources:
+  - title: Behavioral Red Flags of Fraud
+    publisher: ACFE
+    year: '2024'
+    url: https://acfe.com/-/media/files/fraudweek/pdfs/2024-fraud-week/behavioral-red-flags-of-fraud.pdf
+    locator: Chart of behavioural red flags
+    quote: Irritability, suspiciousness, or defensiveness
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Behavioral Red Flags of Fraud
+    publisher: ACFE
+    year: '2024'
+    url: https://acfe.com/-/media/files/fraudweek/pdfs/2024-fraud-week/behavioral-red-flags-of-fraud.pdf
+    locator: Chart of behavioural red flags
+    quote: Bullying or intimidation
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Circumstances that May Be Indicative of Fraud or Suspected Fraud (Appendix 4, ASA
+      240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2058
+    locator: Appendix 4, Other
+    quote: Unusual, irrational, or inconsistent behaviour.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Finance manager intimidates juniors who ask questions
+  cases: []
+  data_needed:
+  - Person
+  - Document (interviews)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: 'Meets the published definition as worded (ACFE: 12% irritability/defensiveness, 12% wheeler-dealer,
+      11% bullying, 10% divorce/family problems; prevalence, not thresholds)'
+    threshold_source: https://acfe.com/-/media/files/fraudweek/pdfs/2024-fraud-week/behavioral-red-flags-of-fraud.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Stress, personality, health or family problems
+  version: 1
+- id: AF-051
+  name: 'Public-sector risks: trust funds, spending limits, government aid, tax and grant revenue'
+  definition: Public bodies holding money for others, facing statutory spending caps, or receiving government
+    aid or tax and grant revenue have specific chances to misreport or misuse funds.
+  areas:
+  - AF
+  typology: Public-sector fraud risk factors
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Opportunities
+    quote: Trust funds under administration – public sector entities often manage assets on behalf of
+      others, including vulnerable…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Fraudulent financial reporting, Incentives/Pressures
+    quote: Public sector entities subject to statutory limits on their spending may result in inaccurate...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Opportunities
+    quote: Lack of oversight by those charged with governance over how management utilised financial aid
+      from governments…
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Agency shifts spending between years to stay under a cap
+  - Pandemic aid used without board oversight
+  cases: []
+  data_needed:
+  - PublicBody
+  - Payment
+  - Contract
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Government audit office reports
+  - Budget documents
+  - FOIA requests
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Misuse of trust funds and aid is also embezzlement of public money
+    source_url: https://standards.auasb.gov.au/node/2056
+  - target_area: EF
+    reason: Trust funds for vulnerable people overlap with guardianship abuse
+    source_url: https://standards.auasb.gov.au/node/2056
+  innocent_explanations:
+  - Budget timing and carry-forward rules legitimately shape spending
+  version: 1
+- id: AF-052
+  name: Poor screening and supervision of staff who handle assets
+  definition: Job applicants with access to assets are not screened, staff handling assets are not supervised,
+    and asset records are poor.
+  areas:
+  - AF
+  typology: 'Misappropriation of assets: opportunity'
+  status: verified
+  sources:
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Opportunities
+    quote: Inadequate job applicant screening of employees with access to assets.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Examples of Fraud Risk Factors (Appendix 2, ASA 240)
+    publisher: AUASB
+    url: https://standards.auasb.gov.au/node/2056
+    locator: Appendix 2, Misappropriation, Opportunities
+    quote: Inadequate record keeping with respect to assets.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Treasurer with a prior embezzlement conviction hired without checks
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Court records
+  - Professional disciplinary registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Many small charities and clubs rely on trusted volunteers without checks
+  version: 1
+not_reached:
+- standards.auasb.gov.au pages could only be read through WebFetch, which truncates quotes to about 120
+  characters; quotes ending in '...' are exact prefixes of longer bullets. Direct curl to node/2056 returned
+  'Page not found' (and PCAOB returned a Cloudflare challenge), so full verbatim text was not saved locally.
+- The AUASB appendix pages do not name the parent standard on the page; their identification as ASA 240
+  Appendix 2 and 4 comes from the coverage-check brief and the search result title, not from the page
+  text.
+- IAASB ISA 240 (international original, and the revised ISA 240 approved 2025) not opened directly.
+- PCAOB AS 2401 appendix paragraph .85 bullet list not read in full (only heading confirmed); ASA 240
+  Appendix 2 used instead.
+- Beneish (1999) 'The Detection of Earnings Manipulation', Financial Analysts Journal — original paper
+  not opened; −1.78 threshold taken from CFA Institute blog.
+- 'ACFE Occupational Fraud 2024: A Report to the Nations full report not opened; percentages come from
+  the ACFE Fraud Week handout, which does not name the edition (matched labels to percentages by chart
+  order).'
+- 'Dechow et al. 2011 financing finding: exact sentence not captured (paraphrase flagged in quote field).'
+- 'Wirecard: Bundestag final report Drucksache 19/30900 itself not opened; Munich criminal trial outcome
+  not checked. WorldCom/Ebbers conviction: no primary DOJ/court page found; only the 2002 SEC complaint
+  was used.'
+- Toshiba (Japan SESC), Patisserie Valerie (UK) and Enron special-purpose-entity details not researched.
+- SEC Form 12b-25 late-filing notice and Regulation S-K Item 304 (auditor disagreements) not opened.

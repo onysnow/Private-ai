@@ -416,3 +416,103 @@ terms:
   indicators: []
   areas:
   - SA
+- term: Online violence against women journalists
+  definition: Gender-based abuse of women journalists carried out or made worse through digital technology,
+    including threats of rape and murder.
+  examples:
+  - Rape threats sent through social media
+  source_url: https://www.icfj.org/sites/default/files/2023-02/ICFJ%20Unesco_TheChilling_OnlineViolence.pdf
+  cases: []
+  related:
+  - Doxxing
+  - Online-to-offline escalation
+  indicators: []
+  areas:
+  - SA
+- term: Online-to-offline escalation
+  definition: When harassment that starts online turns into abuse or physical attacks in person.
+  examples: []
+  source_url: https://www.icfj.org/our-work/chilling-global-study-online-violence-against-women-journalists
+  cases: []
+  related:
+  - Online violence against women journalists
+  indicators: []
+  areas:
+  - SA
+- term: Red Notice
+  definition: An INTERPOL alert asking police worldwide to find and provisionally arrest a wanted person
+    pending extradition. It is not an arrest warrant.
+  examples: []
+  source_url: https://www.interpol.int/en/How-we-work/Notices/Red-Notices
+  cases: []
+  related:
+  - Diffusion
+  - Transnational repression
+  indicators: []
+  areas:
+  - SA
+- term: Diffusion (INTERPOL)
+  definition: A less formal alert that one country sends directly to others through INTERPOL's system.
+    Fair Trials says it can have the same effect as a Red Notice.
+  examples: []
+  source_url: https://www.fairtrials.org/campaigns/interpol/
+  cases: []
+  related:
+  - Red Notice
+  indicators: []
+  areas:
+  - SA
+- term: INTERPOL Constitution, Article 3
+  definition: The rule that bars INTERPOL from any intervention or activity of a political, military,
+    religious or racial character. It is the main ground for challenging politically motivated notices.
+  examples: []
+  source_url: https://www.interpol.int/en/Who-we-are/Legal-framework/Legal-documents
+  cases: []
+  related:
+  - Red Notice
+  indicators: []
+  areas:
+  - SA
+- term: Mobility controls
+  definition: Ways an origin state restricts a person's travel, such as revoking passports or refusing
+    consular services.
+  examples: []
+  source_url: https://freedomhouse.org/report/transnational-repression
+  cases: []
+  related:
+  - Transnational repression
+  indicators: []
+  areas:
+  - SA
+- term: Rendition
+  definition: Abducting a person in one country and taking them to another, outside lawful extradition.
+  examples: []
+  source_url: https://freedomhouse.org/report/transnational-repression
+  cases: []
+  related:
+  - Transnational repression
+  indicators: []
+  areas:
+  - SA
+- term: Foreign agent (designation)
+  definition: A government label for people or outlets said to be under foreign influence. In Russia it
+    brings labelling duties, income locked in special accounts, fines and criminal liability.
+  examples: []
+  source_url: https://cpj.org/2025/02/russia-preps-to-block-income-of-foreign-agent-journalists/
+  cases: []
+  related:
+  - Undesirable organisation
+  indicators: []
+  areas:
+  - SA
+- term: Undesirable organisation
+  definition: A Russian designation that bans an organisation, such as a news outlet, and makes taking
+    part in its work an offence.
+  examples: []
+  source_url: https://cpj.org/2025/02/russia-preps-to-block-income-of-foreign-agent-journalists/
+  cases: []
+  related:
+  - Foreign agent (designation)
+  indicators: []
+  areas:
+  - SA

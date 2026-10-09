@@ -1,0 +1,298 @@
+area: CA
+terms:
+- term: Institutional child sexual abuse
+  definition: Sexual abuse of a child that happens in, or is connected to, an organisation such as a school,
+    church, club, care home or detention centre, including how that organisation responds.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/media-centre/media-releases/2017-06/research-identifies-four-dimensions-of-risk-of-chi
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Situational risk
+  definition: Risk created when the setting gives adults the chance to be alone with children or form
+    close relationships with them.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/media-centre/media-releases/2017-06/research-identifies-four-dimensions-of-risk-of-chi
+  cases: []
+  related:
+  - Vulnerability risk
+  - Propensity risk
+  - Institutional risk
+  indicators: []
+  areas:
+  - CA
+- term: Vulnerability risk
+  definition: Risk that comes from the characteristics of the children in a setting, such as age, disability
+    or earlier maltreatment.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/media-centre/media-releases/2017-06/research-identifies-four-dimensions-of-risk-of-chi
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Propensity risk
+  definition: Risk from a concentration of adults inclined to abuse, or of children with harmful sexual
+    behaviours, in one setting.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/media-centre/media-releases/2017-06/research-identifies-four-dimensions-of-risk-of-chi
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Institutional risk
+  definition: Risk from how an organisation is run, such as putting reputation first or not listening
+    to children.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/media-centre/media-releases/2017-06/research-identifies-four-dimensions-of-risk-of-chi
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Grooming
+  definition: Deliberate steps an abuser takes to build trust with a child and the people around them,
+    to make abuse possible and avoid being caught.
+  examples: []
+  source_url: https://childabuseroyalcommission.gov.au/getattachment/b8c8cc19-ad65-44f5-951e-3b1705156da2/Grooming-and-child-sexual-abuse-in-institutional-c
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Institutional grooming
+  definition: Grooming aimed at an organisation itself, using its features and trust to get around its
+    safety measures.
+  examples: []
+  source_url: https://childabuseroyalcommission.gov.au/getattachment/b8c8cc19-ad65-44f5-951e-3b1705156da2/Grooming-and-child-sexual-abuse-in-institutional-c
+  cases: []
+  related:
+  - Grooming
+  indicators: []
+  areas:
+  - CA
+- term: Closed institution / total institution
+  definition: A setting where children live or spend most of their time cut off from outside contact and
+    scrutiny, such as boarding houses, residential homes and detention.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/schools
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Clericalism
+  definition: The idea that clergy hold a special status above lay people; the Royal Commission placed
+    it at the centre of the factors that enabled abuse in religious institutions.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/religious-institutions
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Harmful sexual behaviours
+  definition: Sexual behaviour by children that is outside what is developmentally expected and can harm
+    other children.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/schools
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Low-level concern
+  definition: Under English school guidance, any worry, however small, that an adult has acted against
+    the staff code of conduct without reaching the harm threshold.
+  examples:
+  - being overfriendly with children
+  - having favourites
+  source_url: https://assets.publishing.service.gov.uk/media/6ac3c09c11ed58342ad8e4ac/Keeping_children_safe_in_education_2026.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Harm threshold
+  definition: 'The English guidance test for a serious allegation: the adult harmed or may have harmed
+    a child, may have committed an offence against a child, or behaved in a way showing risk or unsuitability.'
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/6ac3c09c11ed58342ad8e4ac/Keeping_children_safe_in_education_2026.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: LADO (Local Authority Designated Officer)
+  definition: The local council officer in England who must be consulted about allegations that staff
+    or volunteers have harmed or may pose a risk to children.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/6ac3c09c11ed58342ad8e4ac/Keeping_children_safe_in_education_2026.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: DBS (Disclosure and Barring Service)
+  definition: The body in England and Wales that runs criminal-record checks and bars unsuitable people
+    from working with children; employers have a legal duty to refer certain cases to it.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/6ac3c09c11ed58342ad8e4ac/Keeping_children_safe_in_education_2026.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Settlement (compromise) agreement
+  definition: A deal where an employee resigns, the employer drops discipline, and both agree wording
+    for future references; English guidance says it must not be used where there is a risk to children.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/6ac3c09c11ed58342ad8e4ac/Keeping_children_safe_in_education_2026.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Position of trust (offence)
+  definition: Under section 16 of the Sexual Offences Act 2003 (England and Wales), it is an offence for
+    an adult in a position of trust to have sexual activity with a person under 18 in their care, even
+    if consensual.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/6ac3c09c11ed58342ad8e4ac/Keeping_children_safe_in_education_2026.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Transferable risk
+  definition: Behaviour outside work that may make a person unsuitable to work with children.
+  examples: []
+  source_url: https://assets.publishing.service.gov.uk/media/6ac3c09c11ed58342ad8e4ac/Keeping_children_safe_in_education_2026.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Child Safe Standards / National Principles for Child Safe Organisations
+  definition: Ten standards recommended by the Australian Royal Commission, adopted as national principles
+    that set out what a child-safe organisation does, from leadership to complaint handling.
+  examples: []
+  source_url: https://humanrights.gov.au/resource-hub/resources-for-organisations-businesses/child-safe-organisations
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Mandatory reporting
+  definition: A legal duty on certain people, such as those in positions of trust, to report known or
+    suspected child sexual abuse; IICSA recommended making it law in England and Wales.
+  examples: []
+  source_url: https://www.iicsa.org.uk/reports-recommendations/publications/inquiry/final-report/executive-summary
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Royal Commission into Institutional Responses to Child Sexual Abuse
+  definition: Australia's national public inquiry (2013-2017) into how institutions responded to child
+    sexual abuse; its Final Report has 17 volumes.
+  examples: []
+  source_url: https://www.royalcommission.gov.au/child-abuse/final-report
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: IICSA (Independent Inquiry into Child Sexual Abuse)
+  definition: The statutory inquiry for England and Wales, chaired by Professor Alexis Jay, which published
+    its final report in 2022.
+  examples: []
+  source_url: https://www.iicsa.org.uk/reports-recommendations/publications/inquiry/final-report/executive-summary
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Investigating grand jury
+  definition: In Pennsylvania, a panel of citizens that can compel evidence and issue a public report
+    on matters it investigates, as in the 2018 report on six Catholic dioceses.
+  examples: []
+  source_url: https://WWW.BISHOP-ACCOUNTABILITY.ORG/PA_40th_GJ/2018_08_14_Interim_Redacted_PA_GJ_Report.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: MAAPP (Minor Athlete Abuse Prevention Policies)
+  definition: Mandatory rules from the U.S. Center for SafeSport for Olympic and Paralympic sport bodies,
+    covering one-on-one contact, messaging, travel, lodging, massage and locker rooms.
+  examples: []
+  source_url: https://maapp.uscenterforsafesport.org/wp-content/uploads/2025/01/Weightlifting_2025-MAAPP_01.01.25.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Observable and interruptible
+  definition: MAAPP standard that any one-on-one contact between an adult and a minor athlete must happen
+    where others can see it and walk in.
+  examples: []
+  source_url: https://maapp.uscenterforsafesport.org/wp-content/uploads/2025/01/Weightlifting_2025-MAAPP_01.01.25.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Open and Transparent (communications)
+  definition: MAAPP rule that one-to-one electronic messages with a minor athlete must copy a parent,
+    another family adult or another adult participant.
+  examples: []
+  source_url: https://maapp.uscenterforsafesport.org/wp-content/uploads/2025/01/Weightlifting_2025-MAAPP_01.01.25.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Clery Act
+  definition: US federal law requiring colleges receiving federal aid to report campus crimes and issue
+    timely warnings; the Department of Education can fine institutions that fail.
+  examples: []
+  source_url: https://www.cbsnews.com/philadelphia/news/feds-investigating-sandusky-fine-penn-state-a-record-2-4m/
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Out-of-home care
+  definition: Care for children who cannot live with their parents, such as foster care, kinship care
+    and residential care.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/contemporary-out-home-care
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Carers register
+  definition: An official list of authorised foster and kinship carers that the Royal Commission recommended
+    each Australian state create so concerns can follow carers.
+  examples: []
+  source_url: https://www.childabuseroyalcommission.gov.au/recordkeeping-and-information-sharing
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA
+- term: Background (criminal records) check
+  definition: A check of a person's criminal record before they work with children; the CDC notes it will
+    miss most offenders, who have never been caught.
+  examples: []
+  source_url: https://stacks.cdc.gov/view/cdc/7538/cdc_7538_DS1.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - CA

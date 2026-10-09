@@ -1,0 +1,313 @@
+area: PD
+terms:
+- term: Diversion (prescription drug diversion)
+  definition: Moving a legally made controlled drug out of legitimate medical channels into misuse or
+    illegal sale.
+  examples: []
+  source_url: https://www.deadiversion.usdoj.gov/GDP/(DEA-DC-13) Preventing Diversion.pdf
+  cases: []
+  related:
+  - Pill mill
+  - Controlled substance
+  indicators: []
+  areas:
+  - PD
+- term: Pill mill
+  definition: Informal name for a clinic, doctor or pharmacy that hands out controlled drugs, mostly opioids,
+    without legitimate medical need, usually for cash.
+  examples:
+  - Atlanta Medical Group, Cartersville GA
+  source_url: https://www.justice.gov/usao-ndga/pr/two-pill-mill-owners-convicted
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Controlled substance
+  definition: A drug whose making, prescribing and dispensing is regulated by the US Controlled Substances
+    Act and DEA rules because of its abuse potential (e.g. oxycodone, hydrocodone, benzodiazepines).
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/21/1306.04
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Legitimate medical purpose / usual course of professional practice
+  definition: 'The legal test a controlled-drug prescription must meet to be valid: issued for a real
+    medical need by a practitioner acting in normal professional practice.'
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/21/1306.04
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Corresponding responsibility
+  definition: The pharmacist's own legal duty, alongside the prescriber's, to fill only prescriptions
+    issued for a legitimate medical purpose.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/21/1306.04
+  cases: []
+  related:
+  - Red flag
+  indicators: []
+  areas:
+  - PD
+- term: Red flag (diversion)
+  definition: A warning sign that a prescription or order may not be legitimate, which a pharmacist or
+    distributor must resolve before filling or shipping.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: DEA registration
+  definition: The federal registration a doctor, pharmacy, distributor or manufacturer must hold to handle
+    controlled drugs; DEA can suspend or revoke it.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Order to Show Cause / revocation
+  definition: DEA's formal notice asking a registrant to explain why its registration should not be revoked;
+    revocation removes the right to handle controlled drugs.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Suspicious order
+  definition: An order for controlled drugs that is of unusual size, deviates substantially from a normal
+    pattern, or comes with unusual frequency; distributors must detect and report these.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/21/1301.74
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Suspicious order monitoring (SOM) and the shipping requirement
+  definition: A distributor's system for flagging suspicious orders; after flagging, it must decline the
+    order or do due diligence and ship only if diversion is unlikely.
+  examples: []
+  source_url: https://media.cadc.uscourts.gov/opinions/docs/2017/06/15-1335-1682127.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Distributor (wholesaler)
+  definition: A company that buys controlled drugs from manufacturers and ships them to pharmacies and
+    practitioners (e.g. McKesson, Cardinal Health, AmerisourceBergen).
+  examples: []
+  source_url: https://www.ruralhealthinfo.org/assets/2616-9819/Opioid-Distribution-Report-FinalREV.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Prescription drug monitoring program (PDMP)
+  definition: A state database of controlled-drug prescriptions that prescribers and pharmacists check
+    to see a patient's other prescriptions.
+  examples: []
+  source_url: https://www.cdc.gov/mmwr/volumes/65/rr/rr6501e1.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Morphine milligram equivalent (MME / MED)
+  definition: A way to compare opioid doses by converting each drug to the equivalent amount of morphine
+    per day; MED and MME are interchangeable terms.
+  examples: []
+  source_url: https://oig.hhs.gov/OEI/REPORTS/OEI-02-17-00250.PDF
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Doctor shopping
+  definition: Getting overlapping controlled-drug prescriptions from several prescribers (often filled
+    at several pharmacies) without them knowing about each other.
+  examples: []
+  source_url: https://oig.hhs.gov/OEI/REPORTS/OEI-02-17-00250.PDF
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Holy Trinity (drug cocktail)
+  definition: Street name for an opioid (e.g. oxycodone), a benzodiazepine (e.g. Xanax) and the muscle
+    relaxant carisoprodol (Soma) taken together.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Benzodiazepine
+  definition: A class of sedative / anti-anxiety drugs (e.g. Xanax) that, with opioids, raises overdose
+    risk.
+  examples: []
+  source_url: https://www.cdc.gov/mmwr/volumes/65/rr/rr6501e1.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Carisoprodol (Soma)
+  definition: A muscle relaxant that is part of the abused 'trinity' combination.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Pattern prescribing
+  definition: The same drugs or combinations, in very similar quantities and doses, prescribed to many
+    patients regardless of individual needs.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Opioid-naive patient
+  definition: A patient not already taking opioids regularly, for whom high starting doses are dangerous.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Immediate-release (short-acting) opioid
+  definition: An opioid formulation that acts quickly and briefly; two at once is a duplication red flag.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Urine drug testing (toxicology)
+  definition: Lab tests that check whether a patient is taking the prescribed drug and any other or illicit
+    drugs.
+  examples: []
+  source_url: https://www.cdc.gov/mmwr/volumes/65/rr/rr6501e1.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Pain-management clinic (Florida)
+  definition: Under Florida law, a facility that advertises pain services or where in any month most patients
+    get opioids, benzodiazepines, barbiturates or carisoprodol for chronic non-cancer pain; it must register.
+  examples: []
+  source_url: http://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0400-0499/0458/Sections/0458.3265.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Theft or significant loss report
+  definition: A registrant's duty to notify DEA in writing of controlled-drug theft or significant loss,
+    judged by quantity, drug, pattern over time and diversion risk.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/21/1301.76
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: DEA Form 222
+  definition: The official order form (or its electronic CSOS equivalent) used to order Schedule II controlled
+    drugs; audits compare it with inventory.
+  examples: []
+  source_url: https://www.govinfo.gov/content/pkg/FR-2016-07-28/html/2016-17721.htm
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Anti-Kickback Statute
+  definition: US federal law that bans paying or receiving anything of value to induce referrals or orders
+    paid for by federal health programmes.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/opioid-manufacturer-purdue-pharma-pleads-guilty-fraud-and-kickback-conspiracies
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Speaker program
+  definition: Paid talks by doctors arranged by drug makers; Insys used them as a vehicle for bribes to
+    prescribers.
+  examples: []
+  source_url: https://www.justice.gov/usao-ma/pr/founder-and-former-chairman-board-insys-therapeutics-sentenced-66-months-prison
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Prior authorization
+  definition: An insurer's approval required before it will pay for certain drugs; Insys staff gave false
+    diagnoses to obtain it.
+  examples: []
+  source_url: https://www.justice.gov/usao-ma/pr/founder-and-former-chairman-board-insys-therapeutics-sentenced-66-months-prison
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Racketeering conspiracy (RICO)
+  definition: A federal crime of agreeing to run an enterprise through a pattern of crimes; Insys executives
+    were convicted of it.
+  examples: []
+  source_url: https://www.justice.gov/usao-ma/pr/founder-and-former-chairman-board-insys-therapeutics-sentenced-66-months-prison
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Ruan standard (knowing or intentional unauthorized prescribing)
+  definition: US Supreme Court 2022 rule that to convict a doctor under the drug law the government must
+    prove the doctor knowingly or intentionally acted without authorisation.
+  examples: []
+  source_url: https://www.supremecourt.gov/opinions/21pdf/20-1410_1an2.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Automated dispensing cabinet override / waste
+  definition: Hospital drug cabinets log every withdrawal; overrides bypass the order check, and 'waste'
+    is disposal of unused drug, which should be witnessed.
+  examples: []
+  source_url: https://jointcommission.org/resources/news-and-multimedia/newsletters/newsletters/quick-safety/quick-safety-48-drug-diversion-and-impaired-health-care-workers
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD
+- term: Misprision of felony
+  definition: The federal crime of knowing about a felony, concealing it and not reporting it; the GenPharm
+    pharmacist pleaded guilty to it (definition in own words; release names the charge only).
+  examples: []
+  source_url: https://www.justice.gov/usao-ndtx/pr/three-defendants-sentenced-opioid-pill-mill-case
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PD

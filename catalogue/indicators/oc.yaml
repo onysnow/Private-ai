@@ -21,7 +21,7 @@ indicators:
       for a period of time and acting in concert with the aim of committing one or more serious crimes
       or offences'
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A cartel leader convicted of running a continuing criminal enterprise covering 26 drug violations
     (Guzmán, 2019).
@@ -98,7 +98,7 @@ indicators:
     locator: p. 4, point m
     quote: 86 % of the most threatening criminal networks make use of legal business structures (LBS)
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Abuse of Legal Business Structures through Criminal Networks (on Europol, Leveraging legitimacy,
       18 Dec 2024)
     publisher: eucrim / Europol
@@ -107,7 +107,7 @@ indicators:
     locator: news summary
     quote: high-level infiltration or criminal ownership of legal business structures
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Intellectual Property Crime Threat Assessment 2022
     publisher: Europol and EUIPO
     year: '2022'
@@ -116,7 +116,7 @@ indicators:
     locator: p. 35
     quote: Legal business structures are an essential component of IP crime.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A cartel leader laundered money through insurance companies, debit cards and shell companies alongside
     bulk cash smuggling.
@@ -176,7 +176,7 @@ indicators:
     locator: p. 9
     quote: setting-up of front companies, and sending illicit cargo within the legitimate stream of commerce
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A newly formed importer receiving container loads of low-value goods from a cocaine-source country.
   cases: []
@@ -222,7 +222,7 @@ indicators:
     locator: p. 13; p. 19
     quote: The insiders include corrupted port personnel but also extraction teams brought into the port
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A terminal worker with unexplained income who repeatedly accesses records of containers they do not
     handle.
@@ -274,7 +274,7 @@ indicators:
     quote: the criminals retrieve the drugs container from the port terminal pretending to be the legitimate
       client
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A container reported as collected by a haulier the consignee never hired; containers delivered to
     wrong addresses or found in unexpected places (p. 15).
@@ -324,7 +324,7 @@ indicators:
     locator: p. 10
     quote: less likely to be inspected
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Repeated use of the same small forwarder for perishable goods from a source country.
   cases: []
@@ -367,7 +367,7 @@ indicators:
       often in amounts below the cash reporting threshold, and from which the funds are withdrawn in a
       different geographic area with little time elapsing between the deposits and withdrawals.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An account opened near the US southwest border receives cash deposits under $10,000 from unidentified
     people at branches in other states.
@@ -427,7 +427,7 @@ indicators:
     quote: A customer engages in behavior that suggests efforts to evade the Currency Transaction Report
       (CTR) filing requirement
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
     publisher: FINTRAC (Canada)
     year: '2025'
@@ -436,7 +436,7 @@ indicators:
     quote: Client has funds deposited into his or her personal account in amounts below the reporting
       threshold from what
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Several cash deposits of $9,500 on consecutive days.
   cases: []
@@ -481,7 +481,7 @@ indicators:
     locator: Red flags for depository institutions, 1-2
     quote: Large volumes of cash are transported by an ACS or passenger vehicles to an U.S.-based MSB
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
     publisher: FINTRAC
     year: '2025'
@@ -489,7 +489,7 @@ indicators:
     locator: General money laundering indicators
     quote: Client makes use of armored car services that are not in line with expectations.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A Mexico-based business ships cash by armoured car to several US cities before it reaches a bank,
     then wires it to Mexico.
@@ -547,7 +547,7 @@ indicators:
     locator: Red flags for armored car services, 8
     quote: that are not commensurate with the size of the business or the business profile.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
     publisher: FINTRAC
     year: '2025'
@@ -556,7 +556,7 @@ indicators:
     quote: Client sales/purchases/expenses are not in line with their business profile as a cash-heavy
       industry (laundry
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN Advisory on Chinese Money Laundering Networks (FIN-2025-A003)
     publisher: FinCEN
     year: '2025'
@@ -564,7 +564,7 @@ indicators:
     locator: TBML red flag 6
     quote: A business that sells electronics or other luxury goods has income that is not commensurate
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A small laundromat deposits more cash than its machines could take in.
   cases: []
@@ -611,7 +611,7 @@ indicators:
     locator: Red flags 7, 9, 10
     quote: but does not provide a clear explanation of the source of the funds.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A cash shipment arrives from a Mexico- or Canada-based armoured carrier without instructions or purpose.
   cases: []
@@ -655,7 +655,7 @@ indicators:
     quote: with a residential address or a business address shared with other similar businesses or that
       has no physical presence
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Five chemical exporters registered at one apartment in a single city.
   cases:
@@ -712,7 +712,7 @@ indicators:
     quote: Multiple, seemingly unrelated Mexican importing companies share phone numbers, email addresses,
       or physical addresses
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Three Mexican importers list the same email domain and pay the same PRC supplier.
   cases: []
@@ -758,7 +758,7 @@ indicators:
     quote: A Mexico-based entity from an unrelated industry transacts with a PRC-based chemical or pharmaceutical
       company.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
     publisher: FINTRAC
     year: '2025'
@@ -767,7 +767,7 @@ indicators:
     quote: Client makes virtual currency or wire transfers to chemical companies located in China, Eastern
       Europe, or India.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A Mexican clothing retailer wires money to a Hong Kong pharmaceutical intermediate supplier.
   cases:
@@ -821,7 +821,7 @@ indicators:
     quote: shipments of fentanyl precursor chemicals and manufacturing equipment without appropriate importing
       licenses
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An importer with no website or permits receiving 4-ANPP shipments.
   cases: []
@@ -864,7 +864,7 @@ indicators:
     locator: Clearnet and Darknet Marketplace red flags
     quote: Direct or indirect transactions with Darknet marketplaces or CVC mixing services.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
     publisher: FINTRAC
     year: '2025'
@@ -873,7 +873,7 @@ indicators:
     quote: Client sends or receives virtual currency to/from mixing or tumbling services that is unusual
       for their profile.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A wallet receiving funds traced by blockchain analytics to a darknet market vendor address.
   cases:
@@ -924,7 +924,7 @@ indicators:
     locator: Clearnet and Darknet Marketplace red flags
     quote: Customers discussing drug purchases in the transaction notes field available on the exchange,
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
     publisher: FINTRAC
     year: '2025'
@@ -933,7 +933,7 @@ indicators:
     quote: Client receives email money transfers with references to common street-names for drugs in memo
       section
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A transfer note reading '1 gram fent'.
   cases: []
@@ -973,7 +973,7 @@ indicators:
     quote: Client purchases industrial lab equipment with no obvious business need, for example pill presses
       and industrial pumps.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Supplemental Advisory (FIN-2024-A002)
     publisher: FinCEN
     year: '2024'
@@ -982,7 +982,7 @@ indicators:
     quote: Pill presses and die molds are components used to manufacture fentanyl and other synthetic
       opioids in pill form.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A person with a landscaping business buys a tablet press and punch dies online.
   cases: []
@@ -1023,7 +1023,7 @@ indicators:
     quote: Client makes payment for a rental storage locker not commensurate with their overall client
       profile.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Rent paid on three remote farm properties by an office worker.
   cases: []
@@ -1065,7 +1065,7 @@ indicators:
     locator: Indicators of synthetic opioid distribution
     quote: Client ships packages under the 1 kg weight.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Dozens of parcels labelled 'action figure' sent to the US and Mexico.
   cases: []
@@ -1112,7 +1112,7 @@ indicators:
     quote: Client employed in trucking/shipping/logistics frequently makes cash deposits beyond the financial
       means associated
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A long-haul driver making weekly cash deposits to reloadable prepaid cards.
   cases: []
@@ -1154,7 +1154,7 @@ indicators:
     locator: Money mule red flags 1, 3, 4
     quote: as a student, retiree, housewife, or other low-income occupation
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Operational Alert: Laundering the proceeds of illicit synthetic opioids'
     publisher: FINTRAC
     year: '2025'
@@ -1163,7 +1163,7 @@ indicators:
     quote: Client lives beyond his or her apparent means, as evidenced by large credit card or other bills,
       or expenses
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A student account receives 'tuition' wires far above fees and then pays unrelated people.
   cases:
@@ -1229,7 +1229,7 @@ indicators:
     locator: Money mule red flags 5, 10
     quote: shell company or entity in a disparate line of business
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An escrow company receives funds for a house purchase from a Hong Kong trading company unrelated to
     the buyer.
@@ -1278,7 +1278,7 @@ indicators:
     locator: TBML red flags 1-3
     quote: but rarely, or never, engages in transactions that indicate the purchase of goods
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Intellectual Property Crime Threat Assessment 2022
     publisher: Europol and EUIPO
     year: '2022'
@@ -1287,7 +1287,7 @@ indicators:
     locator: p. 36
     quote: Criminals use trade-based money laundering schemes to hide illicit funds
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A small US electronics shop receiving wires from Mexico, Hong Kong and the UAE with no link to those
     countries.
@@ -1344,7 +1344,7 @@ indicators:
     quote: makes payments for multiple credit cards associated with various individuals, who are seemingly
       unrelated to the business.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - P2P transfers from many unknown senders followed by a large credit card payment.
   cases: []
@@ -1386,7 +1386,7 @@ indicators:
     quote: Hong Kong registered trading companies with shell-like characteristics send funds to Chinese
       nationals
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A Hong Kong trading company with a secretarial address wiring funds to a US title insurer.
   cases: []
@@ -1428,7 +1428,7 @@ indicators:
     locator: General money laundering indicators
     quote: Client opens bank accounts for several businesses for no apparent economic reason.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A partner or relative listed as owner (nominee) while another person controls the money; FINTRAC notes
     nominees were often family members or romantic partners.
@@ -1476,7 +1476,7 @@ indicators:
     locator: General money laundering indicators
     quote: Client's identification documents have been forged and/or do not match the client's identity.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN Advisory on CMLNs (FIN-2025-A003)
     publisher: FinCEN
     year: '2025'
@@ -1484,7 +1484,7 @@ indicators:
     locator: Money mule red flag 2
     quote: that contain the same photograph despite being allegedly issued years apart.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Betting accounts opened with misused identities (Europol on match-fixing).
   cases: []
@@ -1528,7 +1528,7 @@ indicators:
     quote: Client makes high volume and/or frequent purchases from his or her personal account to online
       gambling platforms
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Cash deposited and then moved to several offshore betting sites.
   cases: []
@@ -1571,7 +1571,7 @@ indicators:
     quote: The recovery of a crime gun within 2 to 3 years after its initial purchase is considered a
       short time-to-crime
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Justice Department Announces Publication of Second Volume of National Firearms Commerce and
       Trafficking Assessment
     publisher: U.S. Department of Justice / ATF
@@ -1581,7 +1581,7 @@ indicators:
     quote: nearly 25% of traced crime guns – more than 366,000 guns – had a time-to-crime of less than
       one-year
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A handgun bought in one state and recovered at a shooting elsewhere eight months later.
   cases: []
@@ -1622,7 +1622,7 @@ indicators:
     quote: Recovered firearm originated (reported stolen from or traced to) from a different region of
       the country or another country
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - US-sold rifles recovered in Mexico.
   cases: []
@@ -1661,7 +1661,7 @@ indicators:
     locator: p. 2
     quote: Recovered firearm was part of multiple firearms purchased by the same person
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - One buyer purchases five identical pistols in a week.
   cases: []
@@ -1699,7 +1699,7 @@ indicators:
     locator: p. 2
     quote: Recovered firearm was part of multiple firearms stolen at or around the same time or vicinity
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Guns from one gun-shop burglary turning up in several cities.
   cases: []
@@ -1737,7 +1737,7 @@ indicators:
     locator: p. 2
     quote: Altered or obliterated serial number
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A pistol with a ground-off serial recovered in a raid.
   cases: []
@@ -1772,7 +1772,7 @@ indicators:
     locator: p. 2
     quote: Suspect claims to have obtained firearm from a non-licensed individual
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Interview statement naming an acquaintance who 'sells guns'.
   cases: []
@@ -1810,7 +1810,7 @@ indicators:
     locator: p. 2
     quote: Pattern of recovered firearms (from different individuals or from different locations)
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Many crime guns traced to one dealer or one town.
   cases: []
@@ -1849,7 +1849,7 @@ indicators:
     locator: p. 8; p. 11; p. 31
     quote: Packaging materials, logos and labels are usually shipped separately from the counterfeit goods
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Unbranded trainers in one shipment and branded logos in another, joined in an EU workshop (p. 32).
   cases:
@@ -1905,7 +1905,7 @@ indicators:
     locator: p. 12; p. 17
     quote: Online marketplaces remain the chief distribution channels for counterfeit goods in the EU
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Sponsored social media ads for luxury-brand bags at a fraction of retail price.
   cases:
@@ -1956,7 +1956,7 @@ indicators:
     locator: p. 21; p. 27
     quote: Free trade zones are also misused in the trade in counterfeit products
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Cigarettes trans-shipped through a free economic zone before entering the EU.
   cases:
@@ -2005,7 +2005,7 @@ indicators:
     locator: p. 19; p. 14; p. 18
     quote: Criminals rely on fraudulent documents to import and transport illegal goods.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Pesticide shipping documents lacking country of origin (p. 18).
   cases:
@@ -2060,7 +2060,7 @@ indicators:
     locator: p. 21; p. 22
     quote: Counterfeit pharmaceuticals are widely advertised and offered for sale on social media platforms.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Pills sold as prescription painkillers via social media that test positive for fentanyl.
   cases:
@@ -2115,7 +2115,7 @@ indicators:
     locator: Article 3(5)(b)
     quote: any sports betting activity inconsistent with usual or anticipated patterns of the market
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Resource Guide on Good Practices in the Investigation of Match-Fixing
     publisher: UNODC and ICSS
     year: '2016'
@@ -2124,7 +2124,7 @@ indicators:
     quote: to identify dis-crepancies between actual and expected odds that can indicate potentially irregular
       and suspicious betting
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A betting monitoring firm flags heavy late money on a second-tier match.
   cases:
@@ -2180,7 +2180,7 @@ indicators:
     locator: p. 17
     quote: These matches were characterized by unusually poor play by some of the players.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A referee awarding handball penalties when the ball went nowhere near players' hands (Perumal-linked
     friendlies, p. 20).
@@ -2231,7 +2231,7 @@ indicators:
     quote: it has been proven that where participants are paid a low wage, paid late or not paid at all,
       they are more likely to be targeted by fixers.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Šapina's network targeted leagues where players were modestly paid (p. 20).
   cases:
@@ -2284,7 +2284,7 @@ indicators:
     quote: A lack of transparency in this regard has made clubs vulnerable to acquisition and investment
       by organized crime, with clubs used as a vehicle for match-fixing activities.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - One foreign businessman investing in eight financially troubled Belgian clubs.
   cases:
@@ -2339,7 +2339,7 @@ indicators:
     quote: they had posted photos on social media that showed them partying on islands that players on
       the salaries earned in a semi-professional football environment could not normally afford to visit.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Semi-professional players posting luxury island holidays.
   cases: []
@@ -2381,7 +2381,7 @@ indicators:
       global betting markets by using proxy accounts, or by opening multiple betting accounts on multiple
       platforms.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Report on Sports Corruption (summary of Europol report)
     publisher: eucrim
     year: '2020'
@@ -2390,7 +2390,7 @@ indicators:
     quote: OCGs misuse identities to create betting accounts and e-wallets that are used to bet on prearranged
       matches.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Many new accounts placing similar bets on one obscure match.
   cases: []
@@ -2434,7 +2434,7 @@ indicators:
     quote: One European bookmaker paid out on the result after receiving confirmation that the match had
       taken place. Only subsequent investigations revealed that it had not been played.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A friendly listed by data feeds with no venue booking or local reports.
   cases: []
@@ -2476,7 +2476,7 @@ indicators:
     quote: information relating to any competition that a person possesses by virtue of his or her position
       in relation to a sport or competition
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Resource Guide on Good Practices in the Investigation of Match-Fixing
     publisher: UNODC and ICSS
     year: '2016'
@@ -2485,7 +2485,7 @@ indicators:
     quote: it is a way of defrauding betting operators by using specific information about a sporting
       event that is not in the public domain.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A team staff member's relative betting on a line-up change before it is announced.
   cases: []
@@ -2527,7 +2527,7 @@ indicators:
     locator: para 3
     quote: As agreed, three "no balls" were bowled, two by Amir and one by Asif, in effect to order.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Resource Guide on Good Practices in the Investigation of Match-Fixing
     publisher: UNODC and ICSS
     year: '2016'
@@ -2535,7 +2535,7 @@ indicators:
     locator: p. 66
     quote: Spot betting can potentially involve the influencing of one individual or a team.
     quote_verified: false
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A bowler's front foot well over the line at exactly the pre-agreed delivery.
   cases:
@@ -2572,6 +2572,2734 @@ indicators:
   - Such events (no-balls, cards, throw-ins) happen naturally many times in a match.
   jurisdictions: General
   version: 1
+- id: OC-051
+  name: Several gambling accounts linked by the same IP address, device, home address or payment method
+  definition: Accounts opened under different names share a device, IP address, address, contact details
+    or payment card, which suggests one person or group controls them.
+  areas:
+  - ML
+  - OC
+  typology: Gambling-based money laundering (multiple and fake accounts)
+  status: verified
+  sources:
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Online accounts (approx. pp. 5-11)
+    quote: Several accounts under different names are opened using the same IP address or device.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Payment methods/transactions
+    quote: Multiple customers are identified as sharing the same bank account or payment method from which
+      deposits...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: 'Red-flag risk indicators, Customer behaviour and profile: Online'
+    quote: Customer tries to open multiple accounts under the same name or a fake name.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Five betting accounts in different names all log in from one phone and withdraw to one bank card.
+  cases: []
+  data_needed:
+  - Person
+  - Identification
+  - Address
+  - BankAccount
+  - Payment
+  - UnknownLink
+  checkable: lookups
+  lookup_sources:
+  - Gambling operator account records (via regulator, leak or court filing)
+  - Device/IP logs disclosed in litigation
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Linked accounts are a common way to spread bets on fixed events; FATF lists coordinated betting
+      on manipulated competitions in the same indicator set.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+  innocent_explanations:
+  - Family members or housemates sharing a router, address or computer
+  - Shared public Wi-Fi, university or workplace networks
+  - Mobile carriers putting many users behind one IP address
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-052
+  name: Gambling account and payment details do not match (third-party deposits, withdrawals to someone
+    else's account)
+  definition: Money goes into or out of a gambling account through bank accounts, cards or wallets that
+    belong to someone other than the account holder.
+  areas:
+  - ML
+  - OC
+  typology: Gambling-based money laundering
+  status: verified
+  sources:
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: 'Red-flag risk indicators, Customer behaviour and profile: Online'
+    quote: Online betting account details do not match the account details of the payment method for deposits
+      and withdrawals.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Payment methods/transactions
+    quote: Deposits made by third parties that are not clearly related to the account holder.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Payment methods/transactions
+    quote: Attempts to withdraw funds to an account different to the source of the funds.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A betting account in one name is funded by cards in three other names and pays out to a fourth person's
+    bank account.
+  cases: []
+  data_needed:
+  - Person
+  - BankAccount
+  - Payment
+  - Ownership
+  - UnknownLink
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FATF lists 'mule accounts' among banking anomalies in gambling flows.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+  innocent_explanations:
+  - A spouse or parent paying from a joint or family card
+  - Recently changed name or bank account not yet updated
+  - Payment processor or e-wallet showing its own name instead of the user's
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-053
+  name: Money deposited and withdrawn from gambling with little or no play
+  definition: Large sums go into a gambling account or casino and come straight back out with only token
+    betting, so the venue acts as a laundering pass-through.
+  areas:
+  - ML
+  - OC
+  typology: Gambling-based money laundering (minimal play)
+  status: verified
+  sources:
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Payment methods/transactions
+    quote: Deposits followed by withdrawals with minimal or no play in between.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Betting patterns
+    quote: Non-genuine play patterns – wagers are low while large sums are deposited and withdrawn.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Brick-and-mortar
+    quote: Player co-mingle casino value instruments with cash.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A player buys chips with cash, plays two small hands, and cashes out for a casino cheque.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - BankAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: The catalogue's HT area already carries a casino pass-through item; gambling pass-through
+      can also launder trafficking proceeds.
+    source_url: https://www.fatf-gafi.org/en/publications/Methodsandtrends/risks-of-gaming-and-gambling.html
+  innocent_explanations:
+  - Player changes their mind or loses interest
+  - Player using the account as a convenient wallet without criminal intent
+  - Promotional deposit/withdrawal testing
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-054
+  name: Betting on all outcomes, hedged bets, chip dumping or players who always lose to each other
+  definition: Bets or games are set up so value moves from one player to another, or both sides of an
+    event are covered, rather than to win money from the house.
+  areas:
+  - ML
+  - OC
+  typology: Collusive gambling / peer-to-peer value transfer
+  status: verified
+  sources:
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Betting patterns
+    quote: Consistently betting on all possible outcomes (e.g. on red and black in roulette, on both teams
+      to win a match).
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Betting patterns
+    quote: Customers appear to play frequently together, with one always winning and the other always
+      losing.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Betting patterns
+    quote: P2P anomalies (e.g. chip dumping).
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Two online poker accounts meet repeatedly at the same table and one folds strong hands to the other.
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: FATF ties coordinated and hedged betting to competition manipulation and insider information
+      in the same list.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+  innocent_explanations:
+  - Friends playing together socially
+  - Hedging is a legitimate betting strategy used by some professional punters
+  - Low-risk play to clear a bonus requirement
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-055
+  name: Buying winning lottery tickets, betting slips or chips from unknown sources
+  definition: Someone buys another person's winning ticket or slip, or cashes chips of unknown origin,
+    so dirty money can be presented as gambling winnings.
+  areas:
+  - ML
+  - OC
+  typology: Purchase of winning instruments
+  status: verified
+  sources:
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Brick-and-mortar
+    quote: Purchases or attempts to purchase winning claim instruments (e.g. lottery ticket, betting slip...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Brick-and-mortar
+    quote: Player attempts to present a casino value instrument (e.g. chip) from an unknown source.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The same person claims many large lottery prizes over a few years.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Lottery winner lists published by state lotteries
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuinely lucky frequent player
+  - Lottery syndicate where one member claims for the group
+  - Chips brought from a previous visit
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-056
+  name: Gambling deposits or cash-outs kept just under reporting or ID thresholds
+  definition: Deposits are split or winnings are collected in amounts just below the level that triggers
+    identity checks or reports.
+  areas:
+  - ML
+  - OC
+  typology: Structuring in gambling
+  status: verified
+  sources:
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Betting patterns
+    quote: Customer repeatedly collects winnings just below a customer identification threshold.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Brick-and-mortar
+    quote: Requests winnings to be paid in cash up to the threshold amount and never returns to collect
+      the balance.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Payment methods/transactions
+    quote: Numerous daily cash deposits within short timeframes (even seconds apart).
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A customer cashes out repeatedly just under the casino's ID limit on the same day.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (threshold depends on the jurisdiction)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Same structuring behaviour applied to a gambling venue.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+  innocent_explanations:
+  - Player sets personal limits for budgeting
+  - Machine or cage limits force smaller payouts
+  - Privacy concerns unrelated to crime
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-057
+  name: Player placing bets or buying chips for someone else
+  definition: A gambler appears to be following instructions or using money supplied by a hidden third
+    party, or uses third parties to put cash into machines.
+  areas:
+  - ML
+  - OC
+  typology: Third-party / proxy gambling
+  status: verified
+  sources:
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Brick-and-mortar
+    quote: Players appearing to act on behalf of a third party (e.g.taking instructions from mobile phones...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Brick-and-mortar
+    quote: Uses third parties to place cash funds into cash redemption terminals, purchase gaming chips
+      or place bets...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A low-income player bets large amounts at a casino while on the phone and hands winnings to another
+    person outside.
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Payment
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Proxy gamblers play the same role as money mules for the person supplying the cash.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+  innocent_explanations:
+  - Friend placing a bet as a favour
+  - Player talking to family while gambling
+  - Carer helping an elderly or disabled gambler
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-058
+  name: Gambling operator with hidden, offshore or crime-linked owners
+  definition: A casino, betting site or gaming platform is owned through complex foreign structures, nominees
+    or trusts, or its owners are linked to organised crime or corruption.
+  areas:
+  - CO
+  - ML
+  - OC
+  typology: Criminal infiltration of gambling operators
+  status: verified
+  sources:
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Product and platform features
+    quote: Complex (and often cross-border) ownership structures that obscure beneficial ownership and
+      control...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Product and platform features
+    quote: Open-source information indicates that beneficial owners may be linked to organised crime groups,
+      bribery...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Product and platform features
+    quote: Structuring beneficial ownership shareholding in a way which aims to bypass/avoid thresholds
+      for regulatory checks
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An online casino licensed in a small jurisdiction is owned by a trust whose settlor cannot be identified;
+    several shareholders each hold just under the licensing disclosure level.
+  cases: []
+  data_needed:
+  - Company
+  - Ownership
+  - Directorship
+  - Person
+  - LegalEntity
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Gambling regulator licence registers
+  - Company registries and beneficial-ownership registers
+  - Sanctions and adverse-media screening
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Gambling operators are one kind of legal business FATF says criminals seek to own.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+  innocent_explanations:
+  - Tax-driven but lawful international group structures
+  - Private-equity or listed-company ownership with many layers
+  - Founders using trusts for estate planning
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-059
+  name: Gambling platform with unexplained revenue, changing web addresses, idle licence or 'sham merchant'
+    payments
+  definition: An operator shows sudden unexplained profits, keeps changing its URL or brand, holds a licence
+    it does not use, or disguises gambling payments as another kind of merchant.
+  areas:
+  - ML
+  - OC
+  typology: Illegal or front gambling operators
+  status: verified
+  sources:
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Product and platform features
+    quote: Rapid financial growth or unexplained profitability, sudden spikes in revenue or customer activity...
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Product and platform features
+    quote: Frequent changes of platform URLs /website addresses or company/brand name.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Product and platform features
+    quote: Obtaining a gambling licence followed by prolonged period of operational inactivity
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Product and platform features
+    quote: Abuse of merchant identity (also known as "sham merchants"), where illicit operators disguise
+      themselves...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A betting site advertises in a country where gambling is banned and its card payments show up as an
+    online clothing shop.
+  cases: []
+  data_needed:
+  - Company
+  - Payment
+  - Document
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Domain/WHOIS history and web archives
+  - Gambling licence registers
+  - Card-payment descriptors from customer statements
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Rebranding after a merger
+  - New domains to get around unlawful censorship or for marketing
+  - Licence held while waiting for a market to open
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-060
+  name: Gambling platform targeting countries where gambling is illegal, or customers from such countries
+  definition: An operator advertises to or accepts players based where gambling is banned, often through
+    agents or introducers.
+  areas:
+  - OC
+  typology: Illegal cross-border gambling
+  status: verified
+  sources:
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Product and platform features
+    quote: Online platform advertises in jurisdictions where gambling is illegal.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: 'Red-flag risk indicators, Customer behaviour and profile: Online'
+    quote: The customer is based in a country where gambling is illegal.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Product and platform features
+    quote: Platforms/operators accept new customers through introducers/agents.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Social-media ads for a crypto casino aimed at users in a country with a total gambling ban.
+  cases: []
+  data_needed:
+  - Company
+  - Address
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Ad libraries (e.g. Meta Ad Library)
+  - National gambling laws
+  - Regulator blacklists of unlicensed operators
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ads shown by mistake through broad international targeting
+  - Travellers or expatriates using an account opened legally elsewhere
+  - Legal status of online gambling unclear in that country
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-061
+  name: Junkets or agents bringing players from high-risk jurisdictions
+  definition: Casino junket operators or agents arrange play for gamblers from countries with high money-laundering
+    or corruption risk, often moving the money themselves.
+  areas:
+  - CO
+  - ML
+  - OC
+  typology: Junket and agent-based gambling
+  status: verified
+  sources:
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Product and platform features
+    quote: Junket arrangements pertain to players from high-risk jurisdictions.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Product and platform features
+    quote: Remote service provision or use of agents.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A VIP room is run by a junket operator whose customers are officials from a country with capital controls.
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Representation
+  - Payment
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Casino regulator inquiry reports
+  - Company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: FATF lists politically exposed persons and high-corruption ownership in the same gambling
+      indicator set.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+  innocent_explanations:
+  - Licensed junket operators are lawful in some places
+  - Wealthy foreign tourists using travel agents
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-062
+  name: Dormant gambling account suddenly funded, or funds parked unused
+  definition: An inactive account receives a large deposit that does not fit its history, or money is
+    left sitting in an account for long periods as storage.
+  areas:
+  - ML
+  - OC
+  typology: Gambling account used as a store of value
+  status: verified
+  sources:
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Online accounts
+    quote: An inactive player account is suddenly funded with a large deposit inconsistent with the account's
+      history.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Risks of Gaming and Gambling
+    publisher: FATF
+    year: '2026'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+    locator: Red-flag risk indicators, Payment methods/transactions
+    quote: Leaving large sums of money dormant in account for periods of time (e.g. to hide/store illicit
+      funds)
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An account unused for two years receives a five-figure deposit and is emptied to a new bank account
+    a week later.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - BankAccount
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: FATF notes a new IP address inconsistent with history may indicate account take-over.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/publications/risks-of-gaming-and-gambling-2026.pdf.coredownload.pdf
+  innocent_explanations:
+  - Player returns for a major sporting event
+  - Bonus or windfall income
+  - Forgot money was in the account
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-063
+  name: Tobacco consignments declared as in transit or for export that end up on the local market
+  definition: Cigarettes move under duty-suspended 'in transit' or export paperwork but are diverted and
+    sold where duty should have been paid.
+  areas:
+  - FR
+  - OC
+  typology: 'Illicit tobacco trade: in-transit diversion / large-scale smuggling'
+  status: pending
+  sources:
+  - title: Illicit Tobacco Trade
+    publisher: FATF
+    year: '2012'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+    locator: para. 30(b), p. 10
+    quote: large-scale smuggling takes advantage of the 'in transit' system developed to facilitate international
+      trade.
+    quote_verified: false
+  - title: Typologies Report on Money Laundering Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles
+    publisher: ESAAMLG
+    year: '2012'
+    url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    locator: para. 21, p. 14 (same transit-diversion method, for vehicles)
+    quote: pseudo export (vehicle meant for transit subsequently ending up in local market).
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Containers of cigarettes declared in transit to a neighbouring country never cross the exit border.
+  cases:
+  - name: Box 12 subject, Hezbollah-linked cigarette smuggling (FATF Illicit Tobacco Trade report)
+    year: before 2012
+    jurisdiction: United States
+    what_happened: A person born in Lebanon and others smuggled cigarettes and laundered proceeds, some
+      for Hezbollah.
+    outcome: convicted
+    outcome_verified: false
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+    source_title: FATF, Illicit Tobacco Trade, Box 12, pp. 37-38
+  data_needed:
+  - Company
+  - Contract
+  - Document
+  - Vessel
+  - Address
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Customs transit and bill-of-lading data
+  - Ship tracking
+  - Trade statistics (mirror data)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF Box 12 describes a person convicted in the US of cigarette smuggling, money laundering
+      and material support to Hezbollah.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+  innocent_explanations:
+  - Paperwork errors or late transit closure
+  - Consignment re-routed lawfully with amended documents
+  - Theft from a legitimate shipment
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-064
+  name: Tobacco or excise goods misdescribed or undervalued on customs declarations
+  definition: Cigarette loads are described as other goods, or declared at a lower value, to dodge duty
+    and checks.
+  areas:
+  - FR
+  - OC
+  typology: 'Illicit tobacco trade: false declaration'
+  status: pending
+  sources:
+  - title: Illicit Tobacco Trade
+    publisher: FATF
+    year: '2012'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+    locator: para. 41(c)
+    quote: smugglers incorrectly describe loads to frustrate law enforcement intervention.
+    quote_verified: false
+  - title: Illicit Tobacco Trade
+    publisher: FATF
+    year: '2012'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+    locator: para. 87, p. 30 (methods sighted)
+    quote: False declarations
+    quote_verified: false
+  - title: Illicit Tobacco Trade
+    publisher: FATF
+    year: '2012'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+    locator: para. 86
+    quote: mis-descriptions and even under-evaluation of shipments have been reported.
+    quote_verified: false
+  examples:
+  - A container listed as furniture is found to hold 8 million cigarettes.
+  cases:
+  - name: Hong Kong counterfeit cigarette syndicate (FATF Box 5)
+    year: before 2012
+    jurisdiction: Hong Kong, China
+    what_happened: Three core members and 14 peddlers of a syndicate dealing in forged-trademark cigarettes
+      were charged with money laundering and/or forged trade mark offences; HKD 9.18 million in assets
+      were restrained.
+    outcome: convicted
+    outcome_verified: false
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+    source_title: FATF, Illicit Tobacco Trade, Box 5, p. 28
+  data_needed:
+  - Company
+  - Document
+  - Contract
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Customs seizure announcements
+  - Import/export manifests (e.g. bill-of-lading databases)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Same false-declaration method, applied to excise goods.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+  innocent_explanations:
+  - Wrong tariff code chosen by a broker
+  - Mixed consignments declared under the main item
+  - Transfer-pricing disputes over value
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-065
+  name: '''Cheap white'' cigarette brands, especially from free trade zones'
+  definition: Cigarettes made legally in one country but sold mainly by smuggling into markets where they
+    have no legal distribution, often produced in free trade zones.
+  areas:
+  - FR
+  - OC
+  typology: 'Illicit tobacco trade: cheap whites'
+  status: pending
+  sources:
+  - title: Illicit Tobacco Trade
+    publisher: FATF
+    year: '2012'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+    locator: footnote 2, p. 8
+    quote: Cheap whites are factory made cigarettes produced with the approval of a licensing authority
+      in that jurisdiction.
+    quote_verified: false
+  - title: Illicit Tobacco Trade
+    publisher: FATF
+    year: '2012'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+    locator: para. 35
+    quote: a large concentration of manufacturers in the United Arab Emirates free trade zones.
+    quote_verified: false
+  examples:
+  - A wholesaler sells a brand with no local tax stamps that is made in a free trade zone factory.
+  cases: []
+  data_needed:
+  - Company
+  - Document
+  - Address
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Customs seizure data
+  - Brand/tax-stamp registers
+  - Free-zone company directories
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Free trade zones are also the routing point for counterfeit goods in OC-039.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+  innocent_explanations:
+  - A small brand legally exported with proper duty paid
+  - New brand still awaiting local registration
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-066
+  name: Repeated bulk buying of tobacco in low-tax or duty-free outlets (bootlegging)
+  definition: People buy cigarettes in low-tax countries or duty-free shops again and again, often above
+    personal allowances, to resell where tax is higher.
+  areas:
+  - FR
+  - OC
+  typology: 'Illicit tobacco trade: bootlegging'
+  status: pending
+  sources:
+  - title: Illicit Tobacco Trade
+    publisher: FATF
+    year: '2012'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+    locator: para. 25
+    quote: The smugglers purchase products either in low-tax jurisdictions or at duty-free or similar
+      outlets.
+    quote_verified: false
+  - title: Illicit Tobacco Trade
+    publisher: FATF
+    year: '2012'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+    locator: para. 87, p. 30
+    quote: Abuse of cross border shopping limits
+    quote_verified: false
+  examples:
+  - The same van crosses a border weekly with the maximum allowance for every passenger.
+  cases: []
+  data_needed:
+  - Person
+  - Vehicle
+  - Event
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Border crossing / ANPR records (via court records)
+  - Customs seizure notices
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Cross-border commuters buying for personal use
+  - Buying for family members within allowances
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-067
+  name: Small bank notes swapped for large ones ('refining'), often at casinos
+  definition: Cash in small denominations is exchanged for high-value notes so it is easier to carry and
+    hide, a step typical of laundering street-level cash.
+  areas:
+  - ML
+  - OC
+  typology: Cash refining
+  status: pending
+  sources:
+  - title: Illicit Tobacco Trade
+    publisher: FATF
+    year: '2012'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+    locator: para. 106, p. 38
+    quote: Refining at casinos by exchanging USD 20 dollar bills into USD 100 at casinos.
+    quote_verified: false
+  - title: Illicit Cross-Border Movement of Cash and Bearer Negotiable Instruments in the ESAAMLG Region
+    publisher: ESAAMLG
+    year: '2025'
+    url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    locator: para. 76
+    quote: A recurring trend observed is the preference for high-denomination banknotes, such as USD 100
+      bills, due to their high value-to-size ratio and weight
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A customer buys chips with bags of USD 20 notes, plays briefly and cashes out in USD 100 notes.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Refining at casinos uses the same low-play pass-through pattern.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+  innocent_explanations:
+  - Cash businesses (shops, bars) converting takings
+  - Travellers wanting compact cash
+  jurisdictions: Global (FATF, ESAAMLG)
+  version: 1
+- id: OC-068
+  name: Ransom paid in bulk cash by air drop or courier, mostly in USD 100 notes
+  definition: A ransom for a hijacked ship or kidnapped person is delivered as physical cash, usually
+    high-denomination dollars, dropped from the air or handed over by a hired firm, outside the banking
+    system.
+  areas:
+  - OC
+  - SF
+  typology: Maritime piracy / kidnap for ransom
+  status: pending
+  sources:
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+    locator: para. 40, p. 18
+    quote: Eighty percent of ransoms are delivered by air drop, as it entails less risk than any other
+      method.
+    quote_verified: false
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+    locator: para. 25, p. 14
+    quote: payments often do not result in bulk cash disclosures/declarations
+    quote_verified: false
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+    locator: PFR Case Study 1 (M.V. Danica White), pp. 11-12
+    quote: The bulk cash was delivered by a privately hired company to the pirates at a hotel in Dubai
+      on 18 August 2007.
+    quote_verified: false
+  examples:
+  - A shipowner withdraws USD 1.7 million in cash from its bank and pays a firm to air-drop it near the
+    hijacked ship (M.V. CEC Future, 2009, as described by FATF).
+  cases: []
+  data_needed:
+  - Company
+  - Vessel
+  - Payment
+  - BankAccount
+  - Person
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Ship tracking and piracy incident databases (e.g. IMB reports)
+  - Insurance and court filings
+  - Cash declaration records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF examines kidnapping for ransom as a means of financing terrorism (e.g. AQIM and Abu Sayyaf
+      case studies).
+    source_url: https://fatf-gafi.org/en/publications/Methodsandtrends/Organisedmaritimepiracyandrelatedkidnappingforransom.html
+  innocent_explanations:
+  - Ransom payments by shipowners and insurers to free crews were lawful in many countries at the time;
+    the payer is usually a victim
+  - Large cash withdrawals by shipping firms for crew wages or port fees
+  jurisdictions: Horn of Africa and global (FATF)
+  version: 1
+- id: OC-069
+  name: Investors or financiers backing pirate or kidnapping groups for a share of ransoms
+  definition: People supply boats, weapons, fuel and supplies to a pirate group in return for a share
+    of any ransom, acting like investors in a criminal venture.
+  areas:
+  - OC
+  - SF
+  typology: Maritime piracy financing
+  status: pending
+  sources:
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+    locator: para. 38, p. 17
+    quote: Shares in a given syndicate may cost five to ten thousand dollars each.
+    quote_verified: false
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+    locator: Case 6, p. 15
+    quote: the financiers who outfit pirate bands with boats, weapons and communications gear
+    quote_verified: false
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+    locator: para. 37, p. 17
+    quote: Successful syndicates can command as much as a 50 per cent share
+    quote_verified: false
+  examples:
+  - A businessman pays for skiffs and fuel and later receives the largest single share of a ransom.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Vessel
+  - Associate
+  - Asset
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: FATF reports that Puntland authorities have been implicated in supporting or participating
+      in piracy networks.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+  innocent_explanations:
+  - Legitimate fishing or boat-hire investment
+  - Supplying fuel or food to coastal traders without knowledge of piracy
+  jurisdictions: Horn of Africa (FATF)
+  version: 1
+- id: OC-070
+  name: Payments to hostage negotiators, middlemen or intermediaries
+  definition: Fees or bonuses go to people who negotiate or carry ransoms, or a ransom is paid to an intermediary
+    rather than directly to the kidnappers.
+  areas:
+  - OC
+  - SF
+  typology: Kidnap for ransom / piracy
+  status: pending
+  sources:
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+    locator: PFR Case Study 2, para. 22
+    quote: a separate payment of USD 75 000 would be provided if the negotiator could convince the pirates.
+    quote_verified: false
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+    locator: KFR Case Study 1, para. 64
+    quote: the government of the two captives, paid out EUR 3.8 million (USD 5.45 million) to an intermediary.
+    quote_verified: false
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+    locator: para. 38
+    quote: are paid to individuals with singular tasks such as armed guards, interpreters, and middlemen.
+    quote_verified: false
+  examples:
+  - A pirates' negotiator with Dubai connections receives a share after a ship is released (M.V. Pompei,
+    per Belgian authorities in the FATF report).
+  cases: []
+  data_needed:
+  - Person
+  - Representation
+  - Payment
+  - Associate
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF KFR Case 1 describes ransoms for AQIM hostages paid through an intermediary.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+  innocent_explanations:
+  - Professional crisis-response consultants hired by insurers and paid lawful fees
+  - Interpreters hired for legitimate negotiation
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-071
+  name: Ransom or piracy money moved through hawala to a third country
+  definition: After a ransom is paid, the money is moved through informal value-transfer networks such
+    as hawala, often to the UAE, leaving no bank trail.
+  areas:
+  - ML
+  - OC
+  - SF
+  typology: Ransom laundering via alternative remittance
+  status: pending
+  sources:
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+    locator: PFR Case Study 3 (M.V. Pompei), p. 13
+    quote: transferred to the UAE via hawala transactions
+    quote_verified: false
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+    locator: para. 62, p. 26
+    quote: the money flows through alternative remittance systems such as hawalas
+    quote_verified: false
+  examples:
+  - A ransom dropped at sea is later traced to Djibouti and then onward to the UAE through hawala.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - MSB / remittance licence registers
+  - Court records
+  - Sanctions lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: FATF describes hawala as a channel for kidnapping-for-ransom proceeds linked to terrorist
+      groups.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+  innocent_explanations:
+  - Hawala is widely used by diaspora communities for lawful remittances where banks are scarce
+  - FATF itself notes debate about whether Somali pirates use hawalas
+  jurisdictions: Horn of Africa, Gulf (FATF)
+  version: 1
+- id: OC-072
+  name: Sudden wealth, property buying or payments to local leaders in piracy-linked coastal areas
+  definition: After ransoms are paid, money appears locally as property purchases, spending, or payments
+    to clan chiefs and militia.
+  areas:
+  - CO
+  - OC
+  typology: Integration of piracy proceeds
+  status: pending
+  sources:
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+    locator: para. 42, p. 19
+    quote: anecdotes that the proceeds of piracy have been used to purchase real estate in Puntland
+    quote_verified: false
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+    locator: para. 41, p. 18
+    quote: payments to local clan chiefs and militia
+    quote_verified: false
+  - title: Organised Maritime Piracy and Related Kidnapping for Ransom
+    publisher: FATF
+    year: '2011'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/organised%20maritime%20piracy%20and%20related%20kidnapping%20for%20ransom.pdf.coredownload.pdf
+    locator: para. 42, p. 19 (caveat)
+    quote: there has been no evidentiary link between real property purchases
+    quote_verified: false
+  examples:
+  - A building boom in a coastal town after a run of ransom payments, with buyers unable to explain their
+    funds.
+  cases: []
+  data_needed:
+  - Person
+  - RealEstate
+  - Payment
+  - Associate
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Diaspora remittances funding construction
+  - Legitimate trade or aid-driven growth
+  - FATF notes no evidentiary link was established for property purchases
+  jurisdictions: Somalia/Kenya (FATF)
+  version: 1
+- id: OC-073
+  name: Tampered, duplicated or cloned vehicle identity (VIN/chassis, plates, registration)
+  definition: A vehicle's chassis or engine number, plates or registration are altered or copied from
+    another vehicle so a stolen car can be sold as legitimate.
+  areas:
+  - OC
+  typology: Vehicle theft, cloning and smuggling
+  status: verified
+  sources:
+  - title: Typologies Report on Money Laundering Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles
+    publisher: ESAAMLG
+    year: '2012'
+    url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    locator: Section I, General Indicators, p. 22
+    quote: Tempered registration/chassis number and information plate
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Typologies Report on Money Laundering Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles
+    publisher: ESAAMLG
+    year: '2012'
+    url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    locator: Section I, General Indicators, p. 22
+    quote: Different registration numbers for the same vehicle
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Typologies Report on Money Laundering Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles
+    publisher: ESAAMLG
+    year: '2012'
+    url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    locator: Section I, General Indicators, p. 22
+    quote: False Foreign registration plates
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A hijacked car carries the chassis number of an insurance write-off of the same model (ESAAMLG Case
+    Study 1, 'Cloning').
+  cases: []
+  data_needed:
+  - Vehicle
+  - Person
+  - Ownership
+  - Document
+  checkable: lookups
+  lookup_sources:
+  - Vehicle registration databases
+  - INTERPOL Stolen Motor Vehicles database (via police)
+  - Insurance write-off registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Clerical registration errors
+  - Lawful re-registration after import
+  - Personalised or transferred number plates
+  jurisdictions: Southern and Eastern Africa (ESAAMLG); widely seen elsewhere
+  version: 1
+- id: OC-074
+  name: Same people repeatedly crossing borders with different vehicles, often luxury ones
+  definition: The same drivers take a series of different high-value vehicles across a border, which suggests
+    they are delivering stolen cars.
+  areas:
+  - OC
+  typology: Vehicle smuggling
+  status: verified
+  sources:
+  - title: Typologies Report on Money Laundering Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles
+    publisher: ESAAMLG
+    year: '2012'
+    url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    locator: Section I, General Indicators, p. 22
+    quote: Same people crossing borders with different luxury vehicles.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Typologies Report on Money Laundering Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles
+    publisher: ESAAMLG
+    year: '2012'
+    url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    locator: Section I, General Indicators, p. 22
+    quote: Same people transporting vehicles across the borders
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A customs officer notices the same men driving a different Range Rover into the next country every
+    few weeks (ESAAMLG Case Study 2).
+  cases:
+  - name: Southern African stolen luxury vehicle syndicate (ESAAMLG Case Study 2)
+    year: '2011'
+    jurisdiction: Botswana (also South Africa, Zimbabwe, Zambia, Mozambique)
+    what_happened: A syndicate stole 28 vehicles in South Africa, fitted false Zambian plates and papers,
+      and sold them via Zimbabwe; a buyer bought property with suspected proceeds. Members were tried
+      in Botswana and fined for possessing property reasonably suspected to be stolen.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    source_title: ESAAMLG, Typologies Report on ML Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles, Case Study 2, pp. 19-20
+  data_needed:
+  - Person
+  - Vehicle
+  - Event
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Border crossing records (via court files)
+  - Vehicle registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Professional car delivery drivers
+  - Licensed dealers exporting used cars
+  - Rental fleet staff
+  jurisdictions: Southern and Eastern Africa (ESAAMLG)
+  version: 1
+- id: OC-075
+  name: Vehicles declared in transit, or as spare parts, that end up sold locally or reassembled
+  definition: Vehicles meant to pass through a country are sold there instead, or stolen cars are cut
+    up, declared as spare parts and rebuilt at the destination.
+  areas:
+  - FR
+  - OC
+  typology: Pseudo export and chop shops
+  status: verified
+  sources:
+  - title: Typologies Report on Money Laundering Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles
+    publisher: ESAAMLG
+    year: '2012'
+    url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    locator: para. 21, p. 14
+    quote: chopping to hide the true identity of the motor vehicle, use of ungazetted routes and pseudo
+      export (vehicle meant for transit subsequently ending up in local market).
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Typologies Report on Money Laundering Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles
+    publisher: ESAAMLG
+    year: '2012'
+    url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    locator: Case Study 1, 'Chop Shops', p. 17
+    quote: The vehicles would be declared as parts/spares with Customs, leading to commission of false
+      declaration offences.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Typologies Report on Money Laundering Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles
+    publisher: ESAAMLG
+    year: '2012'
+    url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    locator: Section I, General Indicators, p. 22
+    quote: Misclassification of motor vehicles on documentation.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A container of 'used engine parts' turns out to hold a dismantled stolen SUV.
+  cases: []
+  data_needed:
+  - Vehicle
+  - Company
+  - Document
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - Customs manifests
+  - Vehicle registries
+  - Port records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Same transit-diversion method used for tobacco.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Illicit%20Tobacco%20Trade.pdf.coredownload.inline.pdf
+  innocent_explanations:
+  - Legitimate spare-parts trade from salvage yards
+  - Transit buyer pulled out and duties were later paid
+  jurisdictions: Southern and Eastern Africa (ESAAMLG)
+  version: 1
+- id: OC-076
+  name: Bonded warehouse records that do not reconcile
+  definition: A customs-bonded warehouse's records of vehicles or goods coming in and going out do not
+    match, or its bond is too small for the stock it holds.
+  areas:
+  - CO
+  - FR
+  - OC
+  typology: Bonded warehouse abuse
+  status: verified
+  sources:
+  - title: Typologies Report on Money Laundering Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles
+    publisher: ESAAMLG
+    year: '2012'
+    url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    locator: Section I, General Indicators, p. 22
+    quote: Irreconcilable records on import and export of motor vehicles entering and leaving a warehouse.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Typologies Report on Money Laundering Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles
+    publisher: ESAAMLG
+    year: '2012'
+    url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    locator: Case Study 1, p. 16
+    quote: bond sureties held were insufficient in relation to the stock on hand, there were discrepancies
+      between the manual invoices amounts and the electronic invoices amounts
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Vehicles imported to a bonded warehouse for re-export to neighbouring countries are sold locally without
+    duty.
+  cases:
+  - name: Port-area bonded warehouse syndicate (ESAAMLG Case Study 1)
+    year: c. 2012 (reported)
+    jurisdiction: South Africa and BLNS countries
+    what_happened: Bonded warehouses sold vehicles meant for other countries on the local market; inspections
+      found insufficient sureties and invoice discrepancies. Authorities collected about USD 2,300,405
+      in lieu of penalties and temporarily closed 18 warehouses.
+    outcome: fined_by_regulator
+    outcome_verified: true
+    source_url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    source_title: ESAAMLG, Typologies Report on ML Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles, Case Study 1, pp. 16-18
+  data_needed:
+  - Company
+  - Vehicle
+  - Document
+  - Contract
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: ESAAMLG lists 'Same officers assisting particular customers' and corrupt registration of the
+      vehicles in the same case.
+    source_url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+  innocent_explanations:
+  - Poor bookkeeping or system migration
+  - Timing differences between manual and electronic records
+  jurisdictions: Southern and Eastern Africa (ESAAMLG)
+  version: 1
+- id: OC-077
+  name: Vehicle exported, then reported stolen for insurance, or repeated claims from the same dealers
+  definition: An owner sends a car abroad for sale and then claims it was stolen, or many insurance claims
+    come through the same dealers.
+  areas:
+  - FR
+  - OC
+  typology: Vehicle smuggling with insurance fraud
+  status: verified
+  sources:
+  - title: Typologies Report on Money Laundering Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles
+    publisher: ESAAMLG
+    year: '2012'
+    url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    locator: Executive summary, p. 5
+    quote: insurance companies are widely affected by fraudulent claims made by motor vehicle owners who
+      illegally export their vehicles and later report them stolen.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Typologies Report on Money Laundering Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles
+    publisher: ESAAMLG
+    year: '2012'
+    url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    locator: Section I, General Indicators, p. 22
+    quote: Motor vehicle insurance claims from the same dealers.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A car reported stolen in South Africa is found registered and sold in Namibia under a cloned identity
+    (ESAAMLG Case Study 3).
+  cases: []
+  data_needed:
+  - Vehicle
+  - Person
+  - Company
+  - Document
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Insurance fraud databases
+  - Vehicle registries in destination countries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine theft followed by cross-border trafficking by thieves
+  - A dealer with high volume naturally has more claims
+  jurisdictions: Southern and Eastern Africa (ESAAMLG)
+  version: 1
+- id: OC-078
+  name: Vehicles sold well below market price, registered to proxies or through front companies
+  definition: Cars are offered far below normal prices, registered in someone else's name, or traded through
+    front companies, hiding who really owns them.
+  areas:
+  - ML
+  - OC
+  typology: Vehicle smuggling and vehicles as laundering assets
+  status: verified
+  sources:
+  - title: Typologies Report on Money Laundering Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles
+    publisher: ESAAMLG
+    year: '2012'
+    url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    locator: Section I, General Indicators, p. 22
+    quote: Vehicles being sold at low prices.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Typologies Report on Money Laundering Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles
+    publisher: ESAAMLG
+    year: '2012'
+    url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    locator: Section I, General Indicators, p. 22
+    quote: Proxy registration
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Typologies Report on Money Laundering Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles
+    publisher: ESAAMLG
+    year: '2012'
+    url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    locator: Section I, General Indicators, p. 22
+    quote: Use of front companies
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A late-model SUV is advertised at half its usual price and its registered owner is an unrelated pensioner.
+  cases: []
+  data_needed:
+  - Vehicle
+  - Person
+  - Company
+  - Ownership
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Vehicle registries
+  - Classified-ad archives
+  - Company registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: The catalogue's SF area already flags car sales and car-shipping businesses for terrorist
+      financing.
+    source_url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+  innocent_explanations:
+  - Distressed sale or damaged vehicle
+  - Family member registering a car for someone without credit or licence
+  - Grey imports that are legal but cheaper
+  jurisdictions: Southern and Eastern Africa (ESAAMLG)
+  version: 1
+- id: OC-079
+  name: Cash carried across a border without a declaration or with a false one
+  definition: A traveller carries cash or bearer instruments above the declaration threshold without declaring
+    it, or declares less or a false purpose.
+  areas:
+  - ML
+  - OC
+  - SF
+  typology: Cross-border cash smuggling (cash couriers)
+  status: verified
+  sources:
+  - title: Illicit Cross-Border Movement of Cash and Bearer Negotiable Instruments in the ESAAMLG Region
+    publisher: ESAAMLG
+    year: '2025'
+    url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    locator: para. 29
+    quote: exceeding a pre-set threshold of USD/EUR 15,000 to submit a truthful declaration to the
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Illicit Cross-Border Movement of Cash and Bearer Negotiable Instruments in the ESAAMLG Region
+    publisher: ESAAMLG
+    year: '2025'
+    url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    locator: para. 66
+    quote: Customs authorities in the ESAAMLG region have produced 43,527 cross-border cash movement reports,
+      most of which are related to false declarations or failure to declare.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Three travellers fly out via Namibia with about USD 157,000 undeclared, having entered by road without
+    declaring it either (ESAAMLG Case Study 3).
+  cases:
+  - name: Three Angolan travellers at Hosea Kutako International Airport (ESAAMLG Case Study 3)
+    year: 2019-2020
+    jurisdiction: Namibia
+    what_happened: Three women travelling to China carried about USD 157,261 undeclared, hidden in clothing,
+      shoes and adult diapers. They pleaded guilty in 2020 under the Financial Intelligence Act and Exchange
+      Control Regulations and were fined.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    source_title: ESAAMLG, Illicit Cross-Border Movement of Cash and BNIs, Case Study 3, p. 28
+  data_needed:
+  - Person
+  - Passport
+  - Payment
+  - Event
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Customs seizure press releases
+  - Court records
+  - Cash declaration data (FIU, rarely public)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Cash or BNIs above the national declaration threshold carried without a truthful declaration
+      (FATF R.32 sets the threshold at no more than USD/EUR 15,000; ESAAMLG countries range from USD 750
+      to USD 15,000)
+    threshold_source: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: ESAAMLG frames the study around both money laundering and terrorist financing through cash
+      couriers under FATF R.32.
+    source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  innocent_explanations:
+  - Traveller unaware of the declaration rule
+  - Informal cross-border traders carrying working capital
+  - People in cash economies moving savings when banks are weak
+  jurisdictions: Global (FATF Recommendation 32); ESAAMLG region
+  version: 1
+- id: OC-080
+  name: Cash hidden in luggage, food, goods, vehicles, electronics or on the body
+  definition: Cash is concealed in false bottoms, cargo, food, car seats, fuel tanks, hollowed electronics,
+    or strapped to the body to get it across a border.
+  areas:
+  - ML
+  - OC
+  typology: Cash smuggling concealment
+  status: verified
+  sources:
+  - title: Illicit Cross-Border Movement of Cash and Bearer Negotiable Instruments in the ESAAMLG Region
+    publisher: ESAAMLG
+    year: '2025'
+    url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    locator: section 4.3, para. 75
+    quote: These include concealment in handbags, passenger baggage, food items, on the person, false-bottom
+      containers, goods packages, motor vehicles, and electronic devices.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Illicit Cross-Border Movement of Cash and Bearer Negotiable Instruments in the ESAAMLG Region
+    publisher: ESAAMLG
+    year: '2025'
+    url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    locator: section 4.3.6, para. 86
+    quote: The technique also overlaps with trade-based money laundering (TBML), as cash may be concealed
+      in packages labelled as business deliveries.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Cash wrapped in plastic inside sacks of groundnuts declared as an agricultural export (ESAAMLG para.
+    87).
+  cases: []
+  data_needed:
+  - Person
+  - Vehicle
+  - Document
+  - Event
+  checkable: lookups
+  lookup_sources:
+  - Customs and border agency seizure announcements
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: ESAAMLG notes cash hidden in trade goods overlaps with trade-based money laundering.
+    source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  innocent_explanations:
+  - Travellers hiding money from thieves, not from customs (still an offence if undeclared)
+  jurisdictions: ESAAMLG region; global
+  version: 1
+- id: OC-081
+  name: Cash declarations kept just below the border threshold
+  definition: Travellers declare or carry amounts just under the declaration limit, knowing authorities
+    focus on amounts above it.
+  areas:
+  - ML
+  - OC
+  typology: Structuring of cross-border cash
+  status: verified
+  sources:
+  - title: Illicit Cross-Border Movement of Cash and Bearer Negotiable Instruments in the ESAAMLG Region
+    publisher: ESAAMLG
+    year: '2025'
+    url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    locator: para. 69
+    quote: countries tend to allocate more resources to analyse declarations above the threshold, which
+      may encourage criminals to declare amounts just below the threshold to avoid detection.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Several members of a group each cross with just under USD 10,000 on the same flight.
+  cases: []
+  data_needed:
+  - Person
+  - Passport
+  - Payment
+  - Event
+  - Associate
+  checkable: lookups
+  lookup_sources:
+  - Cash declaration records (FIU/customs, via court files or FOI)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (threshold set nationally)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Same threshold-avoidance logic as domestic structuring.
+    source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  innocent_explanations:
+  - Travellers carrying round amounts that happen to be under the limit
+  - Family members each carrying their own travel money
+  jurisdictions: ESAAMLG region; global
+  version: 1
+- id: OC-082
+  name: Frequent travellers repeatedly carrying large cash, or claiming to be traders
+  definition: The same couriers make repeated trips carrying cash, often describing themselves as regular
+    traders, on routes linked to transnational networks.
+  areas:
+  - ML
+  - OC
+  typology: Cash couriers
+  status: verified
+  sources:
+  - title: Illicit Cross-Border Movement of Cash and Bearer Negotiable Instruments in the ESAAMLG Region
+    publisher: ESAAMLG
+    year: '2025'
+    url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    locator: Case Study 3, p. 28
+    quote: Investigations revealed that the women had entered Namibia by road via Oshikango border post
+      without declaring the funds and were frequent travelers from Angola.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Illicit Cross-Border Movement of Cash and Bearer Negotiable Instruments in the ESAAMLG Region
+    publisher: ESAAMLG
+    year: '2025'
+    url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    locator: para. 97
+    quote: The report shows that 58.82% of couriers originate from outside ESAAMLG, confirming the use
+      of transcontinental routes
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Six travellers say they are regular importers of clothes and shoes; their luggage holds USD 857,300
+    (ESAAMLG Case Study 8, Kenya, 2022; investigation ongoing).
+  cases: []
+  data_needed:
+  - Person
+  - Passport
+  - Event
+  - Associate
+  checkable: lookups
+  lookup_sources:
+  - Customs seizure records
+  - Travel records disclosed in court
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: ESAAMLG lists possible human trafficking among the predicate offences behind illicit cross-border
+      cash.
+    source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  innocent_explanations:
+  - Genuine informal cross-border traders who buy stock with cash
+  - Business travellers in cash-based economies
+  jurisdictions: ESAAMLG region; global
+  version: 1
+- id: OC-083
+  name: Crossing at unofficial or ungazetted border points with cash or goods
+  definition: Couriers avoid official crossings and use remote, unpatrolled routes to move cash, vehicles
+    or goods.
+  areas:
+  - OC
+  typology: Smuggling via unofficial crossings
+  status: verified
+  sources:
+  - title: Illicit Cross-Border Movement of Cash and Bearer Negotiable Instruments in the ESAAMLG Region
+    publisher: ESAAMLG
+    year: '2025'
+    url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    locator: para. 122
+    quote: These criminal syndicates often exploit unofficial border crossings (see case below), such
+      as remote or less-patrolled entry points, to bypass border security measures.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Typologies Report on Money Laundering Related to Illicit Dealings in and Smuggling of Motor
+      Vehicles
+    publisher: ESAAMLG
+    year: '2012'
+    url: https://www.esaamlg.org/reports/Illicit%20Dealings%20in%20and%20Smuggling%20of%20Motor%20Vehicles%20Report..pdf
+    locator: para. 21, p. 14
+    quote: Motor vehicles are driven through unmanned entry and exit ports
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A man arrested on the Botswana border line with ZAR 508,400 is charged with entering through an ungazetted
+    point and failing to declare (ESAAMLG Case Study 5).
+  cases: []
+  data_needed:
+  - Person
+  - Vehicle
+  - Event
+  - Address
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Border communities that cross informally for daily life
+  - Official posts far away or closed
+  jurisdictions: ESAAMLG region
+  version: 1
+- id: OC-084
+  name: Bearer cheques, money orders or certified cheques sent by post or courier as 'documents'
+  definition: Bearer negotiable instruments are mailed or couriered, often declared as documents, to move
+    value without a bank transfer or a cash declaration.
+  areas:
+  - FR
+  - ML
+  - OC
+  typology: Cross-border BNI movement
+  status: verified
+  sources:
+  - title: Illicit Cross-Border Movement of Cash and Bearer Negotiable Instruments in the ESAAMLG Region
+    publisher: ESAAMLG
+    year: '2025'
+    url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    locator: para. 33-34 area (declaration gaps)
+    quote: However, the declaration system does not cover BNIs transported via mail and cargo.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Illicit Cross-Border Movement of Cash and Bearer Negotiable Instruments in the ESAAMLG Region
+    publisher: ESAAMLG
+    year: '2025'
+    url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+    locator: Case Study 8 (Mauritius, BNIs), p. 43
+    quote: upon examination of two parcels declared to contain documents consigned from Canada and addressed
+      to a local resident, found thirty certified cheques
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Courier parcels declared as documents contain thirty signed, mostly undated certified cheques (Mauritius,
+    2025; under investigation).
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Address
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Customs/courier seizure notices
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Cheques of implausible value, as in the Mauritius case, often belong to advance-fee or instrument
+      fraud.
+    source_url: https://www.esaamlg.org/reports/Illicit%20Movement%20of%20Cash%20and%20BNIs-September%202025.pdf
+  innocent_explanations:
+  - Businesses mailing cheques as payment in countries where cheques are still common
+  - Elderly people sending money orders to relatives
+  jurisdictions: ESAAMLG region; global
+  version: 1
+- id: OC-085
+  name: Round-figure payments (about USD 50,000 steps) to East Asian trading companies
+  definition: A business sends or receives payments for goods in round amounts, often in steps of roughly
+    USD 50,000, to trading firms in East Asia or the Americas, a pattern linked to drug-money settlement.
+  areas:
+  - ML
+  - OC
+  typology: Trade-based ML for synthetic opioid networks
+  status: verified
+  sources:
+  - title: Money Laundering from Fentanyl and Synthetic Opioids
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+    locator: Risk indicators, Trade Based Money Laundering
+    quote: orders or receives payments for goods in round figures or in increments of approximately USD
+      50 000.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Laundering from Fentanyl and Synthetic Opioids
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+    locator: Risk indicators, Trade Based Money Laundering
+    quote: orders electronic funds transfers to the benefit of East Asia-based trading companies or individuals…
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A small wholesaler wires exactly USD 50,000, USD 100,000 and USD 150,000 to three Asian 'trading'
+    firms in a month.
+  cases:
+  - name: Xiangbin Gan (FATF Box 3.1)
+    year: 2018 (arrest)
+    jurisdiction: United States
+    what_happened: Laundered narcotics proceeds for Mexican traffickers; arrested in November 2018 and
+      sentenced by a federal judge in Chicago to 14 years in prison.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+    source_title: FATF, Money Laundering from Fentanyl and Synthetic Opioids, Box 3.1
+  data_needed:
+  - Company
+  - Payment
+  - BankAccount
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: Repeated payments in round figures or approximate USD 50,000 increments (FATF)
+    textbook: Meets the published definition as worded
+    threshold_source: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FATF places this under trade-based money laundering indicators.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+  innocent_explanations:
+  - Deposits or instalments on large orders often use round numbers
+  - Normal trade with Asian suppliers
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-086
+  name: Trade account used as a pass-through, or imports paid by someone other than the buyer
+  definition: A trading company's account moves large sums in and straight out, cash is wired to free
+    trade zones, or a third party pays for goods with no clear reason.
+  areas:
+  - ML
+  - OC
+  typology: Trade-based ML / third-party payments
+  status: verified
+  sources:
+  - title: Money Laundering from Fentanyl and Synthetic Opioids
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+    locator: Risk indicators, account and transaction activity
+    quote: An account of a trade entity appears to be a "pay-through" or "transit" account with a rapid
+      movement of high-volume…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Laundering from Fentanyl and Synthetic Opioids
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+    locator: Risk indicators, account and transaction activity
+    quote: Payment for imported commodities is made by an entity other than the consignee of the commodities
+      with no clear economic reasons…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Laundering from Fentanyl and Synthetic Opioids
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+    locator: Risk indicators, account and transaction activity
+    quote: An account displays frequent deposits in cash which are subsequently transferred to persons
+      or entities in free trade zones…
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A furniture importer's bill is paid by an unrelated money-services business abroad.
+  cases: []
+  data_needed:
+  - Company
+  - Payment
+  - BankAccount
+  - Contract
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Third-party payment for trade is a core trade-based ML red flag in FATF guidance.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+  innocent_explanations:
+  - Group treasury paying on behalf of a subsidiary
+  - Factoring or trade-finance arrangements
+  - Customers paying the supplier directly in drop-ship deals
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-087
+  name: Vague descriptions of chemicals on contracts, invoices or trade papers
+  definition: Trade documents describe chemicals loosely or inconsistently so that controlled precursors
+    are hard to identify.
+  areas:
+  - OC
+  typology: Synthetic drug precursor trafficking
+  status: verified
+  sources:
+  - title: Money Laundering from Fentanyl and Synthetic Opioids
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+    locator: Risk indicators (procurement)
+    quote: Contracts, invoices, or other trade documents have vague descriptions of the traded chemicals…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Laundering from Fentanyl and Synthetic Opioids
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+    locator: Risk indicators, Trade Based Money Laundering
+    quote: Inconsistencies across contracts, invoices, or other trade documents, e.g., contradictions
+      between the name of the exporting entity…
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An invoice lists 'industrial chemical powder' with no CAS number or concentration.
+  cases: []
+  data_needed:
+  - Document
+  - Contract
+  - Company
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Poor paperwork by small traders
+  - Trade names used instead of chemical names
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-088
+  name: Trading company with dormant periods or trade unrelated to its stated business
+  definition: A trading firm goes quiet for long periods or suddenly trades in goods unrelated to its
+    line of business, using many unrelated intermediaries.
+  areas:
+  - ML
+  - OC
+  typology: Trade-based ML / front companies
+  status: verified
+  sources:
+  - title: Money Laundering from Fentanyl and Synthetic Opioids
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+    locator: Risk indicators, Trade Based Money Laundering
+    quote: A trade entity has unexplained periods of dormancy.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Laundering from Fentanyl and Synthetic Opioids
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+    locator: Risk indicators, Trade Based Money Laundering
+    quote: Trade activity is inconsistent with the stated line of business of the entities involved, e.g.,
+      a car dealer…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Laundering from Fentanyl and Synthetic Opioids
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+    locator: Risk indicators, Trade Based Money Laundering
+    quote: A trade entity engages in complex trade deals involving numerous third-party intermediaries
+      in incongruent lines of business.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A car dealer that was inactive for a year starts paying Asian chemical suppliers.
+  cases: []
+  data_needed:
+  - Company
+  - Payment
+  - Contract
+  - Directorship
+  checkable: lookups
+  lookup_sources:
+  - Company registry filings
+  - Customs/bill-of-lading databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Same front-company signals applied to the buyer side.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+  innocent_explanations:
+  - Seasonal businesses
+  - Firms pivoting to new products
+  - Shelf companies bought for a new venture
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-089
+  name: Personal account behaving like an unlicensed money-transfer business (professional money laundering)
+  definition: An individual's accounts take in many wires and cash from many sources, exchange multiple
+    currencies and buy many bank drafts, like an unregistered money service business working for criminals.
+  areas:
+  - ML
+  - OC
+  typology: Professional money laundering networks / underground banking
+  status: verified
+  sources:
+  - title: Money Laundering from Fentanyl and Synthetic Opioids
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+    locator: Risk indicators, Professional Money Laundering Networks
+    quote: Maintains personal account activity similar to that of a money services business;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Laundering from Fentanyl and Synthetic Opioids
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+    locator: Risk indicators, Professional Money Laundering Networks
+    quote: Lists occupation as immigration consultant, student, homemaker or unemployed;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Laundering from Fentanyl and Synthetic Opioids
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+    locator: Risk indicators, Professional Money Laundering Networks
+    quote: Places large, structured cash deposits into the same account at multiple locations on the same
+      day; and
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A 'student' holds accounts at nine banks, deposits cash at several branches on one day, and buys self-addressed
+    bank drafts.
+  cases: []
+  data_needed:
+  - Person
+  - BankAccount
+  - Payment
+  - Employment
+  - Address
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: FATF treats professional money laundering networks as a cross-cutting ML threat, not only
+      for drugs.
+    source_url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+  innocent_explanations:
+  - Informal community money pooling
+  - Students receiving family funds from abroad
+  - Small import businesses run from personal accounts
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-090
+  name: Many small transfers or small crypto payments typical of low-level drug selling
+  definition: A person receives many small electronic transfers or makes many small payments, or uses
+    dark-web markets and crypto in small incremental amounts.
+  areas:
+  - ML
+  - OC
+  typology: Retail drug trafficking proceeds
+  status: verified
+  sources:
+  - title: Money Laundering from Fentanyl and Synthetic Opioids
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+    locator: Risk indicators, Account and transaction activity suggestive of low-level trafficking
+    quote: Person receives numerous small-scale electronic funds transfers, or makes a significant number
+      of small payments…
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Money Laundering from Fentanyl and Synthetic Opioids
+    publisher: FATF
+    year: '2022'
+    url: https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Money-Laundering-Fentanyl-Synthetic-Opioids.pdf.coredownload.inline.pdf
+    locator: Risk indicators, Account and transaction activity suggestive of low-level trafficking
+    quote: Client has funds deposited into account in amounts below the reporting threshold from what
+      appear to be multiple third parties…
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A payment-app account receives dozens of 20-50 dollar transfers a day from different people.
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - BankAccount
+  - CryptoWallet
+  checkable: records
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Low-level selling through deal lines produces this payment pattern; county lines guidance
+      lists unexplained deposits as a sign.
+    source_url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+  innocent_explanations:
+  - Small online sellers, gig workers, tutors or hairdressers paid by app
+  - Friends splitting bills
+  jurisdictions: Global (FATF)
+  version: 1
+- id: OC-091
+  name: Dedicated 'deal line' phone or multiple phones and SIM cards
+  definition: A drug network runs sales through a branded mobile number (the 'line'), and people working
+    for it carry several handsets or SIM cards and get constant calls and texts.
+  areas:
+  - HT
+  - OC
+  typology: County lines drug supply
+  status: verified
+  sources:
+  - title: County Lines
+    publisher: National Crime Agency
+    url: https://www.nationalcrimeagency.gov.uk/what-we-do/crime-threats/drug-trafficking/county-lines
+    locator: NPCC definition
+    quote: a term used to describe gangs and organised criminal networks involved in exporting illegal
+      drugs into one or more importing areas
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Criminal exploitation of children and vulnerable adults: county lines'
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+    locator: Definition; Signs to look out for, possessions
+    quote: excessive receipt of texts/phone calls and/or having multiple sim cards or handsets
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A teenager carries two cheap phones that ring constantly with short calls from unknown numbers.
+  cases: []
+  data_needed:
+  - Person
+  - Email
+  - UnknownLink
+  - Associate
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Home Office guidance says child criminal exploitation is common in county lines.
+    source_url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+  innocent_explanations:
+  - Separate work and personal phones
+  - Cheap SIMs used for travel or better tariffs
+  - Popular young person with a busy social life
+  jurisdictions: United Kingdom (NCA, Home Office)
+  version: 1
+- id: OC-092
+  name: Young people moved between areas by unknown adults, unfamiliar with where they are, going missing
+  definition: Children or young adults go missing, travel on unusual train journeys or in cars and taxis
+    with unknown adults, and turn up in towns they do not know, which signals they are being used to carry
+    drugs.
+  areas:
+  - HT
+  - OC
+  typology: County lines / child criminal exploitation
+  status: verified
+  sources:
+  - title: County Lines
+    publisher: National Crime Agency
+    url: https://www.nationalcrimeagency.gov.uk/what-we-do/crime-threats/drug-trafficking/county-lines
+    locator: Signs of County Lines drug dealing
+    quote: Young people seen in different cars/taxis driven by unknown adults
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: County Lines
+    publisher: National Crime Agency
+    url: https://www.nationalcrimeagency.gov.uk/what-we-do/crime-threats/drug-trafficking/county-lines
+    locator: Signs of County Lines drug dealing
+    quote: Young people seeming unfamiliar with your community or where they are
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Criminal exploitation of children and vulnerable adults: county lines'
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+    locator: Signs to look out for
+    quote: possession of train tickets for unusual train journeys
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: County Lines
+    publisher: National Crime Agency
+    url: https://www.nationalcrimeagency.gov.uk/what-we-do/crime-threats/drug-trafficking/county-lines
+    locator: Signs of County Lines drug dealing
+    quote: Residents or young people you know going missing, maybe for long periods of time
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A 15-year-old from a city is found by police in a seaside town, cannot say where he is staying, and
+    has train tickets for repeated trips.
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Associate
+  - Address
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Moving children for criminal exploitation can be prosecuted as modern slavery; the Home Office
+      guidance defines child criminal exploitation as coercion through an imbalance of power.
+    source_url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+  innocent_explanations:
+  - Visiting relatives or a separated parent
+  - Running away for reasons unrelated to crime
+  - Lifts from family friends or ride-share drivers
+  jurisdictions: United Kingdom (NCA, Home Office)
+  version: 1
+- id: OC-093
+  name: Young person with unexplained money, clothes or phones, or owing a debt to someone older
+  definition: A young person suddenly has new clothes, jewellery, phones or cash they cannot explain,
+    or is paying off a debt to controlling older people.
+  areas:
+  - HT
+  - OC
+  typology: County lines / debt bondage
+  status: verified
+  sources:
+  - title: 'Criminal exploitation of children and vulnerable adults: county lines'
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+    locator: Signs to look out for, possessions
+    quote: unexplained acquisition of money, clothes, or mobile phones
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Criminal exploitation of children and vulnerable adults: county lines'
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+    locator: Signs, financial (debt bondage)
+    quote: asking for money or stealing money/items to pay back a debt
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Criminal exploitation of children and vulnerable adults: county lines'
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+    locator: Signs, relationships
+    quote: relationships with controlling/older individuals or groups
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: County Lines
+    publisher: National Crime Agency
+    url: https://www.nationalcrimeagency.gov.uk/what-we-do/crime-threats/drug-trafficking/county-lines
+    locator: Signs of County Lines drug dealing
+    quote: Unexplained, sometimes unaffordable new things (e.g clothes, jewellery, cars etc)
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A pupil skipping school appears with designer clothes and says he 'owes' an older man after being
+    robbed of drugs.
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Payment
+  - BankAccount
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: OC
+    reason: Home Office lists 'receiving large or unexplained sums of cash or deposits in a bank account'
+      as a sign, matching money-mule use of young people.
+    source_url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+  innocent_explanations:
+  - Gifts from family
+  - Part-time job or reselling clothes
+  - Ordinary teenage borrowing between friends
+  jurisdictions: United Kingdom (NCA, Home Office)
+  version: 1
+- id: OC-094
+  name: 'Cuckooing: a vulnerable person''s home taken over for drug dealing'
+  definition: Dealers take over the home of a vulnerable person to sell or store drugs; signs include
+    more visitors and cars, new or changing residents, and the resident becoming withdrawn or secretive.
+  areas:
+  - HT
+  - OC
+  typology: County lines / cuckooing
+  status: verified
+  sources:
+  - title: 'Criminal exploitation of children and vulnerable adults: county lines'
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+    locator: Cuckooing
+    quote: a tactic used by criminals, typically drug dealers, to take over the homes of vulnerable individuals
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: County Lines
+    publisher: National Crime Agency
+    url: https://www.nationalcrimeagency.gov.uk/what-we-do/crime-threats/drug-trafficking/county-lines
+    locator: Signs of County Lines drug dealing
+    quote: An increase in visitors and cars to a house or flat
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: County Lines
+    publisher: National Crime Agency
+    url: https://www.nationalcrimeagency.gov.uk/what-we-do/crime-threats/drug-trafficking/county-lines
+    locator: Signs of County Lines drug dealing
+    quote: Change in resident's mood and/or demeanour (e.g. secretive/ withdrawn/ aggressive/ emotional)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: County Lines
+    publisher: National Crime Agency
+    url: https://www.nationalcrimeagency.gov.uk/what-we-do/crime-threats/drug-trafficking/county-lines
+    locator: Signs of County Lines drug dealing
+    quote: New and regularly changing residents (e.g different accents compared to local accent
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Neighbours report constant short visits to the flat of a man with learning disabilities, who now rarely
+    leaves and has strangers staying.
+  cases: []
+  data_needed:
+  - Person
+  - Address
+  - Occupancy
+  - Associate
+  - Event
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Home Office guidance treats cuckooing as criminal exploitation of vulnerable adults.
+    source_url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+  innocent_explanations:
+  - Carers, support workers or family visiting more often
+  - Lodgers or new partners moving in
+  - Mental health changes unrelated to crime
+  jurisdictions: United Kingdom (NCA, Home Office)
+  version: 1
+- id: OC-095
+  name: Pupil truancy, exclusion and disengagement linked to drug-network activity
+  definition: A young person stops attending school, is excluded or loses interest, alongside other county
+    lines signs, which may mean they are working for a drug network.
+  areas:
+  - HT
+  - OC
+  typology: County lines / child criminal exploitation
+  status: verified
+  sources:
+  - title: County Lines
+    publisher: National Crime Agency
+    url: https://www.nationalcrimeagency.gov.uk/what-we-do/crime-threats/drug-trafficking/county-lines
+    locator: Signs of County Lines drug dealing
+    quote: Truancy, exclusion, disengagement from school
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Criminal exploitation of children and vulnerable adults: county lines'
+    publisher: UK Home Office
+    url: https://www.gov.uk/government/publications/criminal-exploitation-of-children-and-vulnerable-adults-county-lines/criminal-exploitation-of-children-and-vulnerable-adults-county-lines
+    locator: Signs, relationships
+    quote: isolation from usual peers or social networks
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A previously regular pupil is absent for weeks and seen with older youths from another town.
+  cases: []
+  data_needed:
+  - Person
+  - Associate
+  - Event
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded (only alongside other county lines signs)
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Bullying, illness, caring duties, or special educational needs
+  - Family breakdown or housing moves
+  jurisdictions: United Kingdom (NCA)
+  version: 1
+- id: OC-096
+  name: Rise in drug paraphernalia, anti-social behaviour or unexplained injuries in an area
+  definition: A neighbourhood sees more drug litter, anti-social behaviour and young people with unexplained
+    injuries, community-level signs of a county line operating.
+  areas:
+  - OC
+  typology: County lines (community indicators)
+  status: verified
+  sources:
+  - title: County Lines
+    publisher: National Crime Agency
+    url: https://www.nationalcrimeagency.gov.uk/what-we-do/crime-threats/drug-trafficking/county-lines
+    locator: Signs of County Lines drug dealing
+    quote: An increase in anti-social behaviour in the community
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: County Lines
+    publisher: National Crime Agency
+    url: https://www.nationalcrimeagency.gov.uk/what-we-do/crime-threats/drug-trafficking/county-lines
+    locator: Signs of County Lines drug dealing
+    quote: Substance misuse and/or drug paraphernalia
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: County Lines
+    publisher: National Crime Agency
+    url: https://www.nationalcrimeagency.gov.uk/what-we-do/crime-threats/drug-trafficking/county-lines
+    locator: Signs of County Lines drug dealing
+    quote: Unexplained injuries
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Police open-data crime maps show a rise in drug and ASB reports around one block over six months.
+  cases: []
+  data_needed:
+  - Address
+  - Event
+  - Person
+  checkable: lookups
+  lookup_sources:
+  - Police open crime data (e.g. data.police.uk)
+  - Council ASB reports
+  - Local news
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Local drug use without an organised line
+  - Changes in police recording or reporting
+  - Seasonal or event-driven disorder
+  jurisdictions: United Kingdom (NCA)
+  version: 1
 not_reached:
 - 'FATF, Money Laundering through the Football Sector (2009): fatf-gafi.org blocks automated fetching
   (robots disallowed), so its football and betting indicators are not included.'
@@ -2593,3 +5321,23 @@ not_reached:
 - 'OECD/EUIPO counterfeit trade reports (Mapping global trade in fakes): not reached.'
 - 'Primary court documents for the Šapina (Bochum), Belgian club and Southern Stars cases: not reached.
   Outcomes are as stated in the UNODC Resource Guide (2016).'
+- 'ESAAMLG, Smuggling of Cigarettes and Associated Money Laundering: the URL could not be found because
+  the shared web-search budget for this run ran out. Tobacco indicators rely only on FATF Illicit Tobacco
+  Trade (2012). The FATF 2012 report has no formal indicator annex; items OC-063 to OC-067 come from its
+  methods paragraphs (24-25, 30, 35, 41, 86-87, 106).'
+- 'FATF Illicit Tobacco Trade: the counterfeit-factory link and named defendants could not be confirmed.
+  Box 12 (Hezbollah) does not name the subject, so no name was added from outside sources.'
+- FATF Organised Maritime Piracy (2011) has no formal red-flag list. FATF says only that it 'could consider
+  developing guidance and red flags' (para. 48). OC-068 to OC-072 come from its case studies and narrative.
+- 'FATF Fentanyl (2022): the first part of the Customer Indicators list (pp. 36-37) was cut off at one
+  indicator. Most of those items overlap with existing OC-012 to OC-018 and were not duplicated.'
+- FATF Risks of Gaming and Gambling (2026) includes no named case studies with court or regulator outcomes,
+  so gambling indicators OC-051 to OC-062 have no cases attached.
+- 'Gambling enforcement cases (e.g. AUSTRAC v Crown Resorts): the AUSTRAC page blocked fetching (robots),
+  and the search budget ran out, so these were not added.'
+- 'County lines and cuckooing court cases (e.g. UK Modern Slavery Act convictions): not reached because
+  the search budget ran out. OC-091 to OC-096 have no cases.'
+- 'Somali pirate negotiator prosecution (US DOJ press release): the fetch failed, so it was not added.'
+- FATF gambling, tobacco, piracy and fentanyl PDFs could not be downloaded directly with curl (bot challenge).
+  They were read through WebFetch, which returned some quotes shortened with '...'. The quotes are copied
+  as returned.

@@ -56,7 +56,7 @@ AREA_WORDS = [
     ("CY", ["cyber", "ransomware", "scam", "crypto", "source reliab", "grading"]),
     ("IN", ["disinformation", "information", "forg", "academic", "media manipulation", "sock"]),
     ("OC", ["organised crime", "organized crime", "drug", "arms", "counterfeit", "match-fixing", "illicit goods", "gambling", "sport"]),
-    ("ML", ["laundering"]),
+    ("ML", ["laundering", "tbml", "money mule"]),
 ]
 
 
@@ -67,6 +67,9 @@ def area_key(text: str) -> str | None:
     for key, name in AREA_NAMES.items():
         if t.lower() == name.lower():
             return key
+    lead = re.match(r"([A-Z]{2})(?:-\d+|\b)", t)
+    if lead and lead.group(1) in AREA_NAMES:
+        return lead.group(1)
     low = t.lower()
     for key, words in AREA_WORDS:
         if any(w in low for w in words):

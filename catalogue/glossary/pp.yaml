@@ -493,3 +493,187 @@ terms:
   indicators: []
   areas:
   - PP
+- term: Bait and switch
+  definition: A firm wins by promising staff, equipment or facilities it knows it will not provide, then
+    swaps them after signing.
+  examples: []
+  source_url: https://documents.worldbank.org/curated/en/223241573576857116/text/Warning-Signs-of-Fraud-and-Corruption-in-Procurement.txt
+  cases: []
+  related:
+  - PP-062
+  indicators: []
+  areas:
+  - PP
+- term: Abnormally low bid (abnormally low tender)
+  definition: A bid priced so low that it is doubtful the supplier can deliver the contract at that price.
+  examples: []
+  source_url: https://documents.worldbank.org/curated/en/223241573576857116/text/Warning-Signs-of-Fraud-and-Corruption-in-Procurement.txt
+  cases: []
+  related:
+  - PP-063
+  indicators: []
+  areas:
+  - PP
+- term: Collusive ring
+  definition: A group of companies that secretly work together to rig bids, for example by choosing the
+    winner in advance.
+  examples: []
+  source_url: https://documents.worldbank.org/curated/en/223241573576857116/text/Warning-Signs-of-Fraud-and-Corruption-in-Procurement.txt
+  cases: []
+  related:
+  - PP-011
+  - PP-012
+  indicators: []
+  areas:
+  - PP
+- term: Change order (variation order, contract amendment, addendum)
+  definition: A formal change to a signed contract's scope, price or time; the World Bank warns these
+    are often waved through without scrutiny.
+  examples: []
+  source_url: https://documents.worldbank.org/curated/en/223241573576857116/text/Warning-Signs-of-Fraud-and-Corruption-in-Procurement.txt
+  cases: []
+  related:
+  - PP-029
+  - PP-066
+  indicators: []
+  areas:
+  - PP
+- term: Fictitious offer
+  definition: A fake competing bid, made in the name of a real company without its knowledge or of a company
+    that does not exist, used to make a purchase look competitive.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related:
+  - PP-067
+  indicators: []
+  areas:
+  - PP
+- term: Discrepant offers
+  definition: A scheme where staff tell a favoured bidder which items will not be needed, so it can bid
+    very low on them and win.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related:
+  - PP-065
+  - PP-027
+  indicators: []
+  areas:
+  - PP
+- term: Incompatible grouping
+  definition: Putting unrelated goods or services into one lot that must be bid as a whole, which cuts
+    competition.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related:
+  - PP-069
+  indicators: []
+  areas:
+  - PP
+- term: Influence peddling
+  definition: Using one's influence to get a contract for someone, often a single-source award at an inflated
+    price to a firm close to an official.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related:
+  - PP-070
+  indicators: []
+  areas:
+  - PP
+- term: Kickback
+  definition: A bribe agreed in advance where the supplier pays part of what it receives back to the official
+    who helped it, often through inflated invoices.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related:
+  - PP-075
+  - PP-071
+  indicators: []
+  areas:
+  - PP
+- term: Bribery
+  definition: Offering, giving, asking for or accepting an undue advantage so that a person in power acts,
+    or fails to act, in breach of their duties.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Embezzlement (diversion of assets)
+  definition: Taking for oneself money or property one was trusted to manage.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related:
+  - PP-079
+  indicators: []
+  areas:
+  - PP
+- term: Economic operator
+  definition: EU procurement term for any person or company that takes part in a tender or carries out
+    a publicly funded contract.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Contracting authority
+  definition: The public body (national, regional or local) that runs the tender and signs the contract.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Negotiated procedure without publication
+  definition: An exceptional EU procedure where the buyer negotiates directly with chosen suppliers without
+    a public notice, allowed only in set cases such as extreme urgency.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related:
+  - PP-005
+  - PP-073
+  indicators: []
+  areas:
+  - PP
+- term: Irregularity (EU funds)
+  definition: A breach of EU or national law by someone using EU funds that charges, or would charge,
+    an unjustified cost to the EU budget; it is not necessarily deliberate fraud.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Arachne
+  definition: The European Commission's risk-scoring tool that helps national authorities spot high-risk
+    EU-funded projects, beneficiaries and contractors.
+  examples: []
+  source_url: https://sfc.ec.europa.eu/system/files/documents/sfc-files/fraud-public-procurement-final-20122017-ares20176254403.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - PP
+- term: Shell (fake) company
+  definition: A company that exists only on paper, usually with no real assets, premises or staff.
+  examples: []
+  source_url: https://documents.worldbank.org/curated/en/223241573576857116/text/Warning-Signs-of-Fraud-and-Corruption-in-Procurement.txt
+  cases: []
+  related:
+  - PP-023
+  - PP-067
+  indicators: []
+  areas:
+  - PP

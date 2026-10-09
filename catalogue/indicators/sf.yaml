@@ -22,7 +22,7 @@ indicators:
     quote: vessels engaged in illicit activities may also intentionally disable their AIS transponders
       or manipulate the data transmitted in order to mask their movement.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Sanctions Advisory for the Maritime Industry (Annex A, Guidance for Maritime Insurance Companies)
     publisher: US Department of State, Treasury OFAC and US Coast Guard
     year: '2020'
@@ -31,7 +31,7 @@ indicators:
     quote: any significant time period with non-transmission that is not consistent with the International
       Convention for the Safety of Life at Sea (SOLAS)
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Updated Price Cap Coalition Advisory for the Maritime Oil Industry and Related Sectors
     publisher: Price Cap Coalition (G7, EU, Australia, New Zealand), published by OFAC
     year: '2024'
@@ -40,7 +40,7 @@ indicators:
     quote: Shadow fleet tankers have been observed disabling or manipulating Automatic Identification
       Systems (AIS) to conceal illicit activity or other information about their voyages.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Report of the Panel of Experts established pursuant to resolution 1874 (2009), S/2019/171
     publisher: United Nations Security Council
     year: '2019'
@@ -48,7 +48,7 @@ indicators:
     locator: Summary, p.4
     quote: The manipulation of vessel AIS transmis sions remains an overarching feature of illegal transfers
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The DPRK-flagged bulk carrier Wise Honest had not broadcast AIS since 4 August 2017 despite a March
     2018 coal voyage (DOJ, 2019).
@@ -116,7 +116,7 @@ indicators:
       a different name, International Maritime Organization (IMO) number (a unique, seven-digit vessel
       identification code), Maritime Mobile Service Identity (MMSI), or other identifying information.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Updated Price Cap Coalition Advisory
     publisher: Price Cap Coalition
     year: '2024'
@@ -125,7 +125,7 @@ indicators:
     quote: Industry stakeholders should also vigilantly monitor irregular AIS patterns or data that are
       inconsistent with actual ship locations.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: UN Panel of Experts report S/2019/171
     publisher: United Nations Security Council
     year: '2019'
@@ -135,7 +135,7 @@ indicators:
       (AIS) transmissions is not being taken into account by most global and regional commodity trading
       companies, banks and insurers
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Two ships broadcast the same IMO number at once in different oceans.
   - A tanker's AIS shows it anchored offshore while satellite imagery shows it at a sanctioned port.
@@ -193,7 +193,7 @@ indicators:
     quote: Vessels involved in illicit activities have often painted over vessel names and IMO numbers
       to obscure their identities and pass themselves off as different vessels.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: UN Panel of Experts report S/2019/171
     publisher: United Nations Security Council
     year: '2019'
@@ -203,7 +203,7 @@ indicators:
       laundering, whereby the owners had deceived IMO into providing new vessel identity numbers to avoid
       repeat detection.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Updated Price Cap Coalition Advisory
     publisher: Price Cap Coalition
     year: '2024'
@@ -213,7 +213,7 @@ indicators:
       obfuscate their status, such as renaming, reflagging, obscuring their IMO number, or falsifying
       documents
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Photographs show a hull name freshly painted over and a different name welded on.
   - A ship with a newly issued IMO number has the same build year, tonnage and shape as a sanctioned ship
@@ -265,7 +265,7 @@ indicators:
       to petrochemicals, petroleum, petroleum products, or metals (steel, iron) or sand in order to disguise
       their origin.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Guidance to Address Illicit Shipping and Sanctions Evasion Practices, Annex A
     publisher: US Department of State, Treasury OFAC and US Coast Guard
     year: '2020'
@@ -274,7 +274,7 @@ indicators:
     quote: Any indication of manipulated shipping documentation is a red flag for potential illicit activity
       and should be investigated fully prior to continuing with the transaction.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A certificate of origin says Malaysia but the cargo's chemical profile and the ship's track point
     to Iran.
@@ -334,7 +334,7 @@ indicators:
       or other illicit activity—are frequently used to evade sanctions by concealing the origin or destination
       of surreptitiously transferred petroleum, coal, and other material.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Updated Price Cap Coalition Advisory
     publisher: Price Cap Coalition
     year: '2024'
@@ -344,7 +344,7 @@ indicators:
       purposes, such transfers can also be used to conceal the origin or destination of cargo in circumvention
       of sanctions or other regulations.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: UN Panel of Experts report S/2019/171
     publisher: United Nations Security Council
     year: '2019'
@@ -354,7 +354,7 @@ indicators:
       of Korea, the use of small, unregistered vessels, illegal name-changing and other forms of identity
       fraud, night transfers and the use of additional vessels for transshipment.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Two tankers sit side by side for 20 hours in open water, one with AIS off.
   - Oil record book does not match the volumes the ship's draught shows were transferred.
@@ -424,7 +424,7 @@ indicators:
       by using indirect routing, unscheduled detours, or transit or transshipment of cargo through third
       countries.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
     publisher: FATF
     year: '2021'
@@ -433,7 +433,7 @@ indicators:
     quote: Shipment of goods is made in a circuitous fashion (if information is available), including
       multiple destinations
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A tanker declares Singapore, detours into the Gulf with AIS off, and returns low in the water.
   cases: []
@@ -475,7 +475,7 @@ indicators:
     quote: Bad actors may falsify the flag of their vessels to mask illicit trade. They may also repeatedly
       register with new flag states (“flag hopping”) to avoid detection.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Updated Price Cap Coalition Advisory
     publisher: Price Cap Coalition
     year: '2024'
@@ -484,7 +484,7 @@ indicators:
     quote: These vessels are often registered with flag states that fail to meet their international obligations.
       There is also an increased risk of falsified/fraudulent registration.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: UN Panel of Experts report S/2019/171
     publisher: United Nations Security Council
     year: '2019'
@@ -492,7 +492,7 @@ indicators:
     locator: Summary, p.4
     quote: routinely engaging in double-flagging and providing safe harbour for hijacked ships
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A tanker changes flag three times in a year, the last to a registry that does not list it.
   - A ship claims a flag after that registry announced its deregistration.
@@ -549,7 +549,7 @@ indicators:
     quote: Bad actors also may engage in a pattern of changes in the ownership or management of companies
       or in the International Safety Management Code (ISM) management companies used.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Guidance to Address Illicit Shipping and Sanctions Evasion Practices
     publisher: US Department of State, Treasury OFAC and US Coast Guard
     year: '2020'
@@ -559,7 +559,7 @@ indicators:
       between companies controlled by the same beneficial owner and where there is no discernable legitimate
       purpose for the transfer.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Updated Price Cap Coalition Advisory
     publisher: Price Cap Coalition
     year: '2024'
@@ -568,7 +568,7 @@ indicators:
     quote: The ownership of shadow fleet tankers may be concealed through complex corporate arrangements,
       with a recent increase of single vessel fleets.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A tanker is owned by a Marshall Islands company with one ship, managed by a newly formed company in
     a different country, which changed twice in a year.
@@ -620,7 +620,7 @@ indicators:
     quote: Recognizing that purchases of crude and refined petroleum, petrochemicals, and metals at rates
       significantly below market prices may be red flags indicating illicit behavior.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A trader buys crude at a deep discount to the benchmark with no stated quality reason.
   cases: []
@@ -663,7 +663,7 @@ indicators:
     quote: The billing of commercially unreasonable or opaque shipping and ancillary costs should be viewed
       as a sign of potential price cap evasion.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An invoice shows oil just under the cap but freight several times the market rate for the route.
   cases: []
@@ -706,7 +706,7 @@ indicators:
     quote: The shadow trade involves ships that may rely on unknown, untested, sporadic, or fraudulent
       insurance.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A tanker's P&I certificate names an insurer with no published capital or reinsurance.
   cases: []
@@ -753,7 +753,7 @@ indicators:
       societies, and instead use societies that are not a part of, or have been removed from, the International
       Association of Classification Societies.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A 20-year-old tanker leaves a major class society and joins a little-known one in the same month as
     an ownership change.
@@ -796,7 +796,7 @@ indicators:
       or illicit purchase structures and end-uses, especially for aging tankers, including tankers previously
       designated for recycling.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN-BIS Joint Alert FIN-2022-Alert003
     publisher: FinCEN and BIS
     year: '2022'
@@ -805,7 +805,7 @@ indicators:
     quote: A customer acquires new vessels for no apparent economic or business purpose or for use in
       shipping corridors involving one or more of the identified transshipment countries.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A 22-year-old tanker is sold to a company formed two months earlier in a free zone, paid in full from
     a third country.
@@ -850,7 +850,7 @@ indicators:
     quote: A customer purchases or sells vessels or other properties and goods identified as having been
       involved with or being blocked property under U.S. or partner country sanctions.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Updated Price Cap Coalition Advisory
     publisher: Price Cap Coalition
     year: '2024'
@@ -861,7 +861,7 @@ indicators:
       including to understand whether their unsanctioned counterparties may have recently engaged with
       sanctioned entities.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A port agent services a tanker listed by OFAC under its old name.
   cases: []
@@ -908,7 +908,7 @@ indicators:
     quote: OFAC's 50 Percent Rule applies to entities owned 50 percent or more in the aggregate by one
       or more blocked persons.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Two sanctioned individuals each hold 25 percent of a trading company; the company is blocked even
     though it is not on the list.
@@ -956,7 +956,7 @@ indicators:
       List), Treasury’s List of Specially Designated Nationals and Blocked Persons (SDN List), or State’s
       Statutorily Debarred Parties List.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN Alert FIN-2023-Alert006 (Hamas)
     publisher: FinCEN
     year: '2023'
@@ -967,7 +967,7 @@ indicators:
       entities and individuals, to include email addresses, physical addresses, phone numbers, or passport
       numbers, or virtual currency addresses.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A new supplier's phone number is the one listed in an SDN entry for a designated front company.
   cases: []
@@ -1017,7 +1017,7 @@ indicators:
     quote: Transactions involving companies that are physically co-located, or have shared ownership,
       with an entity on the Entity List or the SDN List.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
     publisher: FATF
     year: '2021'
@@ -1026,7 +1026,7 @@ indicators:
     quote: Demonstrating links between representatives of companies exchanging goods, i.e. same owners
       or management, same
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A Hong Kong buyer and the Russian end-user list the same director and phone number.
   cases: []
@@ -1078,7 +1078,7 @@ indicators:
       to obscure (i) ownership, (ii) source of funds, or (iii) countries involved, particularly sanctioned
       jurisdictions;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Tri-Seal Compliance Note
     publisher: US Departments of Commerce, Treasury and Justice
     year: '2023'
@@ -1087,7 +1087,7 @@ indicators:
     quote: Use of shell companies to conduct international wire transfers, often involving financial institutions
       in jurisdictions distinct from company registration;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
     publisher: FATF
     year: '2021'
@@ -1096,7 +1096,7 @@ indicators:
     quote: Accounts or transactions involve possible companies with opaque ownership structures, front
       companies, or shell companies
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN Alert FIN-2023-Alert006 (Hamas)
     publisher: FinCEN
     year: '2023'
@@ -1107,7 +1107,7 @@ indicators:
       a nexus with Iran or other Iran-supported terrorist groups, such as Hizballah and Palestinian Islamic
       Jihad.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Hong Kong shell companies bought OLED micro-displays from US distributors and received payments that
     hid Russian origin of funds (US v. Marchenko).
@@ -1170,7 +1170,7 @@ indicators:
     locator: press release body
     quote: removed references to sanctioned entities from payment messages
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - MT103 fields for originator name are blank or generic while the related cover payment names a bank
     in a sanctioned country.
@@ -1222,7 +1222,7 @@ indicators:
     locator: p.2, red flags
     quote: IP addresses that do not correspond to a customer’s reported location data;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Enforcement Release: OFAC Settles with Binance Holdings, Ltd. for $968,618,825'
     publisher: US Treasury OFAC
     year: '2023'
@@ -1231,7 +1231,7 @@ indicators:
     quote: Binance continued to allow trades by users who were logged in from an IP address in a comprehensively
       sanctioned jurisdiction so long as that user had submitted KYC documents from a non-sanctioned jurisdiction.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An exchange user with Turkish ID documents logs in repeatedly from Iranian IP addresses.
   cases:
@@ -1286,7 +1286,7 @@ indicators:
     quote: Transactions involve a last-minute change in payment routing that was previously scheduled
       from a country of concern but now routed through a different country or company.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN-BIS Joint Alert FIN-2022-Alert003
     publisher: FinCEN and BIS
     year: '2022'
@@ -1296,7 +1296,7 @@ indicators:
       go to Russia or Belarus, or a company located in Russia or Belarus, but that are now going to a
       different country/company.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Tri-Seal Compliance Note
     publisher: US Departments of Commerce, Treasury and Justice
     year: '2023'
@@ -1305,7 +1305,7 @@ indicators:
     quote: Last-minute changes to shipping instructions that appear contrary to customer history or business
       practices;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An order booked for Moscow is re-addressed to a new distributor in a transshipment hub a week before
     shipment.
@@ -1349,7 +1349,7 @@ indicators:
     quote: Payment coming from a third-party country or business not listed on the End-User Statement
       or other applicable end-user form;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN-BIS Joint Alert FIN-2022-Alert003
     publisher: FinCEN and BIS
     year: '2022'
@@ -1359,7 +1359,7 @@ indicators:
       otherwise involved with the transactions and known to be a potential transshipment point for exports
       to Russia and Belarus.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
     publisher: FATF
     year: '2021'
@@ -1367,7 +1367,7 @@ indicators:
     locator: para 31, maritime sector indicators
     quote: Payment for imported commodities is made by an entity other than the consignee of the commodities
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Goods shipped to a Kazakh importer are paid for by a UAE company with no role in the contract.
   cases: []
@@ -1413,7 +1413,7 @@ indicators:
     quote: Transactions involving entities with little to no web presence, such as a website or a domain-based
       email account.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Tri-Seal Compliance Note
     publisher: US Departments of Commerce, Treasury and Justice
     year: '2023'
@@ -1421,7 +1421,7 @@ indicators:
     locator: p.2
     quote: Use of personal email accounts instead of company email addresses;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A buyer of high-end oscilloscopes corresponds only from a free webmail address and has no website.
   cases: []
@@ -1464,7 +1464,7 @@ indicators:
     quote: Transactions involving customers with phone numbers with country codes that do not match the
       destination country.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Goods consigned to Armenia; buyer's contact number has a +7 (Russia) code.
   cases: []
@@ -1502,7 +1502,7 @@ indicators:
     locator: Supplement No. 3, Red Flags item 1
     quote: The customer or purchasing agent is reluctant to offer information about the end-use of a product.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN-BIS Joint Notice FIN-2023-NTC2
     publisher: FinCEN and BIS
     year: '2023'
@@ -1511,7 +1511,7 @@ indicators:
     quote: A customer lacks or refuses to provide details to banks, shippers, or third parties, including
       details about end-users, intended end-use(s), or company ownership.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Tri-Seal Compliance Note
     publisher: US Departments of Commerce, Treasury and Justice
     year: '2023'
@@ -1520,7 +1520,7 @@ indicators:
     quote: A customer’s reluctance to share information about the end use of a product, including reluctance
       to complete an end-user form;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
     publisher: FATF
     year: '2021'
@@ -1529,7 +1529,7 @@ indicators:
     quote: During on-boarding, a customer provides vague or incomplete information about their proposed
       trading activities.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A buyer of machine-tool controllers declines to say which factory will use them.
   cases: []
@@ -1568,7 +1568,7 @@ indicators:
     quote: The product's capabilities do not fit the buyer's line of business; for example, a small bakery
       places an order for several sophisticated lasers.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN-BIS Joint Notice FIN-2023-NTC2
     publisher: FinCEN and BIS
     year: '2023'
@@ -1576,7 +1576,7 @@ indicators:
     locator: p.4
     quote: The item (commodity, software or technology) does not fit the purchaser’s line of business.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
     publisher: FATF
     year: '2021'
@@ -1584,7 +1584,7 @@ indicators:
     locator: para 31, customer profile indicators, p.19
     quote: The customer is a person dealing with dual-use goods or goods subject to export control
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A furniture importer orders radiation-hardened integrated circuits.
   cases: []
@@ -1625,7 +1625,7 @@ indicators:
     quote: The product ordered is incompatible with the technical level of the country to which the product
       is being shipped.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
     publisher: FATF
     year: '2021'
@@ -1634,7 +1634,7 @@ indicators:
     quote: Shipment of goods incompatible with the technical level of the country to which it is being
       shipped, e.g.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Semiconductor manufacturing equipment shipped to a country without an electronics industry (BIS example).
   cases: []
@@ -1673,7 +1673,7 @@ indicators:
     locator: Red Flags item 9
     quote: A freight forwarding firm is listed as the product's final destination.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN-BIS Joint Notice FIN-2023-NTC2
     publisher: FinCEN and BIS
     year: '2023'
@@ -1682,7 +1682,7 @@ indicators:
     quote: Parties to transactions listed as ultimate consignees or listed in the “consign to” field appear
       to be mail centers, trading companies, or logistics companies.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN-BIS Joint Alert FIN-2022-Alert003
     publisher: FinCEN and BIS
     year: '2022'
@@ -1691,7 +1691,7 @@ indicators:
     quote: Transactions involving freight-forwarding firms that are also listed as the product’s final
       end customer, especially items going to traditional Russian transshipment hubs.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
     publisher: FATF
     year: '2021'
@@ -1700,7 +1700,7 @@ indicators:
     quote: The person or entity preparing a shipment lists a freight forwarding firm as the product's
       final destination;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Marchenko's displays reached Russia via a freight forwarder that served Russia (DOJ 2024).
   cases: []
@@ -1739,7 +1739,7 @@ indicators:
     locator: Red Flags item 10
     quote: The shipping route is abnormal for the product and destination.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Tri-Seal Compliance Note
     publisher: US Departments of Commerce, Treasury and Justice
     year: '2023'
@@ -1748,7 +1748,7 @@ indicators:
     quote: Routing purchases through certain transshipment points commonly used to illegally redirect
       restricted items to Russia or Belarus.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN-BIS Joint Alert FIN-2022-Alert003
     publisher: FinCEN and BIS
     year: '2022'
@@ -1758,7 +1758,7 @@ indicators:
       Kazakhstan, Kyrgyzstan, Mexico, Nicaragua, Serbia, Singapore, South Africa, Taiwan, Tajikistan,
       Turkey, United Arab Emirates, and Uzbekistan.'
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Microcontrollers ordered by a Kyrgyz firm are flown via the UAE and re-exported overland.
   cases:
@@ -1809,7 +1809,7 @@ indicators:
     locator: Red Flags item 7
     quote: Routine installation, training or maintenance services are declined by the customer.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Tri-Seal Compliance Note
     publisher: US Departments of Commerce, Treasury and Justice
     year: '2023'
@@ -1817,7 +1817,7 @@ indicators:
     locator: p.2
     quote: Declining customary installation, training, or maintenance of the purchased item(s);
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A buyer of a CNC machine refuses the free on-site commissioning visit.
   cases: []
@@ -1855,7 +1855,7 @@ indicators:
     locator: p.4
     quote: The customer is significantly overpaying for an item based on known market prices.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: EAR Supplement No. 3 to Part 732
     publisher: US Department of Commerce BIS
     url: https://www.ecfr.gov/current/title-15/subtitle-B/chapter-VII/subchapter-C/part-732
@@ -1863,7 +1863,7 @@ indicators:
     quote: The customer is willing to pay cash for a very expensive item when the terms of the sale call
       for financing.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A distributor pays triple list price for capacitors with immediate prepayment.
   cases: []
@@ -1906,7 +1906,7 @@ indicators:
     quote: A new customer whose line of business is in trade of products associated with the nine HS codes,
       is based in a non-GECC country, and was incorporated after February 24, 2022.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN-BIS Supplemental Alert FIN-2023-Alert004
     publisher: FinCEN and BIS
     year: '2023'
@@ -1916,7 +1916,7 @@ indicators:
       or more of the nine HS codes prior to February 24, 2022, and requested or received a significant
       increase in exports with those same codes thereafter.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A Central Asian electronics importer founded in mid-2022 suddenly imports large volumes of HS 8542.31
     microcontrollers.
@@ -1963,7 +1963,7 @@ indicators:
     quote: Transactions involve a purported civil end-user, but basic research indicates the address is
       a military facility or co-located with military facilities in a country of concern.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN-BIS Joint Alert FIN-2022-Alert003
     publisher: FinCEN and BIS
     year: '2022'
@@ -1972,7 +1972,7 @@ indicators:
     quote: Transactions involving entities whose website or business registration states the entities
       work on “special purpose projects.”
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Cadence documents described Central South CAD Center as an alias for China's National University of
     Defense Technology (DOJ 2025).
@@ -2027,7 +2027,7 @@ indicators:
     quote: Operation of complex and/or international businesses using residential addresses or addresses
       common to multiple closely-held corporate entities;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN-BIS Joint Alert FIN-2022-Alert003
     publisher: FinCEN and BIS
     year: '2022'
@@ -2036,7 +2036,7 @@ indicators:
     quote: Parties to transactions with addresses that do not appear consistent with the business or are
       otherwise problematic (e.g., either the physical address does not exist, or it is residential).
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
     publisher: FATF
     year: '2021'
@@ -2044,7 +2044,7 @@ indicators:
     locator: para 31, maritime sector indicators
     quote: A trade entity is registered at an address that is likely to be a mass registration address
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An importer of aircraft parts is registered at a flat in a residential tower with 300 other companies.
   cases: []
@@ -2091,7 +2091,7 @@ indicators:
       end-user. In addition, supporting documents, such as a commercial invoice, do not list the actual
       end-user.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
     publisher: FATF
     year: '2021'
@@ -2099,7 +2099,7 @@ indicators:
     locator: para 31, maritime and trade finance indicators, pp.21-22
     quote: Inconsistencies are identified across contracts, invoices, or other trade documents, e.g. contradictions
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Guidance on Proliferation Financing Risk Assessment and Mitigation
     publisher: FATF
     year: '2021'
@@ -2107,7 +2107,7 @@ indicators:
     locator: para 31, trade finance indicators
     quote: Transactions include wire instructions or payment details from or due to parties not identified
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The invoice says 500 units at one price, the packing list 800 units at another, and the payer is not
     named in the letter of credit.
@@ -2151,7 +2151,7 @@ indicators:
     locator: para 31, maritime sector indicators
     quote: Shipment of goods have a low declared value vis-à-vis the shipping cost;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An air-freighted crate costing $8,000 to ship is declared as $600 of spare parts.
   cases: []
@@ -2190,7 +2190,7 @@ indicators:
     locator: para 31, account and transaction activity indicators, p.20
     quote: Customer uses a personal account to purchase industrial items that are under export control
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A private individual buys high-precision pressure transducers on a personal credit card for shipment
     abroad.
@@ -2231,7 +2231,7 @@ indicators:
     quote: A customer affiliated with a university or research institution is involved in the trading
       of dual-use goods
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - NUDT, a military university, received EDA tools through an alias (Cadence, DOJ 2025).
   cases: []
@@ -2274,7 +2274,7 @@ indicators:
     quote: A customer or counterparty, declared to be a commercial business, conducts transactions that
       suggest that they
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN-BIS Supplemental Alert FIN-2023-Alert004
     publisher: FinCEN and BIS
     year: '2023'
@@ -2283,7 +2283,7 @@ indicators:
     quote: Transactions involving smaller-volume payments from the same end user’s foreign bank account
       to multiple, similar suppliers of dual-use products.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A trading company receives wires from three countries and pays out the same day to five electronics
     distributors.
@@ -2326,7 +2326,7 @@ indicators:
     quote: Transactions are made on the basis of "ledger" arrangements that obviate the need for frequent
       international
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Goods flow monthly between two related firms, but payments occur once a year as a net balance.
   cases: []
@@ -2365,7 +2365,7 @@ indicators:
     locator: para 31, customer profile and account indicators, p.19
     quote: The customer is a person connected with a country of proliferation or diversion concern
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A shipping agent in a third country is owned by nationals of a country under UN proliferation sanctions.
   cases: []
@@ -2412,7 +2412,7 @@ indicators:
       by holding accounts in the name of family members and front companies and by establishing accounts
       in multiple jurisdictions.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An embassy staffer's spouse holds an account receiving regular wires from a trading company.
   cases:
@@ -2472,7 +2472,7 @@ indicators:
       but does not appear to provide any charitable services or openly supports Hamas’s terrorist activity
       or operations.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Operational alert: Terrorist activity financing (FINTRAC-2022-OA001)'
     publisher: FINTRAC (Canada)
     year: '2022'
@@ -2481,7 +2481,7 @@ indicators:
     quote: The use of funds by a non-profit organization is not consistent with the purpose for which
       it was established.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A newly formed relief fund posts crypto addresses on messaging channels and has no published projects.
   cases:
@@ -2541,7 +2541,7 @@ indicators:
       source over a short period of time and then sends significant wire transfers or checks to other
       charitable organizations or NPOs.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Operational alert: Terrorist activity financing'
     publisher: FINTRAC (Canada)
     year: '2022'
@@ -2551,7 +2551,7 @@ indicators:
       or wire transfers to location of concern) that does not appear to be in line with stated activity
       of the organization.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A local charity receives $400,000 in a month from unidentified donors and wires most to two overseas
     charities.
@@ -2595,7 +2595,7 @@ indicators:
     quote: Use of crowdfunding, FinTech platforms and/or cryptocurrencies to finance individuals or groups
       associated with violent extremism.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Operational alert: Terrorist activity financing'
     publisher: FINTRAC (Canada)
     year: '2022'
@@ -2603,7 +2603,7 @@ indicators:
     locator: Indicators in relation to support of international terrorist groups
     quote: Raising donations in an unofficial or unregistered manner.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FinCEN Alert FIN-2023-Alert006 (Hamas)
     publisher: FinCEN
     year: '2023'
@@ -2612,7 +2612,7 @@ indicators:
     quote: A customer conducts transactions with known or suspected virtual currency addresses tied to
       terrorism or terrorist financing donation campaigns.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A streamer receives donations through a livestream platform and forwards them to a group's crypto
     wallet.
@@ -2656,7 +2656,7 @@ indicators:
     locator: p.2
     quote: Information included in a transaction between customers indicates support for terrorist campaigns.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Operational alert: Terrorist activity financing'
     publisher: FINTRAC (Canada)
     year: '2022'
@@ -2666,7 +2666,7 @@ indicators:
       references to words, phrases and/or numbers linked to violent extremist actors, groups, activity,
       or iconography.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - E-transfer memos read with a group's slogan and amounts use numbers that are known extremist codes.
   cases: []
@@ -2708,7 +2708,7 @@ indicators:
       in proximity to, armed conflict where terrorist groups operate or locations which are subject to
       weaker ML/TF controls.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Operational alert: Terrorist activity financing'
     publisher: FINTRAC (Canada)
     year: '2022'
@@ -2717,7 +2717,7 @@ indicators:
     quote: Individual sends and/or receives wire transfers to/from a number of individuals in different
       countries without an apparent purpose.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A student receives small transfers from several countries and sends wires to a city near a front line.
   cases: []
@@ -2761,7 +2761,7 @@ indicators:
       stated occupation, and are used in part to fund wires to a high-risk jurisdiction and/or cash withdrawals
       within a short period of time.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Operational alert: Terrorist activity financing'
     publisher: FINTRAC (Canada)
     year: '2022'
@@ -2770,7 +2770,7 @@ indicators:
     quote: Excessive email money transfers followed by the depletion of funds through third parties or
       cash withdrawals.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A part-time worker receives 60 e-transfers in two weeks and sends a single wire abroad.
   cases: []
@@ -2815,7 +2815,7 @@ indicators:
     quote: Exploitation of available credit products, including maxing out credit cards (often via cash
       advances), not making payments and transferring balance to personal debit account.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Operational alert: Terrorist activity financing'
     publisher: FINTRAC (Canada)
     year: '2022'
@@ -2823,7 +2823,7 @@ indicators:
     locator: Pre-Departure
     quote: Purchase or airline ticket to country in the vicinity of a conflict zone.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A young man takes a student loan, draws cash advances on two cards, sells his car and buys a one-way
     ticket to a country bordering a conflict area.
@@ -2872,7 +2872,7 @@ indicators:
     quote: Client accesses or attempts to access their online banking from inside or along the border
       of a conflict zone.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Operational alert: Terrorist activity financing'
     publisher: FINTRAC (Canada)
     year: '2022'
@@ -2880,7 +2880,7 @@ indicators:
     locator: In Theatre; Returning
     quote: Client accounts go dormant.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Debit card use in a transit city, a login from a border town, then no activity for 18 months.
   cases: []
@@ -2922,7 +2922,7 @@ indicators:
     quote: Client conducts purchases at vendors who sell firearms, fire-arm making kits, ammunition, explosives,
       and/or tactical gear.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Operational alert: Terrorist activity financing'
     publisher: FINTRAC (Canada)
     year: '2022'
@@ -2930,7 +2930,7 @@ indicators:
     locator: Indicators in relation to domestic terrorism
     quote: Monthly and/or one time payments are made to extremist media outlets and/or propaganda websites.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Card payments to a firearm-kit seller and a monthly subscription to a known extremist forum.
   cases: []
@@ -2974,7 +2974,7 @@ indicators:
     locator: Indicators in relation to domestic terrorism
     quote: Transaction details make reference to membership fees or clubhouse fees.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Ten individuals each send $30 a month to the same person with the memo 'dues'.
   cases: []
@@ -3017,7 +3017,7 @@ indicators:
       (CDD) requirements, opaque ownership, or otherwise fails to comply with anti-money laundering/combatting
       the financing of terrorism (AML/CFT) best practices.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Repeated transfers via an unlicensed exchange office whose owners are not public.
   cases: []
@@ -3062,7 +3062,7 @@ indicators:
     quote: Lafarge and LCS executives required intermediaries to create business entities with names not
       obviously linked
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Lafarge press release
     publisher: US Department of Justice
     year: '2022'
@@ -3071,7 +3071,7 @@ indicators:
     quote: created invoices with false descriptions of services rendered for an intermediary to submit
       to LCS.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Financing of the terrorist organisation ISIL
     publisher: FATF
     year: '2015'
@@ -3079,7 +3079,7 @@ indicators:
     locator: publication page summary
     quote: ISIL's primary source of income comes from the territory it occupies.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A plant in occupied territory pays monthly 'donations' and a per-ton fee on product sold, booked as
     consultancy services.
@@ -3142,7 +3142,7 @@ indicators:
       of concern, sending funds to similar types of companies or to individuals where the purchasing of
       cars is referenced.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A used-car exporter receives wires from exchange houses in Lebanon and ships vehicles to West Africa.
   cases:
@@ -3198,7 +3198,7 @@ indicators:
     quote: Transactions involve persons or entities identified by media and/or sanctions lists as being
       linked to a terrorist group or terrorist activities.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Operational alert: Terrorist activity financing'
     publisher: FINTRAC (Canada)
     year: '2022'
@@ -3207,7 +3207,7 @@ indicators:
     quote: Individual’s online presence indicates individual’s intent to engage in violent extremist activity
       e.g., social media post, tweet, hashtag, and/or manifesto.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A payment recipient's public profile posts a manifesto praising a listed group.
   cases: []
@@ -3228,12 +3228,1367 @@ indicators:
     textbook: Listed on a terrorist or sanctions list (meets the published definition as worded)
     threshold_source: none
   threshold_verified: true
-  cross_hints: []
+  cross_hints:
+  - target_area: VE
+    reason: FINTRAC lists transactions involving people linked to hate crimes or hate speech as a related
+      indicator.
+    source_url: https://fintrac-canafe.canada.ca/intel/operation/taf-eng
   innocent_explanations:
   - Mistaken identity or shared names.
   - Inaccurate media reporting.
   - Lawful political speech that is not violent.
   jurisdictions: Canada; relevant globally
+  version: 1
+- id: SF-057
+  name: Remote IT worker whose name, nationality, location, contact details or history do not line up
+    (possible North Korean IT worker)
+  definition: A freelance or remote developer gives a profile whose identity details conflict across documents
+    and platforms, or whose biography does not match the person, which the US government lists as a sign
+    of a North Korean worker posing as someone else to earn money for the DPRK.
+  areas:
+  - CY
+  - SF
+  typology: DPRK revenue generation through IT workers using false identities
+  status: verified
+  sources:
+  - title: Guidance on the Democratic People's Republic of Korea Information Technology Workers (Advisory)
+    publisher: US Department of State, US Department of the Treasury (OFAC), Federal Bureau of Investigation
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators, companies employing freelance developers, items 3, 4, 11, 12
+    quote: Inconsistencies in name spelling, nationality, claimed work location, contact information,
+      educational history
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Guidance on the DPRK IT Workers (Advisory)
+    publisher: US State, Treasury (OFAC), FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators, companies employing freelance developers, item 12
+    quote: Biographical information which does not appear to match the applicant
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Publication of North Korea Information Technology Workers Advisory
+    publisher: OFAC
+    year: '2022'
+    url: https://ofac.treasury.gov/recent-actions/20220516
+    locator: Recent Actions, 16 May 2022
+    quote: Publication of North Korea Information Technology Workers Advisory
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A contractor's CV says he studied in Canada, his platform profile says Japan, and his phone number
+    changes twice in a month.
+  - A developer's portfolio site is a single template page with no client history.
+  cases:
+  - name: United States v. Christina Marie Chapman
+    year: '2025'
+    jurisdiction: United States (District of Columbia)
+    what_happened: Chapman pleaded guilty in February 2025 to wire fraud conspiracy, aggravated identity
+      theft and money laundering conspiracy for helping North Korean IT workers get remote jobs at 309
+      US companies using 68 stolen US identities; the scheme generated more than $17 million. She was
+      sentenced on 24 July 2025 to 102 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-dc/pr/arizona-woman-sentenced-17m-it-worker-fraud-scheme-illegally-generated-revenue-north
+    source_title: Arizona Woman Sentenced for $17M IT Worker Fraud Scheme that Illegally Generated Revenue
+      for North Korea
+  data_needed:
+  - Person (name, nationality, country, address, phone, email, birthDate)
+  - Employment (employer, employee, startDate, role)
+  - Document (CVs, ID copies, platform profiles)
+  - Passport
+  - UnknownLink between accounts sharing details
+  checkable: person
+  lookup_sources:
+  - Freelance platform profiles
+  - Professional networking sites
+  - Identity verification services
+  - Phone number lookup
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: The same workers have later stolen company code and demanded ransom, so an identity mismatch
+      can be the first sign of a cyber-extortion risk.
+    source_url: https://ic3.gov/PSA/2025/PSA250123
+  innocent_explanations:
+  - People move country and change phone numbers.
+  - Names are transliterated differently across alphabets.
+  - Freelancers often keep thin portfolios, especially early in their careers.
+  - Profiles go out of date.
+  jurisdictions: United States (State, Treasury/OFAC, FBI); relevant wherever companies hire remote contractors
+  version: 1
+- id: SF-058
+  name: Login patterns showing shared or remotely controlled developer accounts
+  definition: On a freelance or payment platform, one account logs in from many IP addresses in different
+    countries within a short time, many developer accounts log in from one IP address, accounts stay logged
+    in for a day or more, or remote-desktop settings are detected, which the advisory lists as signs of
+    North Korean IT workers.
+  areas:
+  - CY
+  - SF
+  typology: DPRK revenue generation through IT workers using false identities
+  status: verified
+  sources:
+  - title: Guidance on the DPRK IT Workers (Advisory)
+    publisher: US State, Treasury (OFAC), FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators, freelance work and payment platform companies, item 2
+    quote: Developers are logging into multiple accounts on the same platform from one IP address
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Guidance on the DPRK IT Workers (Advisory)
+    publisher: US State, Treasury (OFAC), FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators, freelance work and payment platform companies, item 3
+    quote: Developers are logged into their accounts continuously for one or more days at a time
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Five 'different' developer accounts all log in from the same IP address.
+  - One account logs in from three countries in the same afternoon.
+  cases: []
+  data_needed:
+  - Person
+  - Company (platform)
+  - UnknownLink (shared IP address between accounts)
+  - Document (platform login logs)
+  checkable: records
+  lookup_sources:
+  - IP geolocation
+  - Platform login records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: Remote-desktop access to a company laptop from abroad is the method used in laptop-farm schemes
+      and gives network access to the foreign worker.
+    source_url: https://www.ic3.gov/PSA/2025/PSA250723-4
+  innocent_explanations:
+  - Shared office or coworking networks give many people one IP address.
+  - VPNs and mobile networks change IP location.
+  - Agencies legitimately run several developer accounts.
+  - Some users simply never log out.
+  jurisdictions: United States; freelance and payment platforms globally
+  version: 1
+- id: SF-059
+  name: Rating manipulation and templated bidding across developer accounts
+  definition: Developer accounts are boosted by a fake client account that shares their payment account,
+    several accounts get high ratings from one client in a short time, the same bidding templates are
+    reused, or an account bids very heavily but wins few jobs.
+  areas:
+  - FR
+  - SF
+  typology: DPRK revenue generation through IT workers using false identities
+  status: verified
+  sources:
+  - title: Guidance on the DPRK IT Workers (Advisory)
+    publisher: US State, Treasury (OFAC), FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators, freelance work and payment platform companies, items 5 to 8
+    quote: Multiple developer accounts receiving high ratings from one client account in a short period,
+      with similar or identical
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Guidance on the DPRK IT Workers (Advisory)
+    publisher: US State, Treasury (OFAC), FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators, freelance work and payment platform companies, item 8
+    quote: Extensive bidding on projects, and a low number of accepted project bids compared to the number
+      of projects bids on
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A client account that has hired only three developers, all rated five stars in one week, pays into
+    the same payment account those developers use.
+  cases: []
+  data_needed:
+  - Person
+  - Company
+  - Payment (payer, beneficiary, account)
+  - UnknownLink (shared payment account)
+  - Document (bids, reviews)
+  checkable: records
+  lookup_sources:
+  - Freelance platform records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Agencies reuse proposal templates.
+  - A happy client may hire and rate several people from one team at once.
+  - New freelancers bid widely before winning work.
+  jurisdictions: United States; freelance platforms globally
+  version: 1
+- id: SF-060
+  name: Remote worker paid in crypto, through PRC-linked payment services, or onward to PRC bank accounts
+  definition: A remote worker asks to be paid in virtual currency or through payment services linked to
+    China, or platform payouts move often to China-based bank accounts through intermediaries, which the
+    advisory lists as a way DPRK workers avoid identity checks.
+  areas:
+  - ML
+  - SF
+  typology: DPRK revenue generation through IT workers using false identities
+  status: verified
+  sources:
+  - title: Guidance on the DPRK IT Workers (Advisory)
+    publisher: US State, Treasury (OFAC), FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators, companies employing freelance developers, item 8
+    quote: Seeking payment in virtual currency in an effort to evade KYC/AML measures and use of the formal
+      financial system
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Guidance on the DPRK IT Workers (Advisory)
+    publisher: US State, Treasury (OFAC), FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators, freelance work and payment platform companies, item 9
+    quote: Frequent transfers of money through payment platforms, especially to PRC-based bank accounts,
+      and sometimes routed
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A contractor who says he lives in Poland asks for his fee in USDT, and earlier payouts went to an
+    account in China via a third person.
+  cases: []
+  data_needed:
+  - Payment (payer, beneficiary, amount, currency, date)
+  - BankAccount (bank, country)
+  - CryptoWallet
+  - Person
+  - Employment
+  checkable: records
+  lookup_sources:
+  - Bank and payment records
+  - Blockchain analytics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Routing earnings through intermediaries to foreign accounts is a laundering step; Chapman
+      also pleaded guilty to money laundering conspiracy for receiving and forwarding wages.
+    source_url: https://www.justice.gov/usao-dc/pr/arizona-woman-sentenced-17m-it-worker-fraud-scheme-illegally-generated-revenue-north
+  innocent_explanations:
+  - Many legitimate freelancers prefer crypto or regional payment apps because bank transfers are slow
+    or costly.
+  - Workers may support family abroad.
+  - Some platforms only pay out through certain services.
+  jurisdictions: United States; payment platforms globally
+  version: 1
+- id: SF-061
+  name: Remote worker asks for company laptop or documents to go to an address not on their ID (laptop
+    farm)
+  definition: A remote hire asks for the work laptop or documents to be shipped to an address different
+    from the one on their identity documents, which can mean a US-based helper is hosting the device so
+    a worker abroad can use it remotely.
+  areas:
+  - CY
+  - SF
+  typology: DPRK IT worker facilitation (laptop farms)
+  status: verified
+  sources:
+  - title: Guidance on the DPRK IT Workers (Advisory)
+    publisher: US State, Treasury (OFAC), FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators, companies employing freelance developers, item 7
+    quote: An employer proposes to send documents or work-related equipment such as a laptop to a developer,
+      and the developer
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: North Korean IT Worker Threats to U.S. Businesses (I-072325-4-PSA)
+    publisher: Federal Bureau of Investigation (IC3)
+    year: '2025'
+    url: https://www.ic3.gov/PSA/2025/PSA250723-4
+    locator: Recommendations
+    quote: only send to the address listed in the employee's identification documents
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Arizona Woman Sentenced for $17M IT Worker Fraud Scheme
+    publisher: US Attorney's Office, District of Columbia
+    year: '2025'
+    url: https://www.justice.gov/usao-dc/pr/arizona-woman-sentenced-17m-it-worker-fraud-scheme-illegally-generated-revenue-north
+    locator: Press release body
+    quote: Chapman operated a “laptop farm” where she received and hosted computers from the U.S. companies
+      her home
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Several new hires at different companies all give the same suburban house as their delivery address.
+  cases:
+  - name: United States v. Christina Marie Chapman
+    year: '2025'
+    jurisdiction: United States (District of Columbia)
+    what_happened: More than 90 laptops were seized from Chapman's home in October 2023; she also shipped
+      49 devices overseas. She pleaded guilty and was sentenced to 102 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-dc/pr/arizona-woman-sentenced-17m-it-worker-fraud-scheme-illegally-generated-revenue-north
+    source_title: Arizona Woman Sentenced for $17M IT Worker Fraud Scheme that Illegally Generated Revenue
+      for North Korea
+  data_needed:
+  - Address
+  - Person
+  - Employment
+  - Document (shipping records, ID documents)
+  - UnknownLink (shared delivery address across employees)
+  checkable: records
+  lookup_sources:
+  - Address and property records
+  - Shipping records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: Hosted laptops are reached by remote-desktop software, giving foreign actors inside access
+      to company networks.
+    source_url: https://www.ic3.gov/PSA/2025/PSA250723-4
+  innocent_explanations:
+  - Employees move and their ID shows an old address.
+  - People ask for deliveries to a relative's home or office when they travel.
+  - Students and renters often have IDs with a family address.
+  jurisdictions: United States
+  version: 1
+- id: SF-062
+  name: 'Remote worker avoids live identity checks: no video, obscured background, or AI face-swapping'
+  definition: A candidate or worker resists showing their face and surroundings on video, or appears to
+    use face-swapping software in interviews, which the FBI flags in warnings about North Korean IT workers
+    and answers with a recommendation to require video.
+  areas:
+  - CY
+  - SF
+  typology: DPRK revenue generation through IT workers using false identities
+  status: verified
+  sources:
+  - title: North Korean IT Workers Conducting Data Extortion (I-012325-PSA)
+    publisher: Federal Bureau of Investigation (IC3)
+    year: '2025'
+    url: https://ic3.gov/PSA/2025/PSA250123
+    locator: Main text
+    quote: face-swapping technology during video job interviews
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: North Korean IT Worker Threats to U.S. Businesses (I-072325-4-PSA)
+    publisher: Federal Bureau of Investigation (IC3)
+    year: '2025'
+    url: https://www.ic3.gov/PSA/2025/PSA250723-4
+    locator: Recommendations
+    quote: Mandate video and request that their backgrounds be unobscured.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A candidate's camera is 'broken' at every interview, and when it works the face lags behind the voice.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Document (interview recordings, notes)
+  checkable: person
+  lookup_sources: []
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: Deepfake and face-swap use is a cyber-enabled fraud technique.
+    source_url: https://ic3.gov/PSA/2025/PSA250123
+  innocent_explanations:
+  - Poor connections and old hardware break video.
+  - Some people blur backgrounds for privacy at home.
+  - Disability or anxiety can make video hard.
+  jurisdictions: United States
+  version: 1
+- id: SF-063
+  name: Remote worker copies company code or data to personal accounts, or holds data for ransom
+  definition: A remote worker copies company code repositories to personal or cloud accounts, or threatens
+    to release stolen code or data unless paid, a pattern the FBI reports from North Korean IT workers
+    after they are discovered or let go.
+  areas:
+  - CY
+  - SF
+  typology: DPRK IT worker data theft and extortion
+  status: verified
+  sources:
+  - title: North Korean IT Workers Conducting Data Extortion (I-012325-PSA)
+    publisher: Federal Bureau of Investigation (IC3)
+    year: '2025'
+    url: https://ic3.gov/PSA/2025/PSA250123
+    locator: Main text
+    quote: copied company code repositories, such as GitHub, to their own user profiles and personal cloud
+      accounts.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: North Korean IT Workers Conducting Data Extortion (I-012325-PSA)
+    publisher: Federal Bureau of Investigation (IC3)
+    year: '2025'
+    url: https://ic3.gov/PSA/2025/PSA250123
+    locator: Main text
+    quote: holding stolen proprietary data and code hostage until the companies meet ransom demands.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - After being fired, a contractor emails that he still has the source code and will publish it unless
+    paid in crypto.
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Email
+  - Document (access logs, extortion messages)
+  - Payment
+  checkable: records
+  lookup_sources:
+  - Code hosting audit logs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: This is data theft and extortion, a cybercrime pattern.
+    source_url: https://ic3.gov/PSA/2025/PSA250123
+  innocent_explanations:
+  - Developers sometimes fork code to a personal account by mistake or for convenience.
+  - Contract disputes can lead to angry but non-criminal messages.
+  jurisdictions: United States
+  version: 1
+- id: SF-064
+  name: Worker switches to an account in another name or borrows co-workers' identities
+  definition: After a freelance or payment account is shut down, the worker asks to continue under an
+    account registered to a different person, or asks colleagues to lend personal information to win more
+    contracts.
+  areas:
+  - FR
+  - SF
+  typology: DPRK revenue generation through IT workers using false identities
+  status: verified
+  sources:
+  - title: Guidance on the DPRK IT Workers (Advisory)
+    publisher: US State, Treasury (OFAC), FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators, companies employing freelance developers, item 1
+    quote: If a freelance software development website or payment platform account has been shut down
+      or the worker contacts the
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Guidance on the DPRK IT Workers (Advisory)
+    publisher: US State, Treasury (OFAC), FBI
+    year: '2022'
+    url: https://ofac.treasury.gov/media/923126/download?inline
+    locator: Red Flag Indicators, companies employing freelance developers, item 15
+    quote: Asking co-workers to borrow some of their personal information to obtain other contracts
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A developer says his account was 'hacked' and asks to be paid via his cousin's account instead.
+  cases:
+  - name: United States v. Christina Marie Chapman
+    year: '2025'
+    jurisdiction: United States (District of Columbia)
+    what_happened: The scheme used 68 stolen US person identities to obtain jobs; Chapman pleaded guilty
+      to aggravated identity theft among other counts.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-dc/pr/arizona-woman-sentenced-17m-it-worker-fraud-scheme-illegally-generated-revenue-north
+    source_title: Arizona Woman Sentenced for $17M IT Worker Fraud Scheme
+  data_needed:
+  - Person
+  - Employment
+  - Payment (beneficiary differs from worker)
+  - UnknownLink
+  - Representation
+  checkable: records
+  lookup_sources:
+  - Identity verification services
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Accounts do get hacked or wrongly suspended.
+  - Small teams sometimes bill through one member's account.
+  jurisdictions: United States
+  version: 1
+- id: SF-065
+  name: Vague delivery dates or deliveries planned for out-of-the-way destinations
+  definition: The buyer will not commit to a clear delivery date or wants goods sent to an unusual or
+    remote place, which US export regulations list as a know-your-customer red flag for diversion.
+  areas:
+  - SF
+  typology: Export control evasion and diversion
+  status: verified
+  sources:
+  - title: '15 CFR Part 732, Supplement No. 3: BIS''s Know Your Customer Guidance and Red Flags'
+    publisher: US Bureau of Industry and Security (via Cornell LII)
+    year: current
+    url: https://www.law.cornell.edu/cfr/text/15/appendix-Supplement_No_3_to_part_732
+    locator: Red Flags, item 8
+    quote: Delivery dates are vague, or deliveries are planned for out-of-the-way destinations.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An order for industrial controllers asks for delivery 'sometime next quarter' to a small port town
+    with no industry.
+  cases: []
+  data_needed:
+  - Contract
+  - Address
+  - Document (purchase orders, shipping instructions)
+  - Company
+  checkable: records
+  lookup_sources:
+  - Maps and business directories for the delivery address
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Projects in remote areas (mines, oil fields, research stations) are real.
+  - Buyers may not yet know their schedule.
+  - Small buyers consolidate deliveries.
+  jurisdictions: United States (Export Administration Regulations)
+  version: 1
+- id: SF-066
+  name: Packaging does not fit the stated shipping method or destination
+  definition: The way goods are packed does not match how or where they are said to be going, for example
+    sea packing for air freight, which BIS lists as a red flag that the real route or destination differs.
+  areas:
+  - SF
+  typology: Export control evasion and diversion
+  status: verified
+  sources:
+  - title: '15 CFR Part 732, Supplement No. 3: BIS''s Know Your Customer Guidance and Red Flags'
+    publisher: US Bureau of Industry and Security (via Cornell LII)
+    year: current
+    url: https://www.law.cornell.edu/cfr/text/15/appendix-Supplement_No_3_to_part_732
+    locator: Red Flags, item 11
+    quote: Packaging is inconsistent with the stated method of shipment or destination.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Goods declared for a short domestic truck run are crated for long ocean transit.
+  cases: []
+  data_needed:
+  - Document (packing list, bill of lading, air waybill)
+  - Contract
+  - Address
+  checkable: records
+  lookup_sources:
+  - Customs and shipping records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Shippers use whatever packing they have.
+  - Plans change after packing.
+  - Some buyers ask for extra-protective packing as standard.
+  jurisdictions: United States (Export Administration Regulations)
+  version: 1
+- id: SF-067
+  name: Customer has little or no business background
+  definition: The buyer has no track record or trading history that would explain the purchase, which
+    BIS lists as a know-your-customer red flag.
+  areas:
+  - SF
+  typology: Export control evasion and diversion
+  status: verified
+  sources:
+  - title: '15 CFR Part 732, Supplement No. 3: BIS''s Know Your Customer Guidance and Red Flags'
+    publisher: US Bureau of Industry and Security (via Cornell LII)
+    year: current
+    url: https://www.law.cornell.edu/cfr/text/15/appendix-Supplement_No_3_to_part_732
+    locator: Red Flags, item 4
+    quote: The customer has little or no business background.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A company registered four months ago with no prior imports orders high-end machine tools.
+  cases: []
+  data_needed:
+  - Company (incorporationDate, sector, status)
+  - Ownership
+  - Directorship
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Trade databases (import/export records)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Every business starts somewhere; start-ups and new subsidiaries have no history.
+  - Companies set up a new entity for a new project.
+  jurisdictions: United States (Export Administration Regulations)
+  version: 1
+- id: SF-068
+  name: Ultimate owner or user of the goods is unknown, e.g. a distributor with no factory ordering customised
+    equipment
+  definition: An order comes from a party that could not itself be the end user, such as a distributor
+    with no manufacturing site buying chip-making equipment normally customised for or installed at the
+    user's plant, so the real owner is unknown.
+  areas:
+  - SF
+  typology: Export control evasion (advanced computing, supercomputers, semiconductor manufacturing equipment)
+  status: verified
+  sources:
+  - title: '15 CFR Part 732, Supplement No. 3: BIS''s Know Your Customer Guidance and Red Flags'
+    publisher: US Bureau of Industry and Security (via Cornell LII)
+    year: current
+    url: https://www.law.cornell.edu/cfr/text/15/appendix-Supplement_No_3_to_part_732
+    locator: Red Flags, item 21
+    quote: Because the distributor would never be the end user of such equipment, the ultimate owner or
+      beneficiary is unknown
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A trading company in a third country orders a lithography tool that must be calibrated on site at
+    a chip fab, but names no fab.
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Ownership
+  - Address
+  - Document (end-user statement)
+  checkable: lookups
+  lookup_sources:
+  - Company registry
+  - Trade databases
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some distributors legitimately buy for stock or resell to identified customers later.
+  - Leasing companies own equipment they do not use.
+  jurisdictions: United States (Export Administration Regulations)
+  version: 1
+- id: SF-069
+  name: Request to service or upgrade an item with doubtful export licence history or altered for a more
+    advanced use
+  definition: A customer asks for service, installation or upgrades on an item that probably needed an
+    export licence it likely did not get, or that a third party altered after export for a more advanced
+    use needing a licence, which BIS says must be resolved before proceeding.
+  areas:
+  - SF
+  typology: Export control evasion and prohibited end use
+  status: verified
+  sources:
+  - title: '15 CFR Part 732, Supplement No. 3: BIS''s Know Your Customer Guidance and Red Flags'
+    publisher: US Bureau of Industry and Security (via Cornell LII)
+    year: current
+    url: https://www.law.cornell.edu/cfr/text/15/appendix-Supplement_No_3_to_part_732
+    locator: Red Flags, items 22 and 23
+    quote: This would include acting on requests to service, install, upgrade, or otherwise maintain the
+      item of concern.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 15 CFR Part 732, Supplement No. 3
+    publisher: US Bureau of Industry and Security (via Cornell LII)
+    year: current
+    url: https://www.law.cornell.edu/cfr/text/15/appendix-Supplement_No_3_to_part_732
+    locator: Red Flags, item 23
+    quote: that was altered after export, reexport, or transfer by a third-party for a more advanced end
+      use
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A user in a presumption-of-denial country asks the original maker for a software upgrade to a tool
+    the maker never sold there.
+  cases: []
+  data_needed:
+  - Company
+  - Contract
+  - Document (licence records, service tickets)
+  - Address
+  checkable: person
+  lookup_sources:
+  - Export licence records (where obtainable)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Equipment is legitimately resold second-hand with licences.
+  - Records of old licences can be lost.
+  - Some upgrades are minor and need no licence.
+  jurisdictions: United States (Export Administration Regulations)
+  version: 1
+- id: SF-070
+  name: New customer is a likely successor to an Entity List company (same leadership or same tailored
+    items)
+  definition: A new customer's senior managers or lead engineers overlap with a company on the US Entity
+    List, or it orders an item designed for a now-listed former customer, suggesting it has taken over
+    the listed company's work.
+  areas:
+  - SF
+  typology: Export control evasion through successor or front entities
+  status: verified
+  sources:
+  - title: '15 CFR Part 732, Supplement No. 3: BIS''s Know Your Customer Guidance and Red Flags'
+    publisher: US Bureau of Industry and Security (via Cornell LII)
+    year: current
+    url: https://www.law.cornell.edu/cfr/text/15/appendix-Supplement_No_3_to_part_732
+    locator: Red Flags, item 24
+    quote: The new customer's senior management or technical leadership (e.g., process engineers that
+      are team leaders
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 15 CFR Part 732, Supplement No. 3
+    publisher: US Bureau of Industry and Security (via Cornell LII)
+    year: current
+    url: https://www.law.cornell.edu/cfr/text/15/appendix-Supplement_No_3_to_part_732
+    locator: Red Flags, item 25
+    quote: designed or modified for an existing or former customer that is now designated on the Entity
+      List.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Months after a chip firm is added to the Entity List, a new firm whose chief process engineer used
+    to lead the listed firm's fab orders the same custom parts.
+  cases: []
+  data_needed:
+  - Company
+  - Person
+  - Directorship
+  - Employment
+  - Sanction (Entity List)
+  - Contract
+  checkable: lookups
+  lookup_sources:
+  - BIS Entity List / Consolidated Screening List
+  - Company registry
+  - Professional networking sites
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Engineers change jobs; after a company is listed its staff look for work elsewhere.
+  - Industry-standard designs may suit many buyers.
+  jurisdictions: United States (Export Administration Regulations)
+  version: 1
+- id: SF-071
+  name: Assets or ownership moved to children, relatives or associates just before or after a sanctions
+    designation
+  definition: A person facing or under sanctions transfers ownership of companies, trusts, accounts or
+    funds to children, a former spouse, relatives or business associates around the time sanctions are
+    imposed, so the assets stay within reach while appearing to belong to someone else.
+  areas:
+  - ML
+  - SF
+  typology: Sanctions evasion through family members and proxies
+  status: verified
+  sources:
+  - title: 'Trends in Bank Secrecy Act Data: Financial Activity by Russian Oligarchs in 2022 (Financial
+      Trend Analysis)'
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/2022-12/Financial Trend Analysis_Russian Oligarchs
+      FTA _Final.pdf
+    locator: p. 3, Russian Oligarchs Moved or Transferred Funds and Assets around the Time of Russian
+      Invasion
+    quote: transferred beneficial ownership of their companies, trusts, or accounts to their children
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Trends in BSA Data: Financial Activity by Russian Oligarchs in 2022'
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/2022-12/Financial Trend Analysis_Russian Oligarchs
+      FTA _Final.pdf
+    locator: p. 3
+    quote: right before sanctions were imposed on several oligarchs
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Global Advisory on Russian Sanctions Evasion Issued Jointly by the Multilateral REPO Task Force
+    publisher: REPO Task Force (published by Department of Finance Canada)
+    year: '2023'
+    url: https://www.canada.ca/en/department-finance/programs/financial-sector-policy/global-advisory-on-russian-sanctions-evasion.html
+    locator: Use of Family Members and Close Associates to Ensure Continued Access and Control
+    quote: Family members and close associates of designated persons are well placed to act as proxies
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Two weeks before designation, an oligarch's stake in a holding company is re-registered to his 22-year-old
+    son.
+  - Funds move to an ex-wife's account abroad soon after an invasion.
+  cases:
+  - name: OFAC designations of Suleiman Kerimov's family and network
+    year: '2022'
+    jurisdiction: United States
+    what_happened: OFAC designated Kerimov's wife, two daughters and son, real estate companies belonging
+      to his daughter, and his nephew as a financial facilitator, stating Kerimov used relatives, advisers
+      and opaque legal entities to invest in the US. This is an administrative sanctions designation by
+      Treasury, not a court ruling.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://home.treasury.gov/news/press-releases/jy1102
+    source_title: Treasury Sanctions Global Russian Military Supply Chain, Kremlin-linked Networks, and
+      Elites with Western Fortunes
+  data_needed:
+  - Ownership (owner, asset, startDate, endDate, percentage)
+  - Family
+  - Associate
+  - Person
+  - Company
+  - Sanction (startDate)
+  - Payment
+  checkable: lookups
+  lookup_sources:
+  - Company registry (ownership history)
+  - Sanctions lists (designation dates)
+  - Property and trust registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Moving beneficial ownership to proxies to hide control is a laundering and concealment technique.
+    source_url: https://www.canada.ca/en/department-finance/programs/financial-sector-policy/global-advisory-on-russian-sanctions-evasion.html
+  innocent_explanations:
+  - Wealthy families pass assets to children for succession or tax planning.
+  - Divorce settlements transfer assets.
+  - Timing can be coincidental if planning started earlier.
+  jurisdictions: United States, REPO Task Force members (Australia, Canada, EU, Germany, France, Italy,
+    Japan, UK, US)
+  version: 1
+- id: SF-072
+  name: Real estate bought or held for a sanctioned or at-risk person through nominees, straw buyers or
+    opaque companies
+  definition: Property is bought or held through intermediaries, nominees, straw purchasers or opaque
+    corporate structures, sometimes at prices well below or above market or by offshore buyers with links
+    to Russia, hiding who really owns it.
+  areas:
+  - ML
+  - SF
+  typology: Sanctions evasion through real estate
+  status: verified
+  sources:
+  - title: Global Advisory on Russian Sanctions Evasion Issued Jointly by the Multilateral REPO Task Force
+    publisher: REPO Task Force (published by Department of Finance Canada)
+    year: '2023'
+    url: https://www.canada.ca/en/department-finance/programs/financial-sector-policy/global-advisory-on-russian-sanctions-evasion.html
+    locator: Use of Real Estate to Hold Value, Benefit from Wealth
+    quote: often hiding behind intermediaries, nominees or straw purchasers and/or opaque corporate structures
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Global Advisory on Russian Sanctions Evasion
+    publisher: REPO Task Force
+    year: '2023'
+    url: https://www.canada.ca/en/department-finance/programs/financial-sector-policy/global-advisory-on-russian-sanctions-evasion.html
+    locator: Use of Real Estate to Hold Value, Benefit from Wealth
+    quote: the purchase of real property below or above its market value
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 'Trends in BSA Data: Financial Activity by Russian Oligarchs in 2022'
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/2022-12/Financial Trend Analysis_Russian Oligarchs
+      FTA _Final.pdf
+    locator: p. 5, Russian Oligarchs Purchase High-Value Goods or Property in 2022
+    quote: has increasingly become a safe haven for Russian wealth, both legitimate and illicit
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A Park Avenue apartment is owned by a BVI company whose shares are held by a lawyer as nominee.
+  cases:
+  - name: United States v. Robert Wise
+    year: '2023'
+    jurisdiction: United States (Southern District of New York)
+    what_happened: New York attorney Robert Wise pleaded guilty to conspiring to commit international
+      money laundering for keeping up six US properties (about $75 million) held through shell companies
+      for sanctioned oligarch Viktor Vekselberg, paid after designation from a Bahamas shell company and
+      a Russian account of an associate's relative.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/new-york-attorney-pleads-guilty-conspiring-commit-money-laundering-promote-sanctions
+    source_title: New York Attorney Pleads Guilty to Conspiring to Commit Money Laundering to Promote
+      Sanctions Violations
+  data_needed:
+  - RealEstate
+  - Ownership
+  - Company
+  - Person
+  - Representation (nominee)
+  - Payment
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - Property records / land registry
+  - Company registry
+  - Beneficial ownership registers
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Real estate through nominees is a classic money laundering channel as well as a sanctions-evasion
+      one.
+    source_url: https://www.canada.ca/en/department-finance/programs/financial-sector-policy/global-advisory-on-russian-sanctions-evasion.html
+  innocent_explanations:
+  - Many buyers use companies or trusts for privacy, liability or tax reasons.
+  - Prices vary for real reasons (condition, quick sale, family deals).
+  jurisdictions: REPO Task Force members; United States
+  version: 1
+- id: SF-073
+  name: Lawyers, accountants or trust and company service providers move money or manage assets for a
+    designated person
+  definition: Professionals such as lawyers, accountants and trust and company service providers, often
+    in offshore centres, set up structures, pool investments or pass payments through their own accounts
+    so a designated person stays hidden.
+  areas:
+  - ML
+  - SF
+  typology: Sanctions evasion through professional enablers
+  status: verified
+  sources:
+  - title: Global Advisory on Russian Sanctions Evasion Issued Jointly by the Multilateral REPO Task Force
+    publisher: REPO Task Force (published by Department of Finance Canada)
+    year: '2023'
+    url: https://www.canada.ca/en/department-finance/programs/financial-sector-policy/global-advisory-on-russian-sanctions-evasion.html
+    locator: Use of Enablers to Avoid Involvement, Leverage Expertise
+    quote: accountants, as well as trust and company service providers
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Global Advisory on Russian Sanctions Evasion
+    publisher: REPO Task Force
+    year: '2023'
+    url: https://www.canada.ca/en/department-finance/programs/financial-sector-policy/global-advisory-on-russian-sanctions-evasion.html
+    locator: Use of Enablers to Avoid Involvement, Leverage Expertise
+    quote: Enablers may operate in offshore financial centers where company formation is common
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Rent and taxes on a sanctioned person's homes are paid from a lawyer's client trust account.
+  cases:
+  - name: United States v. Robert Wise
+    year: '2023'
+    jurisdiction: United States (Southern District of New York)
+    what_happened: Wise received about 25 wires after Vekselberg's 2018 designation into his attorney
+      trust account and used them for property expenses; he pleaded guilty and agreed to forfeit more
+      than $3.7 million.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/new-york-attorney-pleads-guilty-conspiring-commit-money-laundering-promote-sanctions
+    source_title: New York Attorney Pleads Guilty to Conspiring to Commit Money Laundering to Promote
+      Sanctions Violations
+  data_needed:
+  - Person (profession)
+  - Company
+  - Representation
+  - Payment
+  - BankAccount
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Bar and professional registers
+  - Company registry (registered agents)
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Gatekeeper professionals are a standing money laundering typology.
+    source_url: https://www.canada.ca/en/department-finance/programs/financial-sector-policy/global-advisory-on-russian-sanctions-evasion.html
+  innocent_explanations:
+  - Lawyers and trust companies routinely hold client money and manage property for lawful clients.
+  - Payments may relate to permitted legal fees or licensed activity.
+  jurisdictions: REPO Task Force members; United States
+  version: 1
+- id: SF-074
+  name: Trusts and front persons used to hide a designated person's interest
+  definition: Assets sit in trusts or layered US and foreign shell companies, with front persons named
+    on paper, in arrangements that appear designed to block sanctions enforcement.
+  areas:
+  - ML
+  - SF
+  typology: Sanctions evasion through complex ownership structures
+  status: verified
+  sources:
+  - title: Global Advisory on Russian Sanctions Evasion Issued Jointly by the Multilateral REPO Task Force
+    publisher: REPO Task Force (published by Department of Finance Canada)
+    year: '2023'
+    url: https://www.canada.ca/en/department-finance/programs/financial-sector-policy/global-advisory-on-russian-sanctions-evasion.html
+    locator: Use of Complex Ownership Structures to Avoid Identification
+    quote: trust arrangements that may have been designed to thwart sanctions enforcement
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: U.S. Treasury Blocks Over $1 Billion in Suleiman Kerimov Trust
+    publisher: US Department of the Treasury
+    year: '2022'
+    url: https://home.treasury.gov/news/press-releases/jy0841
+    locator: Press release body
+    quote: Kerimov used a complex series of legal structures and front persons to obscure his interest
+      in Heritage Trust.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A Delaware trust holds US shares; the listed beneficiaries are relatives and the trustee is an associate.
+  cases:
+  - name: OFAC blocking of Heritage Trust (Suleiman Kerimov)
+    year: '2022'
+    jurisdiction: United States
+    what_happened: Treasury identified Heritage Trust, a Delaware trust formed in 2017 to hold Kerimov's
+      US assets, as blocked property worth over $1 billion, stating he used legal structures and front
+      persons to hide his interest. This is an administrative Treasury determination, not a court ruling.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://home.treasury.gov/news/press-releases/jy0841
+    source_title: U.S. Treasury Blocks Over $1 Billion in Suleiman Kerimov Trust
+  data_needed:
+  - Company (trust, legalForm)
+  - Ownership
+  - Representation
+  - Person
+  - Family
+  - Associate
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Trust and company registries
+  - Beneficial ownership registers
+  - Sanctions lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Layered trusts and shells hide beneficial ownership, a core laundering technique.
+    source_url: https://home.treasury.gov/news/press-releases/jy0841
+  innocent_explanations:
+  - Trusts are common for estate planning, privacy and asset protection.
+  - Many trusts were set up long before any sanctions.
+  jurisdictions: REPO Task Force members; United States
+  version: 1
+- id: SF-075
+  name: Payments for upkeep of a designated person's property, yacht or aircraft
+  definition: Someone keeps paying maintenance, crew, taxes or other running costs for real estate, yachts
+    or aircraft beneficially owned by a sanctioned person, often through shell companies, which can itself
+    breach sanctions.
+  areas:
+  - ML
+  - SF
+  typology: Sanctions evasion through maintenance of blocked assets
+  status: verified
+  sources:
+  - title: New York Attorney Pleads Guilty to Conspiring to Commit Money Laundering to Promote Sanctions
+      Violations
+    publisher: US Department of Justice
+    year: '2023'
+    url: https://www.justice.gov/opa/pr/new-york-attorney-pleads-guilty-conspiring-commit-money-laundering-promote-sanctions
+    locator: Press release body
+    quote: Wise also agreed to forfeit more than $3.7 million and to be satisfied by a payment of $210,441.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Civil Forfeiture Complaint Filed Against $300 Million Superyacht Amadea
+    publisher: US Attorney's Office, Southern District of New York
+    year: '2023'
+    url: https://www.justice.gov/usao-sdny/pr/civil-forfeiture-complaint-filed-against-300-million-superyacht-amadea-involved
+    locator: Press release body
+    quote: conducted in a manner designed to conceal his ownership of the yacht
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Crew wages and fuel for a superyacht are paid in US dollars by a newly incorporated company.
+  cases:
+  - name: United States v. Robert Wise
+    year: '2023'
+    jurisdiction: United States (Southern District of New York)
+    what_happened: Wise pleaded guilty for paying expenses on six US properties of sanctioned oligarch
+      Viktor Vekselberg with about $3.8 million received after the 2018 designation.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/new-york-attorney-pleads-guilty-conspiring-commit-money-laundering-promote-sanctions
+    source_title: New York Attorney Pleads Guilty to Conspiring to Commit Money Laundering
+  - name: United States v. M/Y Amadea
+    year: '2023'
+    jurisdiction: United States (Southern District of New York)
+    what_happened: DOJ's civil forfeiture complaint alleges that Suleiman Kerimov became beneficial owner
+      of the yacht in 2021 through transfers between newly incorporated shell companies and that people
+      acting for him paid US-dollar upkeep costs through the US financial system. These are the government's
+      allegations in the complaint; later court rulings were reported in the press but not checked against
+      court documents here.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://www.justice.gov/usao-sdny/pr/civil-forfeiture-complaint-filed-against-300-million-superyacht-amadea-involved
+    source_title: Civil Forfeiture Complaint Filed Against $300 Million Superyacht Amadea
+  data_needed:
+  - Vessel
+  - Airplane
+  - RealEstate
+  - Payment
+  - Company
+  - Ownership
+  - Sanction
+  checkable: records
+  lookup_sources:
+  - Property records
+  - Ship and aircraft registries
+  - Sanctions lists
+  - Court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: The Wise case was charged as international money laundering to promote sanctions violations.
+    source_url: https://www.justice.gov/opa/pr/new-york-attorney-pleads-guilty-conspiring-commit-money-laundering-promote-sanctions
+  innocent_explanations:
+  - Some upkeep is licensed by the sanctions authority to preserve blocked property.
+  - The payer may have bought the asset legitimately before any designation.
+  jurisdictions: United States
+  version: 1
+- id: SF-076
+  name: Sudden rise in value transferred to accounts in a jurisdiction or institution without a clear
+    reason
+  definition: Money flowing to accounts in a particular country or bank jumps suddenly with no clear business
+    reason, which FinCEN flagged as a sign of Russian sanctions evasion.
+  areas:
+  - SF
+  typology: Russian sanctions evasion through the financial system
+  status: verified
+  sources:
+  - title: FinCEN Advises Increased Vigilance for Potential Russian Sanctions Evasion Attempts (FIN-2022-Alert001)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/2022-03/FinCEN Alert Russian Sanctions Evasion FINAL
+      508.pdf
+    locator: p. 4, Select Red Flag Indicators
+    quote: Accounts in jurisdictions or with financial institutions that are experiencing a sudden rise
+      in value being transferred
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - After February 2022, transfers to a small bank in a neighbouring country triple with no new business
+    explaining it.
+  cases: []
+  data_needed:
+  - Payment (amount, date, beneficiary bank, country)
+  - BankAccount
+  - Company
+  checkable: records
+  lookup_sources:
+  - Bank or payment data; central bank and BIS flow statistics
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Businesses relocate operations after a war or sanctions to keep lawful trade going.
+  - New contracts or seasonal trade raise volumes.
+  jurisdictions: United States (FinCEN)
+  version: 1
+- id: SF-077
+  name: Jump in new company formations in places previously linked to Russian money flows
+  definition: A jurisdiction that already handled Russian financial flows sees a notable recent increase
+    in newly formed companies, which FinCEN lists as a red flag for sanctions evasion vehicles.
+  areas:
+  - ML
+  - SF
+  typology: Russian sanctions evasion through corporate vehicles
+  status: verified
+  sources:
+  - title: FinCEN Advises Increased Vigilance for Potential Russian Sanctions Evasion Attempts (FIN-2022-Alert001)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/2022-03/FinCEN Alert Russian Sanctions Evasion FINAL
+      508.pdf
+    locator: p. 4, Select Red Flag Indicators
+    quote: Jurisdictions previously associated with Russian financial flows that are identified as having
+      a notable recent increase
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Company registrations by Russian nationals in a Central Asian or Gulf free zone spike in the months
+    after sanctions.
+  cases: []
+  data_needed:
+  - Company (incorporationDate, jurisdiction)
+  - Directorship
+  - Ownership
+  - Person (nationality)
+  checkable: lookups
+  lookup_sources:
+  - Company registry (bulk or statistics)
+  - OpenCorporates
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Waves of new shell companies are a laundering vehicle as well as a sanctions one.
+    source_url: https://www.fincen.gov/sites/default/files/2022-03/FinCEN Alert Russian Sanctions Evasion
+      FINAL 508.pdf
+  innocent_explanations:
+  - Russian nationals and companies relocated lawfully after 2022.
+  - Free zones run promotions that raise registrations.
+  jurisdictions: United States (FinCEN)
+  version: 1
+- id: SF-078
+  name: New account sends or receives funds from a sanctioned bank or one removed from SWIFT
+  definition: A newly opened account tries to move money to or from a sanctioned financial institution
+    or one cut off from the SWIFT messaging network.
+  areas:
+  - SF
+  typology: Russian sanctions evasion through the financial system
+  status: verified
+  sources:
+  - title: FinCEN Advises Increased Vigilance for Potential Russian Sanctions Evasion Attempts (FIN-2022-Alert001)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/2022-03/FinCEN Alert Russian Sanctions Evasion FINAL
+      508.pdf
+    locator: p. 4, Select Red Flag Indicators
+    quote: Newly established accounts that attempt to send or receive funds from a sanctioned institution
+      or an institution removed
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - An account opened last month receives a transfer routed from a Russian bank disconnected from SWIFT.
+  cases: []
+  data_needed:
+  - BankAccount (openingDate)
+  - Payment
+  - Company (bank)
+  - Sanction
+  checkable: lookups
+  lookup_sources:
+  - Sanctions lists
+  - SWIFT disconnection notices (EU regulations)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Some transactions with sanctioned banks are licensed (e.g. energy, humanitarian, wind-down).
+  - People evacuating savings may open accounts and move personal funds.
+  jurisdictions: United States (FinCEN)
+  version: 1
+- id: SF-079
+  name: Non-routine foreign exchange that may indirectly involve sanctioned Russian banks and breaks with
+    the past 12 months
+  definition: A customer makes unusual currency-exchange transactions that may indirectly touch sanctioned
+    Russian banks and do not fit their activity over the previous 12 months.
+  areas:
+  - SF
+  typology: Russian sanctions evasion through the financial system
+  status: verified
+  sources:
+  - title: FinCEN Advises Increased Vigilance for Potential Russian Sanctions Evasion Attempts (FIN-2022-Alert001)
+    publisher: FinCEN
+    year: '2022'
+    url: https://www.fincen.gov/sites/default/files/2022-03/FinCEN Alert Russian Sanctions Evasion FINAL
+      508.pdf
+    locator: p. 4, Select Red Flag Indicators
+    quote: including transactions that are inconsistent with activity over the prior 12 months.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A trading firm that only used euros suddenly runs large rouble-to-dirham conversions through a correspondent
+    bank.
+  cases: []
+  data_needed:
+  - Payment (currency, amount, date)
+  - BankAccount
+  - Company
+  checkable: records
+  lookup_sources:
+  - Bank records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Departs from the customer's foreign exchange activity over the prior 12 months and may indirectly
+      involve a sanctioned Russian financial institution (FinCEN wording)
+    threshold_source: https://www.fincen.gov/sites/default/files/2022-03/FinCEN Alert Russian Sanctions
+      Evasion FINAL 508.pdf
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Businesses change currencies when payment routes close.
+  - Currency swings prompt hedging or conversions.
+  jurisdictions: United States (FinCEN)
   version: 1
 not_reached:
 - 'FATF Guidance on Proliferation Financing Risk Assessment and Mitigation (2021) on fatf-gafi.org: direct
@@ -3255,3 +4610,11 @@ not_reached:
   judgment status not confirmed.'
 - BIS 'Know Your Customer' red flags were read from the eCFR versioner API (2025-06-02 version of 15 CFR
   Part 732).
+- FinCEN Alert FIN-2022-Alert002 (Real Estate, Luxury Goods, and Other High-Value Assets), the fetch of
+  the PDF failed; its red flags were not added
+- REPO Task Force advisory PDF on dfat.gov.au (robots blocked); the Canada.ca HTML version was used instead
+- Primary court records on later rulings in the Amadea forfeiture case (press reports a ruling and sale;
+  not checked against court documents)
+- 'BIS red flag 28 (IaaS for AI model weights, ECCN 4E091) was not added: it comes from the 2025 AI diffusion
+  rule, and I could not confirm on eCFR whether it is still in force'
+- BIS Entity List page itself (bis.gov), defined from the 15 CFR Supplement 3 text instead

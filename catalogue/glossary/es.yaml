@@ -1,0 +1,237 @@
+area: ES
+terms:
+- term: Insider
+  definition: Anyone who has or had authorised access to, or knowledge of, an organisation's people, places,
+    systems or information.
+  examples: []
+  source_url: https://www.cisa.gov/topics/physical-security/insider-threat-mitigation/defining-insider-threats
+  cases: []
+  related:
+  - Insider threat
+  indicators: []
+  areas:
+  - ES
+- term: Insider threat
+  definition: 'The risk that an insider uses their access, knowingly or not, to harm the organisation.
+    CDSE says: ''An Insider Threat is anyone with authorized access who uses that access to wittingly
+    or unwittingly harm the organization and its resources.'''
+  examples: []
+  source_url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+  cases: []
+  related:
+  - Insider
+  - Potential risk indicator
+  indicators: []
+  areas:
+  - ES
+- term: Potential risk indicator (PRI)
+  definition: 'A behaviour or circumstance that can come before insider harm. It is not proof: CDSE notes
+    ''not everyone who exhibits these behaviors is doing something wrong.'''
+  examples: []
+  source_url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Unintentional insider threat
+  definition: Harm caused by carelessness or accident, not malice, such as losing a laptop or clicking
+    a phishing link.
+  examples: []
+  source_url: https://www.cisa.gov/topics/physical-security/insider-threat-mitigation/defining-insider-threats
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Collusive threat
+  definition: One or more insiders working together with an outside actor, such as a foreign service or
+    criminal group, to compromise an organisation.
+  examples: []
+  source_url: https://www.cisa.gov/topics/physical-security/insider-threat-mitigation/defining-insider-threats
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Third-party threat
+  definition: A threat from contractors or vendors who have access but are not formal members of the organisation.
+  examples: []
+  source_url: https://www.cisa.gov/topics/physical-security/insider-threat-mitigation/defining-insider-threats
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Espionage
+  definition: Covertly or illicitly spying on a government, organisation or person to obtain secret information.
+  examples: []
+  source_url: https://www.cisa.gov/topics/physical-security/insider-threat-mitigation/defining-insider-threats
+  cases: []
+  related:
+  - Economic espionage
+  indicators: []
+  areas:
+  - ES
+- term: Sabotage
+  definition: Deliberate action to damage an organisation's physical or digital infrastructure.
+  examples: []
+  source_url: https://www.cisa.gov/topics/physical-security/insider-threat-mitigation/defining-insider-threats
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Foreign intelligence entity (FIE)
+  definition: Any known or suspected foreign organisation, person or group, public or private, that carries
+    out intelligence activities against the United States.
+  examples: []
+  source_url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: National defense information (NDI)
+  definition: Information relating to US national defence whose unauthorised gathering, retention or transmission
+    is a crime under 18 U.S.C. 793 ('Gathering, transmitting or losing defense information').
+  examples:
+  - Teixeira, Rahman and Winner were all charged over NDI.
+  source_url: https://www.law.cornell.edu/uscode/text/18/793
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Economic espionage
+  definition: Stealing trade secrets knowing or intending that it will benefit a foreign government, foreign
+    instrumentality or foreign agent (18 U.S.C. 1831).
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/1831
+  cases: []
+  related:
+  - Trade secret
+  indicators: []
+  areas:
+  - ES
+- term: Trade secret
+  definition: Business, scientific, technical or engineering information that the owner keeps secret and
+    that has value because it is not generally known (18 U.S.C. 1839).
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/18/1839
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Restricted Data
+  definition: A US legal category of protected nuclear information, including the design of naval nuclear
+    reactors, which the Toebbes conspired to communicate.
+  examples: []
+  source_url: https://justice.gov/archives/opa/pr/maryland-nuclear-engineer-and-wife-sentenced-espionage-related-offenses
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Dead drop
+  definition: A hidden spot where one person leaves an item, such as an SD card, for another to collect
+    later so they never meet.
+  examples: []
+  source_url: https://justice.gov/archives/opa/pr/maryland-nuclear-engineer-and-wife-sentenced-espionage-related-offenses
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Unexplained affluence
+  definition: Wealth or spending that a person's known income cannot explain; US security rules treat
+    it as a disqualifying concern.
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/32/147.8
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Adjudicative guidelines
+  definition: The official US criteria for deciding whether someone can hold a security clearance, covering
+    areas such as foreign influence (Guideline B), financial considerations (F), security violations (K)
+    and misuse of IT (M).
+  examples: []
+  source_url: https://www.law.cornell.edu/cfr/text/32/147.4
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Security clearance
+  definition: Official permission to access classified information at a given level (Confidential, Secret,
+    Top Secret, plus compartments such as SCI and SAP).
+  examples: []
+  source_url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Need-to-know
+  definition: The rule that a cleared person may only see classified information that their duties require;
+    seeking information without it is reportable.
+  examples: []
+  source_url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Volunteer spy (walk-in)
+  definition: A person who offers secrets to a foreign power on their own initiative instead of being
+    recruited; PERSEREC found twice as many US spies volunteered as were recruited.
+  examples: []
+  source_url: https://apps.dtic.mil/sti/pdfs/ADA411004.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Data exfiltration
+  definition: Moving data out of an organisation's control without authorisation, for example by email
+    to a personal account, cloud upload or removable media.
+  examples: []
+  source_url: https://www.sei.cmu.edu/blog/developing-controls-to-prevent-theft-of-intellectual-property
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Removable media
+  definition: Portable storage such as USB sticks, SD cards and discs that can carry data off a system;
+    unauthorised use is a listed indicator.
+  examples: []
+  source_url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Talent plan (talent programme)
+  definition: A government-sponsored scheme recruiting researchers and engineers; Ding applied to a Shanghai
+    talent plan while taking Google's AI secrets.
+  examples: []
+  source_url: https://www.justice.gov/opa/pr/former-google-engineer-found-guilty-economic-espionage-and-theft-confidential-ai-technology
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES
+- term: Elicitation
+  definition: Drawing out protected information through seemingly innocent conversation, questions or
+    messages, including spoofed email and spear phishing.
+  examples: []
+  source_url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - ES

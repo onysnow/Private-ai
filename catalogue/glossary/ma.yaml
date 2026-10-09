@@ -1,0 +1,440 @@
+area: MA
+terms:
+- term: Market manipulation
+  definition: Trading, orders or statements that give false signals about supply, demand or price, or
+    that fix a price at an artificial level.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+  cases: []
+  related:
+  - Spoofing
+  - Wash trade
+  - Pump and dump
+  indicators: []
+  areas:
+  - MA
+- term: Insider trading (insider dealing)
+  definition: Buying or selling a security on the basis of material, non-public information in breach
+    of a duty of trust; it also covers tipping and trading by the person tipped.
+  examples: []
+  source_url: https://www.investor.gov/introduction-investing/investing-basics/glossary/insider-trading
+  cases: []
+  related:
+  - Inside information
+  - Tippee
+  - Misappropriation
+  indicators: []
+  areas:
+  - MA
+- term: Inside information
+  definition: Precise information, not yet public, about an issuer or financial instrument that would
+    probably move the price significantly if made public (EU/UK definition).
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Material non-public information
+  definition: The US term for important information that has not been made public; trading on it in breach
+    of a duty is illegal insider trading.
+  examples: []
+  source_url: https://www.investor.gov/introduction-investing/investing-basics/glossary/insider-trading
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Tippee
+  definition: Someone who gets inside information from an insider (a friend, relative or business contact)
+    and trades on it.
+  examples: []
+  source_url: https://www.investor.gov/introduction-investing/investing-basics/glossary/insider-trading
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Misappropriation
+  definition: Taking confidential information from an employer, client, family member or friend and trading
+    on it, even if you are not a company insider.
+  examples: []
+  source_url: https://www.investor.gov/introduction-investing/investing-basics/glossary/insider-trading
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Unlawful disclosure of inside information
+  definition: Passing inside information to someone else outside the normal course of one's job or duties
+    (EU/UK).
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Pump and dump
+  definition: Fraudsters hype a stock with false or misleading information to drive the price up, then
+    sell their own shares at the high price.
+  examples: []
+  source_url: https://www.investor.gov/introduction-investing/investing-basics/glossary/pump-and-dump-schemes
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Trash and cash
+  definition: 'The reverse of pump and dump: short the stock, spread negative falsehoods, and close the
+    position after the price falls.'
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Spoofing
+  definition: Placing bids or offers you intend to cancel before they execute, to mislead other traders.
+  examples: []
+  source_url: https://www.law.cornell.edu/uscode/text/7/6c
+  cases: []
+  related:
+  - Layering
+  indicators: []
+  areas:
+  - MA
+- term: Layering
+  definition: Placing several orders at different prices on one side of the market, trading on the other
+    side, then cancelling the first orders.
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/19-18
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Wash trade
+  definition: A trade where ownership and risk do not really change hands, because buyer and seller are
+    the same or acting together.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Improper matched orders
+  definition: Buy and sell orders of similar size and price entered at about the same time by the same
+    or colluding parties.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Painting the tape
+  definition: Trades made so they appear on public price displays and suggest activity or price movement.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Marking the close
+  definition: Trading at the close, open or settlement time to push the reference price to a chosen level.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Quote stuffing
+  definition: Flooding a market with orders, cancellations or updates to confuse or slow other traders.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Momentum ignition
+  definition: Orders or trades meant to start or speed up a price trend that others will follow, so the
+    manipulator can trade at a better price.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Abusive squeeze
+  definition: Using a dominant hold over supply, demand or delivery to force others to settle at distorted
+    prices.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Cross-product manipulation
+  definition: Trading one instrument to improperly move the price of a related instrument, such as shares
+    versus their options.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Concealing ownership
+  definition: Holding securities through colluding parties so that ownership disclosures mislead about
+    who really holds them.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0522
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Benchmark
+  definition: A published rate, index or figure used to work out what is paid under, or what is the value
+    of, a financial instrument (for example LIBOR).
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Front running
+  definition: Trading ahead of a known, imminent client or block order to profit from its price effect.
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/rulebooks/finra-rules/5270
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Shadow trading
+  definition: Using confidential information about one company to trade in a different but economically
+    linked company.
+  examples: []
+  source_url: https://www.sec.gov/enforcement-litigation/litigation-releases/lr-25970
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Penny stock
+  definition: Generally a security of a very small company trading at less than $5 a share.
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/21-03
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Microcap stock
+  definition: Generally a security of a company with a market value below about $250 to $300 million;
+    often thinly traded, with little public information.
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/21-03
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Shell company
+  definition: A registrant with no or nominal operations and no or nominal assets, or assets that are
+    only cash (SEC Rule 12b-2 as quoted by FINRA).
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/21-03
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Thinly traded (illiquid) security
+  definition: A stock that trades rarely or in small volumes, so small trades can move its price a lot.
+  examples: []
+  source_url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/microcap-fraud
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Float
+  definition: The shares available for public trading; holding a large share of it gives control over
+    the price.
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/19-18
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Restrictive legend
+  definition: A notice on shares saying they cannot be freely resold until conditions are met; missing
+    legends on newly acquired shares are a red flag.
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/19-18
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: FINRA Form 211
+  definition: The form a broker files so a security can start or resume being quoted over the counter.
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/21-03
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Omnibus account
+  definition: One account at a broker that holds the trades of many underlying customers, hiding who each
+    one is.
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/21-03
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: DVP/RVP account
+  definition: 'Delivery versus Payment / Receive versus Payment: an account where trades are settled against
+    a custodian at another firm, so the executing broker sees less of the customer.'
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/21-03
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Master/sub account
+  definition: A structure where a master account has sub-accounts whose trading is anonymous to the broker.
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/19-18
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: NBBO (National Best Bid or Offer)
+  definition: The best buying and selling prices available for a US stock across all exchanges at a given
+    moment.
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/19-18
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Specified adult
+  definition: Under FINRA Rule 2165, a person aged 65 or older, or 18 or older with an impairment that
+    stops them protecting their own interests.
+  examples: []
+  source_url: https://www.finra.org/rules-guidance/notices/21-03
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Person discharging managerial responsibilities (PDMR)
+  definition: A board member, or a senior executive with regular access to inside information and power
+    to make major decisions, at an EU/UK issuer.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Person closely associated
+  definition: A PDMR's spouse or partner, dependent child, relative sharing the household for a year,
+    or a company or trust they control or that benefits them.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Closed period
+  definition: The 30 calendar days before an interim or year-end report when EU/UK senior managers may
+    not trade the company's securities.
+  examples: []
+  source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014R0596
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Schedule 13D
+  definition: US ownership report that must be filed by anyone acquiring more than five percent of a voting
+    class of a company's shares.
+  examples: []
+  source_url: https://www.investor.gov/introduction-investing/investing-basics/glossary/schedules-13d-and-13g
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Contract for difference (CFD)
+  definition: A contract paying the change in an asset's price, letting traders bet on share prices without
+    owning the shares.
+  examples: []
+  source_url: https://www.fca.org.uk/news/press-releases/fca-fines-and-prohibits-hedge-fund-chief-investment-officer-market-abuse
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Out-of-the-money call option
+  definition: A cheap option to buy a stock at a price above its current level; it pays off only if the
+    price jumps, so heavy buying before news can signal leaked information.
+  examples: []
+  source_url: https://ideas.repec.org/a/inm/ormnsc/v65y2019i12p5697-5720.html
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Deferred prosecution agreement (DPA)
+  definition: A deal in which prosecutors file charges but hold off prosecuting if the company pays and
+    meets conditions.
+  examples: []
+  source_url: https://www.justice.gov/archives/opa/pr/jpmorgan-chase-co-agrees-pay-920-million-connection-schemes-defraud-precious-metals-and-us
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Trading suspension
+  definition: A regulator's temporary halt of trading in a stock, often over doubts about the company's
+    information; a past suspension is a red flag.
+  examples: []
+  source_url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/microcap-fraud
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA
+- term: Over-the-counter (OTC) / alternative trading system (ATS)
+  definition: Venues outside the national exchanges where most microcap stocks are quoted, for example
+    OTC Link ATS.
+  examples: []
+  source_url: https://www.investor.gov/protect-your-investments/fraud/types-fraud/microcap-fraud
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - MA

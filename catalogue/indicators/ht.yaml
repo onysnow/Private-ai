@@ -22,7 +22,7 @@ indicators:
     locator: Indicator 1, Abuse of vulnerability
     quote: Anyone can be a victim of forced labour.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -30,7 +30,7 @@ indicators:
     locator: Page 1, General indicators
     quote: Be in a situation of dependence
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Workers whose visa is tied to one employer told they will be deported if they complain
   - Workers recruited from an area of economic hardship who cannot speak the local language and rely on
@@ -86,7 +86,7 @@ indicators:
     quote: Deception relates to the failure to deliver what has been promised to the worker, either verbally
       or in writing.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -94,7 +94,7 @@ indicators:
     locator: Page 1, General indicators
     quote: Have acted on the basis of false promises
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Supplemental Advisory on Identifying and Reporting Human Trafficking and Related Activity (FIN-2020-A008)
     publisher: FinCEN, US Treasury
     year: '2020'
@@ -103,7 +103,7 @@ indicators:
     quote: Some labor recruiters also mislead workers about the conditions and nature of a job, engage
       in contract switching, and confiscate or destroy workers' identity documents.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Job advert abroad promises factory work at a set wage; worker is placed in a different job at lower
     pay
@@ -161,7 +161,7 @@ indicators:
     quote: Forced labourers may be locked up and guarded to prevent them from escaping, at work or while
       being transported.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -169,21 +169,11 @@ indicators:
     locator: Page 1, General indicators
     quote: Be unable to leave their work environment
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Guarded worker camps
   - Workers escorted to and from work and never seen alone
-  cases:
-  - name: EEOC v. Signal International, LLC
-    year: '2015'
-    jurisdiction: United States (E.D. Louisiana; Delaware bankruptcy court)
-    what_happened: EEOC alleged that Indian H-2B guest workers were made to pay $1,050 a month to live
-      in overcrowded, unsanitary, guarded camps; Signal agreed to pay an estimated $5 million to 476 workers
-      to settle the race and national origin discrimination suit.
-    outcome: settled
-    outcome_verified: true
-    source_url: https://www.eeoc.gov/newsroom/signal-international-llc-pay-5-million-settle-eeoc-race-national-origin-lawsuit
-    source_title: Signal International, LLC to Pay $5 Million to Settle EEOC Race, National Origin Lawsuit
+  cases: []
   data_needed:
   - Address (workplace and housing, same or linked)
   - Employment
@@ -223,7 +213,7 @@ indicators:
     quote: Victims of forced labour are often isolated in remote locations, denied contact with the outside
       world.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -231,7 +221,7 @@ indicators:
     locator: Page 1, General indicators
     quote: Have limited contact with their families or with people outside of their immediate environment
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Fishing crews kept at sea for long periods
   - Workers' phones taken away
@@ -274,7 +264,7 @@ indicators:
     quote: Forced labourers, their family members and close associates may be subjected to actual physical
       or sexual violence.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -282,7 +272,7 @@ indicators:
     locator: Page 1, General indicators
     quote: Suffer injuries that appear to be the result of an assault
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FIN-2020-A008
     publisher: FinCEN
     year: '2020'
@@ -290,7 +280,7 @@ indicators:
     locator: Section II, Behavioral indicators
     quote: A third party commits acts of physical aggression or intimidation toward the customer.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Bank staff see a companion strike or threaten a customer
   - Medical records of repeated unexplained injuries
@@ -331,7 +321,7 @@ indicators:
     quote: Victims of forced labour may suffer intimidation and threats when they complain about their
       conditions
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -339,7 +329,7 @@ indicators:
     locator: Page 1, General indicators
     quote: Be threatened with being handed over to the authorities
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Messages threatening to report a worker to immigration
   - Threats against family in home country
@@ -388,7 +378,7 @@ indicators:
     quote: The retention by the employer of identity documents or other valuable personal possessions
       is an element of forced labour
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -397,7 +387,7 @@ indicators:
     quote: Not be in possession of their passports or other travel or identity documents, as those documents
       are being held by someone else
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Guidance on Recognizing Activity that May be Associated with Human Smuggling and Human Trafficking
       (FIN-2014-A008)
     publisher: FinCEN
@@ -407,7 +397,7 @@ indicators:
     quote: Correspondingly, the third party escorting the customer may always have possession of the customer's
       ID.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FIN-2020-A008
     publisher: FinCEN
     year: '2020'
@@ -415,7 +405,7 @@ indicators:
     locator: Section II, Behavioral indicators
     quote: A third party maintains possession and/or control of all documents or money.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Companion hands the customer's passport to the bank teller
   - Employer keeps workers' passports 'for safekeeping'
@@ -480,7 +470,7 @@ indicators:
     quote: The fact of irregular or delayed payment of wages does not automatically imply a forced labour
       situation.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -488,7 +478,7 @@ indicators:
     locator: Page 1, General indicators
     quote: Have no access to their earnings
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Wages paid months late or held until the end of a contract
   - Workers receive tiny cash sums while records show larger pay
@@ -544,7 +534,7 @@ indicators:
     quote: Debt bondage – or bonded labour – reflects an imbalance in power between the worker-debtor
       and the employer-creditor.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Supplementary Convention on the Abolition of Slavery, the Slave Trade, and Institutions and
       Practices Similar to Slavery
     publisher: United Nations (OHCHR)
@@ -554,7 +544,7 @@ indicators:
     quote: if the value of those services as reasonably assessed is not applied towards the liquidation
       of the debt
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -562,7 +552,7 @@ indicators:
     locator: Page 1, General indicators
     quote: Be under the perception that they are bonded by debt
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Workers paid large recruitment fees and must repay them from wages for years
   - Debt grows through charges for housing and food
@@ -617,7 +607,7 @@ indicators:
     quote: Forced labour victims are likely to endure living and working conditions that workers would
       never freely accept.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -625,7 +615,7 @@ indicators:
     locator: Page 2, Labour exploitation
     quote: Live in degraded, unsuitable places, such as in agricultural or industrial buildings
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Dozens of workers sleeping in a container or a farm building
   - No protective equipment for dangerous work
@@ -686,7 +676,7 @@ indicators:
     quote: Forced labourers may be obliged to work excessive hours or days beyond the limits prescribed
       by national law
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -694,7 +684,7 @@ indicators:
     locator: Page 1, General indicators
     quote: Work excessively long hours over long periods
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Time records showing 7-day weeks for months
   - Audits finding hours far above legal limits
@@ -744,7 +734,7 @@ indicators:
     quote: A third party speaks on behalf of the customer (a third party may insist on being present and/or
       translating).
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FIN-2014-A008
     publisher: FinCEN
     year: '2014'
@@ -753,7 +743,7 @@ indicators:
     quote: A customer establishes an account or visits a branch to conduct transactions while always escorted
       by a third party (e.g., under the pretext of requiring an interpreter).
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Updated Indicators: Laundering of proceeds from human trafficking for sexual exploitation
       (FINTRAC-2021-OA001)'
     publisher: FINTRAC (Canada)
@@ -763,7 +753,7 @@ indicators:
     quote: Client makes deposits accompanied or watched by a third party who may, on separate occasions,
       accompany or watch clients who are making deposits.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -771,7 +761,7 @@ indicators:
     locator: Page 1, General indicators
     quote: Allow others to speak for them when addressed directly
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The same man accompanies several different women to open accounts at one branch
   - A 'cousin' cannot give the customer's date of birth
@@ -815,7 +805,7 @@ indicators:
       where they are staying, or provides scripted, confusing, or inconsistent stories in response to
       inquiry.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -823,7 +813,7 @@ indicators:
     locator: Page 1, General indicators
     quote: Not know their home or work address
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Customer cannot name the city they are staying in
   cases: []
@@ -863,7 +853,7 @@ indicators:
     locator: Section II, Behavioral indicators
     quote: A third party attempts to open an account for an unqualified minor.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -872,7 +862,7 @@ indicators:
     quote: Use of aliases for the purpose of opening multiple accounts in different banks, or in different
       branches of the same bank; and,
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Adult opens an account for a 16-year-old who is not their child
   cases: []
@@ -917,7 +907,7 @@ indicators:
     quote: A customer's account shares common identifiers, such as a telephone number, email, and social
       media handle, or address, associated with escort agency websites and commercial sex advertisements.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -926,7 +916,7 @@ indicators:
     quote: Phone number provided on online advertising and promotional services is used in different cities
       and provinces in a short period of time;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -934,7 +924,7 @@ indicators:
     locator: 'Indicators: out of private residences'
     quote: Escort services business/escort agency is associated to a residential address.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - The phone number on a bank file appears in escort ads in three cities in one week
   cases: []
@@ -980,7 +970,7 @@ indicators:
       companies of online classifieds as well as more expensive, higher-end advertising and website hosting
       companies.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -989,7 +979,7 @@ indicators:
     quote: frequent payments in multiples of small amounts (e.g., $3, $12, $24) in relatively short timelines
       and inconsistent with expected activity;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FIN-2020-A008
     publisher: FinCEN
     year: '2020'
@@ -997,7 +987,7 @@ indicators:
     locator: Section II, Financial indicators
     quote: Frequent transactions with online classified sites that are based in foreign jurisdictions.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Card statement shows many CAD 3, 12 and 24 charges to an adult classifieds site
   cases:
@@ -1056,7 +1046,7 @@ indicators:
     quote: Transactions are inconsistent with a customer's expected activity and/or line of business in
       an apparent effort to cover trafficking victims' living costs
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FIN-2014-A008
     publisher: FinCEN
     year: '2014'
@@ -1065,7 +1055,7 @@ indicators:
     quote: Frequent transactions, inconsistent with expected activity and/or line of business, carried
       out by a business customer in apparent efforts to provide sustenance to individuals
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -1073,7 +1063,7 @@ indicators:
     locator: General contextual and ML indicators
     quote: Frequent purchases for food delivery services, often on the same day.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Several hotel rooms and multiple fast-food orders on the same day from one card
   - A construction firm paying for workers' groceries and housing in bulk with no payroll
@@ -1116,7 +1106,7 @@ indicators:
     quote: Customers frequently appear to move through, and transact from, different geographic locations
       in the United States.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -1125,7 +1115,7 @@ indicators:
     quote: Location(s) of accommodation bookings correspond to location(s) of cash deposits, particularly
       when multiple cities are observed in transactions.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -1134,7 +1124,7 @@ indicators:
     quote: Deposits (e.g., via ABM, in-branch) conducted in one city followed by same day or next day
       withdrawal and/or purchase conducted in another city;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Hotel stays in four cities in ten days with cash deposits near each hotel
   cases: []
@@ -1175,7 +1165,7 @@ indicators:
     locator: Appendix, Patterns of financial transactions (2016 list)
     quote: Cash deposits/withdrawals between the hours of 10 p.m. and 6 a.m.;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -1183,7 +1173,7 @@ indicators:
     locator: 'Indicators: illicit storefront businesses'
     quote: Merchant point-of-sale transactions occur after the establishment's normal business hours.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FIN-2020-A008
     publisher: FinCEN
     year: '2020'
@@ -1192,7 +1182,7 @@ indicators:
     quote: Transactional activity largely occurs outside of normal business operating hours (e.g., an
       establishment that operates during the day has a large number of transactions at night)
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A massage spa listed as open 10am to 7pm takes card payments at 1am
   cases: []
@@ -1235,7 +1225,7 @@ indicators:
     quote: A customer's account appears to function as a funnel account, where cash deposits occur in
       cities/states where the customer does not reside or conduct business.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FIN-2020-A008
     publisher: FinCEN
     year: '2020'
@@ -1244,7 +1234,7 @@ indicators:
     quote: Traffickers maintain control of the victims' bank accounts through coercion, and direct victims
       to deposit money into their accounts and other accounts that the traffickers can access.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -1253,7 +1243,7 @@ indicators:
     quote: Account appears to function as a funnel account; deposits occur in locations where the client
       does not reside or conduct business;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Cash deposited into one account at branches in five states, withdrawn the same day in a sixth
   cases: []
@@ -1298,7 +1288,7 @@ indicators:
     locator: Appendix B, Transactional Red Flags
     quote: Multiple, apparently unrelated, customers sending wire transfers to the same beneficiary.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -1307,7 +1297,7 @@ indicators:
     quote: Email money transfers to third parties with alternate names provided in brackets [e.g., jane@example.com
       (Bambi)];
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -1316,7 +1306,7 @@ indicators:
     quote: Individual or entity received multiple email money transfers referencing the name or partial
       name of an escort agency/escort services business.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Twenty men each send small e-transfers to one woman's account with notes like 'session'
   cases: []
@@ -1356,7 +1346,7 @@ indicators:
     locator: Section II, Financial indicators
     quote: An individual frequently purchases and uses prepaid access cards.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -1365,7 +1355,7 @@ indicators:
     quote: Female's reloadable prepaid credit card is funded by reloads or transfers from a male, usually
       the same male.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -1374,7 +1364,7 @@ indicators:
     quote: Rounded sum purchases at grocery stores and/or other retailers that sell gift cards and/or
       prepaid credit cards.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Round-sum purchases of $500 at a supermarket that sells gift cards, several times a week
   cases: []
@@ -1419,7 +1409,7 @@ indicators:
     quote: A customer frequently sends or receives funds via cryptocurrency to or from darknet markets
       or services known to be associated with illicit activity.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -1428,7 +1418,7 @@ indicators:
     quote: Transfers to individuals or entities that advertise their virtual currency services on escort
       websites.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -1437,7 +1427,7 @@ indicators:
     quote: Frequent transfers to virtual currency exchangers, particularly if these funds were sourced
       from incoming email money transfers from multiple individuals.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - E-transfers from many men followed at once by a transfer to a crypto exchange
   cases: []
@@ -1480,7 +1470,7 @@ indicators:
     quote: Frequent transactions using third-party payment processors that conceal the originators and/
       or beneficiaries of the transactions.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -1489,7 +1479,7 @@ indicators:
     quote: Storefront business or its owner(s) received multiple funds transfers from payment processors,
       particularly from payment processors associated to escort services or adult entertainment.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A spa receives most income through a processor used by escort sites
   cases: []
@@ -1529,7 +1519,7 @@ indicators:
     locator: Section II, Financial indicators
     quote: A customer frequently makes cash deposits with no Automated Clearing House (ACH) payments.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FIN-2014-A008
     publisher: FinCEN
     year: '2014'
@@ -1538,7 +1528,7 @@ indicators:
     quote: Inflows are largely received in cash where substantial cash receipts are inconsistent with
       the customer's line of business.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -1546,7 +1536,7 @@ indicators:
     locator: Appendix, Patterns (2016 list)
     quote: Account funded primarily via third party cash transactions;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Personal account with only cash deposits, no salary or benefit payments
   cases: []
@@ -1590,7 +1580,7 @@ indicators:
     quote: Cash deposits or wire transfers are kept below $3,000 or $10,000 in apparent efforts to avoid
       record keeping requirements or the filing of Currency Transaction Reports (CTRs), respectively.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FIN-2020-A008
     publisher: FinCEN
     year: '2020'
@@ -1599,7 +1589,7 @@ indicators:
     quote: A customer avoids transactions that require identification documents or that trigger reporting
       requirements.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Repeated $9,500 cash deposits
   cases: []
@@ -1641,7 +1631,7 @@ indicators:
     locator: Appendix A and Appendix B
     quote: Unexplained/unjustified lifestyle incommensurate with employment or business line.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -1649,7 +1639,7 @@ indicators:
     locator: General contextual and ML indicators
     quote: Purchases and/or payments at luxury vehicle dealerships or for limousine services.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Unemployed man buys a luxury car and pays for cosmetic surgery for others
   cases: []
@@ -1696,7 +1686,7 @@ indicators:
     quote: A business customer does not exhibit normal payroll expenditures (e.g., wages, payroll taxes,
       social security contributions).
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A farm or restaurant with dozens of workers but almost no payroll outflows
   cases: []
@@ -1744,7 +1734,7 @@ indicators:
     quote: Cashing of payroll checks where the majority of the funds are kept by the employer or are deposited
       back into the employer's account.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FIN-2020-A008
     publisher: FinCEN
     year: '2020'
@@ -1753,7 +1743,7 @@ indicators:
     quote: Financial institutions may see multiple employees receiving their salaries in the same account,
       or payment for employment may be followed by immediate withdrawal or transfer into another account.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -1762,7 +1752,7 @@ indicators:
     quote: There is evidence that workers must pay for tools, food or accommodation or that those costs
       are being deducted from their wages.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Financial Flows from Human Trafficking
     publisher: FATF and APG
     year: '2018'
@@ -1770,7 +1760,7 @@ indicators:
     locator: Paragraph 64 (case example)
     quote: forced to provide a portion of their wages to Mr A to pay back their debt
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Payslips show wages paid, but bank records show the same sums moving back to the employer the same
     day
@@ -1812,7 +1802,7 @@ indicators:
     quote: Accounts of foreign workers or students where the employer or employment agency serves as a
       custodian.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Financial Flows from Human Trafficking
     publisher: FATF and APG
     year: '2018'
@@ -1820,7 +1810,7 @@ indicators:
     locator: Paragraph 65 (case example)
     quote: seized their bank cards to control these accounts
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -1828,7 +1818,7 @@ indicators:
     locator: Overview of FINTRAC's analysis
     quote: Some traffickers also had access to their victims' accounts or held joint accounts with victims.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -1836,7 +1826,7 @@ indicators:
     locator: General contextual and ML indicators
     quote: Multiple phone numbers attempting to access a female's bank account.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Online banking for 30 workers' accounts accessed from the employer's IP address
   cases:
@@ -1888,7 +1878,7 @@ indicators:
     quote: No recruitment fees or related costs should be charged to, or otherwise borne by, workers or
       jobseekers.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FIN-2014-A008
     publisher: FinCEN
     year: '2014'
@@ -1897,7 +1887,7 @@ indicators:
     quote: Payments to employment or student recruitment agencies that are not licensed/registered or
       that have labor violations.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FIN-2020-A008
     publisher: FinCEN
     year: '2020'
@@ -1906,20 +1896,10 @@ indicators:
     quote: Recruitment fees can range from hundreds of dollars to tens of thousands of dollars, and take
       years to repay.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Workers' families wire thousands of dollars to a recruiter before departure
-  cases:
-  - name: EEOC v. Signal International, LLC
-    year: '2015'
-    jurisdiction: United States
-    what_happened: Indian H-2B workers recruited after hurricanes Katrina and Rita; EEOC's district director
-      said many paid thousands of dollars to come to the US. The discrimination suit settled for an estimated
-      $5 million.
-    outcome: settled
-    outcome_verified: true
-    source_url: https://www.eeoc.gov/newsroom/signal-international-llc-pay-5-million-settle-eeoc-race-national-origin-lawsuit
-    source_title: Signal International, LLC to Pay $5 Million to Settle EEOC Race, National Origin Lawsuit
+  cases: []
   data_needed:
   - Payment (worker to agency)
   - Company (recruitment agency, licence status)
@@ -1960,7 +1940,7 @@ indicators:
     quote: Transactions conducted by individuals, escorted by a third party (e.g., under the pretext of
       requiring an interpreter), to transfer funds (that may seem to be their salaries) to other countries.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FIN-2014-A008
     publisher: FinCEN
     year: '2014'
@@ -1969,7 +1949,7 @@ indicators:
     quote: Frequent outbound wire transfers, with no business or apparent lawful purpose, directed to
       countries at higher risk for human trafficking
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Each payday, a supervisor brings five workers to a money transmitter to send most of their pay to
     one recipient abroad
@@ -2011,7 +1991,7 @@ indicators:
     quote: Examples of front companies used by human traffickers for labor or sex trafficking include
       massage businesses, escort services, bars, restaurants, and cantinas.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -2020,7 +2000,7 @@ indicators:
     quote: Front companies co-mingled legitimate with illicit funds and/or had limited business-related
       transactions.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -2030,7 +2010,7 @@ indicators:
       to a business account and from the business account, funds are depleted by outgoing email money
       transfers and cash withdrawals.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Owner of three massage spas moves funds between them and a restaurant he also owns
   cases: []
@@ -2080,7 +2060,7 @@ indicators:
       (e.g., landlords, property management, real estate agencies) or that reference rent or specific
       addresses.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -2088,7 +2068,7 @@ indicators:
     locator: 'Indicators: out of private residences'
     quote: Payments of property taxes to different municipalities.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -2097,7 +2077,7 @@ indicators:
     quote: 'Rent payments: for addresses where prostitution is reported to occur by media, law enforcement,
       or classified ads; and,'
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Individual pays rent on five apartments in one month
   cases: []
@@ -2143,7 +2123,7 @@ indicators:
     quote: Traffickers frequently used nominees to funnel proceeds of crime, pay for human trafficking
       running costs, launder funds, or conceal beneficial ownership.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -2152,7 +2132,7 @@ indicators:
     quote: (The individual may be a financial intermediary/nominee in a human trafficking network and
       may be a collector of human trafficking-related funds.)
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - A trafficker's mother holds a car and accounts funded by escort income
   cases: []
@@ -2198,7 +2178,7 @@ indicators:
     quote: Funds deposited to or withdrawn from a casino player's gaming account with limited or no gambling
       involved.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -2207,7 +2187,7 @@ indicators:
     quote: Funds deposited to or withdrawn from an investment account with limited or no purchases of
       investments.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Cash buys casino chips, little play, cheque cashed out
   cases: []
@@ -2250,7 +2230,7 @@ indicators:
     locator: Appendix, Patterns (2016 list)
     quote: Hotel transactions by the same individual for two separate rooms for the same dates;
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -2258,7 +2238,7 @@ indicators:
     locator: Appendix, Patterns (2016 list)
     quote: Pre-authorized hotel by credit card, but accommodations are actually paid for using cash.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Card authorises a hotel, then a full refund appears, suggesting cash payment
   cases: []
@@ -2298,7 +2278,7 @@ indicators:
     locator: Appendix B, Customer Interaction Red Flags
     quote: Common signer(s)/custodian(s) in apparently unrelated business and/or personal accounts.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -2307,7 +2287,7 @@ indicators:
     quote: Addition of an unusual number of individuals as joint account holders, or authorized users
       to products such as credit cards.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Ten workers' accounts list the same phone number and the same address
   cases: []
@@ -2347,7 +2327,7 @@ indicators:
     locator: 'Contextual indicators: trafficking foreign nationals'
     quote: Individual or entity is associated to advertisements recruiting escorts from foreign countries.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FINTRAC-2021-OA001
     publisher: FINTRAC
     year: '2021'
@@ -2355,7 +2335,7 @@ indicators:
     locator: 'Contextual indicators: trafficking foreign nationals'
     quote: Individual or entity is associated to job recruitment advertisements posted in another country.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -2364,7 +2344,7 @@ indicators:
     quote: Advertisements are placed for brothels or similar places offering the services of women of
       a particular ethnicity or nationality.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Owner of a spa pays for airfares for several young women from one country
   cases: []
@@ -2409,7 +2389,7 @@ indicators:
       locations across the United States to a common beneficiary located in a U.S or Mexican city along
       the Southwest Border.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: FIN-2014-A008
     publisher: FinCEN
     year: '2014'
@@ -2418,7 +2398,7 @@ indicators:
     quote: Beneficiaries receiving wire transfers from countries with high migrant populations (e.g.,
       Mexico, Guatemala, El Salvador, Honduras) who are not nationals of those countries.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Fifteen senders in different states wire $2,800 each to one person in a border town in a week
   cases: []
@@ -2462,7 +2442,7 @@ indicators:
     quote: 'Partial Payment: A portion of the smuggling fees is paid prior to departure, with the remaining
       due upon arrival; final payment is often made by relatives of the migrant in the United States.'
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Relatives in the destination country send a lump sum within days of a migrant's arrival
   cases:
@@ -2513,7 +2493,7 @@ indicators:
     locator: Annex B, Money Laundering, p. 67
     quote: Foreign/Migrants using the same IP or machine ID to perform transactions.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and Terrorist Financing Risks Arising from Migrant Smuggling
     publisher: FATF
     year: '2022'
@@ -2522,7 +2502,7 @@ indicators:
     quote: Numerous transactions with money remittance companies and online payment services companies.
       Sometimes there is no logical reason to use a range of remitters.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Money Laundering and Terrorist Financing Risks Arising from Migrant Smuggling
     publisher: FATF
     year: '2022'
@@ -2531,7 +2511,7 @@ indicators:
     quote: Abnormal payments to hotels, apartments and other accommodation services that are located on
       or close to migrant smuggling routes.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Twelve migrants' remittances sent from one phone
   - Use of hawala to settle smuggling fees
@@ -2580,7 +2560,7 @@ indicators:
     quote: Recharging transactions between prepaid cards held by foreign nationals, living or operating
       in places close to reception centers for immigrants or to border crossing points.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Card-to-card reloads among holders living near a border reception centre
   cases: []
@@ -2622,7 +2602,7 @@ indicators:
     quote: Frequent exchange of small-denomination for larger denomination bills by a customer who is
       not in a cash intensive industry.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Weekly exchange of $20 bills for $100 bills by a salaried person
   cases: []
@@ -2663,7 +2643,7 @@ indicators:
     locator: Page 1, Children
     quote: Travel in groups with persons who are not relatives
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -2671,7 +2651,7 @@ indicators:
     locator: Page 1, Children
     quote: The claim made by an adult that he or she has "found" an unaccompanied child
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Protocol to Prevent, Suppress and Punish Trafficking in Persons, Especially Women and Children
     publisher: United Nations (OHCHR)
     year: '2000'
@@ -2679,7 +2659,7 @@ indicators:
     locator: Article 3(c)
     quote: shall be considered "trafficking in persons" even if this does not involve any of the means
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Child-sized work clothes or children's beds found in a factory or brothel
   cases: []
@@ -2720,7 +2700,7 @@ indicators:
     quote: work which, by its nature or the circumstances in which it is carried out, is likely to harm
       the health, safety or morals of children.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -2728,7 +2708,7 @@ indicators:
     locator: Page 2, Labour exploitation
     quote: Equipment is designed or has been modified so that it can be operated by children.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Teenagers on overnight sanitation shifts in meat plants
   cases:
@@ -2785,7 +2765,7 @@ indicators:
     locator: p. 18, facilitator indicators
     quote: approximate ranges between $13 and $50
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Financial Crime Guide: Combating the Sexual Exploitation of Children for Financial Gain'
     publisher: AUSTRAC
     year: '2022'
@@ -2793,7 +2773,7 @@ indicators:
     locator: p. 14
     quote: The facilitator will have no obvious links to the offenders sending funds.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Combating the sexual exploitation of children for financial gain (web page)
     publisher: AUSTRAC
     year: '2023'
@@ -2802,7 +2782,7 @@ indicators:
     quote: No single financial indicator will reveal if an account is being used for child sexual exploitation
       purposes.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - An Australian man sends AUD 20-40 several times a week to different women in the Philippines with
     notes 'gift' or 'school fees'
@@ -2844,7 +2824,7 @@ indicators:
     locator: p. 21, offender indicators
     quote: escalation in payments to a high-risk jurisdiction for child sexual exploitation
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 'Financial Crime Guide: Combating the Sexual Exploitation of Children for Financial Gain'
     publisher: AUSTRAC
     year: '2022'
@@ -2852,7 +2832,7 @@ indicators:
     locator: p. 12
     quote: Offenders may transit through different countries to hide their final destination.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Card used in Singapore, then hotel and phone purchases in the Philippines after months of small remittances
     there
@@ -2891,7 +2871,7 @@ indicators:
     locator: Page 2, Labour exploitation
     quote: The employer or manager is unable to show records of wages paid to workers.
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -2899,7 +2879,7 @@ indicators:
     locator: Page 2, Labour exploitation
     quote: Have no labour contract
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Inspection finds no payroll records for 40 foreign workers
   cases: []
@@ -2942,7 +2922,7 @@ indicators:
     locator: Page 2, Sexual exploitation
     quote: Have tattoos or other marks indicating "ownership" by their exploiters
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -2950,7 +2930,7 @@ indicators:
     locator: Page 2, Sexual exploitation
     quote: Move from one brothel to the next or work in various locations
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Same women advertised in different cities each week
   cases: []
@@ -2991,7 +2971,7 @@ indicators:
     quote: Be reported missing by their employer even though they are still living in their employer's
       house
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -2999,7 +2979,7 @@ indicators:
     locator: Page 1, Domestic servitude
     quote: Never leave the house without their employer
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Nanny sleeping in a kitchen, never seen outside alone
   cases: []
@@ -3042,7 +3022,7 @@ indicators:
     locator: Page 2, Begging and petty crime
     quote: Be punished if they do not collect or steal enough
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: Human Trafficking Indicators
     publisher: UNODC
     year: '2008'
@@ -3050,7 +3030,7 @@ indicators:
     locator: Page 2, Begging and petty crime
     quote: Be part of large groups of children who have the same adult guardian
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Groups of children dropped off and collected by the same van each day
   cases: []
@@ -3093,7 +3073,7 @@ indicators:
     quote: Effective June 21, 2022, CBP enforces the rebuttable presumption that goods mined, produced,
       or manufactured wholly or in part in the XUAR, or by an entity on the UFLPA Entity List,
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   - title: 19 CFR 12.42 - Findings of Commissioner of CBP
     publisher: Legal Information Institute (Cornell) reproducing US Code of Federal Regulations
     year: current
@@ -3101,7 +3081,7 @@ indicators:
     locator: 19 CFR 12.42(e)
     quote: information available reasonably but not conclusively indicates
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Imports of polysilicon traced to a Xinjiang producer
   - Gloves made by a company under a CBP finding
@@ -3162,7 +3142,7 @@ indicators:
     quote: which it has reason to believe are produced by child labor or forced labor in violation of
       international standards
     quote_verified: true
-    checked: '2026-10-08'
+    checked: '2026-10-09'
   examples:
   - Cocoa from a listed country in a chocolate maker's supply chain
   cases: []
@@ -3186,6 +3166,774 @@ indicators:
   - Listing is about a sector in a country, not a specific company; many producers are clean
   - Certified or audited supply chains
   jurisdictions: International (US DOL list)
+  version: 1
+- id: HT-055
+  name: Recipient arranges a transplant abroad through a broker who hides who the donor is
+  definition: A patient needing an organ goes abroad through a person or company that organises transplants
+    but says nothing about the donors, often without telling their own doctors and without knowing in
+    advance where the operation will be or who the donor is.
+  areas:
+  - HT
+  typology: Trafficking for organ removal - recruitment (recipient side)
+  status: verified
+  sources:
+  - title: 'Indicators to Identify Trafficking in Human Beings for the Purpose of Organ Removal (Transplantation
+      Direct 2(2): e56)'
+    publisher: de Jong & Ambagtsheer, Wolters Kluwer / HOTT Project (EU-funded)
+    year: '2016'
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+    locator: Indicators - Recruitment (recipients)
+    quote: be in (online) contact with a person and/or company that advertises/organizes transplants (abroad)
+      and that does not provide information about the organ donors
+    quote_verified: true
+    licence: CC BY-NC-ND 4.0
+    checked: '2026-10-09'
+  examples:
+  - A dialysis patient stops attending the local transplant waiting-list clinic, then pays a website-based
+    'transplant tour' company that will not name the hospital or donor.
+  - A patient receives a personal invitation from a surgeon abroad and is asked to send test results to
+    an uncertified 'reviewer'.
+  cases:
+  - name: United States v. Levy Izhak Rosenbaum
+    year: '2011'
+    jurisdiction: United States (D. New Jersey)
+    what_happened: Rosenbaum admitted brokering three kidney transplants for which he was paid about $120,000,
+      $150,000 and $140,000, locating paid donors in Israel and arranging their travel and accommodation.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archive/usao/nj/Press/files/Rosenbaum,%20Levy%20Izhak%20Plea%20News%20Release.html
+    source_title: U.S. Attorney's Office, District of New Jersey - Rosenbaum plea news release
+  data_needed:
+  - Person (recipient)
+  - Company or Organization (transplant broker / facilitator)
+  - Payment (recipient to broker)
+  - Email or Message (contact with broker)
+  - Document (medical records sent abroad, invitation letters)
+  - Address (clinic abroad)
+  checkable: person
+  lookup_sources:
+  - Company registry (broker company)
+  - Health regulator / hospital licensing register in destination country
+  - Web archive of broker adverts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Recipients pay brokers large sums (here $120,000-$150,000 per transplant) that must be moved
+      and hidden; the brokered fees were forfeited as criminal proceeds.
+    source_url: https://www.justice.gov/archive/usao/nj/Press/files/Rosenbaum,%20Levy%20Izhak%20Plea%20News%20Release.html
+  innocent_explanations:
+  - Legal medical travel to a country with shorter waiting lists and a lawful living-donor programme.
+  - A genuine relative or friend abroad has agreed to donate.
+  - Patients often research treatment options online without any wrongdoing.
+  jurisdictions: International; indicators drawn from HOTT Project research across EU states
+  version: 1
+- id: HT-056
+  name: Donor recruited by a broker with no real information or clear motive
+  definition: A person is recruited to give an organ abroad by someone who advertises or organises donations,
+    and is given no, wrong or misleading information about the risks, does not know who will receive the
+    organ, and has no clear reason for donating, sometimes after a relative or acquaintance has already
+    sold an organ.
+  areas:
+  - HT
+  typology: Trafficking for organ removal - recruitment (donor side)
+  status: verified
+  sources:
+  - title: Indicators to Identify Trafficking in Human Beings for the Purpose of Organ Removal
+    publisher: de Jong & Ambagtsheer, Transplantation Direct / HOTT Project
+    year: '2016'
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+    locator: Indicators - Recruitment (donors)
+    quote: not have received any or incorrect or misleading information about the pre- and postoperative
+      risks and/or the duration of the operation, not know who their prospective recipients abroad will
+      be, not have a (clear) motivation for their donation, have a relative/acquaintance who has sold
+      an organ before.
+    quote_verified: true
+    licence: CC BY-NC-ND 4.0
+    checked: '2026-10-09'
+  - title: UNODC and partners launch toolkit for tackling underreported crime of human trafficking for
+      organ removal
+    publisher: UNODC
+    year: '2022'
+    url: https://unodc.org/unodc/frontpage/2022/October/unodc-and-partners-launch-toolkit-for-tackling-underreported-crime-of-human-trafficking-for-organ-removal.html
+    locator: News release
+    quote: All forms of human trafficking tend to be hidden, but human trafficking for organ removal is
+      especially so.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Several people from the same poor village travel abroad to 'donate' kidneys after a neighbour did
+    the same.
+  - A donor cannot say who the recipient is or why they are donating.
+  cases:
+  - name: Medicus clinic case (Lutfi Dervishi and others)
+    year: '2013'
+    jurisdiction: Kosovo (EULEX panel)
+    what_happened: A court of two EU judges and one Kosovo judge jailed a urologist and others; donors
+      from poor Eastern European and Central Asian countries were reported to have been lured by financial
+      promises of about $19,540, while recipients paid up to $131,000.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.aljazeera.com/news/2013/4/29/doctors-jailed-for-kosovo-organ-trafficking
+    source_title: Al Jazeera - Doctors jailed for Kosovo organ trafficking (29 April 2013)
+  data_needed:
+  - Person (donor)
+  - Person or Company (recruiter / broker)
+  - Associate (donor to recruiter)
+  - Family (donor to earlier seller)
+  - Address (home village / recruitment location)
+  checkable: person
+  lookup_sources:
+  - Online classifieds and social media (donor recruitment adverts)
+  - Court records of earlier organ-trafficking cases in the region
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine altruistic donors may struggle to put their motive into words.
+  - Poor medical communication can leave lawful donors under-informed.
+  - Donation within families can repeat across relatives lawfully.
+  jurisdictions: International
+  version: 1
+- id: HT-057
+  name: Donor and recipient falsely presented as related
+  definition: 'Paperwork or statements present an unrelated donor and recipient as relatives or close
+    friends: documents are changed from ''unrelated'' to ''related'', the story of the relationship is
+    inconsistent, or the pair do not interact as people who know each other would.'
+  areas:
+  - HT
+  typology: Trafficking for organ removal - transplant stage / document fraud
+  status: verified
+  sources:
+  - title: Indicators to Identify Trafficking in Human Beings for the Purpose of Organ Removal
+    publisher: de Jong & Ambagtsheer, Transplantation Direct / HOTT Project
+    year: '2016'
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+    locator: Indicators - Transplant
+    quote: have documents in which the donor-recipient relationship was changed from “unrelated” to “related”
+    quote_verified: true
+    licence: CC BY-NC-ND 4.0
+    checked: '2026-10-09'
+  - title: Rosenbaum plea news release
+    publisher: U.S. Attorney's Office, District of New Jersey
+    year: '2011'
+    url: https://www.justice.gov/archive/usao/nj/Press/files/Rosenbaum,%20Levy%20Izhak%20Plea%20News%20Release.html
+    locator: News release body
+    quote: fabricating cover stories in order to fool hospital employees
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Hospital forms first list the donor as 'unrelated', later amended to 'cousin'.
+  - A claimed brother of the recipient cannot name the recipient's parents and never visits after surgery.
+  - A typical pairing of a younger foreign donor and an older foreign recipient.
+  cases:
+  - name: United States v. Levy Izhak Rosenbaum
+    year: '2011'
+    jurisdiction: United States (D. New Jersey)
+    what_happened: Rosenbaum pleaded guilty to transferring human organs for valuable consideration and
+      conspiracy, admitting he helped donors and recipients fabricate cover stories to fool hospital staff
+      into believing the transplants were genuine donations.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archive/usao/nj/Press/files/Rosenbaum,%20Levy%20Izhak%20Plea%20News%20Release.html
+    source_title: U.S. Attorney's Office, District of New Jersey - Rosenbaum plea news release
+  data_needed:
+  - Person (donor, recipient)
+  - Family (claimed relationship)
+  - Document (consent forms, hospital relationship declarations, version history)
+  - Identification or Passport (to check family names, birthplaces)
+  checkable: records
+  lookup_sources:
+  - Civil registry / birth and marriage records
+  - Passport and travel records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: FR
+    reason: Falsified relationship declarations and consent documents are deception aimed at hospital
+      staff and regulators.
+    source_url: https://www.justice.gov/archive/usao/nj/Press/files/Rosenbaum,%20Levy%20Izhak%20Plea%20News%20Release.html
+  innocent_explanations:
+  - Genuine distant relatives or in-laws may know little about each other.
+  - A clerical correction to a form may be honest.
+  - Cultural ideas of 'family' can be wider than legal kinship.
+  jurisdictions: International
+  version: 1
+- id: HT-058
+  name: Group travel straight to a clinic, escorted, carrying cash and medical letters
+  definition: Donors or recipients travel in groups of apparent strangers to the same place, are accompanied
+    by someone with a medical background or someone they fear, did not arrange their own transport, carry
+    large amounts of cash or medical invitation letters, and go directly to a hospital or clinic on arrival.
+  areas:
+  - HT
+  typology: Trafficking for organ removal - transport and entrance
+  status: verified
+  sources:
+  - title: Indicators to Identify Trafficking in Human Beings for the Purpose of Organ Removal
+    publisher: de Jong & Ambagtsheer, Transplantation Direct / HOTT Project
+    year: '2016'
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+    locator: Indicators - Transport/entrance
+    quote: travel together with one or more persons, who do not appear to know each other, to the same
+      destination; be accompanied by someone with a medical background
+    quote_verified: true
+    licence: CC BY-NC-ND 4.0
+    checked: '2026-10-09'
+  examples:
+  - Border officers see four unrelated travellers with the same hotel booking, all carrying letters of
+    invitation for treatment from one clinic.
+  - A traveller carries a large sum of cash and has a fresh surgical scar.
+  cases: []
+  data_needed:
+  - Person (travellers, escort)
+  - Event or travel booking records (flights, hotel)
+  - Payment (who paid the tickets)
+  - Document (invitation letters, medical records)
+  - Organization (clinic)
+  checkable: lookups
+  lookup_sources:
+  - Airline passenger / booking data (via authorities)
+  - Hotel records
+  - Border-crossing records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Booking and paying for travel of several unrelated people overlaps with existing travel-for-others
+      indicators (HT-039).
+    source_url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+  innocent_explanations:
+  - Lawful medical-tourism agencies book group travel and send escorts.
+  - Patients often carry their own medical records and invitation letters.
+  - Some travellers carry cash because cards do not work abroad.
+  jurisdictions: International
+  version: 1
+- id: HT-059
+  name: Donor or recipient travels on documents supplied by someone else
+  definition: In an organ-removal context, the person's travel or identity papers were obtained by someone
+    else, are not held by the person while travelling, are very recently issued or look forged, or do
+    not match the stated purpose of the trip.
+  areas:
+  - HT
+  typology: Trafficking for organ removal - documents
+  status: verified
+  sources:
+  - title: Indicators to Identify Trafficking in Human Beings for the Purpose of Organ Removal
+    publisher: de Jong & Ambagtsheer, Transplantation Direct / HOTT Project
+    year: '2016'
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+    locator: Indicators - Documents
+    quote: carry identity documents that are very recently issued and/or appear to be forged; carry travel
+      documents that do not correspond with the purpose of their travel.
+    quote_verified: true
+    licence: CC BY-NC-ND 4.0
+    checked: '2026-10-09'
+  examples:
+  - A 'tourist' visa holder who travels straight to a transplant clinic.
+  - A passport issued days before travel, paid for by a broker.
+  cases: []
+  data_needed:
+  - Passport
+  - Identification
+  - Person (holder, provider of documents)
+  - Payment (document fees)
+  - Document (visa application stating purpose)
+  checkable: lookups
+  lookup_sources:
+  - Passport issuance data (via authorities)
+  - Visa records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Complements HT-007 (retention of identity documents) and HT-014 (someone else's ID) for the
+      organ-removal setting.
+    source_url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+  innocent_explanations:
+  - Many people get a first passport shortly before a first trip.
+  - Travel agents or relatives often handle visa paperwork.
+  - Medical visas can be hard to get, so people travel on tourist visas.
+  jurisdictions: International
+  version: 1
+- id: HT-060
+  name: Donors housed and escorted by the clinic or a medical professional
+  definition: Donors or recipients are housed together in a place owned by a doctor or clinic, cannot
+    leave alone, are escorted to and from the clinic, do not know where they are staying, and have medical
+    tests done at the accommodation.
+  areas:
+  - HT
+  typology: Trafficking for organ removal - housing
+  status: verified
+  sources:
+  - title: Indicators to Identify Trafficking in Human Beings for the Purpose of Organ Removal
+    publisher: de Jong & Ambagtsheer, Transplantation Direct / HOTT Project
+    year: '2016'
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+    locator: Indicators - Housing
+    quote: be housed in an accommodation owned by a medical professional or a hospital/clinic; be housed
+      together in the same accommodation; not be allowed or able to leave the accommodation on their own
+    quote_verified: true
+    licence: CC BY-NC-ND 4.0
+    checked: '2026-10-09'
+  examples:
+  - Property records show the flat where several donors stayed is owned by the transplant surgeon.
+  - Blood samples taken in a rented apartment rather than a lab.
+  cases: []
+  data_needed:
+  - Address
+  - Ownership (property owner)
+  - Person (doctor, donors)
+  - Organization (clinic)
+  - Payment (rent paid by clinic)
+  checkable: lookups
+  lookup_sources:
+  - Land / property registry
+  - Company registry (clinic owners)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Overlaps restriction of movement (HT-003) and isolation (HT-004) in a medical setting.
+    source_url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+  innocent_explanations:
+  - Some hospitals run lawful patient hostels near the ward.
+  - Escorts may be interpreters or carers.
+  - Home-visit phlebotomy is an ordinary service in many places.
+  jurisdictions: International
+  version: 1
+- id: HT-061
+  name: Rushed transplant without screening or real consent
+  definition: The transplant happens abroad within a very short time, without prior screening, signed
+    consent or the chance to withdraw, sometimes at a clinic without dialysis or other necessary equipment,
+    with consent papers the donor could not read, and with another person answering questions for them.
+  areas:
+  - HT
+  typology: Trafficking for organ removal - transplant
+  status: verified
+  sources:
+  - title: Indicators to Identify Trafficking in Human Beings for the Purpose of Organ Removal
+    publisher: de Jong & Ambagtsheer, Transplantation Direct / HOTT Project
+    year: '2016'
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+    locator: Indicators - Transplant
+    quote: undergo the transplant procedure abroad within a very short time frame (2 weeks to 2 months)
+    quote_verified: true
+    licence: CC BY-NC-ND 4.0
+    checked: '2026-10-09'
+  examples:
+  - A recipient flies out and is operated on 10 days later with no screening at home.
+  - An illiterate donor signs a consent form in a language they do not speak.
+  cases: []
+  data_needed:
+  - Person (donor, recipient, surgeon)
+  - Organization (clinic)
+  - Document (consent forms, medical records)
+  - Event (travel date, operation date)
+  checkable: records
+  lookup_sources:
+  - Hospital licensing / transplant centre registry
+  - Medical records (via patient or authorities)
+  levels:
+    faint: To be set by Ony
+    strong: Transplant abroad within 2 weeks to 2 months of first contact or arrival, the time frame named
+      in the source
+    textbook: Meets the published definition as worded
+    threshold_source: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+  threshold_verified: true
+  cross_hints:
+  - target_area: CO
+    reason: Clinics operating transplants without proper licence or equipment point to regulatory capture
+      or corruption in the health sector; UNODC says identifying higher-risk healthcare sectors helps
+      find victims.
+    source_url: https://unodc.org/unodc/frontpage/2022/October/unodc-and-partners-launch-toolkit-for-tackling-underreported-crime-of-human-trafficking-for-organ-removal.html
+  innocent_explanations:
+  - Urgent lawful transplants (for example a matched deceased-donor organ) can move fast.
+  - Screening may have been done abroad rather than at home.
+  - Translation of consent forms may be poor in lawful hospitals.
+  jurisdictions: International
+  version: 1
+- id: HT-062
+  name: Patient reappears with a transplant done abroad and no records
+  definition: A patient turns up unannounced at a local hospital with an organ newly implanted or removed,
+    lacks discharge papers or any record of who operated and where the organ came from, is reluctant to
+    explain, and may have infections or complications.
+  areas:
+  - HT
+  typology: Trafficking for organ removal - aftercare
+  status: verified
+  sources:
+  - title: Indicators to Identify Trafficking in Human Beings for the Purpose of Organ Removal
+    publisher: de Jong & Ambagtsheer, Transplantation Direct / HOTT Project
+    year: '2016'
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+    locator: Indicators - Aftercare
+    quote: reappear unannounced at their local hospital with an implanted or removed organ
+    quote_verified: true
+    licence: CC BY-NC-ND 4.0
+    checked: '2026-10-09'
+  examples:
+  - A transplant unit sees a returning patient with graft failure and only a handwritten note from an
+    unnamed clinic.
+  - A man with a fresh nephrectomy scar will not say where the surgery was done.
+  cases: []
+  data_needed:
+  - Person (patient)
+  - Document (medical records, discharge sheets)
+  - Organization (treating and operating hospitals)
+  - Event (travel abroad dates)
+  checkable: person
+  lookup_sources:
+  - Interviews with transplant professionals
+  - National transplant registry
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Lawful transplants abroad sometimes come with poor paperwork.
+  - Patients may be embarrassed or private rather than hiding a crime.
+  - Complications follow lawful transplants too.
+  jurisdictions: International
+  version: 1
+- id: HT-063
+  name: 'Payments for an organ: cash, intermediaries, instalments, no receipt'
+  definition: 'Money is promised or paid in return for an organ: cash to a donor, doctor or facilitator,
+    payments through an intermediary person or institution, payment in instalments, fees deducted from
+    the donor''s money, no receipt, and payers who do not know who received the money.'
+  areas:
+  - HT
+  typology: Trafficking for organ removal - finance
+  status: verified
+  sources:
+  - title: Indicators to Identify Trafficking in Human Beings for the Purpose of Organ Removal
+    publisher: de Jong & Ambagtsheer, Transplantation Direct / HOTT Project
+    year: '2016'
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+    locator: Indicators - Finance
+    quote: have paid a donor, doctor and/or other facilitator (in cash) for an organ or an organ transplant;
+      not know the name of the person to whom they have paid or who received their payment; have made
+      payments through an intermediary person or institution
+    quote_verified: true
+    licence: CC BY-NC-ND 4.0
+    checked: '2026-10-09'
+  - title: UNODC toolkit launch
+    publisher: UNODC
+    year: '2022'
+    url: https://unodc.org/unodc/frontpage/2022/October/unodc-and-partners-launch-toolkit-for-tackling-underreported-crime-of-human-trafficking-for-organ-removal.html
+    locator: News release
+    quote: The toolkit focuses on organized criminal networks and the illicit financial flows stemming
+      from them.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A recipient wires $120,000+ to a broker, who forwards a fraction to the donor in cash.
+  - Instalments paid before surgery to an account in a third country.
+  - Donor's 'travel and lodging fees' deducted from the promised payment.
+  cases:
+  - name: United States v. Levy Izhak Rosenbaum
+    year: '2011'
+    jurisdiction: United States (D. New Jersey)
+    what_happened: Rosenbaum was paid about $120,000, $150,000 and $140,000 for three brokered kidney
+      transplants and agreed to forfeit about $420,000.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archive/usao/nj/Press/files/Rosenbaum,%20Levy%20Izhak%20Plea%20News%20Release.html
+    source_title: U.S. Attorney's Office, District of New Jersey - Rosenbaum plea news release
+  - name: Medicus clinic case
+    year: '2013'
+    jurisdiction: Kosovo (EULEX panel)
+    what_happened: Recipients reportedly paid up to $131,000 each while donors were promised about $19,540;
+      a urologist and others were jailed for organised crime and human trafficking.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.aljazeera.com/news/2013/4/29/doctors-jailed-for-kosovo-organ-trafficking
+    source_title: Al Jazeera - Doctors jailed for Kosovo organ trafficking
+  data_needed:
+  - Payment (payer, beneficiary, amount, date, purpose)
+  - Person (donor, recipient, broker, doctor)
+  - Company or Organization (clinic, intermediary)
+  - BankAccount
+  - Document (receipts, invoices)
+  checkable: records
+  lookup_sources:
+  - Bank and wire records (via authorities)
+  - Company registry (intermediaries)
+  - Court forfeiture records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Organ trafficking generates illicit financial flows through intermediaries and cash; UNODC's
+      toolkit centres on these flows, and the Rosenbaum proceeds were forfeited.
+    source_url: https://unodc.org/unodc/frontpage/2022/October/unodc-and-partners-launch-toolkit-for-tackling-underreported-crime-of-human-trafficking-for-organ-removal.html
+  innocent_explanations:
+  - Lawful medical tourism involves large payments to clinics and agencies.
+  - Some countries lawfully reimburse donors' expenses or lost income.
+  - Families pool money and pay through one relative.
+  jurisdictions: International; in the US, buying organs for 'valuable consideration' is a federal crime
+    (as charged in the Rosenbaum case)
+  version: 1
+- id: HT-064
+  name: Organ donor not paid the agreed amount
+  definition: A person who gave an organ says they were promised money in return but did not receive the
+    agreed amount.
+  areas:
+  - HT
+  typology: Trafficking for organ removal - finance (victim side)
+  status: verified
+  sources:
+  - title: Indicators to Identify Trafficking in Human Beings for the Purpose of Organ Removal
+    publisher: de Jong & Ambagtsheer, Transplantation Direct / HOTT Project
+    year: '2016'
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+    locator: Indicators - Finance
+    quote: have not received the agreed amount of money
+    quote_verified: true
+    licence: CC BY-NC-ND 4.0
+    checked: '2026-10-09'
+  - title: UNODC toolkit launch
+    publisher: UNODC
+    year: '2022'
+    url: https://unodc.org/unodc/frontpage/2022/October/unodc-and-partners-launch-toolkit-for-tackling-underreported-crime-of-human-trafficking-for-organ-removal.html
+    locator: News release (page says victims are recruited with promises of payment that may never arrive;
+      paraphrase, exact sentence not captured)
+    quote: All forms of human trafficking tend to be hidden, but human trafficking for organ removal is
+      especially so.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - A donor interviewed after surgery says he was promised a sum but got a fraction, minus 'fees'.
+  cases: []
+  data_needed:
+  - Person (donor)
+  - Payment (promised vs received)
+  - Person (recruiter)
+  - Document (any written agreement, messages)
+  checkable: person
+  lookup_sources:
+  - Victim and witness interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Parallels wage withholding (HT-008) and recruitment-fee deductions (HT-031) in labour trafficking.
+    source_url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+  innocent_explanations:
+  - Lawful expense reimbursements may be delayed or disputed.
+  - Misunderstanding about what was promised.
+  jurisdictions: International
+  version: 1
+- id: HT-065
+  name: Tattoos or scars that may be branding by a trafficker
+  definition: A person has tattoos or scars that may mark them as a trafficker's 'property', such as a
+    name, symbol or sign of ownership, sometimes after being pressured to get them.
+  areas:
+  - HT
+  typology: Victim indicator - control and ownership marking
+  status: verified
+  sources:
+  - title: Human Trafficking Response Guide for the Transportation Industry
+    publisher: U.S. Department of Transportation
+    year: '2023'
+    url: https://www.transportation.gov/sites/dot.gov/files/2023-06/Human%20Trafficking%20Response%20Guide%20for%20the%20Transportation%20Industry%20508.pdf
+    locator: Aviation p. 4; also Rail p. 5, Maritime p. 6, Trucking p. 7
+    quote: Have tattoos or scars that could indicate branding by a trafficker.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Blue Campaign Youth Indicator Card
+    publisher: U.S. Department of Homeland Security (Blue Campaign)
+    year: '2023'
+    url: https://www.dhs.gov/sites/default/files/2023-07/BC_YouthIndicatorCard_508c.pdf
+    locator: Indicators of potential traffickers
+    quote: Coerce youth to get tattoos as a form of branding?
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Several women linked to one advert network carry the same tattooed name or crown symbol.
+  - A minor has a recent tattoo of an adult man's nickname.
+  cases: []
+  data_needed:
+  - Person (victim, suspected trafficker)
+  - Document (photos, booking images)
+  - Associate (shared mark across several people)
+  checkable: person
+  lookup_sources:
+  - Social media and advert images
+  - Interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Tattoos of a partner's name or a symbol are common and usually freely chosen.
+  - Scars come from accidents, surgery or self-harm unrelated to trafficking.
+  - The DHS card warns no single indicator is proof of trafficking.
+  jurisdictions: United States guidance; widely used internationally
+  version: 1
+- id: HT-066
+  name: Coached or rehearsed answers, or someone else speaks for them
+  definition: The person lets someone else answer for them, especially with officials, police or medical
+    staff, or seems coached on what to say, giving rehearsed-sounding answers.
+  areas:
+  - HT
+  typology: Victim indicator - control of communication
+  status: verified
+  sources:
+  - title: Human Trafficking Response Guide for the Transportation Industry
+    publisher: U.S. Department of Transportation
+    year: '2023'
+    url: https://www.transportation.gov/sites/dot.gov/files/2023-06/Human%20Trafficking%20Response%20Guide%20for%20the%20Transportation%20Industry%20508.pdf
+    locator: Aviation p. 4; also Rail p. 5, Maritime p. 6, Trucking p. 7
+    quote: Defer to another person to speak for them, appear to be coached on what to say, or their responses
+      seem rehearsed.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Blue Campaign Youth Indicator Card
+    publisher: U.S. Department of Homeland Security (Blue Campaign)
+    year: '2023'
+    url: https://www.dhs.gov/sites/default/files/2023-07/BC_YouthIndicatorCard_508c.pdf
+    locator: Indicators of potential victims
+    quote: Defer to another person to speak for them, especially during interactions with authority figures?
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Indicators to Identify Trafficking in Human Beings for the Purpose of Organ Removal
+    publisher: de Jong & Ambagtsheer, Transplantation Direct / HOTT Project
+    year: '2016'
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+    locator: Indicators - Transplant
+    quote: have been accompanied by another person when visiting the hospital/clinic, who insisted to
+      answer questions on their behalf and/or to translate all conversations with the medical staff
+    quote_verified: true
+    licence: CC BY-NC-ND 4.0
+    checked: '2026-10-09'
+  examples:
+  - Several workers interviewed separately give word-for-word identical accounts of their hours.
+  - A 'cousin' insists on translating every question a doctor asks.
+  cases: []
+  data_needed:
+  - Person (subject, the person who speaks for them)
+  - Associate or UnknownLink (between them)
+  - Document (interview notes, transcripts)
+  checkable: person
+  lookup_sources:
+  - Interviews (separately from companions)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Bank-side version of the same control is HT-012 (third party controls the customer at the
+      bank).
+    source_url: https://www.transportation.gov/sites/dot.gov/files/2023-06/Human%20Trafficking%20Response%20Guide%20for%20the%20Transportation%20Industry%20508.pdf
+  innocent_explanations:
+  - 'Language barriers: a relative or friend genuinely interprets.'
+  - Parents normally speak for young children.
+  - Anxious or shy people may prepare what to say.
+  jurisdictions: United States guidance; HOTT research (EU)
+  version: 1
+- id: HT-067
+  name: Unaware of surroundings or cannot give logical travel plans
+  definition: The person seems not to know where they are, may appear under the influence, did not arrange
+    their own travel, or cannot explain sensible, logical travel plans or answer basic questions about
+    the trip.
+  areas:
+  - HT
+  typology: Victim indicator - disorientation and control of travel
+  status: verified
+  sources:
+  - title: Human Trafficking Response Guide for the Transportation Industry
+    publisher: U.S. Department of Transportation
+    year: '2023'
+    url: https://www.transportation.gov/sites/dot.gov/files/2023-06/Human%20Trafficking%20Response%20Guide%20for%20the%20Transportation%20Industry%20508.pdf
+    locator: Aviation p. 4
+    quote: Have difficulty articulating reasonable, logical travel plans or answering basic questions.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Human Trafficking Response Guide for the Transportation Industry
+    publisher: U.S. Department of Transportation
+    year: '2023'
+    url: https://www.transportation.gov/sites/dot.gov/files/2023-06/Human%20Trafficking%20Response%20Guide%20for%20the%20Transportation%20Industry%20508.pdf
+    locator: Aviation p. 4
+    quote: Seem to be under the influence and/or unaware of their surroundings.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Indicators to Identify Trafficking in Human Beings for the Purpose of Organ Removal
+    publisher: de Jong & Ambagtsheer, Transplantation Direct / HOTT Project
+    year: '2016'
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4946497
+    locator: Indicators - Transport/entrance; Housing
+    quote: have not organized their own transport and/or do not know their destination
+    quote_verified: true
+    licence: CC BY-NC-ND 4.0
+    checked: '2026-10-09'
+  examples:
+  - A teenager at an airport cannot name the city she is flying to or who is meeting her.
+  - A worker cannot say the address of the house he lives in.
+  cases: []
+  data_needed:
+  - Person
+  - Event or travel booking (who booked and paid)
+  - Payment (ticket purchaser)
+  - Address (claimed destination)
+  checkable: person
+  lookup_sources:
+  - Airline and booking records (via authorities)
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: HT
+    reason: Ties to travel paid for by others (HT-039) and hotel booking anomalies (HT-037).
+    source_url: https://www.transportation.gov/sites/dot.gov/files/2023-06/Human%20Trafficking%20Response%20Guide%20for%20the%20Transportation%20Industry%20508.pdf
+  innocent_explanations:
+  - First-time travellers, children, or people with cognitive conditions may not know details.
+  - Jet lag, illness, medication or alcohol.
+  - Business or family travel arranged entirely by someone else.
+  jurisdictions: United States guidance; HOTT research (EU)
   version: 1
 not_reached:
 - 'FATF/APG ''Financial Flows from Human Trafficking'' (July 2018) Annex B indicator list: fatf-gafi.org
@@ -3215,3 +3963,18 @@ not_reached:
 - 'AP ''Seafood from Slaves'' (Benjina) reporting: not opened, so not used as a case.'
 - 'FinCEN FIN-2020-A008 case studies (Thai sex trafficking funnel accounts): names were not extracted,
   so not used as a case.'
+- 'UNODC Assessment Toolkit: Trafficking in Persons for the Purpose of Organ Removal (2015). I guessed
+  the PDF URL and the fetch failed; the search did not find a working link. I used the HOTT/de Jong &
+  Ambagtsheer (2016) indicator list, which the UNODC-linked research site names as the indicator source.'
+- UNODC Toolkit on the Investigation and Prosecution of Trafficking in Persons for Organ Removal (2022).
+  The toolkit page (unodc.org/.../glo-act2/tip-for-or-toolkit.html) and a guessed PDF URL both failed
+  to fetch, so its red-flag list was not read directly.
+- UNODC 2024 explainer 'Understanding Human Trafficking for Organ Removal'. The fetch failed.
+- The PMC page for de Jong & Ambagtsheer was blocked by a captcha. The full text came from the Europe
+  PMC REST API (same article, PMC4946497).
+- Netcare / St Augustine's Hospital (South Africa) organ-trafficking case. I could not verify it from
+  a primary source, so it was not used.
+- A documented case with tattoo branding (for HT-065). The search budget ran out before I found a court
+  or DOJ source.
+- The UNODC 2022 page's sentence on promised payments that never arrive was captured only as a paraphrase
+  by the fetch tool, not as an exact quote.

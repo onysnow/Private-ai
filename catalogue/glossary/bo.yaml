@@ -397,3 +397,220 @@ terms:
   indicators: []
   areas:
   - BO
+- term: Corporate director
+  definition: A company, rather than a human being, appointed as a director of another company.
+  examples: []
+  source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  cases: []
+  related:
+  - Shadow director
+  - Nominee director
+  indicators: []
+  areas:
+  - BO
+- term: Shadow director
+  definition: A person with no formal post whose instructions the company's directors usually follow.
+  examples:
+  - Companies (Guernsey) Law 2008, s.132, quoted in The Puppet Masters fn. 53
+  source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Protector (of a trust)
+  definition: A person given power over a trust's trustees, for example to veto their decisions or replace
+    them.
+  examples: []
+  source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  cases: []
+  related:
+  - Settlor
+  - Trustee
+  indicators: []
+  areas:
+  - BO
+- term: Economic settlor
+  definition: Someone who puts money or assets into a trust without being named as its settlor in the
+    trust documents.
+  examples: []
+  source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Flee clause
+  definition: A trust clause that makes the trustee move the trust's assets to another jurisdiction if
+    the trust is sued or investigated.
+  examples: []
+  source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  cases: []
+  related:
+  - Protector resettlement clause
+  - Mareva injunction
+  indicators: []
+  areas:
+  - BO
+- term: Protector resettlement clause
+  definition: A trust clause that lets the protector move the trust's assets quickly, often to get around
+    court freezing orders.
+  examples: []
+  source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Mareva injunction
+  definition: A court order freezing assets so they cannot be moved before a case is decided.
+  examples: []
+  source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Grand corruption
+  definition: Serious corruption, such as bribery, embezzlement or abuse of office, by high-level public
+    officials or senior officers of state-owned bodies.
+  examples: []
+  source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Chain of corporate vehicles (chaining)
+  definition: Two or more companies or trusts linked through ownership, stacked between the real owner
+    and the assets.
+  examples: []
+  source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: International Business Corporation (IBC)
+  definition: An offshore company used mainly by non-residents, barred from doing business in its home
+    jurisdiction and usually exempt from local tax.
+  examples: []
+  source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Aged shelf company
+  definition: A company formed years earlier and left dormant so it can be sold with a ready-made history.
+  examples: []
+  source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  cases: []
+  related:
+  - Shelf company
+  indicators: []
+  areas:
+  - BO
+- term: Company wholesaler / retailer (TCSP)
+  definition: A service provider that forms companies in bulk (wholesaler) and one that resells them to
+    clients (retailer).
+  examples: []
+  source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Fictitious entity / trading name
+  definition: A business name under which a person or company trades without a separately incorporated
+    company behind it, such as a sole proprietorship or 'doing business as' name.
+  examples: []
+  source_url: https://star.worldbank.org/sites/star/files/puppetmastersv1.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Limited partnership (LP)
+  definition: A business with at least one general partner who manages it and has unlimited liability,
+    and at least one limited partner whose liability is capped at what they put in.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/economic-crime-and-corporate-transparency-act-2023-factsheets/economic-crime-and-corporate-transparency-act-limited-partnerships
+  cases: []
+  related:
+  - General partner
+  - Limited partner
+  - Scottish limited partnership
+  indicators: []
+  areas:
+  - BO
+- term: General partner
+  definition: The partner in a limited partnership who runs the business and is fully liable for its debts.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/economic-crime-and-corporate-transparency-act-2023-factsheets/economic-crime-and-corporate-transparency-act-limited-partnerships
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Limited partner
+  definition: A partner who invests in a limited partnership, takes no part in running it, and can lose
+    only what they contributed.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/economic-crime-and-corporate-transparency-act-2023-factsheets/economic-crime-and-corporate-transparency-act-limited-partnerships
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Scottish limited partnership (SLP)
+  definition: A limited partnership registered in Scotland which, unlike other UK limited partnerships,
+    is a legal person in its own right.
+  examples: []
+  source_url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Legal personality
+  definition: The status of being a 'legal person' that can own property, sign contracts and sue or be
+    sued in its own name.
+  examples: []
+  source_url: https://www.gov.uk/government/publications/economic-crime-and-corporate-transparency-act-2023-factsheets/economic-crime-and-corporate-transparency-act-limited-partnerships
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Secrecy jurisdiction (TI-UK working definition)
+  definition: For TI-UK's 2017 SLP study, a jurisdiction scoring 60 or more on the Tax Justice Network's
+    Financial Secrecy Index (2015).
+  examples: []
+  source_url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO
+- term: Sham litigation
+  definition: A staged lawsuit over a fake debt, used to get a court order that makes a transfer of money
+    look lawful.
+  examples: []
+  source_url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+  cases: []
+  related:
+  - Global Laundromat
+  indicators: []
+  areas:
+  - BO
+- term: Global Laundromat
+  definition: A scheme reported by OCCRP and Novaya Gazeta that moved at least US$20.8 billion out of
+    Russia in 2010-2014 through thousands of shell entities, fake loans and Moldovan court orders.
+  examples: []
+  source_url: https://www.transparency.org.uk/sites/default/files/2025-11/Offshore_In_The_UK_TIUK_June_2017.pdf
+  cases: []
+  related: []
+  indicators: []
+  areas:
+  - BO

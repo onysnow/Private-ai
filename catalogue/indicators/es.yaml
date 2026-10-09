@@ -1,0 +1,2217 @@
+key: ES
+name: Espionage and insider threat
+scope: 'Espionage and insider threat (national security). CDSE Insider Threat Potential Risk Indicators
+  in 9 categories: Access Attributes; Professional Lifecycle and Performance; Foreign Considerations (foreign
+  passport, frequent unofficial foreign travel); Security and Compliance Incidents; Technical Activity
+  (unapproved USB device, transferring data to a personal or suspicious account); Criminal, Violent or
+  Abusive Conduct; Financial Considerations (delinquent debt, unexplained affluence); Substance Abuse
+  and Addictive Behaviours; Judgement, Character and Psychological Conditions.'
+indicators:
+- id: ES-001
+  name: Unauthorized contact with a foreign intelligence officer or agent
+  definition: The person meets or talks with someone known or believed to work for a foreign intelligence
+    service, without authorization or official reason.
+  areas:
+  - ES
+  typology: Foreign considerations
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: Center for Development of Security Excellence (CDSE), DCSA
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Foreign Considerations
+    quote: Unauthorized contact with an officer or agent of a foreign intelligence entity (FIE)
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: DoD Directive 5240.06, Counterintelligence Awareness and Reporting
+    publisher: US Department of Defense
+    year: 2011 (Change 2, 2017)
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 1, item 2
+    quote: Contact with an individual who is known or suspected of being associated with a foreign intelligence
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 32 CFR 147.4 Guideline B - Foreign influence
+    publisher: US Code of Federal Regulations (via Cornell LII)
+    url: https://www.law.cornell.edu/cfr/text/32/147.4
+    locator: 147.4(b)
+    quote: Unauthorized association with a suspected or known collaborator or employee of a foreign intelligence
+      service;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Kevin Mallory travelled to Shanghai in 2017 to meet a man he assessed to be a Chinese intelligence
+    officer (DOJ, 2019).
+  cases:
+  - name: United States v. Kevin Patrick Mallory
+    year: 2018 (conviction), 2019 (sentence)
+    jurisdiction: US, Eastern District of Virginia
+    what_happened: Former CIA officer travelled to Shanghai to meet a man he assessed to be a Chinese
+      intelligence officer, received a covert communications device, and scanned Secret and Top Secret
+      documents onto a micro SD card. Jury convicted him of conspiracy to deliver national defense information;
+      sentenced to 20 years.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/former-cia-officer-sentenced-prison-espionage
+    source_title: Former CIA Officer Sentenced to Prison for Espionage
+  data_needed:
+  - Person
+  - UnknownLink
+  - Associate
+  - Event
+  - Message
+  - Email
+  checkable: person
+  lookup_sources:
+  - court records and indictments
+  - official inquiry reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The person did not know the contact was an intelligence officer (approaches are often disguised as
+    business, academic or social contacts).
+  - Contact was authorised or part of official duties and reported.
+  - Diplomats and liaison officers are legitimately met in many jobs.
+  jurisdictions: United States (DoD and cleared industry); concept applies to any state
+  version: 1
+- id: ES-002
+  name: Failure to report required foreign contacts or associations
+  definition: The person has contact with foreign nationals or foreign officials that their rules require
+    them to report, and does not report it.
+  areas:
+  - ES
+  typology: Foreign considerations / security compliance
+  status: verified
+  sources:
+  - title: 32 CFR 147.4 Guideline B - Foreign influence
+    publisher: US Code of Federal Regulations (via Cornell LII)
+    url: https://www.law.cornell.edu/cfr/text/32/147.4
+    locator: 147.4(b)
+    quote: Failing to report, where required, associations with foreign nationals;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Security and Compliance Incidents
+    quote: Failure to self-report required information associated with holding a security clearance
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Ames met Soviet officials and the required contact reports were never filed; neither CIA nor FBI followed
+    up (Senate Intelligence Committee, 1994).
+  cases:
+  - name: Aldrich Ames
+    year: '1994'
+    jurisdiction: US
+    what_happened: The Senate Select Committee on Intelligence found that reports of Ames's meetings with
+      Soviet officials were never filed and not followed up. Ames and his wife pleaded guilty to espionage-related
+      charges on 28 April 1994.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://irp.fas.org/congress/1994_rpt/ssci_ames.htm
+    source_title: An Assessment of the Aldrich H. Ames Espionage Case and Its Implications for U.S. Intelligence
+      (SSCI, 1994)
+  data_needed:
+  - Person
+  - Associate
+  - UnknownLink
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - agency personnel security files (rarely public)
+  - court records
+  - official inquiry reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The person did not know the reporting rule applied to that contact.
+  - Administrative delay in filing paperwork.
+  - The contact was trivial or incidental.
+  jurisdictions: United States (cleared personnel)
+  version: 1
+- id: ES-003
+  name: Unexplained visits to foreign diplomatic facilities
+  definition: The person visits a foreign embassy or consulate for reasons that their job does not explain.
+  areas:
+  - ES
+  typology: Foreign considerations
+  status: verified
+  sources:
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 1, item 3
+    quote: Visits to foreign diplomatic facilities that are unexplained or inconsistent with an individual's
+      official duties.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Address
+  - Employment
+  checkable: person
+  lookup_sources:
+  - witness accounts
+  - surveillance or court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Visa, passport or consular services for the person or family.
+  - Cultural events or receptions open to the public.
+  - Dual nationals handling personal paperwork.
+  jurisdictions: United States (DoD)
+  version: 1
+- id: ES-004
+  name: Foreign trips that are short, illogical or unaffordable
+  definition: The person makes frequent unofficial foreign trips, or short trips that do not look like
+    holidays, or trips they could not afford on their income.
+  areas:
+  - ES
+  typology: Foreign considerations / travel
+  status: verified
+  sources:
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: 'Enclosure 4, Table 1, item 23a (also 23b: trips inconsistent with financial ability)'
+    quote: Short trips inconsistent with logical vacation travel or not part of official duties.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Foreign Considerations (also 'Foreign travel to countries of concern (Official or Non-Official)')
+    quote: Frequent foreign travel (excluding official travel)
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Mallory travelled to Shanghai in March and April 2017 to meet a suspected intelligence officer.
+  - Xiaolang Zhang bought a last-minute round-trip ticket to China with no co-travellers and was arrested
+    at San Jose airport (indictment, 2018).
+  cases:
+  - name: United States v. Xiaolang Zhang
+    year: 2018 (indictment), 2022 (plea)
+    jurisdiction: US, Northern District of California
+    what_happened: Apple engineer resigned saying he was returning to China, bought a last-minute ticket
+      to Beijing, and was arrested at the airport; his network activity had increased notably and he had
+      downloaded data from project databases. Fortune reported court documents showing he pleaded guilty
+      to one count of theft of trade secrets.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://justice.gov/usao-ndca/pr/former-apple-employee-indicted-theft-trade-secrets
+    source_title: Former Apple Employee Indicted On Theft Of Trade Secrets (DOJ, 2018); Fortune, 23 Aug
+      2022
+  data_needed:
+  - Person
+  - Event
+  - Payment
+  - Passport
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - court records
+  - travel records in case files
+  - social media posts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Family visits or emergencies abroad (Zhang cited an ill mother).
+  - Cheap fares or points travel make trips look unaffordable when they are not.
+  - Business travel for a second job or academic work.
+  jurisdictions: United States (DoD); widely applicable
+  version: 1
+- id: ES-005
+  name: Undisclosed or significant foreign status (citizenship, passport, residency, voting, service)
+  definition: The person holds a foreign passport or citizenship, lives abroad, votes in foreign elections
+    or has served a foreign military or government.
+  areas:
+  - ES
+  typology: Foreign considerations
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: 'Foreign Considerations (also: ''Voting in foreign election'', ''Foreign residency'', ''Service
+      in foreign military or government'', ''Citizenship (Threat or non-threat country – past/present)'')'
+    quote: Possessing foreign passport
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Passport
+  - Identification
+  - Address
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - leaked or court-filed passport records
+  - public voter rolls abroad
+  - biographies and CVs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Dual citizenship by birth or descent is common and lawful.
+  - Former residency or military service before emigrating.
+  - Holding a passport for family travel.
+  jurisdictions: United States (cleared personnel)
+  version: 1
+- id: ES-006
+  name: Foreign business, financial or political interests, or foreign benefits
+  definition: The person owns assets, runs or advises businesses, or receives benefits in a foreign country
+    in a way that could make them open to foreign pressure.
+  areas:
+  - ES
+  typology: Foreign considerations
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Foreign Considerations (also 'Possession of foreign assets', 'Receiving benefits from a foreign
+      nation')
+    quote: Foreign business or political interest
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 32 CFR 147.4 Guideline B - Foreign influence
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/cfr/text/32/147.4
+    locator: 147.4(b)
+    quote: A substantial financial interest in a country, or in any foreign owned or operated business
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Linwei Ding secretly affiliated himself with two PRC-based technology companies and applied to a Shanghai
+    talent plan while employed at Google (DOJ, 2026).
+  cases:
+  - name: United States v. Linwei Ding
+    year: '2026'
+    jurisdiction: US, Northern District of California
+    what_happened: Former Google engineer uploaded more than two thousand pages of confidential AI information
+      to his personal Google Cloud account while secretly affiliated with PRC companies, and applied to
+      a Shanghai talent plan. A jury found him guilty of economic espionage and theft of trade secrets.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/former-google-engineer-found-guilty-economic-espionage-and-theft-confidential-ai-technology
+    source_title: Former Google Engineer Found Guilty of Economic Espionage and Theft of Confidential
+      AI Technology
+  data_needed:
+  - Person
+  - Company
+  - Ownership
+  - Directorship
+  - Employment
+  - Payment
+  - Membership
+  checkable: lookups
+  lookup_sources:
+  - foreign company registries
+  - OpenCorporates
+  - talent-programme lists
+  - court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: SF
+    reason: Undisclosed ties to foreign state-linked companies and talent plans are also the route by
+      which controlled technology leaves the country.
+    source_url: https://www.justice.gov/opa/pr/former-google-engineer-found-guilty-economic-espionage-and-theft-confidential-ai-technology
+  innocent_explanations:
+  - Inherited property or family businesses abroad.
+  - Disclosed and approved outside business activity.
+  - Foreign pensions earned from earlier legitimate employment.
+  jurisdictions: United States; concept used widely
+  version: 1
+- id: ES-007
+  name: Close family, cohabitant or associate ties to a foreign country or government
+  definition: A spouse, family member, housemate or close associate is a foreign citizen or resident,
+    or is connected to a foreign government.
+  areas:
+  - ES
+  typology: Foreign considerations
+  status: verified
+  sources:
+  - title: 32 CFR 147.4 Guideline B - Foreign influence
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/cfr/text/32/147.4
+    locator: 147.4(b)
+    quote: Relatives, cohabitants, or associates who are connected with any foreign government;
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Foreign Considerations (also 'Living with foreign national')
+    quote: Foreign citizenship - spouse or cohabitant
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - Associate
+  - Address
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - marriage records
+  - social media
+  - foreign government staff lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Marriage to a foreign national is common and lawful.
+  - Immigrant families naturally have relatives abroad.
+  - The relative's government job is unrelated to intelligence.
+  jurisdictions: United States (cleared personnel)
+  version: 1
+- id: ES-008
+  name: Being placed under obligation or into a compromising position
+  definition: Someone tries to put the person in debt to them through gifts, favours or money, or to draw
+    them into situations that could be used for blackmail.
+  areas:
+  - ES
+  typology: Recruitment / coercion
+  status: verified
+  sources:
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 1, item 20 (also items 18-19 on enticement into blackmail or compromising
+      situations)
+    quote: Attempts to place DoD personnel or contractors under obligation through special treatment,
+      favors, gifts, or money.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 32 CFR 147.4 Guideline B - Foreign influence
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/cfr/text/32/147.4
+    locator: 147.4(b)
+    quote: Conduct which may make the individual vulnerable to coercion, exploitation, or pressure by
+      a foreign government;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Payment
+  - Associate
+  - UnknownLink
+  - Event
+  checkable: person
+  lookup_sources:
+  - gift and hospitality registers
+  - financial disclosure forms
+  - interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary business hospitality.
+  - Friendship gifts between colleagues.
+  - Sponsored conference travel that was disclosed and approved.
+  jurisdictions: United States (DoD)
+  version: 1
+- id: ES-009
+  name: Unexplained affluence
+  definition: The person spends or owns much more than their known income can explain.
+  areas:
+  - ES
+  typology: Financial considerations
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Financial Considerations
+    quote: Displaying signs of unexplained affluence
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 1, item 24a
+    quote: Expensive purchases an individual's income does not logically support.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 32 CFR 147.8 Guideline F - Financial considerations
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/cfr/text/32/147.8
+    locator: 147.8(a)
+    quote: Unexplained affluence is often linked to proceeds from financially profitable criminal acts.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Ames bought a new Jaguar and a $540,000 home in Arlington with cash while earning less than $70,000
+    a year (SSCI, 1994).
+  - Hanssen received cash payments of at least $500,000 and three diamonds from the KGB (DOJ OIG, 2003).
+  cases:
+  - name: Aldrich Ames
+    year: '1994'
+    jurisdiction: US
+    what_happened: Senate Intelligence Committee found Ames's large cash purchases on a salary under $70,000
+      did not draw attention, and the story that his wife came from a wealthy family 'seemed to diffuse
+      any security concern'. Ames pleaded guilty on 28 April 1994.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://irp.fas.org/congress/1994_rpt/ssci_ames.htm
+    source_title: SSCI Assessment of the Aldrich H. Ames Espionage Case (1994)
+  - name: Robert Philip Hanssen
+    year: 2001 (plea), 2003 (OIG review)
+    jurisdiction: US
+    what_happened: FBI agent spied in 1979-81, 1985-91 and 1999-2001, received at least $500,000 in cash
+      and diamonds; he was never asked to complete a detailed financial disclosure form. Pleaded guilty
+      6 July 2001, sentenced to life on 10 May 2002.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://oig.justice.gov/special/0308/index.htm
+    source_title: A Review of the FBI's Performance in Deterring, Detecting, and Investigating the Espionage
+      Activities of Robert Philip Hanssen (DOJ OIG, 2003)
+  data_needed:
+  - Person
+  - Payment
+  - RealEstate
+  - Vehicle
+  - Ownership
+  - Employment
+  - CryptoWallet
+  checkable: lookups
+  lookup_sources:
+  - property and land registry
+  - vehicle records
+  - court financial filings
+  - salary scales for public posts
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: ML
+    reason: Unexplained wealth relative to declared income is also a core money-laundering and corruption
+      red flag; espionage proceeds are often cash, gems or cryptocurrency.
+    source_url: https://www.law.cornell.edu/cfr/text/32/147.8
+  innocent_explanations:
+  - Inheritance, spouse's income or family wealth.
+  - Lawful side business, investments or lottery win.
+  - Debt-financed spending that looks like wealth.
+  jurisdictions: United States (cleared personnel); general financial-crime concept
+  version: 1
+- id: ES-010
+  name: Wealth explained by inheritance, gambling luck or a business windfall
+  definition: The person explains new money with a story such as an inheritance, gambling wins or a successful
+    business, which may be a cover.
+  areas:
+  - ES
+  typology: Financial considerations
+  status: verified
+  sources:
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 1, item 24b
+    quote: Attempts to explain wealth by reference to an inheritance, luck in gambling, or a successful
+      business venture.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Ames's spending was explained by his wife's supposedly wealthy family (SSCI, 1994).
+  cases:
+  - name: Aldrich Ames
+    year: '1994'
+    jurisdiction: US
+    what_happened: The family-wealth explanation for Ames's spending was accepted and not checked, per
+      the Senate Intelligence Committee.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://irp.fas.org/congress/1994_rpt/ssci_ames.htm
+    source_title: SSCI Assessment of the Aldrich H. Ames Espionage Case (1994)
+  data_needed:
+  - Person
+  - Family
+  - Payment
+  - Document
+  - Company
+  checkable: lookups
+  lookup_sources:
+  - probate court records
+  - company registry and filed accounts
+  - foreign family records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - The inheritance or win is real and documented (probate, casino records).
+  - A real business with filed accounts.
+  jurisdictions: United States (DoD)
+  version: 1
+- id: ES-011
+  name: Sudden reversal of a bad financial situation
+  definition: A person in financial trouble suddenly pays off large debts or recovers without a clear
+    source of money.
+  areas:
+  - ES
+  typology: Financial considerations
+  status: verified
+  sources:
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 1, item 24c
+    quote: Sudden reversal of a bad financial situation or repayment of large debts.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Debt
+  - Payment
+  - CourtCase
+  checkable: lookups
+  lookup_sources:
+  - court judgments and lien records (satisfaction filings)
+  - bankruptcy dockets
+  - credit-related court filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Debt consolidation loan or refinancing.
+  - Sale of a house or other asset.
+  - Family help or a new, better-paid job.
+  jurisdictions: United States (DoD)
+  version: 1
+- id: ES-012
+  name: 'Financial distress: debts, bankruptcy, foreclosure, liens, garnishment, unpaid taxes'
+  definition: The person is heavily in debt or failing to meet financial obligations, which can create
+    a motive to sell access.
+  areas:
+  - ES
+  typology: Financial considerations
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Financial Considerations (also 'Filing for bankruptcy', 'Foreclosure or repossession', 'Loan
+      default', 'Involuntary lien or unfavorable judgement', 'High debt-to-income ratio', 'Failure to
+      file tax returns', 'Pay garnishment')
+    quote: Delinquent debts
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 32 CFR 147.8 Guideline F - Financial considerations
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/cfr/text/32/147.8
+    locator: 147.8(a)
+    quote: An individual who is financially overextended is at risk of having to engage in illegal acts
+      to generate funds.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Espionage Against the United States by American Citizens 1947-2001 (PERSEREC TR 02-5)
+    publisher: Defense Personnel Security Research Center
+    year: '2002'
+    url: https://apps.dtic.mil/sti/pdfs/ADA411004.pdf
+    locator: Motives
+    quote: Americans most consistently have cited money as the dominant motive for espionage,
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Debt
+  - CourtCase
+  - RealEstate
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - bankruptcy court (PACER)
+  - county lien and judgment records
+  - foreclosure notices
+  - tax lien records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Medical bills, divorce or job loss.
+  - Most people in debt never commit any security offence.
+  - Economic downturns affecting whole groups.
+  jurisdictions: United States (cleared personnel)
+  version: 1
+- id: ES-013
+  name: Gambling problem
+  definition: The person has gambling losses or a gambling habit that creates money pressure.
+  areas:
+  - ES
+  typology: Financial considerations / addictive behaviour
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Financial Considerations
+    quote: Experienced gambling problem
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 32 CFR 147.8 Guideline F
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/cfr/text/32/147.8
+    locator: 147.8(b)
+    quote: Financial problems that are linked to gambling, drug abuse, alcoholism, or other issues of
+      security concern.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Debt
+  - Payment
+  checkable: person
+  lookup_sources:
+  - court debt records
+  - interviews
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Recreational gambling within means.
+  - Problem is known, treated and disclosed.
+  jurisdictions: United States (cleared personnel)
+  version: 1
+- id: ES-014
+  name: Seeking classified or sensitive information without clearance or need-to-know
+  definition: The person tries to get information they are not cleared for or that their job does not
+    require.
+  areas:
+  - ES
+  typology: Security and compliance
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Security and Compliance Incidents (also 'without proper clearance')
+    quote: Attempts to obtain national security information without need-to-know
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 1, item 6 (also item 5)
+    quote: Persons attempting to obtain access to sensitive information inconsistent with their duty requirements.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Teixeira ran hundreds of searches for classified documents unrelated to his duties (DOJ, 2024).
+  cases:
+  - name: United States v. Jack Douglas Teixeira
+    year: '2024'
+    jurisdiction: US, District of Massachusetts
+    what_happened: Air National Guardsman with a Top Secret//SCI clearance ran searches unrelated to his
+      duties, removed classified information and posted it on Discord; superiors twice warned him not
+      to take notes. Sentenced to 15 years.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/former-air-national-guardsman-sentenced-15-years-prison-unlawfully-disclosing-classified
+    source_title: Former Air National Guardsman Sentenced to 15 Years in Prison for Unlawfully Disclosing
+      Classified National Defense Information
+  - name: Department of the Air Force Inspector General investigation of the 102nd Intelligence Wing
+    year: '2023'
+    jurisdiction: US
+    what_happened: Investigation found individuals in Teixeira's unit failed to take proper action after
+      becoming aware of his intelligence-seeking activities; disciplinary actions followed.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://www.af.mil/News/Article-Display/Article/3613146/results-of-investigation-into-a1c-texieras-unit-following-unauthorized-disclosu/
+    source_title: Results of Investigation into A1C Teixeira's Unit following unauthorized disclosure
+      of classified documents
+  data_needed:
+  - Person
+  - Employment
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - court filings with audit-log evidence
+  - inspector general reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Curiosity or wish to learn beyond the job.
+  - Unclear job boundaries or new tasking not yet formalised.
+  - Training or research tasks.
+  jurisdictions: United States
+  version: 1
+- id: ES-015
+  name: Volunteering for duties to widen access
+  definition: The person keeps seeking assignments or roles that would give them access to more classified
+    material.
+  areas:
+  - ES
+  typology: Access seeking
+  status: verified
+  sources:
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 1, item 7
+    quote: Attempting to expand access to classified information by volunteering for assignments or duties...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Event
+  checkable: person
+  lookup_sources:
+  - personnel records
+  - interviews with colleagues
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Career ambition and wish for promotion.
+  - Unit staffing gaps.
+  jurisdictions: United States (DoD)
+  version: 1
+- id: ES-016
+  name: Excessive browsing of internal systems beyond duties, including searching for oneself
+  definition: The person browses internal files or databases far beyond what their job needs, including
+    checking whether they are under investigation.
+  areas:
+  - ES
+  typology: Technical activity
+  status: verified
+  sources:
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 3, item 12
+    quote: Excessive and abnormal intranet browsing, beyond the individual's duties and responsibilities,
+      of internal file
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: DOJ OIG review of the Hanssen case
+    publisher: US Department of Justice Office of the Inspector General
+    year: '2003'
+    url: https://oig.justice.gov/special/0308/index.htm
+    locator: Executive summary
+    quote: Hanssen also routinely searched the system for references to his own name and home address
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Hanssen searched FBI systems for his own name and address (DOJ OIG, 2003).
+  - Teixeira's searches unrelated to his duties (DOJ, 2024).
+  cases:
+  - name: Robert Philip Hanssen
+    year: '2003'
+    jurisdiction: US
+    what_happened: DOJ OIG found Hanssen routinely searched FBI systems for references to himself and
+      hacked into the FBI's computer system.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://oig.justice.gov/special/0308/index.htm
+    source_title: A Review of the FBI's Performance ... Robert Philip Hanssen
+  data_needed:
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - audit logs cited in court filings
+  - inspector general reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Poorly defined roles or broad research tasks.
+  - System administrators legitimately touch many files.
+  jurisdictions: United States
+  version: 1
+- id: ES-017
+  name: Off-hours access and unwarranted work outside normal hours
+  definition: The person accesses facilities or systems at unusual hours without a work reason.
+  areas:
+  - ES
+  typology: Security and compliance
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Security and Compliance Incidents (also 'Accessing DoD physical facilities at off-hours')
+    quote: Accessing DoD systems and applications at off-hours
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 1, item 17
+    quote: Unwarranted work outside of normal duty hours.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Employment
+  checkable: records
+  lookup_sources:
+  - badge and log records in case files
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Deadlines, shift work or time-zone work.
+  - Personal schedule preference.
+  - Remote or on-call duties.
+  jurisdictions: United States (DoD)
+  version: 1
+- id: ES-018
+  name: Removing classified or sensitive material from secure areas; unauthorised printing or copying
+  definition: The person prints, copies or carries protected material out of the secure place where it
+    must stay.
+  areas:
+  - ES
+  typology: Handling protected information
+  status: verified
+  sources:
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: 'Enclosure 4, Table 1, item 13 (also item 15: ''Unauthorized copying, printing, faxing, e-mailing,
+      or transmitting classified material.'')'
+    quote: Removing or sending classified or sensitive material out of secured areas without proper authorization.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 32 CFR 147.13 Guideline K - Security violations
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/cfr/text/32/147.13
+    locator: 147.13(b)
+    quote: Unauthorized disclosure of classified information
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Reality Winner printed a TOP SECRET//SCI report, removed it and mailed it to a news outlet (DOJ, 2018).
+  - Asif Rahman printed, removed and photographed Top Secret documents (DOJ, 2025).
+  - Ames said he routinely carried shopping bags of classified documents out of the office (SSCI, 1994).
+  cases:
+  - name: United States v. Reality Leigh Winner
+    year: '2018'
+    jurisdiction: US, Southern District of Georgia
+    what_happened: Federal contractor printed a TOP SECRET//SCI intelligence report, removed it from her
+      workplace and mailed it to an online news outlet; pleaded guilty and was sentenced to 63 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/federal-government-contractor-sentenced-removing-and-transmitting-classified-materials-news
+    source_title: Federal Government Contractor Sentenced for Removing and Transmitting Classified Materials
+      to a News Outlet
+  - name: United States v. Asif William Rahman
+    year: '2025'
+    jurisdiction: US, Eastern District of Virginia
+    what_happened: CIA analyst printed two Top Secret documents, removed and photographed them and sent
+      them to people not entitled to them; they appeared on social media. Pleaded guilty and was sentenced
+      to 37 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/former-cia-analyst-sentenced-over-three-years-prison-unlawfully-transmitting-top-secret
+    source_title: Former CIA Analyst Sentenced to Over Three Years in Prison for Unlawfully Transmitting
+      Top Secret National Defense Information
+  data_needed:
+  - Person
+  - Document
+  - Event
+  - Employment
+  checkable: records
+  lookup_sources:
+  - print logs and CCTV cited in court filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Careless handling or misunderstanding of marking rules.
+  - Printing for an authorised meeting and forgetting to return it.
+  jurisdictions: United States
+  version: 1
+- id: ES-019
+  name: Unauthorised storage of classified material, including at home
+  definition: The person keeps classified material somewhere it is not allowed, in any form, such as at
+    home or on a personal device.
+  areas:
+  - ES
+  typology: Handling protected information
+  status: verified
+  sources:
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 1, item 14
+    quote: Unauthorized storage of classified material, regardless of medium or location, to include...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The FBI found Mallory's micro SD card of scanned documents hidden in his home (DOJ, 2019).
+  cases:
+  - name: United States v. Kevin Patrick Mallory
+    year: '2019'
+    jurisdiction: US
+    what_happened: See ES-001; hidden SD card found at home after arrest.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/former-cia-officer-sentenced-prison-espionage
+    source_title: Former CIA Officer Sentenced to Prison for Espionage
+  data_needed:
+  - Person
+  - Document
+  - Address
+  - Event
+  checkable: records
+  lookup_sources:
+  - search warrant returns in court files
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Accidental retention after leaving a job.
+  - Taking work home in breach of rules but without intent to disclose.
+  jurisdictions: United States
+  version: 1
+- id: ES-020
+  name: Transmitting or discussing classified information by insecure means
+  definition: The person sends or talks about classified information over channels that are not approved,
+    such as ordinary phones, email or online platforms.
+  areas:
+  - ES
+  typology: Handling protected information
+  status: verified
+  sources:
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: 'Enclosure 4, Table 1, item 12 (also item 10: ''Discussions of classified information over
+      a non-secure communication device.'' and item 11)'
+    quote: Transmitting or transporting classified information by unsecured or unauthorized means.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Teixeira typed classified information into Discord (DOJ, 2024).
+  cases:
+  - name: United States v. Jack Douglas Teixeira
+    year: '2024'
+    jurisdiction: US
+    what_happened: See ES-014.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/archives/opa/pr/former-air-national-guardsman-sentenced-15-years-prison-unlawfully-disclosing-classified
+    source_title: Former Air National Guardsman Sentenced to 15 Years
+  data_needed:
+  - Person
+  - Message
+  - Email
+  - Document
+  - UserAccount
+  checkable: records
+  lookup_sources:
+  - platform posts preserved in court filings
+  - OSINT archives of leaked material
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Inadvertent spillage by someone unsure what is classified.
+  - Discussing publicly reported information that is still formally classified.
+  jurisdictions: United States
+  version: 1
+- id: ES-021
+  name: Removing or altering classification markings
+  definition: The person removes or changes the classification labels on documents, which can hide that
+    they are protected.
+  areas:
+  - ES
+  typology: Handling protected information
+  status: verified
+  sources:
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 1, item 16
+    quote: Improperly removing classification markings from documents or improperly changing classification
+      markings on documents.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Document
+  - Person
+  checkable: records
+  lookup_sources:
+  - leaked documents compared with originals
+  - court exhibits
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Authorised declassification or portion-marking corrections.
+  - Formatting errors when copying text.
+  jurisdictions: United States
+  version: 1
+- id: ES-022
+  name: Unapproved USB or removable media, and abnormal data volume to it
+  definition: The person plugs in unapproved USB devices, burns discs, or copies unusual amounts of data
+    to removable media.
+  areas:
+  - ES
+  typology: Technical activity
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Technical Activity (also 'Attempting to introduce unapproved USB device', 'Attempting to
+      burn discs without authorization')
+    quote: Anomalous volume of data transferred to removable media inserted in USB port
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 3, item 7
+    quote: Unauthorized use of Universal Serial Bus, removable media, or other transfer devices.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 32 CFR 147.15 Guideline M - Misuse of information technology systems
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/cfr/text/32/147.15
+    locator: 147.15(b)
+    quote: Removal (or use) of hardware, software, or media from any information technology system without
+      authorization
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Toebbe passed reactor data on SD cards hidden in a peanut butter sandwich and a gum package at dead
+    drops (DOJ, 2022).
+  cases:
+  - name: United States v. Jonathan and Diana Toebbe
+    year: '2022'
+    jurisdiction: US, Northern District of West Virginia
+    what_happened: Navy nuclear engineer offered Restricted Data on naval reactors to a foreign government,
+      left SD cards at dead drops and took cryptocurrency payments from an undercover FBI agent. Both
+      pleaded guilty; sentenced to 232 and 262 months.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://justice.gov/archives/opa/pr/maryland-nuclear-engineer-and-wife-sentenced-espionage-related-offenses
+    source_title: Maryland Nuclear Engineer and Wife Sentenced for Espionage-Related Offenses
+  data_needed:
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - endpoint logs cited in court filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Backing up personal files.
+  - Moving data between systems where no approved method exists.
+  - Charging a phone through a USB port.
+  jurisdictions: United States
+  version: 1
+- id: ES-023
+  name: Transferring data to personal, suspicious or foreign accounts and domains
+  definition: The person moves work data to a personal cloud or email account, to unknown domains, or
+    sends unauthorised email abroad.
+  areas:
+  - ES
+  typology: Technical activity / exfiltration
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Technical Activity
+    quote: Transfer data to personal or suspicious account
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: 'Enclosure 4, Table 3, item 14 (also item 10: ''Unauthorized e-mail traffic to foreign destinations.'')'
+    quote: Data exfiltrated to unauthorized domains.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Developing Controls to Prevent Theft of Intellectual Property (SEI blog, R. Trzeciak)
+    publisher: Software Engineering Institute, Carnegie Mellon University (CERT)
+    year: '2012'
+    url: https://www.sei.cmu.edu/blog/developing-controls-to-prevent-theft-of-intellectual-property
+    locator: Body text
+    quote: the primary vehicles for data exfiltration over the network are corporate email systems
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Ding uploaded more than two thousand pages of Google AI information to his personal Google Cloud account
+    (DOJ, 2026).
+  cases:
+  - name: United States v. Linwei Ding
+    year: '2026'
+    jurisdiction: US
+    what_happened: See ES-006.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/former-google-engineer-found-guilty-economic-espionage-and-theft-confidential-ai-technology
+    source_title: Former Google Engineer Found Guilty of Economic Espionage
+  data_needed:
+  - Person
+  - Email
+  - UserAccount
+  - Document
+  - Event
+  checkable: records
+  lookup_sources:
+  - court filings citing DLP or email logs
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Working from home with poor tools.
+  - Forwarding personal documents such as payslips or benefits forms.
+  jurisdictions: United States; applies to private-sector trade secrets too
+  version: 1
+- id: ES-024
+  name: Spike in downloading around resignation or departure
+  definition: The person's downloading or network activity rises sharply in the weeks around announcing
+    they will leave.
+  areas:
+  - ES
+  typology: Technical activity / IP theft by departing insiders
+  status: verified
+  sources:
+  - title: Developing Controls to Prevent Theft of Intellectual Property (SEI blog, R. Trzeciak)
+    publisher: Software Engineering Institute, Carnegie Mellon University (CERT)
+    year: '2012'
+    url: https://www.sei.cmu.edu/blog/developing-controls-to-prevent-theft-of-intellectual-property
+    locator: Body text
+    quote: the majority of the insiders (approximately 70 percent) who steal IP do so within 30 days of
+      announcing their resignation.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: A Pattern for Increased Monitoring for Intellectual Property Theft by Departing Insiders (ADA585504)
+    publisher: CERT Program, SEI (via DTIC)
+    url: https://apps.dtic.mil/sti/html/tr/ADA585504/index.html
+    locator: Abstract
+    quote: Our case data shows that many insiders who stole IP did so within 30 days of their termination.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Zhang's network activity increased notably compared with the prior two years before he resigned (DOJ
+    indictment, 2018).
+  - Ding downloaded the trade secrets to his personal computer less than two weeks before resigning (DOJ,
+    2026).
+  cases:
+  - name: United States v. Xiaolang Zhang
+    year: 2018-2022
+    jurisdiction: US
+    what_happened: See ES-004.
+    outcome: alleged_in_reporting
+    outcome_verified: true
+    source_url: https://justice.gov/usao-ndca/pr/former-apple-employee-indicted-theft-trade-secrets
+    source_title: Former Apple Employee Indicted On Theft Of Trade Secrets
+  data_needed:
+  - Person
+  - Employment
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - court filings in trade-secret cases
+  - employment dates from company registries or LinkedIn
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Heavy or unusual downloading of proprietary data within 30 days of resignation or termination
+      (CERT window)
+    threshold_source: https://www.sei.cmu.edu/blog/developing-controls-to-prevent-theft-of-intellectual-property
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Handover work and documenting projects before leaving.
+  - Collecting one's own personal files or portfolio.
+  - Project deadlines that coincide with departure.
+  jurisdictions: General (private and public sector)
+  version: 1
+- id: ES-025
+  name: Erasing or tampering with records; disabling security controls
+  definition: The person deletes or changes logs and records, or turns off anti-virus, firewalls or system
+    settings, often to hide activity.
+  areas:
+  - ES
+  typology: Technical activity / concealment
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Technical Activity (also 'Disabling anti-virus or firewall settings', 'Attempted modification
+      to registry or system settings')
+    quote: Erasing, modifying, or tampering with any record-keeping data
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 32 CFR 147.15 Guideline M
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/cfr/text/32/147.15
+    locator: 147.15(b)
+    quote: Illegal or unauthorized modification, destruction, manipulation or denial of access to information
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - After printing Top Secret documents, Rahman ran a deletion campaign of work product on his workstation
+    (DOJ, 2025).
+  cases:
+  - name: United States v. Asif William Rahman
+    year: '2025'
+    jurisdiction: US
+    what_happened: See ES-018; deletion of work product after the disclosure.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/former-cia-analyst-sentenced-over-three-years-prison-unlawfully-transmitting-top-secret
+    source_title: Former CIA Analyst Sentenced to Over Three Years in Prison
+  data_needed:
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - forensic findings in court filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Routine clean-up of old files.
+  - Turning off security software to fix a performance or compatibility problem.
+  jurisdictions: United States
+  version: 1
+- id: ES-026
+  name: Hacking, unauthorised software, privilege escalation or malicious code
+  definition: The person installs unapproved programs, cracks passwords, raises their own privileges,
+    hacks other accounts or introduces malware.
+  areas:
+  - ES
+  typology: Technical activity
+  status: verified
+  sources:
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 3, item 2 (also items 8, 17, 19)
+    quote: Password cracking, key logging, encryption, steganography, privilege escalation, and account
+      masquerading.
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Technical Activity (also 'Introducing malicious code')
+    quote: Introduction of unauthorized software
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 32 CFR 147.15 Guideline M
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/cfr/text/32/147.15
+    locator: 147.15(b)
+    quote: Illegal or unauthorized entry into any information technology system;
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Hanssen hacked into the FBI's computer system (DOJ OIG, 2003).
+  cases:
+  - name: Robert Philip Hanssen
+    year: '2003'
+    jurisdiction: US
+    what_happened: See ES-009 and ES-016.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://oig.justice.gov/special/0308/index.htm
+    source_title: DOJ OIG Hanssen review
+  data_needed:
+  - Person
+  - UserAccount
+  - Event
+  checkable: records
+  lookup_sources:
+  - court filings
+  - inspector general reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - IT staff testing security with permission.
+  - Installing a harmless productivity tool without knowing the rule.
+  jurisdictions: United States
+  version: 1
+- id: ES-027
+  name: Unexplained encrypted data or user accounts
+  definition: Encrypted files or user accounts appear on systems with no work explanation.
+  areas:
+  - ES
+  typology: Technical activity
+  status: verified
+  sources:
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 3, items 15 and 16 ('Unexplained user accounts.')
+    quote: Unexplained storage of encrypted data.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - UserAccount
+  - Document
+  - Person
+  checkable: records
+  lookup_sources:
+  - forensic reports in court files
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Legitimate use of encryption for privacy or compliance.
+  - Leftover test or service accounts.
+  jurisdictions: United States (DoD)
+  version: 1
+- id: ES-028
+  name: Misuse of privileged functions and access anomalies
+  definition: A user with admin or special rights uses them outside their purpose, or physical or system
+    access logs show unusual patterns.
+  areas:
+  - ES
+  typology: Security and compliance
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Security and Compliance Incidents (also 'Physical access anomalies', 'Virtual access anomalies')
+    quote: Misusing privileged functions
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Teixeira's job involved maintaining classified workstations for his unit (DOJ, 2024).
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - UserAccount
+  - Event
+  checkable: records
+  lookup_sources:
+  - court filings
+  - inspector general reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Admins must access many systems as part of normal work.
+  - Logging errors or shared accounts create false anomalies.
+  jurisdictions: United States (DoD)
+  version: 1
+- id: ES-029
+  name: Pattern of security infractions, violations or warnings
+  definition: The person repeatedly breaks security rules, is warned, or has a clearance denied, suspended
+    or revoked.
+  areas:
+  - ES
+  typology: Security and compliance
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Security and Compliance Incidents (also 'Security infraction', 'Security violation', 'Compliance
+      violation')
+    quote: Security clearance denial, suspension, or revocation
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: 32 CFR 147.13 Guideline K
+    publisher: Cornell LII
+    url: https://www.law.cornell.edu/cfr/text/32/147.13
+    locator: 147.13(b)
+    quote: Violations that are deliberate or multiple or due to negligence
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Ames left his briefcase on a subway train and left TOP SECRET communications equipment unsecured (SSCI,
+    1994).
+  - Teixeira's superiors twice warned him not to take notes on classified intelligence (DOJ, 2024).
+  cases:
+  - name: Aldrich Ames
+    year: '1994'
+    jurisdiction: US
+    what_happened: SSCI documented two significant security violations and noted no follow-up action.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://irp.fas.org/congress/1994_rpt/ssci_ames.htm
+    source_title: SSCI Ames assessment
+  data_needed:
+  - Person
+  - Employment
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - official inquiry reports
+  - court filings
+  - DOHA clearance appeal decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Inattention or overwork rather than intent.
+  - Strict or unclear rules produce minor infractions for many staff.
+  jurisdictions: United States
+  version: 1
+- id: ES-030
+  name: Unauthorised cameras, recorders or surveillance devices in secure areas
+  definition: Recording or communication devices are used where they are banned, or listening devices
+    are found in secure spaces.
+  areas:
+  - ES
+  typology: Handling protected information
+  status: verified
+  sources:
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 1, items 8 and 9
+    quote: Discovery of suspected listening or surveillance devices in classified or secure areas.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Rahman photographed Top Secret documents (DOJ, 2025).
+  cases: []
+  data_needed:
+  - Person
+  - Event
+  - Document
+  checkable: records
+  lookup_sources:
+  - court filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Forgetting to leave a phone or smartwatch outside.
+  jurisdictions: United States (DoD)
+  version: 1
+- id: ES-031
+  name: Suspicious requests for information and elicitation
+  definition: Someone asks the person for information in a way that is odd, probing, or does not fit their
+    role, including by email spoofing or phishing.
+  areas:
+  - ES
+  typology: Recruitment / elicitation
+  status: verified
+  sources:
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 1, item 22; Table 3, item 18 ('Social engineering, electronic elicitation,
+      e-mail spoofing or spear phishing.')
+    quote: Requests for DoD information that make an individual suspicious, to include suspicious or questionable...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Email
+  - Message
+  - Associate
+  checkable: person
+  lookup_sources:
+  - emails or messages held by the case
+  - professional networking profiles of the requester
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Genuine academic, journalistic or business enquiries.
+  - Recruiters asking about experience.
+  jurisdictions: United States (DoD)
+  version: 1
+- id: ES-032
+  name: Requests to witness destruction of classified material the witness did not see
+  definition: The person asks a colleague to sign that classified material was destroyed when the colleague
+    did not watch it happen.
+  areas:
+  - ES
+  typology: Handling protected information
+  status: verified
+  sources:
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 1, item 21
+    quote: Requests for witness signatures certifying the destruction of classified information when the
+      witness...
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Event
+  checkable: person
+  lookup_sources:
+  - interviews
+  - destruction logs in case files
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Sloppy office practice under time pressure.
+  jurisdictions: United States (DoD)
+  version: 1
+- id: ES-033
+  name: Declining performance, discipline, demotion or pending separation
+  definition: 'The person''s career is going badly: poor ratings, reprimands, demotion, suspension or
+    a pending exit.'
+  areas:
+  - ES
+  typology: Professional lifecycle and performance
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Professional Lifecycle and Performance (also 'Demotion', 'Suspension', 'Pending involuntary
+      separation', 'Reprimand/Non-Judicial Punishment')
+    quote: Declining performance ratings
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The SSCI found Ames's job performance in Rome 'mediocre to poor' (1994).
+  cases:
+  - name: Aldrich Ames
+    year: '1994'
+    jurisdiction: US
+    what_happened: SSCI noted poor performance and that his Rome tour was extended despite it.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://irp.fas.org/congress/1994_rpt/ssci_ames.htm
+    source_title: SSCI Ames assessment
+  data_needed:
+  - Person
+  - Employment
+  - Event
+  checkable: records
+  lookup_sources:
+  - employment tribunal or court records
+  - official inquiry reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Illness, family stress or a bad manager.
+  - Restructuring and redundancies.
+  jurisdictions: United States (DoD)
+  version: 1
+- id: ES-034
+  name: Expressed ill-will or disgruntlement toward the employer or government
+  definition: The person openly expresses grievance, hostility or contempt toward their employer or government.
+  areas:
+  - ES
+  typology: Judgement, character and psychological conditions
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Judgement, Character, and Psychological Conditions (also 'Negative characterization of previous
+      employment or service')
+    quote: Expressing ill-will towards USG or employing organization
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: Espionage Against the United States by American Citizens 1947-2001 (PERSEREC TR 02-5)
+    publisher: Defense Personnel Security Research Center
+    year: '2002'
+    url: https://apps.dtic.mil/sti/pdfs/ADA411004.pdf
+    locator: Motives
+    quote: 'Among volunteer spies, disgruntlement with the workplace was cited as a significant motive:'
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Message
+  - Document
+  checkable: person
+  lookup_sources:
+  - social media
+  - interviews
+  - grievance filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Ordinary workplace complaints and political criticism are lawful and common.
+  - Whistleblowers raising real concerns through proper channels.
+  jurisdictions: United States
+  version: 1
+- id: ES-035
+  name: Extremist views or association with extremist or terrorist groups
+  definition: The person communicates extremist views or associates with or helps extremist or terrorist
+    groups.
+  areas:
+  - ES
+  - VE
+  typology: Judgement, character and psychological conditions
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Judgement, Character, and Psychological Conditions (also 'Communicating extremist views',
+      'Enabling or facilitating an extremist or terrorist group')
+    quote: Associating with extremist or terrorist groups
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: DoD Directive 5240.06
+    publisher: US Department of Defense
+    url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+    locator: Enclosure 4, Table 2, item 1
+    quote: Advocating violence, the threat of violence, or the use of force to achieve goals on behalf
+      of a known or suspected
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Membership
+  - Associate
+  - Message
+  checkable: person
+  lookup_sources:
+  - social media and forum archives
+  - court records
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: VE
+    reason: Both CDSE and DoDD 5240.06 (Table 2, international terrorism) treat extremist advocacy by
+      an insider as reportable; an insider with weapons or explosives access who expresses extremist views
+      also belongs in the violent-mobilisation catalogue.
+    source_url: https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodd/524006p.pdf
+  innocent_explanations:
+  - Lawful but strongly held political or religious views.
+  - Research or journalism on extremist groups.
+  jurisdictions: United States
+  version: 1
+- id: ES-036
+  name: Substance abuse
+  definition: The person misuses drugs or alcohol, fails drug tests, or has work incidents involving substances.
+  areas:
+  - ES
+  typology: Substance abuse and addictive behaviours
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Substance Abuse and Addictive Behaviors (also 'Illegal substance use or trafficking', 'Drug
+      test failure')
+    quote: Incident at work involving alcohol abuse or legal substance abuse
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - The SSCI found Ames 'was drunk about three times a week between 1986 and 1988' and no official action
+    followed an incident (1994).
+  cases:
+  - name: Aldrich Ames
+    year: '1994'
+    jurisdiction: US
+    what_happened: SSCI documented well-known alcohol dependency without official action.
+    outcome: found_by_official_inquiry
+    outcome_verified: true
+    source_url: https://irp.fas.org/congress/1994_rpt/ssci_ames.htm
+    source_title: SSCI Ames assessment
+  data_needed:
+  - Person
+  - CourtCase
+  - Employment
+  - Event
+  checkable: person
+  lookup_sources:
+  - court records (DUI, possession)
+  - official inquiry reports
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Addiction is a health condition and most people with it are not spies.
+  - Past problem now treated.
+  jurisdictions: United States
+  version: 1
+- id: ES-037
+  name: 'Dishonesty: falsified hiring or work data, past untruthfulness, failed polygraph'
+  definition: The person has lied on hiring forms, falsified work data, been untruthful before, or failed
+    a polygraph.
+  areas:
+  - ES
+  typology: Judgement, character and psychological conditions
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Judgement, Character, and Psychological Conditions (also 'Falsifying data at place of work',
+      'Failure to successfully complete a polygraph')
+    quote: Falsifying hiring information
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Document
+  - Employment
+  checkable: lookups
+  lookup_sources:
+  - degree and employment verification
+  - court records
+  - DOHA clearance decisions
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Honest mistakes on long forms.
+  - Polygraph results are unreliable and can be failed by truthful people.
+  jurisdictions: United States
+  version: 1
+- id: ES-038
+  name: Criminal, violent or threatening conduct, including weapons misuse
+  definition: The person has criminal arrests or convictions, threatens or uses violence, mishandles weapons,
+    or breaks court or probation orders.
+  areas:
+  - ES
+  typology: Criminal, violent or abusive conduct
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Criminal, Violent, or Abusive Conduct (also 'Threatening violence', 'Possessing unauthorized
+      weapon', 'Criminal affiliations', 'Failure to follow court order')
+    quote: Exhibiting violence at work (directed against property or persons)
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - CourtCase
+  - Sanction
+  - Associate
+  checkable: lookups
+  lookup_sources:
+  - criminal court records
+  - sex-offender and protective-order registries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: VE
+    reason: CDSE lists workplace violence, threats and weapons misuse alongside explosives/CBRN access;
+      together these overlap with mobilisation-to-violence indicators.
+    source_url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+  innocent_explanations:
+  - Old or minor offences unrelated to trustworthiness.
+  - Charges later dropped or acquitted.
+  jurisdictions: United States
+  version: 1
+- id: ES-039
+  name: Outside employment not in line with official rules
+  definition: The person takes on side jobs or roles that they have not declared or that break their employer's
+    rules.
+  areas:
+  - ES
+  typology: Security and compliance / conflict of interest
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Security and Compliance Incidents
+    quote: Outside employment not in accordance with official guidelines
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Ding founded and acted as CEO of his own PRC AI company while employed at Google (DOJ, 2026).
+  cases:
+  - name: United States v. Linwei Ding
+    year: '2026'
+    jurisdiction: US
+    what_happened: See ES-006.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://www.justice.gov/opa/pr/former-google-engineer-found-guilty-economic-espionage-and-theft-confidential-ai-technology
+    source_title: Former Google Engineer Found Guilty of Economic Espionage
+  data_needed:
+  - Person
+  - Employment
+  - Directorship
+  - Company
+  - Ownership
+  checkable: lookups
+  lookup_sources:
+  - company registries (domestic and foreign)
+  - LinkedIn and conference speaker lists
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Side work that was declared and approved.
+  - Unpaid advisory or family business roles.
+  jurisdictions: United States
+  version: 1
+- id: ES-040
+  name: Personal crisis shortly before suspect activity
+  definition: The person went through a major personal crisis, such as divorce or a death, in the months
+    before the suspected disclosure began.
+  areas:
+  - ES
+  typology: Context / stressors
+  status: verified
+  sources:
+  - title: Espionage Against the United States by American Citizens 1947-2001 (PERSEREC TR 02-5)
+    publisher: Defense Personnel Security Research Center
+    year: '2002'
+    url: https://apps.dtic.mil/sti/pdfs/ADA411004.pdf
+    locator: Findings on volunteers; the same report finds about one-fourth of spies experienced a personal
+      crisis in the months before espionage (paraphrase, not quoted)
+    quote: twice as many Americans volunteered to commit espionage as were recruited into it.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples: []
+  cases: []
+  data_needed:
+  - Person
+  - Family
+  - CourtCase
+  - Event
+  checkable: person
+  lookup_sources:
+  - divorce and probate court records
+  - obituaries
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Life crises are very common; nearly everyone who has one does nothing wrong.
+  - PERSEREC itself warns such factors cannot predict espionage.
+  jurisdictions: Research finding (US cases)
+  version: 1
+- id: ES-041
+  name: Holding high-value access (clearance, privileged roles, CBRN or explosives access)
+  definition: 'The person has access worth targeting: high clearance, secure facilities, privileged system
+    roles, or access to explosives or chemical, biological, radiological or nuclear material.'
+  areas:
+  - ES
+  typology: Access attributes (context, not wrongdoing)
+  status: verified
+  sources:
+  - title: Insider Threat - Potential Risk Indicators (PRI) job aid
+    publisher: CDSE
+    url: https://www.information.marines.mil/Portals/224/Docs/BTAC/CDSE_insider_threat_indicators_job_aid.pdf
+    locator: Access Attributes (also 'Security clearance and information access', 'CBRN access or training',
+      'Explosives access or training')
+    quote: DoD system(s) privileged user
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Teixeira held a Top Secret//SCI clearance and maintained classified workstations (DOJ, 2024).
+  - Toebbe had access to Restricted Data on naval reactors (DOJ, 2022).
+  cases: []
+  data_needed:
+  - Person
+  - Employment
+  - Identification
+  checkable: records
+  lookup_sources:
+  - job postings and CVs naming clearance level
+  - court filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints: []
+  innocent_explanations:
+  - Access alone is not a warning sign; it only raises the stakes when other indicators appear.
+  jurisdictions: United States
+  version: 1
+- id: ES-042
+  name: Cryptocurrency or covert payment methods tied to information handover
+  definition: The person receives payment for information through hard-to-trace methods such as cryptocurrency,
+    cash or valuables, often arranged with dead drops.
+  areas:
+  - ES
+  typology: Financial considerations / tradecraft
+  status: verified
+  sources:
+  - title: Maryland Nuclear Engineer and Wife Sentenced for Espionage-Related Offenses
+    publisher: US Department of Justice
+    year: '2022'
+    url: https://justice.gov/archives/opa/pr/maryland-nuclear-engineer-and-wife-sentenced-espionage-related-offenses
+    locator: Press release 22-1207 (describes $10,000, $20,000 and $70,000 cryptocurrency payments)
+    quote: concealed within half a peanut butter sandwich
+    quote_verified: true
+    checked: '2026-10-09'
+  - title: DOJ OIG review of the Hanssen case
+    publisher: DOJ Office of the Inspector General
+    year: '2003'
+    url: https://oig.justice.gov/special/0308/index.htm
+    locator: Executive summary
+    quote: In return, the KGB gave Hanssen cash payments of at least $500,000, as well as three diamonds.
+    quote_verified: true
+    checked: '2026-10-09'
+  examples:
+  - Toebbe received cryptocurrency payments from an undercover FBI agent posing as a foreign representative.
+  cases:
+  - name: United States v. Jonathan and Diana Toebbe
+    year: '2022'
+    jurisdiction: US
+    what_happened: See ES-022.
+    outcome: convicted
+    outcome_verified: true
+    source_url: https://justice.gov/archives/opa/pr/maryland-nuclear-engineer-and-wife-sentenced-espionage-related-offenses
+    source_title: Maryland Nuclear Engineer and Wife Sentenced
+  data_needed:
+  - Person
+  - Payment
+  - CryptoWallet
+  - Event
+  - Address
+  checkable: lookups
+  lookup_sources:
+  - blockchain explorers
+  - court filings
+  levels:
+    faint: To be set by Ony
+    strong: To be set by Ony
+    textbook: Meets the published definition as worded
+    threshold_source: none
+  threshold_verified: true
+  cross_hints:
+  - target_area: CY
+    reason: Espionage proceeds paid in cryptocurrency create on-chain trails that crypto-tracing indicators
+      can follow.
+    source_url: https://justice.gov/archives/opa/pr/maryland-nuclear-engineer-and-wife-sentenced-espionage-related-offenses
+  innocent_explanations:
+  - Lawful crypto investing or trading.
+  - Cash-heavy legitimate side income.
+  jurisdictions: United States (case-derived; not on an official checklist)
+  version: 1
+not_reached:
+- 'FBI brochure ''The Insider Threat: An Introduction to Detecting and Deterring an Insider Spy'' (fbi.gov/file-repository/insider_threat_brochure.pdf):
+  WebFetch returned no indicator text, so its personal and organisational factor lists were not used.'
+- 'FBI counterintelligence insider threat page (fbi.gov/investigate/counterintelligence/the-insider-threat):
+  fetch error.'
+- 'SEAD 4 National Security Adjudicative Guidelines (archive.dni.gov PDF): no machine-readable text. The
+  older 32 CFR Part 147 guidelines were used instead; SEAD 4 wording may differ.'
+- 'eCFR 32 CFR part 147: fetch error (Cornell LII copy used).'
+- 'PERSEREC ''The Expanding Spectrum of Espionage by Americans, 1947-2015'' (irp.fas.org/eprint/spectrum.pdf):
+  empty response. The 2002 PERSEREC report was used instead.'
+- Direct curl of the CDSE PDF and justice.gov pages was blocked by bot checks; quotes came through WebFetch,
+  which returns quoted extracts, not the raw file. Spot-check the wording against the originals before
+  publishing.
+- Air Force IG directed inspection PDF (afinspectorgeneral.af.mil) was not opened; only the af.mil summary
+  article was read.
+- 'Xiaolang Zhang guilty plea: no DOJ plea or sentencing release was opened; the plea rests on Fortune''s
+  report of court documents (23 Aug 2022).'
+- CERT Common Sense Guide to Mitigating Insider Threats (7th ed.) and the CISA Insider Threat Mitigation
+  Guide PDF were not opened.
+- UK NPSA / CPNI insider-risk guidance and Five Eyes 'Think Before You Link' material were not reached
+  (non-US coverage gap).
+- The PERSEREC finding that about one-fourth of spies had a personal crisis beforehand (ES-040) is paraphrased
+  from WebFetch output and not quoted exactly.
