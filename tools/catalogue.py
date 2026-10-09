@@ -74,7 +74,8 @@ def area_key(text: str) -> str | None:
     return None
 
 
-WEAK_FIT = re.compile(r"weak fit|only a general example|does not specifically|loosely relevant|only loosely|loose fit|fit caveat|narrow the case|true only for", re.IGNORECASE)
+SOURCE_SHORT = re.compile(r"cannot confirm|swap in|needs a (?:verdict|sentencing|court|different|better)|source (?:does not|doesn't) (?:say|confirm|report|show)", re.IGNORECASE)
+WEAK_FIT = re.compile(r"weakly support|weak support|weak fit|only a general example|does not specifically|loosely relevant|only loosely|loose fit|fit caveat|narrow the case|true only for", re.IGNORECASE)
 
 
 def norm(s: str) -> str:
@@ -120,7 +121,9 @@ def ingest(paths: list[str]) -> None:
                         if WEAK_FIT.search(cv.get("note") or ""):
                             continue  # the checker found the case does not show this indicator
                         if cv.get("correct_outcome") in Outcome.__members__:
-                            outcome, ok = cv["correct_outcome"], True
+                            # the checker's outcome counts as checked only if the cited
+                            # source itself shows it (an indictment cannot show a conviction)
+                            outcome, ok = cv["correct_outcome"], not SOURCE_SHORT.search(cv.get("note") or "")
                         elif cv.get("outcome_confirmed"):
                             ok = True
                     cases.append({**{k: c.get(k) for k in ("name", "year", "jurisdiction", "what_happened", "source_url", "source_title")},
