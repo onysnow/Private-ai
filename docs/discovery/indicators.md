@@ -14,7 +14,7 @@ Status: proposed, 8 October 2026. The catalogue's data and tools exist (`catalog
 
 ## One source of truth
 
-- **Files.** `catalogue/indicators/<area>.yaml` (one per area, 13 areas) and `catalogue/glossary/<area>.yaml`. The shape is defined by the Pydantic models in `backend/app/catalogue/models.py`, and the JSON Schema in `catalogue/schema/` is exported from them.
+- **Files.** `catalogue/indicators/<area>.yaml` (one per area, 22 areas) and `catalogue/glossary/<area>.yaml`. The shape is defined by the Pydantic models in `backend/app/catalogue/models.py`, and the JSON Schema in `catalogue/schema/` is exported from them.
 - **Verified or pending.** An indicator is `verified` only when every quote was found word for word at its source, every case outcome was confirmed, and any threshold number was found in its cited source. The models refuse an indicator marked verified that is not. Only verified indicators reach Red Flags and the PDF; pending ones stay in the files with what is missing.
 - **Three outputs, one input.** Red Flags, the glossary page and the PDF are all made from these files. Correcting an indicator is one edit and one commit.
 - **Research and checking.** Each area was collected by one research agent and checked by a second agent that re-opened every source (`tools/catalogue.py ingest` applies the checker's verdicts). The broader evidence base is in `indicators-research.md`.
